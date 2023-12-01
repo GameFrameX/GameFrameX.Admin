@@ -1,0 +1,115 @@
+﻿using Admin.NET.Core;
+using System.ComponentModel.DataAnnotations;
+
+namespace @Model.NameSpace;
+
+    /// <summary>
+    /// @(@Model.BusName)基础输入参数
+    /// </summary>
+    public class @(@Model.ClassName)BaseInput
+    {
+@foreach (var column in Model.TableField){
+if (@column.ColumnKey != "True"){
+
+        @:/// <summary>
+        @:/// @column.ColumnComment
+        @:/// </summary>
+        @:public virtual @column.NetType @column.PropertyName { get; set; }
+        @:
+}
+}
+    }
+
+    /// <summary>
+    /// @(@Model.BusName)分页查询输入参数
+    /// </summary>
+    public class @(@Model.ClassName)Input : BasePageInput
+    {
+        /// <summary>
+        /// 关键字查询
+        /// </summary>
+        public string? SearchKey { get; set; }
+
+@foreach (var column in Model.TableField){
+    if (@column.QueryWhether == "Y"){
+
+        @:/// <summary>
+        @:/// @column.ColumnComment
+        @:/// </summary>
+        if(@column.NetType?.EndsWith("?") == true){
+        @:public @column.NetType @column.PropertyName { get; set; }
+        }else {
+        @:public @(@column.NetType)? @column.PropertyName { get; set; }
+        }
+        @:
+
+    if(@column.NetType?.TrimEnd('?') == "DateTime" && @column.QueryType == "~"){
+        @:/// <summary>
+        @: /// @(@column.ColumnComment)范围
+        @: /// </summary>
+        @: public List<DateTime?> @(@column.PropertyName)Range { get; set; } 
+
+}
+
+}
+}
+    }
+
+    /// <summary>
+    /// @(@Model.BusName)增加输入参数
+    /// </summary>
+    public class Add@(@Model.ClassName)Input : @(@Model.ClassName)BaseInput
+    {
+@foreach (var column in Model.TableField){
+if (@column.WhetherRequired == "Y"){
+        @:/// <summary>
+        @:/// @column.ColumnComment
+        @:/// </summary>
+        @:[Required(ErrorMessage = "@(@column.ColumnComment)不能为空")]
+        @:public override @column.NetType @column.PropertyName { get; set; }
+        @:
+}
+}
+    }
+
+    /// <summary>
+    /// @(@Model.BusName)删除输入参数
+    /// </summary>
+    public class Delete@(@Model.ClassName)Input : BaseIdInput
+    {
+@foreach (var column in Model.TableField){
+if (@column.ColumnKey == "True" && @column.PropertyName != "Id"){
+        @:/// <summary>
+        @:/// @column.ColumnComment
+        @:/// </summary>
+        @:[Required(ErrorMessage = "@(@column.ColumnComment)不能为空")]
+        @:public @column.NetType @column.PropertyName { get; set; }
+        @:
+}
+}
+    }
+
+    /// <summary>
+    /// @(@Model.BusName)更新输入参数
+    /// </summary>
+    public class Update@(@Model.ClassName)Input : @(@Model.ClassName)BaseInput
+    {
+@foreach (var column in Model.TableField){
+if (@column.ColumnKey == "True"){
+        @:/// <summary>
+        @:/// @column.ColumnComment
+        @:/// </summary>
+        @:[Required(ErrorMessage = "@(@column.ColumnComment)不能为空")]
+        @:public @column.NetType @column.PropertyName { get; set; }
+        @:
+}
+}
+    }
+
+    /// <summary>
+    /// @(@Model.BusName)主键查询输入参数
+    /// </summary>
+    public class QueryById@(@Model.ClassName)Input : Delete@(@Model.ClassName)Input
+    {
+
+    }
