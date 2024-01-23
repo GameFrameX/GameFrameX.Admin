@@ -7,7 +7,14 @@
 // 软件按“原样”提供，不提供任何形式的明示或暗示的保证，包括但不限于对适销性、适用性和非侵权的保证。
 // 在任何情况下，作者或版权持有人均不对任何索赔、损害或其他责任负责，无论是因合同、侵权或其他方式引起的，与软件或其使用或其他交易有关。
 
-namespace Admin.NET.Plugin.GoView.Service;
+using GameFrameX.Core.Entity;
+using GameFrameX.Core.Service.File;
+using GameFrameX.Core.SqlSugar;
+using GameFrameX.Plugin.GoView.Const;
+using GameFrameX.Plugin.GoView.Entity;
+using GameFrameX.Plugin.GoView.Service.GoViewPro.Dto;
+
+namespace GameFrameX.Plugin.GoView.Service.GoViewPro;
 
 /// <summary>
 /// 项目管理服务
@@ -16,12 +23,12 @@ namespace Admin.NET.Plugin.GoView.Service;
 [ApiDescriptionSettings(GoViewConst.GroupName, Module = "goview", Name = "project", Order = 100)]
 public class GoViewProService : IDynamicApiController
 {
-    private readonly SqlSugarRepository<GoViewPro> _goViewProRep;
+    private readonly SqlSugarRepository<Entity.GoViewPro> _goViewProRep;
     private readonly SqlSugarRepository<GoViewProData> _goViewProDataRep;
     private readonly SqlSugarRepository<SysFile> _sysFileRep;
     private readonly SysFileService _fileService;
 
-    public GoViewProService(SqlSugarRepository<GoViewPro> goViewProjectRep,
+    public GoViewProService(SqlSugarRepository<Entity.GoViewPro> goViewProjectRep,
         SqlSugarRepository<GoViewProData> goViewProjectDataRep,
         SqlSugarRepository<SysFile> fileRep,
         SysFileService fileService)
@@ -56,7 +63,7 @@ public class GoViewProService : IDynamicApiController
     [DisplayName("新增项目")]
     public async Task<GoViewProCreateOutput> Create(GoViewProCreateInput input)
     {
-        var project = await _goViewProRep.AsInsertable(input.Adapt<GoViewPro>()).ExecuteReturnEntityAsync();
+        var project = await _goViewProRep.AsInsertable(input.Adapt<Entity.GoViewPro>()).ExecuteReturnEntityAsync();
         return new GoViewProCreateOutput
         {
             Id = project.Id
@@ -71,7 +78,7 @@ public class GoViewProService : IDynamicApiController
     [DisplayName("修改项目")]
     public async Task Edit(GoViewProEditInput input)
     {
-        await _goViewProRep.AsUpdateable(input.Adapt<GoViewPro>()).IgnoreColumns(true).ExecuteCommandAsync();
+        await _goViewProRep.AsUpdateable(input.Adapt<Entity.GoViewPro>()).IgnoreColumns(true).ExecuteCommandAsync();
     }
 
     /// <summary>
@@ -95,7 +102,7 @@ public class GoViewProService : IDynamicApiController
     public async Task Publish(GoViewProPublishInput input)
     {
         await _goViewProRep.AsUpdateable()
-            .SetColumns(u => new GoViewPro
+            .SetColumns(u => new Entity.GoViewPro
             {
                 State = input.State
             })

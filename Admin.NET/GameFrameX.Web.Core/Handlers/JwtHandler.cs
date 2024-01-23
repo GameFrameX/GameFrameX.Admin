@@ -7,18 +7,21 @@
 // 软件按“原样”提供，不提供任何形式的明示或暗示的保证，包括但不限于对适销性、适用性和非侵权的保证。
 // 在任何情况下，作者或版权持有人均不对任何索赔、损害或其他责任负责，无论是因合同、侵权或其他方式引起的，与软件或其使用或其他交易有关。
 
-using Admin.NET.Core;
-using Admin.NET.Core.Service;
+using System;
+using System.Threading.Tasks;
 using Furion;
 using Furion.Authorization;
 using Furion.DataEncryption;
+using GameFrameX.Core.Const;
+using GameFrameX.Core.Enum;
+using GameFrameX.Core.Service.Config;
+using GameFrameX.Core.Service.Menu;
+using GameFrameX.Core.SignatureAuth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Threading.Tasks;
 
-namespace Admin.NET.Web.Core
+namespace GameFrameX.Web.Core.Handlers
 {
     public class JwtHandler : AppAuthorizeHandler
     {

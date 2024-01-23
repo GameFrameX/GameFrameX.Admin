@@ -10,7 +10,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 
-namespace Admin.NET.Application;
+namespace GameFrameX.Application;
 
 [AppStartup(100)]
 public class Startup : AppStartup

@@ -9,9 +9,16 @@
 
 using Aliyun.OSS.Util;
 using Furion.VirtualFileServer;
+using GameFrameX.Core.Entity;
+using GameFrameX.Core.Enum;
+using GameFrameX.Core.Option;
+using GameFrameX.Core.Service.File.Dto;
+using GameFrameX.Core.Service.User;
+using GameFrameX.Core.SqlSugar;
+using GameFrameX.Core.Util;
 using OnceMi.AspNetCore.OSS;
 
-namespace Admin.NET.Core.Service;
+namespace GameFrameX.Core.Service.File;
 
 /// <summary>
 /// 系统文件服务
@@ -36,7 +43,7 @@ public class SysFileService : IDynamicApiController, ITransient
         _OSSProviderOptions = oSSProviderOptions.Value;
         _uploadOptions = uploadOptions.Value;
         if (_OSSProviderOptions.IsEnable)
-            _OSSService = ossServiceFactory.Create(Enum.GetName(_OSSProviderOptions.Provider));
+            _OSSService = ossServiceFactory.Create(System.Enum.GetName(_OSSProviderOptions.Provider));
     }
 
     /// <summary>
@@ -175,8 +182,8 @@ public class SysFileService : IDynamicApiController, ITransient
             else
             {
                 var filePath = Path.Combine(App.WebHostEnvironment.WebRootPath, file.FilePath, input.Id.ToString() + file.Suffix);
-                if (File.Exists(filePath))
-                    File.Delete(filePath);
+                if (System.IO.File.Exists(filePath))
+                    System.IO.File.Delete(filePath);
             }
         }
     }
@@ -276,7 +283,7 @@ public class SysFileService : IDynamicApiController, ITransient
         var finalName = newFile.Id + suffix; // 文件最终名称
         if (_OSSProviderOptions.IsEnable)
         {
-            newFile.Provider = Enum.GetName(_OSSProviderOptions.Provider);
+            newFile.Provider = System.Enum.GetName(_OSSProviderOptions.Provider);
             var filePath = string.Concat(path, "/", finalName);
             await _OSSService.PutObjectAsync(newFile.BucketName, filePath, file.OpenReadStream());
             //  http://<你的bucket名字>.oss.aliyuncs.com/<你的object名字>
@@ -304,7 +311,7 @@ public class SysFileService : IDynamicApiController, ITransient
 
             var realFile = Path.Combine(filePath, finalName);
             //IDetector detector;
-            using (var stream = File.Create(realFile))
+            using (var stream = System.IO.File.Create(realFile))
             {
                 await file.CopyToAsync(stream);
                 //detector = stream.DetectFiletype();

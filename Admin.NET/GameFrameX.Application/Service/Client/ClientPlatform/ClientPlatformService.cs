@@ -1,13 +1,18 @@
-﻿using Admin.NET.Application.Const;
-namespace Admin.NET.Application;
+﻿using GameFrameX.Application.Const;
+using GameFrameX.Application.Service.Client.ClientPlatform.Dto;
+using GameFrameX.Core.Enum;
+using GameFrameX.Core.Extension;
+using GameFrameX.Core.SqlSugar;
+
+namespace GameFrameX.Application.Service.Client.ClientPlatform;
 /// <summary>
 /// 平台管理服务
 /// </summary>
 [ApiDescriptionSettings(ApplicationConst.GroupName, Order = 100)]
-public class ClientPlatformService :GetSelectBaseService<ClientPlatform>
+public class ClientPlatformService :GetSelectBaseService<Entity.Client.ClientPlatform>
 {
-    private readonly SqlSugarRepository<ClientPlatform> _rep;
-    public ClientPlatformService(SqlSugarRepository<ClientPlatform> rep):base(rep)
+    private readonly SqlSugarRepository<Entity.Client.ClientPlatform> _rep;
+    public ClientPlatformService(SqlSugarRepository<Entity.Client.ClientPlatform> rep):base(rep)
     {
         _rep = rep;
     }
@@ -41,7 +46,7 @@ public class ClientPlatformService :GetSelectBaseService<ClientPlatform>
     [ApiDescriptionSettings(Name = "Add")]
     public async Task Add(AddClientPlatformInput input)
     {
-        var entity = input.Adapt<ClientPlatform>();
+        var entity = input.Adapt<Entity.Client.ClientPlatform>();
         await _rep.InsertAsync(entity);
     }
 
@@ -68,7 +73,7 @@ public class ClientPlatformService :GetSelectBaseService<ClientPlatform>
     [ApiDescriptionSettings(Name = "Update")]
     public async Task Update(UpdateClientPlatformInput input)
     {
-        var entity = input.Adapt<ClientPlatform>();
+        var entity = input.Adapt<Entity.Client.ClientPlatform>();
         await _rep.AsUpdateable(entity).IgnoreColumns(ignoreAllNullColumns: true).ExecuteCommandAsync();
     }
 
@@ -79,7 +84,7 @@ public class ClientPlatformService :GetSelectBaseService<ClientPlatform>
     /// <returns></returns>
     [HttpGet]
     [ApiDescriptionSettings(Name = "Detail")]
-    public async Task<ClientPlatform> Get([FromQuery] QueryByIdClientPlatformInput input)
+    public async Task<Entity.Client.ClientPlatform> Get([FromQuery] QueryByIdClientPlatformInput input)
     {
         return await _rep.GetFirstAsync(u => u.Id == input.Id);
     }

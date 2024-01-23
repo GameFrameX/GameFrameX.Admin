@@ -5,7 +5,7 @@
     <NoWarn>1701;1702;1591</NoWarn>
     <DocumentationFile></DocumentationFile>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <RootNamespace>Admin.NET.Web.Core</RootNamespace>
+    <RootNamespace>GameFrameX.Web.Core</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

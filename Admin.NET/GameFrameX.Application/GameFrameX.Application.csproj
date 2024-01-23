@@ -6,7 +6,6 @@
     <DocumentationFile></DocumentationFile>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <Nullable>disable</Nullable>
-    <RootNamespace>Admin.NET.Application</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

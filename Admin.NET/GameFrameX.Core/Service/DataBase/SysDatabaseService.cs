@@ -7,9 +7,14 @@
 // 软件按“原样”提供，不提供任何形式的明示或暗示的保证，包括但不限于对适销性、适用性和非侵权的保证。
 // 在任何情况下，作者或版权持有人均不对任何索赔、损害或其他责任负责，无论是因合同、侵权或其他方式引起的，与软件或其使用或其他交易有关。
 
+using GameFrameX.Core.Const;
+using GameFrameX.Core.Enum;
+using GameFrameX.Core.Option;
+using GameFrameX.Core.Service.DataBase.Dto;
+using GameFrameX.Core.Util;
 using Newtonsoft.Json.Converters;
 
-namespace Admin.NET.Core.Service;
+namespace GameFrameX.Core.Service.DataBase;
 
 /// <summary>
 /// 系统数据库管理服务
@@ -236,7 +241,7 @@ public class SysDatabaseService : IDynamicApiController, ITransient
         if (_codeGenOptions.BaseEntityNames.Contains(input.BaseClassName, StringComparer.OrdinalIgnoreCase))
             dbColumnInfos = dbColumnInfos.Where(u => !dbColumnNames.Contains(u.DbColumnName, StringComparer.OrdinalIgnoreCase)).ToList();
 
-        var tContent = File.ReadAllText(templatePath);
+        var tContent = System.IO.File.ReadAllText(templatePath);
         var tResult = _viewEngine.RunCompileFromCached(tContent, new
         {
             NameSpace = $"{input.Position}.Entity",
@@ -247,7 +252,7 @@ public class SysDatabaseService : IDynamicApiController, ITransient
             dbTableInfo.Description,
             TableField = dbColumnInfos
         });
-        File.WriteAllText(targetPath, tResult, Encoding.UTF8);
+        System.IO.File.WriteAllText(targetPath, tResult, Encoding.UTF8);
     }
 
     /// <summary>
@@ -325,7 +330,7 @@ public class SysDatabaseService : IDynamicApiController, ITransient
             }
         }
 
-        var tContent = File.ReadAllText(templatePath);
+        var tContent = System.IO.File.ReadAllText(templatePath);
         var data = new
         {
             NameSpace = $"{input.Position}.SeedData",
@@ -345,7 +350,7 @@ public class SysDatabaseService : IDynamicApiController, ITransient
             builder.AddUsing("System.Collections.Generic");
             builder.AddUsing("System.Linq");
         });
-        File.WriteAllText(targetPath, tResult, Encoding.UTF8);
+        System.IO.File.WriteAllText(targetPath, tResult, Encoding.UTF8);
     }
 
     /// <summary>
@@ -366,9 +371,9 @@ public class SysDatabaseService : IDynamicApiController, ITransient
                 types.AddRange(asm.GetExportedTypes().ToList());
             }
         }
-        bool IsMyAttribute(Attribute[] o)
+        bool IsMyAttribute(System.Attribute[] o)
         {
-            foreach (Attribute a in o)
+            foreach (System.Attribute a in o)
             {
                 if (a.GetType() == type)
                     return true;
@@ -377,7 +382,7 @@ public class SysDatabaseService : IDynamicApiController, ITransient
         }
         Type[] cosType = types.Where(o =>
         {
-            return IsMyAttribute(Attribute.GetCustomAttributes(o, true));
+            return IsMyAttribute(System.Attribute.GetCustomAttributes(o, true));
         }
         ).ToArray();
 

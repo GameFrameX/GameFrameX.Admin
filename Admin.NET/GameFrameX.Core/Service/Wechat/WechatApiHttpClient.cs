@@ -10,8 +10,9 @@
 using Flurl;
 using Flurl.Http;
 using Flurl.Http.Configuration;
+using GameFrameX.Core.Option;
 
-namespace Admin.NET.Core.Service;
+namespace GameFrameX.Core.Service.Wechat;
 
 /// <summary>
 /// 微信API客户端

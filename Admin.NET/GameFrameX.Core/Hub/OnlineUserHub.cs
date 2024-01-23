@@ -8,9 +8,16 @@
 // 在任何情况下，作者或版权持有人均不对任何索赔、损害或其他责任负责，无论是因合同、侵权或其他方式引起的，与软件或其使用或其他交易有关。
 
 using Furion.InstantMessaging;
+using GameFrameX.Core.Const;
+using GameFrameX.Core.Entity;
+using GameFrameX.Core.Hub.Dto;
+using GameFrameX.Core.Service.Cache;
+using GameFrameX.Core.Service.Message;
+using GameFrameX.Core.Service.Message.Dto;
+using GameFrameX.Core.SqlSugar;
 using Microsoft.AspNetCore.SignalR;
 
-namespace Admin.NET.Core;
+namespace GameFrameX.Core.Hub;
 
 /// <summary>
 /// 在线用户集线器

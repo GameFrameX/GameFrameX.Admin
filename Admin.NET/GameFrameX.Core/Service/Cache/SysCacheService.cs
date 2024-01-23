@@ -7,7 +7,9 @@
 // 软件按“原样”提供，不提供任何形式的明示或暗示的保证，包括但不限于对适销性、适用性和非侵权的保证。
 // 在任何情况下，作者或版权持有人均不对任何索赔、损害或其他责任负责，无论是因合同、侵权或其他方式引起的，与软件或其使用或其他交易有关。
 
-namespace Admin.NET.Core.Service;
+using GameFrameX.Core.Option;
+
+namespace GameFrameX.Core.Service.Cache;
 
 /// <summary>
 /// 系统缓存服务
@@ -31,7 +33,7 @@ public class SysCacheService : IDynamicApiController, ISingleton
     [DisplayName("获取缓存键名集合")]
     public List<string> GetKeyList()
     {
-        return _cache == Cache.Default
+        return _cache == NewLife.Caching.Cache.Default
             ? _cache.Keys.Where(u => u.StartsWith(_cacheOptions.Prefix)).Select(u => u[_cacheOptions.Prefix.Length..]).OrderBy(u => u).ToList()
             : ((FullRedis)_cache).Search($"{_cacheOptions.Prefix}*", int.MaxValue).Select(u => u[_cacheOptions.Prefix.Length..]).OrderBy(u => u).ToList();
     }
@@ -109,7 +111,7 @@ public class SysCacheService : IDynamicApiController, ISingleton
     [DisplayName("根据键名前缀删除缓存")]
     public int RemoveByPrefixKey(string prefixKey)
     {
-        var delKeys = _cache == Cache.Default
+        var delKeys = _cache == NewLife.Caching.Cache.Default
             ? _cache.Keys.Where(u => u.StartsWith($"{_cacheOptions.Prefix}{prefixKey}")).ToArray()
             : ((FullRedis)_cache).Search($"{_cacheOptions.Prefix}{prefixKey}*", int.MaxValue).ToArray();
 
@@ -124,7 +126,7 @@ public class SysCacheService : IDynamicApiController, ISingleton
     [DisplayName("根据键名前缀获取键名集合")]
     public List<string> GetKeysByPrefixKey(string prefixKey)
     {
-        return _cache == Cache.Default
+        return _cache == NewLife.Caching.Cache.Default
             ? _cache.Keys.Where(u => u.StartsWith($"{_cacheOptions.Prefix}{prefixKey}")).Select(u => u[_cacheOptions.Prefix.Length..]).ToList()
             : ((FullRedis)_cache).Search($"{_cacheOptions.Prefix}{prefixKey}*", int.MaxValue).Select(u => u[_cacheOptions.Prefix.Length..]).ToList();
     }
@@ -137,7 +139,7 @@ public class SysCacheService : IDynamicApiController, ISingleton
     [DisplayName("获取缓存值")]
     public object GetValue(string key)
     {
-        return _cache == Cache.Default
+        return _cache == NewLife.Caching.Cache.Default
             ? _cache.Get<object>($"{_cacheOptions.Prefix}{key}")
             : _cache.Get<string>($"{_cacheOptions.Prefix}{key}");
     }

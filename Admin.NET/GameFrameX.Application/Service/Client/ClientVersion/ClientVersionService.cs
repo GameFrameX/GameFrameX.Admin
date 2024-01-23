@@ -1,16 +1,20 @@
-﻿using Admin.NET.Application.Const;
+﻿using GameFrameX.Application.Const;
+using GameFrameX.Application.Service.Client.ClientVersion.Dto;
+using GameFrameX.Core.Enum;
+using GameFrameX.Core.Extension;
+using GameFrameX.Core.SqlSugar;
 
-namespace Admin.NET.Application;
+namespace GameFrameX.Application.Service.Client.ClientVersion;
 
 /// <summary>
 /// 版本管理服务
 /// </summary>
 [ApiDescriptionSettings(ApplicationConst.GroupName, Order = 100)]
-public class ClientVersionService : GetSelectBaseService<ClientVersion>
+public class ClientVersionService : GetSelectBaseService<Entity.Client.ClientVersion>
 {
-    private readonly SqlSugarRepository<ClientVersion> _rep;
+    private readonly SqlSugarRepository<Entity.Client.ClientVersion> _rep;
 
-    public ClientVersionService(SqlSugarRepository<ClientVersion> rep) : base(rep)
+    public ClientVersionService(SqlSugarRepository<Entity.Client.ClientVersion> rep) : base(rep)
     {
         _rep = rep;
     }
@@ -44,7 +48,7 @@ public class ClientVersionService : GetSelectBaseService<ClientVersion>
     [ApiDescriptionSettings(Name = "Add")]
     public async Task Add(AddClientVersionInput input)
     {
-        var entity = input.Adapt<ClientVersion>();
+        var entity = input.Adapt<Entity.Client.ClientVersion>();
         await _rep.InsertAsync(entity);
     }
 
@@ -71,7 +75,7 @@ public class ClientVersionService : GetSelectBaseService<ClientVersion>
     [ApiDescriptionSettings(Name = "Update")]
     public async Task Update(UpdateClientVersionInput input)
     {
-        var entity = input.Adapt<ClientVersion>();
+        var entity = input.Adapt<Entity.Client.ClientVersion>();
         await _rep.AsUpdateable(entity).IgnoreColumns(ignoreAllNullColumns: true).ExecuteCommandAsync();
     }
 
@@ -82,7 +86,7 @@ public class ClientVersionService : GetSelectBaseService<ClientVersion>
     /// <returns></returns>
     [HttpGet]
     [ApiDescriptionSettings(Name = "Detail")]
-    public async Task<ClientVersion> Get([FromQuery] QueryByIdClientVersionInput input)
+    public async Task<Entity.Client.ClientVersion> Get([FromQuery] QueryByIdClientVersionInput input)
     {
         return await _rep.GetFirstAsync(u => u.Id == input.Id);
     }

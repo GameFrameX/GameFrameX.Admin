@@ -8,7 +8,6 @@
     <PreserveCompilationContext>true</PreserveCompilationContext>
     <Nullable>disable</Nullable>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <RootNamespace>Admin.NET.Core</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

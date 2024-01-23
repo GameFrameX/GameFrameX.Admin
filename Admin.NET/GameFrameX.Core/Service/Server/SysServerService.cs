@@ -10,12 +10,14 @@
 using AngleSharp.Html.Parser;
 using AspNetCoreRateLimit;
 using FluentEmail.Core;
+using GameFrameX.Core.Extension;
+using GameFrameX.Core.Util;
 using Lazy.Captcha.Core;
 using Magicodes.ExporterAndImporter.Pdf;
 using Nest;
 using OnceMi.AspNetCore.OSS;
 
-namespace Admin.NET.Core.Service;
+namespace GameFrameX.Core.Service.Server;
 
 /// <summary>
 /// 系统服务器监控服务

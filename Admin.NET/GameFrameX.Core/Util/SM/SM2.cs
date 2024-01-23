@@ -13,7 +13,7 @@ using Org.BouncyCastle.Math;
 using Org.BouncyCastle.Math.EC;
 using Org.BouncyCastle.Security;
 
-namespace Admin.NET.Core;
+namespace GameFrameX.Core.Util.SM;
 
 public class SM2
 {

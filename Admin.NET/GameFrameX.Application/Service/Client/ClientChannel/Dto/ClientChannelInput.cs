@@ -1,7 +1,6 @@
-﻿using Admin.NET.Core;
-using System.ComponentModel.DataAnnotations;
+﻿using GameFrameX.Core.Util;
 
-namespace Admin.NET.Application;
+namespace GameFrameX.Application.Service.Client.ClientChannel.Dto;
 
     /// <summary>
     /// 渠道基础输入参数

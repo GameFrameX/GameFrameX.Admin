@@ -9,7 +9,7 @@
 
 using Newtonsoft.Json.Linq;
 
-namespace Admin.NET.Core.Service;
+namespace GameFrameX.Core.Service.APIJSON;
 
 /// <summary>
 /// APIJSON服务

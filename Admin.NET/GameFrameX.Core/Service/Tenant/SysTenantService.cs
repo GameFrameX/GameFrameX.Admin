@@ -7,7 +7,20 @@
 // 软件按“原样”提供，不提供任何形式的明示或暗示的保证，包括但不限于对适销性、适用性和非侵权的保证。
 // 在任何情况下，作者或版权持有人均不对任何索赔、损害或其他责任负责，无论是因合同、侵权或其他方式引起的，与软件或其使用或其他交易有关。
 
-namespace Admin.NET.Core.Service;
+using GameFrameX.Core.Const;
+using GameFrameX.Core.Entity;
+using GameFrameX.Core.Enum;
+using GameFrameX.Core.Option;
+using GameFrameX.Core.Service.Cache;
+using GameFrameX.Core.Service.Config;
+using GameFrameX.Core.Service.Role;
+using GameFrameX.Core.Service.Role.Dto;
+using GameFrameX.Core.Service.Tenant.Dto;
+using GameFrameX.Core.Service.User;
+using GameFrameX.Core.SqlSugar;
+using GameFrameX.Core.Util;
+
+namespace GameFrameX.Core.Service.Tenant;
 
 /// <summary>
 /// 系统租户管理服务
@@ -141,7 +154,7 @@ public class SysTenantService : IDynamicApiController, ITransient
         if (tenant == null || tenant.ConfigId == SqlSugarConst.MainConfigId)
             throw Oops.Oh(ErrorCodeEnum.Z1001);
 
-        if (!Enum.IsDefined(typeof(StatusEnum), input.Status))
+        if (!System.Enum.IsDefined(typeof(StatusEnum), input.Status))
             throw Oops.Oh(ErrorCodeEnum.D3005);
 
         tenant.Status = input.Status;
@@ -365,7 +378,7 @@ public class SysTenantService : IDynamicApiController, ITransient
         var tenant = await _sysTenantRep.GetSingleAsync(u => u.Id == input.Id);
         if (tenant == null) return;
 
-        if (tenant.DbType == SqlSugar.DbType.Oracle)
+        if (tenant.DbType == global::SqlSugar.DbType.Oracle)
             throw Oops.Oh(ErrorCodeEnum.Z1002);
 
         // 默认数据库配置

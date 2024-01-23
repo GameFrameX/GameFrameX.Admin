@@ -9,7 +9,7 @@
 
 using Microsoft.AspNetCore.Authentication;
 
-namespace Admin.NET.Core;
+namespace GameFrameX.Core.SignatureAuth;
 
 /// <summary>
 /// Signature 身份验证质询上下文

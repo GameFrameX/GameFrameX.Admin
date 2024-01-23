@@ -1,13 +1,18 @@
-﻿using Admin.NET.Application.Const;
-namespace Admin.NET.Application;
+﻿using GameFrameX.Application.Const;
+using GameFrameX.Application.Service.Client.ClientGlobalInfo.Dto;
+using GameFrameX.Core.Enum;
+using GameFrameX.Core.Extension;
+using GameFrameX.Core.SqlSugar;
+
+namespace GameFrameX.Application.Service.Client.ClientGlobalInfo;
 /// <summary>
 /// 全局信息管理服务
 /// </summary>
 [ApiDescriptionSettings(ApplicationConst.GroupName, Order = 100)]
 public class ClientGlobalInfoService : IDynamicApiController, ITransient
 {
-    private readonly SqlSugarRepository<ClientGlobalInfo> _rep;
-    public ClientGlobalInfoService(SqlSugarRepository<ClientGlobalInfo> rep)
+    private readonly SqlSugarRepository<Entity.Client.ClientGlobalInfo> _rep;
+    public ClientGlobalInfoService(SqlSugarRepository<Entity.Client.ClientGlobalInfo> rep)
     {
         _rep = rep;
     }
@@ -61,7 +66,7 @@ public class ClientGlobalInfoService : IDynamicApiController, ITransient
     [ApiDescriptionSettings(Name = "Add")]
     public async Task Add(AddClientGlobalInfoInput input)
     {
-        var entity = input.Adapt<ClientGlobalInfo>();
+        var entity = input.Adapt<Entity.Client.ClientGlobalInfo>();
         await _rep.InsertAsync(entity);
     }
 
@@ -88,7 +93,7 @@ public class ClientGlobalInfoService : IDynamicApiController, ITransient
     [ApiDescriptionSettings(Name = "Update")]
     public async Task Update(UpdateClientGlobalInfoInput input)
     {
-        var entity = input.Adapt<ClientGlobalInfo>();
+        var entity = input.Adapt<Entity.Client.ClientGlobalInfo>();
         await _rep.AsUpdateable(entity).IgnoreColumns(ignoreAllNullColumns: true).ExecuteCommandAsync();
     }
 
@@ -99,7 +104,7 @@ public class ClientGlobalInfoService : IDynamicApiController, ITransient
     /// <returns></returns>
     [HttpGet]
     [ApiDescriptionSettings(Name = "Detail")]
-    public async Task<ClientGlobalInfo> Get([FromQuery] QueryByIdClientGlobalInfoInput input)
+    public async Task<Entity.Client.ClientGlobalInfo> Get([FromQuery] QueryByIdClientGlobalInfoInput input)
     {
         return await _rep.GetFirstAsync(u => u.Id == input.Id);
     }

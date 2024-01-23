@@ -13,7 +13,7 @@ using Org.BouncyCastle.Math;
 using Org.BouncyCastle.Math.EC;
 using Org.BouncyCastle.Utilities.Encoders;
 
-namespace Admin.NET.Core;
+namespace GameFrameX.Core.Util.SM;
 
 /// <summary>
 /// SM2工具类

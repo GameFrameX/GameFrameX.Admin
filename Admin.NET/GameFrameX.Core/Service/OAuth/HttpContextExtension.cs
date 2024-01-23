@@ -9,7 +9,7 @@
 
 using Microsoft.AspNetCore.Authentication;
 
-namespace Admin.NET.Core.Service;
+namespace GameFrameX.Core.Service.OAuth;
 
 public static class HttpContextExtension
 {

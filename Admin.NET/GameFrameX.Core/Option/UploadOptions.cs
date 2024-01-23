@@ -9,7 +9,7 @@
 
 using OnceMi.AspNetCore.OSS;
 
-namespace Admin.NET.Core;
+namespace GameFrameX.Core.Option;
 
 /// <summary>
 /// 文件上传配置选项

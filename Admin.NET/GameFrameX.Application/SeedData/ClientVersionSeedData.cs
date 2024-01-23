@@ -1,4 +1,8 @@
-﻿namespace Admin.NET.Application.SeedData;
+﻿using GameFrameX.Application.Entity.Client;
+using GameFrameX.Core.Extension;
+using GameFrameX.Core.SqlSugar;
+
+namespace GameFrameX.Application.SeedData;
 
 /// <summary>
 ///  表种子数据

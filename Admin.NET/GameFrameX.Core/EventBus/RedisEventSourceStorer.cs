@@ -9,7 +9,7 @@
 
 using System.Threading.Channels;
 
-namespace Admin.NET.Core;
+namespace GameFrameX.Core.EventBus;
 
 /// <summary>
 /// Redis自定义事件源存储器

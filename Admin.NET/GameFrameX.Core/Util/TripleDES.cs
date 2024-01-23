@@ -9,7 +9,7 @@
 
 using System.Security.Cryptography;
 
-namespace Admin.NET.Core;
+namespace GameFrameX.Core.Util;
 
 /// <summary>
 /// 3DES文件加解密

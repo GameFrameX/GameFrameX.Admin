@@ -7,7 +7,15 @@
 // 软件按“原样”提供，不提供任何形式的明示或暗示的保证，包括但不限于对适销性、适用性和非侵权的保证。
 // 在任何情况下，作者或版权持有人均不对任何索赔、损害或其他责任负责，无论是因合同、侵权或其他方式引起的，与软件或其使用或其他交易有关。
 
-namespace Admin.NET.Core.Service;
+using GameFrameX.Core.Const;
+using GameFrameX.Core.Entity;
+using GameFrameX.Core.Enum;
+using GameFrameX.Core.Service.Org;
+using GameFrameX.Core.Service.Role.Dto;
+using GameFrameX.Core.Service.User;
+using GameFrameX.Core.SqlSugar;
+
+namespace GameFrameX.Core.Service.Role;
 
 /// <summary>
 /// 系统角色服务
@@ -232,7 +240,7 @@ public class SysRoleService : IDynamicApiController, ITransient
     [DisplayName("设置角色状态")]
     public async Task<int> SetStatus(RoleInput input)
     {
-        if (!Enum.IsDefined(typeof(StatusEnum), input.Status))
+        if (!System.Enum.IsDefined(typeof(StatusEnum), input.Status))
             throw Oops.Oh(ErrorCodeEnum.D3005);
 
         return await _sysRoleRep.AsUpdateable()

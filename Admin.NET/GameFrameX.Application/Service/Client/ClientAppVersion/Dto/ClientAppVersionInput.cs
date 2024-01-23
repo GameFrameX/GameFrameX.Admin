@@ -1,7 +1,6 @@
-﻿using Admin.NET.Core;
-using System.ComponentModel.DataAnnotations;
+﻿using GameFrameX.Core.Util;
 
-namespace Admin.NET.Application;
+namespace GameFrameX.Application.Service.Client.ClientAppVersion.Dto;
 
     /// <summary>
     /// 游戏版本管理基础输入参数

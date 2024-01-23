@@ -1,16 +1,20 @@
-﻿using Admin.NET.Application.Const;
+﻿using GameFrameX.Application.Const;
+using GameFrameX.Application.Service.Client.ClientPackage.Dto;
+using GameFrameX.Core.Enum;
+using GameFrameX.Core.Extension;
+using GameFrameX.Core.SqlSugar;
 
-namespace Admin.NET.Application;
+namespace GameFrameX.Application.Service.Client.ClientPackage;
 
 /// <summary>
 /// 包管理服务
 /// </summary>
 [ApiDescriptionSettings(ApplicationConst.GroupName, Order = 100)]
-public class ClientPackageService : GetSelectBaseService<ClientPackage>
+public class ClientPackageService : GetSelectBaseService<Entity.Client.ClientPackage>
 {
-    private readonly SqlSugarRepository<ClientPackage> _rep;
+    private readonly SqlSugarRepository<Entity.Client.ClientPackage> _rep;
 
-    public ClientPackageService(SqlSugarRepository<ClientPackage> rep) : base(rep)
+    public ClientPackageService(SqlSugarRepository<Entity.Client.ClientPackage> rep) : base(rep)
     {
         _rep = rep;
     }
@@ -44,7 +48,7 @@ public class ClientPackageService : GetSelectBaseService<ClientPackage>
     [ApiDescriptionSettings(Name = "Add")]
     public async Task Add(AddClientPackageInput input)
     {
-        var entity = input.Adapt<ClientPackage>();
+        var entity = input.Adapt<Entity.Client.ClientPackage>();
         await _rep.InsertAsync(entity);
     }
 
@@ -71,7 +75,7 @@ public class ClientPackageService : GetSelectBaseService<ClientPackage>
     [ApiDescriptionSettings(Name = "Update")]
     public async Task Update(UpdateClientPackageInput input)
     {
-        var entity = input.Adapt<ClientPackage>();
+        var entity = input.Adapt<Entity.Client.ClientPackage>();
         await _rep.AsUpdateable(entity).IgnoreColumns(ignoreAllNullColumns: true).ExecuteCommandAsync();
     }
 
@@ -82,7 +86,7 @@ public class ClientPackageService : GetSelectBaseService<ClientPackage>
     /// <returns></returns>
     [HttpGet]
     [ApiDescriptionSettings(Name = "Detail")]
-    public async Task<ClientPackage> Get([FromQuery] QueryByIdClientPackageInput input)
+    public async Task<Entity.Client.ClientPackage> Get([FromQuery] QueryByIdClientPackageInput input)
     {
         return await _rep.GetFirstAsync(u => u.Id == input.Id);
     }

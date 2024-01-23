@@ -9,7 +9,7 @@
 
 using Org.BouncyCastle.Crypto;
 
-namespace Admin.NET.Core;
+namespace GameFrameX.Core.Util.SM;
 
 public abstract class GeneralDigest : IDigest
 {

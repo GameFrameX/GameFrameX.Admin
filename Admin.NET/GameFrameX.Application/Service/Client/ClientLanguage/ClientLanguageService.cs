@@ -1,13 +1,18 @@
-﻿using Admin.NET.Application.Const;
-namespace Admin.NET.Application;
+﻿using GameFrameX.Application.Const;
+using GameFrameX.Application.Service.Client.ClientLanguage.Dto;
+using GameFrameX.Core.Enum;
+using GameFrameX.Core.Extension;
+using GameFrameX.Core.SqlSugar;
+
+namespace GameFrameX.Application.Service.Client.ClientLanguage;
 /// <summary>
 /// 语言管理服务
 /// </summary>
 [ApiDescriptionSettings(ApplicationConst.GroupName, Order = 100)]
-public class ClientLanguageService : GetSelectBaseService<ClientLanguage>
+public class ClientLanguageService : GetSelectBaseService<Entity.Client.ClientLanguage>
 {
-    private readonly SqlSugarRepository<ClientLanguage> _rep;
-    public ClientLanguageService(SqlSugarRepository<ClientLanguage> rep):base(rep)
+    private readonly SqlSugarRepository<Entity.Client.ClientLanguage> _rep;
+    public ClientLanguageService(SqlSugarRepository<Entity.Client.ClientLanguage> rep):base(rep)
     {
         _rep = rep;
     }
@@ -41,7 +46,7 @@ public class ClientLanguageService : GetSelectBaseService<ClientLanguage>
     [ApiDescriptionSettings(Name = "Add")]
     public async Task Add(AddClientLanguageInput input)
     {
-        var entity = input.Adapt<ClientLanguage>();
+        var entity = input.Adapt<Entity.Client.ClientLanguage>();
         await _rep.InsertAsync(entity);
     }
 
@@ -68,7 +73,7 @@ public class ClientLanguageService : GetSelectBaseService<ClientLanguage>
     [ApiDescriptionSettings(Name = "Update")]
     public async Task Update(UpdateClientLanguageInput input)
     {
-        var entity = input.Adapt<ClientLanguage>();
+        var entity = input.Adapt<Entity.Client.ClientLanguage>();
         await _rep.AsUpdateable(entity).IgnoreColumns(ignoreAllNullColumns: true).ExecuteCommandAsync();
     }
 
@@ -79,7 +84,7 @@ public class ClientLanguageService : GetSelectBaseService<ClientLanguage>
     /// <returns></returns>
     [HttpGet]
     [ApiDescriptionSettings(Name = "Detail")]
-    public async Task<ClientLanguage> Get([FromQuery] QueryByIdClientLanguageInput input)
+    public async Task<Entity.Client.ClientLanguage> Get([FromQuery] QueryByIdClientLanguageInput input)
     {
         return await _rep.GetFirstAsync(u => u.Id == input.Id);
     }

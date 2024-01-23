@@ -1,4 +1,4 @@
-﻿namespace Admin.NET.Application;
+﻿namespace GameFrameX.Application.Service.Client.ClientPackage.Dto;
 
     /// <summary>
     /// 包管理输出参数

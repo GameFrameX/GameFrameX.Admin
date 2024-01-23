@@ -1,4 +1,4 @@
-namespace Admin.NET.Core;
+namespace GameFrameX.Core.Enum;
 
 /// <summary>
 /// 婚姻状况枚举

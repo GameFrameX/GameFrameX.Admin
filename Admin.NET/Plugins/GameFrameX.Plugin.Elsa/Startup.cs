@@ -14,7 +14,7 @@ using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Admin.NET.Plugin.Elsa;
+namespace GameFrameX.Plugin.Elsa;
 
 [AppStartup(100)]
 public class Startup : AppStartup

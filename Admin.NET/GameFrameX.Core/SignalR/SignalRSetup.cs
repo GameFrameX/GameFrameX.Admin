@@ -8,10 +8,12 @@
 // 在任何情况下，作者或版权持有人均不对任何索赔、损害或其他责任负责，无论是因合同、侵权或其他方式引起的，与软件或其使用或其他交易有关。
 
 using Furion.Logging.Extensions;
+using GameFrameX.Core.Enum;
+using GameFrameX.Core.Option;
 using Microsoft.AspNetCore.DataProtection;
 using StackExchange.Redis;
 
-namespace Admin.NET.Core;
+namespace GameFrameX.Core.SignalR;
 
 public static class SignalRSetup
 {

@@ -7,12 +7,26 @@
 // 软件按“原样”提供，不提供任何形式的明示或暗示的保证，包括但不限于对适销性、适用性和非侵权的保证。
 // 在任何情况下，作者或版权持有人均不对任何索赔、损害或其他责任负责，无论是因合同、侵权或其他方式引起的，与软件或其使用或其他交易有关。
 
-using Admin.NET.Core;
-using Admin.NET.Core.Service;
+using System;
+using System.Net;
+using System.Net.Mail;
 using AspNetCoreRateLimit;
 using Furion;
 using Furion.SpecificationDocument;
 using Furion.VirtualFileServer;
+using GameFrameX.Core.Cache;
+using GameFrameX.Core.EventBus;
+using GameFrameX.Core.Extension;
+using GameFrameX.Core.Logging;
+using GameFrameX.Core.OAuth;
+using GameFrameX.Core.Option;
+using GameFrameX.Core.Service.Job;
+using GameFrameX.Core.Service.OpenAccess;
+using GameFrameX.Core.SignalR;
+using GameFrameX.Core.SignatureAuth;
+using GameFrameX.Core.SqlSugar;
+using GameFrameX.Core.Util;
+using GameFrameX.Web.Core.Handlers;
 using IGeekFan.AspNetCore.Knife4jUI;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -21,11 +35,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using OnceMi.AspNetCore.OSS;
-using System;
-using System.Net;
-using System.Net.Mail;
 
-namespace Admin.NET.Web.Core;
+namespace GameFrameX.Web.Core;
 
 public class Startup : AppStartup
 {

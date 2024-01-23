@@ -9,7 +9,7 @@
 
 using Org.BouncyCastle.Utilities.Encoders;
 
-namespace Admin.NET.Core;
+namespace GameFrameX.Core.Util.SM;
 
 /// <summary>
 /// SM4工具类

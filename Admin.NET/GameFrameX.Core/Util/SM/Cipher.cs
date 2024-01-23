@@ -12,7 +12,7 @@ using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Math;
 using Org.BouncyCastle.Math.EC;
 
-namespace Admin.NET.Core;
+namespace GameFrameX.Core.Util.SM;
 
 public class Cipher
 {

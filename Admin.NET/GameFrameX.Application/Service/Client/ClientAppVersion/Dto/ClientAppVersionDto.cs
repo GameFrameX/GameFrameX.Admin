@@ -1,4 +1,4 @@
-﻿namespace Admin.NET.Application;
+﻿namespace GameFrameX.Application.Service.Client.ClientAppVersion.Dto;
 
     /// <summary>
     /// 游戏版本管理输出参数

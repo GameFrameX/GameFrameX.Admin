@@ -1,4 +1,4 @@
-﻿namespace Admin.NET.Application;
+﻿namespace GameFrameX.Application.Service.Client.ClientChannel.Dto;
 
 /// <summary>
 /// 渠道输出参数

@@ -1,7 +1,6 @@
-﻿using Admin.NET.Core;
-using System.ComponentModel.DataAnnotations;
+﻿using GameFrameX.Core.Util;
 
-namespace Admin.NET.Application;
+namespace GameFrameX.Application.Service.Client.ClientPlatform.Dto;
 
     /// <summary>
     /// 平台管理基础输入参数

@@ -9,8 +9,12 @@
 
 using AngleSharp;
 using AngleSharp.Html.Dom;
+using GameFrameX.Core.Entity;
+using GameFrameX.Core.Enum;
+using GameFrameX.Core.Service.Region.Dto;
+using GameFrameX.Core.SqlSugar;
 
-namespace Admin.NET.Core.Service;
+namespace GameFrameX.Core.Service.Region;
 
 /// <summary>
 /// 系统行政区域服务

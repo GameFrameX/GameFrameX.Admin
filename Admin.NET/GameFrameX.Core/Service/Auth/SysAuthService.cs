@@ -8,9 +8,20 @@
 // 在任何情况下，作者或版权持有人均不对任何索赔、损害或其他责任负责，无论是因合同、侵权或其他方式引起的，与软件或其使用或其他交易有关。
 
 using Furion.SpecificationDocument;
+using GameFrameX.Core.Const;
+using GameFrameX.Core.Entity;
+using GameFrameX.Core.Enum;
+using GameFrameX.Core.Service.Auth.Dto;
+using GameFrameX.Core.Service.Cache;
+using GameFrameX.Core.Service.Config;
+using GameFrameX.Core.Service.Menu;
+using GameFrameX.Core.Service.OnlineUser;
+using GameFrameX.Core.Service.User;
+using GameFrameX.Core.SqlSugar;
+using GameFrameX.Core.Util;
 using Lazy.Captcha.Core;
 
-namespace Admin.NET.Core.Service;
+namespace GameFrameX.Core.Service.Auth;
 
 /// <summary>
 /// 系统登录授权服务

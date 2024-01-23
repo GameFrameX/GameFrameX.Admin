@@ -1,16 +1,20 @@
-﻿using Admin.NET.Application.Const;
+﻿using GameFrameX.Application.Const;
+using GameFrameX.Application.Service.Client.ClientChannel.Dto;
+using GameFrameX.Core.Enum;
+using GameFrameX.Core.Extension;
+using GameFrameX.Core.SqlSugar;
 
-namespace Admin.NET.Application;
+namespace GameFrameX.Application.Service.Client.ClientChannel;
 
 /// <summary>
 /// 渠道服务
 /// </summary>
 [ApiDescriptionSettings(ApplicationConst.GroupName, Order = 100)]
-public class ClientChannelService : GetSelectBaseService<ClientChannel>
+public class ClientChannelService : GetSelectBaseService<Entity.Client.ClientChannel>
 {
-    private readonly SqlSugarRepository<ClientChannel> _rep;
+    private readonly SqlSugarRepository<Entity.Client.ClientChannel> _rep;
 
-    public ClientChannelService(SqlSugarRepository<ClientChannel> rep) : base(rep)
+    public ClientChannelService(SqlSugarRepository<Entity.Client.ClientChannel> rep) : base(rep)
     {
         _rep = rep;
     }
@@ -44,7 +48,7 @@ public class ClientChannelService : GetSelectBaseService<ClientChannel>
     [ApiDescriptionSettings(Name = "Add")]
     public async Task Add(AddClientChannelInput input)
     {
-        var entity = input.Adapt<ClientChannel>();
+        var entity = input.Adapt<Entity.Client.ClientChannel>();
         await _rep.InsertAsync(entity);
     }
 
@@ -71,7 +75,7 @@ public class ClientChannelService : GetSelectBaseService<ClientChannel>
     [ApiDescriptionSettings(Name = "Update")]
     public async Task Update(UpdateClientChannelInput input)
     {
-        var entity = input.Adapt<ClientChannel>();
+        var entity = input.Adapt<Entity.Client.ClientChannel>();
         await _rep.AsUpdateable(entity).IgnoreColumns(ignoreAllNullColumns: true).ExecuteCommandAsync();
     }
 
@@ -82,7 +86,7 @@ public class ClientChannelService : GetSelectBaseService<ClientChannel>
     /// <returns></returns>
     [HttpGet]
     [ApiDescriptionSettings(Name = "Detail")]
-    public async Task<ClientChannel> Get([FromQuery] QueryByIdClientChannelInput input)
+    public async Task<Entity.Client.ClientChannel> Get([FromQuery] QueryByIdClientChannelInput input)
     {
         return await _rep.GetFirstAsync(u => u.Id == input.Id);
     }

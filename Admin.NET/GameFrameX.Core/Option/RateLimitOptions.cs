@@ -9,7 +9,7 @@
 
 using AspNetCoreRateLimit;
 
-namespace Admin.NET.Core;
+namespace GameFrameX.Core.Option;
 
 /// <summary>
 /// IP限流配置选项

@@ -1,4 +1,4 @@
-﻿namespace Admin.NET.Application;
+﻿namespace GameFrameX.Application.Service.Client.ClientLanguage.Dto;
 
     /// <summary>
     /// 语言管理输出参数

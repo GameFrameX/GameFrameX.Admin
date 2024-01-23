@@ -1,4 +1,4 @@
-﻿namespace Admin.NET.Application;
+﻿namespace GameFrameX.Application.Service.Client.ClientPlatform.Dto;
 
 /// <summary>
 /// 平台管理输出参数

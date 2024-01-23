@@ -1,4 +1,4 @@
-﻿namespace Admin.NET.Application;
+﻿namespace GameFrameX.Application.Service.Client.ClientGlobalInfo.Dto;
 
 /// <summary>
 /// 全局信息管理输出参数

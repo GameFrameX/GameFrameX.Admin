@@ -8,8 +8,15 @@
 // 在任何情况下，作者或版权持有人均不对任何索赔、损害或其他责任负责，无论是因合同、侵权或其他方式引起的，与软件或其使用或其他交易有关。
 
 using System.IO.Compression;
+using GameFrameX.Core.Const;
+using GameFrameX.Core.Entity;
+using GameFrameX.Core.Enum;
+using GameFrameX.Core.Option;
+using GameFrameX.Core.Service.CodeGen.Dto;
+using GameFrameX.Core.SqlSugar;
+using GameFrameX.Core.Util;
 
-namespace Admin.NET.Core.Service;
+namespace GameFrameX.Core.Service.CodeGen;
 
 /// <summary>
 /// 系统代码生成器服务
@@ -252,9 +259,9 @@ public class SysCodeGenService : IDynamicApiController, ITransient
                 types.AddRange(asm.GetExportedTypes().ToList());
             }
         }
-        bool IsMyAttribute(Attribute[] o)
+        bool IsMyAttribute(System.Attribute[] o)
         {
-            foreach (Attribute a in o)
+            foreach (System.Attribute a in o)
             {
                 if (a.GetType() == type)
                     return true;
@@ -263,7 +270,7 @@ public class SysCodeGenService : IDynamicApiController, ITransient
         }
         Type[] cosType = types.Where(o =>
         {
-            return IsMyAttribute(Attribute.GetCustomAttributes(o, true));
+            return IsMyAttribute(System.Attribute.GetCustomAttributes(o, true));
         }
         ).ToArray();
 
@@ -342,7 +349,7 @@ public class SysCodeGenService : IDynamicApiController, ITransient
 
         for (var i = 0; i < templatePathList.Count; i++)
         {
-            var tContent = File.ReadAllText(templatePathList[i]);
+            var tContent = System.IO.File.ReadAllText(templatePathList[i]);
             var tResult = await _viewEngine.RunCompileFromCachedAsync(tContent, data, builderAction: builder =>
             {
                 builder.AddAssemblyReferenceByName("System.Linq");
@@ -353,7 +360,7 @@ public class SysCodeGenService : IDynamicApiController, ITransient
             var dirPath = new DirectoryInfo(targetPathList[i]).Parent.FullName;
             if (!Directory.Exists(dirPath))
                 Directory.CreateDirectory(dirPath);
-            File.WriteAllText(targetPathList[i], tResult, Encoding.UTF8);
+            System.IO.File.WriteAllText(targetPathList[i], tResult, Encoding.UTF8);
         }
 
         await AddMenu(input.TableName, input.BusName, input.MenuPid, tableFieldList);
@@ -364,8 +371,8 @@ public class SysCodeGenService : IDynamicApiController, ITransient
         {
             string downloadPath = zipPath + ".zip";
             // 判断是否存在同名称文件
-            if (File.Exists(downloadPath))
-                File.Delete(downloadPath);
+            if (System.IO.File.Exists(downloadPath))
+                System.IO.File.Delete(downloadPath);
             ZipFile.CreateFromDirectory(zipPath, downloadPath);
             return new { url = $"{CommonUtil.GetLocalhost()}/CodeGen/{input.TableName}.zip" };
         }

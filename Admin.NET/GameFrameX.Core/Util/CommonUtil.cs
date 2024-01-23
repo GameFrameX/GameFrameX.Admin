@@ -10,8 +10,9 @@
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using GameFrameX.Core.Service.File;
 
-namespace Admin.NET.Core;
+namespace GameFrameX.Core.Util;
 
 /// <summary>
 /// 通用工具类

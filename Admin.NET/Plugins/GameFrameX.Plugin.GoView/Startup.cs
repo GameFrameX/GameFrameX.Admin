@@ -7,12 +7,12 @@
 // 软件按“原样”提供，不提供任何形式的明示或暗示的保证，包括但不限于对适销性、适用性和非侵权的保证。
 // 在任何情况下，作者或版权持有人均不对任何索赔、损害或其他责任负责，无论是因合同、侵权或其他方式引起的，与软件或其使用或其他交易有关。
 
-using Admin.NET.Plugin.GoView.Util;
+using GameFrameX.Plugin.GoView.Util;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Admin.NET.Plugin.GoView;
+namespace GameFrameX.Plugin.GoView;
 
 [AppStartup(100)]
 public class Startup : AppStartup
