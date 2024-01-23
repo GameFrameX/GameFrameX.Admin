@@ -16,7 +16,7 @@
         },
         "TableSettings": {
           "EnableInitTable": true, // 启用表初始化
-          "EnableIncreTable": false // 启用表增量更新-特性[IncreTable]
+          "EnableIncreTable": true // 启用表增量更新-特性[IncreTable]
         },
         "SeedSettings": {
           "EnableInitSeed": true, // 启用种子初始化
