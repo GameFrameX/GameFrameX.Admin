@@ -3,7 +3,7 @@
 
   // 代码生成配置项-程序集名称集合
   "CodeGen": {
-    "EntityAssemblyNames": [ "Admin.NET.Core", "Admin.NET.Application" ],
+    "EntityAssemblyNames": [ "GameFrameX.Core", "GameFrameX.Application" ],
     "BaseEntityNames": [ "EntityTenantId", "EntityTenant", "EntityBaseData", "EntityBase", "EntityBaseId" ],
     "EntityBaseColumn": {
       "EntityTenantId": [ "Id", "TenantId" ],
@@ -14,6 +14,6 @@
       //"BaseId": [ "Id" ]
     },
     "FrontRootPath": "Web", // 前端项目根目录
-    "BackendApplicationNamespaces": [ "Admin.NET.Application", "Admin.NET.Application2" ] // 后端生成到的项目
+    "BackendApplicationNamespaces": [ "GameFrameX.Application", "GameFrameX.Application2" ] // 后端生成到的项目
   }
 }

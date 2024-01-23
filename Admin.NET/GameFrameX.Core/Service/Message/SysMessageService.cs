@@ -9,12 +9,13 @@
 
 using FluentEmail.Core;
 using GameFrameX.Core.Const;
-using GameFrameX.Core.Entity;
 using GameFrameX.Core.Hub;
 using GameFrameX.Core.Option;
 using GameFrameX.Core.Service.Cache;
 using GameFrameX.Core.Service.Message.Dto;
+using GameFrameX.Entity.System;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Options;
 
 namespace GameFrameX.Core.Service.Message;
 

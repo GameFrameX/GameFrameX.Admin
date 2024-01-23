@@ -13,4 +13,4 @@ RUN sed -i 's/deb.debian.org/mirrors.aliyun.com/' /etc/apt/sources.list
 # 更新包管理器并安装free命令
 RUN apt-get update && apt-get install -y procps
 
-ENTRYPOINT ["dotnet", "Admin.NET.Web.Entry.dll"]
+ENTRYPOINT ["dotnet", "GameFrameX.Web.Entry.dll"]

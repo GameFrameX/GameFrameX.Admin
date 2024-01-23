@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="SqlSugarCore" Version="5.1.4.125-preview02" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\GameFrameX.Core.Attribute\GameFrameX.Core.Attribute.csproj" />
+      <ProjectReference Include="..\GameFrameX.Core.Enum\GameFrameX.Core.Enum.csproj" />
+    </ItemGroup>
+
+</Project>

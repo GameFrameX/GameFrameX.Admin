@@ -10,10 +10,11 @@
 using GameFrameX.Core.Attribute;
 using GameFrameX.Core.Cache;
 using GameFrameX.Core.Const;
-using GameFrameX.Core.Entity;
 using GameFrameX.Core.Enum;
 using GameFrameX.Core.Extension;
 using GameFrameX.Core.Option;
+using GameFrameX.Entity;
+using GameFrameX.Entity.System;
 
 namespace GameFrameX.Core.SqlSugar;
 

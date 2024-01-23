@@ -10,6 +10,6 @@
     "UseDefaultCredentials": false, // 是否使用默认凭据
     "UserName": "zuohuaijun@163.com", // 邮箱账号
     "Password": "", // 邮箱授权码
-    "DefaultFromName": "Admin.NET 通用权限开发平台" // 默认邮件标题
+    "DefaultFromName": "GameFrameX 通用权限开发平台" // 默认邮件标题
   }
 }

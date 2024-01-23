@@ -9,6 +9,7 @@
 
 using GameFrameX.Core.Const;
 using GameFrameX.Core.Enum;
+using Microsoft.AspNetCore.Http;
 
 namespace GameFrameX.Core.Service.User;
 

@@ -8,7 +8,7 @@
       {
         //"ConfigId": "1300000000001", // 默认库标识-禁止修改
         "DbType": "Sqlite", // MySql、SqlServer、Sqlite、Oracle、PostgreSQL、Dm、Kdbndp、Oscar、MySqlConnector、Access、OpenGauss、QuestDB、HG、ClickHouse、GBase、Odbc、Custom
-        "ConnectionString": "DataSource=./Admin.NET.db", // 库连接字符串
+        "ConnectionString": "DataSource=./GameFrameX.db", // 库连接字符串
         "DbSettings": {
           "EnableInitDb": true, // 启用库初始化
           "EnableDiffLog": false, // 启用库表差异日志
@@ -27,7 +27,7 @@
       //{
       //  "ConfigId": "1300000000002", // 日志库标识-禁止修改
       //  "DbType": "Sqlite",
-      //  "ConnectionString": "DataSource=./Admin.NET.Log.db", // 库连接字符串
+      //  "ConnectionString": "DataSource=./GameFrameX.Log.db", // 库连接字符串
       //  "DbSettings": {
       //    "EnableInitDb": true, // 启用库初始化
       //    "EnableDiffLog": false, // 启用库表差异日志
@@ -46,7 +46,7 @@
       //{
       //  "ConfigId": "test", // 库标识
       //  "DbType": "Sqlite", // 库类型
-      //  "ConnectionString": "DataSource=./Admin.NET.Test.db", // 库连接字符串
+      //  "ConnectionString": "DataSource=./GameFrameX.Test.db", // 库连接字符串
       //  "DbSettings": {
       //    "EnableInitDb": true, // 启用库初始化
       //    "EnableDiffLog": false, // 启用库表差异日志

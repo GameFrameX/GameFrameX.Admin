@@ -22,6 +22,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameFrameX.Plugin.Elsa", "P
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameFrameX.Web.Entry", "GameFrameX.Web.Entry\GameFrameX.Web.Entry.csproj", "{E41C7F7C-FF46-45DE-B4F5-24CC3B0D1C57}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameFrameX.Entity", "GameFrameX.Entity\GameFrameX.Entity.csproj", "{E6347E7C-301B-4C96-A5F5-562967049AC3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameFrameX.Core.Attribute", "GameFrameX.Core.Attribute\GameFrameX.Core.Attribute.csproj", "{977E74ED-EC83-4C06-9609-4C0CF19E1490}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameFrameX.Core.Enum", "GameFrameX.Core.Enum\GameFrameX.Core.Enum.csproj", "{BA3A4881-F7E4-4B9C-A79A-EB4399B9F131}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -52,6 +58,18 @@ Global
 		{E41C7F7C-FF46-45DE-B4F5-24CC3B0D1C57}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E41C7F7C-FF46-45DE-B4F5-24CC3B0D1C57}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E41C7F7C-FF46-45DE-B4F5-24CC3B0D1C57}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E6347E7C-301B-4C96-A5F5-562967049AC3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E6347E7C-301B-4C96-A5F5-562967049AC3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E6347E7C-301B-4C96-A5F5-562967049AC3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E6347E7C-301B-4C96-A5F5-562967049AC3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{977E74ED-EC83-4C06-9609-4C0CF19E1490}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{977E74ED-EC83-4C06-9609-4C0CF19E1490}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{977E74ED-EC83-4C06-9609-4C0CF19E1490}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{977E74ED-EC83-4C06-9609-4C0CF19E1490}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BA3A4881-F7E4-4B9C-A79A-EB4399B9F131}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA3A4881-F7E4-4B9C-A79A-EB4399B9F131}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA3A4881-F7E4-4B9C-A79A-EB4399B9F131}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA3A4881-F7E4-4B9C-A79A-EB4399B9F131}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

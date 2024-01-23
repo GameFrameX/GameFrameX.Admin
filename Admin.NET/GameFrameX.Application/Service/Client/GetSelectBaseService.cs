@@ -9,9 +9,9 @@
 
 using System.Linq;
 using GameFrameX.Application.Const;
-using GameFrameX.Core.Entity;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Core.Util;
+using GameFrameX.Entity;
 
 namespace GameFrameX.Application.Service.Client;
 

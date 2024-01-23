@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Admin.NET.Application.xml" />
+    <None Remove="GameFrameX.Application.xml" />
     <None Remove="Configuration\Limit.json" />
     <None Remove="Configuration\Logging.json" />
   </ItemGroup>
@@ -27,6 +27,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\GameFrameX.Core\GameFrameX.Core.csproj" />
+    <ProjectReference Include="..\GameFrameX.Entity\GameFrameX.Entity.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -79,6 +80,7 @@
 
   <ItemGroup>
     <Folder Include="Entity\" />
+    <Folder Include="Service\System\" />
   </ItemGroup>
 
 </Project>

@@ -11,7 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Admin.NET.Core.xml" />
+    <None Remove="GameFrameX.Core.xml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -45,7 +45,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Service\File\" />
+    <ProjectReference Include="..\GameFrameX.Core.Attribute\GameFrameX.Core.Attribute.csproj" />
+    <ProjectReference Include="..\GameFrameX.Core.Enum\GameFrameX.Core.Enum.csproj" />
+    <ProjectReference Include="..\GameFrameX.Entity\GameFrameX.Entity.csproj" />
   </ItemGroup>
 	
 </Project>

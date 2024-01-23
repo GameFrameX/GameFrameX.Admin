@@ -7,16 +7,25 @@
 // 软件按“原样”提供，不提供任何形式的明示或暗示的保证，包括但不限于对适销性、适用性和非侵权的保证。
 // 在任何情况下，作者或版权持有人均不对任何索赔、损害或其他责任负责，无论是因合同、侵权或其他方式引起的，与软件或其使用或其他交易有关。
 
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Web;
 using Aliyun.OSS.Util;
+using Furion.RemoteRequest.Extensions;
 using Furion.VirtualFileServer;
-using GameFrameX.Core.Entity;
 using GameFrameX.Core.Enum;
 using GameFrameX.Core.Option;
 using GameFrameX.Core.Service.File.Dto;
 using GameFrameX.Core.Service.User;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Core.Util;
+using GameFrameX.Entity.System;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
 using OnceMi.AspNetCore.OSS;
+using Yitter.IdGenerator;
 
 namespace GameFrameX.Core.Service.File;
 

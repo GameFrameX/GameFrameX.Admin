@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Admin.NET.Web.Core.xml" />
+    <None Remove="GameFrameX.Web.Core.xml" />
   </ItemGroup>
 
   <ItemGroup>

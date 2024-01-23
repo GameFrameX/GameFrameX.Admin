@@ -18,7 +18,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "Admin.NET.Web.Entry": {
+    "GameFrameX.Web.Entry": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,

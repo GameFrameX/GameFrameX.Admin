@@ -9,12 +9,12 @@
 
 using Furion.InstantMessaging;
 using GameFrameX.Core.Const;
-using GameFrameX.Core.Entity;
 using GameFrameX.Core.Hub.Dto;
 using GameFrameX.Core.Service.Cache;
 using GameFrameX.Core.Service.Message;
 using GameFrameX.Core.Service.Message.Dto;
 using GameFrameX.Core.SqlSugar;
+using GameFrameX.Entity.System;
 using Microsoft.AspNetCore.SignalR;
 
 namespace GameFrameX.Core.Hub;

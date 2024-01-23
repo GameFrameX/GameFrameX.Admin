@@ -3,6 +3,6 @@
 
   // 枚举实体所在程序集名称集合
   "Enum": {
-    "EntityAssemblyNames": [ "Admin.NET.Core", "Admin.NET.Application", "Admin.NET.AppCPMS" ]
+    "EntityAssemblyNames": [ "GameFrameX.Core", "GameFrameX.Application", "GameFrameX.AppCPMS" ]
   }
 }
