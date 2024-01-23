@@ -1,0 +1,161 @@
+import { h } from 'vue';
+import { BasicColumn, FormSchema } from '/@@/components/Table';
+@foreach (var column in Model.TableField){
+if(@column.EffectType == "Upload"){
+@:import { uploadFile } from '/@@/api/sys/admin';
+}else if(@column.EffectType == "fk"){
+@:import { get@(@column.FkEntityName)Dropdown } from '/@@/api/main/@(@Model.ClassName)';
+}else if(@column.EffectType == "Select"){
+@:import { getDataList } from '/@@/api/sys/admin';
+}else if(@column.EffectType == "ApiTreeSelect"){
+@:import { get@(@column.FkEntityName)Tree } from '/@@/api/main/@(@Model.ClassName)';
+}else if(@column.EffectType == "ConstSelector"){
+@:import { codeToName, getSelector } from '/@@/utils/helper/constSelectorHelper';
+}else if(@column.EffectType == "Switch"){
+@:import { Switch } from 'ant-design-vue';
+}
+}
+export const columns: BasicColumn[] = [
+  @foreach (var column in Model.TableField){
+  if(@column.WhetherTable == "Y"){
+  @:{
+    @:title: '@column.ColumnComment',
+    @:dataIndex: '@column.LowerPropertyName',    
+    @:sorter: true,
+if(@column.EffectType == "Upload"){
+    @:slots: { customRender: '@(@column.LowerPropertyName)' },
+}else if(@column.EffectType == "fk"){
+    @:customRender: ({ record }) => {
+      @:return record.fk@(@column.PropertyName).@(@column.LowerFkColumnName);
+    @:},
+}else if(@column.EffectType == "Switch"){
+    @:customRender: ({ record }) => {
+      @:return h(@(@column.EffectType), { checked: record.@(@column.LowerPropertyName) });
+    @:},
+}else if(@column.EffectType == "ConstSelector"){
+    @:customRender: ({ record }) => {
+      @:return codeToName(record.@(@column.LowerPropertyName), '@(@column.DictTypeCode)');
+    @:},
+}
+  @:},
+    }
+
+  }
+];
+
+export const searchFormSchema: FormSchema[] = [
+@foreach (var column in Model.QueryWhetherList){  
+  @:{
+    @:field: '@column.LowerPropertyName',
+    @:label: '@column.ColumnComment',
+    @:colProps: { span: 8 },
+if(@column.EffectType == "fk"){
+    @:component: 'ApiSelect',
+    @:componentProps: {
+      @:api: get@(@column.FkEntityName)Dropdown,
+      @:labelField: 'label',
+      @:valueField: 'value',
+    @:},
+}else if(@column.EffectType == "Select"){
+    @:component: 'ApiSelect',
+    @:componentProps: {
+      @:api: getDataList,
+      @:params: '@(@column.DictTypeCode)',
+      @:fieldNames: {
+        @:label: 'label',
+        @:value: 'value',
+      @:},
+    @:},
+}else if(@column.EffectType == "ConstSelector"){
+    @:component: 'Select',
+    @:componentProps: {
+      @:options: getSelector('@(@column.DictTypeCode)'),
+      @:fieldNames: {
+        @:label: 'name',
+        @:value: 'code',
+      @:},
+    @:},
+}else if(@column.EffectType == "ApiTreeSelect"){
+    @:component: '@(@column.EffectType)',
+    @:componentProps: {
+      @:api: get@(@column.FkEntityName)Tree,
+    @:},
+}
+else if(@column.NetType?.TrimEnd('?') == "DateTime" && @column.QueryType == "~"){
+    @:component: 'RangePicker',
+    @:componentProps: {
+    @:  valueFormat:"YYYY-MM-DD"
+    @:},
+}
+else{
+    @:component: 'Input',
+}
+
+  @:},
+}
+];
+
+export const formSchema: FormSchema[] = [
+  @foreach (var column in Model.TableField){
+  @:{
+    @:label: '@column.ColumnComment',
+    @:field: '@column.LowerPropertyName',
+if(@column.EffectType == "fk"){
+    @:component: 'ApiSelect',
+    @:componentProps: {
+      @:api: get@(@column.FkEntityName)Dropdown,
+      @:labelField: 'label',
+      @:valueField: 'value',
+    @:},
+}else if(@column.EffectType == "Select"){
+    @:component: 'ApiSelect',
+    @:componentProps: {
+      @:api: getDataList,
+      @:params: '@(@column.DictTypeCode)',
+      @:fieldNames: {
+        @:label: 'label',
+        @:value: 'value',
+      @:},
+    @:},
+}else if(@column.EffectType == "ConstSelector"){
+    @:component: 'Select',
+    @:componentProps: {
+      @:options: getSelector('@(@column.DictTypeCode)'),
+      @:fieldNames: {
+        @:label: 'name',
+        @:value: 'code',
+      @:},
+    @:},
+}else if(@column.EffectType == "ApiTreeSelect"){
+    @:component: '@(@column.EffectType)',
+    @:componentProps: {
+      @:api: get@(@column.FkEntityName)Tree,
+    @:},
+}else if(@column.EffectType == "Switch"){
+    @:component: '@(@column.EffectType)',
+    @:componentProps: {
+      @:checkedChildren: '是',
+      @:unCheckedChildren: '否',
+    @:},
+}else{
+    @:component: '@column.EffectType',
+}
+    if(@column.WhetherRequired == "Y"){
+    @:required: true,
+    }else{
+    @:required: false,
+    }
+    if(@column.EffectType == "Upload"){
+    @:componentProps: {
+      @:maxNumber: 1,
+      @:api: uploadFile,
+    @:},
+    }
+  if(@column.LowerPropertyName == "id"){
+    @:show: false,
+  }
+    @:colProps: { span: 12 },
+  @:},
+
+  }
+];

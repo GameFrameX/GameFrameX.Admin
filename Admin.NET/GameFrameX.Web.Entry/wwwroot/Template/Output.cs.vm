@@ -1,0 +1,58 @@
+﻿namespace @Model.NameSpace;
+
+/// <summary>
+/// @(@Model.BusName)输出参数
+/// </summary>
+public class @(@Model.ClassName)Output
+{
+@foreach (var column in Model.TableField){
+    @:/// <summary>
+    @:/// @column.ColumnComment
+    @:/// </summary>
+if(column.EffectType == "fk")
+{
+    @:public @column.NetType @column.PropertyName { get; set; } 
+    @:
+    @:/// <summary>
+    @:/// @(column.ColumnComment) 描述
+    @:/// </summary>
+    @:public @(@column.FkColumnNetType) @(@column.PropertyName)@(@column.FkColumnName) { get; set; } 
+
+}else if(column.EffectType == "Upload"){
+    @:public @column.NetType @column.PropertyName { get; set; }
+    @:public SysFile @(@column.PropertyName)Attachment { get; set; }
+}else if(column.EffectType == "ApiTreeSelect"){
+    @:public @column.NetType @column.PropertyName { get; set; } 
+    @:
+    @:/// <summary>
+    @:/// @(column.ColumnComment) 描述 
+    @:/// </summary>
+    @:public string? @(@column.PropertyName)@(@column.DisplayColumn) { get; set; } 
+}else{
+    @:public @column.NetType @(@column.PropertyName) { get; set; }
+}
+    @:
+}
+    }
+ 
+
+@foreach (var column in Model.TableField){
+if (@column.EffectType == "ApiTreeSelect"){
+    @:// 使用实际实体@(@column.FkTableName),所以这里就删了
+    @:/*
+    @:[SugarTable("@(@column.FkTableName)")]
+    @:public class @(@column.FkEntityName)TreeOutput: EntityBaseId
+    @:{
+        @:[SugarColumn(ColumnName = "@(@column.DisplayColumn)")]
+        @:public @(@Model.GetColumnNetType(@column.FkTableName,@column.DisplayColumn)) Label { get; set; }
+
+        @:[SugarColumn(ColumnName = "@(@column.ValueColumn)", IsPrimaryKey = true, IsIdentity = false)]
+        @:public @(@Model.GetColumnNetType(@column.FkTableName,@column.ValueColumn))  Value { get; set; }
+
+        @:public @(@Model.GetColumnNetType(@column.FkTableName,@column.PidColumn)) @column.PidColumn { get; set; }
+        @:[SugarColumn(IsIgnore = true)]
+        @:public List<@(@column.FkEntityName)TreeOutput> Children { get; set; }
+    @:}
+    @:*/
+}
+}

@@ -1,0 +1,66 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32112.339
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameFrameX.Application", "GameFrameX.Application\GameFrameX.Application.csproj", "{C3F5AEC5-ACEE-4109-94E3-3F981DC18268}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameFrameX.Core", "GameFrameX.Core\GameFrameX.Core.csproj", "{3AD1A3ED-ED11-479D-BE32-6589D98A9ADC}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameFrameX.Web.Core", "GameFrameX.Web.Core\GameFrameX.Web.Core.csproj", "{8A42A864-A69E-40F7-975E-F2FA36E7DFEE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{662E0B8E-F23E-4C7D-80BD-CAA5707503CC}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugins", "Plugins", "{76F70D22-8D53-468E-A3B6-1704666A1D71}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameFrameX.Plugin.GoView", "Plugins\GameFrameX.Plugin.GoView\GameFrameX.Plugin.GoView.csproj", "{C4A288D5-0FAA-4F43-9072-B97635D7871D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameFrameX.Plugin.Elsa", "Plugins\GameFrameX.Plugin.Elsa\GameFrameX.Plugin.Elsa.csproj", "{48EFC3A6-BDC0-4D05-819A-B1FB927FA4C8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameFrameX.Web.Entry", "GameFrameX.Web.Entry\GameFrameX.Web.Entry.csproj", "{E41C7F7C-FF46-45DE-B4F5-24CC3B0D1C57}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C3F5AEC5-ACEE-4109-94E3-3F981DC18268}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3F5AEC5-ACEE-4109-94E3-3F981DC18268}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3F5AEC5-ACEE-4109-94E3-3F981DC18268}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3F5AEC5-ACEE-4109-94E3-3F981DC18268}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3AD1A3ED-ED11-479D-BE32-6589D98A9ADC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3AD1A3ED-ED11-479D-BE32-6589D98A9ADC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3AD1A3ED-ED11-479D-BE32-6589D98A9ADC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3AD1A3ED-ED11-479D-BE32-6589D98A9ADC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8A42A864-A69E-40F7-975E-F2FA36E7DFEE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8A42A864-A69E-40F7-975E-F2FA36E7DFEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8A42A864-A69E-40F7-975E-F2FA36E7DFEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8A42A864-A69E-40F7-975E-F2FA36E7DFEE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C4A288D5-0FAA-4F43-9072-B97635D7871D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C4A288D5-0FAA-4F43-9072-B97635D7871D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C4A288D5-0FAA-4F43-9072-B97635D7871D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C4A288D5-0FAA-4F43-9072-B97635D7871D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{48EFC3A6-BDC0-4D05-819A-B1FB927FA4C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{48EFC3A6-BDC0-4D05-819A-B1FB927FA4C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{48EFC3A6-BDC0-4D05-819A-B1FB927FA4C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{48EFC3A6-BDC0-4D05-819A-B1FB927FA4C8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E41C7F7C-FF46-45DE-B4F5-24CC3B0D1C57}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E41C7F7C-FF46-45DE-B4F5-24CC3B0D1C57}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E41C7F7C-FF46-45DE-B4F5-24CC3B0D1C57}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E41C7F7C-FF46-45DE-B4F5-24CC3B0D1C57}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C4A288D5-0FAA-4F43-9072-B97635D7871D} = {76F70D22-8D53-468E-A3B6-1704666A1D71}
+		{48EFC3A6-BDC0-4D05-819A-B1FB927FA4C8} = {76F70D22-8D53-468E-A3B6-1704666A1D71}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5CD801D7-984A-4F5C-8FA2-211B7A5EA9F3}
+	EndGlobalSection
+EndGlobal
