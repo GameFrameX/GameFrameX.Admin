@@ -258,12 +258,14 @@ const handleQuery = async () => {
 // 打开新增页面
 const openAdd@(@Model.ClassName) = () => {
   edit@(@Model.ClassName)Title.value = '添加@(@Model.BusName)';
+  editDialogRef.value.isEditor= false;
   editDialogRef.value.openDialog({});
 };
 
 // 打开编辑页面
 const openEdit@(@Model.ClassName) = (row: any) => {
   edit@(@Model.ClassName)Title.value = '编辑@(@Model.BusName)';
+  editDialogRef.value.isEditor= true;
   editDialogRef.value.openDialog(row);
 };
 

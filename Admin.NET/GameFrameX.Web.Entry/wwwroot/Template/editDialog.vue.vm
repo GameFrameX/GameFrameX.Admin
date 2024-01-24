@@ -210,6 +210,8 @@
 	const emit = defineEmits(["reloadTable"]);
 	const ruleFormRef = ref();
 	const isShowDialog = ref(false);
+	// 标记是否是编辑模式
+	const isEditor = ref(false);
 	const ruleForm = ref<any>({});
 	//自行添加其他规则
 	const rules = ref<FormRules>({
