@@ -87,6 +87,13 @@ public class SysCodeGen : EntityBase
     public string? BusName { get; set; }
 
     /// <summary>
+    /// 模块名
+    /// </summary>
+    [SugarColumn(ColumnDescription = "模块名", Length = 128)]
+    [MaxLength(128)]
+    public string ModuleName { get; set; }
+
+    /// <summary>
     /// 菜单编码
     /// </summary>
     [SugarColumn(ColumnDescription = "菜单编码")]

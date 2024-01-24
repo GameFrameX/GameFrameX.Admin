@@ -219,19 +219,25 @@ public class SysCodeGenService : IDynamicApiController, ITransient
         var dbTableName = config.DbSettings.EnableUnderLine ? UtilMethods.ToUnderLine(entityType.DbTableName) : entityType.DbTableName;
         var entityBasePropertyNames = _codeGenOptions.EntityBaseColumn[nameof(EntityTenant)];
         var columnInfos = provider.DbMaintenance.GetColumnInfosByTableName(dbTableName, false);
-        var result = columnInfos.Select(u => new ColumnOuput
+
+        List<ColumnOuput> result = new List<ColumnOuput>();
+        foreach (DbColumnInfo dbColumnInfo in columnInfos)
         {
-            // 转下划线后的列名需要再转回来（暂时不转）
-            //ColumnName = config.DbSettings.EnableUnderLine ? CodeGenUtil.CamelColumnName(u.DbColumnName, entityBasePropertyNames) : u.DbColumnName,
-            ColumnName = u.DbColumnName,
-            ColumnLength = u.Length,
-            IsPrimarykey = u.IsPrimarykey,
-            IsNullable = u.IsNullable,
-            ColumnKey = u.IsPrimarykey.ToString(),
-            NetType = CodeGenUtil.ConvertDataType(u, provider.CurrentConnectionConfig.DbType),
-            DataType = CodeGenUtil.ConvertDataType(u, provider.CurrentConnectionConfig.DbType),
-            ColumnComment = string.IsNullOrWhiteSpace(u.ColumnDescription) ? u.DbColumnName : u.ColumnDescription
-        }).ToList();
+            var item = new ColumnOuput
+            {
+                // 转下划线后的列名需要再转回来（暂时不转）
+                //ColumnName = config.DbSettings.EnableUnderLine ? CodeGenUtil.CamelColumnName(u.DbColumnName, entityBasePropertyNames) : u.DbColumnName,
+                ColumnName = dbColumnInfo.DbColumnName,
+                ColumnLength = dbColumnInfo.Length,
+                IsPrimarykey = dbColumnInfo.IsPrimarykey,
+                IsNullable = dbColumnInfo.IsNullable,
+                ColumnKey = dbColumnInfo.IsPrimarykey.ToString(),
+                NetType = CodeGenUtil.ConvertDataType(dbColumnInfo, provider.CurrentConnectionConfig.DbType),
+                DataType = CodeGenUtil.ConvertDataType(dbColumnInfo, provider.CurrentConnectionConfig.DbType)
+            };
+            item.ColumnComment = string.IsNullOrWhiteSpace(dbColumnInfo.ColumnDescription) ? dbColumnInfo.DbColumnName : dbColumnInfo.ColumnDescription;
+            result.Add(item);
+        }
 
         // 获取实体的属性信息，赋值给PropertyName属性(CodeFirst模式应以PropertyName为实际使用名称)
         var entityProperties = entityType.Type.GetProperties();
@@ -239,15 +245,35 @@ public class SysCodeGenService : IDynamicApiController, ITransient
         for (int i = result.Count - 1; i >= 0; i--)
         {
             var columnOutput = result[i];
+
+            // 先找自定义字段名的
+            var propertyInfoColumnComment = entityProperties.FirstOrDefault(p => p.Name.ToLower() == columnOutput.ColumnName.ToLower());
+
+            if (propertyInfoColumnComment != null)
+            {
+                var sugarColumn = propertyInfoColumnComment.GetCustomAttribute<SugarColumn>();
+                if (sugarColumn != null)
+                {
+                    columnOutput.ColumnComment = sugarColumn.ColumnDescription;
+                }
+            }
+
             // 先找自定义字段名的
             var propertyInfo = entityProperties.FirstOrDefault(p => (p.GetCustomAttribute<SugarColumn>()?.ColumnName ?? "").ToLower() == columnOutput.ColumnName.ToLower());
             // 如果找不到就再找自动生成字段名的(并且过滤掉没有SugarColumn的属性)
             if (propertyInfo == null)
+            {
                 propertyInfo = entityProperties.FirstOrDefault(p => p.GetCustomAttribute<SugarColumn>() != null && p.Name == (config.DbSettings.EnableUnderLine ? CodeGenUtil.CamelColumnName(columnOutput.ColumnName, entityBasePropertyNames) : columnOutput.ColumnName));
+            }
+
             if (propertyInfo != null)
+            {
                 columnOutput.PropertyName = propertyInfo.Name;
+            }
             else
+            {
                 result.RemoveAt(i); //移除没有定义此属性的字段
+            }
         }
 
         return result;
@@ -384,7 +410,7 @@ public class SysCodeGenService : IDynamicApiController, ITransient
             global::System.IO.File.WriteAllText(targetPathList[i], tResult, Encoding.UTF8);
         }
 
-        await AddMenu(input.TableName, input.BusName, input.MenuPid, tableFieldList);
+        await AddMenu(input.TableName, input.BusName,input.ModuleName, input.MenuPid, tableFieldList);
         // 非ZIP压缩返回空
         if (!input.GenerateType.StartsWith('1'))
             return null;
@@ -433,7 +459,7 @@ public class SysCodeGenService : IDynamicApiController, ITransient
     /// <param name="pid"></param>
     /// <param name="tableFieldList"></param>
     /// <returns></returns>
-    private async Task AddMenu(string className, string busName, long pid, List<CodeGenConfig> tableFieldList)
+    private async Task AddMenu(string className, string busName,string moduleName, long pid, List<CodeGenConfig> tableFieldList)
     {
         var pPath = string.Empty;
         // 若 pid=0 为顶级则创建菜单目录
@@ -482,7 +508,7 @@ public class SysCodeGenService : IDynamicApiController, ITransient
             Name = className[..1].ToLower() + className[1..],
             Type = MenuTypeEnum.Menu,
             Path = pPath + "/" + className.ToLower(),
-            Component = "/main/" + className[..1].ToLower() + className[1..] + "/index",
+            Component = "/" + moduleName + "/" + className[..1].ToLower() + className[1..] + "/index",
         };
         // 若先前存在则删除本级和下级
         var menuList1 = await _db.Queryable<SysMenu>().Where(u => u.Title == menuType1.Title && u.Type == menuType1.Type).ToListAsync();
@@ -682,10 +708,10 @@ public class SysCodeGenService : IDynamicApiController, ITransient
         var inputPath = Path.Combine(backendPath, "Dto", input.TableName + "Input.cs");
         var outputPath = Path.Combine(backendPath, "Dto", input.TableName + "Output.cs");
         var viewPath = Path.Combine(backendPath, "Dto", input.TableName + "Dto.cs");
-        var frontendPath = Path.Combine(new DirectoryInfo(App.WebHostEnvironment.ContentRootPath).Parent.Parent.FullName, _codeGenOptions.FrontRootPath, "src", "views", "main");
+        var frontendPath = Path.Combine(new DirectoryInfo(App.WebHostEnvironment.ContentRootPath).Parent.Parent.FullName, _codeGenOptions.FrontRootPath, "src", "views", input.ModuleName.ToLower());
         var indexPath = Path.Combine(frontendPath, input.TableName[..1].ToLower() + input.TableName[1..], "index.vue"); //
         var formModalPath = Path.Combine(frontendPath, input.TableName[..1].ToLower() + input.TableName[1..], "component", "editDialog.vue");
-        var apiJsPath = Path.Combine(new DirectoryInfo(App.WebHostEnvironment.ContentRootPath).Parent.Parent.FullName, _codeGenOptions.FrontRootPath, "src", "api", "main", input.TableName[..1].ToLower() + input.TableName[1..] + ".ts");
+        var apiJsPath = Path.Combine(new DirectoryInfo(App.WebHostEnvironment.ContentRootPath).Parent.Parent.FullName, _codeGenOptions.FrontRootPath, "src", "api", input.ModuleName.ToLower(), input.TableName[..1].ToLower() + input.TableName[1..] + ".ts");
 
         if (input.GenerateType.Substring(1, 1).Contains('1'))
         {
@@ -739,10 +765,10 @@ public class SysCodeGenService : IDynamicApiController, ITransient
         var inputPath = Path.Combine(backendPath, "Dto", input.TableName + "Input.cs");
         var outputPath = Path.Combine(backendPath, "Dto", input.TableName + "Output.cs");
         var viewPath = Path.Combine(backendPath, "Dto", input.TableName + "Dto.cs");
-        var frontendPath = Path.Combine(zipPath, _codeGenOptions.FrontRootPath, "src", "views", "main");
+        var frontendPath = Path.Combine(zipPath, _codeGenOptions.FrontRootPath, "src", "views", input.ModuleName.ToLower());
         var indexPath = Path.Combine(frontendPath, input.TableName[..1].ToLower() + input.TableName[1..], "index.vue");
         var formModalPath = Path.Combine(frontendPath, input.TableName[..1].ToLower() + input.TableName[1..], "component", "editDialog.vue");
-        var apiJsPath = Path.Combine(zipPath, _codeGenOptions.FrontRootPath, "src", "api", "main", input.TableName[..1].ToLower() + input.TableName[1..] + ".ts");
+        var apiJsPath = Path.Combine(zipPath, _codeGenOptions.FrontRootPath, "src", "api", input.ModuleName.ToLower(), input.TableName[..1].ToLower() + input.TableName[1..] + ".ts");
         if (input.GenerateType.StartsWith("11"))
         {
             return new List<string>()

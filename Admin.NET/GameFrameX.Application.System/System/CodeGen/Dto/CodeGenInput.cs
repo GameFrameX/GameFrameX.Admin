@@ -72,6 +72,11 @@ public class CodeGenInput : BasePageInput
     public virtual string BusName { get; set; }
 
     /// <summary>
+    /// 模块名称(文件夹名称)
+    /// </summary>
+    public virtual string ModuleName { get; set; }
+    
+    /// <summary>
     /// 功能名（数据库表名称）
     /// </summary>
     public virtual string TableComment { get; set; }
@@ -100,6 +105,12 @@ public class AddCodeGenInput : CodeGenInput
     /// </summary>
     [Required(ErrorMessage = "业务名不能为空")]
     public override string BusName { get; set; }
+
+    /// <summary>
+    /// 模块名称
+    /// </summary>
+    [Required(ErrorMessage = "模块名称")]
+    public override string ModuleName { get; set; }
 
     /// <summary>
     /// 命名空间

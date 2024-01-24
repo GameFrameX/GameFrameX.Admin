@@ -35,6 +35,7 @@ public static class CodeGenUtil
                 if (col.Length > 0)
                     sb.Append(col[..1].ToUpper() + col[1..].ToLower());
             }
+
             columnName = sb.ToString();
         }
         else
@@ -49,6 +50,7 @@ public static class CodeGenUtil
                 columnName = columnName[..1].ToUpper() + columnName[1..].ToLower();
             }
         }
+
         return columnName;
     }
 
@@ -111,11 +113,13 @@ public static class CodeGenUtil
                             return "long";
                         }
                     }
+
                     if (length == 1)
                     {
                         return "bool";
                     }
                 }
+
                 return "decimal";
 
             case "char":
@@ -246,7 +250,7 @@ public static class CodeGenUtil
             "int" => "int",
             "smallint" => "Int16",
             //"tinyint" => "byte",
-            "tinyint" => "bool",    // MYSQL
+            "tinyint" => "bool", // MYSQL
             "bigint" or "integer" => "long",
             "bit" => "bool",
             "money" or "smallmoney" or "numeric" or "decimal" => "decimal",
@@ -282,6 +286,21 @@ public static class CodeGenUtil
         };
     }
 
+    /// <summary>
+    /// 是否是新增或更新
+    /// </summary>
+    /// <param name="columnName"></param>
+    /// <returns></returns>
+    public static bool IsAddOrUpdate(string columnName)
+    {
+        var columnList = new List<string>()
+        {
+            nameof(EntityBase.CreateUserName),
+            nameof(EntityBase.UpdateUserName),
+        };
+        return columnList.Contains(columnName);
+    }
+
     // 是否通用字段
     public static bool IsCommonColumn(string columnName)
     {
@@ -293,6 +312,8 @@ public static class CodeGenUtil
             nameof(EntityBase.UpdateTime),
             nameof(EntityBase.CreateUserId),
             nameof(EntityBase.UpdateUserId),
+            nameof(EntityBase.CreateUserName),
+            nameof(EntityBase.UpdateUserName),
             nameof(EntityBase.IsDelete)
         };
         return columnList.Contains(columnName);

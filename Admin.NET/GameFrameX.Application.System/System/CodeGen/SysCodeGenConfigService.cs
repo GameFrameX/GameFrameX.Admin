@@ -36,15 +36,14 @@ public class SysCodeGenConfigService : IDynamicApiController, ITransient
     [DisplayName("获取代码生成配置列表")]
     public async Task<List<CodeGenConfig>> GetList([FromQuery] CodeGenConfig input)
     {
-        return await _db.Queryable<SysCodeGenConfig>()
+        var list = await _db.Queryable<SysCodeGenConfig>()
             .Where(u => u.CodeGenId == input.CodeGenId && u.WhetherCommon != YesNoEnum.Y.ToString())
             .Select<CodeGenConfig>()
-            .Mapper(u =>
-            {
-                u.NetType = (u.EffectType == "EnumSelector" || u.EffectType == "ConstSelector" ? u.DictTypeCode : u.NetType);
-            })
+            .Mapper(u => { u.NetType = (u.EffectType == "EnumSelector" || u.EffectType == "ConstSelector" ? u.DictTypeCode : u.NetType); })
             .OrderBy(u => u.OrderNo)
             .ToListAsync();
+
+        return list;
     }
 
     /// <summary>
@@ -118,8 +117,8 @@ public class SysCodeGenConfigService : IDynamicApiController, ITransient
 
             codeGenConfig.CodeGenId = codeGenerate.Id;
             codeGenConfig.ColumnName = tableColumn.ColumnName; // 字段名
-            codeGenConfig.PropertyName = tableColumn.PropertyName;// 实体属性名
-            codeGenConfig.ColumnLength = tableColumn.ColumnLength;// 长度
+            codeGenConfig.PropertyName = tableColumn.PropertyName; // 实体属性名
+            codeGenConfig.ColumnLength = tableColumn.ColumnLength; // 长度
             codeGenConfig.ColumnComment = tableColumn.ColumnComment;
             codeGenConfig.NetType = tableColumn.DataType;
             codeGenConfig.WhetherRetract = YesNoEnum.N.ToString();
@@ -140,6 +139,7 @@ public class SysCodeGenConfigService : IDynamicApiController, ITransient
 
             orderNo += 10; // 每个配置排序间隔10
         }
+
         // 多库代码生成---这里要切回主库
         var provider = _db.AsTenant().GetConnectionScope(SqlSugarConst.MainConfigId);
         provider.Insertable(codeGenConfigs).ExecuteCommand();
