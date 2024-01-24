@@ -26,6 +26,7 @@
 				<el-table-column prop="configId" label="库定位器" align="center" show-overflow-tooltip />
 				<el-table-column prop="tableName" label="表名称" align="center" show-overflow-tooltip />
 				<el-table-column prop="busName" label="业务名" header-align="center" show-overflow-tooltip />
+				<el-table-column prop="moduleName" label="模块名" header-align="center" show-overflow-tooltip />
 				<el-table-column prop="nameSpace" label="命名空间" header-align="center" show-overflow-tooltip />
 				<el-table-column prop="authorName" label="作者姓名" align="center" show-overflow-tooltip />
 				<el-table-column prop="generateType" label="生成方式" align="center" show-overflow-tooltip>

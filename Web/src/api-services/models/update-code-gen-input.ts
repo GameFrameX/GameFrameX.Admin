@@ -114,6 +114,12 @@ export interface UpdateCodeGenInput {
      */
     busName?: string | null;
     /**
+     * 模块名
+     * @type {string}
+     * @memberof UpdateCodeGenInput
+     */
+    moduleName?: string | null;
+    /**
      * 功能名（数据库表名称）
      * @type {string}
      * @memberof UpdateCodeGenInput
