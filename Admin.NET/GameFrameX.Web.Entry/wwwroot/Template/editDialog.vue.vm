@@ -177,16 +177,16 @@
     @:import { Plus } from "@@element-plus/icons-vue";
 	@:import { getDictDataList as dl } from '/@@/utils/dict-utils';
     @:import { UploadRequestOptions } from "element-plus";
-    @:import {@string.Join(",",Model.TableField.Where(x=>x.EffectType == "Upload").Select(x=>"upload"+x.PropertyName).ToList())} from '/@@/api/main/@(@Model.LowerClassName)';
+    @:import {@string.Join(",",Model.TableField.Where(x=>x.EffectType == "Upload").Select(x=>"upload"+x.PropertyName).ToList())} from '/@@/api/@(@Model.ModuleName)/@(@Model.LowerClassName)';
 }
-	import { add@(@Model.ClassName), update@(@Model.ClassName) } from "/@@/api/main/@(@Model.LowerClassName)";
+	import { add@(@Model.ClassName), update@(@Model.ClassName) } from "/@@/api/@(@Model.ModuleName)/@(@Model.LowerClassName)";
 	@foreach (var column in Model.TableField){
 	if(@column.EffectType == "ApiTreeSelect" && !definedObjects.ContainsKey("import__@(@column.FkEntityName)Tree")){
 	@{definedObjects.Add("import__@(@column.FkEntityName)Tree", 1);}
-	@:import { get@(@column.FkEntityName)Tree } from '/@@/api/main/@(@Model.LowerClassName)';
+	@:import { get@(@column.FkEntityName)Tree } from '/@@/api/@(@Model.ModuleName)/@(@Model.LowerClassName)';
 	}
 	if(@column.EffectType == "fk" && @column.WhetherAddUpdate == "Y"){
-	@:import { get@(@column.FkEntityName)@(@column.PropertyName)Dropdown } from '/@@/api/main/@(@Model.LowerClassName)';
+	@:import { get@(@column.FkEntityName)@(@column.PropertyName)Dropdown } from '/@@/api/@(@Model.ModuleName)/@(@Model.LowerClassName)';
 	}
 	}
 	@if(@Model.TableField.Any(x=>x.EffectType == "EnumSelector")){
