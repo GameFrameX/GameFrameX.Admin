@@ -387,6 +387,7 @@ public class SysCodeGenService : IDynamicApiController, ITransient
             BusName = input.BusName,
             NameSpace = input.NameSpace,
             ClassName = input.TableName,
+            ModuleName = input.ModuleName,
             ProjectLastName = input.NameSpace.Split('.').Last(),
             QueryWhetherList = queryWhetherList,
             TableField = tableFieldList,

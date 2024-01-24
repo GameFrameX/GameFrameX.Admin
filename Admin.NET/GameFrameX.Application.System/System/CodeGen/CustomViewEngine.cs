@@ -37,6 +37,8 @@ public class CustomViewEngine : ViewEngineModel
 
     public string BusName { get; set; }
 
+    public string ModuleName { get; set; }
+
     public string NameSpace { get; set; }
 
     public string ClassName { get; set; }
@@ -47,7 +49,14 @@ public class CustomViewEngine : ViewEngineModel
     {
         get
         {
-            return ClassName[..1].ToLower() + ClassName[1..]; // 首字母小写
+            var name = (ClassName[..1].ToLower() + ClassName[1..]); // 首字母小写
+
+            // if (name.EndsWith("Entity"))
+            // {
+            //     name = name[..^6]; // 去掉Entity
+            // }
+
+            return name;
         }
     }
 
