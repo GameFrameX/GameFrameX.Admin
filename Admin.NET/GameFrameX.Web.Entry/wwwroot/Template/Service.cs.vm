@@ -1,5 +1,4 @@
-﻿using @(@Model.NameSpace).Const;
-@{
+﻿@{
     string joinTableName = "u";
     Dictionary<string, int> definedObjects = new Dictionary<string, int>();
     bool haveLikeCdt = false;
