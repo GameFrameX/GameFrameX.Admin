@@ -1,4 +1,5 @@
-﻿using GameFrameX.Core.Extension;
+﻿using GameFrameX.Application.Game;
+using GameFrameX.Core.Extension;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Entity.Client;
 

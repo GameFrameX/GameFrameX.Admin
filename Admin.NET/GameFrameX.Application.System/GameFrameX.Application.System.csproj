@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+      <DocumentationFile>bin\Debug\GameFrameX.Application.System.xml</DocumentationFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Reference Include="Microsoft.AspNetCore.Authorization">
+        <HintPath>C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\7.0.13\Microsoft.AspNetCore.Authorization.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\GameFrameX.Core\GameFrameX.Core.csproj" />
+      <ProjectReference Include="..\GameFrameX.Global.Const\GameFrameX.Global.Const.csproj" />
+    </ItemGroup>
+
+</Project>

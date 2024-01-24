@@ -39,6 +39,9 @@ public class SingleFilePublish : ISingleFilePublish
         return new[]
         {
             "GameFrameX.Application",
+            "GameFrameX.Application.Game",
+            "GameFrameX.Application.Client",
+            "GameFrameX.Application.System",
             "GameFrameX.Core",
             "GameFrameX.Web.Core",
         };

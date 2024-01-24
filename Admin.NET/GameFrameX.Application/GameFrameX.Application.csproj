@@ -26,7 +26,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\GameFrameX.Application.Client\GameFrameX.Application.Client.csproj" />
+    <ProjectReference Include="..\GameFrameX.Application.Game\GameFrameX.Application.Game.csproj" />
+    <ProjectReference Include="..\GameFrameX.Application.System\GameFrameX.Application.System.csproj" />
     <ProjectReference Include="..\GameFrameX.Core\GameFrameX.Core.csproj" />
+    <ProjectReference Include="..\GameFrameX.Entity.Client\GameFrameX.Entity.Client.csproj" />
+    <ProjectReference Include="..\GameFrameX.Entity.System\GameFrameX.Entity.System.csproj" />
     <ProjectReference Include="..\GameFrameX.Entity\GameFrameX.Entity.csproj" />
   </ItemGroup>
 
@@ -76,11 +81,6 @@
     <None Update="Configuration\Wechat.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Entity\" />
-    <Folder Include="Service\System\" />
   </ItemGroup>
 
 </Project>
