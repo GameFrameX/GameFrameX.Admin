@@ -5,6 +5,7 @@ namespace GameFrameX.Game.Enum;
 /// <summary>
 /// 游戏玩家账号状态
 /// </summary>
+[Description("游戏玩家账号状态")]
 public enum GameUserStatus
 {
     /// <summary>

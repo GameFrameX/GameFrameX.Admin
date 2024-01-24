@@ -15,6 +15,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\GameFrameX.Core\GameFrameX.Core.csproj" />
       <ProjectReference Include="..\GameFrameX.Entity.Game\GameFrameX.Entity.Game.csproj" />
     </ItemGroup>
 
