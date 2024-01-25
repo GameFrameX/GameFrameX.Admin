@@ -452,8 +452,16 @@ public class SysCodeGenService : IDynamicApiController, ITransient
             var templateNameType = templateFileName[templateFileName.IndexOf('.')..].Replace(".vm", string.Empty);
 
             var templateName = Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(templatePath));
+
+
             foreach (string targetPath in targetPathList)
             {
+                if (templateName == "Manage" && targetPath.IndexOf("src", StringComparison.Ordinal) >= 0 && targetPath.IndexOf("api", StringComparison.Ordinal) >= 0)
+                {
+                    dict.Add(templatePath, targetPath);
+                    continue;
+                }
+
                 string targetFileName = Path.GetFileName(targetPath);
                 var targetNameType = targetFileName[targetFileName.IndexOf('.')..];
 
