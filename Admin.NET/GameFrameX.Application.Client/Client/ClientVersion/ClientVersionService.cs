@@ -56,7 +56,7 @@ public class ClientVersionService : BaseSelectService<Entity.Client.ClientVersio
     /// <returns></returns>
     [HttpPost]
     [ApiDescriptionSettings(Name = "Delete")]
-    public async Task Delete(DeleteClientVersionInput input)
+    public async Task Delete(BaseDeleteClientVersionInput input)
     {
         var entity = await Repository.GetFirstAsync(u => u.Id == input.Id) ?? throw Oops.Oh(ErrorCodeEnum.D1002);
         await Repository.FakeDeleteAsync(entity); //假删除

@@ -1,0 +1,34 @@
+﻿using GameFrameX.Core;
+using System.ComponentModel.DataAnnotations;
+
+namespace @Model.NameSpace;
+
+/// <summary>
+/// @(@Model.BusName)分页查询输入参数
+/// </summary>
+public class @(@Model.ClassName)Input : BasePageInput
+{
+@foreach (var column in Model.TableField){
+    if (@column.QueryWhether == "Y"){
+
+    @:/// <summary>
+    @:/// @column.ColumnComment
+    @:/// </summary>
+        if(@column.NetType?.EndsWith("?") == true){
+    @:public @column.NetType @column.PropertyName { get; set; }
+        }else {
+    @:public @(@column.NetType)? @column.PropertyName { get; set; }
+        }
+        @:
+
+    if(@column.NetType?.TrimEnd('?') == "DateTime" && @column.QueryType == "~"){
+    @:/// <summary>
+    @: /// @(@column.ColumnComment)范围
+    @: /// </summary>
+    @: public List<DateTime?> @(@column.PropertyName)Range { get; set; } 
+
+}
+
+}
+}
+}

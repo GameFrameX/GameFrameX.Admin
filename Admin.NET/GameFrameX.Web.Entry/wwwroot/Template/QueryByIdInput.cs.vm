@@ -1,0 +1,12 @@
+﻿using GameFrameX.Core;
+using System.ComponentModel.DataAnnotations;
+
+namespace @Model.NameSpace;    
+
+/// <summary>
+/// @(@Model.BusName)主键查询输入参数
+/// </summary>
+public class QueryById@(@Model.ClassName)Input : QueryByIdInput
+{
+
+}

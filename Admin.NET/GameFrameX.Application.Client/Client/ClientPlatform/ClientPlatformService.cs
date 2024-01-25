@@ -5,14 +5,16 @@ using GameFrameX.Core.Extension;
 using GameFrameX.Core.SqlSugar;
 
 namespace GameFrameX.Application.Client.Client.ClientPlatform;
+
 /// <summary>
 /// 平台管理服务
 /// </summary>
-[ApiDescriptionSettings( Order = 100)]
-public class ClientPlatformService :BaseSelectService<Entity.Client.ClientPlatform>
+[ApiDescriptionSettings(Order = 100)]
+public class ClientPlatformService : BaseService<Entity.Client.ClientPlatform>
 {
     private readonly SqlSugarRepository<Entity.Client.ClientPlatform> _rep;
-    public ClientPlatformService(SqlSugarRepository<Entity.Client.ClientPlatform> rep):base(rep)
+
+    public ClientPlatformService(SqlSugarRepository<Entity.Client.ClientPlatform> rep) : base(rep)
     {
         _rep = rep;
     }
@@ -26,13 +28,13 @@ public class ClientPlatformService :BaseSelectService<Entity.Client.ClientPlatfo
     [ApiDescriptionSettings(Name = "Page")]
     public async Task<SqlSugarPagedList<ClientPlatformOutput>> Page(ClientPlatformInput input)
     {
-        var query= _rep.AsQueryable()
-            .WhereIF(!string.IsNullOrWhiteSpace(input.SearchKey), u =>
-                u.Name.Contains(input.SearchKey.Trim())
-            )
-            .WhereIF(!string.IsNullOrWhiteSpace(input.Name), u => u.Name.Contains(input.Name.Trim()))
-            .Select<ClientPlatformOutput>()
-;
+        var query = _rep.AsQueryable()
+                .WhereIF(!string.IsNullOrWhiteSpace(input.SearchKey), u =>
+                    u.Name.Contains(input.SearchKey.Trim())
+                )
+                .WhereIF(!string.IsNullOrWhiteSpace(input.Name), u => u.Name.Contains(input.Name.Trim()))
+                .Select<ClientPlatformOutput>()
+            ;
         query = query.OrderBuilder(input, "", "CreateTime");
         return await query.ToPagedListAsync(input.Page, input.PageSize);
     }
@@ -60,7 +62,7 @@ public class ClientPlatformService :BaseSelectService<Entity.Client.ClientPlatfo
     public async Task Delete(DeleteClientPlatformInput input)
     {
         var entity = await _rep.GetFirstAsync(u => u.Id == input.Id) ?? throw Oops.Oh(ErrorCodeEnum.D1002);
-        await _rep.FakeDeleteAsync(entity);   //假删除
+        await _rep.FakeDeleteAsync(entity); //假删除
         //await _rep.DeleteAsync(entity);   //真删除
     }
 
@@ -100,10 +102,4 @@ public class ClientPlatformService :BaseSelectService<Entity.Client.ClientPlatfo
     {
         return await _rep.AsQueryable().Select<ClientPlatformOutput>().ToListAsync();
     }
-
-
-
-
-
 }
-

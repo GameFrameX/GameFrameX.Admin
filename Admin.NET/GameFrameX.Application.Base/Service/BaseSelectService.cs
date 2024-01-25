@@ -41,7 +41,6 @@ public class BaseSelectService<T> : BaseService<T> where T : EntityBase, ISelect
             ;
         var list = new List<BaseSelectPageOutput>(query.Count);
         list.AddRange(query.Select(ts => new BaseSelectPageOutput { Value = ts.Name, Label = ts.Description }));
-
         return list;
     }
 }

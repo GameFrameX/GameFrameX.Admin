@@ -211,7 +211,9 @@ public class SysCodeGenService : IDynamicApiController, ITransient
     {
         var entityType = GetEntityInfos().GetAwaiter().GetResult().FirstOrDefault(u => u.EntityName == input.TableName);
         if (entityType == null)
+        {
             return null;
+        }
 
         // 切库---多库代码生成用
         var provider = _db.AsTenant().GetConnectionScope(!string.IsNullOrEmpty(input.ConfigId) ? input.ConfigId : SqlSugarConst.MainConfigId);
@@ -364,17 +366,7 @@ public class SysCodeGenService : IDynamicApiController, ITransient
             input.GenerateType = "200";
 
         // 先删除该表已生成的菜单列表
-        var templatePathList = GetTemplatePathList(input);
-        List<string> targetPathList;
         var zipPath = Path.Combine(App.WebHostEnvironment.WebRootPath, "CodeGen", input.TableName);
-        if (input.GenerateType.StartsWith('1'))
-        {
-            targetPathList = GetZipPathList(input);
-            if (Directory.Exists(zipPath))
-                Directory.Delete(zipPath, true);
-        }
-        else
-            targetPathList = GetTargetPathList(input);
 
         var tableFieldList = await _codeGenConfigService.GetList(new CodeGenConfig() { CodeGenId = input.Id }); // 字段集合
         var queryWhetherList = tableFieldList.Where(u => u.QueryWhether == YesNoEnum.Y.ToString()).ToList(); // 前端查询集合
@@ -396,9 +388,12 @@ public class SysCodeGenService : IDynamicApiController, ITransient
             IsUpload = joinTableList.Where(u => u.EffectType == "Upload").Any(),
         };
 
-        for (var i = 0; i < templatePathList.Count; i++)
+        var templatePathList = HandleTemplateToSavePath(input, zipPath);
+        foreach (var kv in templatePathList)
         {
-            var tContent = global::System.IO.File.ReadAllText(templatePathList[i]);
+            string templatePath = kv.Key;
+            string targetPath = kv.Value;
+            var tContent = await File.ReadAllTextAsync(templatePath);
             var tResult = await _viewEngine.RunCompileFromCachedAsync(tContent, data, builderAction: builder =>
             {
                 builder.AddAssemblyReferenceByName("System.Linq");
@@ -406,10 +401,13 @@ public class SysCodeGenService : IDynamicApiController, ITransient
                 builder.AddUsing("System.Collections.Generic");
                 builder.AddUsing("System.Linq");
             });
-            var dirPath = new DirectoryInfo(targetPathList[i]).Parent.FullName;
+            var dirPath = new DirectoryInfo(targetPath).Parent.FullName;
             if (!Directory.Exists(dirPath))
+            {
                 Directory.CreateDirectory(dirPath);
-            global::System.IO.File.WriteAllText(targetPathList[i], tResult, Encoding.UTF8);
+            }
+
+            await File.WriteAllTextAsync(targetPath, tResult, Encoding.UTF8);
         }
 
         await AddMenu(input.TableName, input.BusName, input.ModuleName, input.MenuPid, tableFieldList);
@@ -425,6 +423,49 @@ public class SysCodeGenService : IDynamicApiController, ITransient
             ZipFile.CreateFromDirectory(zipPath, downloadPath);
             return new { url = $"{CommonUtility.GetLocalhost()}/CodeGen/{input.TableName}.zip" };
         }
+    }
+
+    private Dictionary<string, string> HandleTemplateToSavePath(SysCodeGen input, string zipPath)
+    {
+        var dict = new Dictionary<string, string>();
+        var templatePathList = GetTemplatePathList(input);
+        List<string> targetPathList = new List<string>();
+        if (input.GenerateType.StartsWith('1'))
+        {
+            targetPathList = GetTargetPathList(input, GetSavePath(input, true));
+            if (Directory.Exists(zipPath))
+            {
+                Directory.Delete(zipPath, true);
+            }
+        }
+        else
+        {
+            targetPathList = GetTargetPathList(input, GetSavePath(input));
+        }
+
+
+        for (var i = 0; i < templatePathList.Count; i++)
+        {
+            var templatePath = templatePathList[i];
+
+            string templateFileName = Path.GetFileName(templatePath);
+            var templateNameType = templateFileName[templateFileName.IndexOf('.')..].Replace(".vm", string.Empty);
+
+            var templateName = Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(templatePath));
+            foreach (string targetPath in targetPathList)
+            {
+                string targetFileName = Path.GetFileName(targetPath);
+                var targetNameType = targetFileName[targetFileName.IndexOf('.')..];
+
+                string targetName = Path.GetFileNameWithoutExtension(targetPath);
+                if (templateNameType == targetNameType && targetName.EndsWith(templateName) && !dict.ContainsKey(templatePath))
+                {
+                    dict.Add(templatePath, targetPath);
+                }
+            }
+        }
+
+        return dict;
     }
 
     /// <summary>
@@ -646,74 +687,86 @@ public class SysCodeGenService : IDynamicApiController, ITransient
         var templatePath = Path.Combine(App.WebHostEnvironment.WebRootPath, "Template");
         if (input.GenerateType.Substring(1, 1).Contains('1'))
         {
-            return new List<string>()
-            {
-                Path.Combine(templatePath, "index.vue.vm"),
-                Path.Combine(templatePath, "editDialog.vue.vm"),
-                Path.Combine(templatePath, "manage.js.vm"),
-            };
+            return GetTemplatePathList(templatePath, TemplateType.Front).OrderByDescending(m => m.Length).ToList();
         }
         else if (input.GenerateType.Substring(1, 1).Contains('2'))
         {
-            return new List<string>()
-            {
-                Path.Combine(templatePath, "Service.cs.vm"),
-                Path.Combine(templatePath, "Input.cs.vm"),
-                Path.Combine(templatePath, "Output.cs.vm"),
-                Path.Combine(templatePath, "Dto.cs.vm"),
-            };
+            return GetTemplatePathList(templatePath, TemplateType.Backed).OrderByDescending(m => m.Length).ToList();
         }
         else
         {
-            return new List<string>()
-            {
-                Path.Combine(templatePath, "Service.cs.vm"),
-                Path.Combine(templatePath, "Input.cs.vm"),
-                Path.Combine(templatePath, "Output.cs.vm"),
-                Path.Combine(templatePath, "Dto.cs.vm"),
-                Path.Combine(templatePath, "index.vue.vm"),
-                Path.Combine(templatePath, "editDialog.vue.vm"),
-                Path.Combine(templatePath, "manage.js.vm"),
-            };
+            return GetTemplatePathList(templatePath).OrderByDescending(m => m.Length).ToList();
         }
     }
 
-    /// <summary>
-    /// 获取模板文件路径集合
-    /// </summary>
-    /// <returns></returns>
-    private static List<string> GetTemplatePathList()
+    enum TemplateType
     {
-        var templatePath = Path.Combine(App.WebHostEnvironment.WebRootPath, "Template");
-        return new List<string>()
+        Front,
+        Backed,
+        All,
+    }
+
+    private static List<string> GetTemplatePathList(string templatePath, TemplateType type = TemplateType.All)
+    {
+        var templateList = Directory.GetFiles(templatePath, "*.vm", SearchOption.AllDirectories);
+        List<string> result = new List<string>();
+        foreach (string fileName in templateList)
         {
-            Path.Combine(templatePath, "Service.cs.vm"),
-            Path.Combine(templatePath, "Input.cs.vm"),
-            Path.Combine(templatePath, "Output.cs.vm"),
-            Path.Combine(templatePath, "Dto.cs.vm"),
-            Path.Combine(templatePath, "index.vue.vm"),
-            Path.Combine(templatePath, "editDialog.vue.vm"),
-            Path.Combine(templatePath, "manage.js.vm"),
-        };
+            if (fileName.Contains(".bak."))
+            {
+                continue;
+            }
+
+            bool isFront = !fileName.EndsWith(".cs.vm");
+            switch (type)
+            {
+                case TemplateType.Front:
+                    if (isFront)
+                    {
+                        result.Add(Path.Combine(templatePath, fileName));
+                    }
+
+                    break;
+                case TemplateType.Backed:
+                    if (!isFront)
+                    {
+                        result.Add(Path.Combine(templatePath, fileName));
+                    }
+
+                    break;
+                case TemplateType.All:
+                    result.Add(Path.Combine(templatePath, fileName));
+                    break;
+            }
+        }
+
+        return result;
     }
 
     /// <summary>
     /// 设置生成文件路径
     /// </summary>
     /// <param name="input"></param>
+    /// <param name="savePath"></param>
     /// <returns></returns>
-    private List<string> GetTargetPathList(SysCodeGen input)
+    private List<string> GetTargetPathList(SysCodeGen input, string savePath)
     {
-        //var backendPath = Path.Combine(new DirectoryInfo(App.WebHostEnvironment.ContentRootPath).Parent.FullName, _codeGenOptions.BackendApplicationNamespace, "Service", input.TableName);
-        var backendPath = Path.Combine(new DirectoryInfo(App.WebHostEnvironment.ContentRootPath).Parent.FullName, input.NameSpace, "Service", input.TableName);
+        var frontendRootPath = Directory.GetParent(savePath).FullName;
+
+        var backendPath = Path.Combine(savePath, input.NameSpace, "Service", input.TableName);
         var servicePath = Path.Combine(backendPath, input.TableName + "Service.cs");
         var inputPath = Path.Combine(backendPath, "Dto", input.TableName + "Input.cs");
+        var inputAddByEntityInputPath = Path.Combine(backendPath, "Dto", input.TableName + "AddByEntityInput.cs");
+        var inputPageInputPath = Path.Combine(backendPath, "Dto", input.TableName + "PageInput.cs");
+        var inputQueryByIdInputPath = Path.Combine(backendPath, "Dto", input.TableName + "QueryByIdInput.cs");
+        var inputUpdateByIdInputPath = Path.Combine(backendPath, "Dto", input.TableName + "UpdateByIdInput.cs");
+        var inputDeleteByIdInputPath = Path.Combine(backendPath, "Dto", input.TableName + "DeleteByIdInput.cs");
         var outputPath = Path.Combine(backendPath, "Dto", input.TableName + "Output.cs");
         var viewPath = Path.Combine(backendPath, "Dto", input.TableName + "Dto.cs");
-        var frontendPath = Path.Combine(new DirectoryInfo(App.WebHostEnvironment.ContentRootPath).Parent.Parent.FullName, _codeGenOptions.FrontRootPath, "src", "views", input.ModuleName.ToLower());
+        var frontendPath = Path.Combine(frontendRootPath, _codeGenOptions.FrontRootPath, "src", "views", input.ModuleName.ToLower());
         var indexPath = Path.Combine(frontendPath, input.TableName[..1].ToLower() + input.TableName[1..], "index.vue"); //
         var formModalPath = Path.Combine(frontendPath, input.TableName[..1].ToLower() + input.TableName[1..], "component", "editDialog.vue");
-        var apiJsPath = Path.Combine(new DirectoryInfo(App.WebHostEnvironment.ContentRootPath).Parent.Parent.FullName, _codeGenOptions.FrontRootPath, "src", "api", input.ModuleName.ToLower(), input.TableName[..1].ToLower() + input.TableName[1..] + ".ts");
+        var apiJsPath = Path.Combine(frontendRootPath, _codeGenOptions.FrontRootPath, "src", "api", input.ModuleName.ToLower(), input.TableName[..1].ToLower() + input.TableName[1..] + ".ts");
 
         if (input.GenerateType.Substring(1, 1).Contains('1'))
         {
@@ -732,6 +785,11 @@ public class SysCodeGenService : IDynamicApiController, ITransient
             {
                 servicePath,
                 inputPath,
+                inputQueryByIdInputPath,
+                inputUpdateByIdInputPath,
+                inputDeleteByIdInputPath,
+                inputAddByEntityInputPath,
+                inputPageInputPath,
                 outputPath,
                 viewPath,
             };
@@ -743,6 +801,11 @@ public class SysCodeGenService : IDynamicApiController, ITransient
             {
                 servicePath,
                 inputPath,
+                inputQueryByIdInputPath,
+                inputUpdateByIdInputPath,
+                inputDeleteByIdInputPath,
+                inputAddByEntityInputPath,
+                inputPageInputPath,
                 outputPath,
                 viewPath,
                 indexPath,
@@ -753,55 +816,19 @@ public class SysCodeGenService : IDynamicApiController, ITransient
     }
 
     /// <summary>
-    /// 设置生成文件路径
+    /// 获取保存路径
     /// </summary>
     /// <param name="input"></param>
+    /// <param name="isZip"></param>
     /// <returns></returns>
-    private List<string> GetZipPathList(SysCodeGen input)
+    private string GetSavePath(SysCodeGen input, bool isZip = false)
     {
-        var zipPath = Path.Combine(App.WebHostEnvironment.WebRootPath, "CodeGen", input.TableName);
+        string path = new DirectoryInfo(App.WebHostEnvironment.ContentRootPath).Parent.FullName;
+        if (isZip)
+        {
+            path = Path.Combine(App.WebHostEnvironment.WebRootPath, "CodeGen", input.TableName);
+        }
 
-        //var backendPath = Path.Combine(zipPath, _codeGenOptions.BackendApplicationNamespace, "Service", input.TableName);
-        var backendPath = Path.Combine(zipPath, input.NameSpace, "Service", input.TableName);
-        var servicePath = Path.Combine(backendPath, input.TableName + "Service.cs");
-        var inputPath = Path.Combine(backendPath, "Dto", input.TableName + "Input.cs");
-        var outputPath = Path.Combine(backendPath, "Dto", input.TableName + "Output.cs");
-        var viewPath = Path.Combine(backendPath, "Dto", input.TableName + "Dto.cs");
-        var frontendPath = Path.Combine(zipPath, _codeGenOptions.FrontRootPath, "src", "views", input.ModuleName.ToLower());
-        var indexPath = Path.Combine(frontendPath, input.TableName[..1].ToLower() + input.TableName[1..], "index.vue");
-        var formModalPath = Path.Combine(frontendPath, input.TableName[..1].ToLower() + input.TableName[1..], "component", "editDialog.vue");
-        var apiJsPath = Path.Combine(zipPath, _codeGenOptions.FrontRootPath, "src", "api", input.ModuleName.ToLower(), input.TableName[..1].ToLower() + input.TableName[1..] + ".ts");
-        if (input.GenerateType.StartsWith("11"))
-        {
-            return new List<string>()
-            {
-                indexPath,
-                formModalPath,
-                apiJsPath
-            };
-        }
-        else if (input.GenerateType.StartsWith("12"))
-        {
-            return new List<string>()
-            {
-                servicePath,
-                inputPath,
-                outputPath,
-                viewPath
-            };
-        }
-        else
-        {
-            return new List<string>()
-            {
-                servicePath,
-                inputPath,
-                outputPath,
-                viewPath,
-                indexPath,
-                formModalPath,
-                apiJsPath
-            };
-        }
+        return path;
     }
 }

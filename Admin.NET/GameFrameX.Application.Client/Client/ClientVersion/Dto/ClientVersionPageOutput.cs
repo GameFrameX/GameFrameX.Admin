@@ -3,6 +3,6 @@
 /// <summary>
 /// 版本管理输出参数
 /// </summary>
-public class ClientVersionPageOutput : BasePageOutput<Entity.Client.ClientVersion>
+public class ClientVersionPageOutput : Entity.Client.ClientVersion, IBasePageOutput<Entity.Client.ClientVersion>
 {
 }

@@ -9,16 +9,15 @@
     }
 }
 namespace @Model.NameSpace;
+
 /// <summary>
 /// @(@Model.BusName)服务
 /// </summary>
 [ApiDescriptionSettings(@(@Model.ProjectLastName)Const.GroupName, Order = 100)]
-public class @(@Model.ClassName)Service : IDynamicApiController, ITransient
+public class @(@Model.ClassName)Service : BaseService<@(@Model.ClassName)>
 {
-    private readonly SqlSugarRepository<@(@Model.ClassName)> _rep;
-    public @(@Model.ClassName)Service(SqlSugarRepository<@(@Model.ClassName)> rep)
+    public @(@Model.ClassName)Service(SqlSugarRepository<@(@Model.ClassName)> rep) : base(rep)
     {
-        _rep = rep;
     }
 
     /// <summary>
@@ -30,7 +29,7 @@ public class @(@Model.ClassName)Service : IDynamicApiController, ITransient
     [ApiDescriptionSettings(Name = "Page")]
     public async Task<SqlSugarPagedList<@(@Model.ClassName)Output>> Page(@(@Model.ClassName)Input input)
     {
-        var query= _rep.AsQueryable()
+        var query= Repository.AsQueryable()
 @{string conditionFlag = "";}
 @if (haveLikeCdt) {
             @:.WhereIF(!string.IsNullOrWhiteSpace(input.SearchKey), u =>
@@ -119,8 +118,10 @@ if (@column.QueryWhether == "Y"){
     [ApiDescriptionSettings(Name = "Add")]
     public async Task Add(Add@(@Model.ClassName)Input input)
     {
-        var entity = input.Adapt<@(@Model.ClassName)>();
-        await _rep.InsertAsync(entity);
+        await InnerAdd(input);
+        
+        //var entity = input.Adapt<@(@Model.ClassName)>();
+        //await Repository.InsertAsync(entity);
     }
 
     /// <summary>
@@ -129,16 +130,16 @@ if (@column.QueryWhether == "Y"){
     /// <param name="input"></param>
     /// <returns></returns>
     [HttpPost]
-    [ApiDescriptionSettings(Name = "Delete")]
-    public async Task Delete(Delete@(@Model.ClassName)Input input)
+    [ApiDescriptionSettings(Name = "DisableDelete")]
+    public async Task DisableDelete(Delete@(@Model.ClassName)Input input)
     {
 @foreach (var column in Model.TableField){
 if (@column.ColumnKey == "True"){
-        @:var entity = await _rep.GetFirstAsync(u => u.@(@column.PropertyName) == input.@(@column.PropertyName)) ?? throw Oops.Oh(ErrorCodeEnum.D1002);
+        @:var entity = await Repository.GetFirstAsync(u => u.@(@column.PropertyName) == input.@(@column.PropertyName)) ?? throw Oops.Oh(ErrorCodeEnum.D1002);
 }
 }
-        await _rep.FakeDeleteAsync(entity);   //假删除
-        //await _rep.DeleteAsync(entity);   //真删除
+        await Repository.FakeDeleteAsync(entity);   //假删除
+        //await Repository.DeleteAsync(entity);   //真删除
     }
 
     /// <summary>
@@ -150,8 +151,9 @@ if (@column.ColumnKey == "True"){
     [ApiDescriptionSettings(Name = "Update")]
     public async Task Update(Update@(@Model.ClassName)Input input)
     {
-        var entity = input.Adapt<@(@Model.ClassName)>();
-        await _rep.AsUpdateable(entity).IgnoreColumns(ignoreAllNullColumns: true).ExecuteCommandAsync();
+        await InnerUpdate(input);
+        //var entity = input.Adapt<@(@Model.ClassName)>();
+        //await Repository.AsUpdateable(entity).IgnoreColumns(ignoreAllNullColumns: true).ExecuteCommandAsync();
     }
 
     /// <summary>
@@ -165,7 +167,8 @@ if (@column.ColumnKey == "True"){
     {
 @foreach (var column in Model.TableField){
 if (@column.ColumnKey == "True"){
-        @:return await _rep.GetFirstAsync(u => u.@(@column.PropertyName) == input.@(@column.PropertyName));
+        return await InnerGet(input);
+        @://return await Repository.GetFirstAsync(u => u.@(@column.PropertyName) == input.@(@column.PropertyName));
 }   
 }            
     }
@@ -179,11 +182,11 @@ if (@column.ColumnKey == "True"){
     [ApiDescriptionSettings(Name = "List")]
     public async Task<List<@(@Model.ClassName)Output>> List([FromQuery] @(@Model.ClassName)Input input)
     {
-        return await _rep.AsQueryable().Select<@(@Model.ClassName)Output>().ToListAsync();
+        return await Repository.AsQueryable().Select<@(@Model.ClassName)Output>().ToListAsync();
     }
 
 @foreach (var column in Model.TableField){
-if(@column.EffectType == "fk" && (@column.WhetherAddUpdate == "Y" || column.QueryWhether == "Y")){  
+if(@column.EffectType == "fk" && (@column.WhetherUpdate == "Y" || column.QueryWhether == "Y")){  
     @:/// <summary>
     @:/// 获取@(@column.ColumnComment)列表
     @:/// </summary>
@@ -192,7 +195,7 @@ if(@column.EffectType == "fk" && (@column.WhetherAddUpdate == "Y" || column.Quer
     @:[ApiDescriptionSettings(Name = "@(@column.FkEntityName)@(@column.PropertyName)Dropdown"), HttpGet]
     @:public async Task<dynamic> @(@column.FkEntityName)@(@column.PropertyName)Dropdown()
     @:{
-        @:return await _rep.Context.Queryable<@(@column.FkEntityName)>()
+        @:return await Repository.Context.Queryable<@(@column.FkEntityName)>()
                 @:.Select(u => new
                 @:{
                     @:Label = u.@(@column.FkColumnName),
@@ -218,15 +221,13 @@ if(@column.EffectType == "Upload"){
     @:} 
 }
 }
-
-
 @foreach (var column in Model.TableField){
 if(@column.EffectType == "ApiTreeSelect" && !definedObjects.ContainsKey("@(@column.FkEntityName)Tree")){
     @{definedObjects.Add("@(@column.FkEntityName)Tree", 1);}
     @:[HttpGet("/@(@Model.LowerClassName)/@(@column.FkEntityName)Tree")]
     @:public async Task<dynamic> @(@column.FkEntityName)Tree()
     @:{
-        @:return await _rep.Context.Queryable<@(@column.FkEntityName)>().ToTreeAsync(u => u.Children, u => u.@(@column.PidColumn), 0);
+        @:return await Repository.Context.Queryable<@(@column.FkEntityName)>().ToTreeAsync(u => u.Children, u => u.@(@column.PidColumn), 0);
     @:}
 }
 }

@@ -278,19 +278,30 @@ public static class CodeGenUtility
     public static string DataTypeToEff(string dataType)
     {
         if (string.IsNullOrEmpty(dataType)) return "";
-        return dataType?.TrimEnd('?') switch
+        switch (dataType?.TrimEnd('?'))
         {
-            "string" => "Input",
-            "int" => "InputNumber",
-            "long" => "Input",
-            "float" => "Input",
-            "double" => "Input",
-            "decimal" => "Input",
-            "bool" => "Switch",
-            "Guid" => "Input",
-            "DateTime" => "DatePicker",
-            _ => "Input",
-        };
+            case "string":
+                return "Input";
+            case "int":
+                return "InputNumber";
+            case "long":
+            case "float":
+            case "double":
+            case "decimal":
+                return "Input";
+            case "bool":
+                return "Switch";
+            case "Guid":
+                return "Input";
+            case "DatePicker":
+                return "DatePicker";
+            case "DateTimePicker":
+                return "DateTimePicker";
+            case "TimePicker":
+                return "TimePicker";
+            default:
+                return "Input";
+        }
     }
 
     /// <summary>

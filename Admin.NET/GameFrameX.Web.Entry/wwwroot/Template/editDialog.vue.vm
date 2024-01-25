@@ -3,7 +3,7 @@
 @{string pkFieldName = LowerFirstLetter(pkField.PropertyName);}
 <template>
 	<div class="@(@Model.LowerClassName)-container">
-		<el-dialog v-model="isShowDialog" :width="800" draggable="">
+		<el-dialog v-model="isShowDialog" width="75%" draggable="">
 			<template #header>
 				<div style="color: #fff">
 					<!--<el-icon size="16" style="margin-right: 3px; display: inline; vertical-align: middle"> <ele-Edit /> </el-icon>-->
@@ -18,7 +18,7 @@
 						<el-input v-model="ruleForm.@(@column.LowerPropertyName)" />
 					</el-form-item>
 					}else{
-					if (@column.WhetherAddUpdate == "Y"){
+					if (@column.WhetherAdd == "Y" || @column.WhetherUpdate == "Y"){
 					if(@column.EffectType == "fk"){
 					@:<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12" class="mb20">
 						@:<el-form-item label="@column.ColumnComment" prop="@(@column.LowerPropertyName)">
@@ -112,6 +112,22 @@
 						</el-form-item>
 						@:
 					</el-col>
+					}else if(@column.EffectType == "TimePicker"){
+					@:<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12" class="mb20">
+						@:<el-form-item label="@column.ColumnComment" prop="@(@column.LowerPropertyName)">
+							@:<el-time-picker v-model="ruleForm.@(@column.LowerPropertyName)" type="date" placeholder="@(@column.ColumnComment)" />
+							@:
+						</el-form-item>
+						@:
+					</el-col>
+					}else if(@column.EffectType == "DateTimePicker"){
+					@:<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12" class="mb20">
+						@:<el-form-item label="@column.ColumnComment" prop="@(@column.LowerPropertyName)">
+							@:<el-date-picker v-model="ruleForm.@(@column.LowerPropertyName)" type="datetime" placeholder="@(@column.ColumnComment)" />
+							@:
+						</el-form-item>
+						@:
+					</el-col>
 					}else if(@column.EffectType == "Upload"){
 					@:<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12" class="mb20">
 						@:<el-form-item label="@column.ColumnComment" prop="@(@column.LowerPropertyName)">
@@ -185,7 +201,7 @@
 	@{definedObjects.Add("import__@(@column.FkEntityName)Tree", 1);}
 	@:import { get@(@column.FkEntityName)Tree } from '/@@/api/@(@Model.ModuleName)/@(@Model.LowerClassName)';
 	}
-	if(@column.EffectType == "fk" && @column.WhetherAddUpdate == "Y"){
+	if(@column.EffectType == "fk" && @column.WhetherAdd == "Y"){
 	@:import { get@(@column.FkEntityName)@(@column.PropertyName)Dropdown } from '/@@/api/@(@Model.ModuleName)/@(@Model.LowerClassName)';
 	}
 	}
@@ -264,7 +280,7 @@
 	};
 
 	@foreach (var column in Model.TableField){
-	if(@column.EffectType == "fk" && @column.WhetherAddUpdate == "Y"){
+	if(@column.EffectType == "fk" && @column.WhetherAdd == "Y"){
 	@:const @LowerFirstLetter(@column.FkEntityName)@(@column.PropertyName)DropdownList = ref<any>([]); 
 	@:const get@(@column.FkEntityName)@(@column.PropertyName)DropdownList = async () => {
 		@:let list = await get@(@column.FkEntityName)@(@column.PropertyName)Dropdown();
@@ -300,7 +316,7 @@
 
 
 	@foreach (var column in Model.TableField){ 
-	if(column.WhetherAddUpdate=="N") continue;
+	if(column.WhetherUpdate=="N") continue;
 	if(@column.EffectType == "Upload"){
 	@:const upload@(@column.PropertyName)Handle = async (options: UploadRequestOptions) => {
 		@:const res = await upload@(@column.PropertyName)(options);
@@ -320,7 +336,7 @@
 	});
 
 	//将属性或者函数暴露给父组件
-	defineExpose({ openDialog });
+	defineExpose({ openDialog, isEditor });
 </script>
 
 

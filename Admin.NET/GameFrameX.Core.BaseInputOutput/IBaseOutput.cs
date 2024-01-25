@@ -9,13 +9,6 @@
 
 namespace GameFrameX.Core.BaseInputOutput;
 
-/// <summary>
-/// 全局选择器查询输入参数
-/// </summary>
-public class BaseSelectPageInput : IBaseInput
+public interface IBaseOutput
 {
-    /// <summary>
-    /// 关键字查询
-    /// </summary>
-    public string? SearchKey { get; set; }
 }

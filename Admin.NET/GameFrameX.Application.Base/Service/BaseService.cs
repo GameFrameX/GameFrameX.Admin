@@ -29,7 +29,7 @@ public class BaseService<T> : IDynamicApiController, ITransient where T : Entity
 {
     protected readonly SqlSugarRepository<T> Repository;
 
-    public BaseService(SqlSugarRepository<T> repository)
+    protected BaseService(SqlSugarRepository<T> repository)
     {
         Repository = repository;
     }
@@ -59,9 +59,9 @@ public class BaseService<T> : IDynamicApiController, ITransient where T : Entity
     /// </summary>
     /// <param name="input"></param>
     /// <returns></returns>
-    [HttpPost]
-    [ApiDescriptionSettings(Name = "Add")]
-    public async Task Add(BaseInput<T> input)
+    // [HttpPost]
+    // [ApiDescriptionSettings(Name = "Add")]
+    protected async Task InnerAdd(BaseAddInput input)
     {
         var entity = input.Adapt<T>();
         await Repository.InsertAsync(entity);
@@ -74,7 +74,7 @@ public class BaseService<T> : IDynamicApiController, ITransient where T : Entity
     /// <returns></returns>
     [HttpPost]
     [ApiDescriptionSettings(Name = "Delete")]
-    public async Task Delete(DeleteBaseInput input)
+    public async Task Delete(BaseDeleteInput input)
     {
         var entity = await Repository.GetFirstAsync(u => u.Id == input.Id) ?? throw Oops.Oh(ErrorCodeEnum.D1002);
         await Repository.FakeDeleteAsync<T>(entity); //假删除
@@ -86,22 +86,20 @@ public class BaseService<T> : IDynamicApiController, ITransient where T : Entity
     /// </summary>
     /// <param name="input"></param>
     /// <returns></returns>
-    // [HttpPost]
-    // [ApiDescriptionSettings(Name = "Update")]
-    // public async Task Update(UpdateClientVersionInput input)
-    // {
-    //     var entity = input.Adapt<T>();
-    //     await _rep.AsUpdateable(entity).IgnoreColumns(ignoreAllNullColumns: true).ExecuteCommandAsync();
-    // }
+    protected async Task InnerUpdate(BaseUpdateInput input)
+    {
+        var entity = input.Adapt<T>();
+        await Repository.AsUpdateable(entity).IgnoreColumns(ignoreAllNullColumns: true).ExecuteCommandAsync();
+    }
 
     /// <summary>
     /// 根据主键ID获取详细信息
     /// </summary>
     /// <param name="input"></param>
     /// <returns></returns>
-    [HttpGet]
-    [ApiDescriptionSettings(Name = "Detail")]
-    public async Task<T> Get([FromQuery] QueryByIdInput input)
+    // [HttpGet]
+    // [ApiDescriptionSettings(Name = "Detail")]
+    protected async Task<T> InnerGet([FromQuery] QueryByIdInput input)
     {
         return await Repository.GetFirstAsync(u => u.Id == input.Id);
     }
@@ -111,10 +109,10 @@ public class BaseService<T> : IDynamicApiController, ITransient where T : Entity
     /// </summary>
     /// <param name="input"></param>
     /// <returns></returns>
-    [HttpGet]
-    [ApiDescriptionSettings(Name = "List")]
-    public async Task<List<BasePageOutput<T>>> List([FromQuery] BasePageInput input)
-    {
-        return await Repository.AsQueryable().Select<BasePageOutput<T>>().ToListAsync();
-    }
+    // [HttpGet]
+    // [ApiDescriptionSettings(Name = "List")]
+    // public async Task<List<T>> InnerList([FromQuery] BasePageInput input)
+    // {
+    //     return await Repository.AsQueryable().Select<IBasePageOutput<T>>().ToListAsync();
+    // }
 }

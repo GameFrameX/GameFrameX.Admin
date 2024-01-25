@@ -3,7 +3,7 @@
 /// <summary>
 /// 版本管理基础输入参数
 /// </summary>
-public class ClientVersionBaseInput : BaseInput
+public class ClientVersionBaseInput : IBaseInput
 {
     /// <summary>
     /// 名称
@@ -54,7 +54,7 @@ public class AddClientVersionInput : ClientVersionBaseInput
 /// <summary>
 /// 版本管理删除输入参数
 /// </summary>
-public class DeleteClientVersionInput : DeleteBaseInput
+public class BaseDeleteClientVersionInput : BaseDeleteInput
 {
 }
 
