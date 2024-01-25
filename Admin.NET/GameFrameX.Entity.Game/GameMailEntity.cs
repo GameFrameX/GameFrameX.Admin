@@ -18,47 +18,40 @@ namespace GameFrameX.Entity.Game;
 public class GameMailEntity : EntityBase
 {
     /// <summary>
-    /// 区服Id
+    /// 区服列表
     /// </summary>
-    [SugarColumn(ColumnDescription = "区服Id")]
-    public long AreaId { get; set; }
-
-    /// <summary>
-    /// 发送者的唯一标识符。
-    /// </summary>
-    [SugarColumn(ColumnDescription = "发送者的唯一标识符")]
-    public long SenderId { get; set; }
+    [SugarColumn(ColumnDescription = "区服列表")]
+    public string AreaIdList { get; set; }
 
     /// <summary>
     /// 接收者的唯一标识符。
     /// </summary>
-    [SugarColumn(ColumnDescription = "接收者的唯一标识符")]
-    public long RecipientId { get; set; }
+    [SugarColumn(ColumnDescription = "接收者")]
+    public string RecipientId { get; set; }
 
     /// <summary>
     /// 邮件发送的日期和时间。
     /// </summary>
-    [SugarColumn(ColumnDescription = "邮件发送的日期和时间")]
+    [SugarColumn(ColumnDescription = "发送的时间")]
     public DateTime SendDate { get; set; }
 
     /// <summary>
     /// 邮件的标题或主题。
     /// </summary>
-    [SugarColumn(ColumnDescription = "邮件的标题或主题")]
+    [SugarColumn(ColumnDescription = "标题")]
     public string Subject { get; set; }
 
     /// <summary>
     /// 邮件的详细信息内容。
     /// </summary>
-    [SugarColumn(ColumnDescription = "邮件的详细信息内容", Length = 4096)]
+    [SugarColumn(ColumnDescription = "详细内容", Length = 4096)]
     public string Body { get; set; }
 
     /// <summary>
     /// 附件列表
     /// </summary>
-    [SugarColumn(IsIgnore = true, ColumnDescription = "附件列表")]
-    [Navigate(NavigateType.OneToMany, nameof(Id), nameof(GameMailAttachmentEntity.MailId))]
-    public List<GameMailAttachmentEntity> Attachments { get; set; }
+    [SugarColumn(ColumnDescription = "附件列表")]
+    public string Attachments { get; set; }
 
     /// <summary>
     /// 邮件状态，包括已读、未读、删除等件。
