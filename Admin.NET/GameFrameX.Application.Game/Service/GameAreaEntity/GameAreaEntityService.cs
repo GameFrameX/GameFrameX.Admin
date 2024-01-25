@@ -4,7 +4,7 @@
 /// 游戏区服服务
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
-public class GameAreaEntityService : BaseService<GameAreaEntity>
+public class GameAreaEntityService : BaseSelectService<GameAreaEntity>
 {
     public GameAreaEntityService(SqlSugarRepository<GameAreaEntity> rep) : base(rep)
     {
