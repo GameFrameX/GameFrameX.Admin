@@ -36,11 +36,16 @@
 						<el-checkbox v-model="scope.row.whetherTable" />
 					</template>
 				</el-table-column>
-				<el-table-column prop="whetherAddUpdate" label="增改" width="80" align="center" show-overflow-tooltip>
+				<el-table-column prop="whetherAdd" label="增加" width="80" align="center" show-overflow-tooltip>
 					<template #default="scope">
-						<el-checkbox v-model="scope.row.whetherAddUpdate" :disabled="judgeColumns(scope.row)" />
+						<el-checkbox v-model="scope.row.whetherAdd" :disabled="judgeColumns(scope.row)" />
 					</template>
 				</el-table-column>
+        <el-table-column prop="whetherUpdate" label="修改" width="80" align="center" show-overflow-tooltip>
+          <template #default="scope">
+            <el-checkbox v-model="scope.row.whetherUpdate" :disabled="judgeColumns(scope.row)" />
+          </template>
+        </el-table-column>
 				<el-table-column prop="whetherRequired" label="必填" width="80" align="center" show-overflow-tooltip>
 					<template #default="scope">
 						<el-checkbox v-model="scope.row.whetherRequired" :disabled="judgeColumns(scope.row)" />
