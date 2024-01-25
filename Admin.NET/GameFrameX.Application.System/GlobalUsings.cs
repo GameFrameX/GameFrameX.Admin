@@ -21,3 +21,7 @@ global using System.Collections.Generic;
 global using System.ComponentModel;
 global using System.ComponentModel.DataAnnotations;
 global using System.Threading.Tasks;
+global using GameFrameX.Core.BaseInputOutput;
+global using GameFrameX.Core.Enum;
+global using GameFrameX.Core.Utility;
+global using GameFrameX.Entity.System;

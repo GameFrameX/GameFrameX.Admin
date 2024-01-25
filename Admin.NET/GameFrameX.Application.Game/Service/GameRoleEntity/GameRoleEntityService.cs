@@ -1,4 +1,6 @@
-﻿namespace GameFrameX.Application.Game;
+﻿using GameFrameX.Core.Extension;
+
+namespace GameFrameX.Application.Game;
 /// <summary>
 /// 游戏角色服务
 /// </summary>

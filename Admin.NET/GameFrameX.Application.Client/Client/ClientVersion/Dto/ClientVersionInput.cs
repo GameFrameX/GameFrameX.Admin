@@ -1,88 +1,78 @@
-﻿using GameFrameX.Core.Util;
+﻿namespace GameFrameX.Application.Client.Client.ClientVersion.Dto;
 
-namespace GameFrameX.Application.Client.Client.ClientVersion.Dto;
+/// <summary>
+/// 版本管理基础输入参数
+/// </summary>
+public class ClientVersionBaseInput : BaseInput
+{
+    /// <summary>
+    /// 名称
+    /// </summary>
+    public virtual string? Name { get; set; }
 
     /// <summary>
-    /// 版本管理基础输入参数
+    /// 描述
     /// </summary>
-    public class ClientVersionBaseInput
-    {
-        /// <summary>
-        /// 名称
-        /// </summary>
-        public virtual string? Name { get; set; }
-        
-        /// <summary>
-        /// 描述
-        /// </summary>
-        public virtual string? Description { get; set; }
-        
-        /// <summary>
-        /// CreateUserName
-        /// </summary>
-        public virtual string? CreateUserName { get; set; }
-        
-        /// <summary>
-        /// UpdateUserName
-        /// </summary>
-        public virtual string? UpdateUserName { get; set; }
-        
-    }
+    public virtual string? Description { get; set; }
 
     /// <summary>
-    /// 版本管理分页查询输入参数
+    /// CreateUserName
     /// </summary>
-    public class ClientVersionInput : BasePageInput
-    {
-        /// <summary>
-        /// 关键字查询
-        /// </summary>
-        public string? SearchKey { get; set; }
-
-        /// <summary>
-        /// 名称
-        /// </summary>
-        public string? Name { get; set; }
-        
-    }
+    public virtual string? CreateUserName { get; set; }
 
     /// <summary>
-    /// 版本管理增加输入参数
+    /// UpdateUserName
     /// </summary>
-    public class AddClientVersionInput : ClientVersionBaseInput
-    {
-        /// <summary>
-        /// 名称
-        /// </summary>
-        [Required(ErrorMessage = "名称不能为空")]
-        public override string? Name { get; set; }
-        
-    }
+    public virtual string? UpdateUserName { get; set; }
+}
+
+/// <summary>
+/// 版本管理分页查询输入参数
+/// </summary>
+public class ClientVersionInput : BasePageInput
+{
+
 
     /// <summary>
-    /// 版本管理删除输入参数
+    /// 名称
     /// </summary>
-    public class DeleteClientVersionInput : BaseIdInput
-    {
-    }
+    public string? Name { get; set; }
+}
 
+/// <summary>
+/// 版本管理增加输入参数
+/// </summary>
+public class AddClientVersionInput : ClientVersionBaseInput
+{
     /// <summary>
-    /// 版本管理更新输入参数
+    /// 名称
     /// </summary>
-    public class UpdateClientVersionInput : ClientVersionBaseInput
-    {
-        /// <summary>
-        /// Id
-        /// </summary>
-        [Required(ErrorMessage = "Id不能为空")]
-        public long Id { get; set; }
-        
-    }
+    [Required(ErrorMessage = "名称不能为空")]
+    public override string? Name { get; set; }
+}
 
+/// <summary>
+/// 版本管理删除输入参数
+/// </summary>
+public class DeleteClientVersionInput : DeleteBaseInput
+{
+}
+
+/// <summary>
+/// 版本管理更新输入参数
+/// </summary>
+public class UpdateClientVersionInput : ClientVersionBaseInput
+{
     /// <summary>
-    /// 版本管理主键查询输入参数
+    /// Id
     /// </summary>
-    public class QueryByIdClientVersionInput : DeleteClientVersionInput
-    {
+    [Required(ErrorMessage = "Id不能为空")]
+    public long Id { get; set; }
+}
 
-    }
+/// <summary>
+/// 版本管理主键查询输入参数
+/// </summary>
+public class QueryByIdClientVersionInput : QueryByIdInput
+{
+}

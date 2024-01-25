@@ -1,4 +1,5 @@
-﻿using GameFrameX.Application.Client.Client.ClientPlatform.Dto;
+﻿using GameFrameX.Application.Base.Service;
+using GameFrameX.Application.Client.Client.ClientPlatform.Dto;
 using GameFrameX.Core.Enum;
 using GameFrameX.Core.Extension;
 using GameFrameX.Core.SqlSugar;
@@ -8,7 +9,7 @@ namespace GameFrameX.Application.Client.Client.ClientPlatform;
 /// 平台管理服务
 /// </summary>
 [ApiDescriptionSettings( Order = 100)]
-public class ClientPlatformService :GetSelectBaseService<Entity.Client.ClientPlatform>
+public class ClientPlatformService :BaseSelectService<Entity.Client.ClientPlatform>
 {
     private readonly SqlSugarRepository<Entity.Client.ClientPlatform> _rep;
     public ClientPlatformService(SqlSugarRepository<Entity.Client.ClientPlatform> rep):base(rep)

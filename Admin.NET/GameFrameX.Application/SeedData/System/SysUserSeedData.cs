@@ -9,7 +9,7 @@
 
 using GameFrameX.Core.Enum;
 using GameFrameX.Core.SqlSugar;
-using GameFrameX.Core.Util;
+using GameFrameX.Core.Utility;
 using GameFrameX.Entity.System;
 
 namespace GameFrameX.Application.SeedData.System;
@@ -25,7 +25,7 @@ public class SysUserSeedData : ISqlSugarEntitySeedData<SysUser>
     /// <returns></returns>
     public IEnumerable<SysUser> HasData()
     {
-        var encryptPasswod = CryptogramUtil.Encrypt("123456");
+        var encryptPasswod = CryptogramUtility.Encrypt("123456");
 
         return new[]
         {

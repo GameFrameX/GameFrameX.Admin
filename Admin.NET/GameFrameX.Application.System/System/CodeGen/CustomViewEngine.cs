@@ -9,9 +9,10 @@
 
 using Furion.ViewEngine;
 using GameFrameX.Application.System.System.CodeGen.Dto;
+using GameFrameX.Core.Base.Const;
 using GameFrameX.Core.Const;
 using GameFrameX.Core.Option;
-using GameFrameX.Core.Util;
+using GameFrameX.Core.Utility;
 
 namespace GameFrameX.Application.System.System.CodeGen;
 
@@ -75,7 +76,7 @@ public class CustomViewEngine : ViewEngineModel
         var config = App.GetOptions<DbConnectionOptions>().ConnectionConfigs.FirstOrDefault(u => u.ConfigId.ToString() == ConfigId);
         ColumnList = GetColumnListByTableName(tbName.ToString());
         var col = ColumnList.Where(c => (config.DbSettings.EnableUnderLine
-            ? CodeGenUtil.CamelColumnName(c.ColumnName, Array.Empty<string>())
+            ? CodeGenUtility.CamelColumnName(c.ColumnName, Array.Empty<string>())
             : c.ColumnName) == colName.ToString()).FirstOrDefault();
         return col.NetType;
     }
@@ -103,7 +104,7 @@ public class CustomViewEngine : ViewEngineModel
             ColumnName = u.DbColumnName,
             ColumnKey = u.IsPrimarykey.ToString(),
             DataType = u.DataType.ToString(),
-            NetType = CodeGenUtil.ConvertDataType(u, provider.CurrentConnectionConfig.DbType),
+            NetType = CodeGenUtility.ConvertDataType(u, provider.CurrentConnectionConfig.DbType),
             ColumnComment = u.ColumnDescription
         }).ToList();
     }

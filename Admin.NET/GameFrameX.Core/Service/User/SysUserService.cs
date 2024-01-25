@@ -7,17 +7,10 @@
 // 软件按“原样”提供，不提供任何形式的明示或暗示的保证，包括但不限于对适销性、适用性和非侵权的保证。
 // 在任何情况下，作者或版权持有人均不对任何索赔、损害或其他责任负责，无论是因合同、侵权或其他方式引起的，与软件或其使用或其他交易有关。
 
-using System.Linq;
-using Furion.DatabaseAccessor;
-using Furion.DataEncryption;
-using Furion.DataValidation;
-using GameFrameX.Core.Const;
-using GameFrameX.Core.Enum;
-using GameFrameX.Core.Service.Config;
+
 using GameFrameX.Core.Service.Org;
 using GameFrameX.Core.Service.User.Dto;
-using GameFrameX.Core.SqlSugar;
-using GameFrameX.Core.Util;
+using GameFrameX.Core.Utility;
 using GameFrameX.Entity.System;
 
 namespace GameFrameX.Core.Service.User;
@@ -61,7 +54,7 @@ public class SysUserService : IDynamicApiController, ITransient
         // 获取用户拥有的机构集合
         var userOrgIdList = await _sysOrgService.GetUserOrgIdList();
         List<long> orgList = null;
-        if (input.OrgId > 0)  // 指定机构查询时
+        if (input.OrgId > 0) // 指定机构查询时
         {
             orgList = await _sysOrgService.GetChildIdListWithSelfById(input.OrgId);
             orgList = _userManager.SuperAdmin ? orgList : orgList.Where(u => userOrgIdList.Contains(u)).ToList();
@@ -97,7 +90,7 @@ public class SysUserService : IDynamicApiController, ITransient
         var password = await _sysConfigService.GetConfigValue<string>(CommonConst.SysPassword);
 
         var user = input.Adapt<SysUser>();
-        user.Password = CryptogramUtil.Encrypt(password);
+        user.Password = GameFrameX.Core.Utility.CryptogramUtility.Encrypt(password);
         var newUser = await _sysUserRep.AsInsertable(user).ExecuteReturnEntityAsync();
         input.Id = newUser.Id;
         await UpdateRoleAndExtOrg(input);
@@ -229,28 +222,29 @@ public class SysUserService : IDynamicApiController, ITransient
     public async Task<int> ChangePwd(ChangePwdInput input)
     {
         var user = await _sysUserRep.GetFirstAsync(u => u.Id == _userManager.UserId) ?? throw Oops.Oh(ErrorCodeEnum.D0009);
-        if (CryptogramUtil.CryptoType == CryptogramEnum.MD5.ToString())
+        if (CryptogramUtility.CryptoType == CryptogramEnum.MD5.ToString())
         {
             if (user.Password != MD5Encryption.Encrypt(input.PasswordOld))
                 throw Oops.Oh(ErrorCodeEnum.D1004);
         }
         else
         {
-            if (CryptogramUtil.Decrypt(user.Password) != input.PasswordOld)
+            if (CryptogramUtility.Decrypt(user.Password) != input.PasswordOld)
                 throw Oops.Oh(ErrorCodeEnum.D1004);
         }
 
         // 验证密码强度
-        if (CryptogramUtil.StrongPassword)
+        if (CryptogramUtility.StrongPassword)
         {
-            user.Password = input.PasswordNew.TryValidate(CryptogramUtil.PasswordStrengthValidation)
-                ? CryptogramUtil.Encrypt(input.PasswordNew)
-                : throw Oops.Oh(CryptogramUtil.PasswordStrengthValidationMsg);
+            user.Password = input.PasswordNew.TryValidate(CryptogramUtility.PasswordStrengthValidation)
+                ? CryptogramUtility.Encrypt(input.PasswordNew)
+                : throw Oops.Oh(CryptogramUtility.PasswordStrengthValidationMsg);
         }
         else
         {
-            user.Password = CryptogramUtil.Encrypt(input.PasswordNew);
+            user.Password = CryptogramUtility.Encrypt(input.PasswordNew);
         }
+
         return await _sysUserRep.AsUpdateable(user).UpdateColumns(u => u.Password).ExecuteCommandAsync();
     }
 
@@ -264,7 +258,7 @@ public class SysUserService : IDynamicApiController, ITransient
     {
         var user = await _sysUserRep.GetFirstAsync(u => u.Id == input.Id) ?? throw Oops.Oh(ErrorCodeEnum.D0009);
         var password = await _sysConfigService.GetConfigValue<string>(CommonConst.SysPassword);
-        user.Password = CryptogramUtil.Encrypt(password);
+        user.Password = CryptogramUtility.Encrypt(password);
         await _sysUserRep.AsUpdateable(user).UpdateColumns(u => u.Password).ExecuteCommandAsync();
         return password;
     }

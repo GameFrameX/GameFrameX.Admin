@@ -1,4 +1,4 @@
-﻿// 麻省理工学院许可证
+﻿/*// 麻省理工学院许可证
 //
 // 版权所有 (c) 2021-2023 zuohuaijun，大名科技（天津）有限公司  联系电话/微信：18020030720  QQ：515096995
 //
@@ -17,11 +17,11 @@ namespace GameFrameX.Core.Service;
 /// <typeparam name="TEntity"></typeparam>
 public class BaseService<TEntity> : IDynamicApiController where TEntity : class, new()
 {
-    private readonly SqlSugarRepository<TEntity> _rep;
+    protected readonly SqlSugarRepository<TEntity> Repository;
 
-    public BaseService(SqlSugarRepository<TEntity> rep)
+    public BaseService(SqlSugarRepository<TEntity> repository)
     {
-        _rep = rep;
+        Repository = repository;
     }
 
     /// <summary>
@@ -32,7 +32,7 @@ public class BaseService<TEntity> : IDynamicApiController where TEntity : class,
     [DisplayName("获取实体详情")]
     public virtual async Task<TEntity> GetDetail(long id)
     {
-        return await _rep.GetByIdAsync(id);
+        return await Repository.GetByIdAsync(id);
     }
 
     /// <summary>
@@ -42,7 +42,7 @@ public class BaseService<TEntity> : IDynamicApiController where TEntity : class,
     [DisplayName("获取实体集合")]
     public virtual async Task<List<TEntity>> GetList()
     {
-        return await _rep.GetListAsync();
+        return await Repository.GetListAsync();
     }
 
     ///// <summary>
@@ -66,7 +66,7 @@ public class BaseService<TEntity> : IDynamicApiController where TEntity : class,
     [DisplayName("增加实体")]
     public virtual async Task<bool> Add(TEntity entity)
     {
-        return await _rep.InsertAsync(entity);
+        return await Repository.InsertAsync(entity);
     }
 
     /// <summary>
@@ -78,7 +78,7 @@ public class BaseService<TEntity> : IDynamicApiController where TEntity : class,
     [DisplayName("更新实体")]
     public virtual async Task<bool> Update(TEntity entity)
     {
-        return await _rep.UpdateAsync(entity);
+        return await Repository.UpdateAsync(entity);
     }
 
     /// <summary>
@@ -90,6 +90,6 @@ public class BaseService<TEntity> : IDynamicApiController where TEntity : class,
     [DisplayName("删除实体")]
     public virtual async Task<bool> Delete(long id)
     {
-        return await _rep.DeleteByIdAsync(id);
+        return await Repository.DeleteByIdAsync(id);
     }
-}
+}*/

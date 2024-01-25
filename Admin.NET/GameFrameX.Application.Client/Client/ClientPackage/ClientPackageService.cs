@@ -1,4 +1,6 @@
-﻿using GameFrameX.Application.Client.Client.ClientPackage.Dto;
+﻿using GameFrameX.Application.Base.Service;
+using GameFrameX.Application.Client.Client.ClientPackage.Dto;
+using GameFrameX.Core.Extension;
 
 namespace GameFrameX.Application.Client.Client.ClientPackage;
 
@@ -6,13 +8,13 @@ namespace GameFrameX.Application.Client.Client.ClientPackage;
 /// 包管理服务
 /// </summary>
 [ApiDescriptionSettings(Order = 100)]
-public class ClientPackageService : GetSelectBaseService<Entity.Client.ClientPackage>
+public class ClientPackageService : BaseSelectService<Entity.Client.ClientPackage>
 {
-    private readonly SqlSugarRepository<Entity.Client.ClientPackage> _rep;
+    private readonly SqlSugarRepository<Entity.Client.ClientPackage> _repository;
 
-    public ClientPackageService(SqlSugarRepository<Entity.Client.ClientPackage> rep) : base(rep)
+    public ClientPackageService(SqlSugarRepository<Entity.Client.ClientPackage> repository) : base(repository)
     {
-        _rep = rep;
+        _repository = repository;
     }
 
     /// <summary>
@@ -24,7 +26,7 @@ public class ClientPackageService : GetSelectBaseService<Entity.Client.ClientPac
     [ApiDescriptionSettings(Name = "Page")]
     public async Task<SqlSugarPagedList<ClientPackageOutput>> Page(ClientPackageInput input)
     {
-        var query = _rep.AsQueryable()
+        var query = _repository.AsQueryable()
                 .WhereIF(!string.IsNullOrWhiteSpace(input.SearchKey), u =>
                     u.Name.Contains(input.SearchKey.Trim())
                 )
@@ -45,7 +47,7 @@ public class ClientPackageService : GetSelectBaseService<Entity.Client.ClientPac
     public async Task Add(AddClientPackageInput input)
     {
         var entity = input.Adapt<Entity.Client.ClientPackage>();
-        await _rep.InsertAsync(entity);
+        await _repository.InsertAsync(entity);
     }
 
     /// <summary>
@@ -57,8 +59,8 @@ public class ClientPackageService : GetSelectBaseService<Entity.Client.ClientPac
     [ApiDescriptionSettings(Name = "Delete")]
     public async Task Delete(DeleteClientPackageInput input)
     {
-        var entity = await _rep.GetFirstAsync(u => u.Id == input.Id) ?? throw Oops.Oh(ErrorCodeEnum.D1002);
-        await _rep.FakeDeleteAsync(entity); //假删除
+        var entity = await _repository.GetFirstAsync(u => u.Id == input.Id) ?? throw Oops.Oh(ErrorCodeEnum.D1002);
+        await _repository.FakeDeleteAsync(entity); //假删除
         //await _rep.DeleteAsync(entity);   //真删除
     }
 
@@ -72,7 +74,7 @@ public class ClientPackageService : GetSelectBaseService<Entity.Client.ClientPac
     public async Task Update(UpdateClientPackageInput input)
     {
         var entity = input.Adapt<Entity.Client.ClientPackage>();
-        await _rep.AsUpdateable(entity).IgnoreColumns(ignoreAllNullColumns: true).ExecuteCommandAsync();
+        await _repository.AsUpdateable(entity).IgnoreColumns(ignoreAllNullColumns: true).ExecuteCommandAsync();
     }
 
     /// <summary>
@@ -84,7 +86,7 @@ public class ClientPackageService : GetSelectBaseService<Entity.Client.ClientPac
     [ApiDescriptionSettings(Name = "Detail")]
     public async Task<Entity.Client.ClientPackage> Get([FromQuery] QueryByIdClientPackageInput input)
     {
-        return await _rep.GetFirstAsync(u => u.Id == input.Id);
+        return await _repository.GetFirstAsync(u => u.Id == input.Id);
     }
 
     /// <summary>
@@ -96,6 +98,6 @@ public class ClientPackageService : GetSelectBaseService<Entity.Client.ClientPac
     [ApiDescriptionSettings(Name = "List")]
     public async Task<List<ClientPackageOutput>> List([FromQuery] ClientPackageInput input)
     {
-        return await _rep.AsQueryable().Select<ClientPackageOutput>().ToListAsync();
+        return await _repository.AsQueryable().Select<ClientPackageOutput>().ToListAsync();
     }
 }

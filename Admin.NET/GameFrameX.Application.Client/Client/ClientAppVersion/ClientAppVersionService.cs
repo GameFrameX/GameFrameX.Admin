@@ -1,4 +1,5 @@
 ﻿using GameFrameX.Application.Client.Client.ClientAppVersion.Dto;
+using GameFrameX.Core.Extension;
 
 namespace GameFrameX.Application.Client.Client.ClientAppVersion;
 

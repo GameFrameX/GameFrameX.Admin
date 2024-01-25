@@ -9,7 +9,7 @@
 
 using System.Dynamic;
 using AspectCore.Extensions.Reflection;
-using GameFrameX.Core.Extension;
+using Furion.LinqBuilder;
 using Newtonsoft.Json.Linq;
 
 namespace GameFrameX.Core.Service.APIJSON;

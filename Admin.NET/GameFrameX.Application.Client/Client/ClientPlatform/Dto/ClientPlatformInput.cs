@@ -1,6 +1,4 @@
-﻿using GameFrameX.Core.Util;
-
-namespace GameFrameX.Application.Client.Client.ClientPlatform.Dto;
+﻿namespace GameFrameX.Application.Client.Client.ClientPlatform.Dto;
 
     /// <summary>
     /// 平台管理基础输入参数

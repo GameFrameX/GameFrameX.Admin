@@ -12,10 +12,11 @@ using System.Reflection;
 using System.Text;
 using Furion.ViewEngine;
 using GameFrameX.Application.System.System.DataBase.Dto;
+using GameFrameX.Core.Base.Const;
 using GameFrameX.Core.Const;
 using GameFrameX.Core.Enum;
 using GameFrameX.Core.Option;
-using GameFrameX.Core.Util;
+using GameFrameX.Core.Utility;
 using Magicodes.ExporterAndImporter.Core.Extension;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -226,7 +227,7 @@ public class SysDatabaseService : IDynamicApiController, ITransient
     {
         var config = App.GetOptions<DbConnectionOptions>().ConnectionConfigs.FirstOrDefault(u => u.ConfigId.ToString() == input.ConfigId);
         input.Position = string.IsNullOrWhiteSpace(input.Position) ? "GameFrameX.Application" : input.Position;
-        input.EntityName = string.IsNullOrWhiteSpace(input.EntityName) ? (config.DbSettings.EnableUnderLine ? CodeGenUtil.CamelColumnName(input.TableName, null) : input.TableName) : input.EntityName;
+        input.EntityName = string.IsNullOrWhiteSpace(input.EntityName) ? (config.DbSettings.EnableUnderLine ? CodeGenUtility.CamelColumnName(input.TableName, null) : input.TableName) : input.EntityName;
         string[] dbColumnNames = Array.Empty<string>();
         // Entity.cs.vm中是允许创建没有基类的实体的，所以这里也要做出相同的判断
         if (!string.IsNullOrWhiteSpace(input.BaseClassName))
@@ -242,8 +243,8 @@ public class SysDatabaseService : IDynamicApiController, ITransient
         List<DbColumnInfo> dbColumnInfos = db.DbMaintenance.GetColumnInfosByTableName(input.TableName, false);
         dbColumnInfos.ForEach(u =>
         {
-            u.PropertyName = config.DbSettings.EnableUnderLine ? CodeGenUtil.CamelColumnName(u.DbColumnName, dbColumnNames) : u.DbColumnName; // 转下划线后的列名需要再转回来
-            u.DataType = CodeGenUtil.ConvertDataType(u, config.DbType);
+            u.PropertyName = config.DbSettings.EnableUnderLine ? CodeGenUtility.CamelColumnName(u.DbColumnName, dbColumnNames) : u.DbColumnName; // 转下划线后的列名需要再转回来
+            u.DataType = CodeGenUtility.ConvertDataType(u, config.DbType);
         });
         if (_codeGenOptions.BaseEntityNames.Contains(input.BaseClassName, StringComparer.OrdinalIgnoreCase))
             dbColumnInfos = dbColumnInfos.Where(u => !dbColumnNames.Contains(u.DbColumnName, StringComparer.OrdinalIgnoreCase)).ToList();

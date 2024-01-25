@@ -1,11 +1,13 @@
-﻿using GameFrameX.Application.Client.Client.ClientLanguage.Dto;
+﻿using GameFrameX.Application.Base.Service;
+using GameFrameX.Application.Client.Client.ClientLanguage.Dto;
+using GameFrameX.Core.Extension;
 
 namespace GameFrameX.Application.Client.Client.ClientLanguage;
 /// <summary>
 /// 语言管理服务
 /// </summary>
 [ApiDescriptionSettings( Order = 100)]
-public class ClientLanguageService : GetSelectBaseService<Entity.Client.ClientLanguage>
+public class ClientLanguageService : BaseSelectService<Entity.Client.ClientLanguage>
 {
     private readonly SqlSugarRepository<Entity.Client.ClientLanguage> _rep;
     public ClientLanguageService(SqlSugarRepository<Entity.Client.ClientLanguage> rep):base(rep)

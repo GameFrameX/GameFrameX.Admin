@@ -9,6 +9,7 @@
 
 using AspNetCoreRateLimit;
 using Furion;
+using GameFrameX.Core.Base.Option;
 using GameFrameX.Core.Option;
 using Microsoft.Extensions.DependencyInjection;
 

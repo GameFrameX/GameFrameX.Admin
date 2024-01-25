@@ -1,4 +1,6 @@
-﻿using GameFrameX.Application.Client.Client.ClientVersion.Dto;
+﻿using GameFrameX.Application.Base.Service;
+using GameFrameX.Application.Client.Client.ClientVersion.Dto;
+using GameFrameX.Core.Extension;
 
 namespace GameFrameX.Application.Client.Client.ClientVersion;
 
@@ -6,13 +8,12 @@ namespace GameFrameX.Application.Client.Client.ClientVersion;
 /// 版本管理服务
 /// </summary>
 [ApiDescriptionSettings( Order = 100)]
-public class ClientVersionService : GetSelectBaseService<Entity.Client.ClientVersion>
+public class ClientVersionService : BaseSelectService<Entity.Client.ClientVersion>
 {
-    private readonly SqlSugarRepository<Entity.Client.ClientVersion> _rep;
 
     public ClientVersionService(SqlSugarRepository<Entity.Client.ClientVersion> rep) : base(rep)
     {
-        _rep = rep;
+       
     }
 
     /// <summary>
@@ -22,14 +23,14 @@ public class ClientVersionService : GetSelectBaseService<Entity.Client.ClientVer
     /// <returns></returns>
     [HttpPost]
     [ApiDescriptionSettings(Name = "Page")]
-    public async Task<SqlSugarPagedList<ClientVersionOutput>> Page(ClientVersionInput input)
+    public async Task<SqlSugarPagedList<ClientVersionPageOutput>> Page(ClientVersionInput input)
     {
-        var query = _rep.AsQueryable()
+        var query = Repository.AsQueryable()
                 .WhereIF(!string.IsNullOrWhiteSpace(input.SearchKey), u =>
                     u.Name.Contains(input.SearchKey.Trim())
                 )
                 .WhereIF(!string.IsNullOrWhiteSpace(input.Name), u => u.Name.Contains(input.Name.Trim()))
-                .Select<ClientVersionOutput>()
+                .Select<ClientVersionPageOutput>()
             ;
         query = query.OrderBuilder(input, "", "CreateTime");
         return await query.ToPagedListAsync(input.Page, input.PageSize);
@@ -45,7 +46,7 @@ public class ClientVersionService : GetSelectBaseService<Entity.Client.ClientVer
     public async Task Add(AddClientVersionInput input)
     {
         var entity = input.Adapt<Entity.Client.ClientVersion>();
-        await _rep.InsertAsync(entity);
+        await Repository.InsertAsync(entity);
     }
 
     /// <summary>
@@ -57,8 +58,8 @@ public class ClientVersionService : GetSelectBaseService<Entity.Client.ClientVer
     [ApiDescriptionSettings(Name = "Delete")]
     public async Task Delete(DeleteClientVersionInput input)
     {
-        var entity = await _rep.GetFirstAsync(u => u.Id == input.Id) ?? throw Oops.Oh(ErrorCodeEnum.D1002);
-        await _rep.FakeDeleteAsync(entity); //假删除
+        var entity = await Repository.GetFirstAsync(u => u.Id == input.Id) ?? throw Oops.Oh(ErrorCodeEnum.D1002);
+        await Repository.FakeDeleteAsync(entity); //假删除
         //await _rep.DeleteAsync(entity);   //真删除
     }
 
@@ -72,7 +73,7 @@ public class ClientVersionService : GetSelectBaseService<Entity.Client.ClientVer
     public async Task Update(UpdateClientVersionInput input)
     {
         var entity = input.Adapt<Entity.Client.ClientVersion>();
-        await _rep.AsUpdateable(entity).IgnoreColumns(ignoreAllNullColumns: true).ExecuteCommandAsync();
+        await Repository.AsUpdateable(entity).IgnoreColumns(ignoreAllNullColumns: true).ExecuteCommandAsync();
     }
 
     /// <summary>
@@ -84,7 +85,7 @@ public class ClientVersionService : GetSelectBaseService<Entity.Client.ClientVer
     [ApiDescriptionSettings(Name = "Detail")]
     public async Task<Entity.Client.ClientVersion> Get([FromQuery] QueryByIdClientVersionInput input)
     {
-        return await _rep.GetFirstAsync(u => u.Id == input.Id);
+        return await Repository.GetFirstAsync(u => u.Id == input.Id);
     }
 
     /// <summary>
@@ -94,8 +95,8 @@ public class ClientVersionService : GetSelectBaseService<Entity.Client.ClientVer
     /// <returns></returns>
     [HttpGet]
     [ApiDescriptionSettings(Name = "List")]
-    public async Task<List<ClientVersionOutput>> List([FromQuery] ClientVersionInput input)
+    public async Task<List<ClientVersionPageOutput>> List([FromQuery] ClientVersionInput input)
     {
-        return await _rep.AsQueryable().Select<ClientVersionOutput>().ToListAsync();
+        return await Repository.AsQueryable().Select<ClientVersionPageOutput>().ToListAsync();
     }
 }

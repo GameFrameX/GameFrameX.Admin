@@ -8,9 +8,10 @@
 // 在任何情况下，作者或版权持有人均不对任何索赔、损害或其他责任负责，无论是因合同、侵权或其他方式引起的，与软件或其使用或其他交易有关。
 
 using GameFrameX.Application.System.System.CodeGen.Dto;
+using GameFrameX.Core.Base.Const;
 using GameFrameX.Core.Const;
 using GameFrameX.Core.Enum;
-using GameFrameX.Core.Util;
+using GameFrameX.Core.Utility;
 using GameFrameX.Entity.System;
 
 namespace GameFrameX.Application.System.System.CodeGen;
@@ -105,7 +106,7 @@ public class SysCodeGenConfigService : IDynamicApiController, ITransient
                 YesOrNo = YesNoEnum.N.ToString();
             }
 
-            if (CodeGenUtil.IsCommonColumn(tableColumn.ColumnName))
+            if (CodeGenUtility.IsCommonColumn(tableColumn.ColumnName))
             {
                 codeGenConfig.WhetherCommon = YesNoEnum.Y.ToString();
                 YesOrNo = YesNoEnum.N.ToString();
@@ -126,14 +127,14 @@ public class SysCodeGenConfigService : IDynamicApiController, ITransient
             // 生成代码时，主键并不是必要输入项，故一定要排除主键字段
             codeGenConfig.WhetherRequired = (tableColumn.IsNullable || tableColumn.IsPrimarykey) ? YesNoEnum.N.ToString() : YesNoEnum.Y.ToString();
             codeGenConfig.QueryWhether = YesOrNo;
-            codeGenConfig.WhetherAdd = CodeGenUtil.IsAdd(tableColumn.ColumnName) ? YesNoEnum.Y.ToString() : YesNoEnum.N.ToString();
-            codeGenConfig.WhetherUpdate = CodeGenUtil.IsUpdate(tableColumn.ColumnName) ? YesNoEnum.Y.ToString() : YesNoEnum.N.ToString();
+            codeGenConfig.WhetherAdd = CodeGenUtility.IsAdd(tableColumn.ColumnName) ? YesNoEnum.Y.ToString() : YesNoEnum.N.ToString();
+            codeGenConfig.WhetherUpdate = CodeGenUtility.IsUpdate(tableColumn.ColumnName) ? YesNoEnum.Y.ToString() : YesNoEnum.N.ToString();
             codeGenConfig.WhetherTable = YesOrNo;
 
             codeGenConfig.ColumnKey = tableColumn.ColumnKey;
 
             codeGenConfig.DataType = tableColumn.DataType;
-            codeGenConfig.EffectType = CodeGenUtil.DataTypeToEff(codeGenConfig.NetType);
+            codeGenConfig.EffectType = CodeGenUtility.DataTypeToEff(codeGenConfig.NetType);
             codeGenConfig.QueryType = GetDefaultQueryType(codeGenConfig); // QueryTypeEnum.eq.ToString();
             codeGenConfig.OrderNo = orderNo;
             codeGenConfigs.Add(codeGenConfig);

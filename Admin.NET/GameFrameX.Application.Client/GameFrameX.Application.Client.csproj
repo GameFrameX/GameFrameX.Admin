@@ -21,6 +21,8 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\GameFrameX.Application.Base\GameFrameX.Application.Base.csproj" />
+      <ProjectReference Include="..\GameFrameX.Core.Extension\GameFrameX.Core.Extension.csproj" />
       <ProjectReference Include="..\GameFrameX.Core\GameFrameX.Core.csproj" />
       <ProjectReference Include="..\GameFrameX.Entity.Client\GameFrameX.Entity.Client.csproj" />
       <ProjectReference Include="..\GameFrameX.Entity\GameFrameX.Entity.csproj" />

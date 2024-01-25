@@ -1,4 +1,6 @@
-﻿using GameFrameX.Application.Client.Client.ClientChannel.Dto;
+﻿using GameFrameX.Application.Base.Service;
+using GameFrameX.Application.Client.Client.ClientChannel.Dto;
+using GameFrameX.Core.Extension;
 
 namespace GameFrameX.Application.Client.Client.ClientChannel;
 
@@ -6,7 +8,7 @@ namespace GameFrameX.Application.Client.Client.ClientChannel;
 /// 渠道服务
 /// </summary>
 [ApiDescriptionSettings(Order = 100)]
-public class ClientChannelService : GetSelectBaseService<Entity.Client.ClientChannel>
+public class ClientChannelService : BaseSelectService<Entity.Client.ClientChannel>
 {
     private readonly SqlSugarRepository<Entity.Client.ClientChannel> _rep;
 

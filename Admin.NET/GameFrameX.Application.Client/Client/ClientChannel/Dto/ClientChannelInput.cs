@@ -1,6 +1,4 @@
-﻿using GameFrameX.Core.Util;
-
-namespace GameFrameX.Application.Client.Client.ClientChannel.Dto;
+﻿namespace GameFrameX.Application.Client.Client.ClientChannel.Dto;
 
     /// <summary>
     /// 渠道基础输入参数

@@ -23,7 +23,6 @@ global using System.ComponentModel;
 global using System.ComponentModel.DataAnnotations;
 global using System.Threading.Tasks;
 global using GameFrameX.Core.Enum;
-global using GameFrameX.Core.Extension;
 global using GameFrameX.Core.SqlSugar;
 global using GameFrameX.Entity.Game;
-global using GameFrameX.Core.Util;
+global using GameFrameX.Core.BaseInputOutput;

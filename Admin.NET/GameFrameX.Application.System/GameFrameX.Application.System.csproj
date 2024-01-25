@@ -17,8 +17,10 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\GameFrameX.Core.Extension\GameFrameX.Core.Extension.csproj" />
       <ProjectReference Include="..\GameFrameX.Core\GameFrameX.Core.csproj" />
       <ProjectReference Include="..\GameFrameX.Global.Const\GameFrameX.Global.Const.csproj" />
+      <ProjectReference Include="..\GameFrameX.Core.Utility\GameFrameX.Core.Utility.csproj" />
     </ItemGroup>
 
 </Project>

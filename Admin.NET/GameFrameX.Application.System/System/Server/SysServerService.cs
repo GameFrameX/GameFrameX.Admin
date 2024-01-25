@@ -13,7 +13,7 @@ using AngleSharp.Html.Parser;
 using AspNetCoreRateLimit;
 using FluentEmail.Core;
 using GameFrameX.Core.Extension;
-using GameFrameX.Core.Util;
+using GameFrameX.Core.Utility;
 using Lazy.Captcha.Core;
 using Magicodes.ExporterAndImporter.Excel;
 using Magicodes.ExporterAndImporter.Pdf;
@@ -51,8 +51,8 @@ public class SysServerService : IDynamicApiController, ITransient
             SystemOs = RuntimeInformation.OSDescription, // 操作系统
             OsArchitecture = Environment.OSVersion.Platform.ToString() + " " + RuntimeInformation.OSArchitecture.ToString(), // 系统架构
             ProcessorCount = Environment.ProcessorCount + " 核", // CPU核心数
-            SysRunTime = ComputerUtil.GetRunTime(), // 系统运行时间
-            RemoteIp = ComputerUtil.GetIpFromOnline(), // 外网地址
+            SysRunTime = ComputerUtility.GetRunTime(), // 系统运行时间
+            RemoteIp = ComputerUtility.GetIpFromOnline(), // 外网地址
             LocalIp = App.HttpContext?.Connection?.LocalIpAddress.ToString(), // 本地地址
             FrameworkDescription = RuntimeInformation.FrameworkDescription, // NET框架
             Environment = App.HostEnvironment.IsDevelopment() ? "Development" : "Production",
@@ -71,9 +71,9 @@ public class SysServerService : IDynamicApiController, ITransient
         var programStartTime = Process.GetCurrentProcess().StartTime;
         var totalMilliseconds = (DateTime.Now - programStartTime).TotalMilliseconds.ToString();
         var ts = totalMilliseconds.Contains('.') ? totalMilliseconds.Split('.')[0] : totalMilliseconds;
-        var programRunTime = DateTimeUtil.FormatTime(ts.ParseToLong());
+        var programRunTime = DateTimeUtility.FormatTime(ts.ParseToLong());
 
-        var memoryMetrics = ComputerUtil.GetComputerInfo();
+        var memoryMetrics = ComputerUtility.GetComputerInfo();
         return new
         {
             memoryMetrics.FreeRam, // 空闲内存
@@ -93,7 +93,7 @@ public class SysServerService : IDynamicApiController, ITransient
     [DisplayName("获取服务器磁盘信息")]
     public dynamic GetServerDisk()
     {
-        return ComputerUtil.GetDiskInfos();
+        return ComputerUtility.GetDiskInfos();
     }
 
     /// <summary>

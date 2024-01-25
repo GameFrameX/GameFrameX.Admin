@@ -1,6 +1,4 @@
-﻿using GameFrameX.Core.Util;
-
-namespace GameFrameX.Application.Client.Client.ClientAppVersion.Dto;
+﻿namespace GameFrameX.Application.Client.Client.ClientAppVersion.Dto;
 
     /// <summary>
     /// 游戏版本管理基础输入参数

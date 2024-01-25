@@ -12,11 +12,12 @@ using System.Reflection;
 using System.Text;
 using Furion.ViewEngine;
 using GameFrameX.Application.System.System.CodeGen.Dto;
+using GameFrameX.Core.Base.Const;
 using GameFrameX.Core.Const;
 using GameFrameX.Core.Enum;
 using GameFrameX.Core.Option;
 using GameFrameX.Core.SqlSugar;
-using GameFrameX.Core.Util;
+using GameFrameX.Core.Utility;
 using GameFrameX.Entity;
 using GameFrameX.Entity.System;
 using GameFrameX.Global.Const;
@@ -194,10 +195,10 @@ public class SysCodeGenService : IDynamicApiController, ITransient
         // 按原始类型的顺序获取所有实体类型属性（不包含导航属性，会返回null）
         return provider.DbMaintenance.GetColumnInfosByTableName(entityType.Name).Select(u => new ColumnOuput
         {
-            ColumnName = config.DbSettings.EnableUnderLine ? CodeGenUtil.CamelColumnName(u.DbColumnName, entityBasePropertyNames) : u.DbColumnName,
+            ColumnName = config.DbSettings.EnableUnderLine ? CodeGenUtility.CamelColumnName(u.DbColumnName, entityBasePropertyNames) : u.DbColumnName,
             ColumnKey = u.IsPrimarykey.ToString(),
             DataType = u.DataType.ToString(),
-            NetType = CodeGenUtil.ConvertDataType(u, provider.CurrentConnectionConfig.DbType),
+            NetType = CodeGenUtility.ConvertDataType(u, provider.CurrentConnectionConfig.DbType),
             ColumnComment = u.ColumnDescription
         }).ToList();
     }
@@ -232,8 +233,8 @@ public class SysCodeGenService : IDynamicApiController, ITransient
                 IsPrimarykey = dbColumnInfo.IsPrimarykey,
                 IsNullable = dbColumnInfo.IsNullable,
                 ColumnKey = dbColumnInfo.IsPrimarykey.ToString(),
-                NetType = CodeGenUtil.ConvertDataType(dbColumnInfo, provider.CurrentConnectionConfig.DbType),
-                DataType = CodeGenUtil.ConvertDataType(dbColumnInfo, provider.CurrentConnectionConfig.DbType)
+                NetType = CodeGenUtility.ConvertDataType(dbColumnInfo, provider.CurrentConnectionConfig.DbType),
+                DataType = CodeGenUtility.ConvertDataType(dbColumnInfo, provider.CurrentConnectionConfig.DbType)
             };
             item.ColumnComment = string.IsNullOrWhiteSpace(dbColumnInfo.ColumnDescription) ? dbColumnInfo.DbColumnName : dbColumnInfo.ColumnDescription;
             result.Add(item);
@@ -263,7 +264,7 @@ public class SysCodeGenService : IDynamicApiController, ITransient
             // 如果找不到就再找自动生成字段名的(并且过滤掉没有SugarColumn的属性)
             if (propertyInfo == null)
             {
-                propertyInfo = entityProperties.FirstOrDefault(p => p.GetCustomAttribute<SugarColumn>() != null && p.Name == (config.DbSettings.EnableUnderLine ? CodeGenUtil.CamelColumnName(columnOutput.ColumnName, entityBasePropertyNames) : columnOutput.ColumnName));
+                propertyInfo = entityProperties.FirstOrDefault(p => p.GetCustomAttribute<SugarColumn>() != null && p.Name == (config.DbSettings.EnableUnderLine ? CodeGenUtility.CamelColumnName(columnOutput.ColumnName, entityBasePropertyNames) : columnOutput.ColumnName));
             }
 
             if (propertyInfo != null)
@@ -411,7 +412,7 @@ public class SysCodeGenService : IDynamicApiController, ITransient
             global::System.IO.File.WriteAllText(targetPathList[i], tResult, Encoding.UTF8);
         }
 
-        await AddMenu(input.TableName, input.BusName,input.ModuleName, input.MenuPid, tableFieldList);
+        await AddMenu(input.TableName, input.BusName, input.ModuleName, input.MenuPid, tableFieldList);
         // 非ZIP压缩返回空
         if (!input.GenerateType.StartsWith('1'))
             return null;
@@ -422,7 +423,7 @@ public class SysCodeGenService : IDynamicApiController, ITransient
             if (global::System.IO.File.Exists(downloadPath))
                 global::System.IO.File.Delete(downloadPath);
             ZipFile.CreateFromDirectory(zipPath, downloadPath);
-            return new { url = $"{CommonUtil.GetLocalhost()}/CodeGen/{input.TableName}.zip" };
+            return new { url = $"{CommonUtility.GetLocalhost()}/CodeGen/{input.TableName}.zip" };
         }
     }
 
@@ -460,7 +461,7 @@ public class SysCodeGenService : IDynamicApiController, ITransient
     /// <param name="pid"></param>
     /// <param name="tableFieldList"></param>
     /// <returns></returns>
-    private async Task AddMenu(string className, string busName,string moduleName, long pid, List<CodeGenConfig> tableFieldList)
+    private async Task AddMenu(string className, string busName, string moduleName, long pid, List<CodeGenConfig> tableFieldList)
     {
         var pPath = string.Empty;
         // 若 pid=0 为顶级则创建菜单目录
@@ -588,7 +589,7 @@ public class SysCodeGenService : IDynamicApiController, ITransient
         var menuList = new List<SysMenu>() { menuType2, menuType2_1, menuType2_2, menuType2_3, menuType2_4 };
         // 加入fk、Upload、ApiTreeSelect 等接口的权限
         // 在生成表格时，有些字段只是查询时显示，不需要填写（WhetherAddUpdate），所以这些字段没必要生成相应接口
-        var fkTableList = tableFieldList.Where(u => u.EffectType == "fk" && (u.WhetherAddUpdate == "Y" || u.QueryWhether == "Y")).ToList();
+        var fkTableList = tableFieldList.Where(u => u.EffectType == "fk" && (u.WhetherAdd == "Y" || u.WhetherUpdate == "Y" || u.QueryWhether == "Y")).ToList();
         foreach (var @column in fkTableList)
         {
             var menuType = new SysMenu

@@ -1,6 +1,4 @@
-﻿using GameFrameX.Core.Util;
-
-namespace GameFrameX.Application.Client.Client.ClientGlobalInfo.Dto;
+﻿namespace GameFrameX.Application.Client.Client.ClientGlobalInfo.Dto;
 
     /// <summary>
     /// 全局信息管理基础输入参数

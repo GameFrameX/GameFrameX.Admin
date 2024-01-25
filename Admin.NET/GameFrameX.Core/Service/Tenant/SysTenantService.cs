@@ -7,18 +7,13 @@
 // 软件按“原样”提供，不提供任何形式的明示或暗示的保证，包括但不限于对适销性、适用性和非侵权的保证。
 // 在任何情况下，作者或版权持有人均不对任何索赔、损害或其他责任负责，无论是因合同、侵权或其他方式引起的，与软件或其使用或其他交易有关。
 
-using System.Linq;
-using GameFrameX.Core.Const;
-using GameFrameX.Core.Enum;
+using GameFrameX.Core.Base.Const;
 using GameFrameX.Core.Option;
 using GameFrameX.Core.Service.Cache;
-using GameFrameX.Core.Service.Config;
 using GameFrameX.Core.Service.Role;
 using GameFrameX.Core.Service.Role.Dto;
 using GameFrameX.Core.Service.Tenant.Dto;
 using GameFrameX.Core.Service.User;
-using GameFrameX.Core.SqlSugar;
-using GameFrameX.Core.Util;
 using GameFrameX.Entity.System;
 
 namespace GameFrameX.Core.Service.Tenant;
@@ -209,7 +204,7 @@ public class SysTenantService : IDynamicApiController, ITransient
         {
             TenantId = tenantId,
             Account = tenant.AdminAccount,
-            Password = CryptogramUtil.Encrypt(password),
+            Password = CryptogramUtility.Encrypt(password),
             NickName = "租管",
             Email = tenant.Email,
             Phone = tenant.Phone,
@@ -346,7 +341,7 @@ public class SysTenantService : IDynamicApiController, ITransient
     public async Task<string> ResetPwd(TenantUserInput input)
     {
         var password = await _sysConfigService.GetConfigValue<string>(CommonConst.SysPassword);
-        var encryptPassword = CryptogramUtil.Encrypt(password);
+        var encryptPassword = CryptogramUtility.Encrypt(password);
         await _sysUserRep.UpdateAsync(u => new SysUser() { Password = encryptPassword }, u => u.Id == input.UserId);
         return password;
     }

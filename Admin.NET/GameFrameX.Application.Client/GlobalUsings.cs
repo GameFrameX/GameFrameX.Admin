@@ -23,5 +23,5 @@ global using System.ComponentModel.DataAnnotations;
 global using System.Threading.Tasks;
 global using GameFrameX.Application.Client.Client.ClientPlatform.Dto;
 global using GameFrameX.Core.Enum;
-global using GameFrameX.Core.Extension;
 global using GameFrameX.Core.SqlSugar;
+global using GameFrameX.Core.BaseInputOutput;

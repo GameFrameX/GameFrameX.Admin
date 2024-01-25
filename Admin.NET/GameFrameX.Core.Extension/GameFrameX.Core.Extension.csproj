@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <TargetFramework>net7.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Mapster" Version="7.4.0" />
+      <PackageReference Include="NewLife.Core" Version="10.6.2023.1101" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\GameFrameX.Core.BaseInputOutput\GameFrameX.Core.BaseInputOutput.csproj" />
+      <ProjectReference Include="..\GameFrameX.Core.Base\GameFrameX.Core.Base.csproj" />
+      <ProjectReference Include="..\GameFrameX.Entity\GameFrameX.Entity.csproj" />
+    </ItemGroup>
+
+</Project>

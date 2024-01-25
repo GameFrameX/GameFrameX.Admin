@@ -1,9 +1,4 @@
-﻿using GameFrameX.Core;
-using System.ComponentModel.DataAnnotations;
-using GameFrameX.Core.Util;
-using GameFrameX.Game.Enum;
-
-namespace GameFrameX.Application.Game;
+﻿namespace GameFrameX.Application.Game;
 
     /// <summary>
     /// 游戏账号基础输入参数

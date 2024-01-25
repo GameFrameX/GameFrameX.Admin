@@ -8,6 +8,8 @@
 // 在任何情况下，作者或版权持有人均不对任何索赔、损害或其他责任负责，无论是因合同、侵权或其他方式引起的，与软件或其使用或其他交易有关。
 
 using GameFrameX.Core.Attribute;
+using GameFrameX.Core.Base.Const;
+using GameFrameX.Core.Base.Option;
 using GameFrameX.Core.Cache;
 using GameFrameX.Core.Const;
 using GameFrameX.Core.Enum;
@@ -32,14 +34,10 @@ public static class SqlSugarSetup
 
         // 注册雪花Id-支持分布式
         var snowIdOpt = App.GetConfig<SnowIdOptions>("SnowId", true);
-        services.AddYitIdHelper(snowIdOpt);
-
+        services.AddYitIdHelper(snowIdOpt, App.GetService<ICache>());
         // 自定义 SqlSugar 雪花ID算法
         SnowFlakeSingle.WorkId = snowIdOpt.WorkerId;
-        StaticConfig.CustomSnowFlakeFunc = () =>
-        {
-            return YitIdHelper.NextId();
-        };
+        StaticConfig.CustomSnowFlakeFunc = () => { return YitIdHelper.NextId(); };
 
         var dbOptions = App.GetConfig<DbConnectionOptions>("DbConnection", true);
         dbOptions.ConnectionConfigs.ForEach(SetDbConfig);
@@ -59,10 +57,7 @@ public static class SqlSugarSetup
         services.AddUnitOfWork<SqlSugarUnitOfWork>(); // 事务与工作单元注册
 
         // 初始化数据库表结构及种子数据
-        dbOptions.ConnectionConfigs.ForEach(config =>
-        {
-            InitDatabase(sqlSugar, config);
-        });
+        dbOptions.ConnectionConfigs.ForEach(config => { InitDatabase(sqlSugar, config); });
     }
 
     /// <summary>
@@ -160,6 +155,7 @@ public static class SqlSugarSetup
                 }
             };
         }
+
         // 数据审计
         db.Aop.DataExecuting = (oldValue, entityInfo) =>
         {
@@ -185,6 +181,7 @@ public static class SqlSugarSetup
                     if (id == null || (long)id == 0)
                         entityInfo.SetValue(YitIdHelper.NextId());
                 }
+
                 if (entityInfo.PropertyName == nameof(EntityBase.CreateTime))
                     entityInfo.SetValue(DateTime.Now);
                 if (App.User != null)
@@ -221,6 +218,7 @@ public static class SqlSugarSetup
                     }
                 }
             }
+
             if (entityInfo.OperationType == DataFilterType.UpdateByObject)
             {
                 if (entityInfo.PropertyName == nameof(EntityBase.UpdateTime))
@@ -384,7 +382,7 @@ public static class SqlSugarSetup
 
         // 获取所有业务表-初始化租户库表结构（排除系统表、日志表、特定库表）
         var entityTypes = App.EffectiveTypes.Where(u => !u.IsInterface && !u.IsAbstract && u.IsClass && u.IsDefined(typeof(SugarTable), false) &&
-            !u.IsDefined(typeof(SysTableAttribute), false) && !u.IsDefined(typeof(LogTableAttribute), false) && !u.IsDefined(typeof(TenantAttribute), false)).ToList();
+                                                        !u.IsDefined(typeof(SysTableAttribute), false) && !u.IsDefined(typeof(LogTableAttribute), false) && !u.IsDefined(typeof(TenantAttribute), false)).ToList();
         if (!entityTypes.Any()) return;
 
         foreach (var entityType in entityTypes)

@@ -12,7 +12,7 @@ using System.Security.Cryptography;
 using System.Text.Encodings.Web;
 using GameFrameX.Core.Const;
 using GameFrameX.Core.Service.Cache;
-using GameFrameX.Core.Util;
+using GameFrameX.Core.Utility;
 using Microsoft.AspNetCore.Authentication;
 
 namespace GameFrameX.Core.SignatureAuth;
@@ -66,7 +66,7 @@ public sealed class SignatureAuthenticationHandler : AuthenticationHandler<Signa
         if (!long.TryParse(timestampStr, out var timestamp))
             return await AuthenticateResultFailAsync("timestamp 值不合法");
 
-        var requestDate = DateTimeUtil.ToLocalTimeDateBySeconds(timestamp);
+        var requestDate = DateTimeUtility.ToLocalTimeDateBySeconds(timestamp);
         if (requestDate > Clock.UtcNow.Add(Options.AllowedDateDrift).LocalDateTime || requestDate < Clock.UtcNow.Subtract(Options.AllowedDateDrift).LocalDateTime)
             return await AuthenticateResultFailAsync("timestamp 值已超过允许的偏差范围");
 

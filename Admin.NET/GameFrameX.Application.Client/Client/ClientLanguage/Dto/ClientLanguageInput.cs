@@ -1,6 +1,4 @@
-﻿using GameFrameX.Core.Util;
-
-namespace GameFrameX.Application.Client.Client.ClientLanguage.Dto;
+﻿namespace GameFrameX.Application.Client.Client.ClientLanguage.Dto;
 
     /// <summary>
     /// 语言管理基础输入参数
