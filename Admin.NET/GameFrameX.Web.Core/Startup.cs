@@ -53,10 +53,7 @@ public class Startup : AppStartup
         // JWT
         services.AddJwt<JwtHandler>(enableGlobalAuthorize: true)
             // 添加 Signature 身份验证
-            .AddSignatureAuthentication(options =>
-            {
-                options.Events = SysOpenAccessService.GetSignatureAuthenticationEventImpl();
-            });
+            .AddSignatureAuthentication(options => { options.Events = SysOpenAccessService.GetSignatureAuthenticationEventImpl(); });
         // 允许跨域
         services.AddCorsAccessor();
         // 远程请求
@@ -84,7 +81,9 @@ public class Startup : AppStartup
             // setting.MetadataPropertyHandling = MetadataPropertyHandling.Ignore; // 解决DateTimeOffset异常
             // setting.DateParseHandling = DateParseHandling.None; // 解决DateTimeOffset异常
             // setting.Converters.Add(new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal }); // 解决DateTimeOffset异常
-        };
+        }
+
+        ;
 
         services.AddControllersWithViews()
             .AddAppLocalization()
@@ -158,6 +157,9 @@ public class Startup : AppStartup
 
         // 控制台logo
         services.AddConsoleLogo();
+        
+        // 添加HTTP客户端
+        // services.AddHttpClient();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
