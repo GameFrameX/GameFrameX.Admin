@@ -34,43 +34,43 @@ public class GameAreaEntity : EntityBaseSelect
     /// <summary>
     /// 表示服务器当前的状态。例如：Online, Offline, Maintenance, Full。
     /// </summary>
-    [SugarColumn(ColumnDescription = "服务器当前的状态")]
+    [SugarColumn(ColumnDescription = "状态")]
     public GameServerStatus ServerStatus { get; set; }
 
     /// <summary>
     /// 服务器所在地理位置或服务的区域。
     /// </summary>
-    [SugarColumn(ColumnDescription = "服务器当前的状态")]
+    [SugarColumn(ColumnDescription = "区域")]
     public string Region { get; set; }
 
     /// <summary>
     /// 服务器的Internet协议地址。
     /// </summary>
-    [SugarColumn(ColumnDescription = "服务器的Internet协议地址")]
+    [SugarColumn(ColumnDescription = "地址")]
     public string IPAddress { get; set; }
 
     /// <summary>
     /// 服务器监听的网络端口号。
     /// </summary>
-    [SugarColumn(ColumnDescription = "服务器监听的网络端口号")]
+    [SugarColumn(ColumnDescription = "端口号")]
     public int Port { get; set; }
 
     /// <summary>
     /// 服务器能够承载的最大玩家数量。
     /// </summary>
-    [SugarColumn(ColumnDescription = "服务器能够承载的最大玩家数量")]
+    [SugarColumn(ColumnDescription = "最大玩家数量")]
     public int Capacity { get; set; }
 
     /// <summary>
     /// 目前服务器上的玩家数量。
     /// </summary>
-    [SugarColumn(ColumnDescription = "目前服务器上的玩家数量")]
+    [SugarColumn(ColumnDescription = "目前的玩家数量")]
     public int CurrentLoad { get; set; }
 
     /// <summary>
     /// 服务器启用的日期。
     /// </summary>
-    [SugarColumn(ColumnDescription = "服务器启用的日期")]
+    [SugarColumn(ColumnDescription = "启用的日期")]
     public DateTime CreationDate { get; set; }
 
     /// <summary>
@@ -82,7 +82,7 @@ public class GameAreaEntity : EntityBaseSelect
     /// <summary>
     /// 服务器运行的游戏版本号。
     /// </summary>
-    [SugarColumn(ColumnDescription = "服务器运行的游戏版本号")]
+    [SugarColumn(ColumnDescription = "游戏版本号")]
     public string Version { get; set; }
 
     /// <summary>
@@ -94,13 +94,13 @@ public class GameAreaEntity : EntityBaseSelect
     /// <summary>
     /// 服务器支持的主要语言。
     /// </summary>
-    [SugarColumn(ColumnDescription = "服务器支持的主要语言")]
+    [SugarColumn(ColumnDescription = "语言")]
     public string Language { get; set; }
 
     /// <summary>
     /// 服务器所在的时区。
     /// </summary>
-    [SugarColumn(ColumnDescription = "服务器所在的时区")]
+    [SugarColumn(ColumnDescription = "时区")]
     public TimeZoneInfo TimeZone { get; set; }
 
     /// <summary>
