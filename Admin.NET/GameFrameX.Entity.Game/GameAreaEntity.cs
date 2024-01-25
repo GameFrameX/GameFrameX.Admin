@@ -47,7 +47,7 @@ public class GameAreaEntity : EntityBaseSelect
     /// 服务器的Internet协议地址。
     /// </summary>
     [SugarColumn(ColumnDescription = "地址")]
-    public string IPAddress { get; set; }
+    public string Address { get; set; }
 
     /// <summary>
     /// 服务器监听的网络端口号。
@@ -65,7 +65,7 @@ public class GameAreaEntity : EntityBaseSelect
     /// 目前服务器上的玩家数量。
     /// </summary>
     [SugarColumn(ColumnDescription = "目前的玩家数量")]
-    public int CurrentLoad { get; set; }
+    public int? CurrentLoad { get; set; }
 
     /// <summary>
     /// 服务器启用的日期。
@@ -77,7 +77,7 @@ public class GameAreaEntity : EntityBaseSelect
     /// 服务器最后一次维护或更新的日期。
     /// </summary>
     [SugarColumn(ColumnDescription = "服务器最后一次维护或更新的日期")]
-    public DateTime LastMaintenanceDate { get; set; }
+    public DateTime? LastMaintenanceDate { get; set; }
 
     /// <summary>
     /// 服务器运行的游戏版本号。
@@ -101,23 +101,23 @@ public class GameAreaEntity : EntityBaseSelect
     /// 服务器所在的时区。
     /// </summary>
     [SugarColumn(ColumnDescription = "时区")]
-    public TimeZoneInfo TimeZone { get; set; }
+    public string TimeZone { get; set; }
 
     /// <summary>
     /// 指定可以加入此服务器的玩家类型，如：NewPlayer, VIP。
     /// </summary>
     [SugarColumn(ColumnDescription = "指定可以加入此服务器的玩家类型")]
-    public string AllowedPlayerProfile { get; set; }
+    public string? AllowedPlayerProfile { get; set; }
 
     /// <summary>
     /// 特定服务器举行的事件或活动信息。
     /// </summary>
     [SugarColumn(ColumnDescription = "特定服务器举行的事件或活动信息")]
-    public string ServerEvents { get; set; }
+    public string? ServerEvents { get; set; }
 
     /// <summary>
     /// 访问权限设置，控制哪些玩家可以访问服务器。
     /// </summary>
     [SugarColumn(ColumnDescription = "访问权限设置，控制哪些玩家可以访问服务器")]
-    public string AccessControls { get; set; }
+    public string? AccessControls { get; set; }
 }
