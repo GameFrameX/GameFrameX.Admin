@@ -1,13 +1,13 @@
 <template>
 	<div class="sys-codeGenConfig-container">
-		<el-dialog v-model="state.isShowDialog" draggable :close-on-click-modal="false" width="1500px">
+		<el-dialog v-model="state.isShowDialog" draggable :close-on-click-modal="false" width="90%">
 			<template #header>
 				<div style="color: #fff">
 					<el-icon size="16" style="margin-right: 3px; display: inline; vertical-align: middle"> <ele-Edit /> </el-icon>
 					<span> 生成配置 </span>
 				</div>
 			</template>
-			<el-table :data="state.tableData" style="width: 100%" v-loading="state.loading" border>
+			<el-table :data="state.tableData" style="width: 100%" v-loading="state.loading" stripe border>
 				<el-table-column type="index" label="序号" width="55" align="center" />
 				<el-table-column prop="propertyName" label="实体属性" width="180" show-overflow-tooltip />
 				<el-table-column prop="columnComment" label="描述" width="180" show-overflow-tooltip>
@@ -15,8 +15,8 @@
 						<el-input v-model="scope.row.columnComment" autocomplete="off" />
 					</template>
 				</el-table-column>
-				<el-table-column prop="netType" label="数据类型" minWidth="90" show-overflow-tooltip />
-				<el-table-column prop="effectType" label="作用类型" width="120" show-overflow-tooltip>
+				<el-table-column prop="netType" label="数据类型" minWidth="80" show-overflow-tooltip />
+				<el-table-column prop="effectType" label="作用类型" width="150" show-overflow-tooltip>
 					<template #default="scope">
 						<el-select v-model="scope.row.effectType" class="m-2" placeholder="Select" :disabled="judgeColumns(scope.row)" @change="effectTypeChange(scope.row, scope.$index)">
 							<el-option v-for="item in state.effectTypeList" :key="item.code" :label="item.value" :value="item.code" />
@@ -31,39 +31,39 @@
 					</template>
 				</el-table-column>
 
-				<el-table-column prop="whetherTable" label="列表显示" width="85" align="center" show-overflow-tooltip>
+				<el-table-column prop="whetherTable" label="列表显示" width="70" align="center" show-overflow-tooltip>
 					<template #default="scope">
 						<el-checkbox v-model="scope.row.whetherTable" />
 					</template>
 				</el-table-column>
-				<el-table-column prop="whetherAdd" label="增加" width="80" align="center" show-overflow-tooltip>
+				<el-table-column prop="whetherAdd" label="增加" width="50" align="center" show-overflow-tooltip>
 					<template #default="scope">
 						<el-checkbox v-model="scope.row.whetherAdd" :disabled="judgeColumns(scope.row)" />
 					</template>
 				</el-table-column>
-        <el-table-column prop="whetherUpdate" label="修改" width="80" align="center" show-overflow-tooltip>
+        <el-table-column prop="whetherUpdate" label="修改" width="50" align="center" show-overflow-tooltip>
           <template #default="scope">
             <el-checkbox v-model="scope.row.whetherUpdate" :disabled="judgeColumns(scope.row)" />
           </template>
         </el-table-column>
-				<el-table-column prop="whetherRequired" label="必填" width="80" align="center" show-overflow-tooltip>
+				<el-table-column prop="whetherRequired" label="必填" width="50" align="center" show-overflow-tooltip>
 					<template #default="scope">
 						<el-checkbox v-model="scope.row.whetherRequired" :disabled="judgeColumns(scope.row)" />
 					</template>
 				</el-table-column>
-				<el-table-column prop="queryWhether" label="是否是查询" minWidth="80" align="center" show-overflow-tooltip>
+				<el-table-column prop="queryWhether" label="是否是查询" minWidth="50" align="center" show-overflow-tooltip>
 					<template #default="scope">
 						<el-switch v-model="scope.row.queryWhether" :active-value="true" :inactive-value="false" />
 					</template>
 				</el-table-column>
-				<el-table-column prop="queryType" label="查询方式" minWidth="120" align="center" show-overflow-tooltip>
+				<el-table-column prop="queryType" label="查询方式" minWidth="80" align="center" show-overflow-tooltip>
 					<template #default="scope">
 						<el-select v-model="scope.row.queryType" class="m-2" placeholder="Select" :disabled="!scope.row.queryWhether">
 							<el-option v-for="item in state.queryTypeList" :key="item.code" :label="item.value" :value="item.code" />
 						</el-select>
 					</template>
 				</el-table-column>
-				<el-table-column prop="orderNo" label="排序" width="100" show-overflow-tooltip>
+				<el-table-column prop="orderNo" label="排序" width="120" show-overflow-tooltip>
 					<template #default="scope">
 						<el-input v-model="scope.row.orderNo" autocomplete="off" type="number" />
 					</template>
