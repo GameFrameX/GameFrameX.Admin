@@ -122,9 +122,14 @@ public class CodeGenConfig
     public string WhetherTable { get; set; }
 
     /// <summary>
-    /// 增改
+    /// 增加
     /// </summary>
-    public string WhetherAddUpdate { get; set; }
+    public string WhetherAdd { get; set; }
+
+    /// <summary>
+    /// 修改
+    /// </summary>
+    public string WhetherUpdate { get; set; }
 
     /// <summary>
     /// 主外键
@@ -157,6 +162,7 @@ public class CodeGenConfig
             {
                 str = "sysFile_FK_" + LowerPropertyName;
             }
+
             return str;
         }
     }

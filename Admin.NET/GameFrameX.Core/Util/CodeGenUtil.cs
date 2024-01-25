@@ -287,11 +287,26 @@ public static class CodeGenUtil
     }
 
     /// <summary>
-    /// 是否是新增或更新
+    /// 是否是更新
     /// </summary>
     /// <param name="columnName"></param>
     /// <returns></returns>
-    public static bool IsAddOrUpdate(string columnName)
+    public static bool IsUpdate(string columnName)
+    {
+        var columnList = new List<string>()
+        {
+            nameof(EntityBase.CreateUserName),
+            nameof(EntityBase.UpdateUserName),
+        };
+        return columnList.Contains(columnName);
+    }
+
+    /// <summary>
+    /// 是否是新增
+    /// </summary>
+    /// <param name="columnName"></param>
+    /// <returns></returns>
+    public static bool IsAdd(string columnName)
     {
         var columnList = new List<string>()
         {
@@ -312,8 +327,6 @@ public static class CodeGenUtil
             nameof(EntityBase.UpdateTime),
             nameof(EntityBase.CreateUserId),
             nameof(EntityBase.UpdateUserId),
-            nameof(EntityBase.CreateUserName),
-            nameof(EntityBase.UpdateUserName),
             nameof(EntityBase.IsDelete)
         };
         return columnList.Contains(columnName);

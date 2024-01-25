@@ -134,11 +134,18 @@ public class SysCodeGenConfig : EntityBase
     public string? WhetherTable { get; set; }
 
     /// <summary>
-    /// 增改
+    /// 增加
     /// </summary>
-    [SugarColumn(ColumnDescription = "增改", Length = 8)]
+    [SugarColumn(ColumnDescription = "增加", Length = 8)]
     [MaxLength(8)]
-    public string? WhetherAddUpdate { get; set; }
+    public string? WhetherAdd { get; set; }
+
+    /// <summary>
+    /// 修改
+    /// </summary>
+    [SugarColumn(ColumnDescription = "修改", Length = 8)]
+    [MaxLength(8)]
+    public string? WhetherUpdate { get; set; }
 
     /// <summary>
     /// 主键
