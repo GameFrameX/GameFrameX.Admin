@@ -167,7 +167,7 @@ if (@column.ColumnKey == "True"){
     {
 @foreach (var column in Model.TableField){
 if (@column.ColumnKey == "True"){
-        return await InnerGet(input);
+        @:return await InnerGet(input);
         @://return await Repository.GetFirstAsync(u => u.@(@column.PropertyName) == input.@(@column.PropertyName));
 }   
 }            
