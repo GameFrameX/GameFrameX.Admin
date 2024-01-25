@@ -1,4 +1,4 @@
-﻿import request from '/src/utils/request';
+﻿import request from '/@/utils/request';
 enum Api {
   AddGameUserEntity = '/api/gameUserEntity/add',
   DeleteGameUserEntity = '/api/gameUserEntity/delete',
