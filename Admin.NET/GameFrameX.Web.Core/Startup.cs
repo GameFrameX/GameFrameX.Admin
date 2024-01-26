@@ -157,9 +157,8 @@ public class Startup : AppStartup
 
         // 控制台logo
         services.AddConsoleLogo();
-        
-        // 添加HTTP客户端
-        // services.AddHttpClient();
+
+       
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

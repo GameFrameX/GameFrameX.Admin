@@ -7,17 +7,18 @@
 // 软件按“原样”提供，不提供任何形式的明示或暗示的保证，包括但不限于对适销性、适用性和非侵权的保证。
 // 在任何情况下，作者或版权持有人均不对任何索赔、损害或其他责任负责，无论是因合同、侵权或其他方式引起的，与软件或其使用或其他交易有关。
 
-namespace GameFrameX.Application.Game;
+using Furion.ConfigurableOptions;
+using Yitter.IdGenerator;
 
-public static class GameConst
+namespace GameFrameX.Core.Base.Option;
+
+/// <summary>
+/// 游戏服务器配置选项
+/// </summary>
+public sealed class GameServerOptions : IdGeneratorOptions, IConfigurableOptions
 {
     /// <summary>
-    /// 
+    /// HTTP请求根地址
     /// </summary>
-    public const string GroupName = "游戏应用";
-
-    /// <summary>
-    /// 游戏HTTP请求组名称
-    /// </summary>
-    public const string GameRequestHttpGroupName = "GameHttp";
+    public string HttpRootUrl { get; set; }
 }

@@ -23,6 +23,9 @@
     "ThrowBah": true, // 是否将 Oops.Oh 默认抛出为业务异常
     "LogError": false // 是否输出异常日志
   },
+  "GameServerSettings": {
+    "HttpRootUrl": "http://localhost:20001" // 游戏服务器的HTTP请求根地址
+  },
   "LocalizationSettings": {
     "SupportedCultures": [ "zh-CN", "en" ], // 语言列表
     "DefaultCulture": "zh-CN", // 默认语言
