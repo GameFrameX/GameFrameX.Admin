@@ -7,8 +7,8 @@
     "ConnectionConfigs": [
       {
         //"ConfigId": "1300000000001", // 默认库标识-禁止修改
-        "DbType": "Sqlite", // MySql、SqlServer、Sqlite、Oracle、PostgreSQL、Dm、Kdbndp、Oscar、MySqlConnector、Access、OpenGauss、QuestDB、HG、ClickHouse、GBase、Odbc、Custom
-        "ConnectionString": "DataSource=./GameFrameX.db", // 库连接字符串
+        "DbType": "MySql", // MySql、SqlServer、Sqlite、Oracle、PostgreSQL、Dm、Kdbndp、Oscar、MySqlConnector、Access、OpenGauss、QuestDB、HG、ClickHouse、GBase、Odbc、Custom
+        "ConnectionString": "Data Source=localhost;Database=GameFrameX;Port=9101;Uid=root;Pwd=123456;", // 库连接字符串
         "DbSettings": {
           "EnableInitDb": true, // 启用库初始化
           "EnableDiffLog": false, // 启用库表差异日志

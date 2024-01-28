@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <TargetFrameworks>net8.0;net6.0;net7.0</TargetFrameworks>
+        <LangVersion>11</LangVersion>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+      <DocumentationFile>bin\Debug\net8.0\GameFrameX.Application.Client.Api.xml</DocumentationFile>
+    </PropertyGroup>
+
+
+
+
+</Project>

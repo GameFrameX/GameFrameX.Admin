@@ -54,6 +54,16 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameFrameX.Core.BaseInputOu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameFrameX.Core.Base", "GameFrameX.Core.Base\GameFrameX.Core.Base.csproj", "{5902AB42-B772-4C81-9BE8-2F0814CC61CA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameFrameX.Web.Api", "GameFrameX.Web.Api\GameFrameX.Web.Api.csproj", "{1652070B-488F-41A0-9A6E-4D86CDFF1941}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameFrameX.Application.Api", "Api\GameFrameX.Application.Api\GameFrameX.Application.Api.csproj", "{58C03309-1427-4919-A9BD-FE43FE6671C2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Api", "Api", "{05B968EA-1F2C-474D-8511-0302BF42290D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameFrameX.Application.Client.Api", "Api\GameFrameX.Application.Client.Api\GameFrameX.Application.Client.Api.csproj", "{3B3F2E8B-7D67-485A-9B72-C72FEA5E2865}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Entity", "Entity", "{6C02023E-2E15-4712-B36C-E93724556726}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -148,6 +158,18 @@ Global
 		{5902AB42-B772-4C81-9BE8-2F0814CC61CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5902AB42-B772-4C81-9BE8-2F0814CC61CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5902AB42-B772-4C81-9BE8-2F0814CC61CA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1652070B-488F-41A0-9A6E-4D86CDFF1941}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1652070B-488F-41A0-9A6E-4D86CDFF1941}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1652070B-488F-41A0-9A6E-4D86CDFF1941}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1652070B-488F-41A0-9A6E-4D86CDFF1941}.Release|Any CPU.Build.0 = Release|Any CPU
+		{58C03309-1427-4919-A9BD-FE43FE6671C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{58C03309-1427-4919-A9BD-FE43FE6671C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{58C03309-1427-4919-A9BD-FE43FE6671C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{58C03309-1427-4919-A9BD-FE43FE6671C2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B3F2E8B-7D67-485A-9B72-C72FEA5E2865}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B3F2E8B-7D67-485A-9B72-C72FEA5E2865}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B3F2E8B-7D67-485A-9B72-C72FEA5E2865}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B3F2E8B-7D67-485A-9B72-C72FEA5E2865}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -155,6 +177,8 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{C4A288D5-0FAA-4F43-9072-B97635D7871D} = {76F70D22-8D53-468E-A3B6-1704666A1D71}
 		{48EFC3A6-BDC0-4D05-819A-B1FB927FA4C8} = {76F70D22-8D53-468E-A3B6-1704666A1D71}
+		{58C03309-1427-4919-A9BD-FE43FE6671C2} = {05B968EA-1F2C-474D-8511-0302BF42290D}
+		{3B3F2E8B-7D67-485A-9B72-C72FEA5E2865} = {05B968EA-1F2C-474D-8511-0302BF42290D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5CD801D7-984A-4F5C-8FA2-211B7A5EA9F3}
