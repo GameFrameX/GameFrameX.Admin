@@ -16,6 +16,7 @@ namespace GameFrameX.Entity.System;
 /// </summary>
 [SugarTable(null, "系统微信用户表")]
 [SysTable]
+[IncreTable]
 public class SysWechatUser : EntityBase
 {
     /// <summary>

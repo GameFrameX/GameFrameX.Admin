@@ -16,6 +16,7 @@ namespace GameFrameX.Entity.System;
 /// </summary>
 [SugarTable(null, "系统审计日志表")]
 [SysTable]
+[IncreTable]
 [LogTable]
 public class SysLogAudit : EntityBase
 {

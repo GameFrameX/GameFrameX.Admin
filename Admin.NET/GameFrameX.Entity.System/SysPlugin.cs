@@ -16,6 +16,7 @@ namespace GameFrameX.Entity.System;
 /// </summary>
 [SugarTable(null, "系统动态插件表")]
 [SysTable]
+[IncreTable]
 public class SysPlugin : EntityTenant
 {
     /// <summary>

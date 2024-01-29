@@ -16,6 +16,7 @@ namespace GameFrameX.Entity.System;
 /// </summary>
 [SugarTable(null, "系统作业信息表")]
 [SysTable]
+[IncreTable]
 public class SysJobDetail : EntityBaseId
 {
     /// <summary>

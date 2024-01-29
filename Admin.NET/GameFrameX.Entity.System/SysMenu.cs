@@ -16,6 +16,7 @@ namespace GameFrameX.Entity.System;
 /// </summary>
 [SugarTable(null, "系统菜单表")]
 [SysTable]
+[IncreTable]
 public class SysMenu : EntityBase
 {
     /// <summary>

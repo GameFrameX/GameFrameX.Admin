@@ -16,6 +16,7 @@ namespace GameFrameX.Entity.System;
 /// </summary>
 [SugarTable(null, "系统通知公告用户表")]
 [SysTable]
+[IncreTable]
 public class SysNoticeUser
 {
     /// <summary>

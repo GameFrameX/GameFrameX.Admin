@@ -16,6 +16,7 @@ namespace GameFrameX.Entity.System;
 /// </summary>
 [SugarTable(null, "系统字典类型表")]
 [SysTable]
+[IncreTable]
 public class SysDictType : EntityBase
 {
     /// <summary>

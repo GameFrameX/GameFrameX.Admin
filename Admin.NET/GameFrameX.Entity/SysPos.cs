@@ -16,6 +16,7 @@ namespace GameFrameX.Entity.System;
 /// </summary>
 [SugarTable(null, "系统职位表")]
 [SysTable]
+[IncreTable]
 public class SysPos : EntityTenant
 {
     /// <summary>

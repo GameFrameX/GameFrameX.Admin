@@ -16,6 +16,7 @@ namespace GameFrameX.Entity.System;
 /// </summary>
 [SugarTable(null, "系统访问日志表")]
 [SysTable]
+[IncreTable]
 [LogTable]
 public class SysLogVis : EntityTenant
 {

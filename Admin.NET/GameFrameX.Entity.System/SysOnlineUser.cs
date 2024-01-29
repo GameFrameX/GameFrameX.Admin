@@ -14,6 +14,7 @@ namespace GameFrameX.Entity.System;
 /// </summary>
 [SugarTable(null, "系统在线用户表")]
 [SysTable]
+[IncreTable]
 public class SysOnlineUser : EntityTenantId
 {
     /// <summary>

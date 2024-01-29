@@ -14,6 +14,7 @@ namespace GameFrameX.Entity.System;
 /// </summary>
 [SugarTable(null, "系统差异日志表")]
 [SysTable]
+[IncreTable]
 [LogTable]
 public class SysLogDiff : EntityBase
 {

@@ -14,6 +14,7 @@ namespace GameFrameX.Entity.System;
 /// </summary>
 [SugarTable(null, "系统角色机构表")]
 [SysTable]
+[IncreTable]
 public class SysRoleOrg : EntityBaseId
 {
     /// <summary>

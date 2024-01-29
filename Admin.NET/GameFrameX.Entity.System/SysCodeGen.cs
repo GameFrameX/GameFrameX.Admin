@@ -14,6 +14,7 @@ namespace GameFrameX.Entity.System;
 /// </summary>
 [SugarTable(null, "代码生成表")]
 [SysTable]
+[IncreTable]
 public class SysCodeGen : EntityBase
 {
     /// <summary>

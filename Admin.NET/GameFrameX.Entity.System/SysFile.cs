@@ -14,6 +14,7 @@ namespace GameFrameX.Entity.System;
 /// </summary>
 [SugarTable(null, "系统文件表")]
 [SysTable]
+[IncreTable]
 public class SysFile : EntityBase
 {
     /// <summary>

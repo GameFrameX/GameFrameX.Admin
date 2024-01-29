@@ -16,6 +16,7 @@ namespace GameFrameX.Entity.System;
 /// </summary>
 [SugarTable(null, "系统作业集群表")]
 [SysTable]
+[IncreTable]
 public class SysJobCluster : EntityBaseId
 {
     /// <summary>

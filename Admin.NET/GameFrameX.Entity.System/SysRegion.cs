@@ -14,6 +14,7 @@ namespace GameFrameX.Entity.System;
 /// </summary>
 [SugarTable(null, "系统行政地区表")]
 [SysTable]
+[IncreTable]
 public class SysRegion : EntityBaseId
 {
     /// <summary>

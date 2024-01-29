@@ -14,6 +14,7 @@ namespace GameFrameX.Entity.System;
 /// </summary>
 [SugarTable(null, "开放接口身份表")]
 [SysTable]
+[IncreTable]
 public class SysOpenAccess : EntityBase
 {
     /// <summary>

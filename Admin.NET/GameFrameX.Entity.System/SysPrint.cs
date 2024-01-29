@@ -16,6 +16,7 @@ namespace GameFrameX.Entity.System;
 /// </summary>
 [SugarTable(null, "系统打印模板表")]
 [SysTable]
+[IncreTable]
 public class SysPrint : EntityTenant
 {
     /// <summary>

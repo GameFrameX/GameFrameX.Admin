@@ -16,6 +16,7 @@ namespace GameFrameX.Entity.System;
 /// </summary>
 [SugarTable(null, "系统参数配置表")]
 [SysTable]
+[IncreTable]
 public class SysConfig : EntityBase
 {
     /// <summary>

@@ -16,6 +16,7 @@ namespace GameFrameX.Entity.System;
 /// </summary>
 [SugarTable(null, "系统微信支付表")]
 [SysTable]
+[IncreTable]
 public class SysWechatPay : EntityBase
 {
     /// <summary>

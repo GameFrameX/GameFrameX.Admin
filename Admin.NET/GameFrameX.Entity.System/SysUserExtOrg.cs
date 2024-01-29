@@ -14,6 +14,7 @@ namespace GameFrameX.Entity.System;
 /// </summary>
 [SugarTable(null, "系统用户扩展机构表")]
 [SysTable]
+[IncreTable]
 public class SysUserExtOrg : EntityBaseId
 {
     /// <summary>
