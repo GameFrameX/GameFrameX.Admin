@@ -10,7 +10,7 @@ namespace GameFrameX.Application.Client.Client.ClientPlatform;
 /// 平台管理服务
 /// </summary>
 [ApiDescriptionSettings(Order = 100)]
-public class ClientPlatformService : BaseService<Entity.Client.ClientPlatform>
+public class ClientPlatformService : BaseSelectService<Entity.Client.ClientPlatform>
 {
     private readonly SqlSugarRepository<Entity.Client.ClientPlatform> _rep;
 
