@@ -1,3 +1,28 @@
+
+
+# 如何运行
+
+1. 安装Node(我用的20.10.0) 建议使用nvm 管理多个版本
+2. 安装cnpm 
+```
+npm install cnpm -g --registry=https://registry.npmmirror.com
+```
+3. 命令行CD到当前目录
+4. 执行环境安装
+```
+cnpm install
+```
+5. 运行
+```
+cnpm run dev
+```
+
+
+
+
+# 以下为原内容
+
+
 <div align="center">
 	<img src="https://i.hd-r.cn/6ce52e5724fae609444b5b48bdc4accb.png">
 	<p align="center">
