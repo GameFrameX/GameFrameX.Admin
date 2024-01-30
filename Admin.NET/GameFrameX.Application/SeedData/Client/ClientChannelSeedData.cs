@@ -15,24 +15,22 @@ public class ClientChannelSeedData: ISqlSugarEntitySeedData<ClientChannel>
     /// <returns></returns>
     public IEnumerable<ClientChannel> HasData()
     {
-        string recordsJSON = """
-                             
-                                         [
-                             			  {
-                             			    "Name": "default",
-                             			    "Description": "默认缺省渠道",
-                             			    "CreateTime": "2024-01-30 10:01:12",
-                             			    "UpdateTime": null,
-                             			    "CreateUserId": 1300000000101,
-                             			    "CreateUserName": "超级管理员",
-                             			    "UpdateUserId": null,
-                             			    "UpdateUserName": null,
-                             			    "IsDelete": false,
-                             			    "Id": 31850206682437
-                             			  }
-                             			]
-                                     
-                             """;
+        string recordsJSON = @"
+            [
+			  {
+			    ""Name"": ""default"",
+			    ""Description"": ""默认缺省渠道"",
+			    ""CreateTime"": ""2024-01-30 10:01:12"",
+			    ""UpdateTime"": ""2024-01-30 19:00:41"",
+			    ""CreateUserId"": 1300000000101,
+			    ""CreateUserName"": ""超级管理员"",
+			    ""UpdateUserId"": null,
+			    ""UpdateUserName"": null,
+			    ""IsDelete"": false,
+			    ""Id"": 31850206682437
+			  }
+			]
+        ";
         List<ClientChannel> records = Newtonsoft.Json.JsonConvert.DeserializeObject<List<ClientChannel>>(recordsJSON);
         
         #region 处理 JsonIgnore 的Property

@@ -15,24 +15,22 @@ public class ClientPackageSeedData: ISqlSugarEntitySeedData<ClientPackage>
     /// <returns></returns>
     public IEnumerable<ClientPackage> HasData()
     {
-        string recordsJSON = """
-                             
-                                         [
-                             			  {
-                             			    "Name": "default",
-                             			    "Description": "默认缺省包",
-                             			    "CreateTime": "2024-01-30 10:01:44",
-                             			    "UpdateTime": null,
-                             			    "CreateUserId": 1300000000101,
-                             			    "CreateUserName": "超级管理员",
-                             			    "UpdateUserId": null,
-                             			    "UpdateUserName": null,
-                             			    "IsDelete": false,
-                             			    "Id": 31850214795589
-                             			  }
-                             			]
-                                     
-                             """;
+        string recordsJSON = @"
+            [
+			  {
+			    ""Name"": ""default"",
+			    ""Description"": ""默认缺省包"",
+			    ""CreateTime"": ""2024-01-30 10:01:44"",
+			    ""UpdateTime"": ""2024-01-30 19:00:41"",
+			    ""CreateUserId"": 1300000000101,
+			    ""CreateUserName"": ""超级管理员"",
+			    ""UpdateUserId"": null,
+			    ""UpdateUserName"": null,
+			    ""IsDelete"": false,
+			    ""Id"": 31850214795589
+			  }
+			]
+        ";
         List<ClientPackage> records = Newtonsoft.Json.JsonConvert.DeserializeObject<List<ClientPackage>>(recordsJSON);
         
         #region 处理 JsonIgnore 的Property
