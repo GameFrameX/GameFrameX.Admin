@@ -1,6 +1,6 @@
 ﻿<template>
   <div class="clientGlobalInfo-container">
-    <el-dialog v-model="isShowDialog" :width="800" draggable="">
+    <el-dialog v-model="isShowDialog" width="80%" draggable="">
       <template #header>
         <div style="color: #fff">
           <!--<el-icon size="16" style="margin-right: 3px; display: inline; vertical-align: middle"> <ele-Edit /> </el-icon>-->
@@ -99,7 +99,7 @@
 
           </el-col>
 
-          <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12" class="mb20">
+          <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" class="mb20">
             <el-form-item label="检测资源地址" prop="checkResourceUrl">
               <el-input v-model="ruleForm.checkResourceUrl" placeholder="请输入CheckResourceUrl" maxlength="128"
                         show-word-limit clearable/>
@@ -107,7 +107,7 @@
             </el-form-item>
 
           </el-col>
-          <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12" class="mb20">
+          <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" class="mb20">
             <el-form-item label="检测应用版本地址" prop="checkAppVersionUrl">
               <el-input v-model="ruleForm.checkAppVersionUrl" placeholder="请输入CheckAppVersionUrl" maxlength="128"
                         show-word-limit clearable/>
