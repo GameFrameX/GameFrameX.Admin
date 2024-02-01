@@ -62,8 +62,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Api", "Api", "{05B968EA-1F2
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameFrameX.Application.Client.Api", "Api\GameFrameX.Application.Client.Api\GameFrameX.Application.Client.Api.csproj", "{3B3F2E8B-7D67-485A-9B72-C72FEA5E2865}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Entity", "Entity", "{6C02023E-2E15-4712-B36C-E93724556726}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameFrameX.Core.Options", "GameFrameX.Core.Options\GameFrameX.Core.Options.csproj", "{6D8CC653-BE6D-478C-84DB-0D77F15A7198}"
 EndProject
 Global
