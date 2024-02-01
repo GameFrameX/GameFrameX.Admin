@@ -29,12 +29,14 @@ public class GameAnnouncementEntity : EntityBase
     /// 标题
     /// </summary>
     [SugarColumn(ColumnDescription = "标题", Length = 256)]
+    [MaxLength(256)]
     public string Title { get; set; }
 
     /// <summary>
     /// 内容
     /// </summary>
     [SugarColumn(ColumnDescription = "内容", Length = 4096)]
+    [MaxLength(4096)]
     public string Content { get; set; }
 
     /// <summary>
