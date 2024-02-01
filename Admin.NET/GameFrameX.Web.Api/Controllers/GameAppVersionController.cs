@@ -26,6 +26,7 @@ public class GameAppVersionController : BaseController<ClientAppVersion>
     /// <returns></returns>
     [ProducesResponseType(typeof(GameAppVersionResponse), 200)]
     [HttpPost]
+    [HttpOptions]
     public async Task<ResultModel> GetInfo([FromBody] GameAppVersionRequest gameAppVersionRequest)
     {
         GameAppVersionResponse gameAppVersionResponse = new GameAppVersionResponse();
