@@ -19,23 +19,6 @@ var argsList = App.Configuration.AsEnumerable().ToList();
 Console.WriteLine("环境变量开始");
 Console.WriteLine(string.Join("\n", argsList));
 Console.WriteLine("环境变量结束");
-/*
-
-
-LauncherOptions launcherOptions = new LauncherOptions();
-
-foreach (var valuePair in argsList)
-{
-    if (valuePair.Key.Equals("DbType"))
-    {
-        launcherOptions.DbType = valuePair.Value;
-    }
-    else if (valuePair.Key.Equals("ConnectionString"))
-    {
-        launcherOptions.ConnectionString = valuePair.Value;
-    }
-}*/
-
 
 namespace GameFrameX.Web.Entry
 {
