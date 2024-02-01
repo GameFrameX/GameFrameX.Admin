@@ -1,4 +1,5 @@
 using System.Reflection;
+using GameFrameX.Core.Options;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Entity;
 using GameFrameX.Web.Api;
@@ -6,11 +7,16 @@ using GameFrameX.Web.Api.Filter;
 using GameFrameX.Web.Api.SqlSugar;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json;
 using SqlSugar;
 
 var builder = WebApplication.CreateBuilder(args);
 
-Console.WriteLine(string.Join("\n", args.ToArray()));
+var argsList = builder.Configuration.AsEnumerable().ToList();
+
+Console.WriteLine("环境变量开始");
+Console.WriteLine(string.Join("\n", argsList));
+Console.WriteLine("环境变量结束");
 
 // 处理启动的URLS
 List<string> urls = new List<string>();
@@ -25,6 +31,21 @@ foreach (string param in args)
         }
     }
 }
+
+LauncherOptions launcherOptions = new LauncherOptions();
+
+foreach (var valuePair in argsList)
+{
+    if (valuePair.Key.Equals("DbType"))
+    {
+        launcherOptions.DbType = valuePair.Value;
+    }
+    else if (valuePair.Key.Equals("ConnectionString"))
+    {
+        launcherOptions.ConnectionString = valuePair.Value;
+    }
+}
+
 
 if (urls.Count > 0)
 {
@@ -120,10 +141,12 @@ SqlSugarClient AddSqlSugarClientService(IConfigurationSection configurationSecti
 //Scoped用SqlSugarClient 
     var dbConfig = new ConnectionConfig()
     {
-        DbType = Enum.Parse<SqlSugar.DbType>(configurationSection["DbType"] ?? SqlSugar.DbType.Sqlite.ToString()),
-        ConnectionString = configurationSection["ConnectionString"],
+        DbType = Enum.Parse<SqlSugar.DbType>(!string.IsNullOrWhiteSpace(launcherOptions.DbType) ? launcherOptions.DbType : (configurationSection["DbType"] ?? SqlSugar.DbType.Sqlite.ToString())),
+        ConnectionString = !string.IsNullOrWhiteSpace(launcherOptions.ConnectionString) ? launcherOptions.ConnectionString : configurationSection["ConnectionString"],
         IsAutoCloseConnection = true,
     };
+
+    Console.WriteLine(JsonConvert.SerializeObject(dbConfig));
     SqlSugarClient sqlSugarClient = new SqlSugarClient(dbConfig,
         db =>
         {

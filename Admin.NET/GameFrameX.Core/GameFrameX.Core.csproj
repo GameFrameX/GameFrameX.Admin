@@ -50,6 +50,7 @@
     <ProjectReference Include="..\GameFrameX.Core.BaseInputOutput\GameFrameX.Core.BaseInputOutput.csproj" />
     <ProjectReference Include="..\GameFrameX.Core.Base\GameFrameX.Core.Base.csproj" />
     <ProjectReference Include="..\GameFrameX.Core.Enum\GameFrameX.Core.Enum.csproj" />
+    <ProjectReference Include="..\GameFrameX.Core.Options\GameFrameX.Core.Options.csproj" />
     <ProjectReference Include="..\GameFrameX.Core.Utility\GameFrameX.Core.Utility.csproj" />
     <ProjectReference Include="..\GameFrameX.Entity.System\GameFrameX.Entity.System.csproj" />
     <ProjectReference Include="..\GameFrameX.Entity\GameFrameX.Entity.csproj" />

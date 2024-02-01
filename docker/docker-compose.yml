@@ -1,30 +1,46 @@
-version: "3"
+﻿version: '3'
+  # nginx:
+  #   image: nginx:1.20.2
+  #   ports:
+  #     - "9100:80"
+  #     - "9103:443"
+  #   environment:
+  #     - TZ=Asia/Shanghai
+  #   volumes:
+  #     - "./nginx/dist:/usr/share/nginx/html"
+  #     - "./nginx/conf/nginx.conf:/etc/nginx/nginx.conf:ro"
+  #     - "./nginx/key:/etc/nginx/key/"
+  #   links:
+#     - adminNet
+
+# adminNet:
+#   image: mcr.microsoft.com/dotnet/aspnet:8.0
+#   ports:
+#     - "9102:5050"
+#   environment:
+#     - TZ=Asia/Shanghai
+#   volumes:
+#     - "./app:/app"
+#   working_dir: /app
+#   command: ["/app/wait-for-it.sh", "mysql:3306", "-t", "120", "--","dotnet", "GameFrameX.Web.Entry.dll"]
+#   depends_on:
+#     - mysql
+
+
 
 services:
-  nginx:
-    image: nginx:1.20.2
-    ports:
-      - "9100:80"
-      - "9103:443"
-    environment:
-      - TZ=Asia/Shanghai
-    volumes:
-      - "./nginx/dist:/usr/share/nginx/html"
-      - "./nginx/conf/nginx.conf:/etc/nginx/nginx.conf:ro"
-      - "./nginx/key:/etc/nginx/key/"
-    links:
-      - adminNet
   mysql:
-    image: mysql:5.7
+    image: mysql:5.7.44
+    container_name: mysql
     ports:
-      - 9101:3306
+      - "9101:3306"
     restart: unless-stopped
     privileged: true
     ulimits:
-       nproc: 655350
-       nofile:
-         soft: 131072
-         hard: 400000
+      nproc: 655350
+      nofile:
+        soft: 131072
+        hard: 400000
     #healthcheck:
     #  test: "/usr/bin/mysql --user=root --password=root --execute \"SHOW DATABASES;\""
     #  interval: 10s # 间隔时间
@@ -33,7 +49,7 @@ services:
     command: [
       '--character-set-server=utf8mb4', #设置数据库表的数据集
       '--collation-server=utf8mb4_unicode_ci', #设置数据库表的数据集
-      ]
+    ]
     environment:
       MYSQL_ROOT_HOST: "%"
       MYSQL_DATABASE: gameframex
@@ -42,16 +58,50 @@ services:
     volumes:
       - ./mysql/mysql:/var/lib/mysql
       - ./mysql/mysql.cnf:/etc/mysql/conf.d/mysql.cnf
-  adminNet:
-    image: mcr.microsoft.com/dotnet/aspnet:8.0
+    networks:
+      - gameframex_networks
+  gameframex.web.api:
+    image: gameframex.web.api
+    container_name: client-api
+    build:
+      context: .
+      dockerfile: ./../Admin.NET/GameFrameX.Web.Api/Dockerfile
+      args:
+        - no-cache
     ports:
-      - "9102:5050"
+      - "20808:80"
+      - "20809:443"
     environment:
-      - TZ=Asia/Shanghai
-    volumes:
-      - "./app:/app"
-    working_dir: /app
-    command: ["/app/wait-for-it.sh", "mysql:3306", "-t", "120", "--","dotnet", "GameFrameX.Web.Entry.dll"]
-    depends_on:
+      - "DatabaseName=GameFrameX"
+      - "DbType=MySql"
+      - "ConnectionString=Data Source=mysql;Database=GameFrameX;Port=3306;Uid=root;Pwd=123456;"
+    links:
       - mysql
-
+    networks:
+      - gameframex_networks
+  gameframex.web.entry:
+    image: gameframex.web.entry
+    container_name: admin-api
+    build:
+      context: .
+      dockerfile: ./../Admin.NET/GameFrameX.Web.Entry/Dockerfile
+    ports:
+      - "20802:80"
+      - "20803:443"
+    environment:
+      - "TZ=Asia/Shanghai"
+      - "DatabaseName=GameFrameX"
+      - "DbType=MySql"
+      - "ConnectionString=Data Source=mysql;Database=GameFrameX;Port=3306;Uid=root;Pwd=123456;"
+    links:
+      - mysql
+    networks:
+      - gameframex_networks
+networks:
+  gameframex_networks:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.100.1.0/24
+          gateway: 172.100.1.1

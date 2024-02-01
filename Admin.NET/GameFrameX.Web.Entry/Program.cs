@@ -7,9 +7,35 @@
 // 软件按“原样”提供，不提供任何形式的明示或暗示的保证，包括但不限于对适销性、适用性和非侵权的保证。
 // 在任何情况下，作者或版权持有人均不对任何索赔、损害或其他责任负责，无论是因合同、侵权或其他方式引起的，与软件或其使用或其他交易有关。
 
+using Furion;
 using GameFrameX.Web.Entry;
 
+
 Serve.Run(RunOptions.Default.AddWebComponent<WebComponent>());
+
+
+var argsList = App.Configuration.AsEnumerable().ToList();
+
+Console.WriteLine("环境变量开始");
+Console.WriteLine(string.Join("\n", argsList));
+Console.WriteLine("环境变量结束");
+/*
+
+
+LauncherOptions launcherOptions = new LauncherOptions();
+
+foreach (var valuePair in argsList)
+{
+    if (valuePair.Key.Equals("DbType"))
+    {
+        launcherOptions.DbType = valuePair.Value;
+    }
+    else if (valuePair.Key.Equals("ConnectionString"))
+    {
+        launcherOptions.ConnectionString = valuePair.Value;
+    }
+}*/
+
 
 namespace GameFrameX.Web.Entry
 {
@@ -18,10 +44,7 @@ namespace GameFrameX.Web.Entry
         public void Load(WebApplicationBuilder builder, ComponentContext componentContext)
         {
             // 设置日志过滤
-            builder.Logging.AddFilter((provider, category, logLevel) =>
-            {
-                return !new[] { "Microsoft.Hosting", "Microsoft.AspNetCore" }.Any(u => category.StartsWith(u)) && logLevel >= LogLevel.Information;
-            });
+            builder.Logging.AddFilter((provider, category, logLevel) => { return !new[] { "Microsoft.Hosting", "Microsoft.AspNetCore" }.Any(u => category.StartsWith(u)) && logLevel >= LogLevel.Information; });
 
             // 设置接口超时时间和上传大小
             builder.Configuration.Get<WebHostBuilder>().ConfigureKestrel(u =>

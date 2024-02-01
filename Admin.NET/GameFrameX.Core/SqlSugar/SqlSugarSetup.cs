@@ -15,6 +15,7 @@ using GameFrameX.Core.Const;
 using GameFrameX.Core.Enum;
 using GameFrameX.Core.Extension;
 using GameFrameX.Core.Option;
+using GameFrameX.Core.Options;
 using GameFrameX.Entity;
 using GameFrameX.Entity.System;
 
@@ -39,7 +40,34 @@ public static class SqlSugarSetup
         SnowFlakeSingle.WorkId = snowIdOpt.WorkerId;
         StaticConfig.CustomSnowFlakeFunc = () => { return YitIdHelper.NextId(); };
 
+
+        var configuration = App.Configuration.AsEnumerable().ToList();
+
+        LauncherOptions launcherOptions = new LauncherOptions();
+
+        foreach (var valuePair in configuration)
+        {
+            if (valuePair.Key.Equals("DbType"))
+            {
+                launcherOptions.DbType = valuePair.Value;
+            }
+            else if (valuePair.Key.Equals("ConnectionString"))
+            {
+                launcherOptions.ConnectionString = valuePair.Value;
+            }
+        }
+
         var dbOptions = App.GetConfig<DbConnectionOptions>("DbConnection", true);
+
+        if (launcherOptions.DbType != null)
+        {
+            var dbConfig = dbOptions.ConnectionConfigs[0];
+            dbConfig.ConnectionString = launcherOptions.ConnectionString;
+            dbConfig.DbType = System.Enum.Parse<DbType>(launcherOptions.DbType);
+            dbOptions.ConnectionConfigs.Add(dbConfig);
+        }
+
+
         dbOptions.ConnectionConfigs.ForEach(SetDbConfig);
 
         SqlSugarScope sqlSugar = new(dbOptions.ConnectionConfigs.Adapt<List<ConnectionConfig>>(), db =>

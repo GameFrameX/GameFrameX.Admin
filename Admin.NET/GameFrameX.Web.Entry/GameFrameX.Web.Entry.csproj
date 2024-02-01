@@ -16,6 +16,9 @@
 		<Compile Remove="publish\**" />
 		<Content Remove="logs\**" />
 		<Content Remove="publish\**" />
+		<Content Include="..\.dockerignore">
+		  <Link>.dockerignore</Link>
+		</Content>
 		<EmbeddedResource Remove="logs\**" />
 		<EmbeddedResource Remove="publish\**" />
 		<None Remove="logs\**" />

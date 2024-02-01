@@ -5,14 +5,22 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <InvariantGlobalization>true</InvariantGlobalization>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\Api\GameFrameX.Application.Client.Api\GameFrameX.Application.Client.Api.csproj" />
       <ProjectReference Include="..\GameFrameX.Core.Extension\GameFrameX.Core.Extension.csproj" />
+      <ProjectReference Include="..\GameFrameX.Core.Options\GameFrameX.Core.Options.csproj" />
       <ProjectReference Include="..\GameFrameX.Core\GameFrameX.Core.csproj" />
       <ProjectReference Include="..\GameFrameX.Entity.Client\GameFrameX.Entity.Client.csproj" />
       <ProjectReference Include="..\GameFrameX.Entity\GameFrameX.Entity.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="..\.dockerignore">
+        <Link>.dockerignore</Link>
+      </Content>
     </ItemGroup>
     
 
