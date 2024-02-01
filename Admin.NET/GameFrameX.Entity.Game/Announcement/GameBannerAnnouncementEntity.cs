@@ -29,6 +29,7 @@ public class GameBannerAnnouncementEntity : EntityBase
     /// 内容
     /// </summary>
     [SugarColumn(ColumnDescription = "内容", Length = 4096)]
+    [MaxLength(4096)]
     public string Content { get; set; }
 
     /// <summary>
