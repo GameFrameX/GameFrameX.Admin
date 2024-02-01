@@ -85,9 +85,10 @@ services:
     build:
       context: .
       dockerfile: ./../Admin.NET/GameFrameX.Web.Entry/Dockerfile
+      args:
+        - no-cache
     ports:
-      - "20802:80"
-      - "20803:443"
+      - "20802:5005"
     environment:
       - "TZ=Asia/Shanghai"
       - "DatabaseName=GameFrameX"
