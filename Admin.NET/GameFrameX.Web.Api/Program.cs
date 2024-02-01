@@ -52,6 +52,19 @@ if (urls.Count > 0)
     builder.WebHost.UseUrls(urls.ToArray());
 }
 
+// 配置跨域
+builder.Services.AddCors((options) =>
+{
+    options.AddPolicy("CorsPolicy", (configurePolicy) =>
+    {
+        //允许所有Origin策略
+        configurePolicy.AllowAnyOrigin()
+            // 允许任何请求头
+            .AllowAnyHeader()
+            // 允许任何请求方法
+            .AllowAnyMethod().Build();
+    });
+});
 var configuration = builder.Configuration.GetSection(nameof(DBConnectionStrings));
 builder.Services.Configure<DBConnectionStrings>(configuration);
 builder.Services.AddSingleton<DBConnectionStrings>(sp => sp.GetRequiredService<IOptions<DBConnectionStrings>>().Value);
@@ -102,7 +115,6 @@ foreach (Type type in assembly.GetTypes())
 
 AddSwaggerService(builder.Services);
 
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -113,7 +125,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapControllers();
-
+// 设置跨域
+app.UseCors("CorsPolicy");
 app.Run();
 
 void AddSwaggerService(IServiceCollection service)
