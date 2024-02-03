@@ -12,6 +12,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{662E0B8E-F23E-4C7D-80BD-CAA5707503CC}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		docker-compose.yml = docker-compose.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugins", "Plugins", "{76F70D22-8D53-468E-A3B6-1704666A1D71}"
@@ -63,6 +64,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameFrameX.Application.Client.Api", "Api\GameFrameX.Application.Client.Api\GameFrameX.Application.Client.Api.csproj", "{3B3F2E8B-7D67-485A-9B72-C72FEA5E2865}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameFrameX.Core.Options", "GameFrameX.Core.Options\GameFrameX.Core.Options.csproj", "{6D8CC653-BE6D-478C-84DB-0D77F15A7198}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameFrameX.FileServer", "GameFrameX.FileServer\GameFrameX.FileServer.csproj", "{94FD588E-5A3C-44FB-BA3B-F73F01FEDFB9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -174,6 +177,10 @@ Global
 		{6D8CC653-BE6D-478C-84DB-0D77F15A7198}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6D8CC653-BE6D-478C-84DB-0D77F15A7198}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6D8CC653-BE6D-478C-84DB-0D77F15A7198}.Release|Any CPU.Build.0 = Release|Any CPU
+		{94FD588E-5A3C-44FB-BA3B-F73F01FEDFB9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{94FD588E-5A3C-44FB-BA3B-F73F01FEDFB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{94FD588E-5A3C-44FB-BA3B-F73F01FEDFB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{94FD588E-5A3C-44FB-BA3B-F73F01FEDFB9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

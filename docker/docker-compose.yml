@@ -98,6 +98,23 @@ services:
       - mysql
     networks:
       - gameframex_networks
+  gameframex.fileserver:
+    image: gameframex.fileserver
+    container_name: fileserver
+    build:
+      context: .
+      dockerfile: ./../Admin.NET/GameFrameX.FileServer/Dockerfile
+      args:
+        - no-cache
+    ports:
+      - "28080:8080"
+      - "28081:8081"
+    environment:
+      - "RootPath=./Bundles"
+    volumes:
+      - ./Bundles:./../Bundles
+    networks:
+      - gameframex_networks
 networks:
   gameframex_networks:
     driver: bridge
