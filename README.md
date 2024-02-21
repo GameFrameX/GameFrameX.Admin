@@ -74,7 +74,7 @@ docker push registry.cn-shenzhen.aliyuncs.com/gameframex/gameframex.web.vue:1.0.
 ```
 
 
-
+# 以下为原始内容
 
 基于.NET6(Furion)/SqlSugar实现的通用权限开发框架，前端Vue3/Element-plus。整合最新技术，模块插件式开发，前后端分离，开箱即用。
 
