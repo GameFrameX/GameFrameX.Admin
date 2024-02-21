@@ -47,8 +47,10 @@ services:
     #  timeout: 3s  # 超时时间
     #  retries: 50   # 重试次数
     command: [
-      '--character-set-server=utf8mb4', #设置数据库表的数据集
-      '--collation-server=utf8mb4_unicode_ci', #设置数据库表的数据集
+      #设置数据库表的数据集
+      '--character-set-server=utf8mb4', 
+      #设置数据库表的数据集
+      '--collation-server=utf8mb4_unicode_ci', 
     ]
     environment:
       MYSQL_ROOT_HOST: "%"
@@ -65,7 +67,7 @@ services:
     container_name: client-api
     build:
       context: .
-      dockerfile: ./../Admin.NET/GameFrameX.Web.Api/Dockerfile
+      dockerfile: ./../Admin.NET/Dockerfile-Web-Api
       args:
         - no-cache
     ports:
@@ -84,7 +86,7 @@ services:
     container_name: admin-api
     build:
       context: .
-      dockerfile: ./../Admin.NET/GameFrameX.Web.Entry/Dockerfile
+      dockerfile: ./../Admin.NET/Dockerfile-Web-Admin
       args:
         - no-cache
     ports:
@@ -103,7 +105,7 @@ services:
     container_name: fileserver
     build:
       context: .
-      dockerfile: ./../Admin.NET/GameFrameX.FileServer/Dockerfile
+      dockerfile: ./../Admin.NET/Dockerfile-FileServer
       args:
         - no-cache
     ports:

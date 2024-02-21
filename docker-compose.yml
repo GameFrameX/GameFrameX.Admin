@@ -1,0 +1,114 @@
+﻿version: '3'
+
+services:
+  mysql:
+    image: mysql:5.7.44
+    container_name: mysql
+    ports:
+      - "9101:3306"
+    restart: unless-stopped
+    privileged: true
+    ulimits:
+      nproc: 655350
+      nofile:
+        soft: 131072
+        hard: 400000
+    #healthcheck:
+    #  test: "/usr/bin/mysql --user=root --password=root --execute \"SHOW DATABASES;\""
+    #  interval: 10s # 间隔时间
+    #  timeout: 3s  # 超时时间
+    #  retries: 50   # 重试次数
+    command: [
+      #设置数据库表的数据集
+      '--character-set-server=utf8mb4', 
+      #设置数据库表的数据集
+      '--collation-server=utf8mb4_unicode_ci', 
+    ]
+    environment:
+      MYSQL_ROOT_HOST: "%"
+      MYSQL_DATABASE: gameframex
+      MYSQL_ROOT_PASSWORD: 123456
+      TZ: Asia/Shanghai
+    volumes:
+      - ./mysql/mysql:/var/lib/mysql
+      - ./mysql/mysql.cnf:/etc/mysql/conf.d/mysql.cnf
+    networks:
+      - gameframex_networks
+  gameframex.web.api:
+    image: registry.cn-shenzhen.aliyuncs.com/gameframex/gameframex.web.api:1.0.0
+    container_name: client-api
+    # build:
+    #   context: .
+    #   dockerfile: ./../Admin.NET/Dockerfile-Web-Api
+    #   args:
+    #     - no-cache
+    ports:
+      - "20808:80"
+      - "20809:443"
+    environment:
+      - "DatabaseName=gameframex"
+      - "DbType=MySql"
+      - "ConnectionString=Data Source=mysql;Database=gameframex;Port=3306;Uid=root;Pwd=123456;"
+    links:
+      - mysql
+    networks:
+      - gameframex_networks
+  gameframex.web.admin:
+    image: registry.cn-shenzhen.aliyuncs.com/gameframex/gameframex.web.admin:1.0.0
+    container_name: admin-api
+    # build:
+    #   context: .
+    #   dockerfile: ./../Admin.NET/Dockerfile-Web-Admin
+    #   args:
+    #     - no-cache
+    ports:
+      - "20802:5005"
+    environment:
+      - "TZ=Asia/Shanghai"
+      - "DatabaseName=gameframex"
+      - "DbType=MySql"
+      - "ConnectionString=Data Source=mysql;Database=gameframex;Port=3306;Uid=root;Pwd=123456;"
+    links:
+      - mysql
+    networks:
+      - gameframex_networks
+  # gameframex.fileserver:
+  #   image: gameframex.fileserver
+  #   container_name: fileserver
+  #   build:
+  #     context: .
+  #     dockerfile: ./../Admin.NET/Dockerfile-FileServer
+  #     args:
+  #       - no-cache
+  #   ports:
+  #     - "28080:8080"
+  #     - "28081:8081"
+  #   environment:
+  #     - "RootPath=./Bundles"
+  #   volumes:
+  #     - ./Bundles:./../Bundles
+  #   networks:
+  #     - gameframex_networks
+  gameframex.web.vue:
+    image: nginx:1.20.2
+    container_name: admin-vue
+    ports:
+      - "20800:80"
+      - "20801:443"
+    environment:
+      - TZ=Asia/Shanghai
+    volumes:
+      - "./nginx/dist:/usr/share/nginx/html"
+      - "./nginx/conf/nginx.conf:/etc/nginx/conf/nginx.conf"
+      - "./nginx/key:/etc/nginx/key/"
+    # 这个不需要网络间通讯?
+    # networks:
+    #   - gameframex_networks
+networks:
+  gameframex_networks:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.100.1.0/24
+          gateway: 172.100.1.1

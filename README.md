@@ -1,17 +1,78 @@
-<div align="center"><h1>Admin.NET</h1></div>
-<div align="center"><h3>有可能是.NET最好用的通用权限开发框架</h3></div>
 
-<div align="center">
-
-[![star](https://gitee.com/zuohuaijun/Admin.NET/badge/star.svg?theme=dark)](https://gitee.com/zuohuaijun/Admin.NET/stargazers)
-[![fork](https://gitee.com/zuohuaijun/Admin.NET/badge/fork.svg?theme=dark)](https://gitee.com/zuohuaijun/Admin.NET/members)
-[![GitHub license](https://img.shields.io/badge/license-MIT-yellow)](https://gitee.com/zuohuaijun/Admin.NET/blob/next/LICENSE)
-
-</div>
 
 ## 🎁框架介绍
 
 基于 `Admin.NET` 二次开发的游戏后台管理框架
+
+# 发布
+
+## Docker 
+
+### 构建后端
+1. CD 到Admin.Net 目录下
+2. 执行Build命令
+3. 构建后台接口
+```
+    docker build -f ./Dockerfile-Web-Admin -t gameframex.web.admin:1.0.0 .
+```
+4. 构建前台接口
+```
+    docker build -f ./Dockerfile-Web-Api -t gameframex.web.api:1.0.0 .
+```
+
+5. 构建前端的文件服务器(可选。线上用OSS代替)
+```
+    docker build -f ./Dockerfile-FileServer -t gameframex.fileserver:1.0.0 .
+```
+### 构建前端
+1. CD 到 Web 目录下
+2. 构建前端的Vue
+
+```
+    docker build -f ./Dockerfile-Web-Vue -t gameframex.web.vue:1.0.0 .
+```
+
+## 推送到私有仓库（Aliyun）
+1. 打开阿里云的容器镜像服务
+2. 创建命名空间
+3. 创建镜像
+4. 登录容器管理中心
+```
+docker login --username=alianblank registry.cn-shenzhen.aliyuncs.com
+```
+### 前端API
+
+1. 设置容器关联
+```
+docker tag gameframex.web.api:1.0.0 registry.cn-shenzhen.aliyuncs.com/gameframex/gameframex.web.api:1.0.0
+```
+2. 推送镜像
+```
+docker push registry.cn-shenzhen.aliyuncs.com/gameframex/gameframex.web.api:1.0.0
+```
+
+### 管理端API
+
+1. 设置容器关联
+```
+docker tag gameframex.web.admin:1.0.0 registry.cn-shenzhen.aliyuncs.com/gameframex/gameframex.web.admin:1.0.0
+```
+2. 推送镜像
+```
+docker push registry.cn-shenzhen.aliyuncs.com/gameframex/gameframex.web.admin:1.0.0
+```
+
+### 管理端Web-Vue
+
+1. 设置容器关联
+```
+docker tag gameframex.web.vue:1.0.0 registry.cn-shenzhen.aliyuncs.com/gameframex/gameframex.web.vue:1.0.0
+```
+2. 推送镜像
+```
+docker push registry.cn-shenzhen.aliyuncs.com/gameframex/gameframex.web.vue:1.0.0
+```
+
 
 
 
@@ -40,33 +101,6 @@
 
 ```
 
-## 🍎效果截图
-<table>
-    <tr>
-        <td><img src="https://gitee.com/zuohuaijun/Admin.NET/raw/next/doc/img/1.png"/></td>
-        <td><img src="https://gitee.com/zuohuaijun/Admin.NET/raw/next/doc/img/2.png"/></td>
-        <td><img src="https://gitee.com/zuohuaijun/Admin.NET/raw/next/doc/img/3.png"/></td>
-        <td><img src="https://gitee.com/zuohuaijun/Admin.NET/raw/next/doc/img/4.png"/></td>
-    </tr>
-    <tr>
-        <td><img src="https://gitee.com/zuohuaijun/Admin.NET/raw/next/doc/img/5.png"/></td>
-        <td><img src="https://gitee.com/zuohuaijun/Admin.NET/raw/next/doc/img/6.png"/></td>
-        <td><img src="https://gitee.com/zuohuaijun/Admin.NET/raw/next/doc/img/7.png"/></td>
-        <td><img src="https://gitee.com/zuohuaijun/Admin.NET/raw/next/doc/img/8.png"/></td>
-    </tr>
-    <tr>
-        <td><img src="https://gitee.com/zuohuaijun/Admin.NET/raw/next/doc/img/9.png"/></td>
-        <td><img src="https://gitee.com/zuohuaijun/Admin.NET/raw/next/doc/img/10.png"/></td>
-        <td><img src="https://gitee.com/zuohuaijun/Admin.NET/raw/next/doc/img/11.png"/></td>
-        <td><img src="https://gitee.com/zuohuaijun/Admin.NET/raw/next/doc/img/12.png"/></td>
-    </tr>
-    <tr>
-        <td><img src="https://gitee.com/zuohuaijun/Admin.NET/raw/next/doc/img/13.png"/></td>
-        <td><img src="https://gitee.com/zuohuaijun/Admin.NET/raw/next/doc/img/14.png"/></td>
-        <td><img src="https://gitee.com/zuohuaijun/Admin.NET/raw/next/doc/img/15.png"/></td>
-        <td><img src="https://gitee.com/zuohuaijun/Admin.NET/raw/next/doc/img/16.png"/></td>
-    </tr>
-</table>
 
 ## 🍖内置功能
  1. 主控面板：控制台页面，可进行工作台，分析页，统计等功能的展示。

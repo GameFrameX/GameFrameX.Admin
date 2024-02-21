@@ -1,0 +1,48 @@
+# node镜像
+# FROM node:latest as build-stage
+# RUN echo "-------------------- start build --------------------"
+
+# RUN echo "-------------------- web environment configuration --------------------"
+
+# # 指定接下来的工作路径为/app  - 类似于cd命令
+# WORKDIR /app
+# # 拷贝前端项目 当前目录下的所有文件到app目录下(./指当前所有的代码路径 .指上一步cd到app的路径)
+# COPY ./ .
+
+# RUN echo "-------------------- start install --------------------"
+# # 设置淘宝npm镜像
+# RUN npm install -g cnpm --registry=https://registry.npmmirror.com
+# # 安装依赖
+# RUN cnpm install
+
+# RUN echo "-------------------- end install --------------------"
+
+# RUN echo "-------------------- build start  --------------------"
+
+# # 打包 - 目的：丢到nginx下跑
+# RUN vite build
+
+# RUN echo "-------------------- build end  --------------------"
+
+# # 开始运行
+
+# RUN echo "-------------------- build end  --------------------"
+
+
+# 该镜像是基于nginx:1.20.2 镜像构建的
+FROM nginx:1.20.2 as production-stage
+# 移除nginx容器的default.conf文件、nginx配置文件
+RUN rm /etc/nginx/conf.d/default.conf
+RUN rm /etc/nginx/nginx.conf
+# 把主机的nginx.conf文件复制到nginx容器的/etc/nginx文件夹下
+COPY ./docker/nginx.conf /etc/nginx/conf.d/
+
+# 拷贝前端vue项目打包后生成的文件到nginx下运行
+# COPY --from=build-stage /app/dist /usr/share/nginx/html
+COPY  ./dist /usr/share/nginx/html
+
+# 暴露20800端口
+EXPOSE 20800
+
+# 使用daemon off的方式将nginx运行在前台保证镜像不至于退出
+CMD ["nginx", "-g", "daemon off;"]

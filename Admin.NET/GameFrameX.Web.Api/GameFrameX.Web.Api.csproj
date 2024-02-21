@@ -16,12 +16,6 @@
       <ProjectReference Include="..\GameFrameX.Entity.Client\GameFrameX.Entity.Client.csproj" />
       <ProjectReference Include="..\GameFrameX.Entity\GameFrameX.Entity.csproj" />
     </ItemGroup>
-
-    <ItemGroup>
-      <Content Include="..\.dockerignore">
-        <Link>.dockerignore</Link>
-      </Content>
-    </ItemGroup>
     
 
 </Project>
