@@ -25,3 +25,6 @@ global using GameFrameX.Application.Client.Client.ClientPlatform.Dto;
 global using GameFrameX.Core.Enum;
 global using GameFrameX.Core.SqlSugar;
 global using GameFrameX.Core.BaseInputOutput;
+global using GameFrameX.Entity.Client;
+global using GameFrameX.Application.Base.Service;
+global using GameFrameX.Core.Extension;

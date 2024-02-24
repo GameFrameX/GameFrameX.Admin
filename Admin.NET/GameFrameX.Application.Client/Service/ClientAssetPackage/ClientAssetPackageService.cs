@@ -3,8 +3,8 @@
 /// <summary>
 /// 资源包服务
 /// </summary>
-[ApiDescriptionSettings(ClientConst.GroupName, Order = 100)]
-public class ClientAssetPackageService : BaseService<ClientAssetPackage>
+[ApiDescriptionSettings(Order = 100)]
+public class ClientAssetPackageService : BaseSelectService<ClientAssetPackage>
 {
     public ClientAssetPackageService(SqlSugarRepository<ClientAssetPackage> rep) : base(rep)
     {
@@ -19,13 +19,13 @@ public class ClientAssetPackageService : BaseService<ClientAssetPackage>
     [ApiDescriptionSettings(Name = "Page")]
     public async Task<SqlSugarPagedList<ClientAssetPackageOutput>> Page(ClientAssetPackageInput input)
     {
-        var query= Repository.AsQueryable()
-            .WhereIF(!string.IsNullOrWhiteSpace(input.SearchKey), u =>
-                u.Name.Contains(input.SearchKey.Trim())
-            )
-            .WhereIF(!string.IsNullOrWhiteSpace(input.Name), u => u.Name.Contains(input.Name.Trim()))
-            .Select<ClientAssetPackageOutput>()
-;
+        var query = Repository.AsQueryable()
+                .WhereIF(!string.IsNullOrWhiteSpace(input.SearchKey), u =>
+                    u.Name.Contains(input.SearchKey.Trim())
+                )
+                .WhereIF(!string.IsNullOrWhiteSpace(input.Name), u => u.Name.Contains(input.Name.Trim()))
+                .Select<ClientAssetPackageOutput>()
+            ;
         query = query.OrderBuilder(input, "", "CreateTime");
         return await query.ToPagedListAsync(input.Page, input.PageSize);
     }
@@ -40,7 +40,7 @@ public class ClientAssetPackageService : BaseService<ClientAssetPackage>
     public async Task Add(AddClientAssetPackageInput input)
     {
         await InnerAdd(input);
-        
+
         //var entity = input.Adapt<ClientAssetPackage>();
         //await Repository.InsertAsync(entity);
     }
@@ -55,7 +55,7 @@ public class ClientAssetPackageService : BaseService<ClientAssetPackage>
     public async Task DisableDelete(DeleteClientAssetPackageInput input)
     {
         var entity = await Repository.GetFirstAsync(u => u.Id == input.Id) ?? throw Oops.Oh(ErrorCodeEnum.D1002);
-        await Repository.FakeDeleteAsync(entity);   //假删除
+        await Repository.FakeDeleteAsync(entity); //假删除
         //await Repository.DeleteAsync(entity);   //真删除
     }
 
@@ -97,8 +97,4 @@ public class ClientAssetPackageService : BaseService<ClientAssetPackage>
     {
         return await Repository.AsQueryable().Select<ClientAssetPackageOutput>().ToListAsync();
     }
-
-
-
 }
-
