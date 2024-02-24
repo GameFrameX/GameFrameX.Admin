@@ -77,9 +77,14 @@
 					}else if(@column.EffectType == "Select"){
 					@:<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12" class="mb20">
 						@:<el-form-item label="@column.ColumnComment" prop="@(@column.LowerPropertyName)">
-							@:<el-select clearable v-model="ruleForm.@(@column.LowerPropertyName)" placeholder="请选择@(@column.ColumnComment)">
-								@:<el-option v-for="(item,index) in dl('@(@column.DictTypeCode)')"  :key="index" :value="item.code" :label="`[${item.code}] ${item.value}`"></el-option>
-								@:
+							@:<el-select clearable v-model="ruleForm.@(@column.LowerPropertyName)" placeholder="请选择@(@column.ColumnComment)" :disabled="isEditor">
+							    if(@column.DictTypeCode == "code_gen_type"){
+							  @:<el-option v-for="item in queryParams.@(@column.LowerPropertyName)" :key="item.value" :label="item.label" :value="item.value">
+                                @:<span>{{ item.value }} - {{ item.label }}</span>
+                              @:</el-option>
+							    }else{
+						      @:<el-option v-for="(item,index) in dl('@(@column.DictTypeCode)')"  :key="index" :value="item.code" :label="`[${item.code}] ${item.value}`"></el-option>
+								}
 							</el-select>
 							@:
 						</el-form-item>
@@ -229,6 +234,7 @@
 	// 标记是否是编辑模式
 	const isEditor = ref(false);
 	const ruleForm = ref<any>({});
+	const queryParams = ref<any>({});
 	//自行添加其他规则
 	const rules = ref<FormRules>({
 @foreach (var column in Model.TableField){
@@ -292,25 +298,32 @@
 	}
 
 	@foreach (var column in Model.TableField){
-	if(@column.EffectType == "ApiTreeSelect" && !definedObjects.ContainsKey("define_get@(@column.FkEntityName)TreeData")){
-		@{definedObjects.Add("define_get@(@column.FkEntityName)TreeData", 1);}
-	@:const @LowerFirstLetter(@column.FkEntityName)TreeData = ref<any>([]); 
-	@:const get@(@column.FkEntityName)TreeData = async () => {
-		@:let list = await get@(@column.FkEntityName)Tree();
-		@:@LowerFirstLetter(@column.FkEntityName)TreeData.value = list.data.result ?? [];
-	@:};
-	@:get@(@column.FkEntityName)TreeData();
-	@:
-	}
-	else if(@column.EffectType == "ConstSelector"){   
-	@:const @LowerFirstLetter(@column.DictTypeCode)DropdownList = ref<any>([]); 
-	@:const get@(@column.DictTypeCode)DropdownList = async () => {
-		@:let list = await getConstSelectorList("@column.DictTypeCode");
-		@:@LowerFirstLetter(@column.DictTypeCode)DropdownList.value = list.data.result ?? [];
-	@:};
-	@:get@(@column.DictTypeCode)DropdownList();
-	@:
-	}
+        if(@column.EffectType == "ApiTreeSelect" && !definedObjects.ContainsKey("define_get@(@column.FkEntityName)TreeData")){
+                @{definedObjects.Add("define_get@(@column.FkEntityName)TreeData", 1);}
+            @:const @LowerFirstLetter(@column.FkEntityName)TreeData = ref<any>([]); 
+            @:const get@(@column.FkEntityName)TreeData = async () => {
+                @:let list = await get@(@column.FkEntityName)Tree();
+                @:@LowerFirstLetter(@column.FkEntityName)TreeData.value = list.data.result ?? [];
+            @:};
+            @:get@(@column.FkEntityName)TreeData();
+            @:
+        }else if(@column.EffectType == "ConstSelector"){   
+            @:const @LowerFirstLetter(@column.DictTypeCode)DropdownList = ref<any>([]); 
+            @:const get@(@column.DictTypeCode)DropdownList = async () => {
+                @:let list = await getConstSelectorList("@column.DictTypeCode");
+                @:@LowerFirstLetter(@column.DictTypeCode)DropdownList.value = list.data.result ?? [];
+            @:};
+            @:get@(@column.DictTypeCode)DropdownList();
+            @:
+        }else if(@column.EffectType == "Select" && @column.DictTypeCode == "code_gen_type"){ 
+@://
+@:const handleQuerySelector@(@column.PropertyName) = async () => {
+   @:const res = await select@(@column.ColumnName)({});
+   @:queryParams.value.@(@column.LowerPropertyName) = res.data.result;
+@:};
+@:// 
+@:handleQuerySelector@(@column.PropertyName)();
+        }	
 	}
 
 
