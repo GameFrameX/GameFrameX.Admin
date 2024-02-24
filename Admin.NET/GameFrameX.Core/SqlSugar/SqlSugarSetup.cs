@@ -339,10 +339,18 @@ public static class SqlSugarSetup
 
             foreach (var entityType in entityTypes)
             {
-                if (entityType.GetCustomAttribute<SplitTableAttribute>() == null)
-                    dbProvider.CodeFirst.InitTables(entityType);
-                else
-                    dbProvider.CodeFirst.SplitTables().InitTables(entityType);
+                try
+                {
+                    if (entityType.GetCustomAttribute<SplitTableAttribute>() == null)
+                        dbProvider.CodeFirst.InitTables(entityType);
+                    else
+                        dbProvider.CodeFirst.SplitTables().InitTables(entityType);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    // throw;
+                }
             }
         }
 
