@@ -316,7 +316,7 @@ public static class SqlSugarSetup
     private static void InitDatabase(SqlSugarScope db, DbConnectionConfig config)
     {
         SqlSugarScopeProvider dbProvider = db.GetConnectionScope(config.ConfigId);
-
+        Log.Information($"数据库类型:{config.DbType}连接字符串:{config.ConnectionString}");
         // 初始化/创建数据库
         if (config.DbSettings.EnableInitDb)
         {
