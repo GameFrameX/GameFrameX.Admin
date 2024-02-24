@@ -40,7 +40,7 @@ export const pageClientAssetPackage = (params?: any) =>
         data: params,
     });
 
-export const selectClientChannel = (params?: any) =>
+export const selectClientAssetPackage = (params?: any) =>
     request({
         url: Api.SelectClientAssetPackage,
         method: 'post',
