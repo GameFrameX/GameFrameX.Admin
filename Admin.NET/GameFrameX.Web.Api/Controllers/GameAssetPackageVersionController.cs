@@ -3,6 +3,7 @@ using GameFrameX.Application.Client.Api.GameResourceVersion;
 using GameFrameX.Core.Extension;
 using GameFrameX.Entity.Client;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace GameFrameX.Web.Api.Controllers;
 
@@ -90,6 +91,6 @@ public class GameAssetPackageVersionController : BaseController<ClientAssetPacka
         response.PackageName = gameResourceVersion.Package;
         response.AppVersion = gameResourceVersion.AppVersion;
 
-        return ResultModel.Create(response.ToJson());
+        return ResultModel.Create(JsonConvert.SerializeObject(response));
     }
 }
