@@ -111,8 +111,9 @@
         <el-table-column prop="description" label="详细描述" width="140" show-overflow-tooltip=""/>
         <el-table-column prop="createUserName" label="创建者姓名" width="140" show-overflow-tooltip=""/>
         <el-table-column prop="updateUserName" label="修改者姓名" width="140" show-overflow-tooltip=""/>
-        <el-table-column label="操作" width="140" align="center" fixed="right" show-overflow-tooltip="" v-if="auth('clientAssetPackageVersion:edit') || auth('clientAssetPackageVersion:delete')">
+        <el-table-column label="操作" width="200" align="center" fixed="right" show-overflow-tooltip="" v-if="auth('clientAssetPackageVersion:edit') || auth('clientAssetPackageVersion:delete')">
           <template #default="scope">
+            <el-button icon="ele-Document" size="small" text="" type="primary" @click="openClientAssetPackageVersionHistory(scope.row)" v-auth="'clientAssetPackageVersion:history'"> 记录</el-button>
             <el-button icon="ele-Edit" size="small" text="" type="primary" @click="openEditClientAssetPackageVersion(scope.row)" v-auth="'clientAssetPackageVersion:edit'"> 编辑</el-button>
             <el-button icon="ele-Delete" size="small" text="" type="primary" @click="delClientAssetPackageVersion(scope.row)" v-auth="'clientAssetPackageVersion:delete'"> 删除</el-button>
           </template>
@@ -134,6 +135,11 @@
           :title="editClientAssetPackageVersionTitle"
           @reloadTable="handleQuery"
       />
+      <updateHistoryDialog
+          ref="updateHistoryDialogRef"
+          :title="historyClientAssetPackageVersionTitle"
+          @reloadTable="handleQuery"
+      />
     </el-card>
   </div>
 </template>
@@ -146,6 +152,7 @@ import {getDictDataItem as di, getDictDataList as dl} from '/@/utils/dict-utils'
 //import { formatDate } from '/@/utils/formatTime';
 
 import editDialog from '/@/views/client/clientAssetPackageVersion/component/editDialog.vue'
+import updateHistoryDialog from '/@/views/client/clientAssetPackageVersion/component/updateHistory.vue'
 import {pageClientAssetPackageVersion, deleteClientAssetPackageVersion} from '/@/api/client/clientAssetPackageVersion';
 import {selectClientChannel} from "/@/api/client/channel";
 import {selectClientPlatform} from "/@/api/client/appplatform";
@@ -157,6 +164,7 @@ import {selectClientAssetPackage} from "/@/api/client/clientAssetPackage";
 
 const showAdvanceQueryUI = ref(false);
 const editDialogRef = ref();
+const updateHistoryDialogRef = ref();
 const loading = ref(false);
 const tableData = ref<any>([]);
 const queryParams = ref<any>({});
@@ -167,6 +175,7 @@ const tableParams = ref({
   total: 0,
 });
 const editClientAssetPackageVersionTitle = ref("");
+const historyClientAssetPackageVersionTitle = ref("");
 
 // 改变高级查询的控件显示状态
 const changeAdvanceQueryUI = () => {
@@ -195,6 +204,11 @@ const openEditClientAssetPackageVersion = (row: any) => {
   editClientAssetPackageVersionTitle.value = '编辑资源包版本';
   editDialogRef.value.isEditor = true;
   editDialogRef.value.openDialog(row);
+};
+// 打开历史记录页面
+const openClientAssetPackageVersionHistory = (row: any) => {
+  historyClientAssetPackageVersionTitle.value = "历史记录"
+  updateHistoryDialogRef.value.openDialog(row);
 };
 
 // 删除
