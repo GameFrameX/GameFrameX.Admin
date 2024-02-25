@@ -64,7 +64,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameFrameX.Application.Clie
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameFrameX.Core.Options", "GameFrameX.Core.Options\GameFrameX.Core.Options.csproj", "{6D8CC653-BE6D-478C-84DB-0D77F15A7198}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameFrameX.FileServer", "GameFrameX.FileServer\GameFrameX.FileServer.csproj", "{94FD588E-5A3C-44FB-BA3B-F73F01FEDFB9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameFrameX.Web.FileServer", "GameFrameX.Web.FileServer\GameFrameX.Web.FileServer.csproj", "{DDA806EC-1C2B-40E6-8958-75C9DED8C1B6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -176,10 +176,10 @@ Global
 		{6D8CC653-BE6D-478C-84DB-0D77F15A7198}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6D8CC653-BE6D-478C-84DB-0D77F15A7198}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6D8CC653-BE6D-478C-84DB-0D77F15A7198}.Release|Any CPU.Build.0 = Release|Any CPU
-		{94FD588E-5A3C-44FB-BA3B-F73F01FEDFB9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{94FD588E-5A3C-44FB-BA3B-F73F01FEDFB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{94FD588E-5A3C-44FB-BA3B-F73F01FEDFB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{94FD588E-5A3C-44FB-BA3B-F73F01FEDFB9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DDA806EC-1C2B-40E6-8958-75C9DED8C1B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DDA806EC-1C2B-40E6-8958-75C9DED8C1B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DDA806EC-1C2B-40E6-8958-75C9DED8C1B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DDA806EC-1C2B-40E6-8958-75C9DED8C1B6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
