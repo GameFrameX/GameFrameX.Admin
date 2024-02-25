@@ -61,10 +61,11 @@ public class BaseService<T> : IDynamicApiController, ITransient where T : Entity
     /// <returns></returns>
     // [HttpPost]
     // [ApiDescriptionSettings(Name = "Add")]
-    protected async Task InnerAdd(BaseAddInput input)
+    protected async Task<T> InnerAdd(BaseAddInput input)
     {
         var entity = input.Adapt<T>();
         await Repository.InsertAsync(entity);
+        return entity;
     }
 
     /// <summary>
@@ -86,10 +87,11 @@ public class BaseService<T> : IDynamicApiController, ITransient where T : Entity
     /// </summary>
     /// <param name="input"></param>
     /// <returns></returns>
-    protected async Task InnerUpdate(BaseUpdateInput input)
+    protected async Task<T> InnerUpdate(BaseUpdateInput input)
     {
         var entity = input.Adapt<T>();
         await Repository.AsUpdateable(entity).IgnoreColumns(ignoreAllNullColumns: true).ExecuteCommandAsync();
+        return entity;
     }
 
     /// <summary>
