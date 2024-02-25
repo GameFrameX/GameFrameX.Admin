@@ -15,5 +15,8 @@ public class GlobalInfoResponse
     /// </summary>
     public string CheckResourceVersionUrl { get; set; }
 
+    /// <summary>
+    /// 附加内容。JSON对象
+    /// </summary>
     public string Content { get; set; }
 }

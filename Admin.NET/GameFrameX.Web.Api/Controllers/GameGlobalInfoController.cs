@@ -25,7 +25,6 @@ public class GameGlobalInfoController : BaseController<ClientGlobalInfo>
     /// <returns></returns>
     [ProducesResponseType(typeof(GlobalInfoResponse), 200)]
     [HttpPost]
-    [HttpOptions]
     public async Task<ResultModel> GetInfo([FromBody] GlobalInfoRequest globalInfoRequest)
     {
         GlobalInfoResponse globalInfoResponse = new GlobalInfoResponse();
