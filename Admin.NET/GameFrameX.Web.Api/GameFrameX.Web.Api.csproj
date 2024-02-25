@@ -8,6 +8,10 @@
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
 
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+      <DocumentationFile>bin\Debug\net7.0\GameFrameX.Web.Api.xml</DocumentationFile>
+    </PropertyGroup>
+
     <ItemGroup>
       <ProjectReference Include="..\Api\GameFrameX.Application.Client.Api\GameFrameX.Application.Client.Api.csproj" />
       <ProjectReference Include="..\GameFrameX.Core.Extension\GameFrameX.Core.Extension.csproj" />
