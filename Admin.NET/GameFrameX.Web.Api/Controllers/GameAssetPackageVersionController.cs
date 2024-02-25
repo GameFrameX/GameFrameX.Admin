@@ -28,7 +28,7 @@ public class GameAssetPackageVersionController : BaseController<ClientAssetPacka
     [HttpPost]
     public async Task<ResultModel> GetInfo([FromBody] AssetPackageVersionRequest request)
     {
-        AssetPackageVersionResponse response = new AssetPackageVersionResponse();
+        var response = new AssetPackageVersionResponse();
 
         var gameResourceVersion = await PBaseService.GetAsync(m => m.AssetPackageName == request.AssetPackageName &&
                                                                    m.Platform == request.Platform && m.Package == request.PackageName &&

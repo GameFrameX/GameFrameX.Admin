@@ -28,7 +28,7 @@ public class GameAppVersionController : BaseController<ClientAppVersion>
     [HttpPost]
     public async Task<ResultModel> GetInfo([FromBody] GameAppVersionRequest gameAppVersionRequest)
     {
-        GameAppVersionResponse gameAppVersionResponse = new GameAppVersionResponse();
+        var response = new GameAppVersionResponse();
         ClientAppVersion gameAppVersion = await PBaseService.GetAsync(m =>
             m.Platform == gameAppVersionRequest.Platform && m.Package == gameAppVersionRequest.PackageName && m.OldVersion == gameAppVersionRequest.AppVersion && m.Language == gameAppVersionRequest.Language &&
             m.Channel == gameAppVersionRequest.Channel);
@@ -85,11 +85,11 @@ public class GameAppVersionController : BaseController<ClientAppVersion>
             return ResultModel.Create(ResultCode.NotFound, "not found");
         }
 
-        gameAppVersionResponse.IsForce = gameAppVersion.IsForce;
-        gameAppVersionResponse.IsUpgrade = gameAppVersionRequest.AppVersion != gameAppVersion.Version;
-        gameAppVersionResponse.UpdateAnnouncement = gameAppVersion.Announcement;
-        gameAppVersionResponse.AppDownloadUrl = gameAppVersion.DownloadUrl;
+        response.IsForce = gameAppVersion.IsForce;
+        response.IsUpgrade = gameAppVersionRequest.AppVersion != gameAppVersion.Version;
+        response.UpdateAnnouncement = gameAppVersion.Announcement;
+        response.AppDownloadUrl = gameAppVersion.DownloadUrl;
 
-        return ResultModel.Create(JsonConvert.SerializeObject(gameAppVersionResponse));
+        return ResultModel.Create(JsonConvert.SerializeObject(response));
     }
 }
