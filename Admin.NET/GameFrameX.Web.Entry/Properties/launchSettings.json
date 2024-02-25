@@ -12,9 +12,9 @@
     "GameFrameX.Web.Entry": {
       "commandName": "Project",
       "dotnetRunMessages": true,
-      "launchBrowser": true,
+      "launchBrowser": false,
       "launchUrl": "swagger",
-      "applicationUrl": "http://*:5005",
+      "applicationUrl": "http://*:20802",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
