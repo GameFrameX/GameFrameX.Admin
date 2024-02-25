@@ -57,6 +57,12 @@ public class ClientAssetPackageVersion : EntityBase
     [Required, MaxLength(32)]
     public virtual string AssetPackageName { get; set; }
 
+    /// <summary>
+    /// 资源下载根路径
+    /// </summary>
+    [SugarColumn(ColumnDescription = "资源下载根路径", Length = 128)]
+    [Required, MaxLength(128)]
+    public virtual string RootPath { get; set; }
 
     /// <summary>
     /// 资源版本

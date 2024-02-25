@@ -67,6 +67,13 @@
 
           </el-col>
           <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12" class="mb20">
+            <el-form-item label="资源下载根路径" prop="version">
+              <el-input v-model="ruleForm.rootPath" placeholder="请输入资源下载根路径" maxlength="64" show-word-limit clearable/>
+
+            </el-form-item>
+
+          </el-col>
+          <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12" class="mb20">
             <el-form-item label="资源版本" prop="version">
               <el-input v-model="ruleForm.version" placeholder="请输入资源版本" maxlength="64" show-word-limit clearable/>
 
@@ -134,6 +141,7 @@ const rules = ref<FormRules>({
   language: [{required: true, message: '请选择语言！', trigger: 'change',},],
   assetPackageName: [{required: true, message: '请选择资源包名称！', trigger: 'change',},],
   version: [{required: true, message: '请输入资源版本！', trigger: 'blur',},],
+  rootPath: [{required: true, message: '请输入资源下载根路径', trigger: 'blur',},],
   description: [{required: true, message: '请输入详细描述！', trigger: 'blur',},],
 });
 
