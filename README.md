@@ -4,6 +4,33 @@
 
 基于 `Admin.NET` 二次开发的游戏后台管理框架
 
+为了方便 `CICD`.`DevOps` 和独立的自动化程序。将项目拆分成了独立的仓库
+
+
+# 项目地址
+##  客户端接口项目 下载地址
+
+[GameFrameX.Admin.Client.Api](https://github.com/AlianBlank/GameFrameX.Admin.Client.Api)
+
+## 后台管理接口项目 下载地址
+
+[GameFrameX.Admin.Client.Api](https://github.com/AlianBlank/GameFrameX.Admin.Web.Api)
+
+## 后台Web页面项目 下载地址
+
+[GameFrameX.Admin.Client.Api](https://github.com/AlianBlank/GameFrameX.Admin.Web.Vue)
+
+
+# 使用指南
+
+将上面的项目下载到当前目录下。三个项目要在同级。
+```
+git clone https://github.com/AlianBlank/GameFrameX.Admin.Client.Api.git
+git clone https://github.com/AlianBlank/GameFrameX.Admin.Web.Api.git
+git clone https://github.com/AlianBlank/GameFrameX.Admin.Web.Vue.git
+```
+
+
 # 发布
 
 ## Docker 
@@ -13,65 +40,79 @@
 2. 执行Build命令
 3. 构建后台接口
 ```
-    docker build -f ./Dockerfile-Web-Admin -t gameframex.web.admin:1.0.0 .
+    docker build -t gameframex.web.admin:1.0.0.0 .
 ```
 4. 构建前台接口
 ```
-    docker build -f ./Dockerfile-Web-Api -t gameframex.web.api:1.0.0 .
+    docker build  -t gameframex.web.api:1.0.0.0 .
 ```
 
-5. 构建前端的文件服务器(可选。线上用OSS代替)
-```
-    docker build -f ./Dockerfile-FileServer -t gameframex.fileserver:1.0.0 .
-```
 ### 构建前端
 1. CD 到 Web 目录下
 2. 构建前端的Vue
 
 ```
-    docker build -f ./Dockerfile-Web-Vue -t gameframex.web.vue:1.0.0 .
+    docker build -f ./Dockerfile-Web-Vue -t gameframex.web.vue:1.0.0.0 .
 ```
 
 ## 推送到私有仓库（Aliyun）
-1. 打开阿里云的容器镜像服务
+1. 打开阿里云的容器镜像服务。找到个人服务。企业的没用过。
 2. 创建命名空间
 3. 创建镜像
 4. 登录容器管理中心
 ```
-docker login --username=alianblank registry.cn-shenzhen.aliyuncs.com
+docker login --username={这里替换成你自己的用户名} registry.cn-shenzhen.aliyuncs.com
 ```
 ### 前端API
 
 1. 设置容器关联
 ```
-docker tag gameframex.web.api:1.0.0 registry.cn-shenzhen.aliyuncs.com/gameframex/gameframex.web.api:1.0.0
+docker tag gameframex.web.api:1.0.0.0 registry.cn-shenzhen.aliyuncs.com/gameframex/gameframex.web.api:1.0.0.0
 ```
 2. 推送镜像
 ```
-docker push registry.cn-shenzhen.aliyuncs.com/gameframex/gameframex.web.api:1.0.0
+docker push registry.cn-shenzhen.aliyuncs.com/gameframex/gameframex.web.api:1.0.0.0
 ```
 
 ### 管理端API
 
 1. 设置容器关联
 ```
-docker tag gameframex.web.admin:1.0.0 registry.cn-shenzhen.aliyuncs.com/gameframex/gameframex.web.admin:1.0.0
+docker tag gameframex.web.admin:1.0.0.0 registry.cn-shenzhen.aliyuncs.com/gameframex/gameframex.web.admin:1.0.0.0
 ```
 2. 推送镜像
 ```
-docker push registry.cn-shenzhen.aliyuncs.com/gameframex/gameframex.web.admin:1.0.0
+docker push registry.cn-shenzhen.aliyuncs.com/gameframex/gameframex.web.admin:1.0.0.0
 ```
 
 ### 管理端Web-Vue
 
 1. 设置容器关联
 ```
-docker tag gameframex.web.vue:1.0.0 registry.cn-shenzhen.aliyuncs.com/gameframex/gameframex.web.vue:1.0.0
+docker tag gameframex.web.vue:1.0.0.0 registry.cn-shenzhen.aliyuncs.com/gameframex/gameframex.web.vue:1.0.0.0
 ```
 2. 推送镜像
 ```
-docker push registry.cn-shenzhen.aliyuncs.com/gameframex/gameframex.web.vue:1.0.0
+docker push registry.cn-shenzhen.aliyuncs.com/gameframex/gameframex.web.vue:1.0.0.0
 ```
+
+
+# 部署到服务器
+1. 将 `production.env`和`development.env` 文件中的内容修改为自己的。`不修改出了事别找我`.找我也没用
+
+2. 修改`docker-compose.yml` 中的环境变量的引用文件。默认引用的是`development.env`。
+
+3. 将`docker-compose.yml` 和你要的环境变量文件上传到服务器的同一目录下。
+
+4. 在`docker-compose.yml` 所在的目录下执行`docker-compose up -d` 。
+
+5. 如果你的服务器上没有装`docker`和`docker-compose` 自己想办法安装啦。
+
+6. 如果是`私有的镜像服务器`。一定要记得先`登录`呀。我的镜像反正你也拉不到。
+
+
+
+<details> <summary>以下为原始内容</summary>
 
 
 # 以下为原始内容
@@ -154,3 +195,6 @@ https://gitee.com/zuohuaijun/Admin.NET/commit/28787175c023ef784b865fb4dc99192580
 - 👉 System.Linq.Dynamic.Core：[https://github.com/zzzprojects/System.Linq.Dynamic.Core](https://github.com/zzzprojects/System.Linq.Dynamic.Core)
 - 👉 APIJSON.NET：[https://github.com/liaozb/APIJSON.NET](https://github.com/liaozb/APIJSON.NET)
 - 👉 vue-plugin-hiprint：[https://gitee.com/CcSimple/vue-plugin-hiprint](https://gitee.com/CcSimple/vue-plugin-hiprint)
+
+
+</details>
