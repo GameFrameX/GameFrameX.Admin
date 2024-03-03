@@ -1,6 +1,7 @@
 ﻿version: '3.7'
 
 services:
+  # MySQL
   mysql:
     image: mysql:5.7.44
     container_name: mysql
@@ -25,66 +26,106 @@ services:
       '--collation-server=utf8mb4_general_ci', 
     ]
     environment:
-      MYSQL_ROOT_HOST: "%"
-      MYSQL_DATABASE: gameframex
-      MYSQL_ROOT_PASSWORD: 123456
+      # MySQL配置链接权限
+      MYSQL_ROOT_HOST: ${MYSQL_ROOT_HOST:-%}
+      # MySQL配置创建数据库名称
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-gameframex}
+      # MySQL配置创建数据库账号密码
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-123456}
+      # MySQL配置时区
       TZ: Asia/Shanghai
+    # 环境变量注入
+    env_file:
+      # 开发环境的配置文件
+      - ./development.env
+      # 生产环境的配置文件
+      # - ./production.env
     volumes:
+      # MySQL数据存储映射
       - ./running/mysql/mysql:/var/lib/mysql
+      # MySQL配置文件映射
       - ./running/mysql/mysql.cnf:/etc/mysql/conf.d/mysql.cnf
     networks:
+    # MySQL网络映射
       - gameframex_networks
   # 后台管理API
   gameframex.web.admin.api:
-    image: registry.cn-shenzhen.aliyuncs.com/gameframex/gameframex.web.admin.api:1.0.0
-    container_name: admin-api
-    build:
-      context: ./Admin.NET
-      dockerfile: Dockerfile-Web-Admin
-      args:
-        - no-cache
+  # 自定义镜像私有镜像地址和版本
+    image: registry.cn-shenzhen.aliyuncs.com/gameframex/gameframex.web.admin.api:1.0.0.0
+    # 容器名称
+    container_name: gameframex-web-admin-api
+    # build:
+    #   context: ./GameFrameX.Admin.Web.Api
+    #   dockerfile: Dockerfile
+    #   args:
+    #     - no-cache
     ports:
-      - "20802:5005"
+      # 端口映射
+      - "20802:20802"
+    # 环境变量
     environment:
-      - "TZ=Asia/Shanghai"
-      - "DatabaseName=gameframex"
-      - "DbType=MySql"
-      - "ConnectionString=Data Source=mysql;Database=gameframex;Port=3306;Uid=root;Pwd=123456;"
+      # 数据库名称
+      DatabaseName: ${DatabaseName:-gameframex}
+      # 数据库类型
+      DbType: ${DbType:-MySql}
+      # 数据库链接字符串
+      ConnectionString: ${ConnectionString:-Data Source=mysql;Database=gameframex;Port=3306;Uid=root;Pwd=123456;}
+    # 环境变量注入
+    env_file:
+      # 开发环境的配置文件
+      - ./development.env
+      # 生产环境的配置文件
+      # - ./production.env
     links:
       - mysql
     networks:
+    # 网络映射
       - gameframex_networks
   # 客户端使用API
   gameframex.web.client.api:
-    image: registry.cn-shenzhen.aliyuncs.com/gameframex/gameframex.web.client.api:1.0.0
-    container_name: client-api
-    build:
-      context: ./Admin.NET
-      dockerfile: Dockerfile-Web-Api
-      args:
-        - no-cache
+    # 自定义镜像私有镜像地址和版本
+    image: registry.cn-shenzhen.aliyuncs.com/gameframex/gameframex.web.client.api:1.0.0.0
+    # 容器名称
+    container_name: gameframex-web-client-api
+    # build:
+    #   context: ./GameFrameX.Admin.Client.Api
+    #   dockerfile: Dockerfile
+    #   args:
+    #     - no-cache
     ports:
       - "20808:80"
       # - "20809:443"
     environment:
-      - "DatabaseName=gameframex"
-      - "DbType=MySql"
-      - "ConnectionString=Data Source=mysql;Database=gameframex;Port=3306;Uid=root;Pwd=123456;"
+      # 数据库名称
+      DatabaseName: ${DatabaseName:-gameframex}
+      # 数据库类型
+      DbType: ${DbType:-MySql}
+      # 数据库链接字符串
+      ConnectionString: ${ConnectionString:-Data Source=mysql;Database=gameframex;Port=3306;Uid=root;Pwd=123456;}
+    # 环境变量注入
+    env_file:
+      # 开发环境的配置文件
+      - ./development.env
+      # 生产环境的配置文件
+      # - ./production.env
     links:
       - mysql
     networks:
+    # 网络映射
       - gameframex_networks
     depends_on:
+    # 客户端API依赖的服务.需要等后台启动好了才能启动。如果部署在不同的机器上。可以删除这个配置
       - gameframex.web.admin.api
   # Web前端Vue
-  gameframex.web.admin.vue:
-    image: registry.cn-shenzhen.aliyuncs.com/gameframex/gameframex.web.vue:1.0.0
-    container_name: admin-vue
-    build:
-      context: ./Web/build
-      dockerfile: Dockerfile-Web-Vue
-      args:
-        - no-cache
+  gameframex.admin.web.vue:
+    # 自定义镜像私有镜像地址和版本
+    image: registry.cn-shenzhen.aliyuncs.com/gameframex/gameframex.admin.web.vue:1.0.0.0
+    container_name: gameframex-admin-web-vue
+    # build:
+    #   context: ./GameFrameX.Admin.Web.Vue
+    #   dockerfile: Dockerfile
+    #   args:
+    #     - no-cache
     ports:
       - "20800:80"
       # - "20801:443"
@@ -96,30 +137,13 @@ services:
     #   - "./running/nginx/conf/nginx.conf:/etc/nginx/conf/nginx.conf"
     #   - "./running/nginx/key:/etc/nginx/key/"
     networks:
+    # 网络映射
       - gameframex_networks
     restart: always
     depends_on:
+    # 客户端API依赖的服务.需要等后台启动好了才能启动。如果部署在不同的机器上。可以删除这个配置
       - gameframex.web.admin.api
       - mysql
-  # 文件服务器
-  # gameframex.fileserver:
-  #   image: registry.cn-shenzhen.aliyuncs.com/gameframex/gameframex.fileserver:1.0.0
-  #   container_name: client-fileserver
-  #   build:
-  #     context: ./Admin.NET
-  #     dockerfile: Dockerfile-FileServer
-  #     args:
-  #       - no-cache
-  #   ports:
-  #     - "20804:80"
-  #     # - "20805:443"
-  #   environment:
-  #     - "IsOpenDirectoryBrowser=true"
-  #   privileged: true
-  #   volumes:
-  #     - "./Bundles:/app/Bundles"
-  #   networks:
-  #     - gameframex_networks
 networks:
   gameframex_networks:
     driver: bridge
