@@ -83,7 +83,7 @@ git clone https://github.com/AlianBlank/GameFrameX.Admin.Web.Vue.git
 ## Docker 
 
 ### 构建后端
-1. CD 到Admin.Net 目录下
+1. CD 到当前 三个项目同级的目录下(三个项目不同级会出现异常哟)
 2. 执行Build命令
 3. 构建后台接口
 ```
