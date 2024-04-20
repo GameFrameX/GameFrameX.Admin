@@ -72,6 +72,7 @@ QQ 群：`467608841`
 ![13.png](doc/img/13.png)
 ![14.png](doc/img/14.png)
 
+
 # 更多功能等待你的发现。！！！
 
 # 项目地址
@@ -91,7 +92,7 @@ QQ 群：`467608841`
 # 使用指南
 
 将上面的项目下载到当前目录下。三个项目要在同级。
-
+![14.png](doc/img/dir.png)
 ```
 git clone https://github.com/AlianBlank/GameFrameX.Admin.Client.Api.git
 git clone https://github.com/AlianBlank/GameFrameX.Admin.Web.Api.git
@@ -102,9 +103,19 @@ git clone https://github.com/AlianBlank/GameFrameX.Admin.Web.Vue.git
 
 ## Docker
 
-### 构建后端
+### 构建前台接口
 
-1. CD 到当前 三个项目同级的目录下(三个项目不同级会出现异常哟)
+1. CD 到 GameFrameX.Admin.Client.Api 目录下
+2. 执行Build命令
+3. 构建接口
+
+```
+    docker build  -t gameframex.web.api:1.0.0.0 .
+```
+
+### 构建后端接口
+
+1. CD 到 GameFrameX.Admin.Web.Api 目录下. 三个项目同级的目录下(三个项目不同级会出现异常哟)
 2. 执行Build命令
 3. 构建后台接口
 
@@ -112,19 +123,13 @@ git clone https://github.com/AlianBlank/GameFrameX.Admin.Web.Vue.git
     docker build -t gameframex.web.admin:1.0.0.0 .
 ```
 
-4. 构建前台接口
-
-```
-    docker build  -t gameframex.web.api:1.0.0.0 .
-```
-
 ### 构建前端
 
-1. CD 到 Web 目录下
+1. CD 到 GameFrameX.Admin.Web.Vue 目录下
 2. 构建前端的Vue
 
 ```
-    docker build -f ./Dockerfile-Web-Vue -t gameframex.web.vue:1.0.0.0 .
+    docker build -t gameframex.web.vue:1.0.0.0 .
 ```
 
 ## 推送到私有仓库（Aliyun）
