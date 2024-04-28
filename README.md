@@ -87,7 +87,7 @@ QQ 群：`467608841`
 
 ## 后台Web页面项目 下载地址
 
-[GameFrameX.Admin.Web.Api](https://github.com/AlianBlank/GameFrameX.Admin.Web.Vue)
+[GameFrameX.Admin.Web.Vue](https://github.com/AlianBlank/GameFrameX.Admin.Web.Vue)
 
 # 使用指南
 
