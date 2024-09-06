@@ -81,22 +81,22 @@ QQ 群：`467608841`
 
 [GameFrameX.Admin.Client.Api](https://github.com/AlianBlank/GameFrameX.Admin.Client.Api)
 
-## 后台管理接口项目 下载地址
+## 后台管理接口项目 下载地址(付费获取源码)
 
 [GameFrameX.Admin.Web.Api](https://github.com/AlianBlank/GameFrameX.Admin.Web.Api)
 
-## 后台Web页面项目 下载地址
+## 后台Web页面项目 下载地址(付费获取源码)
 
-[GameFrameX.Admin.Web.Vue](https://github.com/AlianBlank/GameFrameX.Admin.Web.Vue)
+[GameFrameX.Admin.Web.Vue](https://github.com/AlianBlank/GameFrameX.Admin.Web.Vue)   请关注==>:   [`演示站点 https://game.admin.web.vue.alianblank.com`](https://game.admin.web.vue.alianblank.com/)
 
 # 使用指南
 
 将上面的项目下载到当前目录下。三个项目要在同级。
 ![14.png](doc/img/dir.png)
 ```
-git clone https://github.com/AlianBlank/GameFrameX.Admin.Client.Api.git
-git clone https://github.com/AlianBlank/GameFrameX.Admin.Web.Api.git
-git clone https://github.com/AlianBlank/GameFrameX.Admin.Web.Vue.git
+git clone https://github.com/GameFrameX/GameFrameX.Admin.Client.Api.git
+git clone https://github.com/GameFrameX/GameFrameX.Admin.Web.Api.git
+git clone https://github.com/GameFrameX/GameFrameX.Admin.Web.Vue.git
 ```
 
 # 发布
