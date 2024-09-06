@@ -79,11 +79,11 @@ QQ 群：`467608841`
 
 ## 客户端接口项目 下载地址
 
-[GameFrameX.Admin.Client.Api](https://github.com/AlianBlank/GameFrameX.Admin.Client.Api)
+[GameFrameX.Admin.Client.Api](https://github.com/GameFrameX/GameFrameX.Admin.Client.Api)
 
 ## 后台管理接口项目 下载地址(付费获取源码)
 
-[GameFrameX.Admin.Web.Api](https://github.com/AlianBlank/GameFrameX.Admin.Web.Api)
+[GameFrameX.Admin.Web.Api](https://github.com/GameFrameX/GameFrameX.Admin.Web.Api)
 
 ## 后台Web页面项目 下载地址(付费获取源码)
 
