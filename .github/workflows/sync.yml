@@ -2,8 +2,8 @@ name: Sync Github To Image
 
 on:
   push:
-    branches: [main]
-  #schedule:
+    branches: [ main ]
+    #schedule:
     # 定时任务，每天 UTC 时间 0 点运行
     #- cron: "0 0 * * *"
   #workflow_dispatch:
@@ -50,7 +50,7 @@ jobs:
 
       # 拉取
       - name: pull and push
-        run: | 
+        run: |
           if [ "${{ github.ref_name }}" ]; then
           git checkout ${{ github.ref_name }}
           git pull --progress -v --no-rebase gitlink ${{ github.ref_name }} --tags --verbose || echo 远端不存在${{ github.ref_name }}分支;
@@ -96,7 +96,7 @@ jobs:
 
       # 拉取
       - name: pull and push
-        run: | 
+        run: |
           if [ "${{ github.ref_name }}" ]; then
           git checkout ${{ github.ref_name }}
           git pull --progress -v --no-rebase gitlab ${{ github.ref_name }} --tags --verbose || echo 远端不存在${{ github.ref_name }}分支;
@@ -142,7 +142,7 @@ jobs:
 
       # 拉取
       - name: pull and push
-        run: | 
+        run: |
           if [ "${{ github.ref_name }}" ]; then
           git checkout ${{ github.ref_name }}
           git pull --progress -v --no-rebase gitee ${{ github.ref_name }} --tags --verbose || echo 远端不存在${{ github.ref_name }}分支;
@@ -188,7 +188,7 @@ jobs:
 
       # 拉取
       - name: pull and push
-        run: | 
+        run: |
           if [ "${{ github.ref_name }}" ]; then
           git checkout ${{ github.ref_name }}
           git pull --progress -v --no-rebase atomgit ${{ github.ref_name }} --tags --verbose || echo 远端不存在${{ github.ref_name }}分支;
@@ -234,7 +234,7 @@ jobs:
 
       # 拉取
       - name: pull and push
-        run: | 
+        run: |
           if [ "${{ github.ref_name }}" ]; then
           git checkout ${{ github.ref_name }}
           git pull --progress -v --no-rebase gitcode ${{ github.ref_name }} --tags --verbose || echo 远端不存在${{ github.ref_name }}分支;
@@ -280,9 +280,101 @@ jobs:
 
       # 拉取
       - name: pull and push
-        run: | 
+        run: |
           if [ "${{ github.ref_name }}" ]; then
           git checkout ${{ github.ref_name }}
           git pull --progress -v --no-rebase framagit ${{ github.ref_name }} --tags --verbose || echo 远端不存在${{ github.ref_name }}分支;
           git push -u framagit ${{ github.ref_name }} --tags --verbose
+          fi
+  
+  
+  sync-codeup-admin:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # 为了 git pull --unshallow，我们需要获取所有的提交历史
+
+      - name: Set up Git user
+        run: |
+          git config --global user.email "wangfj11@foxmail.com"
+          git config --global user.name "AlianBlank"
+
+      - name: Set SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.CODEUP_ID_RSA }}" >> ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          eval $(ssh-agent -s) && ssh-add ~/.ssh/id_rsa
+          # 信任域名
+          ssh-keyscan -H codeup.aliyun.com >> ~/.ssh/known_hosts
+      # 查看当前分支
+      - name: Check current branch
+        run: echo 当前分支：${{ github.ref_name }} ${{ github.Repository }}
+      # 查看远端 地址
+      - name: echo git url
+        run: echo codeup.aliyun.com:652bee7ea3bbd14127c037dd/GameFrameX/Admin/GameFrameX.Admin.git
+
+      # 添加远端
+      - name: add remote url
+        run: git remote add codeup "git@codeup.aliyun.com:652bee7ea3bbd14127c037dd/GameFrameX/Admin/GameFrameX.Admin.git"
+
+      # 获取
+      - name: fetch
+        run: git fetch --prune codeup --tags --verbose
+
+      # 拉取
+      - name: pull and push
+        run: |
+          if [ "${{ github.ref_name }}" ]; then
+          git checkout ${{ github.ref_name }}
+          git pull --progress -v --no-rebase codeup ${{ github.ref_name }} --tags --verbose || echo 远端不存在${{ github.ref_name }}分支;
+          git push -u codeup ${{ github.ref_name }} --tags --verbose
+          fi
+  sync-codeup-hope:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # 为了 git pull --unshallow，我们需要获取所有的提交历史
+
+      - name: Set up Git user
+        run: |
+          git config --global user.email "wangfj11@foxmail.com"
+          git config --global user.name "AlianBlank"
+
+      - name: Set SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.CODEUP_ID_RSA }}" >> ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          eval $(ssh-agent -s) && ssh-add ~/.ssh/id_rsa
+          # 信任域名
+          ssh-keyscan -H codeup.aliyun.com >> ~/.ssh/known_hosts
+      # 查看当前分支
+      - name: Check current branch
+        run: echo 当前分支：${{ github.ref_name }} ${{ github.Repository }}
+      # 查看远端 地址
+      - name: echo git url
+        run: echo git@codeup.aliyun.com:652bee7ea3bbd14127c037dd/GameFrameX/Admin.Hope/GameFrameX.Admin.git
+
+      # 添加远端
+      - name: add remote url
+        run: git remote add codeup "git@codeup.aliyun.com:652bee7ea3bbd14127c037dd/GameFrameX/Admin.Hope/GameFrameX.Admin.git"
+
+      # 获取
+      - name: fetch
+        run: git fetch --prune codeup --tags --verbose
+
+      # 拉取
+      - name: pull and push
+        run: |
+          if [ "${{ github.ref_name }}" ]; then
+          git checkout ${{ github.ref_name }}
+          git pull --progress -v --no-rebase codeup ${{ github.ref_name }} --tags --verbose || echo 远端不存在${{ github.ref_name }}分支;
+          git push -u codeup ${{ github.ref_name }} --tags --verbose
           fi
