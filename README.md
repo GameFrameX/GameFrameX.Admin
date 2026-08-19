@@ -34,7 +34,6 @@ QQ 群：`467608841`
 22. 限流控制：采用 AspNetCoreRateLimit 组件实现对接口访问限制。
 23. ES 日志：通过 NEST 组件实现日志存取到 Elasticsearch 日志系统。
 24. 开放授权：支持OAuth 2.0开放标准授权登录，比如微信。
-25. APIJSON：适配腾讯APIJSON协议，支持后端0代码
 
 ## 附加功能
 
@@ -256,7 +255,6 @@ docker push registry.cn-shenzhen.aliyuncs.com/gameframex/gameframex.web.vue:1.0.
 22. 限流控制：采用 AspNetCoreRateLimit 组件实现对接口访问限制。
 23. ES 日志：通过 NEST 组件实现日志存取到 Elasticsearch 日志系统。
 24. 开放授权：支持OAuth 2.0开放标准授权登录，比如微信。
-25. APIJSON：适配腾讯APIJSON协议，支持后端0代码，[使用文档](https://github.com/liaozb/APIJSON.NET)。
 
 # 同步记录
 
@@ -281,7 +279,6 @@ https://gitee.com/zuohuaijun/Admin.NET/commit/28787175c023ef784b865fb4dc99192580
 - 👉 IGeekFan.AspNetCore.Knife4jUI：[https://github.com/luoyunchong/IGeekFan.AspNetCore.Knife4jUI](https://github.com/luoyunchong/IGeekFan.AspNetCore.Knife4jUI)
 - 👉 AspNet.Security.OAuth.Providers：[https://github.com/aspnet-contrib/AspNet.Security.OAuth.Providers](https://github.com/aspnet-contrib/AspNet.Security.OAuth.Providers)
 - 👉 System.Linq.Dynamic.Core：[https://github.com/zzzprojects/System.Linq.Dynamic.Core](https://github.com/zzzprojects/System.Linq.Dynamic.Core)
-- 👉 APIJSON.NET：[https://github.com/liaozb/APIJSON.NET](https://github.com/liaozb/APIJSON.NET)
 - 👉 vue-plugin-hiprint：[https://gitee.com/CcSimple/vue-plugin-hiprint](https://gitee.com/CcSimple/vue-plugin-hiprint)
 
 </details>
