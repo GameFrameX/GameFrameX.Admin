@@ -1,0 +1,16 @@
+build/dist
+node_modules
+.idea
+**/.DS_Store
+docs
+gfx-doc
+.claude
+Blog
+AGENTS.md
+.codegraph
+.orca-automations
+.api-gen
+
+.backup-c224
+.playwright-mcp
+e2e/.e2e/

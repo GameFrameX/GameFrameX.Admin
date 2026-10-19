@@ -1,0 +1,13 @@
+allowBuilds:
+  "@fortawesome/fontawesome-common-types": true
+  "@fortawesome/free-regular-svg-icons": true
+  "@fortawesome/free-solid-svg-icons": true
+  '@openapitools/openapi-generator-cli': true
+  "@parcel/watcher": true
+  "@vue-office/docx": true
+  "@vue-office/excel": true
+  "@vue-office/pdf": true
+  core-js: true
+  es5-ext: true
+  esbuild: true
+  vue-demi: true
