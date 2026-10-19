@@ -1,0 +1,51 @@
+// 정의 내용 (PLATFORM-콕핏=SuperAdmin 플랫폼 홈; greeting은 appHome에서 재사용; notice 섹션은 공지 페이지에서 사용)
+export default {
+    home: {
+        // 판머리
+        greetingMorning: '좋은 아침입니다',
+        greetingNoon: '점심 시간입니다',
+        greetingAfternoon: '좋은 오후입니다',
+        greetingEvening: '좋은 저녁입니다',
+        greetingNight: '늦은 밤까지 수고하셨습니다',
+        platformSub: 'GameFrameX 플랫폼 콕핏',
+        // 플랫폼 지표
+        kpiTenants: '테넌트 총수 · TENANTS',
+        kpiTenantsFoot: '비활성·만료 포함',
+        kpiApps: '앱 총수 · APPS',
+        kpiAppsFoot: '전체 테넌트 누계',
+        kpiExpiring: '만료 예고 · EXPIRING',
+        kpiExpiringFoot: '30일 이내 만료 테넌트',
+        kpiPackages: '패키지 수 · PACKAGES',
+        kpiPackagesFoot: '할당 가능한 테넌트 패키지',
+        // 빠른 접근
+        quickNav: '플랫폼 빠른 접근',
+        quickEmpty: '사용 가능한 플랫폼 입구가 없습니다',
+        quickTenants: '테넌트 관리',
+        quickPackages: '패키지 관리',
+        quickMenus: '메뉴 관리',
+        quickConfigs: '파라미터 설정',
+        quickDicts: '사전 관리',
+        quickPlatforms: '플랫폼 정의',
+        // 공지 카드
+        noticeTitle: '공지',
+        noticeEmpty: '공지가 없습니다',
+        // 공지 페이지
+        title: '제목',
+        type: '유형',
+        notice: '알림',
+        announcement: '공지사항',
+        query: '조회',
+        reset: '초기화',
+        content: '내용',
+        createdTime: '생성 시간',
+        readStatus: '읽음 상태',
+        read: '읽음',
+        unread: '안 읽음',
+        publisher: '게시자',
+        publishTime: '게시 시간',
+        operation: '작업',
+        detail: '상세',
+        messageDetail: '메시지 상세',
+        confirm: '확인',
+    },
+};

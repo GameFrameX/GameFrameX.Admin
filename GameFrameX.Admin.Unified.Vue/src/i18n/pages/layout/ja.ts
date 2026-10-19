@@ -1,0 +1,60 @@
+// 定義内容
+export default {
+    layout: {
+        header: {
+            expandMenu: 'メニューを展開',
+            collapseMenu: 'メニューを折りたたむ',
+        },
+        lockScreen: {
+            slideToUnlock: 'スライドしてロック解除',
+            enterPassword: 'パスワードを入力してください',
+        },
+        link: {
+            goNow: '今すぐ移動',
+        },
+        tagsView: {
+            invalidPathWarning: '正しいパスと完全なパラメータ（query、params）を入力してください',
+        },
+        user: {
+            fullscreenNotSupported: 'フルスクリーンはサポートされていません',
+            simplifiedChinese: '简体中文',
+            traditionalChinese: '繁體中文',
+            japanese: '日本語',
+            korean: '한국어',
+            notificationTitle: 'お知らせ',
+            notificationMessage: '新しいメッセージがあります...',
+            targetTenantSet: '対象テナントを設定',
+            targetTenantActive: '対象テナント',
+            targetTenantShort: 'テナント',
+            targetTenantExit: '対象テナントを解除',
+            targetTenantDialogTitle: 'SuperAdmin 対象テナント',
+            targetTenantInputLabel: '対象テナント ID',
+            targetTenantInputPlaceholder: '対象テナント ID を入力してください',
+            targetTenantHint: '保存後、リクエストに GameFrameX-Target-Tenant-Id を付与し、現在のページを再読み込みします。',
+            targetTenantInvalid: '有効な対象テナント ID を入力してください',
+            targetTenantSaved: '対象テナントを設定しました',
+            targetTenantCleared: '対象テナントを解除しました',
+        },
+        userNews: {
+            siteMessage: 'メッセージ',
+            mine: '自分のメッセージ',
+            goToNoticeCenter: '通知センターへ移動',
+            messageDetail: 'メッセージ詳細',
+            confirm: '確認',
+            noticeTag: '[お知らせ]',
+            announcementTag: '[お知らせ]',
+            empty: 'なし',
+        },
+        setings: {
+            themeColor: 'テーマカラー',
+            style1: 'スタイル 1',
+            style4: 'スタイル 4',
+            style5: 'スタイル 5',
+            round: '角丸',
+            card: 'カード',
+            horizontal: '横',
+            vertical: '縦',
+            pleaseSelect: '選択してください',
+        },
+    },
+};

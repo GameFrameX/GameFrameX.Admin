@@ -1,0 +1,115 @@
+// 登录卡的表单字段词汇（登录面与注册面共用同一张卡纸的同一套语法）：
+// 字段结构、label、四角注册标记聚焦、错误行、验证码行布局、提交按钮、底部提示。
+// 用 mixin 而非全局样式：两张卡面各自 scoped，共享词汇、各自持有。
+// 本文件会被组件 @use（非编译入口，additionalData 不注入），断点 mixin 需自行引入
+@use "/@/theme/breakpoints" as *;
+
+@mixin login-form {
+  .login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+
+    .login-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .login-label {
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.4;
+      color: var(--p-text-muted-color);
+    }
+
+    // 四角注册标记：聚焦字段收拢标记，不发光（取景框挑战者的纪律捐赠）
+    .login-input-mark {
+      position: relative;
+      padding: 3px;
+
+      &::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        transition: opacity 0.12s ease-out;
+        pointer-events: none;
+        background-image:
+          linear-gradient(var(--p-primary-300), var(--p-primary-300)),
+          linear-gradient(var(--p-primary-300), var(--p-primary-300)),
+          linear-gradient(var(--p-primary-300), var(--p-primary-300)),
+          linear-gradient(var(--p-primary-300), var(--p-primary-300)),
+          linear-gradient(var(--p-primary-300), var(--p-primary-300)),
+          linear-gradient(var(--p-primary-300), var(--p-primary-300)),
+          linear-gradient(var(--p-primary-300), var(--p-primary-300)),
+          linear-gradient(var(--p-primary-300), var(--p-primary-300));
+        background-repeat: no-repeat;
+        background-size: 8px 2px, 2px 8px, 8px 2px, 2px 8px, 8px 2px, 2px 8px, 8px 2px, 2px 8px;
+        background-position: left top, left top, right top, right top, left bottom, left bottom, right bottom, right bottom;
+      }
+
+      &:focus-within::before {
+        opacity: 1;
+      }
+    }
+
+    .login-input {
+      width: 100%;
+      caret-color: var(--p-primary-color);
+
+      // Chromium 截断 placeholder 跟随 input 自身的 text-overflow（伪元素上设置无效）：
+      // 长占位文案（账号@租户ID 格式提示）窄屏省略号截断，避免拦腰断字。
+      // InputText 根即 input；Password 的 input 是后代——两种形态都覆盖
+      overflow: hidden;
+      text-overflow: ellipsis;
+
+      :deep(input) {
+        width: 100%;
+        caret-color: var(--p-primary-color);
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+
+    .login-code-row {
+      display: flex;
+      align-items: stretch;
+      gap: 8px;
+      width: 100%;
+    }
+
+    .login-code-input {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+
+    .login-error {
+      font-size: 12.5px;
+      line-height: 1.4;
+      color: var(--p-red-400, #f87171);
+    }
+
+    .login-submit {
+      margin-top: 8px;
+      width: 100%;
+      border-radius: 8px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+    }
+
+    .login-forgot {
+      margin-top: -6px;
+      font-size: 12px;
+      color: var(--p-text-muted-color);
+    }
+  }
+
+  @include bp-down(sm) {
+    .login-form {
+      .login-code-row {
+        flex-direction: column;
+      }
+    }
+  }
+}

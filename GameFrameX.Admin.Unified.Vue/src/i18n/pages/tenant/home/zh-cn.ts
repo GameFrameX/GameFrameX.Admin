@@ -1,0 +1,51 @@
+// 定义内容（PLATFORM-驾驶舱=超管平台首页；greeting 供 appHome 复用；notice 段为通知管理页使用）
+export default {
+    home: {
+        // 版头
+        greetingMorning: '早上好',
+        greetingNoon: '中午好',
+        greetingAfternoon: '下午好',
+        greetingEvening: '晚上好',
+        greetingNight: '夜深了',
+        platformSub: 'GameFrameX 平台驾驶舱',
+        // 平台指标带
+        kpiTenants: '租户总数 · TENANTS',
+        kpiTenantsFoot: '含禁用与到期租户',
+        kpiApps: '应用总数 · APPS',
+        kpiAppsFoot: '全部租户累计',
+        kpiExpiring: '到期预警 · EXPIRING',
+        kpiExpiringFoot: '30 天内到期的租户',
+        kpiPackages: '套餐数 · PACKAGES',
+        kpiPackagesFoot: '可分配的租户套餐',
+        // 快捷入口
+        quickNav: '平台快捷入口',
+        quickEmpty: '暂无可用的平台入口',
+        quickTenants: '租户管理',
+        quickPackages: '租户套餐',
+        quickMenus: '菜单管理',
+        quickConfigs: '参数配置',
+        quickDicts: '字典管理',
+        quickPlatforms: '平台定义',
+        // 公告卡（HomeNoticeCard 组件复用）
+        noticeTitle: '公告',
+        noticeEmpty: '暂无公告',
+        // 通知页面（views/home/notice）
+        title: '标题',
+        type: '类型',
+        notice: '通知',
+        announcement: '公告',
+        query: '查询',
+        reset: '重置',
+        content: '内容',
+        createdTime: '创建时间',
+        readStatus: '阅读状态',
+        read: '已读',
+        unread: '未读',
+        publisher: '发布者',
+        publishTime: '发布时间',
+        operation: '操作',
+        detail: '详情',
+        messageDetail: '消息详情',
+        confirm: '确认',
+    },
+};

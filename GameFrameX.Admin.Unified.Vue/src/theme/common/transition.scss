@@ -1,0 +1,85 @@
+// Keyframe animations used across the app
+
+@keyframes error-num {
+  0% {
+    transform: translateY(60px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes error-img {
+  0% {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes loginLeft {
+  0% {
+    left: -100%;
+  }
+  50%,
+  to {
+    left: 100%;
+  }
+}
+
+@keyframes loginTop {
+  0% {
+    top: -100%;
+  }
+  50%,
+  to {
+    top: 100%;
+  }
+}
+
+@keyframes loginRight {
+  0% {
+    right: -100%;
+  }
+  50%,
+  to {
+    right: 100%;
+  }
+}
+
+@keyframes loginBottom {
+  0% {
+    bottom: -100%;
+  }
+  50%,
+  to {
+    bottom: 100%;
+  }
+}
+
+@keyframes logoAnimation {
+  0% {
+    transform: scale(0);
+  }
+  80% {
+    transform: scale(1.2);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes toRight {
+  0% {
+    left: -5px;
+  }
+  50% {
+    left: 100%;
+  }
+  to {
+    left: -5px;
+  }
+}

@@ -1,0 +1,51 @@
+// Defined content (PLATFORM cockpit = SuperAdmin platform home; greeting reused by appHome; notice section used by the notice page)
+export default {
+    home: {
+        // Sheet head
+        greetingMorning: 'Good morning',
+        greetingNoon: 'Good noon',
+        greetingAfternoon: 'Good afternoon',
+        greetingEvening: 'Good evening',
+        greetingNight: 'Working late',
+        platformSub: 'GameFrameX Platform Cockpit',
+        // Platform KPI row
+        kpiTenants: 'Tenants · ALL',
+        kpiTenantsFoot: 'Including disabled and expired',
+        kpiApps: 'Apps · TOTAL',
+        kpiAppsFoot: 'Across all tenants',
+        kpiExpiring: 'Expiring · SOON',
+        kpiExpiringFoot: 'Tenants expiring in 30 days',
+        kpiPackages: 'Packages · ALL',
+        kpiPackagesFoot: 'Assignable tenant packages',
+        // Quick nav
+        quickNav: 'Platform Quick Access',
+        quickEmpty: 'No platform entries available',
+        quickTenants: 'Tenants',
+        quickPackages: 'Packages',
+        quickMenus: 'Menus',
+        quickConfigs: 'Configs',
+        quickDicts: 'Dictionaries',
+        quickPlatforms: 'Platform Definitions',
+        // Notice card (reused by HomeNoticeCard)
+        noticeTitle: 'Notices',
+        noticeEmpty: 'No notices yet',
+        // Notice page
+        title: 'Title',
+        type: 'Type',
+        notice: 'Notice',
+        announcement: 'Announcement',
+        query: 'Query',
+        reset: 'Reset',
+        content: 'Content',
+        createdTime: 'Created Time',
+        readStatus: 'Read Status',
+        read: 'Read',
+        unread: 'Unread',
+        publisher: 'Publisher',
+        publishTime: 'Publish Time',
+        operation: 'Operation',
+        detail: 'Detail',
+        messageDetail: 'Message Detail',
+        confirm: 'Confirm',
+    },
+};

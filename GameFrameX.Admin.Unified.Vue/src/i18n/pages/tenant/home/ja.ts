@@ -1,0 +1,51 @@
+// 定義内容（PLATFORM-コックピット=SuperAdmin プラットフォームホーム；greeting は appHome で再利用；notice 段はお知らせページで使用）
+export default {
+    home: {
+        // 版頭
+        greetingMorning: 'おはようございます',
+        greetingNoon: 'こんにちは',
+        greetingAfternoon: 'こんにちは',
+        greetingEvening: 'こんばんは',
+        greetingNight: '夜遅くまでお疲れさまです',
+        platformSub: 'GameFrameX プラットフォーム コックピット',
+        // プラットフォーム指標
+        kpiTenants: 'テナント総数 · TENANTS',
+        kpiTenantsFoot: '無効・期限切れを含む',
+        kpiApps: 'アプリ総数 · APPS',
+        kpiAppsFoot: '全テナント累計',
+        kpiExpiring: '期限切れ予告 · EXPIRING',
+        kpiExpiringFoot: '30 日以内に期限切れのテナント',
+        kpiPackages: 'パッケージ数 · PACKAGES',
+        kpiPackagesFoot: '割り当て可能なテナントパッケージ',
+        // クイックアクセス
+        quickNav: 'プラットフォーム クイックアクセス',
+        quickEmpty: '利用できるプラットフォーム入口はありません',
+        quickTenants: 'テナント管理',
+        quickPackages: 'パッケージ管理',
+        quickMenus: 'メニュー管理',
+        quickConfigs: 'パラメータ設定',
+        quickDicts: '辞書管理',
+        quickPlatforms: 'プラットフォーム定義',
+        // お知らせカード
+        noticeTitle: 'お知らせ',
+        noticeEmpty: 'お知らせはありません',
+        // お知らせページ
+        title: 'タイトル',
+        type: 'タイプ',
+        notice: 'お知らせ',
+        announcement: 'アナウンス',
+        query: '検索',
+        reset: 'リセット',
+        content: '内容',
+        createdTime: '作成日時',
+        readStatus: '既読状態',
+        read: '既読',
+        unread: '未読',
+        publisher: '投稿者',
+        publishTime: '投稿日時',
+        operation: '操作',
+        detail: '詳細',
+        messageDetail: 'メッセージ詳細',
+        confirm: '確認',
+    },
+};

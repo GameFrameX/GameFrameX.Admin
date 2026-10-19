@@ -1,0 +1,14 @@
+// Z-Index 分层刻度（C256）
+// 跨层叠放必须取本刻度值；组件内部 stacking context 的 0/1/2 相对层级豁免（无全局竞争语义）。
+// SCSS 变量供 .vue/.scss 使用；TS 运行时注入场景（如 blockLoading 指令）用 --z-index-block CSS 变量，
+// 双轨先例同 theme/breakpoints.scss。
+$z-index-local: 10; // 局部提层（如顶栏折叠按钮防遮挡）
+$z-index-raised: 20; // 组件内装饰提层（如 dragVerify 的刷新/提示浮层）
+$z-index-block: 40; // 块级 loading 遮罩
+$z-index-overlay: 100; // 自定义 overlay 预留
+$z-index-sticky: 1000; // 吸顶（tagsView），与 PrimeVue overlay 基准一致
+$z-index-fullscreen: 99999; // 全屏覆盖（closeFull）
+
+:root {
+  --z-index-block: 40;
+}

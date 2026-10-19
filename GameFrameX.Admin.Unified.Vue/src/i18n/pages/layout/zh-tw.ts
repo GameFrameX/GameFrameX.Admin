@@ -1,0 +1,60 @@
+// 定义内容
+export default {
+    layout: {
+        header: {
+            expandMenu: '展開選單',
+            collapseMenu: '收合選單',
+        },
+        lockScreen: {
+            slideToUnlock: '上滑解鎖',
+            enterPassword: '請輸入密碼',
+        },
+        link: {
+            goNow: '立即前往體驗',
+        },
+        tagsView: {
+            invalidPathWarning: '請正確輸入路徑及完整參數（query、params）',
+        },
+        user: {
+            fullscreenNotSupported: '暫不不支持全螢幕',
+            simplifiedChinese: '简体中文',
+            traditionalChinese: '繁體中文',
+            japanese: '日本語',
+            korean: '한국어',
+            notificationTitle: '提示',
+            notificationMessage: '您有一條新消息...',
+            targetTenantSet: '設定目標租戶',
+            targetTenantActive: '目標租戶',
+            targetTenantShort: '租戶',
+            targetTenantExit: '退出目標租戶',
+            targetTenantDialogTitle: 'SuperAdmin 目標租戶',
+            targetTenantInputLabel: '目標租戶 ID',
+            targetTenantInputPlaceholder: '請輸入目標租戶 ID',
+            targetTenantHint: '保存後請求會攜帶 GameFrameX-Target-Tenant-Id，並刷新當前頁面。',
+            targetTenantInvalid: '請輸入有效的目標租戶 ID',
+            targetTenantSaved: '目標租戶已設定',
+            targetTenantCleared: '已退出目標租戶',
+        },
+        userNews: {
+            siteMessage: '站內信',
+            mine: '我的',
+            goToNoticeCenter: '前往通知中心',
+            messageDetail: '消息詳情',
+            confirm: '確認',
+            noticeTag: '【通知】',
+            announcementTag: '【公告】',
+            empty: '空',
+        },
+        setings: {
+            themeColor: '主題顏色',
+            style1: '風格1',
+            style4: '風格4',
+            style5: '風格5',
+            round: '圓角',
+            card: '卡片',
+            horizontal: '水準',
+            vertical: '垂直',
+            pleaseSelect: '請選擇',
+        },
+    },
+};

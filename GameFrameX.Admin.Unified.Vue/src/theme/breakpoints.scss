@@ -1,0 +1,32 @@
+// 全局响应式断点（C143 移动端响应式适配）
+// sm=640 手机 / md=768 小平板 / lg=1024 布局切换阈值
+// JS 侧移动端判定阈值统一为 1024，见 SplitterLayout.vue、layout/index.vue、MobileMenuDrawer.vue。
+// 用法（组件 scoped scss）：@include bp-down(sm) { ... } / @include bp-up(lg) { ... }
+
+:root {
+  --bp-sm: 640px;
+  --bp-md: 768px;
+  --bp-lg: 1024px;
+}
+
+// 视口宽度 >= 断点
+@mixin bp-up($name) {
+  @if $name == sm {
+    @media (min-width: 640px) { @content; }
+  } @else if $name == md {
+    @media (min-width: 768px) { @content; }
+  } @else if $name == lg {
+    @media (min-width: 1024px) { @content; }
+  }
+}
+
+// 视口宽度 < 断点
+@mixin bp-down($name) {
+  @if $name == sm {
+    @media (max-width: 639px) { @content; }
+  } @else if $name == md {
+    @media (max-width: 767px) { @content; }
+  } @else if $name == lg {
+    @media (max-width: 1023px) { @content; }
+  }
+}

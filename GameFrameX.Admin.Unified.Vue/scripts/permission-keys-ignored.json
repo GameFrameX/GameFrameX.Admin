@@ -1,0 +1,32 @@
+{
+  "directive/authDirective.ts": [
+    "xxx:update"
+  ],
+  "utils/authFunction.ts": [
+    "x:update"
+  ],
+  "views/app/onlineCenter/controlledOperation/index.vue": [
+    "onlineControlledCommand:execute"
+  ],
+  "views/app/appCenter/tenantGameAdvertisementRewardEntity/index.vue": [
+    "tenantGameAdvertisementRewardEntity:export"
+  ],
+  "views/platform/global/platformLoggingConfig/index.vue": [
+    "platformLoggingConfig:update"
+  ],
+  "views/platform/global/platformPasswordPolicyConfig/index.vue": [
+    "platformPasswordPolicyConfig:update"
+  ],
+  "views/platform/system/config/index.vue": [
+    "systemConfig:batchDelete"
+  ],
+  "views/platform/system/database/index.vue": [
+    "systemDatabase:updatetable",
+    "systemDatabase:deletetable"
+  ],
+  "views/platform/system/dict/index.vue": [
+    "systemDictType:update",
+    "systemDictType:page",
+    "systemDictType:delete"
+  ]
+}

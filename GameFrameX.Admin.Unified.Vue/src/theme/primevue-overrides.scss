@@ -1,0 +1,106 @@
+// 全局 reset
+html, body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
+// 全局排版基线：系统字体栈 + 中文回退（PrimeVue 4 base 不注入字体，不声明则落到浏览器默认栈）
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+#app {
+  min-height: 100%;
+}
+
+// Utility classes
+.layout-pd {
+  padding: 15px;
+}
+
+.flex-margin {
+  margin: 15px;
+}
+
+.font32 {
+  font-size: 32px;
+}
+
+.font12 {
+  font-size: 12px;
+}
+
+// 等宽字体公共类：Secret/Key/JSON 等内容展示统一入口，替代各 view 逐字重复的等宽栈。
+// !important 与 primeflex utility 惯例一致：PrimeVue 输入组件运行时注入 .p-textarea/.p-inputtext
+// { font-family: inherit }（同为 0-1-0 但注入更晚），不加 important 会被压回 body 系统栈
+.font-mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
+}
+
+.color-primary {
+  color: var(--p-primary-color);
+}
+
+.p-button.p-button-link.p-button-danger {
+  color: var(--p-button-text-danger-color, var(--p-red-500));
+}
+
+.p-button.p-button-link.p-button-danger:not(:disabled):hover,
+.p-button.p-button-link.p-button-danger:not(:disabled):active {
+  color: var(--p-button-text-danger-color, var(--p-red-500));
+}
+
+.layout-padding {
+  padding: 15px;
+}
+
+.layout-padding-auto {
+  padding: 15px;
+}
+
+.layout-padding-view {
+  padding: 15px;
+}
+
+// 等宽数字工具类：金额/ID/数量列对齐规范（C254），表格 bodyClass 与视图层通用
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+// 响应式 grid 列数 class：桌面多列，手机端自动减少列数，替代写死的 inline grid-template-columns（C143）
+.grid-cols-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.grid-cols-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+@include bp-down(sm) {
+  .grid-cols-2 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .grid-cols-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+// 移动端窄视口 Toast 防溢出（GFX-742，C332）
+// PrimeVue toast 容器固定宽 25rem(400px) 且无 max-width 约束，视口 <440px 时右侧溢出被裁切；
+// max-width 按视口收缩（40px = 2×20px 定位 offset，窄视口左右边距对称），桌面端(≥440px)恒为无操作。
+.p-toast {
+  max-width: calc(100vw - 40px);
+}
+
+// 全局减弱动态效果：系统开启 prefers-reduced-motion 时压制全应用动画/过渡（GFX-659，C253）
+// 覆盖 noticeBar 无限滚动、user.vue hover 弹跳、chart.scss 旋转、dragVerifyImgRotate 3s 动画等
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

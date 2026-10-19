@@ -1,0 +1,60 @@
+// 정의 내용
+export default {
+    layout: {
+        header: {
+            expandMenu: '메뉴 펼치기',
+            collapseMenu: '메뉴 접기',
+        },
+        lockScreen: {
+            slideToUnlock: '밀어서 잠금 해제',
+            enterPassword: '비밀번호를 입력하세요',
+        },
+        link: {
+            goNow: '바로 이동',
+        },
+        tagsView: {
+            invalidPathWarning: '올바른 경로와 전체 매개변수(query, params)를 입력해 주세요',
+        },
+        user: {
+            fullscreenNotSupported: '전체 화면을 지원하지 않습니다',
+            simplifiedChinese: '简体中文',
+            traditionalChinese: '繁體中文',
+            japanese: '日本語',
+            korean: '한국어',
+            notificationTitle: '알림',
+            notificationMessage: '새 메시지가 도착했습니다...',
+            targetTenantSet: '대상 테넌트 설정',
+            targetTenantActive: '대상 테넌트',
+            targetTenantShort: '테넌트',
+            targetTenantExit: '대상 테넌트 해제',
+            targetTenantDialogTitle: 'SuperAdmin 대상 테넌트',
+            targetTenantInputLabel: '대상 테넌트 ID',
+            targetTenantInputPlaceholder: '대상 테넌트 ID를 입력하세요',
+            targetTenantHint: '저장 후 요청에 GameFrameX-Target-Tenant-Id를 포함하고 현재 페이지를 새로고침합니다.',
+            targetTenantInvalid: '유효한 대상 테넌트 ID를 입력하세요',
+            targetTenantSaved: '대상 테넌트가 설정되었습니다',
+            targetTenantCleared: '대상 테넌트가 해제되었습니다',
+        },
+        userNews: {
+            siteMessage: '메시지',
+            mine: '내 메시지',
+            goToNoticeCenter: '알림 센터로 이동',
+            messageDetail: '메시지 상세',
+            confirm: '확인',
+            noticeTag: '[알림]',
+            announcementTag: '[공지]',
+            empty: '없음',
+        },
+        setings: {
+            themeColor: '테마 색상',
+            style1: '스타일 1',
+            style4: '스타일 4',
+            style5: '스타일 5',
+            round: '둥글게',
+            card: '카드',
+            horizontal: '가로',
+            vertical: '세로',
+            pleaseSelect: '선택해 주세요',
+        },
+    },
+};

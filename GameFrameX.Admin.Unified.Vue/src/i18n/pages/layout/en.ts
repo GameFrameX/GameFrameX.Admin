@@ -1,0 +1,60 @@
+// 定义内容
+export default {
+    layout: {
+        header: {
+            expandMenu: 'Expand menu',
+            collapseMenu: 'Collapse menu',
+        },
+        lockScreen: {
+            slideToUnlock: 'Slide to unlock',
+            enterPassword: 'Please enter password',
+        },
+        link: {
+            goNow: 'Go now',
+        },
+        tagsView: {
+            invalidPathWarning: 'Please enter the correct path and full parameters (query, params)',
+        },
+        user: {
+            fullscreenNotSupported: 'Fullscreen is not supported',
+            simplifiedChinese: '简体中文',
+            traditionalChinese: '繁體中文',
+            japanese: '日本語',
+            korean: '한국어',
+            notificationTitle: 'Notice',
+            notificationMessage: 'You have a new message...',
+            targetTenantSet: 'Set target tenant',
+            targetTenantActive: 'Target tenant',
+            targetTenantShort: 'Tenant',
+            targetTenantExit: 'Exit target tenant',
+            targetTenantDialogTitle: 'SuperAdmin target tenant',
+            targetTenantInputLabel: 'Target tenant ID',
+            targetTenantInputPlaceholder: 'Enter target tenant ID',
+            targetTenantHint: 'After saving, requests include GameFrameX-Target-Tenant-Id and the current page reloads.',
+            targetTenantInvalid: 'Enter a valid target tenant ID',
+            targetTenantSaved: 'Target tenant set',
+            targetTenantCleared: 'Exited target tenant',
+        },
+        userNews: {
+            siteMessage: 'Messages',
+            mine: 'Mine',
+            goToNoticeCenter: 'Go to notification center',
+            messageDetail: 'Message detail',
+            confirm: 'Confirm',
+            noticeTag: '[Notice]',
+            announcementTag: '[Announcement]',
+            empty: 'Empty',
+        },
+        setings: {
+            themeColor: 'Theme color',
+            style1: 'Style 1',
+            style4: 'Style 4',
+            style5: 'Style 5',
+            round: 'Round',
+            card: 'Card',
+            horizontal: 'Horizontal',
+            vertical: 'Vertical',
+            pleaseSelect: 'Please select',
+        },
+    },
+};
