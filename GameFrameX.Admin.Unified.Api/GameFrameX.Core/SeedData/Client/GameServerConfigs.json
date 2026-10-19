@@ -1,0 +1,1714 @@
+{
+  "bakeOut": {
+    "md5": "8ef73c45a4180c263debc366165f59f9",
+    "config": {
+      "id": 100083,
+      "eTime": 1787796000,
+      "rTime": 1787796600,
+      "sTime": 1787191800,
+      "bakeout_rank_reward": [
+        {
+          "rewards": [
+            "gem-25",
+            "energy-100",
+            "skiptime_1-1"
+          ],
+          "end_rank": 1,
+          "start_rank": 1
+        },
+        {
+          "rewards": [
+            "gem-20",
+            "energy-80",
+            "additem_1-1"
+          ],
+          "end_rank": 2,
+          "start_rank": 2
+        },
+        {
+          "rewards": [
+            "gem-15",
+            "energy-50"
+          ],
+          "end_rank": 3,
+          "start_rank": 3
+        },
+        {
+          "rewards": [
+            "gem-10"
+          ],
+          "end_rank": 6,
+          "start_rank": 4
+        },
+        {
+          "rewards": [
+            "energy-50"
+          ],
+          "end_rank": 10,
+          "start_rank": 7
+        },
+        {
+          "rewards": [
+            "skipprop-50"
+          ],
+          "end_rank": 15,
+          "start_rank": 11
+        },
+        {
+          "rewards": [
+            "skipprop-25"
+          ],
+          "end_rank": 20,
+          "start_rank": 16
+        }
+      ],
+      "bakeout_rank_exchange": [
+        {
+          "cost": 10,
+          "time": 1
+        },
+        {
+          "cost": 11,
+          "time": 2
+        },
+        {
+          "cost": 14,
+          "time": 3
+        },
+        {
+          "cost": 17,
+          "time": 4
+        },
+        {
+          "cost": 21,
+          "time": 5
+        },
+        {
+          "cost": 28,
+          "time": 6
+        },
+        {
+          "cost": 37,
+          "time": 7
+        },
+        {
+          "cost": 51,
+          "time": 8
+        },
+        {
+          "cost": 72,
+          "time": 9
+        },
+        {
+          "cost": 100,
+          "time": 10
+        }
+      ],
+      "bakeout_rank_parameter": [
+        {
+          "maxNum": 20,
+          "delayTime": 90,
+          "retainTime": 601200,
+          "uploadTime": 60,
+          "noRegisterTime": 300,
+          "settlementTime": 300
+        }
+      ]
+    }
+  },
+  "badge": {
+    "md5": "a8ea08bdc11bb0196b2f273acaa94a31",
+    "config": [
+      {
+        "id": 10,
+        "eTime": 4892580000,
+        "sTime": 1767578400,
+        "weight": 200,
+        "player_ability": 1
+      },
+      {
+        "id": 11,
+        "eTime": 4892580000,
+        "sTime": 1767837600,
+        "weight": 10,
+        "badge_id": "badge_2_1",
+        "player_ability": 1
+      },
+      {
+        "id": 12,
+        "eTime": 4892580000,
+        "sTime": 1768183200,
+        "weight": 10,
+        "badge_id": "badge_2_2",
+        "player_ability": 1
+      },
+      {
+        "id": 13,
+        "eTime": 4892580000,
+        "sTime": 1767578400,
+        "weight": 200,
+        "player_ability": 2
+      },
+      {
+        "id": 14,
+        "eTime": 4892580000,
+        "sTime": 1768183200,
+        "weight": 10,
+        "badge_id": "badge_2_1",
+        "player_ability": 2
+      },
+      {
+        "id": 15,
+        "eTime": 4892580000,
+        "sTime": 1768442400,
+        "weight": 5,
+        "badge_id": "badge_2_2",
+        "player_ability": 2
+      },
+      {
+        "id": 16,
+        "eTime": 4892580000,
+        "sTime": 1767578400,
+        "weight": 200,
+        "player_ability": 3
+      },
+      {
+        "id": 17,
+        "eTime": 4892580000,
+        "sTime": 1768788000,
+        "weight": 0,
+        "badge_id": "badge_2_1",
+        "player_ability": 3
+      },
+      {
+        "id": 18,
+        "eTime": 4892580000,
+        "sTime": 1768788000,
+        "weight": 0,
+        "badge_id": "badge_2_2",
+        "player_ability": 3
+      },
+      {
+        "id": 19,
+        "eTime": 4892580000,
+        "sTime": 1770256800,
+        "weight": 10,
+        "badge_id": "badge_3_1",
+        "player_ability": 1
+      },
+      {
+        "id": 20,
+        "eTime": 4892580000,
+        "sTime": 1770602400,
+        "weight": 10,
+        "badge_id": "badge_3_2",
+        "player_ability": 1
+      },
+      {
+        "id": 21,
+        "eTime": 4892580000,
+        "sTime": 1770602400,
+        "weight": 10,
+        "badge_id": "badge_3_1",
+        "player_ability": 2
+      },
+      {
+        "id": 22,
+        "eTime": 4892580000,
+        "sTime": 1770861600,
+        "weight": 5,
+        "badge_id": "badge_3_2",
+        "player_ability": 2
+      },
+      {
+        "id": 23,
+        "eTime": 4892580000,
+        "sTime": 1771207200,
+        "weight": 0,
+        "badge_id": "badge_3_1",
+        "player_ability": 3
+      },
+      {
+        "id": 24,
+        "eTime": 4892580000,
+        "sTime": 1771207200,
+        "weight": 0,
+        "badge_id": "badge_3_2",
+        "player_ability": 3
+      },
+      {
+        "id": 25,
+        "eTime": 4892580000,
+        "sTime": 1772676000,
+        "weight": 10,
+        "badge_id": "badge_4_1",
+        "player_ability": 1
+      },
+      {
+        "id": 26,
+        "eTime": 4892580000,
+        "sTime": 1773021600,
+        "weight": 10,
+        "badge_id": "badge_4_2",
+        "player_ability": 1
+      },
+      {
+        "id": 27,
+        "eTime": 4892580000,
+        "sTime": 1773021600,
+        "weight": 10,
+        "badge_id": "badge_4_1",
+        "player_ability": 2
+      },
+      {
+        "id": 28,
+        "eTime": 4892580000,
+        "sTime": 1773280800,
+        "weight": 5,
+        "badge_id": "badge_4_2",
+        "player_ability": 2
+      },
+      {
+        "id": 29,
+        "eTime": 4892580000,
+        "sTime": 1773626400,
+        "weight": 0,
+        "badge_id": "badge_4_1",
+        "player_ability": 3
+      },
+      {
+        "id": 30,
+        "eTime": 4892580000,
+        "sTime": 1773626400,
+        "weight": 0,
+        "badge_id": "badge_4_2",
+        "player_ability": 3
+      },
+      {
+        "id": 31,
+        "eTime": 4892580000,
+        "sTime": 1775095200,
+        "weight": 10,
+        "badge_id": "badge_5_1",
+        "player_ability": 1
+      },
+      {
+        "id": 32,
+        "eTime": 4892580000,
+        "sTime": 1775440800,
+        "weight": 10,
+        "badge_id": "badge_5_2",
+        "player_ability": 1
+      },
+      {
+        "id": 33,
+        "eTime": 4892580000,
+        "sTime": 1775440800,
+        "weight": 10,
+        "badge_id": "badge_5_1",
+        "player_ability": 2
+      },
+      {
+        "id": 34,
+        "eTime": 4892580000,
+        "sTime": 1775700000,
+        "weight": 5,
+        "badge_id": "badge_5_2",
+        "player_ability": 2
+      },
+      {
+        "id": 35,
+        "eTime": 4892580000,
+        "sTime": 1776045600,
+        "weight": 0,
+        "badge_id": "badge_5_1",
+        "player_ability": 3
+      },
+      {
+        "id": 36,
+        "eTime": 4892580000,
+        "sTime": 1776045600,
+        "weight": 0,
+        "badge_id": "badge_5_2",
+        "player_ability": 3
+      },
+      {
+        "id": 37,
+        "eTime": 4892580000,
+        "sTime": 1777514400,
+        "weight": 10,
+        "badge_id": "badge_6_1",
+        "player_ability": 1
+      },
+      {
+        "id": 38,
+        "eTime": 4892580000,
+        "sTime": 1777860000,
+        "weight": 10,
+        "badge_id": "badge_6_2",
+        "player_ability": 1
+      },
+      {
+        "id": 39,
+        "eTime": 4892580000,
+        "sTime": 1777860000,
+        "weight": 10,
+        "badge_id": "badge_6_1",
+        "player_ability": 2
+      },
+      {
+        "id": 40,
+        "eTime": 4892580000,
+        "sTime": 1778119200,
+        "weight": 5,
+        "badge_id": "badge_6_2",
+        "player_ability": 2
+      },
+      {
+        "id": 41,
+        "eTime": 4892580000,
+        "sTime": 1778464800,
+        "weight": 0,
+        "badge_id": "badge_6_1",
+        "player_ability": 3
+      },
+      {
+        "id": 42,
+        "eTime": 4892580000,
+        "sTime": 1778464800,
+        "weight": 0,
+        "badge_id": "badge_6_2",
+        "player_ability": 3
+      },
+      {
+        "id": 43,
+        "eTime": 4892580000,
+        "sTime": 1779933600,
+        "weight": 10,
+        "badge_id": "badge_7_1",
+        "player_ability": 1
+      },
+      {
+        "id": 44,
+        "eTime": 4892580000,
+        "sTime": 1780279200,
+        "weight": 10,
+        "badge_id": "badge_7_2",
+        "player_ability": 1
+      },
+      {
+        "id": 45,
+        "eTime": 4892580000,
+        "sTime": 1780279200,
+        "weight": 10,
+        "badge_id": "badge_7_1",
+        "player_ability": 2
+      },
+      {
+        "id": 46,
+        "eTime": 4892580000,
+        "sTime": 1780538400,
+        "weight": 5,
+        "badge_id": "badge_7_2",
+        "player_ability": 2
+      },
+      {
+        "id": 47,
+        "eTime": 4892580000,
+        "sTime": 1780884000,
+        "weight": 0,
+        "badge_id": "badge_7_1",
+        "player_ability": 3
+      },
+      {
+        "id": 48,
+        "eTime": 4892580000,
+        "sTime": 1780884000,
+        "weight": 0,
+        "badge_id": "badge_7_2",
+        "player_ability": 3
+      },
+      {
+        "id": 49,
+        "eTime": 4892580000,
+        "sTime": 1782352800,
+        "weight": 10,
+        "badge_id": "badge_8_1",
+        "player_ability": 1
+      },
+      {
+        "id": 50,
+        "eTime": 4892580000,
+        "sTime": 1782698400,
+        "weight": 10,
+        "badge_id": "badge_8_2",
+        "player_ability": 1
+      },
+      {
+        "id": 51,
+        "eTime": 4892580000,
+        "sTime": 1782698400,
+        "weight": 10,
+        "badge_id": "badge_8_1",
+        "player_ability": 2
+      },
+      {
+        "id": 52,
+        "eTime": 4892580000,
+        "sTime": 1782957600,
+        "weight": 5,
+        "badge_id": "badge_8_2",
+        "player_ability": 2
+      },
+      {
+        "id": 53,
+        "eTime": 4892580000,
+        "sTime": 1783303200,
+        "weight": 0,
+        "badge_id": "badge_8_1",
+        "player_ability": 3
+      },
+      {
+        "id": 54,
+        "eTime": 4892580000,
+        "sTime": 1783303200,
+        "weight": 0,
+        "badge_id": "badge_8_2",
+        "player_ability": 3
+      },
+      {
+        "id": 55,
+        "eTime": 4892580000,
+        "sTime": 1784772000,
+        "weight": 10,
+        "badge_id": "badge_9_1",
+        "player_ability": 1
+      },
+      {
+        "id": 56,
+        "eTime": 4892580000,
+        "sTime": 1785117600,
+        "weight": 10,
+        "badge_id": "badge_9_2",
+        "player_ability": 1
+      },
+      {
+        "id": 57,
+        "eTime": 4892580000,
+        "sTime": 1785117600,
+        "weight": 10,
+        "badge_id": "badge_9_1",
+        "player_ability": 2
+      },
+      {
+        "id": 58,
+        "eTime": 4892580000,
+        "sTime": 1785376800,
+        "weight": 5,
+        "badge_id": "badge_9_2",
+        "player_ability": 2
+      },
+      {
+        "id": 59,
+        "eTime": 4892580000,
+        "sTime": 1785722400,
+        "weight": 0,
+        "badge_id": "badge_9_1",
+        "player_ability": 3
+      },
+      {
+        "id": 60,
+        "eTime": 4892580000,
+        "sTime": 1785722400,
+        "weight": 0,
+        "badge_id": "badge_9_2",
+        "player_ability": 3
+      },
+      {
+        "id": 61,
+        "eTime": 4892580000,
+        "sTime": 1787191200,
+        "weight": 300,
+        "badge_id": "badge_10_1",
+        "player_ability": 1
+      }
+    ]
+  },
+  "bulletinLanguage": {
+    "md5": "ea412c0112043913b1b4e627c983ba2f",
+    "config": [
+      {
+        "key": "facebook_title",
+        "value": "關注我們"
+      },
+      {
+        "key": "facebook_content",
+        "value": "<<<img=https://cdn.mergecola.com/cloud/5526a2509d6160ee7bce8d1661d71b23bfb5518a>>>\n歡迎您關注我們的 Facebook 頁面！\n\n在那裡，您可以瞭解火辣餐廳的最新消息。我們也會同步發送照片和活動，您還有機會贏取能量、鑽石和其他精彩獎勵！\n\n點擊下方按鈕進入 Facebook 頁面，關注我們！"
+      },
+      {
+        "key": "digboard_error_title",
+        "value": "Compensation Rewards"
+      },
+      {
+        "key": "digboard_error_desc",
+        "value": "Hey Chefs!\n\nWe discovered a little hiccup in the “Foraging for Funghi” event that may have stopped some of you from progressing. The issue is now fixed—just close and reopen the event to continue!\n\nSorry for the interruption—we will be sending out some rewards shortly to thank you for your patience!\n\nHappy merging!\nThe Flambé Team"
+      },
+      {
+        "key": "energyEvent_title",
+        "value": "体力大放送"
+      },
+      {
+        "key": "energyEvent_content",
+        "value": "<<<img=https://cdn.mergecola.com/cloud/832f6ad1417bf023254d29d7f6e94bb9a7734cb3>>>\n美食探險活動開始啦！快來參與體力抽獎活動，有機會贏取400體力哦！\n\n參與方式：\n1.關注我們的Facebook，@Flambé: Merge & Cook\n2.在評論區留下問題的答案\n3.我們將隨機抽取20位幸運兒\n\n點擊下方按鈕進入Facebook吧，祝你好運！"
+      },
+      {
+        "key": "cardEvent_title",
+        "value": "体力大放送"
+      },
+      {
+        "key": "cardEvent_content",
+        "value": "<<<img=https://cdn.mergecola.com/cloud/a1e38d7d955bf1f3c1e0561a96f1e2d78694d9d0>>>\n秋季集卡活動開始啦！快來參與體力抽獎活動，有機會贏取400體力哦！\n\n參與方式：\n1. 關注我們的Facebook，@Flambé: Merge & Cook\n2. 在評論區留下問題的答案\n3. 我們將隨機抽取20位幸運兒\n\n點擊下方按鈕進入Facebook吧，祝你好運！"
+      },
+      {
+        "key": "adboard_error_title",
+        "value": "Compensation Rewards"
+      },
+      {
+        "key": "adboard_error_desc",
+        "value": "Hey Chefs!\n\nSorry for the recent technical issues you may have encountered during the \"Feast of Spooky Sweets\" event. They have now all been fixed and the Feast is sweeter (and spookier!) than ever!\n\nTo show our thanks, we have attached our own sweet treat below! \n\nHappy merging!\nThe Flambé Team"
+      },
+      {
+        "key": "fb_freegift_title",
+        "value": "領取驚喜禮物"
+      },
+      {
+        "key": "fb_freegift_desc",
+        "value": "<<<img=https://cdn.mergecola.com/cloud/c8d381f4bcb2b7198e7ddf5e609d5dcf2aad92a5>>>\n點擊我們Facebook主頁貼子中的連結，就可以免費獲得體力或道具哦！\n\n參與答題抽獎活動，還有機會贏取更多獎勵！\n\n點擊下方按鈕進入Facebook，立即領取驚喜禮物吧！"
+      }
+    ]
+  },
+  "bundleController": {
+    "md5": "eda0984d6fa455af86323a9ec6ebbf30",
+    "config": [
+      {
+        "id": 1,
+        "buyCD": 10080,
+        "order": [
+          "starter_499"
+        ],
+        "popCD": 360,
+        "uiCode": "starter",
+        "groupId": "starter",
+        "is_open": 1,
+        "duration": 720,
+        "maxBuyNum": 1,
+        "dailyBuyNum": 1,
+        "specialType": "starter",
+        "dailyShowNum": 2,
+        "bundleContent": [
+          {
+            "payID": "starter_bundle_1",
+            "price": 4.99,
+            "content": [
+              {
+                "Amount": 240,
+                "Currency": "gem"
+              },
+              {
+                "Amount": 200,
+                "Currency": "energy"
+              },
+              {
+                "Amount": 4,
+                "Currency": "additem_1"
+              },
+              {
+                "Amount": 1,
+                "Currency": "enebox_1"
+              }
+            ],
+            "bundleId": "starter_499"
+          }
+        ],
+        "bundleTrigger": [
+          {
+            "popNum": 1,
+            "trigger": "task_finished",
+            "popOrder": [
+              "starter"
+            ]
+          }
+        ],
+        "bundleCondition": [
+          {
+            "taskFinished": {
+              "ChapterId": 2,
+              "TaskCount": 3
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "chapterUpdate": {
+    "md5": "1f222fe2a9928dc9ba81019a201dd14f",
+    "config": [
+      {
+        "enable": 1,
+        "preDay": 1784772000,
+        "chapter": 46,
+        "openDay": 1785376800,
+        "dayLevel": 1275
+      },
+      {
+        "enable": 1,
+        "preDay": 1785376800,
+        "chapter": 46,
+        "openDay": 1785981600,
+        "dayLevel": 1290
+      },
+      {
+        "enable": 1,
+        "preDay": 1735005600,
+        "chapter": 5,
+        "openDay": 1735178400,
+        "dayLevel": 75
+      },
+      {
+        "enable": 1,
+        "preDay": 1736215200,
+        "chapter": 6,
+        "openDay": 1736388000,
+        "dayLevel": 100
+      },
+      {
+        "enable": 1,
+        "preDay": 1737424800,
+        "chapter": 7,
+        "openDay": 1737597600,
+        "dayLevel": 125
+      },
+      {
+        "enable": 1,
+        "preDay": 1739239200,
+        "chapter": 8,
+        "openDay": 1739412000,
+        "dayLevel": 150
+      },
+      {
+        "enable": 1,
+        "preDay": 1740448800,
+        "chapter": 9,
+        "openDay": 1740621600,
+        "dayLevel": 165
+      },
+      {
+        "enable": 1,
+        "preDay": 1741053600,
+        "chapter": 9,
+        "openDay": 1741226400,
+        "dayLevel": 180
+      },
+      {
+        "enable": 1,
+        "preDay": 1741658400,
+        "chapter": 10,
+        "openDay": 1741831200,
+        "dayLevel": 195
+      },
+      {
+        "enable": 1,
+        "preDay": 1741831200,
+        "chapter": 10,
+        "openDay": 1742436000,
+        "dayLevel": 210
+      },
+      {
+        "enable": 1,
+        "preDay": 1742868000,
+        "chapter": 11,
+        "openDay": 1743040800,
+        "dayLevel": 225
+      },
+      {
+        "enable": 1,
+        "preDay": 1743040800,
+        "chapter": 11,
+        "openDay": 1743645600,
+        "dayLevel": 240
+      },
+      {
+        "enable": 1,
+        "preDay": 1744077600,
+        "chapter": 12,
+        "openDay": 1744250400,
+        "dayLevel": 255
+      },
+      {
+        "enable": 1,
+        "preDay": 1744250400,
+        "chapter": 12,
+        "openDay": 1744855200,
+        "dayLevel": 270
+      },
+      {
+        "enable": 1,
+        "preDay": 1745287200,
+        "chapter": 13,
+        "openDay": 1745460000,
+        "dayLevel": 285
+      },
+      {
+        "enable": 1,
+        "preDay": 1745460000,
+        "chapter": 13,
+        "openDay": 1746064800,
+        "dayLevel": 300
+      },
+      {
+        "enable": 1,
+        "preDay": 1746496800,
+        "chapter": 14,
+        "openDay": 1746669600,
+        "dayLevel": 315
+      },
+      {
+        "enable": 1,
+        "preDay": 1746669600,
+        "chapter": 14,
+        "openDay": 1747274400,
+        "dayLevel": 330
+      },
+      {
+        "enable": 1,
+        "preDay": 1747706400,
+        "chapter": 15,
+        "openDay": 1747879200,
+        "dayLevel": 345
+      },
+      {
+        "enable": 1,
+        "preDay": 1747879200,
+        "chapter": 15,
+        "openDay": 1748484000,
+        "dayLevel": 360
+      },
+      {
+        "enable": 1,
+        "preDay": 1748916000,
+        "chapter": 16,
+        "openDay": 1749088800,
+        "dayLevel": 375
+      },
+      {
+        "enable": 1,
+        "preDay": 1749088800,
+        "chapter": 16,
+        "openDay": 1749693600,
+        "dayLevel": 390
+      },
+      {
+        "enable": 1,
+        "preDay": 1750125600,
+        "chapter": 17,
+        "openDay": 1750298400,
+        "dayLevel": 405
+      },
+      {
+        "enable": 1,
+        "preDay": 1750298400,
+        "chapter": 17,
+        "openDay": 1750903200,
+        "dayLevel": 420
+      },
+      {
+        "enable": 1,
+        "preDay": 1751335200,
+        "chapter": 18,
+        "openDay": 1751508000,
+        "dayLevel": 435
+      },
+      {
+        "enable": 1,
+        "preDay": 1751508000,
+        "chapter": 18,
+        "openDay": 1752112800,
+        "dayLevel": 450
+      },
+      {
+        "enable": 1,
+        "preDay": 1752544800,
+        "chapter": 19,
+        "openDay": 1752717600,
+        "dayLevel": 465
+      },
+      {
+        "enable": 1,
+        "preDay": 1752717600,
+        "chapter": 19,
+        "openDay": 1753322400,
+        "dayLevel": 480
+      },
+      {
+        "enable": 1,
+        "preDay": 1753754400,
+        "chapter": 20,
+        "openDay": 1753927200,
+        "dayLevel": 495
+      },
+      {
+        "enable": 1,
+        "preDay": 1753927200,
+        "chapter": 20,
+        "openDay": 1754532000,
+        "dayLevel": 510
+      },
+      {
+        "enable": 1,
+        "preDay": 1754532000,
+        "chapter": 21,
+        "openDay": 1755136800,
+        "dayLevel": 525
+      },
+      {
+        "enable": 1,
+        "preDay": 1755136800,
+        "chapter": 21,
+        "openDay": 1755741600,
+        "dayLevel": 540
+      },
+      {
+        "enable": 1,
+        "preDay": 1755741600,
+        "chapter": 22,
+        "openDay": 1756346400,
+        "dayLevel": 555
+      },
+      {
+        "enable": 1,
+        "preDay": 1756346400,
+        "chapter": 22,
+        "openDay": 1756951200,
+        "dayLevel": 570
+      },
+      {
+        "enable": 1,
+        "preDay": 1756951200,
+        "chapter": 23,
+        "openDay": 1757556000,
+        "dayLevel": 585
+      },
+      {
+        "enable": 1,
+        "preDay": 1757556000,
+        "chapter": 23,
+        "openDay": 1758160800,
+        "dayLevel": 600
+      },
+      {
+        "enable": 1,
+        "preDay": 1758160800,
+        "chapter": 24,
+        "openDay": 1758765600,
+        "dayLevel": 615
+      },
+      {
+        "enable": 1,
+        "preDay": 1758765600,
+        "chapter": 24,
+        "openDay": 1759370400,
+        "dayLevel": 630
+      },
+      {
+        "enable": 1,
+        "preDay": 1759370400,
+        "chapter": 25,
+        "openDay": 1759975200,
+        "dayLevel": 645
+      },
+      {
+        "enable": 1,
+        "preDay": 1759975200,
+        "chapter": 25,
+        "openDay": 1760580000,
+        "dayLevel": 660
+      },
+      {
+        "enable": 1,
+        "preDay": 1760580000,
+        "chapter": 26,
+        "openDay": 1761184800,
+        "dayLevel": 675
+      },
+      {
+        "enable": 1,
+        "preDay": 1761184800,
+        "chapter": 26,
+        "openDay": 1761789600,
+        "dayLevel": 690
+      },
+      {
+        "enable": 1,
+        "preDay": 1761789600,
+        "chapter": 27,
+        "openDay": 1762394400,
+        "dayLevel": 705
+      },
+      {
+        "enable": 1,
+        "preDay": 1762394400,
+        "chapter": 27,
+        "openDay": 1762999200,
+        "dayLevel": 720
+      },
+      {
+        "enable": 1,
+        "preDay": 1762999200,
+        "chapter": 28,
+        "openDay": 1763604000,
+        "dayLevel": 735
+      },
+      {
+        "enable": 1,
+        "preDay": 1763604000,
+        "chapter": 28,
+        "openDay": 1764208800,
+        "dayLevel": 750
+      },
+      {
+        "enable": 1,
+        "preDay": 1764208800,
+        "chapter": 29,
+        "openDay": 1764813600,
+        "dayLevel": 765
+      },
+      {
+        "enable": 1,
+        "preDay": 1764813600,
+        "chapter": 29,
+        "openDay": 1765418400,
+        "dayLevel": 780
+      },
+      {
+        "enable": 1,
+        "preDay": 1765418400,
+        "chapter": 30,
+        "openDay": 1766023200,
+        "dayLevel": 795
+      },
+      {
+        "enable": 1,
+        "preDay": 1766023200,
+        "chapter": 30,
+        "openDay": 1766628000,
+        "dayLevel": 810
+      },
+      {
+        "enable": 1,
+        "preDay": 1766628000,
+        "chapter": 31,
+        "openDay": 1767232800,
+        "dayLevel": 825
+      },
+      {
+        "enable": 1,
+        "preDay": 1767232800,
+        "chapter": 31,
+        "openDay": 1767837600,
+        "dayLevel": 840
+      },
+      {
+        "enable": 1,
+        "preDay": 1767837600,
+        "chapter": 32,
+        "openDay": 1768442400,
+        "dayLevel": 855
+      },
+      {
+        "enable": 1,
+        "preDay": 1768442400,
+        "chapter": 32,
+        "openDay": 1769047200,
+        "dayLevel": 870
+      },
+      {
+        "enable": 1,
+        "preDay": 1769047200,
+        "chapter": 33,
+        "openDay": 1769652000,
+        "dayLevel": 885
+      },
+      {
+        "enable": 1,
+        "preDay": 1769652000,
+        "chapter": 33,
+        "openDay": 1770256800,
+        "dayLevel": 900
+      },
+      {
+        "enable": 1,
+        "preDay": 1770256800,
+        "chapter": 34,
+        "openDay": 1770861600,
+        "dayLevel": 915
+      },
+      {
+        "enable": 1,
+        "preDay": 1770861600,
+        "chapter": 34,
+        "openDay": 1771466400,
+        "dayLevel": 930
+      },
+      {
+        "enable": 1,
+        "preDay": 1771466400,
+        "chapter": 35,
+        "openDay": 1772071200,
+        "dayLevel": 945
+      },
+      {
+        "enable": 1,
+        "preDay": 1772071200,
+        "chapter": 35,
+        "openDay": 1772676000,
+        "dayLevel": 960
+      },
+      {
+        "enable": 1,
+        "preDay": 1772676000,
+        "chapter": 36,
+        "openDay": 1773280800,
+        "dayLevel": 975
+      },
+      {
+        "enable": 1,
+        "preDay": 1773280800,
+        "chapter": 36,
+        "openDay": 1773885600,
+        "dayLevel": 990
+      },
+      {
+        "enable": 1,
+        "preDay": 1773885600,
+        "chapter": 37,
+        "openDay": 1774490400,
+        "dayLevel": 1005
+      },
+      {
+        "enable": 1,
+        "preDay": 1774490400,
+        "chapter": 37,
+        "openDay": 1775095200,
+        "dayLevel": 1020
+      },
+      {
+        "enable": 1,
+        "preDay": 1775095200,
+        "chapter": 38,
+        "openDay": 1775700000,
+        "dayLevel": 1035
+      },
+      {
+        "enable": 1,
+        "preDay": 1775700000,
+        "chapter": 38,
+        "openDay": 1776304800,
+        "dayLevel": 1050
+      },
+      {
+        "enable": 1,
+        "preDay": 1776304800,
+        "chapter": 39,
+        "openDay": 1776909600,
+        "dayLevel": 1065
+      },
+      {
+        "enable": 1,
+        "preDay": 1776909600,
+        "chapter": 39,
+        "openDay": 1777514400,
+        "dayLevel": 1080
+      },
+      {
+        "enable": 1,
+        "preDay": 1777514400,
+        "chapter": 40,
+        "openDay": 1778119200,
+        "dayLevel": 1095
+      },
+      {
+        "enable": 1,
+        "preDay": 1778119200,
+        "chapter": 40,
+        "openDay": 1778724000,
+        "dayLevel": 1110
+      },
+      {
+        "enable": 1,
+        "preDay": 1778724000,
+        "chapter": 41,
+        "openDay": 1779328800,
+        "dayLevel": 1125
+      },
+      {
+        "enable": 1,
+        "preDay": 1779328800,
+        "chapter": 41,
+        "openDay": 1779933600,
+        "dayLevel": 1140
+      },
+      {
+        "enable": 1,
+        "preDay": 1779933600,
+        "chapter": 42,
+        "openDay": 1780538400,
+        "dayLevel": 1155
+      },
+      {
+        "enable": 1,
+        "preDay": 1780538400,
+        "chapter": 42,
+        "openDay": 1781143200,
+        "dayLevel": 1170
+      },
+      {
+        "enable": 1,
+        "preDay": 1781143200,
+        "chapter": 43,
+        "openDay": 1781748000,
+        "dayLevel": 1185
+      },
+      {
+        "enable": 1,
+        "preDay": 1781748000,
+        "chapter": 43,
+        "openDay": 1782352800,
+        "dayLevel": 1200
+      },
+      {
+        "enable": 1,
+        "preDay": 1782352800,
+        "chapter": 44,
+        "openDay": 1782957600,
+        "dayLevel": 1215
+      },
+      {
+        "enable": 1,
+        "preDay": 1782957600,
+        "chapter": 44,
+        "openDay": 1783562400,
+        "dayLevel": 1230
+      },
+      {
+        "enable": 1,
+        "preDay": 1783562400,
+        "chapter": 45,
+        "openDay": 1784167200,
+        "dayLevel": 1245
+      },
+      {
+        "enable": 1,
+        "preDay": 1784167200,
+        "chapter": 45,
+        "openDay": 1784772000,
+        "dayLevel": 1260
+      }
+    ]
+  },
+  "fileReplace": {
+    "md5": "d431a934ea387f358b77154dc5d469ae",
+    "config": [
+      {
+        "id": 191,
+        "file": "ItemModelConfig",
+        "sTime": 1782957600,
+        "suffix": "_new"
+      }
+    ]
+  },
+  "frame": {
+    "md5": "a67d42b17043bc244f73d8557a871b0a",
+    "config": [
+      {
+        "id": 1,
+        "eTime": 4892580000,
+        "sTime": 1774836000,
+        "weight": 200,
+        "player_ability": 1
+      },
+      {
+        "id": 2,
+        "eTime": 4892580000,
+        "sTime": 1774836000,
+        "weight": 200,
+        "player_ability": 2
+      },
+      {
+        "id": 3,
+        "eTime": 4892580000,
+        "sTime": 1774836000,
+        "weight": 200,
+        "player_ability": 3
+      },
+      {
+        "id": 4,
+        "eTime": 4892580000,
+        "sTime": 1779760800,
+        "weight": 300,
+        "frame_id": "frame_1",
+        "player_ability": 1
+      },
+      {
+        "id": 5,
+        "eTime": 4892580000,
+        "sTime": 1780020000,
+        "weight": 150,
+        "frame_id": "frame_1",
+        "player_ability": 2
+      },
+      {
+        "id": 6,
+        "eTime": 4892580000,
+        "sTime": 1780279200,
+        "weight": 20,
+        "frame_id": "frame_1",
+        "player_ability": 3
+      }
+    ]
+  },
+  "general_conf": {
+    "md5": "28228441a796b49f8e6d7f5d2954b05f",
+    "config": [
+      {
+        "id": 1,
+        "confType": "balance_gold",
+        "param_int": 1
+      },
+      {
+        "id": 3,
+        "confType": "hint_inner_dish",
+        "param_int": 1
+      },
+      {
+        "id": 4,
+        "confType": "level_trans_day",
+        "param_int": 1
+      },
+      {
+        "id": 5,
+        "confType": "social_bind",
+        "param_int": 1
+      },
+      {
+        "id": 6,
+        "confType": "skipprop_not_enough",
+        "param_int": 1
+      },
+      {
+        "id": 7,
+        "confType": "ChangeInventory",
+        "param_int": 1
+      },
+      {
+        "id": 8,
+        "confType": "ingredient_recipe_hint",
+        "param_int": 1
+      },
+      {
+        "id": 10,
+        "confType": "cache",
+        "param_int": 1
+      },
+      {
+        "id": 11,
+        "confType": "new_order_reward_anim",
+        "param_int": 1
+      },
+      {
+        "id": 12,
+        "confType": "new_order_reward_anim_skip",
+        "param_int": 1
+      },
+      {
+        "id": 13,
+        "confType": "equipment_recipe_hint",
+        "param_int": 1
+      },
+      {
+        "id": 14,
+        "confType": "item_auto_recycle",
+        "param_int_array": [
+          3,
+          10
+        ]
+      },
+      {
+        "id": 15,
+        "confType": "order_seq_energy_diff",
+        "param_int": 1
+      },
+      {
+        "id": 16,
+        "confType": "board_cook_bubble",
+        "param_int": 1
+      },
+      {
+        "id": 17,
+        "confType": "item_delete_corn_husk",
+        "param_int": 1
+      },
+      {
+        "id": 18,
+        "confType": "order_new_tag",
+        "param_int": 1
+      },
+      {
+        "id": 21,
+        "sTime": 1750644000,
+        "confType": "doubleEnergy_trigger_bonus",
+        "param_int_array": [
+          10,
+          15,
+          20,
+          15,
+          40,
+          20,
+          80,
+          25,
+          160,
+          30
+        ]
+      },
+      {
+        "id": 22,
+        "confType": "facebook",
+        "param_int": 1
+      },
+      {
+        "id": 24,
+        "confType": "newOrderInfoShow",
+        "param_int": 1
+      },
+      {
+        "id": 25,
+        "confType": "newDayRewardShow",
+        "param_int": 0
+      },
+      {
+        "id": 26,
+        "confType": "cd_countdown_time",
+        "param_int": 1
+      },
+      {
+        "id": 27,
+        "confType": "silent_login",
+        "param_int": 1
+      },
+      {
+        "id": 29,
+        "confType": "newItemInfoShow",
+        "param_int": 1
+      },
+      {
+        "id": 30,
+        "confType": "animation_play",
+        "param_int": 1
+      },
+      {
+        "id": 33,
+        "confType": "newOrderInfoSkip",
+        "param_int": 1
+      },
+      {
+        "id": 34,
+        "confType": "ingredient_recipe_hint_suggest",
+        "param_int": 1
+      },
+      {
+        "id": 35,
+        "confType": "data_balance",
+        "param_int": 1
+      },
+      {
+        "id": 38,
+        "sTime": 1763949600,
+        "confType": "smartItemBox",
+        "param_int": 1
+      },
+      {
+        "id": 39,
+        "confType": "ui_board_cache",
+        "param_int": 1
+      },
+      {
+        "id": 41,
+        "sTime": 1765159200,
+        "confType": "show_badge",
+        "param_int": 1
+      },
+      {
+        "id": 44,
+        "confType": "main_ui_avatar",
+        "param_int": 1
+      },
+      {
+        "id": 48,
+        "confType": "equipment_finish_replacement",
+        "param_int": 1
+      },
+      {
+        "id": 50,
+        "confType": "shop_ingredients_showgreen",
+        "param_int": 1
+      },
+      {
+        "id": 51,
+        "eLv": 9,
+        "confType": "dragitem_cook_tip",
+        "param_int": 1
+      },
+      {
+        "id": 52,
+        "confType": "itemInfoNumHint",
+        "param_int": 1
+      },
+      {
+        "id": 53,
+        "confType": "wrongequip_ingredients_showgreen",
+        "param_int": 1
+      },
+      {
+        "id": 54,
+        "confType": "green_ingredients_autoselect",
+        "param_int": 1
+      },
+      {
+        "id": 55,
+        "confType": "item_transform_effect",
+        "param_int": 1
+      },
+      {
+        "id": 58,
+        "confType": "bookByRoom",
+        "param_int": 1
+      }
+    ]
+  },
+  "notify": {
+    "md5": "47c1751e7551193850791d81b02617b6",
+    "config": [
+      {
+        "id": 1,
+        "scene": [
+          "EnergyRefill",
+          "ComeBack_24",
+          "ComeBack_48",
+          "ItemCooldown"
+        ],
+        "maxNum": 2,
+        "interval": 86400,
+        "pushtimetype": 0
+      }
+    ]
+  },
+  "reward_replace": {
+    "md5": "772925f154252f712a7581fc3ba7c160",
+    "config": [
+      {
+        "is_open": 1,
+        "replace": [
+          {
+            "Amount": 10,
+            "Currency": "skipprop"
+          }
+        ],
+        "rewards": [
+          {
+            "Amount": 1,
+            "Currency": "pack_1_1"
+          }
+        ]
+      },
+      {
+        "is_open": 1,
+        "replace": [
+          {
+            "Amount": 20,
+            "Currency": "skipprop"
+          }
+        ],
+        "rewards": [
+          {
+            "Amount": 1,
+            "Currency": "pack_1_2"
+          }
+        ]
+      },
+      {
+        "is_open": 1,
+        "replace": [
+          {
+            "Amount": 1,
+            "Currency": "rarebox1_1"
+          }
+        ],
+        "rewards": [
+          {
+            "Amount": 1,
+            "Currency": "pack_1_3"
+          }
+        ]
+      },
+      {
+        "is_open": 1,
+        "replace": [
+          {
+            "Amount": 1,
+            "Currency": "commonbox1_1"
+          }
+        ],
+        "rewards": [
+          {
+            "Amount": 1,
+            "Currency": "pack_1_4"
+          }
+        ]
+      },
+      {
+        "is_open": 1,
+        "replace": [
+          {
+            "Amount": 1,
+            "Currency": "commonbox2_1"
+          }
+        ],
+        "rewards": [
+          {
+            "Amount": 1,
+            "Currency": "pack_1_5"
+          }
+        ]
+      },
+      {
+        "is_open": 1,
+        "replace": [
+          {
+            "Amount": 1,
+            "Currency": "commonbox1_1"
+          }
+        ],
+        "rewards": [
+          {
+            "Amount": 1,
+            "Currency": "npack_1_3"
+          }
+        ]
+      },
+      {
+        "is_open": 1,
+        "replace": [
+          {
+            "Amount": 1,
+            "Currency": "commonbox2_1"
+          }
+        ],
+        "rewards": [
+          {
+            "Amount": 1,
+            "Currency": "npack_1_4"
+          }
+        ]
+      },
+      {
+        "is_open": 1,
+        "replace": [
+          {
+            "Amount": 1,
+            "Currency": "rarebox3_1"
+          }
+        ],
+        "rewards": [
+          {
+            "Amount": 1,
+            "Currency": "npack_1_5"
+          }
+        ]
+      },
+      {
+        "is_open": 1,
+        "replace": [
+          {
+            "Amount": 1,
+            "Currency": "commonbox2_1"
+          }
+        ],
+        "rewards": [
+          {
+            "Amount": 1,
+            "Currency": "gpack_1_4"
+          }
+        ]
+      },
+      {
+        "is_open": 1,
+        "replace": [
+          {
+            "Amount": 1,
+            "Currency": "rarebox3_1"
+          }
+        ],
+        "rewards": [
+          {
+            "Amount": 1,
+            "Currency": "gpack_1_5"
+          }
+        ]
+      },
+      {
+        "is_open": 1,
+        "replace": [
+          {
+            "Amount": 1,
+            "Currency": "rarebox1_1"
+          }
+        ],
+        "rewards": [
+          {
+            "Amount": 1,
+            "Currency": "lmpack_1_3"
+          }
+        ]
+      },
+      {
+        "is_open": 1,
+        "replace": [
+          {
+            "Amount": 1,
+            "Currency": "commonbox1_1"
+          }
+        ],
+        "rewards": [
+          {
+            "Amount": 1,
+            "Currency": "lmpack_1_4"
+          }
+        ]
+      },
+      {
+        "is_open": 1,
+        "replace": [
+          {
+            "Amount": 1,
+            "Currency": "rarebox2_1"
+          }
+        ],
+        "rewards": [
+          {
+            "Amount": 1,
+            "Currency": "lmpack_1_5"
+          }
+        ]
+      }
+    ]
+  }
+}

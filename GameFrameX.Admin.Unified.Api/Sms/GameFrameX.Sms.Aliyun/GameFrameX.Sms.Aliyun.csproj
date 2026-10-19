@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <IsPackable>false</IsPackable>
+        <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="AlibabaCloud.SDK.Dysmsapi20170525" Version="4.4.0"/>
+        <PackageReference Include="GameFrameX.Foundation.Json" Version="$(FoundationVersion)"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\GameFrameX.Sms.Abstract\GameFrameX.Sms.Abstract.csproj"/>
+    </ItemGroup>
+
+</Project>

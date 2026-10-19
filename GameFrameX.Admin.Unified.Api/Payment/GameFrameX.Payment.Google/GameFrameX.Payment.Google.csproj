@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+
+    <ItemGroup>
+        <PackageReference Include="GameFrameX.Foundation.Logger" Version="$(FoundationVersion)"/>
+        <PackageReference Include="Google.Apis.AndroidPublisher.v3" Version="1.75.0.4193"/>
+        <PackageReference Include="Mapster" Version="10.0.10"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\GameFrameX.Payment.Abstract\GameFrameX.Payment.Abstract.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Folder Include="Option\"/>
+    </ItemGroup>
+
+</Project>

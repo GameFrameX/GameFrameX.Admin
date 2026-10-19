@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+
+    <ItemGroup>
+        <ProjectReference Include="..\GameFrameX.Email.Abstract\GameFrameX.Email.Abstract.csproj"/>
+    </ItemGroup>
+
+</Project>

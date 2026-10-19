@@ -1,0 +1,49 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <SatelliteResourceLanguages>zh-Hans</SatelliteResourceLanguages>
+        <PublishReadyToRunComposite>true</PublishReadyToRunComposite>
+        <GenerateDocumentationFile>True</GenerateDocumentationFile>
+        <UserSecretsId>ad9369d1-f29b-4f8f-a7df-8b4d7aa0726b</UserSecretsId>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <RootNamespace>GameFrameX.Web.Api</RootNamespace>
+        <AssemblyName>GameFrameX.Web.Api</AssemblyName>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Remove="GameFrameX.Web.Api.xml"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Remove="logs\**"/>
+        <Compile Remove="publish\**"/>
+        <Content Remove="logs\**"/>
+        <Content Remove="publish\**"/>
+        <EmbeddedResource Remove="logs\**"/>
+        <EmbeddedResource Remove="publish\**"/>
+        <None Remove="logs\**"/>
+        <None Remove="publish\**"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Update="wwwroot\Avatar\**" CopyToPublishDirectory="Never"/>
+        <Content Update="wwwroot\logs\**" CopyToPublishDirectory="Never"/>
+        <Content Update="wwwroot\upload\**" CopyToPublishDirectory="Never"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="GameFrameX.Foundation.Options" Version="$(FoundationVersion)"/>
+        <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="10.2.3"/>
+        <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.2.3"/>
+        <PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.9"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="GameFrameX.Core.Tests"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\GameFrameX.Application\GameFrameX.Application.csproj"/>
+    </ItemGroup>
+
+</Project>

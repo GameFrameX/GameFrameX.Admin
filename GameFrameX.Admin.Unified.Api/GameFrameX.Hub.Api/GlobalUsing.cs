@@ -1,0 +1,14 @@
+﻿global using GameFrameX.Foundation.Http.Normalization;
+global using GameFrameX.Hub.Api.Dto;
+global using GameFrameX.Core.Extension;
+global using Mapster;
+global using Microsoft.AspNetCore.Mvc;
+global using GameFrameX.Entity.Tenant.Game.Release;
+global using GameFrameX.Entity;
+global using GameFrameX.Core.Enum;
+global using GameFrameX.Core.SqlSugar;
+global using GameFrameX.Foundation.Http.Extension;
+global using GameFrameX.Foundation.Hash;
+global using GameFrameX.Foundation.Json;
+global using GameFrameX.Foundation.Logger;
+global using GameFrameX.Foundation.Utility;

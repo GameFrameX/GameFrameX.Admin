@@ -1,0 +1,6 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <ItemGroup>
+        <PackageReference Include="Aliyun.OSS.SDK.NetCore" Version="2.14.1"/>
+        <ProjectReference Include="..\GameFrameX.ObjectStorage.Abstract\GameFrameX.ObjectStorage.Abstract.csproj"/>
+    </ItemGroup>
+</Project>

@@ -1,0 +1,51 @@
+<Solution>
+    <Project Path="GameFrameX.Entity\GameFrameX.Entity.csproj"/>
+    <Project Path="GameFrameX.Core.Extension\GameFrameX.Core.Extension.csproj"/>
+    <Project Path="GameFrameX.Core.BaseInputOutput\GameFrameX.Core.BaseInputOutput.csproj"/>
+    <Project Path="GameFrameX.Core.SqlSugar\GameFrameX.Core.SqlSugar.csproj"/>
+    <Project Path="GameFrameX.Core\GameFrameX.Core.csproj"/>
+    <Project Path="GameFrameX.Core.Tests/GameFrameX.Core.Tests.csproj"/>
+    <Project Path="GameFrameX.Core.Utility\GameFrameX.Core.Utility.csproj"/>
+    <Project Path="GameFrameX.Application\GameFrameX.Application.csproj"/>
+    <Project Path="GameFrameX.Application.Game\GameFrameX.Application.Game.csproj"/>
+    <Project Path="GameFrameX.Application.System\GameFrameX.Application.System.csproj"/>
+    <Project Path="GameFrameX.Web.Api\GameFrameX.Web.Api.csproj"/>
+    <Project Path="GameFrameX.Client.Api\GameFrameX.Client.Api.csproj"/>
+    <Project Path="GameFrameX.Hub.Api\GameFrameX.Hub.Api.csproj"/>
+    <Folder Name="/ObjectStorage/">
+        <Project Path="ObjectStorage\GameFrameX.ObjectStorage.Local\GameFrameX.ObjectStorage.Local.csproj"/>
+        <Project Path="ObjectStorage\GameFrameX.ObjectStorage.Abstract\GameFrameX.ObjectStorage.Abstract.csproj"/>
+        <Project Path="ObjectStorage\GameFrameX.ObjectStorage.AliyunOss\GameFrameX.ObjectStorage.AliyunOss.csproj"/>
+        <Project Path="ObjectStorage\GameFrameX.ObjectStorage.QiniuKodo\GameFrameX.ObjectStorage.QiniuKodo.csproj"/>
+        <Project Path="ObjectStorage\GameFrameX.ObjectStorage.TencentCos\GameFrameX.ObjectStorage.TencentCos.csproj"/>
+    </Folder>
+    <Folder Name="/Payment/">
+        <Project Path="Payment\GameFrameX.Payment.Abstract\GameFrameX.Payment.Abstract.csproj"/>
+        <Project Path="Payment\GameFrameX.Payment.Google\GameFrameX.Payment.Google.csproj"/>
+        <Project Path="Payment\GameFrameX.Payment.Apple\GameFrameX.Payment.Apple.csproj"/>
+        <Project Path="Payment\GameFrameX.Payment.Apple.AppStoreServer\GameFrameX.Payment.Apple.AppStoreServer.csproj"/>
+        <Project Path="Payment\GameFrameX.Payment.Xsolla\GameFrameX.Payment.Xsolla.csproj"/>
+        <Project Path="Payment\GameFrameX.Payment.AliPay\GameFrameX.Payment.AliPay.csproj"/>
+        <Project Path="Payment\GameFrameX.Payment.Wechat\GameFrameX.Payment.Wechat.csproj"/>
+    </Folder>
+    <Folder Name="/Advertisement/">
+        <Project Path="Advertisement\GameFrameX.Advertisement.Abstract\GameFrameX.Advertisement.Abstract.csproj"/>
+        <Project Path="Advertisement\GameFrameX.Advertisement.AdMob\GameFrameX.Advertisement.AdMob.csproj"/>
+        <Project Path="Advertisement\GameFrameX.Advertisement.TopOn\GameFrameX.Advertisement.TopOn.csproj"/>
+        <Project Path="Advertisement\GameFrameX.Advertisement.UnityAds\GameFrameX.Advertisement.UnityAds.csproj"/>
+        <Project Path="Advertisement\GameFrameX.Advertisement.Pangle\GameFrameX.Advertisement.Pangle.csproj"/>
+    </Folder>
+    <Folder Name="/Email/">
+        <Project Path="Email\GameFrameX.Email.Abstract\GameFrameX.Email.Abstract.csproj"/>
+        <Project Path="Email\GameFrameX.Email.TencentSes\GameFrameX.Email.TencentSes.csproj"/>
+        <Project Path="Email\GameFrameX.Email.Smtp\GameFrameX.Email.Smtp.csproj"/>
+    </Folder>
+    <Folder Name="/Sms/">
+        <Project Path="Sms\GameFrameX.Sms.Abstract\GameFrameX.Sms.Abstract.csproj"/>
+        <Project Path="Sms\GameFrameX.Sms.Aliyun\GameFrameX.Sms.Aliyun.csproj"/>
+    </Folder>
+    <Folder Name="/Wechat/">
+        <Project Path="Wechat\GameFrameX.Wechat.Abstract\GameFrameX.Wechat.Abstract.csproj"/>
+        <Project Path="Wechat\GameFrameX.Wechat.Open\GameFrameX.Wechat.Open.csproj"/>
+    </Folder>
+</Solution>

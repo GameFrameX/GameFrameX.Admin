@@ -1,0 +1,22 @@
+# EditorConfig — 治理 target-typed new（隐式对象创建）
+# 参考: https://learn.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/ide0090
+root = true
+
+[*.cs]
+# 治理策略：软约束（无法在编译期硬性禁止，详见下方说明）
+#
+# 技术边界（重要）：
+#   Roslyn 内置的 IDE0090 是「单向」的——它只在 new T() 存在时「建议简化为 new()」，
+#   没有任何内置规则反向报错「new() 应展开为 new T()」。
+#   .editorconfig 只能调整已有规则的严重级，无法创造新规则；
+#   dotnet format 对 IDE0090 也是简化方向，不能反向展开。
+#   因此纯 .editorconfig 只能做到「停止诱导」，无法在 build 时强制报错。
+#   若未来需要编译期硬约束，唯一方案是自建 Roslyn 分析器。
+
+# 1) 关闭 IDE0090 的「可简化 new 表达式」提示。
+#    设置后 IDE 不再把 new GameUserPasswordService() 标记为可简化，
+#    dotnet format 也不会自动把它改写为 new()。
+dotnet_diagnostic.IDE0090.severity = none
+
+# 2) 显式声明风格：类型可推断处不偏好隐式对象创建。
+csharp_style_implicit_object_creation_when_type_is_apparent = false:none

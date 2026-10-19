@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.Abstractions" Version="10.0.9"/>
+        <PackageReference Include="SqlSugarCore" Version="$(SqlSugarCoreVersion)"/>
+        <PackageReference Include="GameFrameX.Foundation.Options" Version="$(FoundationVersion)"/>
+        <PackageReference Include="GameFrameX.Foundation.Utility" Version="$(FoundationVersion)"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\GameFrameX.Entity\GameFrameX.Entity.csproj"/>
+    </ItemGroup>
+
+</Project>

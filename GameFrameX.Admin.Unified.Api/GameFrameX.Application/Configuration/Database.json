@@ -1,0 +1,24 @@
+{
+  // 数据库连接默认配置（三 host 共享的单一默认源；默认租户库不在此配置，由启动期自动推导，见第 3 条）
+  // 1. 默认 SQLite 仅限本地开发/调试（零外部依赖，开箱即用）；生产【严禁】SQLite，请用 PostgreSQL。
+  //    SQLite 路径相对进程工作目录解析——请在仓库根执行 dotnet run，三个 host 共享 ./db/ 下的同一库文件（WAL 由启动初始化以 PRAGMA 开启）。
+  // 2. 切换数据库 / 环境覆盖：成对设置环境变量 GFX_MAIN_DB_TYPE + GFX_MAIN_DB_CONNECTION_STRING（docker-compose 即此用法）；
+  //    DbType 全部取值与各库连接串写法见同目录 Database-ConnectionStrings.md（摘自 SqlSugar 官方文档 donet5.com「数据库特色」）。
+  // 3. 默认租户库由启动期从主库连接串自动推导（仅替换库名，Host/账号继承主库）：支持 PostgreSQL / Sqlite / MySQL（建库强制 utf8mb4）；
+  //    其他 DbType 需在 ConnectionConfigs 显式加 ConfigId=1300000000001 项，或成对设置 GFX_DEFAULT_TENANT_DB_TYPE / GFX_DEFAULT_TENANT_DB_CONNECTION_STRING。
+  // 4. 初始化开关默认值在代码中（C278）：建库/建表/种子初始化默认全开（仅 EnableIncreSeed 默认 false），无需在本文件配置；
+  //    如需关闭某开关，在对应连接项显式加回 Settings 节点覆盖。
+  "DbConnection": {
+    "EnableConsoleSql": false,
+    // 启用控制台打印SQL
+    "ConnectionConfigs": [
+      {
+        "ConfigId": "main",
+        // 平台主库标识-禁止修改
+        "DbType": "Sqlite",
+        "ConnectionString": "DataSource=./db/GameFrameX.Admin.db;"
+        // 库连接字符串；初始化/种子开关默认值在代码中（见文件头第 4 条），无需配置 Settings 节点
+      }
+    ]
+  }
+}

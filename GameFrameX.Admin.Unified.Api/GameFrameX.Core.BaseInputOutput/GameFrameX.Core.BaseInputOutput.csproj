@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup/>
+    <ItemGroup>
+        <ProjectReference Include="..\GameFrameX.Entity\GameFrameX.Entity.csproj"/>
+    </ItemGroup>
+
+</Project>

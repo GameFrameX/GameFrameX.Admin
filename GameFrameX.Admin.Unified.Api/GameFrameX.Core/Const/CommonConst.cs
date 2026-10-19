@@ -1,0 +1,74 @@
+﻿using GameFrameX.Foundation.Orm.Attribute;
+using GameFrameX.Core.Const.MenuSeed;
+
+namespace GameFrameX.Core.Const;
+
+/// <summary>
+/// 通用常量
+/// </summary>
+[Const("平台配置")]
+public sealed class CommonConst
+{
+    /// <summary>
+    /// 演示环境开关
+    /// </summary>
+    public const string SysDemoEnv = "sys_demo";
+
+    /// <summary>
+    /// 默认密码
+    /// </summary>
+    public const string SysPassword = "sys_password";
+
+    /// <summary>
+    /// 登录二次验证
+    /// </summary>
+    public const string SysSecondVer = "sys_second_ver";
+
+    /// <summary>
+    /// 开启图形验证码
+    /// </summary>
+    public const string SysCaptcha = "sys_captcha";
+
+    /// <summary>
+    /// 开启水印
+    /// </summary>
+    public const string SysWatermark = "sys_watermark";
+
+    /// <summary>
+    /// 开启操作日志
+    /// </summary>
+    public const string SysOpLog = "sys_oplog";
+
+    /// <summary>
+    /// Token过期时间
+    /// </summary>
+    public const string SysTokenExpire = "sys_token_expire";
+
+    /// <summary>
+    /// RefreshToken过期时间
+    /// </summary>
+    public const string SysRefreshTokenExpire = "sys_refresh_token_expire";
+
+    /// <summary>
+    /// 单用户登录
+    /// </summary>
+    public const string SysSingleLogin = "sys_single_login";
+
+    /// <summary>
+    /// 开启邮箱自助注册
+    /// </summary>
+    public const string SysEmailRegister = "sys_email_register";
+
+    /// <summary>
+    /// 系统管理员角色编码
+    /// </summary>
+    public const string SysAdminRole = "sys_admin";
+
+    /// <summary>
+    /// 仅超级管理员可见的菜单根节点
+    /// </summary>
+    public static IReadOnlyList<long> SuperAdminOnlyMenuRootIds
+    {
+        get { return MenuSeedCatalog.SuperAdminOnlyRootMenuIds; }
+    }
+}

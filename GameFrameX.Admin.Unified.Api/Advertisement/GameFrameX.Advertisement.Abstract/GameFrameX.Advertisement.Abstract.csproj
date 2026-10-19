@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+
+    <ItemGroup>
+        <PackageReference Include="GameFrameX.Foundation.Json" Version="$(FoundationVersion)"/>
+        <PackageReference Include="GameFrameX.Foundation.Logger" Version="$(FoundationVersion)"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\GameFrameX.Core\GameFrameX.Core.csproj"/>
+    </ItemGroup>
+
+</Project>

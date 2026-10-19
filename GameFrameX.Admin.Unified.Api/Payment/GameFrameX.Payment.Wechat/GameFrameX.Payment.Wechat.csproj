@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <ItemGroup>
+        <PackageReference Include="GameFrameX.Foundation.Logger" Version="$(FoundationVersion)"/>
+        <PackageReference Include="SKIT.FlurlHttpClient.Wechat.TenpayV3" Version="3.16.0"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\GameFrameX.Payment.Abstract\GameFrameX.Payment.Abstract.csproj"/>
+    </ItemGroup>
+
+</Project>

@@ -1,0 +1,85 @@
+# See https://docs.docker.com/engine/reference/builder/
+
+# Build stage（自动适配构建机架构；如需交叉构建：docker build --platform linux/amd64）
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+ARG TARGETARCH
+WORKDIR /src
+
+# Copy global build props and project files for restore
+COPY ["Directory.Build.props", "."]
+COPY ["GameFrameX.Web.Api/GameFrameX.Web.Api.csproj", "GameFrameX.Web.Api/"]
+COPY ["GameFrameX.Application/GameFrameX.Application.csproj", "GameFrameX.Application/"]
+COPY ["GameFrameX.Application.System/GameFrameX.Application.System.csproj", "GameFrameX.Application.System/"]
+COPY ["GameFrameX.Application.Game/GameFrameX.Application.Game.csproj", "GameFrameX.Application.Game/"]
+COPY ["GameFrameX.Core/GameFrameX.Core.csproj", "GameFrameX.Core/"]
+COPY ["GameFrameX.Core.Extension/GameFrameX.Core.Extension.csproj", "GameFrameX.Core.Extension/"]
+COPY ["GameFrameX.Core.Utility/GameFrameX.Core.Utility.csproj", "GameFrameX.Core.Utility/"]
+COPY ["GameFrameX.Core.BaseInputOutput/GameFrameX.Core.BaseInputOutput.csproj", "GameFrameX.Core.BaseInputOutput/"]
+COPY ["GameFrameX.Core.SqlSugar/GameFrameX.Core.SqlSugar.csproj", "GameFrameX.Core.SqlSugar/"]
+COPY ["GameFrameX.Entity/GameFrameX.Entity.csproj", "GameFrameX.Entity/"]
+
+COPY ["Advertisement/GameFrameX.Advertisement.Abstract/GameFrameX.Advertisement.Abstract.csproj", "Advertisement/GameFrameX.Advertisement.Abstract/"]
+COPY ["Advertisement/GameFrameX.Advertisement.AdMob/GameFrameX.Advertisement.AdMob.csproj", "Advertisement/GameFrameX.Advertisement.AdMob/"]
+COPY ["Advertisement/GameFrameX.Advertisement.Pangle/GameFrameX.Advertisement.Pangle.csproj", "Advertisement/GameFrameX.Advertisement.Pangle/"]
+COPY ["Advertisement/GameFrameX.Advertisement.TopOn/GameFrameX.Advertisement.TopOn.csproj", "Advertisement/GameFrameX.Advertisement.TopOn/"]
+COPY ["Advertisement/GameFrameX.Advertisement.UnityAds/GameFrameX.Advertisement.UnityAds.csproj", "Advertisement/GameFrameX.Advertisement.UnityAds/"]
+COPY ["Email/GameFrameX.Email.Abstract/GameFrameX.Email.Abstract.csproj", "Email/GameFrameX.Email.Abstract/"]
+COPY ["Email/GameFrameX.Email.TencentSes/GameFrameX.Email.TencentSes.csproj", "Email/GameFrameX.Email.TencentSes/"]
+COPY ["Email/GameFrameX.Email.Smtp/GameFrameX.Email.Smtp.csproj", "Email/GameFrameX.Email.Smtp/"]
+
+COPY ["ObjectStorage/GameFrameX.ObjectStorage.Abstract/GameFrameX.ObjectStorage.Abstract.csproj", "ObjectStorage/GameFrameX.ObjectStorage.Abstract/"]
+COPY ["ObjectStorage/GameFrameX.ObjectStorage.AliyunOss/GameFrameX.ObjectStorage.AliyunOss.csproj", "ObjectStorage/GameFrameX.ObjectStorage.AliyunOss/"]
+COPY ["ObjectStorage/GameFrameX.ObjectStorage.Local/GameFrameX.ObjectStorage.Local.csproj", "ObjectStorage/GameFrameX.ObjectStorage.Local/"]
+COPY ["ObjectStorage/GameFrameX.ObjectStorage.QiniuKodo/GameFrameX.ObjectStorage.QiniuKodo.csproj", "ObjectStorage/GameFrameX.ObjectStorage.QiniuKodo/"]
+COPY ["ObjectStorage/GameFrameX.ObjectStorage.TencentCos/GameFrameX.ObjectStorage.TencentCos.csproj", "ObjectStorage/GameFrameX.ObjectStorage.TencentCos/"]
+
+COPY ["Payment/GameFrameX.Payment.Abstract/GameFrameX.Payment.Abstract.csproj", "Payment/GameFrameX.Payment.Abstract/"]
+COPY ["Payment/GameFrameX.Payment.AliPay/GameFrameX.Payment.AliPay.csproj", "Payment/GameFrameX.Payment.AliPay/"]
+COPY ["Payment/GameFrameX.Payment.Apple/GameFrameX.Payment.Apple.csproj", "Payment/GameFrameX.Payment.Apple/"]
+COPY ["Payment/GameFrameX.Payment.Apple.AppStoreServer/GameFrameX.Payment.Apple.AppStoreServer.csproj", "Payment/GameFrameX.Payment.Apple.AppStoreServer/"]
+COPY ["Payment/GameFrameX.Payment.Google/GameFrameX.Payment.Google.csproj", "Payment/GameFrameX.Payment.Google/"]
+COPY ["Payment/GameFrameX.Payment.Xsolla/GameFrameX.Payment.Xsolla.csproj", "Payment/GameFrameX.Payment.Xsolla/"]
+COPY ["Payment/GameFrameX.Payment.Wechat/GameFrameX.Payment.Wechat.csproj", "Payment/GameFrameX.Payment.Wechat/"]
+
+COPY ["Sms/GameFrameX.Sms.Abstract/GameFrameX.Sms.Abstract.csproj", "Sms/GameFrameX.Sms.Abstract/"]
+COPY ["Sms/GameFrameX.Sms.Aliyun/GameFrameX.Sms.Aliyun.csproj", "Sms/GameFrameX.Sms.Aliyun/"]
+COPY ["Wechat/GameFrameX.Wechat.Abstract/GameFrameX.Wechat.Abstract.csproj", "Wechat/GameFrameX.Wechat.Abstract/"]
+COPY ["Wechat/GameFrameX.Wechat.Open/GameFrameX.Wechat.Open.csproj", "Wechat/GameFrameX.Wechat.Open/"]
+
+# Restore dependencies
+RUN dotnet restore "GameFrameX.Web.Api/GameFrameX.Web.Api.csproj"
+
+# Copy source code
+COPY . .
+
+# Build and publish
+WORKDIR "/src/GameFrameX.Web.Api"
+RUN case "$TARGETARCH" in arm64) RID=linux-arm64 ;; *) RID=linux-x64 ;; esac && \
+    dotnet publish "GameFrameX.Web.Api.csproj" -c Release -r ${RID} --self-contained false -o /app/publish /p:UseAppHost=false
+
+# Runtime stage
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
+WORKDIR /app
+
+# Set timezone
+ENV TZ=Asia/Shanghai
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+# Copy published application
+COPY --from=build /app/publish .
+
+# Create necessary directories and set ownership for non-root user
+RUN mkdir -p /app/wwwroot/Avatar /app/wwwroot/logs /app/wwwroot/upload /app/wwwroot/Upload /app/data/logs && \
+    chown -R $APP_UID:$APP_UID /app/data /app/wwwroot
+
+# Expose port
+EXPOSE 20802
+
+# Set environment variables
+ENV ASPNETCORE_URLS=http://+:20802
+ENV ASPNETCORE_ENVIRONMENT=Production
+
+# Switch to non-root user (built-in in .NET 10 aspnet image)
+USER $APP_UID
+
+ENTRYPOINT ["dotnet", "GameFrameX.Web.Api.dll"]

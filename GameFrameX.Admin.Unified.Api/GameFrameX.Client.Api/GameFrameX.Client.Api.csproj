@@ -1,0 +1,43 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <AssemblyName>GameFrameX.Client.Api</AssemblyName>
+        <RootNamespace>GameFrameX.Client.Api</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\GameFrameX.Application.Game\GameFrameX.Application.Game.csproj"/>
+        <ProjectReference Include="..\GameFrameX.Core.Extension\GameFrameX.Core.Extension.csproj"/>
+        <ProjectReference Include="..\GameFrameX.Core.SqlSugar\GameFrameX.Core.SqlSugar.csproj"/>
+        <ProjectReference Include="..\Email\GameFrameX.Email.Abstract\GameFrameX.Email.Abstract.csproj"/>
+        <ProjectReference Include="..\Email\GameFrameX.Email.TencentSes\GameFrameX.Email.TencentSes.csproj"/>
+        <ProjectReference Include="..\Email\GameFrameX.Email.Smtp\GameFrameX.Email.Smtp.csproj"/>
+        <ProjectReference Include="..\Payment\GameFrameX.Payment.AliPay\GameFrameX.Payment.AliPay.csproj"/>
+        <ProjectReference Include="..\Payment\GameFrameX.Payment.Apple.AppStoreServer\GameFrameX.Payment.Apple.AppStoreServer.csproj"/>
+        <ProjectReference Include="..\Payment\GameFrameX.Payment.Apple\GameFrameX.Payment.Apple.csproj"/>
+        <ProjectReference Include="..\Payment\GameFrameX.Payment.Google\GameFrameX.Payment.Google.csproj"/>
+        <ProjectReference Include="..\Payment\GameFrameX.Payment.Wechat\GameFrameX.Payment.Wechat.csproj"/>
+        <ProjectReference Include="..\Payment\GameFrameX.Payment.Xsolla\GameFrameX.Payment.Xsolla.csproj"/>
+        <ProjectReference Include="..\Advertisement\GameFrameX.Advertisement.AdMob\GameFrameX.Advertisement.AdMob.csproj"/>
+        <ProjectReference Include="..\Advertisement\GameFrameX.Advertisement.Pangle\GameFrameX.Advertisement.Pangle.csproj"/>
+        <ProjectReference Include="..\Advertisement\GameFrameX.Advertisement.TopOn\GameFrameX.Advertisement.TopOn.csproj"/>
+        <ProjectReference Include="..\Advertisement\GameFrameX.Advertisement.UnityAds\GameFrameX.Advertisement.UnityAds.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="GameFrameX.Foundation.Options" Version="$(FoundationVersion)"/>
+        <PackageReference Include="GameFrameX.Foundation.Idempotency" Version="$(FoundationVersion)"/>
+        <PackageReference Include="IP2Location.IPGeolocation" Version="9.1.1"/>
+        <PackageReference Include="Sentry.AspNetCore" Version="6.6.0"/>
+        <PackageReference Include="sqlite-net-pcl" Version="1.9.172"/>
+        <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="10.2.3"/>
+        <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.2.3"/>
+    </ItemGroup>
+
+    <!-- C279：共享 Database.json 默认连接配置（文件链接复制进输出目录，无 ProjectReference，不破坏「业务层不引用 host」分层） -->
+    <ItemGroup>
+        <None Include="..\GameFrameX.Application\Configuration\Database.json" Link="Configuration\Database.json" CopyToOutputDirectory="PreserveNewest"/>
+    </ItemGroup>
+
+</Project>

@@ -1,0 +1,25 @@
+.idea
+**/bin
+**/obj
+**/logs
+.DS_Store
+*.user
+*.user
+gfx-doc
+gfx-doc/vault
+scripts
+
+# C199: 禁止 Google Cloud 凭证文件入库（凭证仅运行时注入，参见 GooglePlayApiManager）
+GameFrameX.Client.Api/Google/*.json
+
+# C265: 契约测试导出的统一错误码码表（dotnet test 每次刷新，供前端 locale 与 Unity 消费）
+error-codes.json
+
+# 本地零配置 SQLite 数据目录（DataSource=./db/...，仓根执行 dotnet run 时生成）
+# db/* 而非 db/：db/ 会整目录排除导致 !db/tenant-isolation/ 反排除失效（git 不进入被排除目录）
+db/*
+!db/tenant-isolation/
+*.db
+.sonarqube
+postgres-data
+.env

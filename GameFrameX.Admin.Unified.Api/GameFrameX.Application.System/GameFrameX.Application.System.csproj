@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup/>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+        <DocumentationFile>bin\Debug\GameFrameX.Application.System.xml</DocumentationFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\GameFrameX.Core\GameFrameX.Core.csproj"/>
+        <ProjectReference Include="..\Payment\GameFrameX.Payment.Wechat\GameFrameX.Payment.Wechat.csproj"/>
+        <ProjectReference Include="..\Wechat\GameFrameX.Wechat.Abstract\GameFrameX.Wechat.Abstract.csproj"/>
+        <ProjectReference Include="..\Wechat\GameFrameX.Wechat.Open\GameFrameX.Wechat.Open.csproj"/>
+        <ProjectReference Include="..\Email\GameFrameX.Email.Smtp\GameFrameX.Email.Smtp.csproj"/>
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="GameFrameX.Foundation.Http.Normalization" Version="$(FoundationVersion)"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="GameFrameX.Core.Tests"/>
+    </ItemGroup>
+
+</Project>

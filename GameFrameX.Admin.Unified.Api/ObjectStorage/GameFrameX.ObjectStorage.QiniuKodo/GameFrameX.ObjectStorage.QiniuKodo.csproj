@@ -1,0 +1,7 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <ItemGroup>
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.4"/>
+        <PackageReference Include="Qiniu" Version="8.7.0"/>
+        <ProjectReference Include="..\GameFrameX.ObjectStorage.Abstract\GameFrameX.ObjectStorage.Abstract.csproj"/>
+    </ItemGroup>
+</Project>

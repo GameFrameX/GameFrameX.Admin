@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <!-- C205 NRT：ISelectFilter（Foundation，string? Name/Description）与实体 DB NOT NULL 列的非空实现系统性契约不匹配，
+         非空实现符合 DB 语义（实体由 SqlSugar 反射填充），整项目抑制 CS8767 误报（合理抑制）。 -->
+    <PropertyGroup>
+        <NoWarn>$(NoWarn);8767</NoWarn>
+    </PropertyGroup>
+
+
+    <ItemGroup>
+        <PackageReference Include="GameFrameX.Foundation.Orm.Attribute" Version="$(FoundationVersion)"/>
+        <PackageReference Include="GameFrameX.Foundation.Orm.Entity" Version="$(FoundationVersion)"/>
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.9"/>
+        <PackageReference Include="SqlSugarCore" Version="$(SqlSugarCoreVersion)"/>
+    </ItemGroup>
+
+    <ItemGroup>
+    </ItemGroup>
+
+</Project>

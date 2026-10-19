@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Apple.Receipt.Models" Version="2.5.0"/>
+        <PackageReference Include="Apple.Receipt.Parser" Version="2.5.0"/>
+        <PackageReference Include="Apple.Receipt.Verificator" Version="2.5.0"/>
+        <PackageReference Include="GameFrameX.Foundation.Logger" Version="$(FoundationVersion)"/>
+        <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.9"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.9"/>
+        <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.9"/>
+        <PackageReference Include="Microsoft.Extensions.Options" Version="10.0.9"/>
+        <PackageReference Include="Refit" Version="15.0.0"/>
+        <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.19.1"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\GameFrameX.Payment.Abstract\GameFrameX.Payment.Abstract.csproj"/>
+        <!-- C271：Server API v2 主动验证路径（GetTransactionInfo + JWS x5c 验签） -->
+        <ProjectReference Include="..\GameFrameX.Payment.Apple.AppStoreServer\GameFrameX.Payment.Apple.AppStoreServer.csproj"/>
+    </ItemGroup>
+
+</Project>

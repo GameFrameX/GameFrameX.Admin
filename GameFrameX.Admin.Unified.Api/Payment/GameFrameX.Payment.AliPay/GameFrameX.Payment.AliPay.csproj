@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+
+    <ItemGroup>
+        <PackageReference Include="AlipaySDKNet.OpenAPI" Version="3.0.57"/>
+        <PackageReference Include="AlipaySDKNet.Standard" Version="4.9.1234"/>
+        <PackageReference Include="GameFrameX.Foundation.Logger" Version="$(FoundationVersion)"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\GameFrameX.Payment.Abstract\GameFrameX.Payment.Abstract.csproj"/>
+    </ItemGroup>
+
+</Project>

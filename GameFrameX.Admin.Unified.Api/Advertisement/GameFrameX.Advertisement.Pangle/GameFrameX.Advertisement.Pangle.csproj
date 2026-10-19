@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+
+    <ItemGroup>
+        <PackageReference Include="GameFrameX.Foundation.Hash" Version="$(FoundationVersion)"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\GameFrameX.Advertisement.Abstract\GameFrameX.Advertisement.Abstract.csproj"/>
+    </ItemGroup>
+
+</Project>

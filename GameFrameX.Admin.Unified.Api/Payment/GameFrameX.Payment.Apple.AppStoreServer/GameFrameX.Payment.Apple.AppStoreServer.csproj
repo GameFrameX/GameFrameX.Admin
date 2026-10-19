@@ -1,0 +1,9 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+
+    <ItemGroup>
+        <PackageReference Include="GameFrameX.Foundation.Logger" Version="$(FoundationVersion)"/>
+        <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.19.1"/>
+    </ItemGroup>
+
+</Project>

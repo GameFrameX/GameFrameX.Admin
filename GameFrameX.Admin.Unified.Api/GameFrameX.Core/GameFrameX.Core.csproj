@@ -1,0 +1,57 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <DocumentationFile></DocumentationFile>
+        <PreserveCompilationContext>true</PreserveCompilationContext>
+        <GenerateDocumentationFile>True</GenerateDocumentationFile>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Remove="GameFrameX.Core.xml" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <EmbeddedResource Include="SeedData\Client\GameServerConfigs.json" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="AngleSharp" Version="1.5.2" />
+        <PackageReference Include="AspectCore.Extensions.Reflection" Version="2.4.0" />
+        <PackageReference Include="IPTools.China" Version="1.6.0" />
+        <PackageReference Include="Lazy.Captcha.Core" Version="2.2.4" />
+        <PackageReference Include="MiniExcel" Version="1.45.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.0" />
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.6.0" />
+        <PackageReference Include="Elastic.Clients.Elasticsearch" Version="9.4.2" />
+        <PackageReference Include="GameFrameX.Foundation.Encryption" Version="$(FoundationVersion)"/>
+        <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.18.0" />
+        <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.18.0" />
+        <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.18.0" />
+        <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.18.0" />
+        <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.18.0" />
+        <PackageReference Include="SqlSugarCore" Version="$(SqlSugarCoreVersion)" />
+        <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="10.2.3" />
+        <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.2.3" />
+        <PackageReference Include="System.Linq.Dynamic.Core" Version="1.7.2" />
+        <PackageReference Include="UAParser" Version="3.1.47" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\GameFrameX.Core.SqlSugar\GameFrameX.Core.SqlSugar.csproj" />
+        <ProjectReference Include="..\GameFrameX.Core.Extension\GameFrameX.Core.Extension.csproj" />
+        <ProjectReference Include="..\GameFrameX.Core.Utility\GameFrameX.Core.Utility.csproj" />
+        <ProjectReference Include="..\ObjectStorage\GameFrameX.ObjectStorage.Abstract\GameFrameX.ObjectStorage.Abstract.csproj" />
+        <!-- C371（GFX-838）：PaymentConfigCrypto 需要 Payment.Abstract 的渠道注册表（敏感字段反射同源），方向对齐 ObjectStorage.Abstract -->
+        <ProjectReference Include="..\Payment\GameFrameX.Payment.Abstract\GameFrameX.Payment.Abstract.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="GameFrameX.Core.Tests" />
+    </ItemGroup>
+
+</Project>

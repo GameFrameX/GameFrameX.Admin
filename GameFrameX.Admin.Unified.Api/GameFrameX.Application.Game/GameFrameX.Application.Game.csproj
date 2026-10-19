@@ -1,0 +1,43 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+        <DocumentationFile>bin\Debug\GameFrameX.Application.Game.xml</DocumentationFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="GameFrameX.Foundation.Extensions" Version="$(FoundationVersion)"/>
+        <PackageReference Include="GameFrameX.Foundation.Http.Extension" Version="$(FoundationVersion)"/>
+        <PackageReference Include="GameFrameX.Foundation.Http.Normalization" Version="$(FoundationVersion)"/>
+        <PackageReference Include="GameFrameX.Foundation.Idempotency" Version="$(FoundationVersion)"/>
+        <PackageReference Include="NCrontab" Version="3.4.0"/>
+        <PackageReference Include="Quartz" Version="3.18.2"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\GameFrameX.Core\GameFrameX.Core.csproj"/>
+        <ProjectReference Include="..\Wechat\GameFrameX.Wechat.Abstract\GameFrameX.Wechat.Abstract.csproj"/>
+        <ProjectReference Include="..\Email\GameFrameX.Email.Abstract\GameFrameX.Email.Abstract.csproj"/>
+        <ProjectReference Include="..\Email\GameFrameX.Email.TencentSes\GameFrameX.Email.TencentSes.csproj"/>
+        <ProjectReference Include="..\Email\GameFrameX.Email.Smtp\GameFrameX.Email.Smtp.csproj"/>
+        <ProjectReference Include="..\ObjectStorage\GameFrameX.ObjectStorage.Abstract\GameFrameX.ObjectStorage.Abstract.csproj"/>
+        <ProjectReference Include="..\ObjectStorage\GameFrameX.ObjectStorage.AliyunOss\GameFrameX.ObjectStorage.AliyunOss.csproj"/>
+        <ProjectReference Include="..\ObjectStorage\GameFrameX.ObjectStorage.Local\GameFrameX.ObjectStorage.Local.csproj"/>
+        <ProjectReference Include="..\ObjectStorage\GameFrameX.ObjectStorage.QiniuKodo\GameFrameX.ObjectStorage.QiniuKodo.csproj"/>
+        <ProjectReference Include="..\ObjectStorage\GameFrameX.ObjectStorage.TencentCos\GameFrameX.ObjectStorage.TencentCos.csproj"/>
+        <ProjectReference Include="..\Payment\GameFrameX.Payment.Abstract\GameFrameX.Payment.Abstract.csproj"/>
+        <ProjectReference Include="..\Payment\GameFrameX.Payment.Apple\GameFrameX.Payment.Apple.csproj"/>
+        <ProjectReference Include="..\Payment\GameFrameX.Payment.Google\GameFrameX.Payment.Google.csproj"/>
+        <ProjectReference Include="..\Payment\GameFrameX.Payment.Xsolla\GameFrameX.Payment.Xsolla.csproj"/>
+        <ProjectReference Include="..\Payment\GameFrameX.Payment.AliPay\GameFrameX.Payment.AliPay.csproj"/>
+        <ProjectReference Include="..\Payment\GameFrameX.Payment.Wechat\GameFrameX.Payment.Wechat.csproj"/>
+        <ProjectReference Include="..\Sms\GameFrameX.Sms.Abstract\GameFrameX.Sms.Abstract.csproj"/>
+        <ProjectReference Include="..\Sms\GameFrameX.Sms.Aliyun\GameFrameX.Sms.Aliyun.csproj"/>
+        <ProjectReference Include="..\Advertisement\GameFrameX.Advertisement.Abstract\GameFrameX.Advertisement.Abstract.csproj"/>
+        <ProjectReference Include="..\Advertisement\GameFrameX.Advertisement.AdMob\GameFrameX.Advertisement.AdMob.csproj"/>
+        <ProjectReference Include="..\Advertisement\GameFrameX.Advertisement.Pangle\GameFrameX.Advertisement.Pangle.csproj"/>
+        <ProjectReference Include="..\Advertisement\GameFrameX.Advertisement.TopOn\GameFrameX.Advertisement.TopOn.csproj"/>
+        <ProjectReference Include="..\Advertisement\GameFrameX.Advertisement.UnityAds\GameFrameX.Advertisement.UnityAds.csproj"/>
+    </ItemGroup>
+
+</Project>

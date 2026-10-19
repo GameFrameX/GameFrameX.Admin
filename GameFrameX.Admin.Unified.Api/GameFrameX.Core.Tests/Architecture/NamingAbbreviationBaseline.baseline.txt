@@ -1,0 +1,82 @@
+# 命名禁简写基线快照（C309 / GFX-713，2026-08-23 冻结）
+# D1 政策：全系统不允许简写；豁免与基线是临时措施，有清零截止点。
+# 只减不增：新增违规 NamingAbbreviationGuardTests 失败；条目清理后必须同步删行（防僵尸断言）；本文件清零后删除快照文件本身（不留永久基线）。
+# 行格式：Assembly|TypeFullName|Kind|Identifier # 命中词
+#
+# 清零路径（按域 -> 对应清理批次/issue 编号）：
+# - Org：已清零（GFX-710（C306）字段层 + 残余收口批次），无条目。
+# - Param/Params：Advertisement callback option（第三方 SDK 集成层 query 参数名）+ Payment Xsolla 镜像 OrderParams*
+#   （第三方契约例外已由 GFX-698（C292）登记）+ Payment.Abstract IOrderParamsGet*（支付 SDK 抽象接口）+ ServerParams
+#   （游戏区服参数，wire 字段联动）+ 散点（TemplateParamJson/CheckMenuParam/RequestParam/LogFieldSerialization）
+#   -> 待 Param 清理批次（外部契约面逐项评估改名成本）。
+#   -> 2026-09-17 广告域命名批次已执行：账本实体/管理面 Service+DTO/表列已全拼 Advertisement（tenant_game_advertisement_reward_entity），剩余为第三方 wire 镜像与枚举值专项。
+# - Msg：LogMsg/PasswordStrengthValidationMsg 散点 -> 散点批次。
+# - Btn：已清零（GFX-711（C307）路由层 + GlobalMenuService 方法 3 个与 MenuTypeEnum.Btn 枚举成员随 Org 批次清理），无条目。
+# - Img：CaptchaResponse.Img（验证码图片字段，Admin wire 联动评估）-> 散点批次。
+# - Dict/Nav/Rep：已清零（GFX-709（C303）/GFX-705（C294）），无条目。
+#
+GameFrameX.Advertisement.AdMob|GameFrameX.Advertisement.AdMob.GoogleAdMobAdvertisementCallbackOption|Property|adNetworkParam # Param
+GameFrameX.Advertisement.AdMob|GameFrameX.Advertisement.AdMob.GoogleAdMobAdvertisementCallbackOption|Property|adUnitParam # Param
+GameFrameX.Advertisement.AdMob|GameFrameX.Advertisement.AdMob.GoogleAdMobAdvertisementCallbackOption|Property|customDataParam # Param
+GameFrameX.Advertisement.AdMob|GameFrameX.Advertisement.AdMob.GoogleAdMobAdvertisementCallbackOption|Property|keyIdParam # Param
+GameFrameX.Advertisement.AdMob|GameFrameX.Advertisement.AdMob.GoogleAdMobAdvertisementCallbackOption|Property|rewardAmountParam # Param
+GameFrameX.Advertisement.AdMob|GameFrameX.Advertisement.AdMob.GoogleAdMobAdvertisementCallbackOption|Property|rewardItemParam # Param
+GameFrameX.Advertisement.AdMob|GameFrameX.Advertisement.AdMob.GoogleAdMobAdvertisementCallbackOption|Property|signatureParam # Param
+GameFrameX.Advertisement.AdMob|GameFrameX.Advertisement.AdMob.GoogleAdMobAdvertisementCallbackOption|Property|transactionIdParam # Param
+GameFrameX.Advertisement.AdMob|GameFrameX.Advertisement.AdMob.GoogleAdMobAdvertisementCallbackOption|Property|userIdParam # Param
+GameFrameX.Advertisement.Pangle|GameFrameX.Advertisement.Pangle.PangleAdvertisementCallbackOption|Property|extraParam # Param
+GameFrameX.Advertisement.Pangle|GameFrameX.Advertisement.Pangle.PangleAdvertisementCallbackOption|Property|rewardAmountParam # Param
+GameFrameX.Advertisement.Pangle|GameFrameX.Advertisement.Pangle.PangleAdvertisementCallbackOption|Property|rewardNameParam # Param
+GameFrameX.Advertisement.Pangle|GameFrameX.Advertisement.Pangle.PangleAdvertisementCallbackOption|Property|signParam # Param
+GameFrameX.Advertisement.Pangle|GameFrameX.Advertisement.Pangle.PangleAdvertisementCallbackOption|Property|transactionIdParam # Param
+GameFrameX.Advertisement.TopOn|GameFrameX.Advertisement.TopOn.TopOnAdvertisementCallbackOption|Property|adsourceIdParam # Param
+GameFrameX.Advertisement.TopOn|GameFrameX.Advertisement.TopOn.TopOnAdvertisementCallbackOption|Property|extraDataParam # Param
+GameFrameX.Advertisement.TopOn|GameFrameX.Advertisement.TopOn.TopOnAdvertisementCallbackOption|Property|networkFirmIdParam # Param
+GameFrameX.Advertisement.TopOn|GameFrameX.Advertisement.TopOn.TopOnAdvertisementCallbackOption|Property|placementIdParam # Param
+GameFrameX.Advertisement.TopOn|GameFrameX.Advertisement.TopOn.TopOnAdvertisementCallbackOption|Property|rewardAmountParam # Param
+GameFrameX.Advertisement.TopOn|GameFrameX.Advertisement.TopOn.TopOnAdvertisementCallbackOption|Property|rewardNameParam # Param
+GameFrameX.Advertisement.TopOn|GameFrameX.Advertisement.TopOn.TopOnAdvertisementCallbackOption|Property|signParam # Param
+GameFrameX.Advertisement.TopOn|GameFrameX.Advertisement.TopOn.TopOnAdvertisementCallbackOption|Property|transactionIdParam # Param
+GameFrameX.Advertisement.TopOn|GameFrameX.Advertisement.TopOn.TopOnAdvertisementCallbackOption|Property|userIdParam # Param
+GameFrameX.Advertisement.UnityAds|GameFrameX.Advertisement.UnityAds.UnityAdsAdvertisementCallbackOption|Property|hmacParam # Param
+GameFrameX.Advertisement.UnityAds|GameFrameX.Advertisement.UnityAds.UnityAdsAdvertisementCallbackOption|Property|orderIdParam # Param
+GameFrameX.Advertisement.UnityAds|GameFrameX.Advertisement.UnityAds.UnityAdsAdvertisementCallbackOption|Property|sidParam # Param
+GameFrameX.Application.Game|GameFrameX.Application.Game.Area.GameArea.Dto.TenantGameAreaEntityBaseRequest|Property|ServerParams # Params
+GameFrameX.Application.Game|GameFrameX.Application.Game.Area.GameArea.Dto.TenantGameAreaEntityResponse|Property|ServerParams # Params
+GameFrameX.Client.Api|GameFrameX.Client.Api.GameUserArchive.Dto.GameUserArchiveDownloadResponse|Property|AdStatus # Ad
+GameFrameX.Client.Api|GameFrameX.Client.Api.GameUserArchive.Dto.GameUserArchiveUploadRequest|Property|AdStatus # Ad
+GameFrameX.Client.Api|GameFrameX.Client.Api.GameUserSession.Dto.GameUserSessionLoginRequest|Property|AdGroup # Ad
+GameFrameX.Client.Api|GameFrameX.Client.Api.GameUserSession.Dto.GameUserSessionLoginRequest|Property|AdGroupId # Ad
+GameFrameX.Client.Api|GameFrameX.Client.Api.GameUserSession.Dto.GameUserSessionLoginRequest|Property|AdId # Ad
+GameFrameX.Client.Api|GameFrameX.Client.Api.GameWebShop.Dto.TenantGameWebShopEntityBuyNotifyRequest|Property|Param # Param
+GameFrameX.Client.Api|GameFrameX.Client.Api.Integrations.Advertisement.Dto.AdMobCallbackRequest|Property|AdNetwork # Ad
+GameFrameX.Client.Api|GameFrameX.Client.Api.Integrations.Advertisement.Dto.AdMobCallbackRequest|Property|AdUnit # Ad
+GameFrameX.Client.Api|GameFrameX.Client.Api.Integrations.Advertisement.GameAdWebHookController+PlayerSendAdvertisementItemRequest|Property|AdPackageId # Ad
+GameFrameX.Client.Api|GameFrameX.Client.Api.Integrations.Advertisement.GameAdWebHookController|Type|GameAdWebHookController # Ad
+GameFrameX.Core.Tests|GameFrameX.Core.Tests.ClientApi.SignatureValidationMiddlewareTests|Method|V2_W2Vector_KeyB_SameParams_Passes # Params
+GameFrameX.Core.Tests|GameFrameX.Core.Tests.SignatureAuth.CanonicalRequestBuilderTests|Method|CanonicalQuery_StripsSignatureParam # Param
+GameFrameX.Core.Tests|GameFrameX.Core.Tests.System.LogFieldSerializationGuardTests|Method|RequestParam_SerializesAsObjectJson_NotEmptyArray # Param
+GameFrameX.Core.Utility|GameFrameX.Core.Utility.CryptogramUtility|Property|PasswordStrengthValidationMsg # Msg
+GameFrameX.Core|GameFrameX.Core.Logging.DatabaseLoggingWriter+LogContext|Property|LogMsg # Msg
+GameFrameX.Core|GameFrameX.Core.Service.Auth.Dto.CaptchaResponse|Property|Img # Img
+GameFrameX.Core|GameFrameX.Core.Service.Menu.GlobalMenuService|Method|CheckMenuParam # Param
+GameFrameX.Core|GameFrameX.Core.Service.PlatformPasswordPolicy.Dto.PlatformPasswordPolicyConfigResponse|Property|PasswordStrengthValidationMsg # Msg
+GameFrameX.Core|GameFrameX.Core.Service.PlatformPasswordPolicy.Dto.PlatformPasswordPolicyConfigUpdateRequest|Property|PasswordStrengthValidationMsg # Msg
+GameFrameX.Core|GameFrameX.Core.Service.PlatformPasswordPolicy.PlatformPasswordPolicyConfigConstants|Field|DefaultPasswordStrengthValidationMsg # Msg
+GameFrameX.Core|GameFrameX.Core.Service.PlatformPasswordPolicy.PlatformPasswordPolicySettings|Property|PasswordStrengthValidationMsg # Msg
+GameFrameX.Entity|GameFrameX.Entity.Enum.ChannelTypeEnum|Field|Ad # Ad
+GameFrameX.Entity|GameFrameX.Entity.Log.LogOperationFields|Property|RequestParam # Param
+GameFrameX.Entity|GameFrameX.Entity.Tenant.Game.TenantGameAreaEntity|Property|ServerParams # Params
+GameFrameX.Payment.Abstract|GameFrameX.Payment.Abstract.IOrderParamsGetList|Type|IOrderParamsGetList # Params
+GameFrameX.Payment.Abstract|GameFrameX.Payment.Abstract.IOrderParamsGet|Type|IOrderParamsGet # Params
+GameFrameX.Payment.Xsolla|GameFrameX.Payment.Xsolla.Models.OrderParamsGetList|Type|OrderParamsGetList # Params
+GameFrameX.Payment.Xsolla|GameFrameX.Payment.Xsolla.Models.OrderParamsGet|Type|OrderParamsGet # Params
+GameFrameX.Payment.Xsolla|GameFrameX.Payment.Xsolla.Order.OrderManager+OrderParamsCreateEmail|Type|OrderParamsCreateEmail # Params
+GameFrameX.Payment.Xsolla|GameFrameX.Payment.Xsolla.Order.OrderManager+OrderParamsCreateId|Type|OrderParamsCreateId # Params
+GameFrameX.Payment.Xsolla|GameFrameX.Payment.Xsolla.Order.OrderManager+OrderParamsCreateItem|Type|OrderParamsCreateItem # Params
+GameFrameX.Payment.Xsolla|GameFrameX.Payment.Xsolla.Order.OrderManager+OrderParamsCreatePurchase|Type|OrderParamsCreatePurchase # Params
+GameFrameX.Payment.Xsolla|GameFrameX.Payment.Xsolla.Order.OrderManager+OrderParamsCreateResponse|Type|OrderParamsCreateResponse # Params
+GameFrameX.Payment.Xsolla|GameFrameX.Payment.Xsolla.Order.OrderManager+OrderParamsCreateSettings|Type|OrderParamsCreateSettings # Params
+GameFrameX.Payment.Xsolla|GameFrameX.Payment.Xsolla.Order.OrderManager+OrderParamsCreateUser|Type|OrderParamsCreateUser # Params
+GameFrameX.Payment.Xsolla|GameFrameX.Payment.Xsolla.Order.OrderManager+OrderParamsCreate|Type|OrderParamsCreate # Params
+GameFrameX.Sms.Abstract|GameFrameX.Sms.Abstract.SmsSendOptions|Property|TemplateParamJson # Param

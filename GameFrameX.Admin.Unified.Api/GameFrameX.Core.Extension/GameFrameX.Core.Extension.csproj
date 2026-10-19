@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup/>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="GameFrameX.Core.Tests"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Mapster" Version="10.0.10"/>
+
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="GameFrameX.Foundation.Http.Normalization" Version="$(FoundationVersion)"/>
+        <ProjectReference Include="..\GameFrameX.Core.BaseInputOutput\GameFrameX.Core.BaseInputOutput.csproj"/>
+        <ProjectReference Include="..\GameFrameX.Core.SqlSugar\GameFrameX.Core.SqlSugar.csproj"/>
+    </ItemGroup>
+
+</Project>

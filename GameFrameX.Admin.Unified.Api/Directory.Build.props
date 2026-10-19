@@ -1,0 +1,26 @@
+<Project>
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <LangVersion>10</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <NoWarn>$(NoWarn);1701;1702;1591;8632</NoWarn>
+    </PropertyGroup>
+
+    <!-- 集中管理高频 NuGet 包版本 -->
+    <PropertyGroup>
+        <SqlSugarCoreVersion>5.1.4.216</SqlSugarCoreVersion>
+        <FoundationVersion>4.1.1</FoundationVersion>
+    </PropertyGroup>
+
+    <!-- 统一上拉 SQLitePCLRaw 传递依赖，消除 NU1903（GHSA-2m69-gcr7-jv3q，lib.e_sqlite3 <=2.1.11）。
+         源头 SqlSugarCore→Microsoft.Data.Sqlite→SQLitePCLRaw 2.1.11。
+         Update 对传递依赖无效（transitive 不在 MSBuild 项列表），改用 Include 显式声明更高版本，
+         NuGet 解图取最高 → 2.1.12，对本就传递依赖 SQLitePCLRaw 的项目零运行时影响。 -->
+    <ItemGroup>
+        <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.12"/>
+        <PackageReference Include="SQLitePCLRaw.core" Version="2.1.12"/>
+        <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3" Version="2.1.12"/>
+        <PackageReference Include="SQLitePCLRaw.provider.e_sqlite3" Version="2.1.12"/>
+    </ItemGroup>
+</Project>

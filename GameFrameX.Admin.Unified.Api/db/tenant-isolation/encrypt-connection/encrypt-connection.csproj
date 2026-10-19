@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <!-- 运维小工具：不注册进 GameFrameX.Admin.Unified.slnx，不参与主解决方案 build -->
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- 与 C317 TenantConnectionCrypto 同底层 AesHelper（AES-GCM + PBKDF2），保证 enc:v1: 密文格式逐字节一致 -->
+    <PackageReference Include="GameFrameX.Foundation.Encryption" Version="$(FoundationVersion)"/>
+  </ItemGroup>
+
+</Project>

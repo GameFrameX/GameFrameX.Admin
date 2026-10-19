@@ -1,0 +1,8 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+
+    <ItemGroup>
+        <PackageReference Include="GameFrameX.Foundation.Json" Version="$(FoundationVersion)"/>
+    </ItemGroup>
+
+</Project>

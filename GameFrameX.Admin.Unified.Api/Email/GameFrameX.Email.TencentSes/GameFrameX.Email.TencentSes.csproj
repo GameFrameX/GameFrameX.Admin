@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+
+    <ItemGroup>
+        <PackageReference Include="GameFrameX.Foundation.Json" Version="$(FoundationVersion)"/>
+        <PackageReference Include="TencentCloudSDK.Common" Version="3.0.1457"/>
+        <PackageReference Include="TencentCloudSDK.Ses" Version="3.0.1454"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\GameFrameX.Email.Abstract\GameFrameX.Email.Abstract.csproj"/>
+    </ItemGroup>
+
+</Project>

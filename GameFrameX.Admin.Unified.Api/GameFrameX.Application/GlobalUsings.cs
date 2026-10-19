@@ -1,0 +1,15 @@
+global using GameFrameX.Core.Api;
+global using ApiDescriptionSettingsAttribute = GameFrameX.Core.Api.ApiDescriptionSettingsAttribute;
+global using GameFrameX.Core.Exceptions;
+global using Mapster;
+global using Microsoft.AspNetCore.Authorization;
+global using Microsoft.AspNetCore.Mvc;
+global using Microsoft.Extensions.DependencyInjection;
+global using SqlSugar;
+global using System;
+global using System.Collections.Generic;
+global using System.ComponentModel;
+global using System.ComponentModel.DataAnnotations;
+global using System.Text.Json;
+global using System.Threading.Tasks;
+global using GameFrameX.Entity.Tenant;
