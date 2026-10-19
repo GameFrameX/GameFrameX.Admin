@@ -147,7 +147,7 @@ GameFrameX.Admin.Unified.Api/
 ├── Dockerfile.web-entry           # Admin API 的 Dockerfile（sdk:10.0 → aspnet:10.0）
 ├── Dockerfile.client-api          # Client API 的 Dockerfile
 ├── Dockerfile.hub-api             # Hub API 的 Dockerfile
-└── docker-compose.yml             # 三个主机一把起
+└── (统一编排已上移仓库根 docker-compose.yml：PostgreSQL + 三 API + 前端共 5 服务)
 ```
 
 平时改代码，99% 时间在 `Application.*` 和 `Entity` 里转悠。`Core.*` 是地基，动它之前最好先看明白谁在依赖它。
@@ -180,14 +180,15 @@ GameFrameX.Admin.Unified.Api/
 - **租户库是自动建的**。创建普通租户时，系统会按租户 ID 自动生成 `gameframex_admin_tenant_<TenantId>` 数据库和对应的登录角色，**不需要 SuperAdmin 手动填租户库连接串**。
 - **默认租户库也是自动推导的（C269）**。主库连接串 → 默认租户库连接串：PostgreSQL / MySQL 仅替换库名为 `gameframex_admin_tenant_1300000000001`（与普通租户库同规律，账号/密码继承主库，MySQL 建库强制 utf8mb4）；SQLite 落在主库同目录 `gameframex_admin_tenant_1300000000001.db`。仅支持 PostgreSQL / MySQL / SQLite，其他类型启动报错。显式配置优先：`Database.json` 加回 `ConfigId=1300000000001` 项或成对设置 `GFX_DEFAULT_TENANT_DB_TYPE` + `GFX_DEFAULT_TENANT_DB_CONNECTION_STRING`。
 - **既有部署升级（BREAKING）**：默认租户库名由 `gameframex_admin_tenant_default` 变为 `gameframex_admin_tenant_1300000000001`，二选一：a. 在线改名 `ALTER DATABASE gameframex_admin_tenant_default RENAME TO gameframex_admin_tenant_1300000000001`（注册表会自动跟上推导值）；b. 成对设置 `GFX_DEFAULT_TENANT_DB_*` 指向旧库名冻结不动。
-- **Compose 内置 PostgreSQL**。`docker compose up` 会自带起一个 `postgres:16-alpine`（首次启动自动建库，见 `docker/postgres/init.sql`，数据落在 named volume）。要复用宿主机已有的 postgres 容器，在 `.env` 里设 `POSTGRES_HOST=host.docker.internal` 等变量并移除 api 服务对 `postgres` 的 `depends_on` 即可。
+- **Compose 内置 PostgreSQL**。在仓库根执行 `docker compose up` 会自带起一个 `postgres:16-alpine`（首次启动自动建库，见 `docker/postgres/init.sql`，数据落在仓库根 `postgres-data/` bind mount）。要复用宿主机已有的 postgres 容器，在仓库根 `.env` 里设 `POSTGRES_HOST=host.docker.internal` 等变量并移除 api 服务对 `postgres` 的 `depends_on` 即可。
 - **三个 host 共读同一份默认配置**。Client / Hub 启动时自动加载 `Database.json`（与 Admin 同源，改一处三处生效）；环境变量覆盖写法与 compose 一致。
 
 ### 启动方式一：Docker Compose 一键起（推荐，零配置）
 
 ```bash
+# 在仓库根执行（不在 Api 子目录）
 docker compose up -d --build
-# 内置 PostgreSQL + Admin(20802) + Client(20808) + Hub(20806)，起完等 healthcheck 变绿
+# 内置 PostgreSQL + Admin(20802) + Client(20808) + Hub(20806) + 前端(20800)，起完等 healthcheck 变绿
 ```
 
 ### 启动方式二：源码直跑（零配置，SQLite）
@@ -784,7 +785,7 @@ Hub 复用 Admin 的 JWT 密钥，但读的是自己 `appsettings.json` 里的 `
 ### Docker Compose（推荐）
 
 ```bash
-docker-compose up --build
+cd .. && docker compose up --build   # 统一编排位于仓库根（含前端共 5 服务）
 ```
 
 一条命令把三个主机全拉起来。端口映射和本地 `dotnet run` **完全一致**：
@@ -857,7 +858,7 @@ ls -lh ../GameFrameX.Admin.Unified.Vue/openapi.json   # 大概 3 MB 才对
 | `dotnet build` | 编译整个解决方案 |
 | `Swagger__Enabled=true dotnet run --project GameFrameX.Web.Api` | 非 dev 环境启动并暴露 Swagger |
 | `ASPNETCORE_ENVIRONMENT=Development dotnet run --project GameFrameX.Web.Api` | dev 环境启动（Swagger 自动开） |
-| `docker-compose up --build` | Docker 一把起三个主机 |
+| `cd .. && docker compose up --build` | Docker 一把起（仓库根统一编排：PG + 三 API + 前端） |
 | `curl -sSL http://localhost:20802/swagger/web.api/swagger.json -o ../GameFrameX.Admin.Unified.Vue/openapi.json` | 导出 Admin Swagger JSON 给前端 |
 
 常用地址：
