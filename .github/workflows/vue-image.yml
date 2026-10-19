@@ -1,0 +1,104 @@
+name: Admin Web Vue (Build & Deploy)
+
+# =============================================================================
+# 由 GameFrameX.Admin.Unified.Vue/.cnb.yml 迁移（2026-10-19 单仓整合，快照合并）。
+# 触发规则与 CNB 版对齐：
+#   main push / v* tag → 构建推送镜像 (gameframex-admin-web-vue)，main 与 tag 额外推 latest 并触发自动部署
+# 路径过滤：仅前端目录或本文件变更触发，后端改动不再误触前端部署。
+#
+# 单仓整合后续（2026-10-19）：Vue Dockerfile 的 build context 已上移为仓库根，
+# default.conf / entrypoint.sh / docker-build-push.sh 同步上移至根 build/。
+#
+# 所需 GitHub Secrets（值拷贝自 cnb.cool/GameFrameX/Admin/cnb-shared-config envs.yml）：
+#   DOCKER_REGISTRY / DOCKER_USERNAME / DOCKER_PASSWORD / WEB_IMAGE_NAMESPACE
+#   DEPLOY_API_URL / DEPLOY_AUTH_USERNAME / DEPLOY_AUTH_PASSWORD / DEPLOY_AUTH_REGISTRY /
+#   DEPLOY_AUTH_EMAIL / DEPLOY_NETWORK_NAME / DEPLOY_NETWORK_GATEWAY
+#   DEPLOY_WEB_VUE_{CONTAINER_NAME,IP_ADDRESS,PORTS,VOLUMES,ENVIRONMENTS}
+# Secrets 未配置时：跳过 docker login 与推送（deploy 脚本自带 [SKIP] 分支），构建仍执行。
+# =============================================================================
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'GameFrameX.Admin.Unified.Vue/**'
+      - 'build/**'
+      - '.github/workflows/vue-image.yml'
+    tags: ['v*']
+  workflow_dispatch:
+
+jobs:
+  build-and-push:
+    name: gameframex-admin-web-vue
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        # 默认仍为 Vue 子目录；构建/部署步骤各自用 working-directory 切换
+        working-directory: GameFrameX.Admin.Unified.Vue
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve image tag
+        id: resolve
+        env:
+          DOCKER_REGISTRY: ${{ secrets.DOCKER_REGISTRY }}
+          WEB_IMAGE_NAMESPACE: ${{ secrets.WEB_IMAGE_NAMESPACE }}
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            TAG="${GITHUB_REF_NAME}"
+          else
+            TAG="${GITHUB_SHA::7}"
+          fi
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          echo "image_tag=${DOCKER_REGISTRY}/${WEB_IMAGE_NAMESPACE}/gameframex-admin-web-vue:${TAG}" >> "$GITHUB_OUTPUT"
+
+      - name: Docker login
+        id: login
+        env:
+          DOCKER_REGISTRY: ${{ secrets.DOCKER_REGISTRY }}
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: |
+          if [ -z "$DOCKER_USERNAME" ] || [ -z "$DOCKER_REGISTRY" ]; then
+            echo "logged=false" >> "$GITHUB_OUTPUT"
+            echo "[SKIP] DOCKER_USERNAME/DOCKER_REGISTRY 未配置，跳过登录与推送（仅构建验证）"
+            exit 0
+          fi
+          echo "$DOCKER_PASSWORD" | docker login "$DOCKER_REGISTRY" -u "$DOCKER_USERNAME" --password-stdin
+          echo "logged=true" >> "$GITHUB_OUTPUT"
+
+      - name: Build image
+        # 单仓整合：Vue Dockerfile 的 build context 已上移为仓库根，便于引用根 build/
+        # 下的 nginx 站点配置 / entrypoint.sh；仓库根 .dockerignore 负责剔除后端、node_modules 等。
+        working-directory: .
+        env:
+          IMAGE_TAG: ${{ steps.resolve.outputs.image_tag }}
+        run: docker build -t "$IMAGE_TAG" -f GameFrameX.Admin.Unified.Vue/Dockerfile .
+
+      - name: Push image (commit hash)
+        if: steps.login.outputs.logged == 'true'
+        env:
+          IMAGE_TAG: ${{ steps.resolve.outputs.image_tag }}
+        run: docker push "$IMAGE_TAG"
+
+      - name: Push latest + deploy
+        if: steps.login.outputs.logged == 'true'
+        env:
+          IMAGE_TAG: ${{ steps.resolve.outputs.image_tag }}
+          DEPLOY_API_URL: ${{ secrets.DEPLOY_API_URL }}
+          DEPLOY_AUTH_USERNAME: ${{ secrets.DEPLOY_AUTH_USERNAME }}
+          DEPLOY_AUTH_PASSWORD: ${{ secrets.DEPLOY_AUTH_PASSWORD }}
+          DEPLOY_AUTH_REGISTRY: ${{ secrets.DEPLOY_AUTH_REGISTRY }}
+          DEPLOY_AUTH_EMAIL: ${{ secrets.DEPLOY_AUTH_EMAIL }}
+          DEPLOY_NETWORK_NAME: ${{ secrets.DEPLOY_NETWORK_NAME }}
+          DEPLOY_NETWORK_GATEWAY: ${{ secrets.DEPLOY_NETWORK_GATEWAY }}
+          DEPLOY_WEB_VUE_CONTAINER_NAME: ${{ secrets.DEPLOY_WEB_VUE_CONTAINER_NAME }}
+          DEPLOY_WEB_VUE_IP_ADDRESS: ${{ secrets.DEPLOY_WEB_VUE_IP_ADDRESS }}
+          DEPLOY_WEB_VUE_PORTS: ${{ secrets.DEPLOY_WEB_VUE_PORTS }}
+          DEPLOY_WEB_VUE_VOLUMES: ${{ secrets.DEPLOY_WEB_VUE_VOLUMES }}
+          DEPLOY_WEB_VUE_ENVIRONMENTS: ${{ secrets.DEPLOY_WEB_VUE_ENVIRONMENTS }}
+        working-directory: .
+        run: |
+          docker tag "$IMAGE_TAG" "${IMAGE_TAG%:*}:latest"
+          docker push "${IMAGE_TAG%:*}:latest"
+          bash build/deploy-admin-web-vue.sh

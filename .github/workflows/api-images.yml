@@ -1,0 +1,122 @@
+name: API Images (Build & Deploy)
+
+# =============================================================================
+# 由 GameFrameX.Admin.Unified.Api/.cnb.yml 迁移（2026-10-19 单仓整合，快照合并）。
+# 触发规则与 CNB 版对齐：
+#   main push / v* tag → 并发构建推送三镜像 (gameframex-web-entry / -client-api / -hub-api)
+#                        main 与 tag 额外推 latest 并触发自动部署
+# 路径过滤：仅后端目录或本文件变更触发，前端改动不再误触后端部署。
+#
+# 所需 GitHub Secrets（值拷贝自 cnb.cool/GameFrameX/Admin/cnb-shared-config envs.yml）：
+#   DOCKER_REGISTRY / DOCKER_USERNAME / DOCKER_PASSWORD / API_IMAGE_NAMESPACE
+#   DEPLOY_API_URL / DEPLOY_AUTH_USERNAME / DEPLOY_AUTH_PASSWORD / DEPLOY_AUTH_REGISTRY /
+#   DEPLOY_AUTH_EMAIL / DEPLOY_NETWORK_NAME / DEPLOY_NETWORK_GATEWAY
+#   DEPLOY_WEB_{CONTAINER_NAME,IP_ADDRESS,PORTS,VOLUMES,ENVIRONMENTS}
+#   DEPLOY_CLIENT_{CONTAINER_NAME,IP_ADDRESS,PORTS,VOLUMES,ENVIRONMENTS}
+#   DEPLOY_HUB_{CONTAINER_NAME,IP_ADDRESS,PORTS,VOLUMES,ENVIRONMENTS}
+# Secrets 未配置时：跳过 docker login 与推送（deploy 脚本自带 [SKIP] 分支），构建仍执行。
+# =============================================================================
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'GameFrameX.Admin.Unified.Api/**'
+      - '.github/workflows/api-images.yml'
+    tags: ['v*']
+  workflow_dispatch:
+
+jobs:
+  build-and-push:
+    name: ${{ matrix.image }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - image: gameframex-web-entry
+            dockerfile: Dockerfile.web-entry
+            deploy-script: deploy-web-entry.sh
+          - image: gameframex-client-api
+            dockerfile: Dockerfile.client-api
+            deploy-script: deploy-client-api.sh
+          - image: gameframex-hub-api
+            dockerfile: Dockerfile.hub-api
+            deploy-script: deploy-hub-api.sh
+    defaults:
+      run:
+        working-directory: GameFrameX.Admin.Unified.Api
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve image tag
+        id: resolve
+        env:
+          DOCKER_REGISTRY: ${{ secrets.DOCKER_REGISTRY }}
+          API_IMAGE_NAMESPACE: ${{ secrets.API_IMAGE_NAMESPACE }}
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            TAG="${GITHUB_REF_NAME}"
+          else
+            TAG="${GITHUB_SHA::7}"
+          fi
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          echo "image_tag=${DOCKER_REGISTRY}/${API_IMAGE_NAMESPACE}/${{ matrix.image }}:${TAG}" >> "$GITHUB_OUTPUT"
+
+      - name: Docker login
+        id: login
+        env:
+          DOCKER_REGISTRY: ${{ secrets.DOCKER_REGISTRY }}
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: |
+          if [ -z "$DOCKER_USERNAME" ] || [ -z "$DOCKER_REGISTRY" ]; then
+            echo "logged=false" >> "$GITHUB_OUTPUT"
+            echo "[SKIP] DOCKER_USERNAME/DOCKER_REGISTRY 未配置，跳过登录与推送（仅构建验证）"
+            exit 0
+          fi
+          echo "$DOCKER_PASSWORD" | docker login "$DOCKER_REGISTRY" -u "$DOCKER_USERNAME" --password-stdin
+          echo "logged=true" >> "$GITHUB_OUTPUT"
+
+      - name: Build image
+        env:
+          IMAGE_TAG: ${{ steps.resolve.outputs.image_tag }}
+        run: docker build -t "$IMAGE_TAG" -f ${{ matrix.dockerfile }} .
+
+      - name: Push image (commit hash)
+        if: steps.login.outputs.logged == 'true'
+        env:
+          IMAGE_TAG: ${{ steps.resolve.outputs.image_tag }}
+        run: docker push "$IMAGE_TAG"
+
+      - name: Push latest + deploy
+        if: steps.login.outputs.logged == 'true'
+        env:
+          IMAGE_TAG: ${{ steps.resolve.outputs.image_tag }}
+          DEPLOY_API_URL: ${{ secrets.DEPLOY_API_URL }}
+          DEPLOY_AUTH_USERNAME: ${{ secrets.DEPLOY_AUTH_USERNAME }}
+          DEPLOY_AUTH_PASSWORD: ${{ secrets.DEPLOY_AUTH_PASSWORD }}
+          DEPLOY_AUTH_REGISTRY: ${{ secrets.DEPLOY_AUTH_REGISTRY }}
+          DEPLOY_AUTH_EMAIL: ${{ secrets.DEPLOY_AUTH_EMAIL }}
+          DEPLOY_NETWORK_NAME: ${{ secrets.DEPLOY_NETWORK_NAME }}
+          DEPLOY_NETWORK_GATEWAY: ${{ secrets.DEPLOY_NETWORK_GATEWAY }}
+          DEPLOY_WEB_CONTAINER_NAME: ${{ secrets.DEPLOY_WEB_CONTAINER_NAME }}
+          DEPLOY_WEB_IP_ADDRESS: ${{ secrets.DEPLOY_WEB_IP_ADDRESS }}
+          DEPLOY_WEB_PORTS: ${{ secrets.DEPLOY_WEB_PORTS }}
+          DEPLOY_WEB_VOLUMES: ${{ secrets.DEPLOY_WEB_VOLUMES }}
+          DEPLOY_WEB_ENVIRONMENTS: ${{ secrets.DEPLOY_WEB_ENVIRONMENTS }}
+          DEPLOY_CLIENT_CONTAINER_NAME: ${{ secrets.DEPLOY_CLIENT_CONTAINER_NAME }}
+          DEPLOY_CLIENT_IP_ADDRESS: ${{ secrets.DEPLOY_CLIENT_IP_ADDRESS }}
+          DEPLOY_CLIENT_PORTS: ${{ secrets.DEPLOY_CLIENT_PORTS }}
+          DEPLOY_CLIENT_VOLUMES: ${{ secrets.DEPLOY_CLIENT_VOLUMES }}
+          DEPLOY_CLIENT_ENVIRONMENTS: ${{ secrets.DEPLOY_CLIENT_ENVIRONMENTS }}
+          DEPLOY_HUB_CONTAINER_NAME: ${{ secrets.DEPLOY_HUB_CONTAINER_NAME }}
+          DEPLOY_HUB_IP_ADDRESS: ${{ secrets.DEPLOY_HUB_IP_ADDRESS }}
+          DEPLOY_HUB_PORTS: ${{ secrets.DEPLOY_HUB_PORTS }}
+          DEPLOY_HUB_VOLUMES: ${{ secrets.DEPLOY_HUB_VOLUMES }}
+          DEPLOY_HUB_ENVIRONMENTS: ${{ secrets.DEPLOY_HUB_ENVIRONMENTS }}
+        working-directory: .
+        run: |
+          docker tag "$IMAGE_TAG" "${IMAGE_TAG%:*}:latest"
+          docker push "${IMAGE_TAG%:*}:latest"
+          bash build/${{ matrix.deploy-script }}
