@@ -1,0 +1,51 @@
+# 单仓整合（2026-10-19）：
+# 当 GameFrameX.Admin.Unified.Vue/Dockerfile 的 build context 设为仓库根时生效。
+# 仓库根其它 Dockerfile 如未来也使用根 context，会一并受益。
+# —— 与子项目各自的 .dockerignore 不冲突（后者在子目录 build context 下生效）。
+
+# ─── 构建产物 / 依赖 ───
+**/node_modules
+**/build/dist
+**/dist
+
+# ─── 版本控制 / 本地工作区 ───
+.git
+.codegraph
+.worktrees
+.local-archive
+.menu-test
+.openclaude
+.claude
+.omp
+.orca-automations
+.playwright-mcp
+
+# ─── 系统 / 编辑器 ───
+**/.idea
+**/.vscode
+**/.DS_Store
+*.user
+
+# ─── 单仓整合时尚未统一进镜像的内容 ───
+# Vue Dockerfile 不需要 Api 后端，避免上下文过大
+GameFrameX.Admin.Unified.Api
+# Api Dockerfile 不需要 Vue 前端源码（若未来将 Api context 也设为根）
+GameFrameX.Admin.Unified.Vue/node_modules
+GameFrameX.Admin.Unified.Vue/build
+GameFrameX.Admin.Unified.Vue/.api-gen
+
+# ─── 文档 / 元数据 ───
+gfx-doc
+doc
+GameFrameX.Admin.Unified.Vue/CHANGELOG.md
+GameFrameX.Admin.Unified.Vue/LICENSE
+GameFrameX.Admin.Unified.Api/CHANGELOG.md
+GameFrameX.Admin.Unified.Api/LICENSE
+
+# ─── 运行时数据 / 凭证 ───
+# .env：仓库根 compose 的凭证文件（GFX_*/OTEL_*/POSTGRES_*），绝不进构建上下文
+.env
+*.env.example
+# postgres-data：root compose 的 PostgreSQL bind mount 数据目录（GB 级，绝不上传）
+postgres-data
+GameFrameX.Admin.Unified.Api/GameFrameX.Web.Api/data

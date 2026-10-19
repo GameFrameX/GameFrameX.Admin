@@ -1,154 +1,299 @@
-﻿version: '3.7'
+# =====================================================================================
+# GameFrameX Admin —— Docker Compose 统一部署配置（单仓整合版，2026-10-20 起为唯一 compose）
+# =====================================================================================
+# 【快速开始】在 仓库根目录 打开终端执行：
+#   docker compose up -d                # 构建镜像并后台启动全部服务（第一次会比较慢）
+#   docker compose ps                   # 查看运行状态，全部显示 healthy 即正常
+#   docker logs -f gameframex-web-entry # 跟踪某个服务日志（Ctrl+C 退出跟踪，不影响服务）
+#   docker compose down                 # 停止并删除容器（数据库数据保留）
+#   docker compose down -v              # 停止并【删除所有数据】！数据库会清空，慎用
+#
+# 【改了代码怎么生效】需要重新构建镜像：
+#   docker compose up -d --build            # 全部重建
+#   docker compose up -d --build web-entry  # 只重建某个服务（前端改动不影响后端层缓存）
+#
+# 【配置覆盖规则】本文件中所有 ${变量:-默认值} 的含义：
+#   优先读取 仓库根 .env 文件里的同名变量，没有才用冒号后面的默认值。
+#   例：新建 .env 文件写入一行  POSTGRES_PASSWORD=我的密码  即可覆盖默认密码，本文件无需改动。
+# =====================================================================================
+
+# ─────────────────────────────────────────────────────────────────
+# 共享数据库配置模板（C279：GFX_MAIN_DB_* 成对覆盖、单一入口管线，经 YAML anchor 合并进各 service environment；
+# 值由 .env 的 POSTGRES_HOST/PORT/USER/PASSWORD 插值，覆盖能力不变）
+#
+# 【这是什么】YAML 锚点（模板）：下面 web-entry / client-api / hub-api 三个服务的
+# environment 里都有一行 `<<: *main-db` 引用这段配置，实现「改一处、三个服务同时生效」。
+# 日常只需要改这里，不用动下面各服务。
+# ─────────────────────────────────────────────────────────────────
+x-main-db: &main-db
+  # 数据库类型，当前使用 PostgreSQL，一般不需要改
+  GFX_MAIN_DB_TYPE: PostgreSQL
+  # 主库连接串（三个 API 共用）。各字段含义：
+  #   Host=postgres   → 数据库地址。postgres 是下方 postgres 服务在容器网络里的名字，
+  #                      不要改成 localhost（容器里的 localhost 是容器自己，连不到数据库）；
+  #                      要连接宿主机上已安装的 PostgreSQL 时改为 host.docker.internal
+  #   Port            → 数据库端口，与下方 postgres 服务保持一致
+  #   Database        → 业务主库库名（由 init.sql 预建，启动时会自动补建缺失的库）
+  #   Username/Password → 登录账号/密码，默认值与下方 postgres 服务的初始化账号一致
+  GFX_MAIN_DB_CONNECTION_STRING: "Host=${POSTGRES_HOST:-postgres};Port=${POSTGRES_PORT:-5432};Database=gameframex_admin;Username=${POSTGRES_USER:-gameframex};Password=${POSTGRES_PASSWORD:-GameFrameX@Local2026}"
+  # 租户库连接串加密密钥（C317/GFX-726，system_tenant.connection 以 enc:v1: 密文落库）：
+  #   留空 = 降级模式（明文直存/直读）；设置后三 host 必须同值，否则跨 host 解密失败。
+  #   凭证不进 git，写入仓库根 .env 文件即可（GFX_TENANT_CONN_ENC_KEY=...）。
+  GFX_TENANT_CONN_ENC_KEY: ${GFX_TENANT_CONN_ENC_KEY:-}
+  # 租户凭证静态加密密钥（C370/C371，签名/会话/票据私钥/邮件/广告/支付等敏感列以 enc:sec:v1: 密文落库）：
+  #   留空 = 降级模式（明文直存/直读，功能不阻断）；设置后三 host 必须同值，且不得再变更
+  #   （密钥丢失 = 存量密文不可解）。同样写入根 .env（GFX_TENANT_SECRET_ENC_KEY=...）。
+  GFX_TENANT_SECRET_ENC_KEY: ${GFX_TENANT_SECRET_ENC_KEY:-}
+  # C371 租户域 10 实体存量明文回填开关：=1 时启动期扫描加密存量行（幂等，稳态 0 行）。
+  #   验收后按 gfx-doc C371 change.md §6 D4 的开启条件评估再开；默认关闭。
+  GFX_TENANT_CREDENTIAL_BACKFILL: ${GFX_TENANT_CREDENTIAL_BACKFILL:-}
+  # 默认租户库显式连接对（C269 推导的替代形态）：GFX-727 存量迁移把默认租户库 REVOKE CONNECT FROM PUBLIC
+  #   后，主库账号（推导连接）无法再连，必须显式指向租户独立账号。留空 = 维持主库推导（未迁移环境）。
+  GFX_DEFAULT_TENANT_DB_TYPE: ${GFX_DEFAULT_TENANT_DB_TYPE:-}
+  GFX_DEFAULT_TENANT_DB_CONNECTION_STRING: ${GFX_DEFAULT_TENANT_DB_CONNECTION_STRING:-}
+  # 建库专用管理连接（C317）：gfx_provisioner 独立账号；留空 = 回落主库连接并告警（降级模式）。
+  DbConnection__ProvisioningConnectionString: ${GFX_DB_PROVISIONING_CONNECTION_STRING:-}
+
+# 【修改数据库密码的完整步骤】（重要：只改本文件不生效！）
+#   POSTGRES_PASSWORD 只在数据卷「第一次初始化」时生效，已有数据的老库不会跟着变。
+#   ① 先改库内实际密码（执行一次即可）：
+#      docker exec -it gameframex-postgres psql -U gameframex -c "ALTER USER gameframex WITH PASSWORD '新密码';"
+#   ② 再把本文件两处旧密码默认值（上方 Password= 与下方 postgres 服务的 POSTGRES_PASSWORD=）改成新密码
+#   ③ 重新应用：docker compose up -d
+# =====================================================================================
+
+# ─────────────────────────────────────────────────────────────────
+# 共享 Grafana Cloud OpenTelemetry 配置模板（三 host 合并引用，同 x-main-db 模式）
+#
+# 【这是什么】OTLP 统一三信号（traces / metrics / logs，logs 自动入 Loki）上报 Grafana Cloud。
+# 【默认状态】三个值默认为空 = 不启用遥测，与未接入前行为一致，不影响现有部署。
+# 【怎么启用】在仓库根 .env 文件写入下面三行（凭证不进 git）：
+#   OTEL_ENDPOINT=https://otlp-gateway-prod-<region>.grafana.net/otlp
+#   OTEL_USER=<Grafana Cloud Stack 的 Instance ID 数字>
+#   OTEL_API_KEY=<Grafana Cloud API Key / glc_ token>
+# 然后 docker compose up -d（已启动的 restart 即可）。凭证获取：Grafana Cloud Portal
+# (grafana.com) → Stack 卡片 → OpenTelemetry 页显示 endpoint 与 Instance ID；
+# API Key 在 Portal → API Keys（Role: MetricsPublisher）或 Access Policies → Create token。
+# 【在哪看数据】Stack 的 Grafana → Explore：Traces / Loki 按标签 service_name
+# （= 各服务名，如 GameFrameX.Web.Api）查询；日志自动带 trace_id 可与链路关联。
+# ─────────────────────────────────────────────────────────────────
+x-grafana-otel: &grafana-otel
+  # Grafana Cloud OTLP endpoint（区域看你注册 Stack 时选的，如 ap-southeast-1）
+  OpenTelemetry__Endpoint: "${OTEL_ENDPOINT:-}"
+  # Basic auth 用户名 = Stack Instance ID（数字）
+  OpenTelemetry__UserName: "${OTEL_USER:-}"
+  # Basic auth 密码 = Grafana Cloud API Key 或 glc_ token
+  OpenTelemetry__ApiKey: "${OTEL_API_KEY:-}"
 
 services:
-  # MySQL
-  mysql:
-    image: mysql:5.7.44
-    container_name: mysql
-    ports:
-      - "29101:3306"
+  # ═══════════════════════ 内置 PostgreSQL 数据库 ═══════════════════════
+  # 默认自带一个 PostgreSQL 16，无需额外安装；首次启动自动建库（见下方 init.sql 挂载），
+  # 数据保存在仓库根 postgres-data/ 目录里——删容器数据也不丢。
+  # 如需复用宿主机/外部已有的 PostgreSQL：在 .env 设置 POSTGRES_HOST=host.docker.internal
+  # （端口/账号/密码同步用 .env 覆盖），并删除下方 web-entry 的 depends_on.postgres 段。
+  postgres:
+    # 官方 PostgreSQL 16 镜像（alpine 版体积更小）
+    image: postgres:16-alpine
+    # 固定容器名，方便 docker logs / docker exec 时引用
+    container_name: gameframex-postgres
+    # 自动重启策略：进程崩溃后自动拉起；手动 docker stop 停掉的不再自动拉起
     restart: unless-stopped
-    privileged: true
-    ulimits:
-      nproc: 655350
-      nofile:
-        soft: 131072
-        hard: 400000
-    #healthcheck:
-    #  test: "/usr/bin/mysql --user=root --password=root --execute \"SHOW DATABASES;\""
-    #  interval: 10s # 间隔时间
-    #  timeout: 3s  # 超时时间
-    #  retries: 50   # 重试次数
-    command: [
-      #设置数据库表的数据集
-      '--character-set-server=utf8mb4', 
-      #设置数据库表的数据集
-      '--collation-server=utf8mb4_general_ci', 
-    ]
     environment:
-      # MySQL配置链接权限
-      MYSQL_ROOT_HOST: ${MYSQL_ROOT_HOST:-%}
-      # MySQL配置创建数据库名称
-      MYSQL_DATABASE: ${MYSQL_DATABASE:-gameframex}
-      # MySQL配置创建数据库账号密码
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-123456}
-      # MySQL配置时区
-      TZ: Asia/Shanghai
-    # 环境变量注入
-    env_file:
-      # 开发环境的配置文件
-      - ./development.env
-      # 生产环境的配置文件
-      # - ./production.env
-    volumes:
-      # MySQL数据存储映射
-      - ./running/mysql/mysql:/var/lib/mysql
-      # MySQL配置文件映射
-      - ./running/mysql/mysql.cnf:/etc/mysql/conf.d/mysql.cnf
-    networks:
-    # MySQL网络映射
-      - gameframex_networks
-  # 后台管理API
-  gameframex.web.admin.api:
-  # 自定义镜像私有镜像地址和版本
-    image: registry.cn-shenzhen.aliyuncs.com/gameframex/gameframex.web.admin.api:1.0.0.0
-    # 容器名称
-    container_name: gameframex-web-admin-api
-    # build:
-    #   context: ./GameFrameX.Admin.Web.Api
-    #   dockerfile: Dockerfile
-    #   args:
-    #     - no-cache
-    ports:
-      # 端口映射
-      - "20802:20802"
-    # 环境变量
-    environment:
-      # 数据库名称
-      DatabaseName: ${DatabaseName:-gameframex}
-      # 数据库类型
-      DbType: ${DbType:-MySql}
-      # 数据库链接字符串
-      ConnectionString: ${ConnectionString:-Data Source=mysql;Database=gameframex;Port=3306;Uid=root;Pwd=123456;}
-    # 环境变量注入
-    env_file:
-      # 开发环境的配置文件
-      - ./development.env
-      # 生产环境的配置文件
-      # - ./production.env
-    links:
-      - mysql
-    networks:
-    # 网络映射
-      - gameframex_networks
-  # 客户端使用API
-  gameframex.web.client.api:
-    # 自定义镜像私有镜像地址和版本
-    image: registry.cn-shenzhen.aliyuncs.com/gameframex/gameframex.web.client.api:1.0.0.0
-    # 容器名称
-    container_name: gameframex-web-client-api
-    # build:
-    #   context: ./GameFrameX.Admin.Client.Api
-    #   dockerfile: Dockerfile
-    #   args:
-    #     - no-cache
-    ports:
-      - "20808:80"
-      # - "20809:443"
-    environment:
-      # 数据库名称
-      DatabaseName: ${DatabaseName:-gameframex}
-      # 数据库类型
-      DbType: ${DbType:-MySql}
-      # 数据库链接字符串
-      ConnectionString: ${ConnectionString:-Data Source=mysql;Database=gameframex;Port=3306;Uid=root;Pwd=123456;}
-    # 环境变量注入
-    env_file:
-      # 开发环境的配置文件
-      - ./development.env
-      # 生产环境的配置文件
-      # - ./production.env
-    links:
-      - mysql
-    networks:
-    # 网络映射
-      - gameframex_networks
-    depends_on:
-    # 客户端API依赖的服务.需要等后台启动好了才能启动。如果部署在不同的机器上。可以删除这个配置
-      - gameframex.web.admin.api
-  # Web前端Vue
-  gameframex.admin.web.vue:
-    # 自定义镜像私有镜像地址和版本
-    image: registry.cn-shenzhen.aliyuncs.com/gameframex/gameframex.admin.web.vue:1.0.0.0
-    container_name: gameframex-admin-web-vue
-    # build:
-    #   context: ./GameFrameX.Admin.Web.Vue
-    #   dockerfile: Dockerfile
-    #   args:
-    #     - no-cache
-    ports:
-      - "20800:80"
-      # - "20801:443"
-    environment:
+      # 初始超级用户名（仅首次初始化数据目录时生效；可被 .env 的 POSTGRES_USER 覆盖）
+      - POSTGRES_USER=${POSTGRES_USER:-gameframex}
+      # 初始密码（仅首次初始化生效！改密码的完整步骤见文件顶部说明）
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-GameFrameX@Local2026}
+      # 初始默认库名（管理库）；真正的业务库 gameframex_admin 由 init.sql 创建
+      - POSTGRES_DB=postgres
+      # 时区：让数据库日志时间与本地一致
       - TZ=Asia/Shanghai
-    # 这里配置映射
-    # volumes:
-    #   - "./running/nginx/dist:/usr/share/nginx/html"
-    #   - "./running/nginx/conf/nginx.conf:/etc/nginx/conf/nginx.conf"
-    #   - "./running/nginx/key:/etc/nginx/key/"
+    # 端口映射，格式 "宿主机端口:容器端口"：
+    #   左边是宿主机端口，可用 .env 的 POSTGRES_PORT 覆盖（本机 5432 被占用时改它）；
+    #   右边是容器内 PostgreSQL 端口，不要改。
+    # 注意：映射到宿主机后，同一局域网的设备都能尝试连接，请保持密码有一定强度。
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      # 数据持久化：数据库全部数据存于仓库根 postgres-data/（bind mount）。
+      # docker compose down 删容器不丢数据；删除 postgres-data/ 目录才会清空
+      - ./postgres-data:/var/lib/postgresql/data
+      # 首次初始化脚本（只读挂载）：仅当数据目录为空（第一次启动）时执行，
+      # 负责创建业务库 gameframex_admin 等（脚本归属后端子目录，见路径）
+      - ./GameFrameX.Admin.Unified.Api/docker/postgres/init.sql:/docker-entrypoint-initdb.d/01-init-databases.sql:ro
+    healthcheck:
+      # 健康检查：用 pg_isready 探测数据库是否就绪（$$ 是 compose 的转义写法，保持原样）
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-gameframex} -d postgres"]
+      interval: 10s      # 检查间隔
+      timeout: 5s        # 单次检查超时
+      retries: 5         # 连续失败多少次判为不健康
+      start_period: 10s  # 启动宽限期：此期间的失败不计入 retries
     networks:
-    # 网络映射
-      - gameframex_networks
-    restart: always
+      # 加入 gameframex 私有网络，网内容器可用服务名 postgres 互访
+      - gameframex
+
+  # ═══════════════════════ 后台管理入口 API（端口 20802）═══════════════════════
+  # 管理后台前端调用的服务；同时负责初始化主库表结构与种子数据。
+  # client-api / hub-api 依赖它启动健康（主库就绪）后才启动。
+  web-entry:
+    build:
+      # 构建上下文：后端子目录（Vue 前端改动不会失效这里的服务层缓存；改代码后需 --build 重建）
+      context: ./GameFrameX.Admin.Unified.Api
+      # 本服务用哪个 Dockerfile 构建
+      dockerfile: Dockerfile.web-entry
+    container_name: gameframex-web-entry
+    restart: unless-stopped
+    ports:
+      # 宿主机 20802 → 容器 20802。换访问端口改左边数字（如 30002:20802），
+      # 右边 20802 与镜像内 ASPNETCORE_URLS 对应，不要改
+      - "20802:20802"
+    environment:
+      # 引用顶部共享配置模板：数据库连接（x-main-db）+ Grafana Cloud OpenTelemetry（x-grafana-otel）
+      <<: [*main-db, *grafana-otel]
+      # 运行环境标识（容器部署按 Production 跑）
+      ASPNETCORE_ENVIRONMENT: Production
+      # 容器时区，影响日志时间戳
+      TZ: Asia/Shanghai
+      # Swagger 在 Production 容器内显式开启（代码默认仅 Development 暴露，见 Startup.Configure）
+      # 访问地址 http://localhost:20802/swagger；对外正式部署如不想暴露接口文档，删除本行即可
+      Swagger__Enabled: "true"
+      # 默认租户库（gameframex_admin_tenant_1300000000001，init.sql 已预建）由主库连接串自动推导，无需配置（C269）
+    volumes:
+      # 把后端仓库里的 appsettings.json 只读挂载进容器（覆盖镜像内同名文件）：
+      # 好处是改配置后 docker compose restart web-entry 即生效，无需重新构建镜像
+      - ./GameFrameX.Admin.Unified.Api/GameFrameX.Web.Api/appsettings.json:/app/appsettings.json:ro
+    extra_hosts:
+      # 让容器内 host.docker.internal 解析到宿主机（Linux 必需；macOS/Windows 的 Docker Desktop 自带）
+      # 需要让 API 连宿主机上装的数据库时会用到
+      - "host.docker.internal:host-gateway"
+    networks:
+      - gameframex
     depends_on:
-    # 客户端API依赖的服务.需要等后台启动好了才能启动。如果部署在不同的机器上。可以删除这个配置
-      - gameframex.web.admin.api
-      - mysql
+      # 启动顺序保证：等 postgres 健康检查通过后本服务才启动
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      # 用 bash 在容器内自连 20802 发 HTTP 请求，检查 /health 是否返回 200
+      # （镜像内无 curl/wget，用 bash 的 /dev/tcp 模拟；一般不需要改）
+      test: ["CMD-SHELL", "bash -ec 'exec 3<>/dev/tcp/127.0.0.1/20802; printf \"GET /health HTTP/1.1\\r\\nHost: localhost\\r\\n\\r\\n\" >&3; read -r status <&3; [[ $$status == *\" 200 \"* ]]'"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # ═══════════════════════ 客户端 API（端口 20808）═══════════════════════
+  # 面向游戏客户端的接口服务；主库连接同走 GFX_MAIN_DB_* 单一入口（C269）
+  client-api:
+    build:
+      context: ./GameFrameX.Admin.Unified.Api
+      # 用客户端 API 专属 Dockerfile 构建（改代码后需 --build 重建）
+      dockerfile: Dockerfile.client-api
+    container_name: gameframex-client-api
+    restart: unless-stopped
+    ports:
+      # 宿主机端口:容器端口，换端口改左边
+      - "20808:20808"
+    environment:
+      # 共享配置模板：数据库连接（x-main-db）+ Grafana Cloud OpenTelemetry（x-grafana-otel）
+      <<: [*main-db, *grafana-otel]
+      ASPNETCORE_ENVIRONMENT: Production
+      TZ: Asia/Shanghai
+      # Swagger 在 Production 容器内显式开启（代码默认仅 Development 暴露）
+      Swagger__Enabled: "true"
+      # 日志标签：在日志行里标记来源服务，便于集中排查时区分
+      TagName: client-api
+    volumes:
+      # 挂载自己的 appsettings.json（改配置后 docker compose restart client-api 生效）
+      - ./GameFrameX.Admin.Unified.Api/GameFrameX.Client.Api/appsettings.json:/app/appsettings.json:ro
+    extra_hosts:
+      # 同 web-entry 处说明
+      - "host.docker.internal:host-gateway"
+    networks:
+      - gameframex
+    depends_on:
+      # 等 web-entry 健康（主库表结构初始化完成）后才启动——client-api 自身不建表
+      web-entry:
+        condition: service_healthy
+    healthcheck:
+      # 同 web-entry：容器内自连 20808 检查 /health 是否 200（探针端点已豁免 X-Proto-Ver 缺头拒绝）
+      test: ["CMD-SHELL", "bash -ec 'exec 3<>/dev/tcp/127.0.0.1/20808; printf \"GET /health HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n\" >&3; read -r status <&3; [[ $$status == *\" 200 \"* ]]'"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # ═══════════════════════ Hub API（端口 20806）═══════════════════════
+  # 面向长连接/推送的 Hub 服务；主库连接同走 GFX_MAIN_DB_* 单一入口（C269）
+  hub-api:
+    build:
+      context: ./GameFrameX.Admin.Unified.Api
+      # 用 Hub API 专属 Dockerfile 构建（改代码后需 --build 重建）
+      dockerfile: Dockerfile.hub-api
+    container_name: gameframex-hub-api
+    restart: unless-stopped
+    ports:
+      # 宿主机端口:容器端口，换端口改左边
+      - "20806:20806"
+    environment:
+      # 共享配置模板：数据库连接（x-main-db）+ Grafana Cloud OpenTelemetry（x-grafana-otel）
+      <<: [*main-db, *grafana-otel]
+      ASPNETCORE_ENVIRONMENT: Production
+      TZ: Asia/Shanghai
+      # Swagger 在 Production 容器内显式开启（代码默认仅 Development 暴露）
+      Swagger__Enabled: "true"
+      # Hub JWT 验签密钥（对齐主库 platform_jwt_settings；留空 = hub 可启动但所有 JWT 校验失败）。
+      # 凭证不进 git：写入仓库根 .env（GFX_HUB_JWT_SIGNING_KEY=...），值与平台密钥一致。
+      JWTSettings__IssuerSigningKey: ${GFX_HUB_JWT_SIGNING_KEY:-}
+      # 日志标签：在日志行里标记来源服务，便于集中排查时区分
+      TagName: hub-api
+    volumes:
+      # 挂载自己的 appsettings.json（改配置后 docker compose restart hub-api 生效）
+      - ./GameFrameX.Admin.Unified.Api/GameFrameX.Hub.Api/appsettings.json:/app/appsettings.json:ro
+    extra_hosts:
+      # 同 web-entry 处说明
+      - "host.docker.internal:host-gateway"
+    networks:
+      - gameframex
+    depends_on:
+      # 等 web-entry 健康（主库表结构初始化完成）后才启动——hub-api 自身不建表
+      web-entry:
+        condition: service_healthy
+    healthcheck:
+      # 同 web-entry：容器内自连 20806 检查 /health 是否 200
+      test: ["CMD-SHELL", "bash -ec 'exec 3<>/dev/tcp/127.0.0.1/20806; printf \"GET /health HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n\" >&3; read -r status <&3; [[ $$status == *\" 200 \"* ]]'"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # ═══════════════════════ Admin 前端 Vue（nginx，端口 20800）═══════════════════════
+  # 静态托管管理后台页面（Vite 产物），运行时由 entrypoint.sh 按环境变量改写 config/config.js。
+  # 浏览器从宿主机访问，API 地址是「宿主机视角」——默认指向本 compose 发布的 web-entry 20802。
+  admin-web-vue:
+    build:
+      # 构建上下文：仓库根（Vue Dockerfile 引用根 build/ 下的 nginx 配置与 entrypoint；
+      # 仓库根 .dockerignore 剔除后端源码与 node_modules，后端改动不会失效前端层缓存）
+      context: .
+      dockerfile: GameFrameX.Admin.Unified.Vue/Dockerfile
+    container_name: gameframex-admin-web-vue
+    restart: unless-stopped
+    ports:
+      # 宿主机 20800 → 容器 80。换访问端口改左边数字
+      - "20800:80"
+    environment:
+      TZ: Asia/Shanghai
+      # 前端运行时 API 地址（entrypoint 写入 config/config.js 的 window.__env__）。
+      # 默认指向本机 web-entry；前端部署到远端时改为浏览器可达的后端地址（可被 .env 覆盖）
+      VITE_API_URL: ${WEB_VUE_API_URL:-http://127.0.0.1:20802}
+    networks:
+      - gameframex
+    depends_on:
+      # 等后台管理 API 健康后再起前端，保证打开页面即可登录
+      web-entry:
+        condition: service_healthy
+
+# ═══════════════════════ 顶层网络声明 ═══════════════════════
+# bridge 私有网络：本项目所有容器都加入它，容器之间通过服务名
+# （postgres / web-entry / client-api / hub-api / admin-web-vue）互相访问，外部网络不可见
 networks:
-  gameframex_networks:
+  gameframex:
     driver: bridge
-    ipam:
-      driver: default
-      config:
-        - subnet: 172.100.1.0/24
-          gateway: 172.100.1.1

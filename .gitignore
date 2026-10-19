@@ -1,39 +1,26 @@
-# Build and Release Folders
-bin-debug/
-bin-release/
-[Oo]bj/
-[Bb]in/
+# ===== 本地工具/工作区目录（不入库） =====
+# 子目录各自的构建产物/密钥/生成物由 GameFrameX.Admin.Unified.{Api,Vue}/.gitignore 覆盖
+.codegraph/
+.worktrees/
+.local-archive/
+.menu-test/
+.openclaude/
+.claude/
+.omp/
+.orca-automations/
+.playwright-mcp/
 
-# Other files and folders
-.settings/
+# ===== 运行时数据 =====
+GameFrameX.Admin.Unified.Api/GameFrameX.Web.Api/data/
 
-# Executables
-*.swf
-*.air
-*.ipa
-*.apk
-
-# Project files, i.e. `.project`, `.actionScriptProperties` and `.flexProperties`
-# should NOT be excluded as they contain compiler settings and other important
-# information for Eclipse / Flash Builder.
-/Admin.NET/.vs
-/Admin.NET/packages
-/Admin.NET/GameFrameX.Web.Entry/wwwroot/Upload
-/Admin.NET/GameFrameX.Web.Entry/wwwroot/Avatar
-/Admin.NET/GameFrameX.Web.Entry/wwwroot/Signature
-/Admin.NET/GameFrameX.Web.Core/Admin.NET.Web.Core.csproj.user
-/Admin.NET/GameFrameX.Web.Entry/Admin.NET.Web.Entry.csproj.user
-/Admin.NET/GameFrameX.Web.Entry/Properties/PublishProfiles
-/Admin.NET/GameFrameX.Web.Entry/publish
-/Admin.NET/GameFrameX.Web.Entry/logs
-/Admin.NET/GameFrameX.Web.Entry/*.db
-
-# folders
-dist/
-node_modules/
-/Web/package-lock.json
+# ===== 系统/编辑器 =====
 .DS_Store
-/Web/public/config.js
-Admin.NET/.idea
-Admin.NET/GameFrameX.Web.Entry/logs
-running
+.idea/
+*.user
+
+# ===== 通用构建产物兜底 =====
+node_modules/
+# ===== 密钥文件（模板见 *.env.example） =====
+/.env
+/postgres-data
+gfx-doc
