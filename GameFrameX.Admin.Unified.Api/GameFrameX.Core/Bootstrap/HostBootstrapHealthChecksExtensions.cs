@@ -27,6 +27,8 @@ public static class HostBootstrapHealthChecksExtensions
 
     /// <summary>
     /// 映射共享健康探针端点：/health 与 /health/live 取 live 标签（存活），/health/ready 取 ready 标签（就绪）。
+    /// <para>探针端点统一打 <see cref="HealthProbeProtoVersionExemptMetadata"/>：容器编排 / 负载均衡探针
+    /// 不携带 X-Proto-Ver，与公开 S2S 回调同走缺头豁免（Client host 的 ProtoVersionMiddleware）。</para>
     /// </summary>
     /// <param name="endpoints">端点路由构建器。</param>
     /// <param name="allowAnonymous">
@@ -42,10 +44,18 @@ public static class HostBootstrapHealthChecksExtensions
 
     private static void MapSingle(IEndpointRouteBuilder endpoints, string pattern, Func<HealthCheckRegistration, bool> predicate, bool allowAnonymous)
     {
-        var builder = endpoints.MapHealthChecks(pattern, new HealthCheckOptions { Predicate = predicate, });
+        var builder = endpoints.MapHealthChecks(pattern, new HealthCheckOptions { Predicate = predicate, })
+                              .WithMetadata(new HealthProbeProtoVersionExemptMetadata());
         if (allowAnonymous)
         {
             builder.AllowAnonymous();
         }
     }
+}
+
+/// <summary>
+/// 健康探针端点的协议版本缺头豁免标记：探针来自容器编排 / 负载均衡，不携带 X-Proto-Ver。
+/// </summary>
+public sealed class HealthProbeProtoVersionExemptMetadata : Middleware.IProtoVersionExempt
+{
 }
