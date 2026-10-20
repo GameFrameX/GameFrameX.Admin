@@ -88,65 +88,14 @@ Compose 内置 PostgreSQL + 三个 host（20802/20806/20808）+ Admin 前端（2
 
 ## 技术栈
 
-**后端（[`GameFrameX.Admin.Unified.Api`](GameFrameX.Admin.Unified.Api/)）**
+- **后端**：.NET 10 + ASP.NET Core 原生宿主 + SqlSugar（Code-First，34 种 DbType）+ JWT/HMAC + SignalR + Serilog。
+- **前端**：Vue 3.5 + Vite 6 + TypeScript strict + PrimeVue 4.5 + Pinia 3 + vue-i18n（5 语言）+ Axios。
 
-| 层 | 选型 | 版本 / 备注 |
-|---|---|---|
-| 运行时 | .NET 10 | `Directory.Build.props`: `net10.0` / `LangVersion=10` |
-| 框架 | ASP.NET Core 原生宿主 | 无第三方框架（自研 `IDynamicApiController` + `Web.Core/ApiRouting/AdminApiRouteRules`） |
-| ORM | SqlSugar | Code-First，34 种 DbType；`SqlSugarRepository<T>` 自动主库 / 租户库 / 日志库路由 |
-| 认证 | JWT Bearer + HMAC Signature | 三 host 共用密钥；HMAC-SHA256 签名（开放接口走 `SignatureAuthenticationHandler`） |
-| 实时通信 | SignalR | `OnlineUserHub` 按租户分组（`GROUP_ONLINE_{tenantId}`），可选 Redis Backplane |
-| 缓存 | Memory / Redis | `SystemCacheService` 统一抽象 |
-| 调度 | `ProjectScheduler`（项目自有） | `GameFrameX.Core/Job/`，内置 / 脚本编译 / HTTP 三类任务，多实例通过 `DbJobPersistence` 协调 |
-| 日志 | SqlSugar AOP + Serilog | 操作 / 异常 / 访问 / 数据变更 四类入库 |
-| 数据库 | SQLite 本地 / PostgreSQL 生产 | 默认零配置；生产推荐 PG |
-| 分布式 ID | Foundation Snowflake 紧凑布局 | 13-14 位数字，< 2^53 JS 安全域 |
-
-**前端（[`GameFrameX.Admin.Unified.Vue`](GameFrameX.Admin.Unified.Vue/)）**
-
-| 层 | 选型 | 版本 |
-|---|---|---|
-| 框架 | Vue 3（Composition API + `<script setup lang="ts">`） | 3.5.x |
-| 构建 | Vite | 6.x |
-| UI 组件库 | PrimeVue（Aura 主题）+ PrimeFlex + PrimeIcons | 4.5.x |
-| 状态 | Pinia + pinia-plugin-persistedstate | 3.x |
-| 路由 | Vue Router（hash 模式，后端动态菜单驱动） | 4.x |
-| 语言 | TypeScript strict | 5.3.x |
-| 国际化 | vue-i18n（5 语言：zh-cn / en / zh-tw / ja / ko） | 11.x，`pnpm run lint:i18n` 守护 |
-| 图表 | ECharts + echarts-gl + echarts-wordcloud | 6.x |
-| 实时 | @microsoft/signalr | 10.x |
-| 富文本 | wangEditor + editor-for-vue | 5.x |
-| 编辑器 | Monaco Editor | 0.44.x |
-| HTTP | Axios + 自研拦截器（JWT 自动续期 / 错误码 i18n） | 1.x |
-| 图标 | FontAwesome 7（vue-fontawesome + 自动按需） | 7.x |
-| 包管理 | pnpm | ≥ 11.5.2 |
-| Node | — | ≥ 16（推荐 20） |
+完整选型清单与版本矩阵见 [后端 README · 技术栈](GameFrameX.Admin.Unified.Api/README.md#技术栈) 与 [前端 README · 技术栈](GameFrameX.Admin.Unified.Vue/README.md#技术栈)。
 
 ## 三套主机：Admin / Client / Hub
 
-```
-Admin API（20802）              Client API（20808）            Hub API（20806）
-    │                              │                              │
-    │ 管理后台用                    │ 游戏客户端用                  │ 外部系统 / 游戏端 / CI 用
-    │ 登录 / 用户 / 菜单 /          │ 登录 / 支付 / 拿配置          │ 区服 / 资源版本 / 道具 /
-    │ 订单 / 日志 / 定时任务         │                              │ 兑换码 / 打包上报 / Tapd WebHook
-    │                              │                              │
-    └──────────── 共享 Entity ──────────────┬─────────────────────┘
-                                           │
-                                           ├── 共享 Payment（仅 Client 用）
-                                           └── 三者各自直接用 SqlSugar 仓储
-```
-
-依赖方向（左到右是引用方向）：
-
-```
-Web.Api → Web.Core → Application.{System, Game, Client, Tenant} → Core → Entity → Core.Enum
-Client.Api（独立，仅引用 Entity + Payment）
-Hub.Api（独立，引用 Application.Game + Core + Entity，但 Controller 不调 Application Service）
-```
-
-**关键约定**：业务层永远不知道 `Web.Api` 的存在。`Application.*` 与 `Core.*` 严禁反向引用宿主——这样 Client / Hub 才能干净地把 Entity 拎出去独立用。
+一套仓库三套主机，分库部署互不拖累：**Admin API**（20802，管理后台）、**Client API**（20808，游戏客户端登录/支付/配置）、**Hub API**（20806，外部系统 / CI / WebHook）。三者共享 Entity 与 SqlSugar 仓储，依赖只能往下走（`Application.*` / `Core.*` 严禁反向引用宿主）。
 
 ### 三个主机最大的差异
 
@@ -179,9 +128,7 @@ App 应用（租户下的具体游戏 / 产品）── AppId 作用域
 | `tenant` | 租户级（所有应用共有，无 appId query） | `/dashboard/*`、`/system/*` |
 | `app` | 应用工作台内（必须带 `appId` query） | `/gameCenter/*` |
 
-**写实体的两条铁律**：
-1. **多租户是天生自带的**：实体打 `[Tenant]` 标记，查询自动加 `TenantId` 过滤 + 自动软删除。只有 SuperAdmin 能穿墙。写业务的时候几乎感觉不到。
-2. **数据库边界由特性决定**：`[SystemTable]` 路由主库；`[LogTable]` 路由日志库；`[Tenant]` 路由租户库；无标记按 JWT `TenantId` 路由。仓储替你做了。
+多租户与数据库边界由实体特性自动生效：`[Tenant]` 自动加 `TenantId` 过滤 + 软删除；`[SystemTable]` 路由主库、`[LogTable]` 路由日志库、无标记按 JWT `TenantId` 路由。细节见 [后端 README · 仓储与多数据库路由](GameFrameX.Admin.Unified.Api/README.md#仓储与多数据库路由)。
 
 ## 30 个功能模块
 
@@ -273,18 +220,11 @@ App 应用（租户下的具体游戏 / 产品）── AppId 作用域
 
 ## 数据库
 
-**默认零配置**：什么都不用配。`GameFrameX.Application/Configuration/Database.json` 是**单一连接串来源**（三 host 共享，改一处三处生效），本地默认 SQLite（仓库根 `db/` 下，WAL 模式）；生产用 PostgreSQL。
+**默认零配置**：本地源码直跑默认 SQLite（仓库根 `db/` 下），生产用 PostgreSQL（也支持 MySQL / Oracle 等共 34 种 DbType）。`GameFrameX.Application/Configuration/Database.json` 是单一连接串来源（三 host 共享，改一处三处生效）。
 
-**主库 / 租户库 / 日志库自动路由**：
-
-- `[SystemTable]` → 主库（平台定义、SuperAdmin bootstrap）
-- `[LogTable]` → 日志库（操作 / 异常 / 访问 / 数据变更）
-- `[Tenant]` → 租户库（业务数据）
-- 无标记 → 按 JWT `TenantId` 路由
-
-**租户库是自动建的**：创建普通租户时，按租户 ID 自动生成 `gameframex_admin_tenant_<TenantId>` 数据库和对应登录角色，**不需要 SuperAdmin 手动填租户库连接串**。默认租户库同样自动推导（PostgreSQL / MySQL 仅替换库名，SQLite 落同目录）。
-
-**支持 34 种 DbType**：SQLite / PostgreSQL / MySQL / 达梦 / Oracle / SqlServer / …换库连改 `Database.json` 即可。连接串写法见 [`Database-ConnectionStrings.md`](GameFrameX.Admin.Unified.Api/GameFrameX.Application/Configuration/Database-ConnectionStrings.md)。
+- 主库 / 租户库 / 日志库按实体特性自动路由（见上文多租户一节）。
+- 租户库自动创建：按租户 ID 生成 `gameframex_admin_tenant_<TenantId>`，无需手填连接串；默认租户库同样自动推导。
+- 换库连接串写法见 [`Database-ConnectionStrings.md`](GameFrameX.Admin.Unified.Api/GameFrameX.Application/Configuration/Database-ConnectionStrings.md)；环境变量成对覆盖（`GFX_MAIN_DB_TYPE` + `GFX_MAIN_DB_CONNECTION_STRING`）等部署细节见 [后端 README · 数据库](GameFrameX.Admin.Unified.Api/README.md#数据库默认零配置生产用-postgresql)。
 
 > SQLite 只面向本地开发。生产禁用——并发写入弱、无独立服务进程、备份恢复与运维监控能力不足。
 
@@ -308,25 +248,12 @@ App 应用（租户下的具体游戏 / 产品）── AppId 作用域
 
 ## 发布与部署
 
-### Docker Compose 一键起（推荐）
-
 ```bash
 docker compose up -d --build
 # 内置 PostgreSQL + Admin(20802) + Client(20808) + Hub(20806) + 前端(20800)，起完等 healthcheck 变绿（前端容器与 dev server 同抢 20800，互斥）
 ```
 
-### 单容器
-
-```bash
-docker run -p 20802:20802 \
-  -e GFX_MAIN_DB_TYPE=PostgreSQL \
-  -e GFX_MAIN_DB_CONNECTION_STRING="Host=...;Port=5432;Database=gameframex_admin;Username=...;Password=..." \
-  -e GFX_DEFAULT_TENANT_DB_TYPE=PostgreSQL \
-  -e GFX_DEFAULT_TENANT_DB_CONNECTION_STRING="Host=...;Port=5432;Database=gameframex_admin_tenant_1300000000001;Username=...;Password=..." \
-  gameframex-admin-web:1.0.0.0
-```
-
-环境变量成对设置（`GFX_MAIN_DB_TYPE` + `GFX_MAIN_DB_CONNECTION_STRING`），半套覆盖会在启动期直接报错。
+单容器 `docker run`、环境变量成对覆盖（半套覆盖启动期直接报错）等细节见 [后端 README · 部署](GameFrameX.Admin.Unified.Api/README.md#部署)。
 
 ## 开发与贡献
 
