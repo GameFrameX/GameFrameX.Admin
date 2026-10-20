@@ -29,7 +29,7 @@
     "test:unit:watch": "vitest",
     "test:unit:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
-    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:headless": "E2E_HEADLESS=1 playwright test",
     "test:e2e:list": "playwright test --list",
     "test:e2e:report": "playwright show-report e2e/.e2e/report",
     "quality": "pnpm run lint && pnpm run typecheck && pnpm run test:unit && pnpm run build && pnpm run check:frontend"

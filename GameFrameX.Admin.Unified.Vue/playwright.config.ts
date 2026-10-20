@@ -29,7 +29,9 @@ export default defineConfig({
   use: {
     baseURL: APP_URL,
     channel: 'msedge',
-    headless: process.env.E2E_HEADED !== '1',
+    // 本地默认有头：肉眼可见测试在真实浏览器里做了什么（2026-10-20 用户要求）；
+    // CI 或显式 E2E_HEADLESS=1 时才无头。test:e2e:headed 脚本始终强制有头。
+    headless: process.env.CI === 'true' || process.env.E2E_HEADLESS === '1',
     locale: 'zh-CN',
     actionTimeout: 15_000,
     trace: 'retain-on-failure',
