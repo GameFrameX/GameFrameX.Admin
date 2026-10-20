@@ -60,7 +60,7 @@ dotnet run --project GameFrameX.Hub.Api      # Hub API → http://localhost:2080
 cd ../GameFrameX.Admin.Unified.Vue
 corepack enable
 pnpm install
-pnpm run dev    # 默认 http://localhost:8888（hash 路由）
+pnpm run dev    # 默认 http://localhost:20800（hash 路由）
 ```
 
 打开浏览器 → 看到登录页 → 账号 `admin` / 密码 `123456` / 租户 `1300000000001`（首次启动 SqlSugar Code-First 会自动建表 + 灌种子）。
@@ -71,7 +71,7 @@ pnpm run dev    # 默认 http://localhost:8888（hash 路由）
 docker compose up -d --build
 ```
 
-Compose 内置 PostgreSQL + 三个 host（20802/20806/20808）+ Admin 前端（20800），起完等 healthcheck 变绿即可访问。
+Compose 内置 PostgreSQL + 三个 host（20802/20806/20808）+ Admin 前端（20810），起完等 healthcheck 变绿即可访问。
 
 更细的命令与踩坑见 [`GameFrameX.Admin.Unified.Api/README.md`](GameFrameX.Admin.Unified.Api/README.md)（后端 893 行手册）与 [`GameFrameX.Admin.Unified.Vue/README.md`](GameFrameX.Admin.Unified.Vue/README.md)（前端 962 行手册）。
 
@@ -312,7 +312,7 @@ App 应用（租户下的具体游戏 / 产品）── AppId 作用域
 
 ```bash
 docker compose up -d --build
-# 内置 PostgreSQL + Admin(20802) + Client(20808) + Hub(20806) + 前端(20800)，起完等 healthcheck 变绿
+# 内置 PostgreSQL + Admin(20802) + Client(20808) + Hub(20806) + 前端(20810)，起完等 healthcheck 变绿
 ```
 
 ### 单容器

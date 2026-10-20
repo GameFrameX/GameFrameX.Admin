@@ -4,7 +4,7 @@ import { defineConfig } from '@playwright/test';
 // 也免旧套件的手动 Edge CDP 9222 前置步骤。
 // 会话模型：setup 项目真实表单登录并落 storageState（e2e/.e2e/state/*.json），
 // admin 项目默认注入 admin 态；superadmin/匿名用例经 tests/helpers.ts 开显式 context。
-const APP_URL = process.env.E2E_APP_URL ?? 'http://127.0.0.1:8888';
+const APP_URL = process.env.E2E_APP_URL ?? 'http://127.0.0.1:20800';
 const STATE_DIR = 'e2e/.e2e/state';
 // setup 项目必须全新上下文，不能被 admin 态污染（否则跳过登录直接落地）
 const NO_STORAGE_STATE = { cookies: [], origins: [] };

@@ -6,7 +6,7 @@
 import puppeteer from 'puppeteer-core';
 
 const CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
-const BASE = 'http://127.0.0.1:8888';
+const BASE = 'http://127.0.0.1:20800';
 
 const browser = await puppeteer.launch({
   executablePath: CHROME,

@@ -23,7 +23,7 @@ test('sign in as tenant admin', async ({ page }) => {
   }
   await page.locator('#login-password').fill(PASSWORD);
 
-  // 跨域（8888 → 20802）下 OPTIONS 预检与 POST 同 URL，waitForResponse 会误捕预检响应；
+  // 跨域（20800 → 20802）下 OPTIONS 预检与 POST 同 URL，waitForResponse 会误捕预检响应；
   // 改用 route 记录器证明真实 POST 发出，waitForURL 证明登录响应已被应用处理成功。
   let loginPosted = false;
   await page.route(LOGIN_URL, async (route) => {

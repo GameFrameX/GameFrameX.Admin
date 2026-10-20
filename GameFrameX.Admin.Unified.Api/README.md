@@ -188,7 +188,7 @@ GameFrameX.Admin.Unified.Api/
 ```bash
 # 在仓库根执行（不在 Api 子目录）
 docker compose up -d --build
-# 内置 PostgreSQL + Admin(20802) + Client(20808) + Hub(20806) + 前端(20800)，起完等 healthcheck 变绿
+# 内置 PostgreSQL + Admin(20802) + Client(20808) + Hub(20806) + 前端(20810)，起完等 healthcheck 变绿
 ```
 
 ### 启动方式二：源码直跑（零配置，SQLite）

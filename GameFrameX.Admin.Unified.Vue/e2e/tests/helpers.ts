@@ -4,7 +4,7 @@ import { test, type Browser, type Page } from '@playwright/test';
 export const ADMIN_STATE = 'e2e/.e2e/state/admin.json';
 export const SUPERADMIN_STATE = 'e2e/.e2e/state/superadmin.json';
 
-const APP_URL = process.env.E2E_APP_URL ?? 'http://127.0.0.1:8888';
+const APP_URL = process.env.E2E_APP_URL ?? 'http://127.0.0.1:20800';
 
 // 显式证据截图：落在 outputDir 的用例目录（e2e/.e2e/results/<test>/<label>.png）
 export async function shot(page: Page, label: string): Promise<void> {

@@ -36,7 +36,7 @@ Any change a user can see or click must be verified in a real browser before rep
 - Log/monitor/audit write paths (e.g. `DatabaseLoggingWriter`): the row must be confirmed rendered on its frontend page, not only present in the DB.
 
 **What counts as real-browser verification:**
-- Drive the actual Vue app (default dev server `http://127.0.0.1:8888`, hash router) with the e2e suite under `GameFrameX.Admin.Unified.Vue/e2e/` (Playwright, `channel: 'msedge'` launches system Edge — no manual CDP/browser step; run `pnpm run test:e2e` from the Vue root).
+- Drive the actual Vue app (default dev server `http://127.0.0.1:20800`, hash router) with the e2e suite under `GameFrameX.Admin.Unified.Vue/e2e/` (Playwright, `channel: 'msedge'` launches system Edge — no manual CDP/browser step; run `pnpm run test:e2e` from the Vue root).
 - Perform real interactions (form login with the right tenant, navigate by real menu), prove the page's real API fired (route recorder), then assert the DOM renders the expected data (account, tenant, the row/field under test).
 - Evidence lands automatically under `GameFrameX.Admin.Unified.Vue/e2e/.e2e/`: per-test artifacts in `results/<test>/` (explicit `shot(page, 'label')` screenshots + trace.zip on failure), plus `report.json` and the HTML report in `report/` (`pnpm run test:e2e:report`). Use the `shot()` helper from `e2e/tests/helpers.ts` for explicit proof shots.
 

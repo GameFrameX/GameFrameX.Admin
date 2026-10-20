@@ -285,7 +285,7 @@ git clone <仓库地址>
 cd GameFrameX.Admin.Unified.Vue
 corepack enable
 pnpm install
-pnpm run dev    # 默认 http://localhost:8888
+pnpm run dev    # 默认 http://localhost:20800
 ```
 
 打开浏览器 → 看到登录页 → 找后端同学要账号。
@@ -295,7 +295,7 @@ pnpm run dev    # 默认 http://localhost:8888
 | 现象 | 大概率原因 |
 |---|---|
 | `pnpm: command not found` | 没装：`npm i -g pnpm@11.5.2` |
-| 端口 8888 被占 | 改 `.env` 的 `VITE_PORT=9000`，重启 dev |
+| 端口 20800 被占 | 改 `.env` 的 `VITE_PORT=9000`，重启 dev |
 | 浏览器白屏 | 看终端最后几行，Vite 会吐编译错误 |
 | 登录失败 | 没有后端 / 后端没跑 / `.env.development` 的 `VITE_API_URL` 不对 |
 
@@ -304,7 +304,7 @@ pnpm run dev    # 默认 http://localhost:8888
 | 变量 | 说明 | 开发默认值 |
 |---|---|---|
 | `VITE_API_URL` | 后端 API 基址 | `http://127.0.0.1:20802` |
-| `VITE_PORT` | dev 端口 | `8888` |
+| `VITE_PORT` | dev 端口 | `20800` |
 | `VITE_OPEN` | 是否自动开浏览器 | `false` |
 | `VITE_OPEN_CDN` | 是否启用 CDN 外置 | `false` |
 | `VITE_PUBLIC_PATH` | 生产公共路径 | 空 |
