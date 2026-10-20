@@ -2926,7 +2926,7 @@ public partial class GlobalMenuSeedData
             {
                 Id = StableSeedId.Menu("route:globalChannelDefinition"),
                 Key = "route:globalChannelDefinition",
-                Pid = StableSeedId.Menu("route:system"),
+                Pid = StableSeedId.Menu("route:globalConfig"),
                 Type = MenuTypeEnum.Menu,
                 Name = "globalChannelDefinition",
                 Path = "/platform/system/globalChannelDefinition",
@@ -2942,13 +2942,14 @@ public partial class GlobalMenuSeedData
                 IsHide = false,
                 IsKeepAlive = true,
                 IsAffix = false,
-                OrderNo = 15000,
+                OrderNo = 20006,
                 IsEnabled = true,
                 Remark = null,
                 CreatedTime = 1705984444,
                 UpdateTime = 1706793684,
                 // B5: 渠道定义为全局配置，仅超管可见（与 route:appplatform 一致）。
-                // 原先 SyncRoles=TenantAdmin + SuperAdminOnly=false，租户侧边栏可见该菜单（点击后端 EnsureScopePermission 抛 403，属 UX 噪声 + 租户边界违规）。
+                // 2026-10-20 修正：父级原挂租户侧 route:system（租户系统管理组），SuperAdminOnly 过滤后
+                // 租户树与超管树均不可达（超管树不含 route:system 组）——改挂 route:globalConfig 全局配置组。
                 SyncRoles = (int)TenantMenuSyncRole.None,
                 SuperAdminOnly = true,
                 AllowTenantWhenSuperAdminOnly = false,
