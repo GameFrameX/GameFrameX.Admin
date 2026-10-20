@@ -188,7 +188,7 @@ GameFrameX.Admin.Unified.Api/
 ```bash
 # 在仓库根执行（不在 Api 子目录）
 docker compose up -d --build
-# 内置 PostgreSQL + Admin(20802) + Client(20808) + Hub(20806) + 前端(20810)，起完等 healthcheck 变绿
+# 内置 PostgreSQL + Admin(20802) + Client(20808) + Hub(20806) + 前端(20800)，起完等 healthcheck 变绿
 ```
 
 ### 启动方式二：源码直跑（零配置，SQLite）
@@ -238,7 +238,7 @@ docker run -p 20802:20802 \
 | Swagger 打不开 | 非开发环境默认不挂 Swagger，见下面的 [导出 OpenAPI](#导出-openapi-给前端) |
 | 种子数据没灌进去 | 种子数据开关被关了；另外种子是按主键 Upsert 的，改了种子要删旧记录才会重灌 |
 | Hub API 启动报"未配置 JWTSettings" | Hub 复用 Admin 的 JWT 配置，`Hub.Api/appsettings.json` 里要有和 Admin 一致的 `JWTSettings` 节点 |
-| 端口被占 | 20802 / 20808 / 20806 / 20810 被别的进程占了，`lsof -i :20806` 查一下 |
+| 端口被占 | 20800 / 20802 / 20808 / 20806 被别的进程占了（前端容器与 dev server 同抢 20800），`lsof -i :20806` 查一下 |
 
 ---
 

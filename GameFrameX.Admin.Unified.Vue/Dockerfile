@@ -11,7 +11,7 @@ RUN corepack enable
 
 # 单仓整合（2026-10-19）：docker build 上下文已上移为仓库根；
 # Vue 项目内的依赖清单通过 GameFrameX.Admin.Unified.Vue/ 子路径引用。
-COPY GameFrameX.Admin.Unified.Vue/package.json GameFrameX.Admin.Unified.Vue/pnpm-lock.yaml GameFrameX.Admin.Unified.Vue/.pnpmrc GameFrameX.Admin.Unified.Vue/pnpm-workspace.yaml ./
+COPY GameFrameX.Admin.Unified.Vue/package.json GameFrameX.Admin.Unified.Vue/pnpm-lock.yaml GameFrameX.Admin.Unified.Vue/.npmrc GameFrameX.Admin.Unified.Vue/pnpm-workspace.yaml ./
 
 RUN echo "-------------------- start install --------------------"
 
@@ -35,7 +35,7 @@ RUN echo "-------------------- build end  --------------------"
 
 
 FROM nginx:1.20.2
-EXPOSE 80 443
+EXPOSE 20800
 RUN rm /etc/nginx/conf.d/default.conf
 
 # nginx 站点配置 + entrypoint 已随 GameFrameX.Admin.Unified.Vue/build 上移仓库根 build/

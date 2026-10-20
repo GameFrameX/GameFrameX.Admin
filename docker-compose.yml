@@ -265,7 +265,7 @@ services:
       retries: 3
       start_period: 40s
 
-  # ═════════════════════════ Admin 前端 Vue（nginx，端口 20810）═══════════════════════
+  # ═════════════════════════ Admin 前端 Vue（nginx，端口 20800）═══════════════════════
   # 静态托管管理后台页面（Vite 产物），运行时由 entrypoint.sh 按环境变量改写 config/config.js。
   # 浏览器从宿主机访问，API 地址是「宿主机视角」——默认指向本 compose 发布的 web-entry 20802。
   admin-web-vue:
@@ -277,8 +277,9 @@ services:
     container_name: gameframex-admin-web-vue
     restart: unless-stopped
     ports:
-      # 宿主机 20810 → 容器 80。换访问端口改左边数字
-      - "20810:80"
+      # 宿主机 20800 → 容器 20800（内外同端口，与三个 API host 一致）。换访问端口改左边数字。
+      # 注意：与 `pnpm run dev`（同为 20800）互斥——起本容器前先停 dev server，反之亦然。
+      - "20800:20800"
     environment:
       TZ: Asia/Shanghai
       # 前端运行时 API 地址（entrypoint 写入 config/config.js 的 window.__env__）。
