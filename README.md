@@ -44,10 +44,13 @@ Single repository (monorepo): frontend and backend live in one codebase. Since 2
 Admin/
 ├── GameFrameX.Admin.Unified.Api/    # .NET backend: Admin / Client / Hub hosts + Application / Entity / Core layers
 ├── GameFrameX.Admin.Unified.Vue/    # Vue frontend: PrimeVue + Pinia + vue-i18n (5 languages)
-├── gfx-doc/                         # Project documentation system (agent handbook / specs / decisions / backlog)
+├── build/                           # Nginx config + deploy scripts (deploy-*.sh / docker-build-push.sh / entrypoint.sh)
 ├── doc/                             # README images
+├── .github/workflows/               # CI: three API images + frontend image builds, frontend tests, external image sync
 ├── docker-compose.yml               # One-command full-stack orchestration (PostgreSQL + 3 APIs + frontend)
-└── .env.example                     # Compose environment variable template (copy to .env and override as needed)
+├── .env.example                     # Compose environment variable template (copy to .env and override as needed)
+├── AGENTS.md / CLAUDE.md            # AI agent entry points (root instructions + readme_i18n config)
+└── LICENSE.md                       # License
 ```
 
 ## Quick Start

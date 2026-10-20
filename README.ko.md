@@ -44,10 +44,13 @@
 Admin/
 ├── GameFrameX.Admin.Unified.Api/    # .NET 백엔드: Admin / Client / Hub 3개 호스트 + Application / Entity / Core 레이어
 ├── GameFrameX.Admin.Unified.Vue/    # Vue 프론트엔드: PrimeVue + Pinia + vue-i18n(5개 언어)
-├── gfx-doc/                         # 프로젝트 문서 시스템(agent 핸드북 / spec / 결정 / 백로그)
+├── build/                           # Nginx 설정 + 배포 스크립트(deploy-*.sh / docker-build-push.sh / entrypoint.sh)
 ├── doc/                             # README 이미지
+├── .github/workflows/               # CI: 3개 API 이미지와 프론트엔드 이미지 빌드, 프론트엔드 테스트, 외부 이미지 동기화
 ├── docker-compose.yml               # 한 줄 명령 풀스택 오케스트레이션(PostgreSQL + 3 API + 프론트엔드)
-└── .env.example                     # compose 환경 변수 템플릿(.env로 복사한 뒤 필요에 따라 재정의)
+├── .env.example                     # compose 환경 변수 템플릿(.env로 복사한 뒤 필요에 따라 재정의)
+├── AGENTS.md / CLAUDE.md            # AI Agent 협업 진입점(루트 지침 + readme_i18n 설정)
+└── LICENSE.md                       # 라이선스
 ```
 
 ## 빠른 시작

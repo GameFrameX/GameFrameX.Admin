@@ -44,10 +44,13 @@
 Admin/
 ├── GameFrameX.Admin.Unified.Api/    # .NET 后端：Admin / Client / Hub 三 host + Application / Entity / Core 分层
 ├── GameFrameX.Admin.Unified.Vue/    # Vue 前端：PrimeVue + Pinia + vue-i18n（5 语言）
-├── gfx-doc/                         # 项目文档系统（agent 手册 / spec / 决策 / 待办）
+├── build/                           # Nginx 配置 + 部署脚本（deploy-*.sh / docker-build-push.sh / entrypoint.sh）
 ├── doc/                             # README 配图
+├── .github/workflows/               # CI：三 API 镜像与前端镜像构建、前端测试、外部镜像同步
 ├── docker-compose.yml               # 一键全栈编排（PostgreSQL + 三 API + 前端）
-└── .env.example                     # compose 环境变量模板（复制为 .env 后按需覆盖）
+├── .env.example                     # compose 环境变量模板（复制为 .env 后按需覆盖）
+├── AGENTS.md / CLAUDE.md            # AI Agent 协作入口（根指令 + readme_i18n 配置）
+└── LICENSE.md                       # 开源协议
 ```
 
 ## 快速开始

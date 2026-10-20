@@ -44,10 +44,13 @@
 Admin/
 ├── GameFrameX.Admin.Unified.Api/    # .NET バックエンド：Admin / Client / Hub の 3 ホスト + Application / Entity / Core レイヤー
 ├── GameFrameX.Admin.Unified.Vue/    # Vue フロントエンド：PrimeVue + Pinia + vue-i18n（5 言語）
-├── gfx-doc/                         # プロジェクトドキュメントシステム（agent ハンドブック / spec / 決定 / バックログ）
+├── build/                           # Nginx 設定 + デプロイスクリプト（deploy-*.sh / docker-build-push.sh / entrypoint.sh）
 ├── doc/                             # README 用画像
+├── .github/workflows/               # CI：3 API イメージとフロントエンドイメージのビルド、フロントエンドテスト、外部イメージ同期
 ├── docker-compose.yml               # コマンド 1 つのフルスタック編成（PostgreSQL + 3 API + フロントエンド）
-└── .env.example                     # compose 環境変数テンプレート（.env にコピーして必要に応じて上書き）
+├── .env.example                     # compose 環境変数テンプレート（.env にコピーして必要に応じて上書き）
+├── AGENTS.md / CLAUDE.md            # AI エージェント連携入口（ルート指示 + readme_i18n 設定）
+└── LICENSE.md                       # ライセンス
 ```
 
 ## クイックスタート
