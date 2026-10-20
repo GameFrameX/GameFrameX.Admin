@@ -113,10 +113,24 @@ const {
   onQuery,
 } = useCrudTable({
   api: { pageApi: tenantGameOnlineConfigRolloutPagePost },
-  immediate: true,
+  // 灰度版本行是应用级事实数据（AppId 必填，EnsureFactAppId）：immediate 首查不带 appId 必 500，
+  // 改为 onMounted 解析当前应用后经 guardedQuery 发起（同设备页 C211 先例）。
+  immediate: false,
 })
 
-const onPage = usePrimeTablePage(tableParams, onQuery)
+// 未选应用时不请求、清空列表，避免后端「应用Id必须大于0」500。
+const hasApp = computed(() => !!queryParams.value.appId && queryParams.value.appId !== '0')
+
+const guardedQuery = async () => {
+  if (!hasApp.value) {
+    tableData.value = []
+    tableParams.value.total = 0
+    return
+  }
+  await onQuery()
+}
+
+const onPage = usePrimeTablePage(tableParams, guardedQuery)
 
 const onRollback = (row: any) => {
   rollbackDialogRef.value.openDialog(row)
@@ -153,7 +167,7 @@ const columns = computed<CrudColumnConfig[]>(() => [
 watch(() => route.query.appId, async () => {
   currentAppId.value = resolveInitialAppId(route.query)
   queryParams.value.appId = currentAppId.value
-  await onQuery()
+  await guardedQuery()
 })
 
 onMounted(async () => {
@@ -161,6 +175,6 @@ onMounted(async () => {
     currentAppId.value = resolveInitialAppId(route.query)
   }
   queryParams.value.appId = currentAppId.value
-  await onQuery()
+  await guardedQuery()
 })
 </script>

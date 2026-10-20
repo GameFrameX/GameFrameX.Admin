@@ -121,8 +121,10 @@ const formatRate = (value: number | undefined | null) => {
   return `${(value * 100).toFixed(2)}%`
 }
 
+// Online 作用域三元组（AppId+ServerId）后端硬校验（vault C2 S1.7）：ServerId 未定时快照请求必被
+// 32200005「Online 作用域缺失」拒绝，不空发（issue #4）。
 const onQuery = async () => {
-  if (!currentAppId.value) {
+  if (!currentAppId.value || !queryParams.value.serverId) {
     return
   }
   loading.value = true

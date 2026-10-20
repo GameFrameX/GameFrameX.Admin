@@ -89,7 +89,12 @@ const auditRequest = async (p: OnlineCursorListParams) => {
   return res.data?.data ?? { items: [], hasMore: false }
 }
 
+// Online 作用域三元组（AppId+ServerId）后端硬校验（vault C2 S1.7）：ServerId 未定时分页请求必被
+// 32200005「Online 作用域缺失」拒绝，不空发，列表保持未加载态（issue #4）。
 const onQuery = async () => {
+  if (!queryParams.value.serverId) {
+    return
+  }
   await listRef.value?.reload()
 }
 

@@ -106,9 +106,12 @@ const stopPolling = () => {
   polling = null
 }
 
-/** 重启轮询（首查 + 定时）；查询条件或应用变化后调用。 */
+/** 重启轮询（首查 + 定时）；查询条件或应用变化后调用。ServerId 未定时只停不发（Online 作用域缺失 32200005，issue #4）。 */
 const restartPolling = () => {
   stopPolling()
+  if (!queryParams.value.serverId) {
+    return
+  }
   polling = startOnlineMatchPolling(fetchOverview)
 }
 
