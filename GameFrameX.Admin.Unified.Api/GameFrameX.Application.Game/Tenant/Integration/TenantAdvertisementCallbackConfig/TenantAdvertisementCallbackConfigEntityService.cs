@@ -37,7 +37,7 @@ public class TenantAdvertisementCallbackConfigEntityService
         return Repository.AsQueryable()
                          .WhereIF(!string.IsNullOrWhiteSpace(searchKey), u => u.Remark.Contains(searchKey) || u.CallbackUrl.Contains(searchKey))
                          .WhereIF(!string.IsNullOrWhiteSpace(provider), u => u.Provider == provider)
-                         .ApplyAppIdFilter(input.AppId)
+                         .ApplyAppIdFilter(input.AppId, u => u.AppId)
                          .WhereIF(input.IsActive.HasValue, u => u.IsEnabled == input.IsActive.Value)
                          .Select<TenantAdvertisementCallbackConfigResponse>();
     }

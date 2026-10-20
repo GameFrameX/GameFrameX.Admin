@@ -37,7 +37,7 @@ public class TenantSmsConfigEntityService
                          .WhereIF(!string.IsNullOrWhiteSpace(searchKey), u =>
                                       (u.SignName ?? string.Empty).Contains(searchKey) ||
                                       (u.Remark ?? string.Empty).Contains(searchKey))
-                         .ApplyAppIdFilter(input.AppId)
+                         .ApplyAppIdFilter(input.AppId, u => u.AppId)
                          .WhereIF(input.IsActive.HasValue, u => u.IsEnabled == input.IsActive.Value)
                          .Select<TenantSmsConfigResponse>();
     }

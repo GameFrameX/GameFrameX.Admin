@@ -53,16 +53,33 @@ public static class AppScopeQueryFilter
     }
 
     /// <summary>
-    /// 按 <see cref="IAppScoped"/> 实体的 <see cref="IAppScoped.AppId"/> 过滤应用作用域查询（省略显式 <paramref name="appIdFilter"/> 谓词）。
-    /// <para>实体已实现 <see cref="IAppScoped"/>，谓词 <c>u =&gt; u.AppId == appId</c> 由本重载内部构造，调用方只需传 <paramref name="appId"/>。
-    /// 三态语义同 <see cref="ApplyAppIdFilter{T}(ISugarQueryable{T}, long?, Expression{Func{T, bool}})"/>。</para>
+    /// 按 <see cref="IAppScoped"/> 实体的应用列过滤应用作用域查询（省略显式谓词重载，只传成员选择器）。
+    /// <para>选择器必须由调用方以具体实体 lambda 写出（<c>u =&gt; u.AppId</c>）：泛型方法内直写 <c>u.AppId</c>
+    /// 会编译为 <see cref="IAppScoped.AppId"/> 接口成员绑定，SqlSugar 查不到实体列映射后按裸名折叠小写生成
+    /// <c>"appid"</c>，PostgreSQL 即 42703 列不存在（issue #3，密钥/邮件配置等分页 500 根因）。</para>
+    /// <para>谓词经 <see cref="Expression.Equal"/> 组合选择器体与常量，生成的 SQL 与手写
+    /// <c>Where(u =&gt; u.AppId == 局部变量)</c> 逐字同构（<c>"app_id" = @AppId0</c>）。三态语义同
+    /// <see cref="ApplyAppIdFilter{T}(ISugarQueryable{T}, long?, Expression{Func{T, bool}})"/>。</para>
     /// </summary>
     /// <typeparam name="T">实现 <see cref="IAppScoped"/> 的实体。</typeparam>
     /// <param name="query">待过滤的 SqlSugar 查询。</param>
     /// <param name="appId">可空应用 ID：<c>null</c> 不过滤；<c>0</c> 租户默认；正值应用级。</param>
+    /// <param name="appIdSelector">实体应用列成员选择器（调用方具体类型 lambda）。</param>
     /// <returns>应用了过滤条件的查询；<paramref name="appId"/> 为 <c>null</c> 时返回原查询。</returns>
-    public static ISugarQueryable<T> ApplyAppIdFilter<T>(this ISugarQueryable<T> query, long? appId) where T : IAppScoped
+    public static ISugarQueryable<T> ApplyAppIdFilter<T>(this ISugarQueryable<T> query, long? appId, Expression<Func<T, long>> appIdSelector) where T : IAppScoped
     {
-        return query.ApplyAppIdFilter(appId, u => u.AppId == (appId ?? 0));
+        if (query == null)
+        {
+            throw new ArgumentNullException(nameof(query));
+        }
+
+        if (!appId.HasValue)
+        {
+            return query;
+        }
+
+        var body = Expression.Equal(appIdSelector.Body, Expression.Constant(appId.Value));
+        var predicate = Expression.Lambda<Func<T, bool>>(body, appIdSelector.Parameters[0]);
+        return query.Where(predicate);
     }
 }

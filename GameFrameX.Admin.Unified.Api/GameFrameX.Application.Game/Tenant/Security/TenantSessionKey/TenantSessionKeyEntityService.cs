@@ -32,7 +32,7 @@ public class TenantSessionKeyEntityService : BaseService<TenantSessionKeyEntity>
         var appId = input.AppId;
         var page = await Repository.AsQueryable()
                                    .Where(u => u.IsDeleted == false)
-                                   .ApplyAppIdFilter(appId)
+                                   .ApplyAppIdFilter(appId, u => u.AppId)
                                    .WhereIF(input.IsActive.HasValue, u => u.IsEnabled == input.IsActive.Value)
                                    .OrderBy(u => u.CreatedTime, OrderByType.Desc)
                                    .Select<TenantSessionKeyResponse>()

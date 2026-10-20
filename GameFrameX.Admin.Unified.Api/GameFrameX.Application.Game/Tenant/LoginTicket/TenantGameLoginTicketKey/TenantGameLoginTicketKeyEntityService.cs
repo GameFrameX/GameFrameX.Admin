@@ -35,7 +35,7 @@ public class TenantGameLoginTicketKeyEntityService : BaseService<TenantGameLogin
         var appId = input.AppId;
         return await Repository.AsQueryable()
                                .Where(u => u.IsDeleted == false)
-                               .ApplyAppIdFilter(appId)
+                               .ApplyAppIdFilter(appId, u => u.AppId)
                                .WhereIF(input.IsActive.HasValue, u => u.IsEnabled == input.IsActive.Value)
                                .OrderBy(u => u.CreatedTime, OrderByType.Desc)
                                .Select<TenantGameLoginTicketKeyResponse>()
