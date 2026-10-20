@@ -4,10 +4,8 @@
 
 # GameFrameX Admin
 
-> 一句话定位：**面向独立游戏开发者的运营 + 联运后台平台**。后端 `.NET 10 + SqlSugar` 三主机（Admin / Client / Hub），前端 `Vue 3 + PrimeVue`，从管理员登录到玩家支付回调一条链路全栈跑通，开箱即用。
-
 [![License](https://img.shields.io/badge/license-blue.svg)](LICENSE.md)
-[![Version](https://img.shields.io/github/v/release/GameFrameX/GameFrameX.Admin.Unified.Api)](https://github.com/GameFrameX/GameFrameX.Admin.Unified.Api/releases)
+[![Version](https://img.shields.io/github/v/release/GameFrameX/Admin)](https://github.com/GameFrameX/Admin/releases)
 [![Documentation](https://img.shields.io/badge/docs-gameframex.doc.alianblank.com-blue)](https://gameframex.doc.alianblank.com)
 
 [![Discord](https://img.shields.io/badge/-5865F2?logo=discord&logoColor=white)](https://discord.gg/VDWUjWMDw9)
@@ -15,297 +13,317 @@
 [![Bilibili](https://img.shields.io/badge/-00A1D6?logo=bilibili&logoColor=white)](https://www.bilibili.com/video/BV1yrpeepEn7)
 [![Gitee](https://img.shields.io/badge/-C71D23?logo=gitee&logoColor=white)](https://gitee.com/GameFrameX/gameframex)
 
-独立游戏前后端一体化解决方案 · 独立游戏开发者的圆梦大使
+All-in-One Solution for Indie Game Development · Empowering Indie Developers' Dreams
 
 <br />
 
-[文档](https://gameframex.doc.alianblank.com) · [快速开始](#5-分钟跑通) · QQ群: 467608841 / 233840761
+[Documentation](https://gameframex.doc.alianblank.com) · [Quick Start](#quick-start) · QQ Group: 467608841 / 233840761
+<br />
+
+**English** | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md) | [日本語](README.ja.md) | [한국어](README.ko.md)
 
 </div>
 
 ---
 
-## 这是什么 / 不是什么
+## Project Overview
 
-**GameFrameX Admin** 是一套**面向游戏运营**的后台系统：管理端给运营 / GM / 客服改菜单、查订单、推版本、看日志；客户端 API 给游戏端登录 / 支付 / 拉配置；Hub API 给外部系统（CI 打包、Tapd WebHook、第三方回调）。一套仓库三套主机，分库部署互不拖累。
+> One-line positioning: **an operations + publishing backend platform for indie game developers**. Backend `.NET 10 + SqlSugar` with three hosts (Admin / Client / Hub), frontend `Vue 3 + PrimeVue` — a full-stack pipeline from admin login to player payment callbacks, ready out of the box.
 
-它**不是**通用 OA / CRM / 商城系统。菜单、权限、字典、表单、客户端配置等都是围绕"游戏后台"的真实业务场景设计的。
+**GameFrameX Admin** is a **game-operations-oriented** backend system: the Admin API lets operations / GM / customer service staff edit menus, query orders, push versions, and view logs; the Client API handles game-side login / payments / config fetching; the Hub API serves external systems (CI builds, Tapd WebHooks, third-party callbacks). One repository, three hosts, deployed on separate databases so they never drag each other down.
 
-本项目基于 [Admin.NET](https://gitee.com/zuohuaijun/Admin.NET) 二次开发，所有 Furion 框架残留与原 Admin.NET 业务命名已完成替换与重基线（U5 / U8 / C37–C41）。致谢原作者 [zuohuaijun](https://gitee.com/zuohuaijun) 及其贡献者。
+It is **not** a generic OA / CRM / e-commerce system. Menus, permissions, dictionaries, forms, and client configs are all designed around real "game backend" business scenarios.
 
-## 5 分钟跑通
+This project is built on secondary development of [Admin.NET](https://gitee.com/zuohuaijun/Admin.NET); all Furion framework leftovers and original Admin.NET business naming have been replaced and rebaselined (U5 / U8 / C37–C41). Credits to the original author [zuohuaijun](https://gitee.com/zuohuaijun) and contributors.
 
-> 假设你要给一个**新游戏**接一套运营后台。读完这一节你应该能从 0 到登录、能用 TeamS admin 看见菜单树。
+### Repository Structure
 
-### 准备
+Single repository (monorepo): frontend and backend live in one codebase. Since 2026-10-19, the historical sub-repositories `GameFrameX.Admin.Unified.Api` / `GameFrameX.Admin.Unified.Vue` have been frozen read-only and merged into this repository as snapshots; all new code lands here.
+
+```
+Admin/
+├── GameFrameX.Admin.Unified.Api/    # .NET backend: Admin / Client / Hub hosts + Application / Entity / Core layers
+├── GameFrameX.Admin.Unified.Vue/    # Vue frontend: PrimeVue + Pinia + vue-i18n (5 languages)
+├── gfx-doc/                         # Project documentation system (agent handbook / specs / decisions / backlog)
+├── doc/                             # README images
+├── docker-compose.yml               # One-command full-stack orchestration (PostgreSQL + 3 APIs + frontend)
+└── .env.example                     # Compose environment variable template (copy to .env and override as needed)
+```
+
+## Quick Start
+
+> Suppose you want to set up an operations backend for a **new game**. After reading this section you should be able to go from zero to logging in and seeing the menu tree with the TeamS admin account.
+
+### Prerequisites
 
 - .NET 10 SDK
-- Node.js ≥ 20（推荐 20）+ pnpm ≥ 11.5.2（`corepack enable`）
-- 没有数据库也行——本地源码直跑默认 SQLite 零配置；生产用 PostgreSQL / MySQL 等 34 种 DbType
+- Node.js ≥ 20 (20 recommended) + pnpm ≥ 11.5.2 (`corepack enable`)
+- No database required — running from local source defaults to zero-config SQLite; production uses PostgreSQL / MySQL and 34 DbTypes in total
 
-### 步骤
+### Steps
 
 ```bash
-# 1. 取代码
-git clone https://github.com/GameFrameX/GameFrameX.Admin.Unified.Api.git
-git clone https://github.com/GameFrameX/GameFrameX.Admin.Unified.Vue.git
+# 1. Get the code (single repository, frontend and backend included)
+git clone https://github.com/GameFrameX/Admin.git
+cd Admin
 
-# 2. 起后端（在仓库根目录！连接串相对工作目录解析）
-cd GameFrameX.Admin.Unified.Api
-dotnet run --project GameFrameX.Web.Api     # Admin API → http://localhost:20802
-dotnet run --project GameFrameX.Client.Api   # Client API → http://localhost:20808
-dotnet run --project GameFrameX.Hub.Api      # Hub API → http://localhost:20806
+# 2. Start the backend (from the repository root! Connection strings resolve relative to the working directory)
+dotnet run --project GameFrameX.Admin.Unified.Api/GameFrameX.Web.Api     # Admin API → http://localhost:20802
+dotnet run --project GameFrameX.Admin.Unified.Api/GameFrameX.Client.Api  # Client API → http://localhost:20808
+dotnet run --project GameFrameX.Admin.Unified.Api/GameFrameX.Hub.Api     # Hub API → http://localhost:20806
 
-# 3. 起前端
-cd ../GameFrameX.Admin.Unified.Vue
+# 3. Start the frontend
+cd GameFrameX.Admin.Unified.Vue
 corepack enable
 pnpm install
-pnpm run dev    # 默认 http://localhost:20800（hash 路由）
+pnpm run dev    # Defaults to http://localhost:20800 (hash routing)
 ```
 
-打开浏览器 → 看到登录页 → 账号 `admin` / 密码 `123456` / 租户 `1300000000001`（首次启动 SqlSugar Code-First 会自动建表 + 灌种子）。
+Open your browser → you should see the login page → account `admin` / password `123456` / tenant `1300000000001` (on first startup, SqlSugar Code-First automatically creates the tables and seeds the data).
 
-### 一条命令全栈（仓库根统一 compose）
+### Full Stack with One Command (unified compose at the repository root)
 
 ```bash
 docker compose up -d --build
 ```
 
-Compose 内置 PostgreSQL + 三个 host（20802/20806/20808）+ Admin 前端（20800，与 `pnpm run dev` 互斥，起容器前先停 dev server），起完等 healthcheck 变绿即可访问。
+Compose ships PostgreSQL + the three hosts (20802/20806/20808) + the Admin frontend (20800, mutually exclusive with `pnpm run dev` — stop the dev server before starting the containers); once the healthchecks turn green you are good to go.
 
-更细的命令与踩坑见 [`GameFrameX.Admin.Unified.Api/README.md`](GameFrameX.Admin.Unified.Api/README.md)（后端 893 行手册）与 [`GameFrameX.Admin.Unified.Vue/README.md`](GameFrameX.Admin.Unified.Vue/README.md)（前端 962 行手册）。
+Environment variable entry point: copy the root [`.env.example`](.env.example) to `.env` and override as needed (unset variables fall back to the compose defaults; `.env` is not committed to git).
 
-## 它适合谁 / 不适合谁
+For finer-grained commands and pitfalls, see [`GameFrameX.Admin.Unified.Api/README.md`](GameFrameX.Admin.Unified.Api/README.md) (backend manual) and [`GameFrameX.Admin.Unified.Vue/README.md`](GameFrameX.Admin.Unified.Vue/README.md) (frontend manual).
 
-| 适合 | 不太适合 |
+## Who It's For / Not For
+
+| Good fit | Not a good fit |
 |---|---|
-| 独立 / 小团队游戏，需要一套能跑起来的运营后台 | 你已经有完整后台只想要其中一个模块 |
-| 多端（管理 / 客户端 / 外部系统）需要清晰边界 | 单端简单后台（直接用 Admin.NET / vue-next-admin 更轻） |
-| 多租户 SaaS 化游戏服务 | 单租户自营不打算对外开放 |
-| 强需求 .NET + SqlSugar 技术栈 | 团队只熟悉 Java / Go / Node |
-| 需要多语言（5 语 i18n）+ AI Agent 友好仓库 | — |
-| 想要可演进到微服务的单体起步 | — |
+| Indie / small-team games that need a working operations backend | You already have a complete backend and only want one module |
+| Multi-end (admin / client / external systems) scenarios needing clear boundaries | Simple single-end backends (Admin.NET / vue-next-admin directly is lighter) |
+| Multi-tenant SaaS-style game services | Single-tenant in-house products with no plans to open up |
+| Teams that require the .NET + SqlSugar stack | Teams only familiar with Java / Go / Node |
+| Need multi-language (5-language i18n) + AI-Agent-friendly repository | — |
+| Want a monolith starting point that can evolve toward microservices | — |
 
-## 技术栈
+## Tech Stack
 
-- **后端**：.NET 10 + ASP.NET Core 原生宿主 + SqlSugar（Code-First，34 种 DbType）+ JWT/HMAC + SignalR + Serilog。
-- **前端**：Vue 3.5 + Vite 6 + TypeScript strict + PrimeVue 4.5 + Pinia 3 + vue-i18n（5 语言）+ Axios。
+- **Backend**: .NET 10 + ASP.NET Core native hosting + SqlSugar (Code-First, 34 DbTypes) + JWT/HMAC + SignalR + Serilog.
+- **Frontend**: Vue 3.5 + Vite 6 + TypeScript strict + PrimeVue 4.5 + Pinia 3 + vue-i18n (5 languages) + Axios.
 
-完整选型清单与版本矩阵见 [后端 README · 技术栈](GameFrameX.Admin.Unified.Api/README.md#技术栈) 与 [前端 README · 技术栈](GameFrameX.Admin.Unified.Vue/README.md#技术栈)。
+For the full technology list and version matrix, see [Backend README · Tech Stack](GameFrameX.Admin.Unified.Api/README.md#tech-stack) and [Frontend README · Tech Stack](GameFrameX.Admin.Unified.Vue/README.md#tech-stack).
 
-## 三套主机：Admin / Client / Hub
+## Three Hosts: Admin / Client / Hub
 
-一套仓库三套主机，分库部署互不拖累：**Admin API**（20802，管理后台）、**Client API**（20808，游戏客户端登录/支付/配置）、**Hub API**（20806，外部系统 / CI / WebHook）。三者共享 Entity 与 SqlSugar 仓储，依赖只能往下走（`Application.*` / `Core.*` 严禁反向引用宿主）。
+One repository, three hosts, deployed on separate databases so they never drag each other down: **Admin API** (20802, admin console), **Client API** (20808, game client login/payment/config), **Hub API** (20806, external systems / CI / WebHooks). All three share Entities and SqlSugar repositories; dependencies only point downward (`Application.*` / `Core.*` must never reference hosts back).
 
-### 三个主机最大的差异
+### The Biggest Differences Between the Three Hosts
 
-| 维度 | Admin API | Client API | Hub API |
+| Dimension | Admin API | Client API | Hub API |
 |---|---|---|---|
-| 路由 | 动态 API（写 Service 自动出接口） | 动态 API | 传统 Controller（`[Route("api/[controller]/[action]")]`） |
-| 数据访问 | 经 Application Service → 仓储 | 经 Application Service → 仓储 | Controller 直接注入 `Repository<T>` |
-| 复用 Application 层 | 是 | 是 | 否（自己校验） |
-| 加新接口 | 写 Service | 写 Service | 建 Controller + 注入仓储 |
-| URL 规则 | 去 `Service` 后缀 + camelCase | 去 `Service` 后缀 + camelCase | `Controller` 名 + `Action` 名 |
-| 是否拒绝 SuperAdmin | 否（SuperAdmin 绕过所有过滤） | 否 | **是**——Hub 拒绝超管访问 |
+| Routing | Dynamic API (write a Service, get an endpoint automatically) | Dynamic API | Traditional Controller (`[Route("api/[controller]/[action]")]`) |
+| Data access | Via Application Service → repository | Via Application Service → repository | Controller injects `Repository<T>` directly |
+| Reuses Application layer | Yes | Yes | No (validates on its own) |
+| Adding a new endpoint | Write a Service | Write a Service | Create a Controller + inject repositories |
+| URL rules | Drop the `Service` suffix + camelCase | Drop the `Service` suffix + camelCase | `Controller` name + `Action` name |
+| Rejects SuperAdmin | No (SuperAdmin bypasses all filters) | No | **Yes** — Hub rejects super-admin access |
 
-> **URL 里严禁出现 `Service` 后缀**。这是新人 100% 会踩的坑——前端按这个约定生成调用，类名一变，前端全炸。
+> **The `Service` suffix must NEVER appear in URLs.** This is a trap 100% of newcomers hit — the frontend generates calls based on this convention; change the class name and the frontend breaks everywhere.
 
-## 多租户 + 应用作用域
+## Multi-Tenancy + App Scopes
 
-三层模型，从外到内：
+A three-layer model, from the outside in:
 
 ```
-SuperAdmin（平台级）── 可访问全局配置、跨租户查询
+SuperAdmin (platform level) ── can access global config, cross-tenant queries
     ↓
-Tenant 租户（多租户 SaaS 化）── 跨应用共享
+Tenant (multi-tenant SaaS) ── shared across apps
     ↓
-App 应用（租户下的具体游戏 / 产品）── AppId 作用域
+App (a specific game / product under a tenant) ── AppId scope
 ```
 
-| Scope | 含义 | 路由示例 |
+| Scope | Meaning | Route examples |
 |---|---|---|
-| `platform` | 平台级（超管可见，跨租户） | `/platform/*` |
-| `tenant` | 租户级（所有应用共有，无 appId query） | `/dashboard/*`、`/system/*` |
-| `app` | 应用工作台内（必须带 `appId` query） | `/gameCenter/*` |
+| `platform` | Platform level (visible to super admins, cross-tenant) | `/platform/*` |
+| `tenant` | Tenant level (shared by all apps, no appId query) | `/dashboard/*`, `/system/*` |
+| `app` | Inside an app workspace (must carry the `appId` query) | `/gameCenter/*` |
 
-多租户与数据库边界由实体特性自动生效：`[Tenant]` 自动加 `TenantId` 过滤 + 软删除；`[SystemTable]` 路由主库、`[LogTable]` 路由日志库、无标记按 JWT `TenantId` 路由。细节见 [后端 README · 仓储与多数据库路由](GameFrameX.Admin.Unified.Api/README.md#仓储与多数据库路由)。
+Multi-tenancy and database boundaries take effect automatically via entity attributes: `[Tenant]` automatically adds `TenantId` filtering + soft delete; `[SystemTable]` routes to the main database, `[LogTable]` routes to the log database, and unmarked entities route by the JWT `TenantId`. For details see [Backend README · Repositories and Multi-Database Routing](GameFrameX.Admin.Unified.Api/README.md#repositories-and-multi-database-routing).
 
-## 30 个功能模块
+## 30 Feature Modules
 
-按"你会用到的场景"分组，不按目录结构。
+Grouped by "the scenarios you'll actually use", not by directory structure.
 
-**身份与权限**
+**Identity & Permissions**
 
-| 模块 | 干啥 |
+| Module | What it does |
 |---|---|
-| 用户管理 | 租户用户 / 系统管理员维护，可绑定用户职务、机构、角色、数据权限 |
-| 机构管理 | 多层级树形组织架构 |
-| 职位管理 | 用户职务标签 |
-| 菜单管理 | 目录 / 菜单 / 按钮 三级权限 |
-| 角色管理 | 角色绑定菜单 + 数据授权范围 |
-| 字典管理 | 全局 / 租户两级字典 |
-| 开放授权 | AccessKey / Secret + HMAC 签名认证（外部接口） |
+| User management | Tenant user / system admin maintenance; can bind user positions, orgs, roles, data permissions |
+| Org management | Multi-level tree-shaped organization structure |
+| Position management | User job title tags |
+| Menu management | Three-level permissions: directory / menu / button |
+| Role management | Roles bound to menus + data authorization scope |
+| Dictionary management | Global / tenant two-level dictionaries |
+| Open authorization | AccessKey / Secret + HMAC signature authentication (external APIs) |
 
-**平台配置（仅 SuperAdmin 可见）**
+**Platform Configuration (visible to SuperAdmin only)**
 
-| 模块 | 干啥 |
+| Module | What it does |
 |---|---|
-| 平台租户管理 | 租户 CRUD、租户库自动开通 / 停用 / 到期 |
-| 全局平台 / 语言 / 渠道定义 | 平台级枚举与多语言基线 |
-| 区域管理 | 行政区划 5 级树，支持从统计局同步 |
-| 系统配置 | 键值对；高频配置迁入主库 `SystemConfig`（JWT / 密码策略 / 图形验证码） |
-| 数据库管理 | 表 / 列 CRUD、库表结构在线管理 |
+| Platform tenant management | Tenant CRUD, automatic tenant database provisioning / disabling / expiry |
+| Global platform / language / channel definitions | Platform-level enums and multilingual baselines |
+| Region management | 5-level administrative division tree, supports syncing from the statistics bureau |
+| System config | Key-value pairs; high-frequency configs migrated into the main database `SystemConfig` (JWT / password policy / captcha) |
+| Database management | Table / column CRUD, online schema management |
 
-**系统能力**
+**System Capabilities**
 
-| 模块 | 干啥 |
+| Module | What it does |
 |---|---|
-| 服务监控 | 主机信息、CPU / 内存 / 磁盘 / 已加载程序集 |
-| 在线用户 | 实时列表 + 强制下线，基于 SignalR |
-| 公告管理 | 系统通知 + SignalR 实时推送 |
-| 文件管理 | 本地存储 + 阿里云 OSS + 腾讯 COS（多 provider） |
-| 定时任务 | `ProjectScheduler` 项目自有调度器；内置 / 脚本编译 / HTTP 三类；运行时编译 C# 动态 API |
-| 邮件 / 短信 | `Mail.Abstract` 多 provider + `Sms.Abstract` Aliyun 实现 |
-| 系统接口 | Swashbuckle Swagger；生产默认不挂（需 `Swagger__Enabled=true`） |
-| 四类日志 | 操作 / 异常 / 访问 / 数据变更（字段级 Diff 审计），支持 Excel 导出 |
-| 运行时插件 | C# 代码动态编译并注册为 API 端点 |
-| 缓存管理 | Memory / Redis 统一抽象 |
+| Service monitoring | Host info, CPU / memory / disk / loaded assemblies |
+| Online users | Real-time list + forced sign-out, based on SignalR |
+| Announcement management | System notifications + real-time SignalR push |
+| File management | Local storage + Aliyun OSS + Tencent COS (multi-provider) |
+| Scheduled jobs | `ProjectScheduler` project-owned scheduler; built-in / script-compiled / HTTP job types; runtime-compiled C# dynamic APIs |
+| Email / SMS | `Mail.Abstract` multi-provider + `Sms.Abstract` Aliyun implementation |
+| System APIs | Swashbuckle Swagger; not mounted in production by default (requires `Swagger__Enabled=true`) |
+| Four log types | Operation / exception / access / data-change (field-level diff audit), with Excel export |
+| Runtime plugins | C# code dynamically compiled and registered as API endpoints |
+| Cache management | Unified Memory / Redis abstraction |
 
-**游戏后台（76 个 Application.Game 服务）**
+**Game Backend (76 Application.Game services)**
 
-| 模块 | 干啥 |
+| Module | What it does |
 |---|---|
-| 游戏账号 / 角色 / 区服 | 玩家账号、角色管理、Docker 容器生命周期 |
-| 订单 / 发货 | 多维度筛选；HTTP 调游戏服 API 发道具 |
-| 邮件 / 兑换码 | 全服 / 单服邮件；兑换码渠道与投放 |
-| Web 商城 | 商品 + 订单 + 分类 |
-| 道具 / 商品 | 道具目录、消耗品 / 永久品管理 |
-| 公告 / 横幅 | 游戏内 + 登录后公告 |
-| 应用版本 / 资源包 | App 版本 + 强制更新 + 资源包版本与历史回滚 |
-| 应用作用域配置 | 远程参数、应用校验、客户端 KV |
-| 邮件运营 | 模板 + Campaign + 多语言 |
-| 广告回调 | TopOn / AdMob / UnityAds 多 provider |
-| 游戏服对接 | 玩家注册 / 登录 / 订单回调 |
+| Game accounts / characters / servers | Player accounts, character management, Docker container lifecycle |
+| Orders / delivery | Multi-dimensional filtering; calls the game-server API over HTTP to deliver items |
+| Mail / redemption codes | Server-wide / single-server mail; redemption code channels and distribution |
+| Web shop | Products + orders + categories |
+| Items / goods | Item catalog, consumable / permanent item management |
+| Announcements / banners | In-game + post-login announcements |
+| App versions / resource packs | App versions + force update + resource pack versions and history rollback |
+| App-scoped config | Remote parameters, app validation, client KV |
+| Mail operations | Templates + campaigns + multilingual |
+| Ad callbacks | TopOn / AdMob / UnityAds multi-provider |
+| Game server integration | Player registration / login / order callbacks |
 
-**集成**
+**Integrations**
 
-| 集成 | 说明 |
+| Integration | Notes |
 |---|---|
-| 微信 | `Wechat.Abstract` + `Wechat.Open` 双 SDK；公众号 OAuth2、小程序登录、模板消息、JS-SDK |
-| 微信支付 | JSAPI 下单（直连 / 服务商）+ 支付回调（`Payment.Wechat`） |
-| 支付 | 支付宝 / Apple IAP（含 App Store Server API v2）/ Google Play / Xsolla，抽象层 + 多 provider |
-| 对象存储 | Local / Tencent COS（多 provider） |
-| 短信 | Aliyun 短信 Provider |
-| 邮件 | Tencent SES / SMTP（多 provider） |
+| WeChat | `Wechat.Abstract` + `Wechat.Open` dual SDK; Official Account OAuth2, Mini Program login, template messages, JS-SDK |
+| WeChat Pay | JSAPI orders (direct / ISV) + payment callbacks (`Payment.Wechat`) |
+| Payments | Alipay / Apple IAP (incl. App Store Server API v2) / Google Play / Xsolla, abstraction layer + multi-provider |
+| Object storage | Local / Tencent COS (multi-provider) |
+| SMS | Aliyun SMS provider |
+| Email | Tencent SES / SMTP (multi-provider) |
 
-**前端框架特性**
+**Frontend Framework Features**
 
-- **后端驱动菜单**：菜单、权限、文案 全部由后端控制。前端不写菜单，加菜单要去后端菜单管理里加；前端只负责渲染后端返回的菜单树。
-- **JWT 自动续期**：登录拿到的 token 过期前自动加 `X-Authorization`，让后端静悄悄换发，登录一次能爽很久。
-- **应用作用域**：路由 `meta.appScope` + `meta.menuContext` 标注 platform / tenant / app 三种 scope，前端按 scope 决定菜单可见性。
-- **i18n 完整性门禁**：`pnpm run lint:i18n` 检查 5 语言键完整，缺一个直接 fail。
+- **Backend-driven menus**: menus, permissions, and copy are all controlled by the backend. The frontend doesn't define menus — add them in the backend menu management; the frontend only renders the menu tree returned by the backend.
+- **Automatic JWT renewal**: before the token from login expires, the frontend automatically adds `X-Authorization` so the backend silently reissues it — one login lasts a long time.
+- **App scopes**: routes tagged with `meta.appScope` + `meta.menuContext` for the platform / tenant / app scopes; the frontend decides menu visibility based on the scope.
+- **i18n completeness gate**: `pnpm run lint:i18n` checks that all 5 languages have complete keys; one missing key fails immediately.
 
-## 安全基线
+## Security Baseline
 
-不是"建议"，是**默认就生效**的硬约束。
+Not "recommendations" — hard constraints that **take effect by default**.
 
-| 威胁 | 应对 |
+| Threat | Mitigation |
 |---|---|
-| 弱密码 | 全项目统一 **Argon2id**（C214 系统用户 / C215 玩家）；旧 PBKDF2 仅保留 `AppSecretHasher`（高熵随机密钥场景，不需要 Argon2id） |
-| SQL 注入 | SqlSugar 全参数化，无字符串拼接 |
-| 越权访问 | 多租户过滤 + 软删除过滤；SuperAdmin 绕过但 Hub API 拒绝超管 |
-| 重放攻击 | HMAC 签名 + nonce 缓存 + 5 分钟时间偏差 |
-| 信息泄露 | Response DTO 必含 Id/RowVersion/CreatedTime；敏感字段（密码哈希 / AccessSecret）**禁止**出现在任何 Response；契约测试守护 |
-| 接口变更回潮 | `ThreeHostApiRoutingContractTests` + `AdminEndpointReturnContractTests` + `AdminActionStyleContractTests` + `NamingAbbreviationGuardTests` 防回潮 |
+| Weak passwords | Project-wide **Argon2id** (C214 system users / C215 players); legacy PBKDF2 kept only for `AppSecretHasher` (high-entropy random key scenarios where Argon2id isn't needed) |
+| SQL injection | Fully parameterized SqlSugar, no string concatenation |
+| Unauthorized access | Multi-tenant filtering + soft-delete filtering; SuperAdmin bypasses them, but Hub API rejects super admins |
+| Replay attacks | HMAC signatures + nonce cache + 5-minute clock skew tolerance |
+| Information leakage | Response DTOs must include Id/RowVersion/CreatedTime; sensitive fields (password hashes / AccessSecret) are **forbidden** in any Response; guarded by contract tests |
+| API regression | `ThreeHostApiRoutingContractTests` + `AdminEndpointReturnContractTests` + `AdminActionStyleContractTests` + `NamingAbbreviationGuardTests` prevent regressions |
 
-## 数据库
+## Database
 
-**默认零配置**：本地源码直跑默认 SQLite（仓库根 `db/` 下），生产用 PostgreSQL（也支持 MySQL / Oracle 等共 34 种 DbType）。`GameFrameX.Application/Configuration/Database.json` 是单一连接串来源（三 host 共享，改一处三处生效）。
+**Zero-config by default**: running from local source defaults to SQLite (under `db/` at the repository root); production uses PostgreSQL (MySQL / Oracle and 34 DbTypes in total are also supported). `GameFrameX.Application/Configuration/Database.json` is the single source of connection strings (shared by the three hosts — change it once and all three pick it up).
 
-- 主库 / 租户库 / 日志库按实体特性自动路由（见上文多租户一节）。
-- 租户库自动创建：按租户 ID 生成 `gameframex_admin_tenant_<TenantId>`，无需手填连接串；默认租户库同样自动推导。
-- 换库连接串写法见 [`Database-ConnectionStrings.md`](GameFrameX.Admin.Unified.Api/GameFrameX.Application/Configuration/Database-ConnectionStrings.md)；环境变量成对覆盖（`GFX_MAIN_DB_TYPE` + `GFX_MAIN_DB_CONNECTION_STRING`）等部署细节见 [后端 README · 数据库](GameFrameX.Admin.Unified.Api/README.md#数据库默认零配置生产用-postgresql)。
+- Main / tenant / log databases are routed automatically by entity attributes (see the multi-tenancy section above).
+- Tenant databases are created automatically: named `gameframex_admin_tenant_<TenantId>` by tenant ID, no manual connection strings needed; the default tenant database is likewise derived automatically.
+- For connection-string syntax when switching databases, see [`Database-ConnectionStrings.md`](GameFrameX.Admin.Unified.Api/GameFrameX.Application/Configuration/Database-ConnectionStrings.md); for paired environment variable overrides (`GFX_MAIN_DB_TYPE` + `GFX_MAIN_DB_CONNECTION_STRING`) and other deployment details, see [Backend README · Database](GameFrameX.Admin.Unified.Api/README.md#database-zero-config-by-default-postgresql-for-production).
 
-> SQLite 只面向本地开发。生产禁用——并发写入弱、无独立服务进程、备份恢复与运维监控能力不足。
+> SQLite is for local development only. Forbidden in production — weak concurrent writes, no standalone service process, and insufficient backup/restore and ops monitoring capabilities.
 
-## 演示与上手
+## Demo & Getting Started
 
-| 资源 | 链接 |
+| Resource | Link |
 |---|---|
-| 演示站点（**请勿用于自己的生产环境**） | <https://game.admin.web.vue.alianblank.com> |
-| 文档站 | <https://gameframex.doc.alianblank.com> |
-| 后端运行手册 | [`GameFrameX.Admin.Unified.Api/README.md`](GameFrameX.Admin.Unified.Api/README.md) |
-| 前端运行手册 | [`GameFrameX.Admin.Unified.Vue/README.md`](GameFrameX.Admin.Unified.Vue/README.md) |
+| Demo site (**do not use it for your own production**) | <https://game.admin.web.vue.alianblank.com> |
+| Documentation site | <https://gameframex.doc.alianblank.com> |
+| Backend operations manual | [`GameFrameX.Admin.Unified.Api/README.md`](GameFrameX.Admin.Unified.Api/README.md) |
+| Frontend operations manual | [`GameFrameX.Admin.Unified.Vue/README.md`](GameFrameX.Admin.Unified.Vue/README.md) |
 
-## 项目仓库
+## Project Repositories
 
-| 项目 | 用途 | 仓库 |
+| Project | Purpose | Repository |
 |---|---|---|
-| 本仓库 | Admin / Client / Hub 三 host 单仓库（Cron 化） | `GameFrameX/Admin` |
-| 客户端接口（独立仓库） | 早期拆分；现统一在本仓库 | [GameFrameX.Admin.Client.Api](https://github.com/GameFrameX/GameFrameX.Admin.Client.Api) |
-| 后台管理接口（付费源码） | 历史命名 | [GameFrameX.Admin.Web.Api](https://github.com/GameFrameX/GameFrameX.Admin.Web.Api) |
-| 后台 Web 页面（付费源码） | 历史命名 | [GameFrameX.Admin.Web.Vue](https://github.com/AlianBlank/GameFrameX.Admin.Web.Vue) |
+| This repository | Single repository for the Admin / Client / Hub hosts (Cron-based) | [GameFrameX/Admin](https://github.com/GameFrameX/Admin) |
+| Client API (separate repository) | Early split; now unified into this repository | [GameFrameX.Admin.Client.Api](https://github.com/GameFrameX/GameFrameX.Admin.Client.Api) |
+| Admin API (paid source) | Historical naming | [GameFrameX.Admin.Web.Api](https://github.com/GameFrameX/GameFrameX.Admin.Web.Api) |
+| Admin Web frontend (paid source) | Historical naming | [GameFrameX.Admin.Web.Vue](https://github.com/AlianBlank/GameFrameX.Admin.Web.Vue) |
 
-## 发布与部署
+## Release & Deployment
 
 ```bash
 docker compose up -d --build
-# 内置 PostgreSQL + Admin(20802) + Client(20808) + Hub(20806) + 前端(20800)，起完等 healthcheck 变绿（前端容器与 dev server 同抢 20800，互斥）
+# Ships PostgreSQL + Admin(20802) + Client(20808) + Hub(20806) + frontend(20800); wait for healthchecks to turn green (the frontend container and the dev server both grab port 20800 — they are mutually exclusive)
 ```
 
-单容器 `docker run`、环境变量成对覆盖（半套覆盖启动期直接报错）等细节见 [后端 README · 部署](GameFrameX.Admin.Unified.Api/README.md#部署)。
+For single-container `docker run`, paired environment variable overrides (a half-paired override fails fast at startup), and other details, see [Backend README · Deployment](GameFrameX.Admin.Unified.Api/README.md#deployment).
 
-## 开发与贡献
+## Development & Contributing
 
-想加一个新 CRUD 服务？看 [`GameFrameX.Admin.Unified.Api/README.md` → 加一个新 CRUD 服务](GameFrameX.Admin.Unified.Api/README.md)。Admin API 只要实现 `IDynamicApiController` 就自动有 REST 端点（Page / Add / Update / Get / List / Delete 六个），无需手写 Controller。
+Want to add a new CRUD service? See [`GameFrameX.Admin.Unified.Api/README.md` → Add a New CRUD Service](GameFrameX.Admin.Unified.Api/README.md). In the Admin API, simply implement `IDynamicApiController` and you get REST endpoints automatically (Page / Add / Update / Get / List / Delete — six in total), with no Controller to write.
 
-CI 门禁（防回潮）：
+CI gates (anti-regression):
 
-- `ThreeHostApiRoutingContractTests` — 三 host 路由 / 谓词 / 参数绑定 / 错误码语义域
-- `AdminEndpointReturnContractTests` — Response DTO 契约
-- `AdminActionStyleContractTests` — Admin action 写法规范
-- `NamingAbbreviationGuardTests` + `NamingAbbreviationBaseline.baseline.txt` — 全系统禁业务缩写
+- `ThreeHostApiRoutingContractTests` — three-host routing / verbs / parameter binding / error-code semantics
+- `AdminEndpointReturnContractTests` — Response DTO contracts
+- `AdminActionStyleContractTests` — Admin action style conventions
+- `NamingAbbreviationGuardTests` + `NamingAbbreviationBaseline.baseline.txt` — business abbreviations banned system-wide
 
-## 功能预览
+## Feature Preview
 
-### 平台管理（SuperAdmin）
+### Platform Management (SuperAdmin)
 
-![登录页](doc/img/1.png)
-![主控台](doc/img/2.png)
-![菜单管理](doc/img/3.png)
-![参数配置](doc/img/4.png)
-![字典管理](doc/img/5.png)
-![任务调度](doc/img/6.png)
-![服务监控](doc/img/7.png)
-![缓存管理](doc/img/8.png)
-![行政区划](doc/img/9.png)
-![动态插件](doc/img/10.png)
-![开放接口](doc/img/11.png)
-![验证码配置](doc/img/12.png)
-![租户管理](doc/img/13.png)
-![库表管理](doc/img/14.png)
+![Login page](doc/img/1.png)
+![Dashboard](doc/img/2.png)
+![Menu management](doc/img/3.png)
+![Config parameters](doc/img/4.png)
+![Dictionary management](doc/img/5.png)
+![Job scheduling](doc/img/6.png)
+![Service monitoring](doc/img/7.png)
+![Cache management](doc/img/8.png)
+![Administrative divisions](doc/img/9.png)
+![Dynamic plugins](doc/img/10.png)
+![Open APIs](doc/img/11.png)
+![Captcha config](doc/img/12.png)
+![Tenant management](doc/img/13.png)
+![Table management](doc/img/14.png)
 
-### 应用工作台核心功能（中英双语对照）
+### App Workspace Core Features (Chinese/English side by side)
 
-进入租户应用工作台后的 5 个核心功能页面。同一页面在中英文界面语言下的实际效果（右上角语言切换器实时切换，无需刷新）：
+The 5 core feature pages you see after entering a tenant app workspace. The same pages shown under Chinese and English UI languages (switch instantly via the language switcher in the top-right corner, no refresh needed):
 
-| 功能 | 简体中文 | English |
+| Feature | 简体中文 | English |
 |------|----------|---------|
-| 远程配置 | ![远程配置-中文](doc/img/15.png) | ![Remote Config-EN](doc/img/16.png) |
-| 版本更新 | ![版本更新-中文](doc/img/17.png) | ![Version Update-EN](doc/img/18.png) |
-| 分包管理 | ![分包管理-中文](doc/img/19.png) | ![Package Management-EN](doc/img/20.png) |
-| 支付配置 | ![支付配置-中文](doc/img/21.png) | ![Payment Config-EN](doc/img/22.png) |
-| 广告回调验签 | ![广告回调验签-中文](doc/img/23.png) | ![Ad Callback-EN](doc/img/24.png) |
+| Remote Config | ![Remote Config-CN](doc/img/15.png) | ![Remote Config-EN](doc/img/16.png) |
+| Version Update | ![Version Update-CN](doc/img/17.png) | ![Version Update-EN](doc/img/18.png) |
+| Package Management | ![Package Management-CN](doc/img/19.png) | ![Package Management-EN](doc/img/20.png) |
+| Payment Config | ![Payment Config-CN](doc/img/21.png) | ![Payment Config-EN](doc/img/22.png) |
+| Ad Callback Verification | ![Ad Callback-CN](doc/img/23.png) | ![Ad Callback-EN](doc/img/24.png) |
 
-## 文档与资源
+## Documentation & Resources
 
-- 项目文档站：<https://gameframex.doc.alianblank.com>
-- 后端运行手册（详细）：[`GameFrameX.Admin.Unified.Api/README.md`](GameFrameX.Admin.Unified.Api/README.md)
-- 前端运行手册（详细）：[`GameFrameX.Admin.Unified.Vue/README.md`](GameFrameX.Admin.Unified.Vue/README.md)
-- Issue 反馈：[GitHub Issues](https://github.com/GameFrameX/GameFrameX.Admin.Unified.Api/issues)
-- 客户端 / 后台 / Web 三仓库：见 [项目仓库](#项目仓库)
+- Project documentation site: <https://gameframex.doc.alianblank.com>
+- Backend operations manual (detailed): [`GameFrameX.Admin.Unified.Api/README.md`](GameFrameX.Admin.Unified.Api/README.md)
+- Frontend operations manual (detailed): [`GameFrameX.Admin.Unified.Vue/README.md`](GameFrameX.Admin.Unified.Vue/README.md)
+- Issue feedback: [GitHub Issues](https://github.com/GameFrameX/Admin/issues)
+- Client / Admin / Web repositories: see [Project Repositories](#project-repositories)
 
-## 社区与支持
+## Community & Support
 
 [![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/GameFrameX/gameframex)
 [![Discord](https://img.shields.io/badge/Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/VDWUjWMDw9)
@@ -318,9 +336,13 @@ CI 门禁（防回潮）：
 [![Gitee](https://img.shields.io/badge/Gitee-C71D23?style=for-the-badge&logo=gitee&logoColor=white)](https://gitee.com/GameFrameX/gameframex)
 ![QQ](https://img.shields.io/badge/QQ-467608841%2F233840761-EB1923?style=for-the-badge&logo=qq&logoColor=white)
 
-## 开源协议
+## Changelog
 
-详见 [LICENSE.md](LICENSE.md) 文件。
+See [GitHub Releases](https://github.com/GameFrameX/Admin/releases) for release notes.
+
+## License
+
+See [LICENSE.md](LICENSE.md) for license information.
 
 <!--
 EN: See [LICENSE.md](LICENSE.md) for license information.
