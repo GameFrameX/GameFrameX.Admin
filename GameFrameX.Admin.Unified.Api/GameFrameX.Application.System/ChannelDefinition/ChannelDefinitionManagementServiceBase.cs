@@ -1,4 +1,3 @@
-using GameFrameX.Entity.Tenant.Game.App;
 using GameFrameX.Application.System.ChannelDefinition.Dto;
 using GameFrameX.Core.Service.User;
 using GameFrameX.Entity.Enum;
@@ -15,7 +14,6 @@ public abstract class ChannelDefinitionManagementServiceBase<TEntity>
         ChannelDefinitionResponse, PageChannelDefinitionRequest>
     where TEntity : GameFrameX.Entity.System.ChannelDefinition, new()
 {
-    private readonly SqlSugarRepository<TenantGameAppPackageEntity> _packageRepository;
     private readonly SqlSugarRepository<GlobalChannelDefinitionEntity>? _globalChannelRepository;
     private readonly CurrentUserContext _currentUserContext;
 
@@ -24,16 +22,13 @@ public abstract class ChannelDefinitionManagementServiceBase<TEntity>
     /// </summary>
     /// <param name="repository"></param>
     /// <param name="globalChannelRepository"></param>
-    /// <param name="packageRepository"></param>
     /// <param name="currentUserContext"></param>
     protected ChannelDefinitionManagementServiceBase(
         SqlSugarRepository<TEntity> repository,
         SqlSugarRepository<GlobalChannelDefinitionEntity>? globalChannelRepository,
-        SqlSugarRepository<TenantGameAppPackageEntity> packageRepository,
         CurrentUserContext currentUserContext)
         : base(repository)
     {
-        _packageRepository = packageRepository;
         _globalChannelRepository = globalChannelRepository;
         _currentUserContext = currentUserContext;
     }
@@ -42,6 +37,18 @@ public abstract class ChannelDefinitionManagementServiceBase<TEntity>
     /// 当前服务管理的渠道作用域
     /// </summary>
     protected abstract ChannelScopeEnum ManagedScope { get; }
+
+    /// <summary>
+    /// 渠道是否已被分包引用。租户作用域由派生类用本租户分包仓储判定；
+    /// 系统作用域（SuperAdmin、无租户上下文）默认不拦截——租户分包表分布在各租户库，
+    /// 构造租户仓储本身就会因缺少租户上下文抛错，且超管侧从未有过可达的单租户判定路径。
+    /// </summary>
+    /// <param name="channelId">渠道 Id。</param>
+    /// <returns>被引用返回 true。</returns>
+    protected virtual Task<bool> IsPackageReferencedAsync(long channelId)
+    {
+        return Task.FromResult(false);
+    }
 
     /// <summary>
     /// 构建分页查询
@@ -120,7 +127,7 @@ public abstract class ChannelDefinitionManagementServiceBase<TEntity>
         EnsureScopePermission();
         await CheckCodeUniqueAsync(input.Code, input.Scope, input.Id);
 
-        var referenced = await _packageRepository.IsAnyAsync(u => u.ChannelId == input.Id);
+        var referenced = await IsPackageReferencedAsync(input.Id);
         if (referenced && !string.Equals(existing.Code, input.Code, StringComparison.OrdinalIgnoreCase))
         {
             throw BusinessError.Oh("渠道已被分包引用，不能修改编码");
@@ -223,7 +230,7 @@ public abstract class ChannelDefinitionManagementServiceBase<TEntity>
             throw BusinessError.Oh("只能删除本租户渠道");
         }
 
-        var referenced = await _packageRepository.IsAnyAsync(u => u.ChannelId == input.Id);
+        var referenced = await IsPackageReferencedAsync(input.Id);
         if (referenced)
         {
             throw BusinessError.Oh("渠道已被分包引用，不能删除，请停用");

@@ -1,4 +1,3 @@
-using GameFrameX.Entity.Tenant.Game.App;
 using GameFrameX.Core.Service.User;
 using GameFrameX.Entity.Enum;
 using GameFrameX.Entity.Global;
@@ -17,9 +16,8 @@ public class GlobalChannelDefinitionService
     /// </summary>
     public GlobalChannelDefinitionService(
         SqlSugarRepository<GlobalChannelDefinitionEntity> repository,
-        SqlSugarRepository<TenantGameAppPackageEntity> packageRepository,
         CurrentUserContext currentUserContext)
-        : base(repository, repository, packageRepository, currentUserContext)
+        : base(repository, repository, currentUserContext)
     {
     }
 

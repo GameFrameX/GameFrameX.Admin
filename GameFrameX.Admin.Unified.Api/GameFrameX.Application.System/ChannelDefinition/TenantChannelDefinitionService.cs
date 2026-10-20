@@ -14,6 +14,8 @@ namespace GameFrameX.Application.System.ChannelDefinition;
 public class TenantChannelDefinitionService
     : ChannelDefinitionManagementServiceBase<TenantChannelDefinitionEntity>
 {
+    private readonly SqlSugarRepository<TenantGameAppPackageEntity> _packageRepository;
+
     /// <summary>
     /// 租户渠道定义服务
     /// </summary>
@@ -22,14 +24,21 @@ public class TenantChannelDefinitionService
         SqlSugarRepository<GlobalChannelDefinitionEntity> globalChannelRepository,
         SqlSugarRepository<TenantGameAppPackageEntity> packageRepository,
         CurrentUserContext currentUserContext)
-        : base(repository, globalChannelRepository, packageRepository, currentUserContext)
+        : base(repository, globalChannelRepository, currentUserContext)
     {
+        _packageRepository = packageRepository;
     }
 
     /// <inheritdoc />
     protected override ChannelScopeEnum ManagedScope
     {
         get { return ChannelScopeEnum.Tenant; }
+    }
+
+    /// <inheritdoc />
+    protected override Task<bool> IsPackageReferencedAsync(long channelId)
+    {
+        return _packageRepository.IsAnyAsync(u => u.ChannelId == channelId);
     }
 
     /// <summary>
