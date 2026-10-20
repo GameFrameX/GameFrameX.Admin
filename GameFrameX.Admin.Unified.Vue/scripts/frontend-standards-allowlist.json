@@ -8,8 +8,6 @@
   "permissions": {
     "gamePenaltyEntity:revoke": "C11-C trust & safety: backend admin API/permission/menu seed not yet landed (C115 follow-up); remove after admin-api-worker seeds permissions",
     "gameRoleEntity:add": "legacy page exposes add search action without matching seeded button",
-    "platformLoggingConfig:update": "C178/GFX-174 logging config UI landed ahead of backend menu/permission seed (C171 out of scope); admin-api-worker follow-up",
-    "platformPasswordPolicyConfig:update": "C174/GFX-180 password policy config UI landed ahead of backend menu/permission seed (C173 out of scope); admin-api-worker follow-up",
     "systemConfig:batchDelete": "legacy system config batch action not yet in current seed",
     "systemDatabase:delete": "legacy database page action not yet in current seed",
     "systemDatabase:deletetable": "cf12213b aligned database page codes to real endpoint actions; backend GlobalMenuSeedData button seed missing (DB sync SQL scripts/perm-buttons-2026-09-01.sql shipped); backend follow-up",

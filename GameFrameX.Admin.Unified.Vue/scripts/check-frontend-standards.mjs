@@ -905,9 +905,9 @@ function checkViewsLayout() {
 }
 
 // ── 静态路由 appScope ↔ 文件首段一致性守护（GFX-734 / C325）────────────────────
-// route.ts / appWorkspaceRoutes.ts / globalConfigRoutes.ts 中静态路由的 meta.appScope
+// route.ts / appWorkspaceRoutes.ts 中静态路由的 meta.appScope
 // 必须与 component 文件路径首段一致：app→app、tenant→tenant、无 appScope⇒platform 或共享目录。
-const STATIC_ROUTE_SCOPE_FILES = ['src/router/route.ts', 'src/router/appWorkspaceRoutes.ts', 'src/router/globalConfigRoutes.ts']
+const STATIC_ROUTE_SCOPE_FILES = ['src/router/route.ts', 'src/router/appWorkspaceRoutes.ts']
 const SHARED_ROUTE_FIRST_SEGMENTS = new Set(['platform', 'login', 'personal', 'error', 'chart'])
 
 function staticRouteScopeViolation(viewPath, appScope) {
