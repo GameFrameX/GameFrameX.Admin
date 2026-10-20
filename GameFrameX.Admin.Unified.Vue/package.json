@@ -25,12 +25,14 @@
     "check:componentNames": "node scripts/check-frontend-standards.mjs componentNames",
     "check:frontend": "node scripts/check-frontend-standards.mjs all && node scripts/check-permission-keys.mjs",
     "check:frontend:self-test": "node scripts/check-frontend-standards.mjs self-test",
-    "test:unit": "node --test \"src/**/*.test.mjs\"",
+    "test:unit": "vitest run",
+    "test:unit:watch": "vitest",
+    "test:unit:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
     "test:e2e:headed": "playwright test --headed",
     "test:e2e:list": "playwright test --list",
     "test:e2e:report": "playwright show-report e2e/.e2e/report",
-    "quality": "pnpm run lint && pnpm run typecheck && pnpm run build && pnpm run check:frontend"
+    "quality": "pnpm run lint && pnpm run typecheck && pnpm run test:unit && pnpm run build && pnpm run check:frontend"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^7.2.0",
@@ -98,11 +100,14 @@
     "@typescript-eslint/parser": "^8.59.0",
     "@vitejs/plugin-vue": "^6.0.6",
     "@vitejs/plugin-vue-jsx": "^5.1.5",
+    "@vitest/coverage-v8": "^3.2.7",
     "@vue/compiler-sfc": "^3.5.33",
+    "@vue/test-utils": "^2.5.1",
     "code-inspector-plugin": "^1.5.1",
     "cross-env": "^10.1.0",
     "eslint": "^10.2.1",
     "eslint-plugin-vue": "^10.9.0",
+    "jsdom": "^25.0.0",
     "less": "^4.6.4",
     "prettier": "^3.8.3",
     "puppeteer-core": "^25.5.0",
@@ -115,6 +120,7 @@
     "vite-plugin-cdn-import": "^1.0.1",
     "vite-plugin-compression": "^0.5.1",
     "vite-plugin-vue-setup-extend-plus": "^0.1.0",
+    "vitest": "^3.2.7",
     "vue-eslint-parser": "^10.4.0"
   },
   "browserslist": [

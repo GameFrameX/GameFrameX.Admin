@@ -53,7 +53,8 @@
     "src/views/pages/**": "C151: pureAdmin 模板自带 demo 页（workflow/filtering/tree/lazyImg/dynamicForm/listAdapt/tableRules/formRules 等），不在后端菜单树也不在 router/route.ts，用户不可见",
     "src/views/system/print/component/hiprint/**": "C151: hiprint 打印模板演示数据（providers/print-data），无业务页面引用，用户不可见",
     "src/utils/toolsValidate.ts": "C151: 功能性中文常量——verifyNumberCnUppercase 数字转中文大写金额算法字符（'零壹贰…'/'元'/'整'）、verifyPasswordStrength 弱/中/强标签；函数未被外部引用，中文是算法功能性字符非用户可见文本",
-    "src/stores/themeConfig.ts": "C151: themeConfig 默认配置值 globalViceTitleMsg（登录页副标题 fallback），可被租户运行时配置覆盖，属配置默认值非组件字面量"
+    "src/stores/themeConfig.ts": "C151: themeConfig 默认配置值 globalViceTitleMsg（登录页副标题 fallback），可被租户运行时配置覆盖，属配置默认值非组件字面量",
+    "src/**/*.test.ts": "Vitest 单元/组件测试（2026-10-20 迁移引入）：中文为用例名与断言失败消息，仅开发可见非用户 UI 文案；测试代码不属于硬编码文案治理范围"
   },
   "sysAbbreviations": {
     "SysFlag": "C179: SystemConfigBase 内置参数标记列，后端 allowlist（数据身份），重命名需跨活跃写入路径的 schema 迁移，单独数据迁移 change 处理",

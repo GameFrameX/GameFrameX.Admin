@@ -105,6 +105,21 @@ const viteConfig = defineConfig((mode: ConfigEnv) => {
 			__NEXT_VERSION__: JSON.stringify(process.env.npm_package_version),
 			__NEXT_NAME__: JSON.stringify(process.env.npm_package_name),
 		},
+		// Vitest 单一配置源：在 Vite 配置上加 test 块，vitest 自动读取。
+		// 单元 = jsdom（支持 Vue 组件与浏览器 API stub）；e2e = Playwright（独立路径，conf 文件分离）。
+		test: {
+			environment: 'jsdom',
+			globals: false,
+			include: ['src/**/*.test.ts'],
+			exclude: ['src/**/*.test.mjs', 'node_modules', 'build/dist'],
+			setupFiles: ['./vitest.setup.ts'],
+			coverage: {
+				provider: 'v8',
+				reporter: ['text', 'html'],
+				include: ['src/**/*.{ts,vue}'],
+				exclude: ['src/**/*.test.ts', 'src/**/*.d.ts', 'src/auto-imports.d.ts', 'src/components.d.ts'],
+			},
+		},
 	};
 });
 
