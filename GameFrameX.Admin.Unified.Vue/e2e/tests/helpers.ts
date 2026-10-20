@@ -39,13 +39,138 @@ export const sleep = (ms: number): Promise<void> => {
   return promise;
 };
 
-// vite dev 下连续 hash 跳转偶发 net::ERR_ABORTED（前一个懒加载 chunk 的 load 事件被打断），
-// 同一导航重试一次即成；巡查/闭环的全菜单循环里必须用它
-export async function openHash(page: Page, path: string): Promise<void> {
-  try {
-    await page.goto(path);
-  } catch (error) {
-    if (!String(error).includes('ERR_ABORTED')) throw error;
-    await page.goto(path);
+// —— 真实菜单导航（2026-10-20 起 e2e 全面真实点击化）——
+// 全部基于渲染后的侧边栏 DOM 与真实点击：不读菜单树接口、不 hash 直达。
+// 侧边栏是 PrimeVue PanelMenu（src/layout/navigationMenu/VerticalMenu.vue）：
+//   根节点 → .p-panelmenu-panel（.p-panelmenu-header 内 span.menu-nav-item[role=button] 开合，
+//            折叠时 .p-panelmenu-content-container display:none，子树仍在 DOM）
+//   子分组 → li.p-panelmenu-item[aria-expanded]（span.menu-nav-item[role=button] 开合）
+//   叶子   → a.menu-nav-item（.menu-label 为标题；router-link href 自带 appId query）
+
+// 读取渲染后侧边栏的全部叶子标题（折叠容器内的叶子也在 DOM 中，去重保序）
+export async function renderedMenuLeaves(page: Page): Promise<string[]> {
+  return page.evaluate(() => {
+    const titles = Array.from(document.querySelectorAll('.p-panelmenu a.menu-nav-item .menu-label'))
+      .map((el) => (el.textContent ?? '').trim())
+      .filter(Boolean);
+    const seen = new Set<string>();
+    return titles.filter((title) => {
+      if (seen.has(title)) return false;
+      seen.add(title);
+      return true;
+    });
+  });
+}
+
+// 当前侧边栏是否包含某叶子（含折叠容器内）
+async function sidebarHasLeaf(page: Page, title: string): Promise<boolean> {
+  return page.evaluate((leafTitle) => {
+    return Array.from(document.querySelectorAll('.p-panelmenu a.menu-nav-item .menu-label')).some(
+      (el) => (el.textContent ?? '').trim() === leafTitle,
+    );
+  }, title);
+}
+
+// 侧边栏叶子链接的文本定位器（menu-label 精确匹配；Vue 重渲染后自动重新解析，
+// 比打 data 标记再点击稳——标记元素会被 PanelMenu 重渲染替换导致 detached）
+function menuLeafLink(page: Page, title: string) {
+  return page
+    .locator('.p-panelmenu a.menu-nav-item')
+    .filter({ has: page.getByText(title, { exact: true }) })
+    .first();
+}
+
+type MenuAction =
+  | { kind: 'ready' }
+  | { kind: 'expand'; label: string; where: 'header' | 'item' }
+  | { kind: 'missing' }
+  | { kind: 'stuck' };
+
+// evaluate 侧：定位目标叶子，返回下一步动作——可见则 ready；
+// 否则给出最外层折叠祖先的开关（分组名 + 层级），由真实 click 展开后重试。
+// 注意：evaluate 函数体序列化后丢失模块闭包，工具逻辑必须函数内定义。
+async function nextMenuAction(page: Page, title: string): Promise<MenuAction> {
+  return page.evaluate((leafTitle) => {
+    const links = Array.from(document.querySelectorAll('.p-panelmenu a.menu-nav-item'));
+    const target = links.find((a) => (a.querySelector('.menu-label')?.textContent ?? '').trim() === leafTitle);
+    if (!target) return { kind: 'missing' };
+    if (target.getBoundingClientRect().height > 0) return { kind: 'ready' };
+    // 自内向外收集折叠祖先（根面板容器 + li 子菜单），先展开最外层
+    const collapsed: { label: string; where: 'header' | 'item' }[] = [];
+    let node: HTMLElement | null = target.parentElement;
+    while (node) {
+      if (
+        node.classList.contains('p-panelmenu-content-container') &&
+        getComputedStyle(node).display === 'none'
+      ) {
+        const toggle = node
+          .closest('.p-panelmenu-panel')
+          ?.querySelector(':scope > .p-panelmenu-header span.menu-nav-item[role="button"]');
+        const label = toggle?.getAttribute('aria-label') ?? toggle?.textContent?.trim();
+        if (toggle && label) collapsed.push({ label, where: 'header' });
+      }
+      if (node.tagName === 'LI' && node.getAttribute('aria-expanded') === 'false') {
+        const toggle = node.querySelector(
+          ':scope > .p-panelmenu-item-content span.menu-nav-item[role="button"]',
+        );
+        const label = toggle?.getAttribute('aria-label') ?? toggle?.textContent?.trim();
+        if (toggle && label) collapsed.push({ label, where: 'item' });
+      }
+      node = node.parentElement;
+    }
+    if (collapsed.length === 0) return { kind: 'stuck' };
+    return { kind: 'expand', ...collapsed[collapsed.length - 1] };
+  }, title);
+}
+
+// 真实点击导航到侧边栏叶子：逐层真实 click 展开折叠祖先，再真实 click 叶子链接
+export async function navigateByMenu(page: Page, leafTitle: string): Promise<void> {
+  for (let round = 0; round < 10; round += 1) {
+    const action = await nextMenuAction(page, leafTitle);
+    if (action.kind === 'missing') throw new Error(`当前侧边栏未找到菜单「${leafTitle}」`);
+    if (action.kind === 'stuck') throw new Error(`菜单「${leafTitle}」展开后仍不可见`);
+    if (action.kind === 'ready') break;
+    // 分组开关同样用文本定位（label 精确匹配），重渲染后可自动重试
+    const scope =
+      action.where === 'header'
+        ? '.p-panelmenu-panel > .p-panelmenu-header span.menu-nav-item[role="button"]'
+        : '.p-panelmenu li[aria-expanded] > .p-panelmenu-item-content span.menu-nav-item[role="button"]';
+    await page
+      .locator(scope)
+      .filter({ has: page.getByText(action.label, { exact: true }) })
+      .first()
+      .click();
+    await sleep(250);
   }
+  await menuLeafLink(page, leafTitle).click();
+  await sleep(250);
+}
+
+// 回到应用选择页（真实用户路径组合）：
+// - 全局侧边栏页面：点「工作台」叶子——未选应用被守卫导流回 appSelector；已选应用落应用驾驶舱
+// - 应用工作台深层页：侧边栏无出口，重载落地应用驾驶舱（守卫真实路径）
+// - 应用驾驶舱：点「返回应用列表」正门出口（C333 后唯一出口）
+export async function gotoAppSelector(page: Page): Promise<void> {
+  if (!page.url().includes('appCenter/appSelector')) {
+    if (await sidebarHasLeaf(page, '工作台')) {
+      await navigateByMenu(page, '工作台');
+      await sleep(600);
+    } else {
+      await page.goto('/');
+      await sleep(900);
+    }
+  }
+  if (!page.url().includes('appCenter/appSelector')) {
+    await page.locator('.back-to-app-list').click();
+    await sleep(600);
+  }
+  await page.locator('role=button[name*="默认应用"] >> nth=0').waitFor({ state: 'visible', timeout: 15_000 });
+}
+
+// 进入应用工作台（真实点击默认应用卡；菜单链接的 href 自带 appId query）
+export async function enterWorkspace(page: Page): Promise<void> {
+  await gotoAppSelector(page);
+  await page.locator('role=button[name*="默认应用"] >> nth=0').click();
+  await page.waitForURL(/\/#\/(?!appCenter\/appSelector)/, { timeout: 20_000 });
+  await sleep(900);
 }

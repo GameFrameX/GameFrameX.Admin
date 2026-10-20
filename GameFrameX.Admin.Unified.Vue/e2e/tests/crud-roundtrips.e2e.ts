@@ -1,12 +1,10 @@
-import { test, expect, type Page } from '@playwright/test';
-import { openHash, shot, sleep, superadminPage } from './helpers';
+import { test, expect } from '@playwright/test';
+import { enterWorkspace, gotoAppSelector, navigateByMenu, shot, sleep, superadminPage } from './helpers';
 
 // L3 功能闭环（数据驱动）：首批 6 个应用域实体的
 // 真实新增 → 表格回显 → 删除 → 行消失，全程真实 web 交互、真实数据、结束即清理。
-// 路由不硬编码：运行时从登录菜单树按菜单名解析真实 Path。
-// 应用域导航编排（真实用户路径）：goto('/') 后等路由守卫弹回完成（异步重定向
-// 晚于 load 事件，立即读 URL 会误判），落在 appSelector 则点默认应用卡进入工作台
-// （动态菜单路由注册 + currentAppId 就位），再 hash 直达子页。
+// 路由不硬编码：2026-10-20 起全面真实点击化——菜单标题在渲染后的侧边栏 DOM 中解析，
+// 逐层真实展开分组后真实点击叶子链接（不读菜单树接口、不 hash 直达；appId 由菜单链接 href 自带）。
 // 通知公告被 is_enabled 缺陷阻塞（Api 仓 issue #284），见 tests-disabled/。
 // 全量推进记录（2026-10-18，42 个带 Edit 组件的叶子页盘点后）：
 // 已闭环 12 页（本矩阵）；例外 9 页——
@@ -50,28 +48,30 @@ const ENTITIES: EntitySpec[] = [
   },
   {
     name: '资源包定义',
-    menuTitle: '资源包定义',
+    // menuTitle 必须是侧边栏渲染后的 i18n 标签（用户所见），不是种子菜单树的 Meta.Title：
+    // gameAppAssetPackage 的 zh-cn 标签是「资源包」，与树 Title「资源包定义」已漂移
+    menuTitle: '资源包',
     fields: ['text', 'text'],
     createApi: /tenantGameAppAssetPackage\/add/,
     deleteApi: /tenantGameAppAssetPackage\/delete/,
   },
   {
     name: '配置字段定义',
-    menuTitle: '配置字段定义',
+    menuTitle: '内容元数据', // configKey 的 zh-cn 渲染标签（树 Title「配置字段定义」已漂移）
     fields: ['text', 'text', 'select'],
     createApi: /tenantGameAppRemoteConfigKey\/add/,
     deleteApi: /tenantGameAppRemoteConfigKey\/delete/,
   },
   {
     name: '配置模式定义',
-    menuTitle: '配置模式定义',
+    menuTitle: '模式配置', // configMode 的 zh-cn 渲染标签（树 Title「配置模式定义」已漂移）
     fields: ['text', 'text'],
     createApi: /tenantGameAppRemoteConfigMode\/add/,
     deleteApi: /tenantGameAppRemoteConfigMode\/delete/,
   },
   {
     name: '设备定义',
-    menuTitle: '设备定义',
+    menuTitle: '设备', // tenantDevice 的 zh-cn 渲染标签（树 Title「设备定义」已漂移）
     fields: ['text', 'text', 'text'],
     createApi: /tenantGameAppDevice\/add/,
     deleteApi: /tenantGameAppDevice\/delete/,
@@ -219,52 +219,6 @@ const ENTITIES: EntitySpec[] = [
   },
 ];
 
-const API_BASE = process.env.E2E_API_BASE ?? 'http://127.0.0.1:20802';
-
-type MenuLeaf = { path: string; title: string };
-
-async function fetchMenuLeaves(page: Page): Promise<MenuLeaf[]> {
-  const leaves = await page.evaluate(
-    async (apiBase: string): Promise<{ path: string; title: string }[]> => {
-      const readFieldLocal = (source: object, keys: string[]): unknown => {
-        for (const key of keys) {
-          if (key in source) return Reflect.get(source, key);
-        }
-        return undefined;
-      };
-      const rawToken: unknown = JSON.parse(localStorage.getItem('gameframex.admin.vue:access-token') ?? '""');
-      const tokenText = typeof rawToken === 'string' ? rawToken : '';
-      const res = await fetch(`${apiBase}/api/globalMenu/loginMenuTree`, {
-        headers: { Authorization: `Bearer ${tokenText}` },
-      });
-      const body: unknown = await res.json();
-      const tree: unknown =
-        body && typeof body === 'object' ? readFieldLocal(body, ['result', 'Result', 'data']) : [];
-      const out: { path: string; title: string }[] = [];
-      const walk = (nodes: unknown) => {
-        if (!Array.isArray(nodes)) return;
-        for (const node of nodes) {
-          if (!node || typeof node !== 'object') continue;
-          const children = readFieldLocal(node, ['children', 'Children']);
-          const path = readFieldLocal(node, ['path', 'Path']);
-          const meta = readFieldLocal(node, ['meta', 'Meta']);
-          const title =
-            meta && typeof meta === 'object' ? readFieldLocal(meta, ['title', 'Title']) : undefined;
-          const childList = Array.isArray(children) ? children : [];
-          if (childList.length === 0 && typeof path === 'string' && path) {
-            out.push({ path, title: typeof title === 'string' ? title : path });
-          }
-          walk(childList);
-        }
-      };
-      walk(tree);
-      return out;
-    },
-    API_BASE,
-  );
-  return leaves;
-}
-
 test.describe('CRUD 功能闭环（首批）', () => {
   for (const entity of ENTITIES) {
     test(`${entity.name} 新增回显删除闭环`, async ({ page: adminPage, browser }) => {
@@ -285,26 +239,23 @@ test.describe('CRUD 功能闭环（首批）', () => {
         await route.continue();
       });
 
-      // 等守卫弹回完成后再判定落地；appSelector 则点默认应用卡进工作台，
-      // 并从卡片标签抓取应用 ID（app 域路由守卫要求 query.appId，与真实菜单链接一致）
+      // 真实菜单导航：等守卫弹回落地后，先在当前侧边栏找目标菜单；
+      // 租户域菜单分布在两个真实表面——应用选择页全局侧边栏与应用工作台侧边栏，
+      // 当前表面没有时切换到另一个表面（全部真实点击）再试
       await page.goto('/');
       await sleep(900);
-      let appId = '';
-      if (page.url().includes('appSelector')) {
-        const cardLabel = await page.locator('role=button[name*="默认应用"] >> nth=0').textContent();
-        appId = /应用ID:\s*(\d+)/.exec(cardLabel ?? '')?.[1] ?? '';
-        await page.locator('role=button[name*="默认应用"] >> nth=0').click();
-        await page.waitForURL(/\/#\/(?!appCenter\/appSelector)/, { timeout: 20_000 });
+      await page.locator('.p-panelmenu').waitFor({ timeout: 15_000 });
+      try {
+        await navigateByMenu(page, entity.menuTitle);
+      } catch {
+        if (entity.session === 'superadmin') throw new Error(`平台侧边栏未找到「${entity.menuTitle}」`);
+        if (page.url().includes('appSelector')) {
+          await enterWorkspace(page);
+        } else {
+          await gotoAppSelector(page);
+        }
+        await navigateByMenu(page, entity.menuTitle);
       }
-
-      const leaves = await fetchMenuLeaves(page);
-      const leaf = leaves.find((item) => item.title === entity.menuTitle);
-      if (!leaf) {
-        throw new Error(`菜单树中未找到「${entity.menuTitle}」`);
-      }
-
-      const appQuery = appId ? `?appId=${appId}` : '';
-      await openHash(page, `/#${leaf.path.startsWith('/') ? '' : '/'}${leaf.path}${appQuery}`);
       await expect(page.locator('.p-datatable-tbody')).toBeVisible({ timeout: 20_000 });
 
       await page.locator('role=button[name="新增"]').first().click();
