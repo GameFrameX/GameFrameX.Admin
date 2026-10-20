@@ -3,7 +3,7 @@ name: Admin Web Vue (Build & Deploy)
 # =============================================================================
 # 由 GameFrameX.Admin.Unified.Vue/.cnb.yml 迁移（2026-10-19 单仓整合，快照合并）。
 # 触发规则与 CNB 版对齐：
-#   main push / v* tag → 构建推送镜像 (gameframex-admin-web-vue)，main 与 tag 额外推 latest 并触发自动部署
+#   main push / v* tag → 构建推送镜像 (gameframex-web-vue)，main 与 tag 额外推 latest 并触发自动部署
 # 路径过滤：仅前端目录或本文件变更触发，后端改动不再误触前端部署。
 #
 # 单仓整合后续（2026-10-19）：Vue Dockerfile 的 build context 已上移为仓库根，
@@ -29,7 +29,7 @@ on:
 
 jobs:
   build-and-push:
-    name: gameframex-admin-web-vue
+    name: gameframex-web-vue
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -50,7 +50,7 @@ jobs:
             TAG="${GITHUB_SHA::7}"
           fi
           echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
-          echo "image_tag=${DOCKER_REGISTRY}/${WEB_IMAGE_NAMESPACE}/gameframex-admin-web-vue:${TAG}" >> "$GITHUB_OUTPUT"
+          echo "image_tag=${DOCKER_REGISTRY}/${WEB_IMAGE_NAMESPACE}/gameframex-web-vue:${TAG}" >> "$GITHUB_OUTPUT"
 
       - name: Docker login
         id: login
@@ -101,4 +101,4 @@ jobs:
         run: |
           docker tag "$IMAGE_TAG" "${IMAGE_TAG%:*}:latest"
           docker push "${IMAGE_TAG%:*}:latest"
-          bash build/deploy-admin-web-vue.sh
+          bash build/deploy-web-vue.sh

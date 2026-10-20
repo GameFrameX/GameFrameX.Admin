@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # =============================================================================
-# Web-Entry 部署脚本
+# Web-Api 部署脚本
 #
 # 通过 HTTP POST 触发远程部署 API
 # 所有配置通过环境变量传入 (由 GitHub Actions Secrets 提供)
@@ -91,7 +91,7 @@ jq -n \
   environments: $environments
 }' > /tmp/deploy-body.json
 
-echo "[DEPLOY] 部署 web-entry"
+echo "[DEPLOY] 部署 web-api"
 echo "[DEPLOY] 请求地址: ${DEPLOY_API_URL}"
 echo "[DEPLOY] 请求参数:"
 jq '.Auth.Password = "****"' /tmp/deploy-body.json
@@ -107,8 +107,8 @@ cat /tmp/deploy-resp.txt
 echo ""
 
 if [ "${HTTP_CODE}" -ge 200 ] && [ "${HTTP_CODE}" -lt 300 ]; then
-  echo "[DEPLOY] web-entry 部署成功"
+  echo "[DEPLOY] web-api 部署成功"
 else
-  echo "[DEPLOY] web-entry 部署失败 (HTTP ${HTTP_CODE})" >&2
+  echo "[DEPLOY] web-api 部署失败 (HTTP ${HTTP_CODE})" >&2
   exit 1
 fi

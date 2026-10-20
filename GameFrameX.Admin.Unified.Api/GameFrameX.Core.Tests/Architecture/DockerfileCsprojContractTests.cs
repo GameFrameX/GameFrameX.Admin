@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 namespace GameFrameX.Core.Tests.Architecture;
 
 // Dockerfile restore 层 csproj 清单守护测试。
-// 三个 Dockerfile（web-entry / client-api / hub-api）的 restore 层逐个 COPY csproj 以利用构建缓存，
+// 三个 Dockerfile（web-api / client-api / hub-api）的 restore 层逐个 COPY csproj 以利用构建缓存，
 // 清单必须与对应 host 的 ProjectReference 传递闭包完全一致，否则：
 //   - 清单缺项（新增项目未同步）→ dotnet restore 找不到引用目标，构建失败；
 //   - 清单多项（项目已删除/合并未同步）→ COPY 不存在的文件，构建直接报错。
@@ -15,7 +15,7 @@ public sealed class DockerfileCsprojContractTests
 
     public static TheoryData<string, string> HostDockerfiles => new()
     {
-        { "Dockerfile.web-entry", "GameFrameX.Web.Api/GameFrameX.Web.Api.csproj" },
+        { "Dockerfile.web-api", "GameFrameX.Web.Api/GameFrameX.Web.Api.csproj" },
         { "Dockerfile.client-api", "GameFrameX.Client.Api/GameFrameX.Client.Api.csproj" },
         { "Dockerfile.hub-api", "GameFrameX.Hub.Api/GameFrameX.Hub.Api.csproj" },
     };

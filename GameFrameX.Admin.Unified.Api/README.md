@@ -121,7 +121,7 @@ Admin API 是"动态 API"——写 Service 自动出接口；Hub API 是"传统 
 
 ```
 GameFrameX.Admin.Unified.Api/
-├── GameFrameX.Web.Api/            # Admin API 宿主（启动入口，compose 服务名 web-entry）
+├── GameFrameX.Web.Api/            # Admin API 宿主（启动入口，compose 服务名 web-api）
 ├── GameFrameX.Client.Api/         # Client API 宿主（独立 WebApplication）
 ├── GameFrameX.Hub.Api/            # Hub API 宿主（独立 WebApplication，传统 Controller 路由）
 ├── GameFrameX.Web.Core/           # Admin 的启动逻辑、中间件、DI 配置（重点）
@@ -144,7 +144,7 @@ GameFrameX.Admin.Unified.Api/
 │   ├── GameFrameX.Pay.Apple.AppStoreServer/  # App Store Server API v2
 │   ├── GameFrameX.Pay.Google/            # Google Play
 │   └── GameFrameX.Pay.Xsolla/            # Xsolla
-├── Dockerfile.web-entry           # Admin API 的 Dockerfile（sdk:10.0 → aspnet:10.0）
+├── Dockerfile.web-api             # Admin API 的 Dockerfile（sdk:10.0 → aspnet:10.0）
 ├── Dockerfile.client-api          # Client API 的 Dockerfile
 ├── Dockerfile.hub-api             # Hub API 的 Dockerfile
 └── (统一编排已上移仓库根 docker-compose.yml：PostgreSQL + 三 API + 前端共 5 服务)
@@ -792,7 +792,7 @@ cd .. && docker compose up --build   # 统一编排位于仓库根（含前端�
 
 | compose 服务 | 容器名 | 端口 | 对应主机 | Dockerfile |
 |--------------|--------|------|----------|-----------|
-| `web-entry` | `gameframex-web-entry` | `20802:20802` | Admin API | `Dockerfile.web-entry` |
+| `web-api` | `gameframex-web-api` | `20802:20802` | Admin API | `Dockerfile.web-api` |
 | `client-api` | `gameframex-client-api` | `20808:20808` | Client API | `Dockerfile.client-api` |
 | `hub-api` | `gameframex-hub-api` | `20806:20806` | Hub API | `Dockerfile.hub-api` |
 
@@ -800,7 +800,7 @@ cd .. && docker compose up --build   # 统一编排位于仓库根（含前端�
 
 > Swagger 在 Production 容器里默认不挂，三个主机都用 `Swagger__Enabled=true` 显式打开（见 compose 的环境变量段）。
 
-> 注意历史命名：compose 里的 `web-entry` 就是 Admin API（Web.Api），名字沿用了旧版的 "Web.Entry"。别被它绕进去。
+> 历史命名：compose 服务曾名 `web-entry`（沿用旧版 "Web.Entry"），2026-10-20 起更名 `web-api`，与 GameFrameX.Web.Api 对齐。
 
 ### 发布前清单：数据库重灌与紧凑短 ID
 

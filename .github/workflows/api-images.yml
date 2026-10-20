@@ -3,7 +3,7 @@ name: API Images (Build & Deploy)
 # =============================================================================
 # 由 GameFrameX.Admin.Unified.Api/.cnb.yml 迁移（2026-10-19 单仓整合，快照合并）。
 # 触发规则与 CNB 版对齐：
-#   main push / v* tag → 并发构建推送三镜像 (gameframex-web-entry / -client-api / -hub-api)
+#   main push / v* tag → 并发构建推送三镜像 (gameframex-web-api / -client-api / -hub-api)
 #                        main 与 tag 额外推 latest 并触发自动部署
 # 路径过滤：仅后端目录或本文件变更触发，前端改动不再误触后端部署。
 #
@@ -34,9 +34,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - image: gameframex-web-entry
-            dockerfile: Dockerfile.web-entry
-            deploy-script: deploy-web-entry.sh
+          - image: gameframex-web-api
+            dockerfile: Dockerfile.web-api
+            deploy-script: deploy-web-api.sh
           - image: gameframex-client-api
             dockerfile: Dockerfile.client-api
             deploy-script: deploy-client-api.sh
