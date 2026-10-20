@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { shot } from './helpers';
 
-// 复刻 .menu-test/verify-log-pages.js 的验证口径，但按 AGENTS 标准以真实菜单导航
+// 复刻 .local-archive/menu-test-20261020/verify-log-pages.js 的验证口径，但按 AGENTS 标准以真实菜单导航
 // （动态菜单 hash 随版本漂移：system/log/oplog 与 log/oplog 均已 404），
 // route 记录器证明分页 API 真实发出，表体断言渲染出 DB 行，截图留证。
 const CASES = [

@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { ADMIN_STATE } from './helpers';
 
-// 与 .menu-test/verify-log-pages.js 同源的开发种子账号（env 可覆盖）。
+// 与 .local-archive/menu-test-20261020/verify-log-pages.js 同源的开发种子账号（env 可覆盖）。
 // 密码用普通字符串：种子账号无敏感面，且截图证据是验收要求。
 const ACCOUNT = process.env.E2E_ACCOUNT ?? 'admin';
 const TENANT_ID = process.env.E2E_TENANT_ID ?? '1300000000001';
