@@ -1,0 +1,71 @@
+name: Admin Web Vue (Tests & Quality Gate)
+
+# =============================================================================
+# 前端逻辑层单测 + 质量门禁（lint / typecheck / vitest / build / check:frontend）。
+# 与 vue-image.yml 的 Docker 部署流解耦：测试不依赖镜像仓库 secrets，也不在 tag 流程跑。
+# 触发：main / develop push 与 PR（path 过滤只跑前端改动）。
+#
+# 单仓整合（2026-10-19）：所有 workflows 在仓库根；Vue 子目录的 .github/workflows/ 已空，本文件落在根。
+# pnpm 通过 corepack 激活；缓存用 pnpm store 而不是 node_modules，省安装时间。
+# =============================================================================
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'GameFrameX.Admin.Unified.Vue/**'
+      - '.github/workflows/vue-tests.yml'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'GameFrameX.Admin.Unified.Vue/**'
+      - '.github/workflows/vue-tests.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: vue-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  unit-and-gate:
+    name: lint · typecheck · vitest · build · check:frontend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: GameFrameX.Admin.Unified.Vue
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup pnpm (Corepack)
+        uses: pnpm/action-setup@v4
+        with:
+          # package.json 锁版（pinned）：11.5.2 —— 与本地一致，避免版本飘。
+          version: 11.5.2
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: pnpm
+          cache-dependency-path: GameFrameX.Admin.Unified.Vue/pnpm-lock.yaml
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm run lint
+
+      - name: Typecheck
+        run: pnpm run typecheck
+
+      - name: Vitest (unit + component)
+        # 45 个测试在 CI 上 ms 级，单 worker 跑足够；不开 coverage（开发本地用 test:unit:coverage）。
+        run: pnpm exec vitest run --reporter=verbose
+
+      - name: Build
+        run: pnpm run build
+
+      - name: Frontend standards gate
+        # check:frontend 套 i18n/route/permission/api/text/standards regex 等多门禁；
+        # 任一失败则 PR 不合并（提交前必跑 `pnpm run quality`）。
+        run: pnpm run check:frontend
