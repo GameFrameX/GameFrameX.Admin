@@ -74,18 +74,14 @@ const viteConfig = defineConfig((mode: ConfigEnv) => {
 		// PrimeVueResolver 按需在模板编译时注入 primevue/* 导入，vite 启动扫描（含 SFC 全量 entries）
 		// 看不见这类注入，dev 首次用到某组件时会运行期再优化并整页 reload，打断 e2e。
 		// 这里按 primevue 包目录动态生成全量 include，启动时一次性预打包（随版本自更新）。
-		// 仅收运行时入口（index.mjs）：类型目录/umd 不收；chart/editor 的可选 peer
-		//（chart.js/quill）项目未安装，预打包会因解析失败崩溃，需一并排除。
+		// 仅收运行时入口（index.mjs）：类型目录/umd 不收。primevue 组件的可选 peer
+		//（chart.js/quill 等）已在 package.json 显式安装，禁止为新组件再加排除特判——
+		// 引入依赖可选 peer 的组件时必须同步安装对应 peer。
 		optimizeDeps: {
 			entries: ['index.html', 'src/**/*.vue'],
 			include: fs
 				.readdirSync(pathResolve('./node_modules/primevue'))
-				.filter(
-					(name) =>
-						fs.existsSync(pathResolve(`./node_modules/primevue/${name}/index.mjs`)) &&
-						name !== 'chart' &&
-						name !== 'editor',
-				)
+				.filter((name) => fs.existsSync(pathResolve(`./node_modules/primevue/${name}/index.mjs`)))
 				.map((name) => `primevue/${name}`),
 			exclude: ['vue-demi'],
 		},
