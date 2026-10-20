@@ -24,7 +24,7 @@ on:
       - 'GameFrameX.Admin.Unified.Vue/**'
       - 'build/**'
       - '.github/workflows/vue-image.yml'
-    tags: ['v*']
+    tags: ['**']
   workflow_dispatch:
 
 jobs:

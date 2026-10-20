@@ -23,7 +23,7 @@ on:
     paths:
       - 'GameFrameX.Admin.Unified.Api/**'
       - '.github/workflows/api-images.yml'
-    tags: ['v*']
+    tags: ['**']
   workflow_dispatch:
 
 jobs:
