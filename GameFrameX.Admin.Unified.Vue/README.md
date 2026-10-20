@@ -75,6 +75,8 @@ GameFrameX 游戏管理平台的前端工程，基于 Vue 3 + TypeScript + Vite 
 | 富文本 | wangEditor + editor-for-vue | 5.x |
 | 代码编辑器 | Monaco Editor | 0.44.x |
 | HTTP | Axios + 自研拦截器 | 1.x |
+| 单元测试 | Vitest（jsdom + @vue/test-utils） | 3.x |
+| 端到端测试 | Playwright（系统 Edge） | 1.64.x |
 | 图标 | FontAwesome 7（vue-fontawesome + 自动按需） | 7.x |
 | 表单 | @primevue/forms + 自研 formResolver | 4.5.x |
 | 编辑器辅助 | code-inspector-plugin（按住 Shift 点击定位源码） | — |
@@ -694,11 +696,16 @@ git push
 ### 提交流程
 
 ```bash
-pnpm run quality      # 必过
+pnpm run quality      # 必过：lint + typecheck + test:unit + build + check:frontend
 git add .
 git commit -m "<scope>(<module>): <subject>"   # 中文 / 英文都可，≤ 60 字
 git push
 ```
+
+> `pnpm run quality` 串起来的总闸，自 2026-10-20 起把 Vitest 单元/组件测试纳入 lint 与 build 之间；
+> 单元层回归挡住就拦在 build 之前，省集成成本。新增纯逻辑工具请在 `src/<dir>/<name>.test.ts` 同位补单测；
+> 新增 Vue 组件请参照 `src/components/form-label/index.test.ts`（`mount` + 注入 provider + slot 文本断言）。
+> 开发期可跑 `pnpm run test:unit:watch` 走 watch UI。
 
 - scope: `feat / fix / refactor / docs / style / test / chore / perf`
 - module: `system.user` / `api` / `router` / `docs` / `i18n`…
@@ -879,6 +886,8 @@ services:
 | `pnpm run lint` / `lint-fix` | ESLint 查 / 自动修 |
 | `pnpm run format` / `format-fix` | Prettier 查 / 自动修 |
 | `pnpm run typecheck` | tsc 类型检查 |
+| `pnpm run test:unit` / `test:unit:watch` / `test:unit:coverage` | Vitest 单元 / 组件单测（jsdom + @vue/test-utils，含 v8 覆盖率） |
+| `pnpm run test:e2e` / `test:e2e:headed` / `test:e2e:list` / `test:e2e:report` | Playwright 端到端（系统 Edge，套件串行） |
 | `pnpm gen:api` | 从 `openapi.json` 重新生成前端 API 客户端 |
 | `pnpm run lint:i18n` | 检查 5 语言 i18n 键完整性 |
 | `pnpm run check:routes` | 后端菜单 component 与前端视图对齐 |
