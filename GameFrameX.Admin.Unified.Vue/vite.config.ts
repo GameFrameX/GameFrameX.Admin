@@ -71,7 +71,17 @@ const viteConfig = defineConfig((mode: ConfigEnv) => {
 		root: process.cwd(),
 		resolve: { alias },
 		base: mode.command === 'serve' ? './' : env.VITE_PUBLIC_PATH,
-		optimizeDeps: { exclude: ['vue-demi'] },
+		// PrimeVueResolver 按需在模板编译时注入 primevue/* 导入，vite 启动扫描（含 SFC 全量 entries）
+		// 看不见这类注入，dev 首次用到某组件时会运行期再优化并整页 reload，打断 e2e。
+		// 这里按 primevue 包目录动态生成全量 include，启动时一次性预打包（随版本自更新）。
+		optimizeDeps: {
+			entries: ['index.html', 'src/**/*.vue'],
+			include: fs
+				.readdirSync(pathResolve('./node_modules/primevue'))
+				.filter((name) => fs.statSync(pathResolve(`./node_modules/primevue/${name}`)).isDirectory())
+				.map((name) => `primevue/${name}`),
+			exclude: ['vue-demi'],
+		},
 		server: {
 			host: '0.0.0.0',
 			port: env.VITE_PORT as unknown as number,

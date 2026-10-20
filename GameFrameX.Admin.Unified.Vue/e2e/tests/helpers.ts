@@ -123,11 +123,19 @@ async function nextMenuAction(page: Page, title: string): Promise<MenuAction> {
   }, title);
 }
 
-// 真实点击导航到侧边栏叶子：逐层真实 click 展开折叠祖先，再真实 click 叶子链接
+// 真实点击导航到侧边栏叶子：逐层真实 click 展开折叠祖先，再真实 click 叶子链接。
+// 「找不到叶子」不立即判死：dev server 整页 reload（vite 依赖再优化、HMR 等）期间
+// PanelMenu 会短暂整体卸载，先有限等待侧边栏重挂载（真缺失超时后仍会失败）。
 export async function navigateByMenu(page: Page, leafTitle: string): Promise<void> {
+  const missingDeadline = Date.now() + 5_000;
   for (let round = 0; round < 10; round += 1) {
     const action = await nextMenuAction(page, leafTitle);
-    if (action.kind === 'missing') throw new Error(`当前侧边栏未找到菜单「${leafTitle}」`);
+    if (action.kind === 'missing') {
+      if (Date.now() >= missingDeadline) throw new Error(`当前侧边栏未找到菜单「${leafTitle}」`);
+      await sleep(300);
+      round -= 1; // 等待侧边栏重挂载不消耗展开轮次
+      continue;
+    }
     if (action.kind === 'stuck') throw new Error(`菜单「${leafTitle}」展开后仍不可见`);
     if (action.kind === 'ready') break;
     // 分组开关同样用文本定位（label 精确匹配），重渲染后可自动重试

@@ -1,4 +1,4 @@
-import { test, expect, type Locator } from '@playwright/test';
+import { test, expect, TimeoutError, type Locator } from '@playwright/test';
 import { enterWorkspace, gotoAppSelector, navigateByMenu, renderedMenuLeaves, shot, sleep } from './helpers';
 
 // 全页面 CRUD 骨架扫描（verify-tenant-admin-menu-contract 的回归化收敛，非破坏性；
@@ -31,7 +31,13 @@ test('租户菜单页新增对话框全量可开可关', async ({ page }) => {
       }
       dialogPages += 1;
 
-      await page.locator('.p-dialog >> role=button[name="取消"]').click();
+      // dev server 整页 reload（vite 依赖再优化等）会连同对话框一起卸载：点击超时但对话框已消失
+      // 视为已关闭继续扫描；对话框仍在则走下方 Escape 兜底并记为异常
+      try {
+        await page.locator('.p-dialog >> role=button[name="取消"]').click();
+      } catch (error) {
+        if (!(error instanceof TimeoutError)) throw error;
+      }
       if (await pollHidden(dialog, 2500)) continue;
       // 取消通道失效时的兜底：Escape 关闭，避免残留弹窗影响下一页
       await page.keyboard.press('Escape');
