@@ -187,7 +187,8 @@ const props = withDefaults(defineProps<{
   storageKey?: string
   /** 是否显示列设置齿轮按钮，默认 true（仅 columns 模式生效） */
   showColumnConfig?: boolean
-  /** 是否显示导出按钮，默认 true（叠加 `${authPrefix}:export` 权限码） */
+  /** 是否显示导出按钮，默认 false（显式 opt-in——后端 Export 端点是逐服务显式提供的（C147），
+   *  未提供端点的页面显示按钮只会得到 404 死按钮；叠加 `${authPrefix}:export` 权限码） */
   showExport?: boolean
   /** 导出时携带的查询条件，应与 pageApi 入参一致（命中数据范围） */
   exportQuery?: any
@@ -205,7 +206,7 @@ const props = withDefaults(defineProps<{
   actionColumnWidth: '140px',
   actionColumnHeader: '',
   showColumnConfig: true,
-  showExport: true,
+  showExport: false,
 })
 
 const emit = defineEmits<{

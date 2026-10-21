@@ -21,6 +21,7 @@
                        authPrefix="tenantChannelDefinition"
                        :actions="actions"
                        :columns="columns"
+                       showExport
                        :exportQuery="queryParams"
                        @page="onPage">
           <template #body-scope="{ data }">
