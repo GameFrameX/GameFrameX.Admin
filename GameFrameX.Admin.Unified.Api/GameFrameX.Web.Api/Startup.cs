@@ -129,6 +129,8 @@ public class Startup
                     options.AddDefaultPolicy(policy => policy.AllowAnyHeader()
                                                              .AllowAnyMethod()
                                                              .WithOrigins(origins)
+                                                             // 跨域默认读不到 Content-Disposition，导出文件名会丢（getFileName 崩溃）
+                                                             .WithExposedHeaders("Content-Disposition")
                                                              .AllowCredentials());
                 });
             }
@@ -140,6 +142,7 @@ public class Startup
                 options.AddDefaultPolicy(policy => policy.AllowAnyHeader()
                                                          .AllowAnyMethod()
                                                          .SetIsOriginAllowed(_ => true)
+                                                         .WithExposedHeaders("Content-Disposition")
                                                          .AllowCredentials());
             });
         }
