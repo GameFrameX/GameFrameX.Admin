@@ -46,7 +46,7 @@
           <FormLabel :name="field.key">
             {{ field.label }}<span v-if="field.required" class="payment-field-required">*</span>
           </FormLabel>
-          <FormField :name="field.key" v-slot="{ props: fProps }">
+          <FormField :name="field.key" v-slot="{ props: fProps, invalid, error }">
             <div class="payment-field">
               <InputText
                 v-if="field.type === 'text'"
@@ -93,6 +93,7 @@
               />
               <InputText v-else v-bind="fProps" v-model="ruleForm[field.key]" class="w-full"/>
               <small v-if="field.help" class="payment-field-help">{{ field.help }}</small>
+              <Message v-if="invalid" severity="error" size="small" variant="simple">{{ error }}</Message>
             </div>
           </FormField>
         </template>
