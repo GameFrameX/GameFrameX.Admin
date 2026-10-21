@@ -316,6 +316,7 @@ async function probeEditFormValidation(page: Page, report: LeafReport, issues: s
     return nodes.some((node) => (node as HTMLInputElement).value !== '');
   });
   if (residualValues) return false;
+  const recordsBefore = (await readApiRecords(page)).length;
   await page.locator('.p-dialog:visible button').filter({ hasText: '确定' }).first().click();
   await sleep(900);
   const newRecords = (await readApiRecords(page)).slice(recordsBefore);
@@ -344,7 +345,9 @@ async function probeEditFormValidation(page: Page, report: LeafReport, issues: s
 
 // 关闭最上层对话框/抽屉并验证：页脚 取消/关闭 → 头部关闭按钮（X）→ Escape，最多三轮
 async function closeDialog(page: Page): Promise<void> {
-  for (let round = 0; round < 3; round += 1) {
+  for (let round = 0; round < 4; round += 1) {
+    // 打开的 Select/下拉面板会吞掉页脚按钮点击（outside-click 先吃掉 mousedown）——每轮先收起
+    await collapseSelectOverlay(page);
     const anySurface = page.locator('.p-dialog:visible, .p-drawer:visible').first();
     if (!(await anySurface.isVisible().catch(() => false))) return;
     const footerButton = page
