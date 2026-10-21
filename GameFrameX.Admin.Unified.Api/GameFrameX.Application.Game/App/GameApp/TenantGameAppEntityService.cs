@@ -117,8 +117,11 @@ public class TenantGameAppEntityService
         entity.AppSecretHashAlgorithm = AppSecretHasher.Algorithm;
         entity.LastRotatedTime = TimerHelper.UnixTimeSeconds();
         // 显式推进 UpdateTime：Client.Api AppCacheService 以 MAX(UpdateTime) 为缓存失效信号，
-        // 不更新此列会导致轮换后的新 hash 对已缓存进程不生效（旧 secret 可继续用）
-        entity.UpdateTime = TimerHelper.UnixTimeSeconds();
+        // 不更新此列会导致轮换后的新 hash 对已缓存进程不生效（旧 secret 可继续用）。
+        // 单调 +1：同一秒内连续轮换时秒级信号不变、旧密钥继续放行（C395 关联性实测），必须严格大于行内旧值
+        var nowSeconds = TimerHelper.UnixTimeSeconds();
+        entity.LastRotatedTime = nowSeconds;
+        entity.UpdateTime = Math.Max(nowSeconds, (entity.UpdateTime ?? 0) + 1);
 #pragma warning disable CS8625 // 实体属性置 null 后通过 UpdateColumns 持久化（DB 列允许 null），用于清除遗留明文
         entity.AppSecret = null;
 #pragma warning restore CS8625

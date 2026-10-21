@@ -13,6 +13,7 @@ public class AppCacheService
     private readonly ConcurrentDictionary<long, TenantAppCache> _tenantCaches = new();
     private readonly ClientApiTenantDbProvider _tenantDbProvider;
     private readonly ISqlSugarTenantIdResolver _tenantIdResolver;
+    private readonly object _refreshLock = new();
 
     public AppCacheService(ClientApiTenantDbProvider tenantDbProvider, ISqlSugarTenantIdResolver tenantIdResolver)
     {
@@ -88,23 +89,37 @@ public class AppCacheService
 
     private TenantAppCache RefreshCacheIfChanged(long tenantId)
     {
-        var db = _tenantDbProvider.GetTenantDb(tenantId);
-        db.QueryFilter.ClearAndBackup();
-        try
+        // 串行化刷新并拒绝旧信号回写：并发请求各自读到不同瞬间的 MAX(UpdateTime) 时，
+        // 迟到的旧刷新若直接 last-write-wins 会把新密钥 hash 覆盖回旧值——轮换后的旧密钥复活
+        // （C395 关联性实测间歇复现）。信号语义单调（轮换侧保证 UpdateTime 严格递增），可比较。
+        lock (_refreshLock)
         {
-            var signal = GetSignalVersion(db);
-            if (_tenantCaches.TryGetValue(tenantId, out var existing) && existing.Signal == signal)
+            var db = _tenantDbProvider.GetTenantDb(tenantId);
+            db.QueryFilter.ClearAndBackup();
+            try
             {
-                return existing;
-            }
+                var signal = GetSignalVersion(db);
+                if (_tenantCaches.TryGetValue(tenantId, out var existing))
+                {
+                    if (existing.Signal == signal)
+                    {
+                        return existing;
+                    }
+                    if (existing.Signal > signal)
+                    {
+                        // 已缓存更新的一代：本次读到的是迟到旧信号，直接用缓存
+                        return existing;
+                    }
+                }
 
-            var refreshed = RefreshCache(db, signal);
-            _tenantCaches[tenantId] = refreshed;
-            return refreshed;
-        }
-        finally
-        {
-            db.QueryFilter.Restore();
+                var refreshed = RefreshCache(db, signal);
+                _tenantCaches[tenantId] = refreshed;
+                return refreshed;
+            }
+            finally
+            {
+                db.QueryFilter.Restore();
+            }
         }
     }
 
