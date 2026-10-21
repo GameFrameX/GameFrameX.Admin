@@ -159,10 +159,11 @@ public abstract class GenericCrudService<TEntity, TAddRequest, TUpdateRequest, T
     {
         EnsureInputNotNull(input);
         await OnUpdatingAsync(input);
-        var entity = input.Adapt<TEntity>();
         var before = await Repository.GetFirstAsync(e => e.Id == input.Id);
-        await InnerUpdateAsync(input);
-        await OnUpdatedAsync(input, before, entity);
+        // InnerUpdateAsync 返回合并后的现行实体（DTO 字段映射到库中行，未声明列保持原值），
+        // 供 OnUpdatedAsync 拿到真实落库视图——此前 input.Adapt 新实体会带默认值误导后续写入
+        var updated = await InnerUpdateAsync(input);
+        await OnUpdatedAsync(input, before, updated);
     }
 
     protected virtual Task OnUpdatingAsync(TUpdateRequest input)
