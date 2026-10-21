@@ -177,6 +177,7 @@ const ENTITIES: EntitySpec[] = [
     deleteApi: /tenantGameRewardTemplateEntity\/delete/,
   },
   {
+    name: '兑换码',
     rowEdit: false, // 动作列仅删除（C130 盘点同源）；编辑复用新增弹窗
     menuTitle: '兑换码',
     fields: ['select', 'text', 'date', 'select', 'text', 'number', 'date', 'skip-select', 'reward-items'],
