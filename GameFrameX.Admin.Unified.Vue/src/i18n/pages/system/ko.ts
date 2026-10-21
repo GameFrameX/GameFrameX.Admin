@@ -232,6 +232,7 @@ export default {
             startTime: '시작 시간',
             endTime: '종료 시간',
             clearLog: '삭제',
+            clearConfirm: '모든 로그를 비우시겠습니까? 되돌릴 수 없습니다.',
             exportLog: '내보내기',
             clearSuccess: '삭제되었습니다',
             moduleName: '모듈',
@@ -508,6 +509,10 @@ export default {
             // tips
             addJobTip: '작업 추가',
             startAllJobsTip: '모든 작업 시작',
+            batchConfirm0: '모든 작업을 시작할까요? 전체 일정에 영향을 줍니다.',
+            batchConfirm1: '모든 작업을 일시중지할까요? 전체 일정에 영향을 줍니다.',
+            batchConfirm2: '휴면 작업을 모두 깨울까요?',
+            batchConfirm3: '모든 작업 영속화를 강제할까요?',
             pauseAllJobsTip: '모든 작업 일시 정지',
             cancelSleepTip: '스케줄러 강제 깨우기',
             persistAllTip: '모든 작업 영속화 강제 실행',

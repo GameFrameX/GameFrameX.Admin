@@ -356,11 +356,16 @@ const delJobTrigger = async (row: SystemJobTriggerEntity) => {
 };
 
 const startAllJob = async () => {
+  // 批量影响全部调度任务，必须二次确认
+  const confirmed = await showConfirm(t('system.job.batchConfirm0'), t('message.common.message.tip'), {type: 'danger'});
+  if (!confirmed) return;
   await systemJobStartAllJobPost();
   showSuccess(t('system.job.startAllJobsSuccess'));
 };
 
 const pauseAllJob = async () => {
+  const confirmed = await showConfirm(t('system.job.batchConfirm1'), t('message.common.message.tip'), {type: 'danger'});
+  if (!confirmed) return;
   await systemJobPauseAllJobPost();
   showSuccess(t('system.job.pauseAllJobsSuccess'));
 };
@@ -391,11 +396,15 @@ const pauseTrigger = async (row: SystemJobTriggerEntity) => {
 };
 
 const cancelSleep = async () => {
+  const confirmed = await showConfirm(t('system.job.batchConfirm2'), t('message.common.message.tip'), {type: 'danger'});
+  if (!confirmed) return;
   await systemJobCancelSleepPost();
   showSuccess(t('system.job.cancelSleepSuccess'));
 };
 
 const persistAll = async () => {
+  const confirmed = await showConfirm(t('system.job.batchConfirm3'), t('message.common.message.tip'));
+  if (!confirmed) return;
   await systemJobPersistAllPost();
   showSuccess(t('system.job.persistAllSuccess'));
 };

@@ -232,6 +232,7 @@ export default {
             startTime: '開始時間',
             endTime: '終了時間',
             clearLog: 'クリア',
+            clearConfirm: 'すべてのログを消去しますか？この操作は元に戻せません。',
             exportLog: 'エクスポート',
             clearSuccess: 'クリアしました',
             moduleName: 'モジュール',
@@ -508,6 +509,10 @@ export default {
             // tips
             addJobTip: 'ジョブ追加',
             startAllJobsTip: '全ジョブ開始',
+            batchConfirm0: 'すべてのジョブを開始しますか？全スケジュールに影響します。',
+            batchConfirm1: 'すべてのジョブを一時停止しますか？全スケジュールに影響します。',
+            batchConfirm2: '休止中のジョブをすべて起床しますか？',
+            batchConfirm3: 'すべてのジョブの永続化を強制しますか？',
             pauseAllJobsTip: '全ジョブ一時停止',
             cancelSleepTip: 'スケジューラを強制起動',
             persistAllTip: '全ジョブの永続化を強制実行',

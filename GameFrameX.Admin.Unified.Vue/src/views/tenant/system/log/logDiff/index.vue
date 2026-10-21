@@ -60,7 +60,7 @@
 import {faTrashCan} from '../../../../../utils/icons.ts';
 
 import {onMounted, reactive, ref} from 'vue';
-import {showSuccess} from '../../../../../utils/message.ts';
+import {showConfirm, showSuccess} from '../../../../../utils/message.ts';
 
 import {logDiffPagePost, logDiffClearPost} from '../../../../../api/logDiff';
 import {LogDiffFields} from '../../../../../api/_shared/data-contracts.ts';
@@ -116,6 +116,9 @@ const onQuery = async () => {
 };
 
 const clearLog = async () => {
+  // 清空是不可逆的整库删除，必须二次确认（danger 样式与高危删除一致）
+  const confirmed = await showConfirm(t('system.log.clearConfirm'), t('system.log.clearLog'), {type: 'danger'});
+  if (!confirmed) return;
   state.loading = true;
   await logDiffClearPost();
   state.loading = false;

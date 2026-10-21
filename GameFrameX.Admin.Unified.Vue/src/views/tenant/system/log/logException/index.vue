@@ -80,7 +80,7 @@
 import {faCircleInfo, faFolderOpen, faTrashCan} from '../../../../../utils/icons.ts';
 
 import {onMounted, reactive} from 'vue';
-import {showSuccess} from '../../../../../utils/message.ts';
+import {showConfirm, showSuccess} from '../../../../../utils/message.ts';
 import {downloadByData, getFileName} from '../../../../../utils/download.ts';
 
 import {logExceptionPagePost, logExceptionClearPost, logExceptionExportPost} from '../../../../../api/logException';
@@ -130,6 +130,9 @@ const onQuery = async () => {
 };
 
 const clearLog = async () => {
+  // 清空是不可逆的整库删除，必须二次确认（danger 样式与高危删除一致）
+  const confirmed = await showConfirm(t('system.log.clearConfirm'), t('system.log.clearLog'), {type: 'danger'});
+  if (!confirmed) return;
   state.loading = true;
   await logExceptionClearPost();
   state.loading = false;

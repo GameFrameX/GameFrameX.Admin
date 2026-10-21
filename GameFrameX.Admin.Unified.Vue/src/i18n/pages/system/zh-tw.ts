@@ -232,6 +232,7 @@ export default {
             startTime: '開始時間',
             endTime: '結束時間',
             clearLog: '清空',
+            clearConfirm: '確認清空全部日誌？該操作不可復原。',
             exportLog: '匯出',
             clearSuccess: '清空成功',
             moduleName: '模組名稱',
@@ -511,6 +512,10 @@ export default {
             // tips
             addJobTip: '增加作業',
             startAllJobsTip: '啟動所有作業',
+            batchConfirm0: '確認啟動所有作業？將影響全部調度任務。',
+            batchConfirm1: '確認暫停所有作業？將影響全部調度任務。',
+            batchConfirm2: '確認喚醒所有休眠作業？',
+            batchConfirm3: '確認強制觸發所有作業持久化？',
             pauseAllJobsTip: '暫停所有作業',
             cancelSleepTip: '強制喚醒作業調度器',
             persistAllTip: '強制觸發所有作業持久化',

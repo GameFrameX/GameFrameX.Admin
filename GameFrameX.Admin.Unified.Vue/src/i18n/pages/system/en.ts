@@ -232,6 +232,7 @@ export default {
             startTime: 'Start Time',
             endTime: 'End Time',
             clearLog: 'Clear',
+            clearConfirm: 'Clear all logs? This cannot be undone.',
             exportLog: 'Export',
             clearSuccess: 'Cleared successfully',
             moduleName: 'Module',
@@ -511,6 +512,10 @@ export default {
             // tips
             addJobTip: 'Add Job',
             startAllJobsTip: 'Start All Jobs',
+            batchConfirm0: 'Start all jobs? This affects every scheduled job.',
+            batchConfirm1: 'Pause all jobs? This affects every scheduled job.',
+            batchConfirm2: 'Wake all sleeping jobs?',
+            batchConfirm3: 'Force persist all jobs?',
             pauseAllJobsTip: 'Pause All Jobs',
             cancelSleepTip: 'Force Wake Scheduler',
             persistAllTip: 'Force Persist All Jobs',
