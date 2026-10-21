@@ -33,7 +33,7 @@ test.describe('SuperAdmin 平台表面分模块覆盖', () => {
       await page.goto('/');
       await page.locator('.p-panelmenu').waitFor({ timeout: 15_000 });
 
-      const reports = await sweepGroup(page, groupName, { minLeaves });
+      const reports = await sweepGroup(page, groupName, { minLeaves, actions: true });
       expect(reports.some((report) => !report.is404), '模块内至少一个非 404 叶子').toBe(true);
 
       await expectNoApiAnomaly(page, minRequests);

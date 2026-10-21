@@ -10,12 +10,12 @@ import { expectNoApiAnomaly, installApiRecorder, sweepGroup } from '../module-co
 const CENTERS = [
   // 组名取侧边栏渲染后的 i18n 文案（与菜单树 Title 既定漂移：信任与安全、在线业务中心）。
   // 权益发货账本 / 受控操作 在种子中 IsHide=true（页内入口，不出侧边栏），故按渲染叶子数计数。
-  { group: '应用中心', minLeaves: 20, minRequests: 12, timeoutMs: 600_000 },
+  { group: '应用中心', minLeaves: 20, minRequests: 12, timeoutMs: 900_000 },
   { group: '玩家中心', minLeaves: 3, minRequests: 3, timeoutMs: 240_000 },
   { group: '信任与安全', minLeaves: 5, minRequests: 5, timeoutMs: 300_000 },
   { group: '商品与道具', minLeaves: 3, minRequests: 3, timeoutMs: 200_000 },
   { group: '区服运维', minLeaves: 3, minRequests: 3, timeoutMs: 200_000 },
-  { group: '在线业务中心', minLeaves: 13, minRequests: 10, timeoutMs: 480_000 },
+  { group: '在线业务中心', minLeaves: 13, minRequests: 10, timeoutMs: 600_000 },
   { group: '兑换码', minLeaves: 3, minRequests: 3, timeoutMs: 200_000 },
   { group: 'Web 商城', minLeaves: 2, minRequests: 2, timeoutMs: 180_000 },
   { group: '任务与自动化', minLeaves: 1, minRequests: 1, timeoutMs: 150_000 },
@@ -31,7 +31,7 @@ test.describe('应用工作台分模块覆盖', () => {
       await page.locator('.p-panelmenu').waitFor({ timeout: 15_000 });
       await enterWorkspace(page);
 
-      const reports = await sweepGroup(page, center.group, { minLeaves: center.minLeaves });
+      const reports = await sweepGroup(page, center.group, { minLeaves: center.minLeaves, actions: true });
       expect(reports.some((report) => !report.is404), '模块内至少一个非 404 叶子').toBe(true);
 
       await expectNoApiAnomaly(page, center.minRequests);

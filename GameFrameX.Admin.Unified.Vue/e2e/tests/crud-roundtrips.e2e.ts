@@ -28,12 +28,14 @@ import { enterWorkspace, gotoAppSelector, navigateByMenu, shot, sleep, superadmi
 //   待专项：角色管理删除走行上下文菜单（⋯）+ 动态权限。
 // 其余 21 页含 Password/DatePicker/CascadeSelect/RewardItemsEditor/依赖链 select 等复杂控件，需引擎扩展后分批纳入。
 
-type FieldSpec = 'text' | 'select' | 'number' | 'unique-number' | 'date' | 'skip' | 'cascade' | 'json' | 'editor' | 'reward-items' | 'skip-text' | 'skip-select' | 'skip-number';
+// 2026-10-20 补编辑半边：闭环升级为 新增 → 行回显 → 编辑提交（回显断言 + 改值）→ 行回显新值 → 删除 → 行消失。
+// update 路由按约定由 create 路由派生（xxx/add → xxx/update，C18 权限码对齐约定），不逐实体重复登记。
 type EntitySpec = {
   name: string;
   menuTitle: string;
   session?: 'admin' | 'superadmin';
-  fields: FieldSpec[];
+  // 行内无「编辑」按钮的页（如兑换码：编辑复用新增弹窗、动作列只挂删除）不跑编辑半边
+  rowEdit?: boolean;
   createApi: RegExp;
   deleteApi: RegExp;
 };
@@ -175,7 +177,7 @@ const ENTITIES: EntitySpec[] = [
     deleteApi: /tenantGameRewardTemplateEntity\/delete/,
   },
   {
-    name: '兑换码',
+    rowEdit: false, // 动作列仅删除（C130 盘点同源）；编辑复用新增弹窗
     menuTitle: '兑换码',
     fields: ['select', 'text', 'date', 'select', 'text', 'number', 'date', 'skip-select', 'reward-items'],
     createApi: /tenantGameRedeemCodeEntity\/add/,
@@ -229,9 +231,14 @@ test.describe('CRUD 功能闭环（首批）', () => {
       const token = `GFX_E2E_${Date.now().toString(36)}`;
 
       let created = false;
+      let updated = false;
       let deleted = false;
       await page.route(entity.createApi, async (route) => {
         created = true;
+        await route.continue();
+      });
+      await page.route(new RegExp(entity.createApi.source.replace('add', 'update')), async (route) => {
+        updated = true;
         await route.continue();
       });
       await page.route(entity.deleteApi, async (route) => {
@@ -369,6 +376,40 @@ test.describe('CRUD 功能闭环（首批）', () => {
       await page.locator('role=button[name="确定"]').first().click();
       await expect.poll(() => created, `${entity.name}: 新增请求未发出`).toBe(true);
       await expect(page.locator('.p-datatable-tbody')).toContainText(token, { timeout: 20_000 });
+      // —— 编辑闭环（rowEdit=false 的页跳过：动作列未挂编辑按钮，如兑换码）：
+      // 真实打开行编辑弹窗 → 回显断言（任意文本框含 token；编辑态字段顺序/禁用可与新增态不同）
+      // → 改首个「可编辑」文本框（业务键编辑态锁定是常态；数字框用数字值）→ 提交 → 更新真实发出且行仍在 ——
+      if (entity.rowEdit !== false) {
+        await page.locator(`tr:has-text("${token}") >> text=编辑`).first().click();
+        await expect(page.locator('.p-dialog')).toBeVisible({ timeout: 10_000 });
+        const editState = await page.evaluate((tk) => {
+          const boxes = Array.from(document.querySelectorAll('.p-dialog input, .p-dialog textarea')).filter(
+            (el) => el.getBoundingClientRect().height > 0,
+          );
+          return {
+            echoed: boxes.some((el) => (el as HTMLInputElement).value.includes(tk)),
+            editableIndex: boxes.findIndex(
+              (el) => !(el as HTMLInputElement).disabled && !(el as HTMLInputElement).readOnly,
+            ),
+          };
+        }, token);
+        expect(editState.echoed, `${entity.name}: 编辑弹窗未回显新增值`).toBe(true);
+        if (editState.editableIndex >= 0) {
+          const editableBox = page.locator('.p-dialog input:visible, .p-dialog textarea:visible').nth(editState.editableIndex);
+          const isNumeric = await editableBox.evaluate(
+            (el) => (el as HTMLInputElement).type === 'number' || (el as HTMLInputElement).getAttribute('inputmode') === 'numeric',
+          );
+          // 数字框填数字值（非数字会被校验拦下，编辑请求发不出）
+          await editableBox.fill(isNumeric ? String((Date.now() % 899) + 2) : `${token}-E2`, { timeout: 5000 });
+          await page.locator('role=button[name="确定"]').first().click();
+          await expect.poll(() => updated, `${entity.name}: 编辑请求未发出`).toBe(true);
+          await sleep(800);
+          await expect(page.locator('.p-datatable-tbody')).toContainText(token, { timeout: 20_000 });
+        } else {
+          // 全字段锁定：仅验证编辑弹窗可开且回显
+          await page.keyboard.press('Escape');
+        }
+      }
 
       await page.locator(`tr:has-text("${token}") >> text=删除`).first().click();
       await page.locator('role=button[name="确定"]').first().click();

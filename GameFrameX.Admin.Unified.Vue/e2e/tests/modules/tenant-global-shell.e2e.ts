@@ -21,7 +21,7 @@ test.describe('租户全局表面分模块覆盖', () => {
       // 前序用例可能已把会话留在应用工作台；回到应用选择页拿全局侧边栏
       await gotoAppSelector(page);
 
-      const reports = await sweepGroup(page, groupName, { minLeaves });
+      const reports = await sweepGroup(page, groupName, { minLeaves, actions: true });
       expect(reports.some((report) => !report.is404), '模块内至少一个非 404 叶子').toBe(true);
 
       await expectNoApiAnomaly(page, minRequests);
