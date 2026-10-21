@@ -61,7 +61,10 @@
             <Column field="realName" :header="t('system.user.realName')" style="width: 120px" />
             <Column :header="t('common.label.avatar')" style="width: 80px">
               <template #body="{ data }">
-                <Avatar :image="data.avatar" size="normal" shape="circle">
+                <!-- PrimeVue Avatar 的默认插槽会抑制内部 image 分支（renderSlot fallback），
+                     有头像时必须走纯 :image 形态，无头像才渲染首字插槽 -->
+                <Avatar v-if="avatarImageUrl(data)" :image="avatarImageUrl(data)" size="normal" shape="circle"/>
+                <Avatar v-else size="normal" shape="circle">
                   {{ data.nickName?.slice(0, 1) ?? data.realName?.slice(0, 1) }}
                 </Avatar>
               </template>
@@ -120,6 +123,7 @@ import { faArrowsRotate, faEllipsisVertical, faMagnifyingGlass, faPenToSquare, f
 import {computed, onMounted, reactive, ref, watch} from 'vue';
 import {showConfirm, showSuccess} from '../../../../utils/message.ts';
 import {auth} from '../../../../utils/authFunction.ts';
+import {resolveBackendFileUrl} from '../../../../utils/fileUrl.ts';
 import OrgTree from '/@/views/tenant/system/org/component/OrgTree.vue';
 import EditUser from '/@/views/tenant/system/user/component/EditUser.vue';
 
@@ -257,6 +261,9 @@ const onPageChange = (event: any) => {
   state.tableParams.page = Math.floor(event.first / event.rows) + 1;
   onQuery();
 };
+
+// 头像列 URL：DB 相对对象键 → 后端 origin 绝对地址（无头像返回空串，走首字插槽分支）
+const avatarImageUrl = (row: UserRow) => resolveBackendFileUrl(row.avatar);
 
 const changeStatus = (row: any) => {
   tenantUserSetStatusPost({id: row.id, isEnabled: row.isEnabled})

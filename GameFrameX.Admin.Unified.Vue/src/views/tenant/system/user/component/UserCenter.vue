@@ -6,7 +6,19 @@
           <template #content>
             <div class="account-center-avatarHolder">
               <Avatar
+                  v-if="hasCustomAvatar"
                   :image="userInfos.avatar"
+                  size="xlarge"
+                  shape="circle"
+                  style="width: 100px; height: 100px; cursor: pointer"
+                  @click="openCropperDialog"
+                  v-block-loading="state.avatarLoading"
+                  @mouseenter="mouseEnterAvatar"
+                  @mouseleave="mouseLeaveAvatar"
+              />
+              <!-- PrimeVue Avatar 默认插槽会抑制内部 image 分支：有头像走纯 :image，无头像才渲染首字插槽 -->
+              <Avatar
+                  v-else
                   size="xlarge"
                   shape="circle"
                   style="width: 100px; height: 100px; cursor: pointer"
@@ -192,7 +204,7 @@
 import { faArrowsRotate, faCircleCheck, faCloudArrowUp, faPenToSquare } from '../../../../../utils/icons.ts';
 import NarrowScreenHint from '/@/components/narrow-screen-hint/index.vue';
 
-import {onMounted, watch, reactive, ref} from 'vue';
+import {computed, onMounted, watch, reactive, ref} from 'vue';
 import {storeToRefs} from 'pinia';
 import Form from '@primevue/forms/form'
 import FormField from '@primevue/forms/formfield'
@@ -202,6 +214,7 @@ import type {FormRules} from '../../../../../composables/types/crud.ts'
 import {showConfirm} from '../../../../../utils/message.ts';
 import {useUserInfoStore} from '../../../../../stores/userInfo.ts';
 import {base64ToFile} from '../../../../../utils/base64Conver.ts';
+import {resolveBackendFileUrl} from '../../../../../utils/fileUrl.ts';
 import OrgTree from '/@/views/tenant/system/user/component/OrgTree.vue';
 import CropperDialog from '/@/components/image-cropper/index.vue';
 import VueGridLayout from 'vue-grid-layout';
@@ -231,6 +244,9 @@ import TabPanel from 'primevue/tabpanel';
 
 const stores = useUserInfoStore();
 const {userInfos} = storeToRefs(stores);
+
+// store 的 avatar 无头像时回退 /favicon.ico；个人中心把回退值仍渲染为首字而非站点图标
+const hasCustomAvatar = computed(() => !!userInfos.value.avatar && !userInfos.value.avatar.endsWith('/favicon.ico'));
 const signaturePadRef = ref<InstanceType<typeof VueGridLayout>>();
 const ruleFormBaseRef = ref();
 const ruleFormPasswordRef = ref();
@@ -292,7 +308,7 @@ watch(state.signOptions, () => {
 
 const uploadCropperImage = async (e: any) => {
   var res = await tenantFileUploadAvatarPost({file: e.img});
-  userInfos.value.avatar = res.data.data?.filePath + '/' + res.data.data?.name;
+  userInfos.value.avatar = resolveBackendFileUrl(res.data.data?.url || `${res.data.data?.filePath}/${res.data.data?.name}`);
 };
 
 const openSignDialog = () => {
@@ -304,7 +320,7 @@ const saveUploadSign = async () => {
   if (isEmpty) return;
 
   var res = await tenantFileUploadSignaturePost({file: base64ToFile(data, userInfos.value.account + '.png')});
-  userInfos.value.signature = res.data.data?.filePath + '/' + res.data.data?.name;
+  userInfos.value.signature = resolveBackendFileUrl(res.data.data?.url || `${res.data.data?.filePath}/${res.data.data?.name}`);
 
   clearSign();
   state.signDialogVisible = false;
@@ -322,7 +338,7 @@ const onSignFileSelect = async (event: any) => {
   const file = event.files?.[0]
   if (!file) return
   var res = await tenantFileUploadSignaturePost({file: file});
-  userInfos.value.signature = res.data.data?.url + '';
+  userInfos.value.signature = resolveBackendFileUrl(res.data.data?.url);
 };
 
 const onChangeSignFile = (_file: any, fileList: []) => {

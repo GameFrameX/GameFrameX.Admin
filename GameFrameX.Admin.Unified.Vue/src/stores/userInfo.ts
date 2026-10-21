@@ -8,6 +8,7 @@ import {SystemAuth} from '../api/systemAuth';
 import {SystemConst} from '../api/systemConst';
 import {GlobalDictionaryType} from '../api/globalDictionaryType';
 import {clearTargetTenantId} from '../utils/targetTenant';
+import {resolveBackendFileUrl} from '../utils/fileUrl';
 
 /**
  * 用户信息
@@ -59,9 +60,9 @@ export const useUserInfoStore = defineStore('userInfo', {
                 account: d.account,
                 realName: d.realName,
                 accountType: d.accountType,
-                avatar: d.avatar ? '/' + d.avatar : '/favicon.ico',
+                avatar: d.avatar ? resolveBackendFileUrl(d.avatar) : '/favicon.ico',
                 address: d.address,
-                signature: d.signature,
+                signature: resolveBackendFileUrl(d.signature),
                 orgId: d.organizationId,
                 orgName: d.organizationName,
                 posName: d.posName,
