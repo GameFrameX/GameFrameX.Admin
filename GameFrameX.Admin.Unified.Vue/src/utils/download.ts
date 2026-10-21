@@ -102,11 +102,17 @@ export function openWindow(url: string, opt?: {
 }
 
 export function getFileName(headers: RawAxiosResponseHeaders | AxiosResponseHeaders) {
-    var fileName = headers['content-disposition'].split(';')[1].split('filename=')[1];
-    var fileNameUnicode = headers['content-disposition'].split('filename*=')[1];
+    // Content-Disposition 可能缺席（跨域未暴露/网关剥头）——兜底时间戳文件名，别让已完成
+    // 的下载在解析文件名时崩溃丢失
+    const disposition = headers?.['content-disposition'];
+    if (!disposition) {
+        return `export_${Date.now()}.xlsx`;
+    }
+    var fileName = disposition.split(';')[1]?.split('filename=')[1];
+    var fileNameUnicode = disposition.split('filename*=')[1];
     if (fileNameUnicode) {
         //当存在 filename* 时，取filename* 并进行解码（为了解决中文乱码问题）
         fileName = decodeURIComponent(fileNameUnicode.split("''")[1]);
     }
-    return fileName;
+    return fileName ?? `export_${Date.now()}.xlsx`;
 }
