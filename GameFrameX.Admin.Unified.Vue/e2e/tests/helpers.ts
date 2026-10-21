@@ -39,6 +39,26 @@ export const sleep = (ms: number): Promise<void> => {
   return promise;
 };
 
+// —— DatePicker(showTime) 真实面板演练（2026-10-21 补齐：此前仅 fill+Escape，面板交互零覆盖）——
+// 面板陷阱：首行含上月灰格（p-disabled + aria-disabled，且 td 拦截指针事件），点首个格子必卡死；
+// showTime 语义下选日期不收面板（hideOnDateTimeSelect=false）且无确认按钮，必须点外部收起；
+// 不用 Escape 收起：会冒泡触发 Dialog dismissOnEscape 关掉整个表单对话框。
+export async function pickDateTime(page: Page, comboboxIndex: number, dayOrdinal: 'first' | 'last' = 'first'): Promise<void> {
+  await page.locator(`.p-dialog >> role=combobox >> nth=${comboboxIndex}`).click();
+  const enabledDays = page.locator('.p-datepicker-day-cell:not(.p-datepicker-other-month)');
+  await enabledDays.first().waitFor({ timeout: 5_000 });
+  // 同表单常见 start/end 日期对且校验 end>start（最小间隔），第二个日期选月末格必然晚于首格
+  await (dayOrdinal === 'last' ? enabledDays.last() : enabledDays.first()).click();
+  const hourIncrement = page.locator('.p-datepicker-hour-picker button').first();
+  if (await hourIncrement.isVisible().catch(() => false)) {
+    await hourIncrement.click();
+    await page.locator('.p-datepicker-minute-picker button').first().click();
+  }
+  // 点对话框标题（面板外部）收起；面板 appendTo body，不遮挡标题
+  await page.locator('.p-dialog-title').first().click();
+  await page.locator('.p-datepicker-panel').waitFor({ state: 'detached', timeout: 5_000 });
+}
+
 // —— 真实菜单导航（2026-10-20 起 e2e 全面真实点击化）——
 // 全部基于渲染后的侧边栏 DOM 与真实点击：不读菜单树接口、不 hash 直达。
 // 侧边栏是 PrimeVue PanelMenu（src/layout/navigationMenu/VerticalMenu.vue）：

@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { enterWorkspace, gotoAppSelector, navigateByMenu, shot, sleep, superadminPage } from './helpers';
+import { enterWorkspace, gotoAppSelector, navigateByMenu, pickDateTime, shot, sleep, superadminPage } from './helpers';
 
 // L3 功能闭环（数据驱动）：首批 6 个应用域实体的
 // 真实新增 → 表格回显 → 删除 → 行消失，全程真实 web 交互、真实数据、结束即清理。
@@ -274,6 +274,7 @@ test.describe('CRUD 功能闭环（首批）', () => {
       let selectIndex = 0;
       let numberIndex = 0;
       let cascadeIndex = 0;
+      let dateFieldIndex = 0;
       for (const field of entity.fields) {
         if (field === 'text') {
           const value = textIndex === 0 ? token : `${token}-${textIndex}`;
@@ -366,9 +367,10 @@ test.describe('CRUD 功能闭环（首批）', () => {
           await page.locator(`.p-dialog >> role=spinbutton >> nth=${numberIndex}`).fill('1');
           numberIndex += 1;
         } else {
-          // DatePicker 输入框 role=combobox（与 Select 同序）：直接填充后 Escape 收起面板
-          await page.locator(`.p-dialog >> role=combobox >> nth=${selectIndex}`).fill('2030-01-01 10:00');
-          await page.keyboard.press('Escape');
+          // DatePicker(showTime) 真实面板交互：点开 → 选可点日期格 → 调时分 → 点外部收起（helpers.pickDateTime）；
+          // 同表单第 2+ 个日期选月末格，满足 end>start 及最小间隔校验（如兑换码失效时间）
+          await pickDateTime(page, selectIndex, dateFieldIndex === 0 ? 'first' : 'last');
+          dateFieldIndex += 1;
           selectIndex += 1;
         }
       }
