@@ -41,20 +41,21 @@ public class BaseService<T> : IAdminApiController where T : EntityBasic, new()
     [ApiDescriptionSettings(Name = "Delete")]
     public virtual async Task DeleteAsync(BaseDeleteRequest input)
     {
-        // 动态 API 校验管线不跑：缺 rowVersion 时 null 直达 SqlSugar 乐观锁，
-        // 以 42883（bigint = text）500 暴露（Api#292）；前置拦截为可读的参数校验失败
-        if (input is null || input.RowVersion is null)
+        // body 为字面 null 时绑定不产生 ModelState 错误（动态 API 无 [ApiController]），统一拦截为参数校验失败
+        if (input is null)
         {
-            Console.Error.WriteLine("GUARD-292-HIT inputNull=" + (input is null));
             throw BusinessError.Oh(CommonErrorCode.ParameterValidationFailed);
         }
+
         var entity = await Repository.GetFirstAsync(u => u.Id == input.Id);
         if (entity == null)
         {
             throw BusinessError.Oh(CommonErrorCode.RecordNotFound);
         }
 
-        entity.RowVersion = input.RowVersion;
+        // 客户端缺 rowVersion（动态 API 校验管线不跑）时回退到刚加载行的当前版本：
+        // 既保持读-改窗口内的乐观锁保护，又避免无类型 NULL 参数与版本列比较触发数据库类型错误（如 PostgreSQL 42883）
+        entity.RowVersion = input.RowVersion ?? entity.RowVersion;
         await Repository.FakeDeleteAsync(entity);
     }
 

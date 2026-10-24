@@ -159,9 +159,12 @@ public abstract class GenericCrudService<TEntity, TAddRequest, TUpdateRequest, T
     {
         EnsureInputNotNull(input);
         await OnUpdatingAsync(input);
-        var before = await Repository.GetFirstAsync(e => e.Id == input.Id);
-        // InnerUpdateAsync 返回合并后的现行实体（DTO 字段映射到库中行，未声明列保持原值），
-        // 供 OnUpdatedAsync 拿到真实落库视图——此前 input.Adapt 新实体会带默认值误导后续写入
+        // 更新目标不存在时显式报记录不存在，与删除链路口径一致
+        var before = await Repository.GetFirstAsync(e => e.Id == input.Id)
+                      ?? throw BusinessError.Oh(CommonErrorCode.RecordNotFound);
+        // 客户端缺 rowVersion（动态 API 校验管线不跑 DataAnnotations）时回退到刚加载行的当前版本：
+        // 保持乐观锁保护的同时，避免无类型 NULL 参数与版本列比较触发数据库类型错误（如 PostgreSQL 42883）
+        input.RowVersion ??= before.RowVersion;
         var updated = await InnerUpdateAsync(input);
         await OnUpdatedAsync(input, before, updated);
     }

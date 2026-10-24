@@ -1,5 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using GameFrameX.Core.BaseInputOutput;
+using GameFrameX.Core.Exceptions;
+using GameFrameX.Core.Service.Base;
 using GameFrameX.Core.Extension;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Entity.Tenant.Game;
@@ -140,6 +142,48 @@ public sealed class OptimisticConcurrencyTests : IDisposable
         Assert.Equal("hub-first", (await _db.Queryable<OptimisticTestEntity>().InSingleAsync(3)).Value);
     }
 
+    [Fact]
+    public async Task DeleteAsync_WithoutRowVersion_SoftDeletesUsingCurrentVersion()
+    {
+        await SeedTestEntityAsync(4);
+        var service = new DeleteTestService(new SqlSugarRepository<OptimisticTestEntity> { Context = _db, });
+
+        await service.DeleteAsync(new BaseDeleteRequest { Id = 4, });
+
+        var persisted = await _db.Queryable<OptimisticTestEntity>().InSingleAsync(4);
+        Assert.True(persisted.IsDeleted);
+    }
+
+    [Fact]
+    public async Task DeleteAsync_WithStaleRowVersion_ThrowsVersionConflict()
+    {
+        await SeedTestEntityAsync(5);
+        var service = new DeleteTestService(new SqlSugarRepository<OptimisticTestEntity> { Context = _db, });
+
+        await Assert.ThrowsAsync<VersionExceptions>(() =>
+                                                         service.DeleteAsync(new BaseDeleteRequest { Id = 5, RowVersion = long.MaxValue, }));
+    }
+
+    [Fact]
+    public async Task UpdateAsync_WithoutRowVersion_UpdatesUsingCurrentVersion()
+    {
+        await SeedTestEntityAsync(6);
+        var service = new CrudTestService(new SqlSugarRepository<OptimisticTestEntity> { Context = _db, });
+
+        await service.UpdateAsync(new CrudTestUpdateRequest { Id = 6, Value = "updated-without-version", });
+
+        Assert.Equal("updated-without-version", (await _db.Queryable<OptimisticTestEntity>().InSingleAsync(6)).Value);
+    }
+
+    [Fact]
+    public async Task UpdateAsync_MissingRecord_ThrowsRecordNotFound()
+    {
+        var service = new CrudTestService(new SqlSugarRepository<OptimisticTestEntity> { Context = _db, });
+
+        await Assert.ThrowsAsync<BusinessException>(() =>
+                                                        service.UpdateAsync(new CrudTestUpdateRequest { Id = 999, Value = "missing", }));
+    }
+
     private async Task SeedTestEntityAsync(long id)
     {
         await _db.Insertable(new OptimisticTestEntity
@@ -157,6 +201,45 @@ public sealed class OptimisticConcurrencyTests : IDisposable
         if (File.Exists(_dbPath))
         {
             File.Delete(_dbPath);
+        }
+    }
+
+    private sealed class DeleteTestService : BaseService<OptimisticTestEntity>
+    {
+        public DeleteTestService(SqlSugarRepository<OptimisticTestEntity> repository) : base(repository)
+        {
+        }
+    }
+
+    private sealed class CrudTestUpdateRequest : ICrudUpdateRequest
+    {
+        public long Id { get; set; }
+
+        public long? RowVersion { get; set; }
+
+        public string Value { get; set; }
+    }
+
+    private sealed class CrudTestAddRequest : BaseAddRequest
+    {
+        public string Value { get; set; }
+    }
+
+    private sealed class CrudTestPageRequest : BasePageRequest
+    {
+    }
+
+    private sealed class CrudTestResponse
+    {
+        public long Id { get; set; }
+
+        public string Value { get; set; }
+    }
+
+    private sealed class CrudTestService : GenericCrudService<OptimisticTestEntity, CrudTestAddRequest, CrudTestUpdateRequest, CrudTestResponse, CrudTestPageRequest>
+    {
+        public CrudTestService(SqlSugarRepository<OptimisticTestEntity> repository) : base(repository)
+        {
         }
     }
 }
