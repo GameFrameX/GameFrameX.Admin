@@ -17,6 +17,7 @@ import 'primeicons/primeicons.css';
 import '/@/theme/primevue-overrides.scss';
 import '/@/theme/common/transition.scss';
 import {getPrimeVueLocale} from './utils/primevue-locale';
+import './utils/primevue-inputnumber-focus-guard';
 import {brandPrimaryPalette} from './theme/brand';
 
 import VueGridLayout from 'vue-grid-layout';

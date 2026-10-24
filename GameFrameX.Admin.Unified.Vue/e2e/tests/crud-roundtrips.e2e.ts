@@ -172,7 +172,7 @@ const ENTITIES: EntitySpec[] = [
   {
     name: '奖励模板',
     menuTitle: '奖励模板',
-    fields: ['text', 'select', 'skip-number', 'reward-items', 'text'],
+    fields: ['text', 'select', 'number', 'reward-items', 'text'],
     createApi: /tenantGameRewardTemplateEntity\/add/,
     deleteApi: /tenantGameRewardTemplateEntity\/delete/,
   },
@@ -186,8 +186,9 @@ const ENTITIES: EntitySpec[] = [
   },
   // 游戏内商品：级联 v2 已验证可用（前置目录数据已 seed），但 add 稳定 500 NRE——
   // Api#291（AddRequest CategoryId:string/Number:long 与前端契约错位 → 绑定失败 input=null）。
-  // 组织管理：级联 v2 可选中叶子，但列表树形数据只渲染根行（Vue#200）token 无法回显；
-  // 级别 InputNumber fill 另触发 onInputFocus NRE（$refs.input.$el null，待建 issue）。
+  // 组织管理：级联 v2 可选中叶子，但列表树形数据只渲染根行（Vue#200）token 无法回显。
+  // 级别 InputNumber fill 的 onInputFocus NRE 已在应用启动层兜底修复（Vue#201），
+  // 组织 CRUD 闭环仍受 Vue#200 阻断；奖励模板「级别」改回真实 number fill 作回归。
   {
     name: '平台定义',
     menuTitle: '平台定义',
