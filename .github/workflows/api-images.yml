@@ -85,11 +85,11 @@ jobs:
         env:
           CNB_REGISTRY: ${{ secrets.CNB_REGISTRY }}
           CNB_REGISTRY_USERNAME: ${{ secrets.CNB_REGISTRY_USERNAME }}
-          CNB_REGISTRY_PASSWORD: ${{ secrets.CNB_REGISTRY_PASSWORD || secrets.CNB_TOKEN }}
+          CNB_REGISTRY_PASSWORD: ${{ secrets.CNB_REGISTRY_PASSWORD }}
         run: |
-          if [ -z "$CNB_REGISTRY_USERNAME" ] || [ -z "$CNB_REGISTRY" ]; then
+          if [ -z "$CNB_REGISTRY_PASSWORD" ] || [ -z "$CNB_REGISTRY_USERNAME" ] || [ -z "$CNB_REGISTRY" ]; then
             echo "logged=false" >> "$GITHUB_OUTPUT"
-            echo "[SKIP] CNB_REGISTRY_USERNAME/CNB_REGISTRY 未配置，跳过 CNB 仓库推送与部署"
+            echo "[SKIP] CNB_REGISTRY_PASSWORD/CNB_REGISTRY_USERNAME/CNB_REGISTRY 未配置，跳过 CNB 仓库推送与部署"
             exit 0
           fi
           echo "$CNB_REGISTRY_PASSWORD" | docker login "$CNB_REGISTRY" -u "$CNB_REGISTRY_USERNAME" --password-stdin
