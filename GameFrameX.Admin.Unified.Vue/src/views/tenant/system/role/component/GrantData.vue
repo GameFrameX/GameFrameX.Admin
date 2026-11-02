@@ -37,7 +37,7 @@
 <script lang="ts" setup name="systemGrantData">
 
 import {reactive, ref} from 'vue';
-import OrgTree from '/@/views/tenant/system/org/component/OrgTree.vue';
+import OrgTree from '/@/components/org-tree/OrgTree.vue';
 
 import {tenantRoleOwnOrgListGet, tenantRoleGrantDataScopePost} from '../../../../../api/tenantRole';
 import {RoleOrgInput} from '../../../../../api/_shared/data-contracts.ts';

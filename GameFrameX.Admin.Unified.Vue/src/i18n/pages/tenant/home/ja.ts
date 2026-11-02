@@ -20,12 +20,9 @@ export default {
         // クイックアクセス
         quickNav: 'プラットフォーム クイックアクセス',
         quickEmpty: '利用できるプラットフォーム入口はありません',
-        quickTenants: 'テナント管理',
-        quickPackages: 'パッケージ管理',
         quickMenus: 'メニュー管理',
         quickConfigs: 'パラメータ設定',
         quickDicts: '辞書管理',
-        quickPlatforms: 'プラットフォーム定義',
         // お知らせカード
         noticeTitle: 'お知らせ',
         noticeEmpty: 'お知らせはありません',

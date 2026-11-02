@@ -62,9 +62,6 @@ import {
   faTableCells,
   faGear,
   faFile,
-  faBuilding,
-  faCoins,
-  faGlobe,
 } from '/@/utils/icons';
 
 const {state} = usePlatformHomeData();
@@ -101,12 +98,9 @@ const sheetDate = `${now.getFullYear()}-${pad2(now.getMonth() + 1)}-${pad2(now.g
 
 // 平台快捷入口：全部为平台面真实菜单路由（SuperAdmin 菜单树内）
 const quickEntries: QuickNavEntry[] = [
-  {path: '/platform/global/tenant', icon: faBuilding, label: t('message.home.quickTenants')},
-  {path: '/platform/global/tenantPackage', icon: faCoins, label: t('message.home.quickPackages')},
   {path: '/platform/menu', icon: faTableCells, label: t('message.home.quickMenus')},
   {path: '/platform/config', icon: faGear, label: t('message.home.quickConfigs')},
   {path: '/platform/dict', icon: faFile, label: t('message.home.quickDicts')},
-  {path: '/platform/global/platform', icon: faGlobe, label: t('message.home.quickPlatforms')},
 ];
 </script>
 

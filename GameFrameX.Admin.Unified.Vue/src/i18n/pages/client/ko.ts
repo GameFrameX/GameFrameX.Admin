@@ -26,9 +26,7 @@ export default {
         tenantDefault: '테넌트 기본값',
         packageAssetName: '패키지 이름',
         languageName: '언어 이름',
-        languageCode: '언어 코드',
         language: '언어',
-        defaultLanguageDescription: '기본 대체 언어',
         forceUpdate: '강제 업데이트',
         isForceUpdate: '강제 업데이트',
         announcementTitle: '공지사항 제목',
@@ -163,8 +161,6 @@ export default {
         pleaseInputMasterPackage: '마스터 패키지를 선택하세요',
 
         // Dialog titles
-        addPlatform: '플랫폼 추가',
-        editPlatform: '플랫폼 편집',
         addChannel: '채널 추가',
         editChannel: '채널 편집',
         addAppVersion: '앱 버전 추가',
@@ -177,8 +173,6 @@ export default {
         editDeviceGroup: '기기 그룹 편집',
         addRemoteConfig: '리모트 설정 추가',
         editRemoteConfig: '리모트 설정 편집',
-        addLanguage: '언어 추가',
-        editLanguage: '언어 편집',
         addPackage: '패키지 추가',
         editPackage: '패키지 편집',
         addVersion: '버전 추가',

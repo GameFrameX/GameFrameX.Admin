@@ -84,7 +84,7 @@ import {
   normalizeAppId,
   visibleApps,
 } from '../../../../utils/appWorkspace.ts'
-import { faBullhorn, faCartShopping, faFolderOpen, faGauge, faGear, faLock, faLockOpen, faShop, faTrophy } from '../../../../utils/icons.ts'
+import { faBullhorn, faCartShopping, faFolderOpen, faGauge, faGear, faShop, faTrophy } from '../../../../utils/icons.ts'
 
 const route = useRoute()
 const router = useRouter()
@@ -106,9 +106,6 @@ const links = computed(() => [
   { label: t('gameBusiness.appWorkspace.packages'), path: '/app/appCenter/gameAppPackage', icon: faFolderOpen },
   { label: t('gameBusiness.appWorkspace.assetPackageVersions'), path: '/app/appCenter/release/assetPackageVersion', icon: faTrophy },
   { label: t('gameBusiness.appWorkspace.remoteConfig'), path: '/app/appCenter/remoteConfig/config', icon: faGear },
-  // C375 凭证中心操作台（C376 菜单 seed 落地后，旧 appSecurityWorkspace 由菜单 IA 收敛下线）
-  { label: t('gameBusiness.credentialCenter.title'), path: '/app/appCenter/credentialCenter', icon: faLock },
-  { label: t('gameBusiness.appWorkspace.security'), path: '/app/appCenter/appSecurityWorkspace', icon: faLockOpen },
   { label: t('gameBusiness.appWorkspace.players'), path: '/app/playerCenter/gameRoleEntity', icon: faGauge },
   { label: t('gameBusiness.appWorkspace.content'), path: '/app/contentCenter/mail/gameMailEntity', icon: faBullhorn },
   { label: t('gameBusiness.appWorkspace.goods'), path: '/app/goodsCenter/gameGoodsEntity', icon: faCartShopping },

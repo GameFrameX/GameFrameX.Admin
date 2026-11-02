@@ -37,7 +37,6 @@ public class MenuSeedPermissionRouteReconciliationTests
         "tenantAppSignatureKeyEntity:update", // 动作被 renew/rotate 取代
         "tenantSessionKeyEntity:update", // 动作被 enable/disable 体系取代
         "tenantUser:detail", // 端点下线
-        "tenantNotice:cancel", // 端点下线（publish/setRead 体系）
     };
 
     [Fact]

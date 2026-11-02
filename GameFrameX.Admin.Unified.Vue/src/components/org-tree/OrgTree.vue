@@ -4,7 +4,7 @@
       <div class="card-header">
         <div class="tree-h-flex" style="padding: 0.75rem 1rem">
           <div class="tree-h-left">
-            <InputText v-model="filterText" :placeholder="t('system.region.regionName')" class="w-full" />
+            <InputText v-model="filterText" :placeholder="t('system.org.orgName')" class="w-full" />
           </div>
           <div class="tree-h-right">
             <Button style="margin-left: 8px" severity="secondary" @click="toggleMenu">
@@ -20,12 +20,13 @@
         <Tree
             ref="treeRef"
             :value="treeNodes"
-            :filter="!!filterText"
+            :filter="true"
             filterBy="label"
             v-model:expandedKeys="expandedKeys"
-            @node-expand="onNodeExpand"
+            v-model:selectionKeys="selectionKeys"
+            :selectionMode="state.isShowCheckbox ? 'checkbox' : 'single'"
             @node-select="onNodeSelect"
-            :loading="state.loading"
+            :metaKeySelection="false"
             class="w-full"
         />
       </div>
@@ -36,8 +37,8 @@
 <script lang="ts" setup>
 import {onMounted, reactive, ref, computed} from 'vue';
 
-import {systemRegionListGet} from '../../../../../api/systemRegion';
-import {SystemRegionEntity} from '../../../../../api/_shared/data-contracts.ts';
+import {tenantOrganizationListGet} from '../../api/tenantOrganization';
+import {TenantOrganizationEntity} from '../../api/_shared/data-contracts.ts';
 
 import Card from 'primevue/card';
 import InputText from 'primevue/inputtext';
@@ -50,16 +51,19 @@ const filterText = ref('');
 const menuRef = ref();
 const treeRef = ref();
 const expandedKeys = ref<Record<string, boolean>>({});
+const selectionKeys = ref<Record<string, boolean>>({});
 const state = reactive({
   loading: false,
-  regionData: [] as Array<SystemRegionEntity>,
+  orgData: [] as Array<TenantOrganizationEntity>,
+  isShowCheckbox: false,
+  ownOrgData: [] as any[],
 });
-const defaultRootRegionId = 1;
+const defaultRootOrgId = 1300000000101;
 
 const menuItems = computed(() => [
   {label: t('system.org.expandAll'), command: () => expandAll()},
   {label: t('system.org.collapseAll'), command: () => collapseAll()},
-  {label: t('system.org.rootNode'), command: () => emits('nodeSelect', {id: defaultRootRegionId, name: ''})},
+  {label: t('system.org.rootNode'), command: () => emits('nodeSelect', {id: defaultRootOrgId, name: ''})},
   {label: t('common.button.refresh'), command: () => initTreeData()},
 ]);
 
@@ -67,17 +71,16 @@ const toggleMenu = (event: Event) => {
   menuRef.value.toggle(event);
 };
 
-const convertToTreeNodes = (data: SystemRegionEntity[]): any[] => {
+const convertToTreeNodes = (data: TenantOrganizationEntity[]): any[] => {
   return data.map(item => ({
     key: String(item.id),
     label: item.name ?? '',
     data: item,
-    leaf: false,
-    children: [],
+    children: item.children ? convertToTreeNodes(item.children) : [],
   }));
 };
 
-const treeNodes = computed(() => convertToTreeNodes(state.regionData));
+const treeNodes = computed(() => convertToTreeNodes(state.orgData));
 
 onMounted(() => {
   initTreeData();
@@ -85,18 +88,8 @@ onMounted(() => {
 
 const initTreeData = async () => {
   state.loading = true;
-  var res = await systemRegionListGet({id: defaultRootRegionId});
-  state.regionData = res.data.data ?? [];
-  state.loading = false;
-};
-
-const onNodeExpand = async (node: any) => {
-  if (node.children && node.children.length > 0) return;
-
-  state.loading = true;
-  var res = await systemRegionListGet({id: node.key});
-  var childrenData = res.data.data ?? [];
-  node.children = convertToTreeNodes(childrenData);
+  var res = await tenantOrganizationListGet({id: defaultRootOrgId});
+  state.orgData = res.data.data ?? [];
   state.loading = false;
 };
 
@@ -104,8 +97,8 @@ const expandAll = () => {
   const keys: Record<string, boolean> = {};
   const expandRecursive = (items: any[]) => {
     for (const item of items) {
-      keys[item.key] = true;
       if (item.children && item.children.length > 0) {
+        keys[item.key] = true;
         expandRecursive(item.children);
       }
     }
@@ -118,8 +111,21 @@ const collapseAll = () => {
   expandedKeys.value = {};
 };
 
+const setCheckedKeys = (orgData: any) => {
+  state.isShowCheckbox = true;
+  selectionKeys.value = {};
+  state.ownOrgData = orgData;
+  const keys: Record<string, boolean> = {};
+  if (Array.isArray(orgData)) {
+    orgData.forEach((id: any) => {
+      keys[String(id)] = true;
+    });
+  }
+  selectionKeys.value = {...keys};
+};
+
 const getCheckedKeys = () => {
-  return [] as number[];
+  return Object.keys(selectionKeys.value).filter(k => selectionKeys.value[k]).map(Number);
 };
 
 const onNodeSelect = (node: any) => {
@@ -128,7 +134,7 @@ const onNodeSelect = (node: any) => {
 
 const emits = defineEmits(['nodeSelect']);
 
-defineExpose({initTreeData, getCheckedKeys});
+defineExpose({initTreeData, setCheckedKeys, getCheckedKeys});
 </script>
 
 <style lang="scss" scoped>

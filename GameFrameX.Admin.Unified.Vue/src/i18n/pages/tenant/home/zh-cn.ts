@@ -20,12 +20,9 @@ export default {
         // 快捷入口
         quickNav: '平台快捷入口',
         quickEmpty: '暂无可用的平台入口',
-        quickTenants: '租户管理',
-        quickPackages: '租户套餐',
         quickMenus: '菜单管理',
         quickConfigs: '参数配置',
         quickDicts: '字典管理',
-        quickPlatforms: '平台定义',
         // 公告卡（HomeNoticeCard 组件复用）
         noticeTitle: '公告',
         noticeEmpty: '暂无公告',
