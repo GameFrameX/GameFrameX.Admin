@@ -24,7 +24,7 @@
 # 默认配置（可通过参数覆盖）:
 #   REGISTRY   = ""              (Docker Hub 无前缀，或填写私有仓库地址)
 #   NAMESPACE  = "alianblank"
-#   IMAGE_NAME = "gameframex-admin-web"
+#   IMAGE_NAME = "admin-web-ui"
 #   TAG        = 当前 git tag 或分支名-日期
 
 set -euo pipefail
@@ -32,7 +32,7 @@ set -euo pipefail
 # ── 默认配置 ──────────────────────────────────────────────
 REGISTRY=""
 NAMESPACE="alianblank"
-IMAGE_NAME="gameframex-admin-web"
+IMAGE_NAME="admin-web-ui"
 PLATFORMS="linux/amd64" # 默认平台；多平台如 "linux/amd64,linux/arm64"
 NO_PUSH=false
 USERNAME=""
@@ -75,7 +75,7 @@ while [[ $# -gt 0 ]]; do
             echo "选项:"
             echo "  --registry URL       容器仓库地址 (默认: Docker Hub)"
             echo "  --namespace NAME     命名空间/用户名 (默认: alianblank)"
-            echo "  --name NAME          镜像名称 (默认: gameframex-admin-web)"
+            echo "  --name NAME          镜像名称 (默认: admin-web-ui)"
             echo "  --tag TAG            镜像标签 (默认: 自动生成)"
             echo "  --platforms LIST     目标平台 (默认: linux/amd64)"
             echo "  --no-push            只构建不推送"

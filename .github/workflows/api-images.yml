@@ -1,5 +1,5 @@
 # =============================================================================
-# 三镜像（web-api / client-api / hub-api）统一构建，双仓库推送（2026-11-02 起）：
+# 三镜像（admin-web-api / admin-client-api / admin-hub-api）统一构建，双仓库推送（2026-11-02 起）：
 #   ghcr.io                 —— 开源分发渠道；GITHUB_TOKEN 登录，无 secrets 也推送（fork 可用）
 #   DOCKER_REGISTRY secrets —— 国内部署源（docker.cnb.cool，国内服务器拉取不受限）
 # 推送后 HTTP POST 触发服务器 deploy API，从 DEPLOY 仓库 pull 并重建容器。
@@ -38,13 +38,13 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - image: gameframex-web-api
+          - image: admin-web-api
             dockerfile: Dockerfile.web-api
             deploy-script: deploy-web-api.sh
-          - image: gameframex-client-api
+          - image: admin-client-api
             dockerfile: Dockerfile.client-api
             deploy-script: deploy-client-api.sh
-          - image: gameframex-hub-api
+          - image: admin-hub-api
             dockerfile: Dockerfile.hub-api
             deploy-script: deploy-hub-api.sh
     defaults:

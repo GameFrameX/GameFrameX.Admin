@@ -1,5 +1,5 @@
 # =============================================================================
-# 前端镜像（gameframex-web-vue）统一构建，双仓库推送（2026-11-02 起）：
+# 前端镜像（admin-web-ui）统一构建，双仓库推送（2026-11-02 起）：
 #   ghcr.io                 —— 开源分发渠道；GITHUB_TOKEN 登录，无 secrets 也推送（fork 可用）
 #   DOCKER_REGISTRY secrets —— 国内部署源（docker.cnb.cool，国内服务器拉取不受限）
 # 推送后 HTTP POST 触发服务器 deploy API，从 DEPLOY 仓库 pull 并重建容器。
@@ -34,7 +34,7 @@ permissions:
 
 jobs:
   build-and-push:
-    name: gameframex-web-vue
+    name: admin-web-ui
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -55,11 +55,11 @@ jobs:
             TAG="${GITHUB_SHA::7}"
           fi
           # 开源分发镜像：ghcr.io/<owner 小写>/<镜像名>（GITHUB_TOKEN 恒可推送）
-          echo "ghcr_image_tag=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/gameframex-web-vue:${TAG}" >> "$GITHUB_OUTPUT"
+          echo "ghcr_image_tag=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/admin-web-ui:${TAG}" >> "$GITHUB_OUTPUT"
           # 国内部署镜像：DOCKER_REGISTRY secrets 齐全才输出；否则留空，
           # 后续 login 步骤同步跳过 DEPLOY 仓库推送与自动部署。
           if [[ -n "${DOCKER_REGISTRY:-}" && -n "${WEB_IMAGE_NAMESPACE:-}" ]]; then
-            echo "image_tag=${DOCKER_REGISTRY}/${WEB_IMAGE_NAMESPACE}/gameframex-web-vue:${TAG}" >> "$GITHUB_OUTPUT"
+            echo "image_tag=${DOCKER_REGISTRY}/${WEB_IMAGE_NAMESPACE}/admin-web-ui:${TAG}" >> "$GITHUB_OUTPUT"
           else
             echo "image_tag=" >> "$GITHUB_OUTPUT"
             echo "[SKIP] DOCKER_REGISTRY/WEB_IMAGE_NAMESPACE 未配置，仅构建 + 推送 ghcr.io"
