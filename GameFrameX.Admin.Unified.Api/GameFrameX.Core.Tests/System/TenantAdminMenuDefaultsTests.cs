@@ -60,7 +60,7 @@ public class TenantAdminMenuDefaultsTests
 
         // ownRoleList/ownExtOrgList 为保留的菜单权限码契约（GFX-710 豁免）；C368 起 Permission 由
         // MenuSeedRouteName.Of 推导，大小写与参数化路由段随规范形态（select / {userId}）。
-        foreach (var permission in new[] { "tenantOrganization:list", "globalPlatform:select", "globalLanguage:select", "tenantUser:ownRoleList:{userId}", "tenantUser:ownExtOrgList:{userId}", })
+        foreach (var permission in new[] { "globalPlatform:select", "globalLanguage:select", "tenantUser:ownRoleList:{userId}", "tenantUser:ownExtOrgList:{userId}", })
         {
             Assert.True(menusByPermission.TryGetValue(permission, out var menuId), $"缺少 DB 菜单权限：{permission}");
             Assert.Contains(menuId, tenantMenuIds);

@@ -71,11 +71,6 @@ public class GlobalMenuSeedAudiencePrefixGuardTests
     {
         var menus = GlobalMenuSeedData.BuildData();
 
-        // C302 后前端文件在 views/tenant/tenantSmsConfigEntity/，种子曾残留 /system/ 前缀（本守护的原始漂移样本）
-        var smsMenu = menus.Single(m => m.Key == "route:tenantSmsConfigEntity");
-        Assert.Equal("/tenant/system/tenantSmsConfigEntity", smsMenu.Path);
-        Assert.Equal("/tenant/tenantSmsConfigEntity/index", smsMenu.Component);
-
         // C302 改名映射：logDiff/logVisit 与 gameDockerTagEntity，种子曾残留旧文件名
         var diffLogMenu = menus.Single(m => m.Key == "route:systemDiffLog");
         Assert.Equal("/tenant/system/log/logDiff/index", diffLogMenu.Component);

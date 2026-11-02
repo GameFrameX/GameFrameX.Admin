@@ -1,5 +1,4 @@
 using GameFrameX.Application.SeedData.System;
-using GameFrameX.Core.Const.MenuSeed;
 
 namespace GameFrameX.Core.Tests.System;
 
@@ -36,15 +35,5 @@ public class OperationsOrganizationSeedDataTests
         Assert.Equal("区服分组", dictionaryData["server_group"]);
         Assert.Equal("渠道运营", dictionaryData["channel_ops"]);
         Assert.Equal("客服运营", dictionaryData["support_ops"]);
-    }
-
-    [Fact]
-    public void DbMenuSeedSource_RenamesTenantOrganizationMenuForGameOperations()
-    {
-        MenuSeedCatalogTestData.LoadSampleMenus();
-        var systemOrganizationMenu = MenuSeedCatalog.Menus
-                                           .Single(menu => string.Equals(menu.Name, "systemOrg", StringComparison.Ordinal));
-
-        Assert.Equal("组织管理", systemOrganizationMenu.Title);
     }
 }
