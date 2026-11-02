@@ -148,6 +148,7 @@ public class TenantNoticeService : IAdminApiController
     /// </summary>
     /// <param name="input"></param>
     /// <returns></returns>
+    [AuthenticatedOnly]
     [DisplayName("设置通知公告已读状态")]
     [ApiDescriptionSettings(Name = "SetRead")]
     public async Task SetReadAsync(NoticeRequest input)
