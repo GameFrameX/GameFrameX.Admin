@@ -113,13 +113,13 @@ jobs:
           docker push "${GHCR_IMAGE_TAG%:*}:latest"
 
       - name: Push image (deploy registry, commit hash)
-        if: steps.login.outputs.logged == 'true'
+        if: steps.login.outputs.logged == 'true' && steps.resolve.outputs.image_tag != ''
         env:
           IMAGE_TAG: ${{ steps.resolve.outputs.image_tag }}
         run: docker push "$IMAGE_TAG"
 
       - name: Push latest (deploy registry) + deploy
-        if: steps.login.outputs.logged == 'true'
+        if: steps.login.outputs.logged == 'true' && steps.resolve.outputs.image_tag != ''
         env:
           IMAGE_TAG: ${{ steps.resolve.outputs.image_tag }}
           DEPLOY_API_URL: ${{ secrets.DEPLOY_API_URL }}
