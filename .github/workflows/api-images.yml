@@ -1,14 +1,14 @@
 # =============================================================================
 # 三镜像（admin-web-api / admin-client-api / admin-hub-api）统一构建，双仓库推送（2026-11-02 起）：
 #   ghcr.io                 —— 开源分发渠道；GITHUB_TOKEN 登录，无 secrets 也推送（fork 可用）
-#   DOCKER_REGISTRY secrets —— 国内部署源（docker.cnb.cool，国内服务器拉取不受限）
+#   CNB_REGISTRY secrets —— 国内部署源（docker.cnb.cool，国内服务器拉取不受限）
 # 推送后 HTTP POST 触发服务器 deploy API，从 DEPLOY 仓库 pull 并重建容器。
 # 触发规则与 CNB 版对齐：
 #   main push / v* tag → 并发构建三镜像，main 与 tag 额外推 latest 并触发自动部署
 # 路径过滤：仅后端目录或本文件变更触发，前端改动不再误触后端部署。
 #
 # 所需 GitHub Secrets（值拷贝自 cnb.cool/GameFrameX/Admin/cnb-shared-config envs.yml）：
-#   DOCKER_REGISTRY / DOCKER_USERNAME / DOCKER_PASSWORD / API_IMAGE_NAMESPACE
+#   CNB_REGISTRY / CNB_REGISTRY_USERNAME / CNB_REGISTRY_PASSWORD / CNB_API_IMAGE_NAMESPACE
 #   DEPLOY_API_URL / DEPLOY_AUTH_USERNAME / DEPLOY_AUTH_PASSWORD / DEPLOY_AUTH_REGISTRY /
 #   DEPLOY_AUTH_EMAIL / DEPLOY_NETWORK_NAME / DEPLOY_NETWORK_GATEWAY
 #   DEPLOY_WEB_{CONTAINER_NAME,IP_ADDRESS,PORTS,VOLUMES,ENVIRONMENTS}
@@ -56,8 +56,8 @@ jobs:
       - name: Resolve image tag
         id: resolve
         env:
-          DOCKER_REGISTRY: ${{ secrets.DOCKER_REGISTRY }}
-          API_IMAGE_NAMESPACE: ${{ secrets.API_IMAGE_NAMESPACE }}
+          CNB_REGISTRY: ${{ secrets.CNB_REGISTRY }}
+          CNB_API_IMAGE_NAMESPACE: ${{ secrets.CNB_API_IMAGE_NAMESPACE }}
         run: |
           if [[ "$GITHUB_REF" == refs/tags/* ]]; then
             TAG="${GITHUB_REF_NAME}"
@@ -66,13 +66,13 @@ jobs:
           fi
           # 开源分发镜像：ghcr.io/<owner 小写>/<镜像名>（GITHUB_TOKEN 恒可推送）
           echo "ghcr_image_tag=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/${{ matrix.image }}:${TAG}" >> "$GITHUB_OUTPUT"
-          # 国内部署镜像：DOCKER_REGISTRY secrets 齐全才输出；否则留空，
-          # 后续 login 步骤同步跳过 DEPLOY 仓库推送与自动部署。
-          if [[ -n "${DOCKER_REGISTRY:-}" && -n "${API_IMAGE_NAMESPACE:-}" ]]; then
-            echo "image_tag=${DOCKER_REGISTRY}/${API_IMAGE_NAMESPACE}/${{ matrix.image }}:${TAG}" >> "$GITHUB_OUTPUT"
+          # 国内部署镜像：CNB 组 secrets 齐全才输出；否则留空，
+          # 后续 login 步骤同步跳过 CNB 仓库推送与自动部署。
+          if [[ -n "${CNB_REGISTRY:-}" && -n "${CNB_API_IMAGE_NAMESPACE:-}" ]]; then
+            echo "image_tag=${CNB_REGISTRY}/${CNB_API_IMAGE_NAMESPACE}/${{ matrix.image }}:${TAG}" >> "$GITHUB_OUTPUT"
           else
             echo "image_tag=" >> "$GITHUB_OUTPUT"
-            echo "[SKIP] DOCKER_REGISTRY/API_IMAGE_NAMESPACE 未配置，仅构建 + 推送 ghcr.io"
+            echo "[SKIP] CNB_REGISTRY/CNB_API_IMAGE_NAMESPACE 未配置，仅构建 + 推送 ghcr.io"
           fi
 
       - name: Docker login (ghcr.io)
@@ -83,16 +83,16 @@ jobs:
       - name: Docker login (deploy registry)
         id: login
         env:
-          DOCKER_REGISTRY: ${{ secrets.DOCKER_REGISTRY }}
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+          CNB_REGISTRY: ${{ secrets.CNB_REGISTRY }}
+          CNB_REGISTRY_USERNAME: ${{ secrets.CNB_REGISTRY_USERNAME }}
+          CNB_REGISTRY_PASSWORD: ${{ secrets.CNB_REGISTRY_PASSWORD }}
         run: |
-          if [ -z "$DOCKER_USERNAME" ] || [ -z "$DOCKER_REGISTRY" ]; then
+          if [ -z "$CNB_REGISTRY_USERNAME" ] || [ -z "$CNB_REGISTRY" ]; then
             echo "logged=false" >> "$GITHUB_OUTPUT"
-            echo "[SKIP] DOCKER_USERNAME/DOCKER_REGISTRY 未配置，跳过 DEPLOY 仓库推送与部署"
+            echo "[SKIP] CNB_REGISTRY_USERNAME/CNB_REGISTRY 未配置，跳过 CNB 仓库推送与部署"
             exit 0
           fi
-          echo "$DOCKER_PASSWORD" | docker login "$DOCKER_REGISTRY" -u "$DOCKER_USERNAME" --password-stdin
+          echo "$CNB_REGISTRY_PASSWORD" | docker login "$CNB_REGISTRY" -u "$CNB_REGISTRY_USERNAME" --password-stdin
           echo "logged=true" >> "$GITHUB_OUTPUT"
 
       - name: Build image
