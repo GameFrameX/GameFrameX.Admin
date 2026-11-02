@@ -8,7 +8,7 @@
 # 路径过滤：仅后端目录或本文件变更触发，前端改动不再误触后端部署。
 #
 # 所需 GitHub Secrets（值拷贝自 cnb.cool/GameFrameX/Admin/cnb-shared-config envs.yml）：
-#   CNB_REGISTRY（值 = docker.cnb.cool）/ CNB_REGISTRY_USERNAME / CNB_REGISTRY_PASSWORD / CNB_API_IMAGE_NAMESPACE
+#   CNB_REGISTRY（值 = docker.cnb.cool）/ CNB_REGISTRY_USERNAME / CNB_TOKEN（CNB 访问令牌）/ CNB_API_IMAGE_NAMESPACE
 #   DEPLOY_API_URL / DEPLOY_AUTH_USERNAME / DEPLOY_AUTH_PASSWORD / DEPLOY_AUTH_REGISTRY /
 #   DEPLOY_AUTH_EMAIL / DEPLOY_NETWORK_NAME / DEPLOY_NETWORK_GATEWAY
 #   DEPLOY_WEB_{CONTAINER_NAME,IP_ADDRESS,PORTS,VOLUMES,ENVIRONMENTS}
@@ -85,7 +85,7 @@ jobs:
         env:
           CNB_REGISTRY: ${{ secrets.CNB_REGISTRY }}
           CNB_REGISTRY_USERNAME: ${{ secrets.CNB_REGISTRY_USERNAME }}
-          CNB_REGISTRY_PASSWORD: ${{ secrets.CNB_REGISTRY_PASSWORD }}
+          CNB_REGISTRY_PASSWORD: ${{ secrets.CNB_TOKEN }}
         run: |
           if [ -z "$CNB_REGISTRY_USERNAME" ] || [ -z "$CNB_REGISTRY" ]; then
             echo "logged=false" >> "$GITHUB_OUTPUT"
