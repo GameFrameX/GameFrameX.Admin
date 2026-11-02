@@ -26,9 +26,7 @@ export default {
         tenantDefault: 'Tenant Default',
         packageAssetName: 'Package Name',
         languageName: 'Language Name',
-        languageCode: 'Language Code',
         language: 'Language',
-        defaultLanguageDescription: 'Default fallback language',
         forceUpdate: 'Force Update',
         isForceUpdate: 'Force Update',
         announcementTitle: 'Announcement Title',
@@ -163,8 +161,6 @@ export default {
         pleaseInputMasterPackage: 'Please select a master package',
 
         // Dialog titles
-        addPlatform: 'Add Platform',
-        editPlatform: 'Edit Platform',
         addChannel: 'Add Channel',
         editChannel: 'Edit Channel',
         addAppVersion: 'Add App Version',
@@ -177,8 +173,6 @@ export default {
         editDeviceGroup: 'Edit Device Group',
         addRemoteConfig: 'Add Remote Config',
         editRemoteConfig: 'Edit Remote Config',
-        addLanguage: 'Add Language',
-        editLanguage: 'Edit Language',
         addPackage: 'Add Package',
         editPackage: 'Edit Package',
         addVersion: 'Add Version',

@@ -124,7 +124,7 @@ import {computed, onMounted, reactive, ref, watch} from 'vue';
 import {showConfirm, showSuccess} from '../../../../utils/message.ts';
 import {auth} from '../../../../utils/authFunction.ts';
 import {resolveBackendFileUrl} from '../../../../utils/fileUrl.ts';
-import OrgTree from '/@/views/tenant/system/org/component/OrgTree.vue';
+import OrgTree from '/@/components/org-tree/OrgTree.vue';
 import EditUser from '/@/views/tenant/system/user/component/EditUser.vue';
 
 import {tenantUserDeletePost, tenantUserPagePost, tenantUserResetPwdPost, tenantUserSetStatusPost} from '../../../../api/tenantUser';

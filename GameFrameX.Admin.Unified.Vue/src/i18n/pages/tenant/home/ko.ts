@@ -20,12 +20,9 @@ export default {
         // 빠른 접근
         quickNav: '플랫폼 빠른 접근',
         quickEmpty: '사용 가능한 플랫폼 입구가 없습니다',
-        quickTenants: '테넌트 관리',
-        quickPackages: '패키지 관리',
         quickMenus: '메뉴 관리',
         quickConfigs: '파라미터 설정',
         quickDicts: '사전 관리',
-        quickPlatforms: '플랫폼 정의',
         // 공지 카드
         noticeTitle: '공지',
         noticeEmpty: '공지가 없습니다',

@@ -26,9 +26,7 @@ export default {
         tenantDefault: '租户默认',
         packageAssetName: '包名称',
         languageName: '语言名称',
-        languageCode: '语言代码',
         language: '语言',
-        defaultLanguageDescription: '默认缺省语言',
         forceUpdate: '强制更新',
         isForceUpdate: '是否是强制更新',
         announcementTitle: '公告标题',
@@ -161,8 +159,6 @@ export default {
         pleaseInputMasterPackage: '请选择母包',
 
         // Dialog titles
-        addPlatform: '添加平台管理',
-        editPlatform: '编辑平台管理',
         addChannel: '添加渠道管理',
         editChannel: '编辑渠道管理',
         addAppVersion: '添加游戏版本管理',
@@ -175,8 +171,6 @@ export default {
         editDeviceGroup: '编辑机器码分组',
         addRemoteConfig: '添加远程配置管理',
         editRemoteConfig: '编辑远程配置管理',
-        addLanguage: '添加语言管理',
-        editLanguage: '编辑语言管理',
         addPackage: '添加包管理',
         editPackage: '编辑包管理',
         addVersion: '添加版本管理',

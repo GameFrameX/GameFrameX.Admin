@@ -56,20 +56,6 @@ const appWorkspaceRoutes: RouteRecordRaw[] = [
       appScope: 'app',
     },
   },
-  {
-    // 凭证中心操作台（C375 fallback 路由；后端菜单 seed 在 C376 落地前启用）。
-    // 由 registerAppWorkspaceRoutes 检测到动态路由已注册同名 path 时跳过注册，避免与 C376 冲突。
-    path: '/app/appCenter/credentialCenter',
-    name: 'credentialCenter',
-    component: () => import('/@/views/app/appCenter/credentialCenter/index.vue'),
-    meta: {
-      title: 'gameBusiness.credentialCenter.title',
-      isHide: true,
-      isKeepAlive: false,
-      menuContext: 'appWorkspace',
-      appScope: 'app',
-    },
-  },
 ]
 
 export function registerAppWorkspaceRoutes(router: { hasRoute: (name: string) => boolean; addRoute: (parentName: string, route: RouteRecordRaw) => void }) {

@@ -26,9 +26,7 @@ export default {
         tenantDefault: 'テナント既定',
         packageAssetName: 'パッケージ名',
         languageName: '言語名',
-        languageCode: '言語コード',
         language: '言語',
-        defaultLanguageDescription: 'デフォルトのフォールバック言語',
         forceUpdate: '強制更新',
         isForceUpdate: '強制更新',
         announcementTitle: 'お知らせタイトル',
@@ -163,8 +161,6 @@ export default {
         pleaseInputMasterPackage: 'マスターパッケージを選択してください',
 
         // Dialog titles
-        addPlatform: 'プラットフォーム追加',
-        editPlatform: 'プラットフォーム編集',
         addChannel: 'チャネル追加',
         editChannel: 'チャネル編集',
         addAppVersion: 'アプリバージョン追加',
@@ -177,8 +173,6 @@ export default {
         editDeviceGroup: 'デバイスグループ編集',
         addRemoteConfig: 'リモート設定追加',
         editRemoteConfig: 'リモート設定編集',
-        addLanguage: '言語追加',
-        editLanguage: '言語編集',
         addPackage: 'パッケージ追加',
         editPackage: 'パッケージ編集',
         addVersion: 'バージョン追加',

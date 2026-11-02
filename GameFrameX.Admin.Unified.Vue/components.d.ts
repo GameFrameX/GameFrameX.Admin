@@ -13,7 +13,6 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AppConfirmDialog: typeof import('./src/components/app-confirm-dialog/index.vue')['default']
-    Avatar: typeof import('primevue/avatar')['default']
     BaseEditDialog: typeof import('./src/components/base-edit-dialog/index.vue')['default']
     Button: typeof import('primevue/button')['default']
     Card: typeof import('primevue/card')['default']
@@ -36,14 +35,13 @@ declare module 'vue' {
     ImageCropper: typeof import('./src/components/image-cropper/index.vue')['default']
     InputNumber: typeof import('primevue/inputnumber')['default']
     InputText: typeof import('primevue/inputtext')['default']
-    Knob: typeof import('primevue/knob')['default']
     Menu: typeof import('primevue/menu')['default']
     Message: typeof import('primevue/message')['default']
     NarrowScreenHint: typeof import('./src/components/narrow-screen-hint/index.vue')['default']
     NoticeBar: typeof import('./src/components/notice-bar/index.vue')['default']
     OnlineCursorList: typeof import('./src/components/OnlineCursorList/index.vue')['default']
+    OrgTree: typeof import('./src/components/org-tree/OrgTree.vue')['default']
     OverlayPanel: typeof import('primevue/overlaypanel')['default']
-    Popover: typeof import('primevue/popover')['default']
     RadioButton: typeof import('primevue/radiobutton')['default']
     RewardItemsEditor: typeof import('./src/components/reward-items-editor/index.vue')['default']
     RichEditor: typeof import('./src/components/rich-editor/index.vue')['default']
@@ -68,7 +66,6 @@ declare module 'vue' {
     TextField: typeof import('./src/components/crud-form-fields/TextField.vue')['default']
     TimeColumn: typeof import('./src/components/time-column/index.vue')['default']
     ToggleSwitch: typeof import('primevue/toggleswitch')['default']
-    Tree: typeof import('primevue/tree')['default']
   }
   export interface GlobalDirectives {
     Ripple: typeof import('primevue/ripple')['default']
@@ -79,7 +76,6 @@ declare module 'vue' {
 // For TSX support
 declare global {
   const AppConfirmDialog: typeof import('./src/components/app-confirm-dialog/index.vue')['default']
-  const Avatar: typeof import('primevue/avatar')['default']
   const BaseEditDialog: typeof import('./src/components/base-edit-dialog/index.vue')['default']
   const Button: typeof import('primevue/button')['default']
   const Card: typeof import('primevue/card')['default']
@@ -102,14 +98,13 @@ declare global {
   const ImageCropper: typeof import('./src/components/image-cropper/index.vue')['default']
   const InputNumber: typeof import('primevue/inputnumber')['default']
   const InputText: typeof import('primevue/inputtext')['default']
-  const Knob: typeof import('primevue/knob')['default']
   const Menu: typeof import('primevue/menu')['default']
   const Message: typeof import('primevue/message')['default']
   const NarrowScreenHint: typeof import('./src/components/narrow-screen-hint/index.vue')['default']
   const NoticeBar: typeof import('./src/components/notice-bar/index.vue')['default']
   const OnlineCursorList: typeof import('./src/components/OnlineCursorList/index.vue')['default']
+  const OrgTree: typeof import('./src/components/org-tree/OrgTree.vue')['default']
   const OverlayPanel: typeof import('primevue/overlaypanel')['default']
-  const Popover: typeof import('primevue/popover')['default']
   const RadioButton: typeof import('primevue/radiobutton')['default']
   const RewardItemsEditor: typeof import('./src/components/reward-items-editor/index.vue')['default']
   const RichEditor: typeof import('./src/components/rich-editor/index.vue')['default']
@@ -134,5 +129,4 @@ declare global {
   const TextField: typeof import('./src/components/crud-form-fields/TextField.vue')['default']
   const TimeColumn: typeof import('./src/components/time-column/index.vue')['default']
   const ToggleSwitch: typeof import('primevue/toggleswitch')['default']
-  const Tree: typeof import('primevue/tree')['default']
 }

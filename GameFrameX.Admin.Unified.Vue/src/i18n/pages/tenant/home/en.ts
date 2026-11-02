@@ -20,12 +20,9 @@ export default {
         // Quick nav
         quickNav: 'Platform Quick Access',
         quickEmpty: 'No platform entries available',
-        quickTenants: 'Tenants',
-        quickPackages: 'Packages',
         quickMenus: 'Menus',
         quickConfigs: 'Configs',
         quickDicts: 'Dictionaries',
-        quickPlatforms: 'Platform Definitions',
         // Notice card (reused by HomeNoticeCard)
         noticeTitle: 'Notices',
         noticeEmpty: 'No notices yet',
