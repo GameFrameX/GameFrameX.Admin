@@ -11,7 +11,7 @@
 # default.conf / entrypoint.sh / docker-build-push.sh 同步上移至根 build/。
 #
 # 所需 GitHub Secrets（值拷贝自 cnb.cool/GameFrameX/Admin/cnb-shared-config envs.yml）：
-#   CNB_REGISTRY（值 = docker.cnb.cool）/ CNB_REGISTRY_USERNAME / CNB_TOKEN（CNB 访问令牌）/ CNB_WEB_IMAGE_NAMESPACE
+#   CNB_REGISTRY（值 = docker.cnb.cool）/ CNB_REGISTRY_USERNAME / CNB_REGISTRY_PASSWORD（CNB 访问令牌，需制品库写权限）/ CNB_WEB_IMAGE_NAMESPACE
 #   DEPLOY_API_URL / DEPLOY_AUTH_USERNAME / DEPLOY_AUTH_PASSWORD / DEPLOY_AUTH_REGISTRY /
 #   DEPLOY_AUTH_EMAIL / DEPLOY_NETWORK_NAME / DEPLOY_NETWORK_GATEWAY
 #   DEPLOY_WEB_VUE_{CONTAINER_NAME,IP_ADDRESS,PORTS,VOLUMES,ENVIRONMENTS}
@@ -75,7 +75,7 @@ jobs:
         env:
           CNB_REGISTRY: ${{ secrets.CNB_REGISTRY }}
           CNB_REGISTRY_USERNAME: ${{ secrets.CNB_REGISTRY_USERNAME }}
-          CNB_REGISTRY_PASSWORD: ${{ secrets.CNB_TOKEN }}
+          CNB_REGISTRY_PASSWORD: ${{ secrets.CNB_REGISTRY_PASSWORD || secrets.CNB_TOKEN }}
         run: |
           if [ -z "$CNB_REGISTRY_USERNAME" ] || [ -z "$CNB_REGISTRY" ]; then
             echo "logged=false" >> "$GITHUB_OUTPUT"
