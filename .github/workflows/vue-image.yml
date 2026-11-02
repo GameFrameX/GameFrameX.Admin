@@ -1,9 +1,10 @@
-name: Admin Web Vue (Build & Deploy)
-
 # =============================================================================
-# 由 GameFrameX.Admin.Unified.Vue/.cnb.yml 迁移（2026-10-19 单仓整合，快照合并）。
+# 前端镜像（gameframex-web-vue）统一构建，双仓库推送（2026-11-02 起）：
+#   ghcr.io                 —— 开源分发渠道；GITHUB_TOKEN 登录，无 secrets 也推送（fork 可用）
+#   DOCKER_REGISTRY secrets —— 国内部署源（docker.cnb.cool，国内服务器拉取不受限）
+# 推送后 HTTP POST 触发服务器 deploy API，从 DEPLOY 仓库 pull 并重建容器。
 # 触发规则与 CNB 版对齐：
-#   main push / v* tag → 构建推送镜像 (gameframex-web-vue)，main 与 tag 额外推 latest 并触发自动部署
+#   main push / v* tag → 构建推送镜像，main 与 tag 额外推 latest 并触发自动部署
 # 路径过滤：仅前端目录或本文件变更触发，后端改动不再误触前端部署。
 #
 # 单仓整合后续（2026-10-19）：Vue Dockerfile 的 build context 已上移为仓库根，
@@ -14,7 +15,7 @@ name: Admin Web Vue (Build & Deploy)
 #   DEPLOY_API_URL / DEPLOY_AUTH_USERNAME / DEPLOY_AUTH_PASSWORD / DEPLOY_AUTH_REGISTRY /
 #   DEPLOY_AUTH_EMAIL / DEPLOY_NETWORK_NAME / DEPLOY_NETWORK_GATEWAY
 #   DEPLOY_WEB_VUE_{CONTAINER_NAME,IP_ADDRESS,PORTS,VOLUMES,ENVIRONMENTS}
-# Secrets 未配置时：跳过 docker login 与推送（deploy 脚本自带 [SKIP] 分支），构建仍执行。
+# Secrets 未配置时：跳过 DEPLOY 仓库登录/推送/部署（构建与 ghcr.io 推送仍执行）。
 # =============================================================================
 
 on:
@@ -26,6 +27,10 @@ on:
       - '.github/workflows/vue-image.yml'
     tags: ['**']
   workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
 
 jobs:
   build-and-push:
@@ -49,10 +54,23 @@ jobs:
           else
             TAG="${GITHUB_SHA::7}"
           fi
-          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
-          echo "image_tag=${DOCKER_REGISTRY}/${WEB_IMAGE_NAMESPACE}/gameframex-web-vue:${TAG}" >> "$GITHUB_OUTPUT"
+          # 开源分发镜像：ghcr.io/<owner 小写>/<镜像名>（GITHUB_TOKEN 恒可推送）
+          echo "ghcr_image_tag=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/gameframex-web-vue:${TAG}" >> "$GITHUB_OUTPUT"
+          # 国内部署镜像：DOCKER_REGISTRY secrets 齐全才输出；否则留空，
+          # 后续 login 步骤同步跳过 DEPLOY 仓库推送与自动部署。
+          if [[ -n "${DOCKER_REGISTRY:-}" && -n "${WEB_IMAGE_NAMESPACE:-}" ]]; then
+            echo "image_tag=${DOCKER_REGISTRY}/${WEB_IMAGE_NAMESPACE}/gameframex-web-vue:${TAG}" >> "$GITHUB_OUTPUT"
+          else
+            echo "image_tag=" >> "$GITHUB_OUTPUT"
+            echo "[SKIP] DOCKER_REGISTRY/WEB_IMAGE_NAMESPACE 未配置，仅构建 + 推送 ghcr.io"
+          fi
 
-      - name: Docker login
+      - name: Docker login (ghcr.io)
+        env:
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: echo "$GHCR_TOKEN" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Docker login (deploy registry)
         id: login
         env:
           DOCKER_REGISTRY: ${{ secrets.DOCKER_REGISTRY }}
@@ -61,7 +79,7 @@ jobs:
         run: |
           if [ -z "$DOCKER_USERNAME" ] || [ -z "$DOCKER_REGISTRY" ]; then
             echo "logged=false" >> "$GITHUB_OUTPUT"
-            echo "[SKIP] DOCKER_USERNAME/DOCKER_REGISTRY 未配置，跳过登录与推送（仅构建验证）"
+            echo "[SKIP] DOCKER_USERNAME/DOCKER_REGISTRY 未配置，跳过 DEPLOY 仓库推送与部署"
             exit 0
           fi
           echo "$DOCKER_PASSWORD" | docker login "$DOCKER_REGISTRY" -u "$DOCKER_USERNAME" --password-stdin
@@ -72,16 +90,28 @@ jobs:
         # 下的 nginx 站点配置 / entrypoint.sh；仓库根 .dockerignore 负责剔除后端、node_modules 等。
         working-directory: .
         env:
+          GHCR_IMAGE_TAG: ${{ steps.resolve.outputs.ghcr_image_tag }}
           IMAGE_TAG: ${{ steps.resolve.outputs.image_tag }}
-        run: docker build -t "$IMAGE_TAG" -f GameFrameX.Admin.Unified.Vue/Dockerfile .
+        run: |
+          TAGS=(-t "$GHCR_IMAGE_TAG")
+          if [ -n "$IMAGE_TAG" ]; then TAGS+=(-t "$IMAGE_TAG"); fi
+          docker build "${TAGS[@]}" -f GameFrameX.Admin.Unified.Vue/Dockerfile .
 
-      - name: Push image (commit hash)
+      - name: Push image (ghcr.io, commit hash + latest)
+        env:
+          GHCR_IMAGE_TAG: ${{ steps.resolve.outputs.ghcr_image_tag }}
+        run: |
+          docker push "$GHCR_IMAGE_TAG"
+          docker tag "$GHCR_IMAGE_TAG" "${GHCR_IMAGE_TAG%:*}:latest"
+          docker push "${GHCR_IMAGE_TAG%:*}:latest"
+
+      - name: Push image (deploy registry, commit hash)
         if: steps.login.outputs.logged == 'true'
         env:
           IMAGE_TAG: ${{ steps.resolve.outputs.image_tag }}
         run: docker push "$IMAGE_TAG"
 
-      - name: Push latest + deploy
+      - name: Push latest (deploy registry) + deploy
         if: steps.login.outputs.logged == 'true'
         env:
           IMAGE_TAG: ${{ steps.resolve.outputs.image_tag }}
