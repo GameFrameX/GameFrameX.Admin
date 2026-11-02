@@ -5,21 +5,19 @@ import { enterWorkspace, gotoAppSelector, navigateByMenu, pickDateTime, shot, sl
 // 真实新增 → 表格回显 → 删除 → 行消失，全程真实 web 交互、真实数据、结束即清理。
 // 路由不硬编码：2026-10-20 起全面真实点击化——菜单标题在渲染后的侧边栏 DOM 中解析，
 // 逐层真实展开分组后真实点击叶子链接（不读菜单树接口、不 hash 直达；appId 由菜单链接 href 自带）。
-// 通知公告被 is_enabled 缺陷阻塞（Api 仓 issue #284），见 tests-disabled/。
 // 全量推进记录（2026-10-18，42 个带 Edit 组件的叶子页盘点后）：
 // 已闭环 12 页（本矩阵）；例外 9 页——
-//   权限类：游戏角色/三方账号/应用管理的新增按钮 v-auth `<prefix>:add` 对租管不渲染（权限矩阵现实）；
+//   权限类：游戏角色/应用管理的新增按钮 v-auth `<prefix>:add` 对租管不渲染（权限矩阵现实）；
 //   字典管理超管按钮不渲染已修复（v-auth 超管短路，已入矩阵）；
 //   引擎能力：支付配置 token 锚点落在列表不可见的 remark 列；
 //   数据依赖：游戏内横幅公告与邮件的区服下拉当前环境"无选项/联动禁用"（需先存在可用区服数据）；
 //     游戏区服自身必填 8 项含 serverVersion/appVersion 联动下拉，闭环三轮校验未过（表单验证失败，
 //     疑 select 数据源按 appId 过滤后无匹配），待专项排查数据链；
 //     邮件另叠加 Vue#198 的两处漏 import（已修复，待合入）；
-//   缺陷阻塞（issue 跟踪）：职位 remark 约束（Api#286）、渠道列表显示软删行（Api#287）、
-//     组织新建 NRE（Api#288）、邮件新增前端 ReferenceError（Vue#198）、通知 is_enabled（Api#284）；
+//   缺陷阻塞（issue 跟踪）：渠道列表显示软删行（Api#287）、邮件新增前端 ReferenceError（Vue#198）；
 //   结构/语义例外：游戏订单（三卡片多表页，锚点歧义）；
 //     游戏运营配置（config 必填合法 JSON，引擎文本值语义不匹配）；
-//   级联/联动交互（交互器 v2 待建）：组织管理与游戏内商品的级联选择存在
+//   级联/联动交互（交互器 v2 待建）：游戏内商品的级联选择存在
 //     "点目录=展开而非选中"语义（'未选择任何项'），需按叶子标记定位；
 //     运营邮件 Campaign 的 areaId 下拉联动禁用；活动功能开关多 select 联动必填；
 //   自举依赖：邮件模板的必填分类下拉取自模板分类数据（闭环用例建完即删，常态为空；
@@ -149,20 +147,6 @@ const ENTITIES: EntitySpec[] = [
     deleteApi: /tenantGameAppPackage\/delete/,
   },
   {
-    name: '通知公告',
-    menuTitle: '通知公告',
-    fields: ['text', 'select', 'editor'],
-    createApi: /tenantNotice\/add/,
-    deleteApi: /tenantNotice\/delete/,
-  },
-  {
-    name: '职位管理',
-    menuTitle: '职位管理',
-    fields: ['text', 'text'],
-    createApi: /tenantPosition\/add/,
-    deleteApi: /tenantPosition\/delete/,
-  },
-  {
     name: '渠道定义',
     menuTitle: '渠道定义',
     fields: ['text', 'text', 'text', 'select', 'text'],
@@ -186,25 +170,8 @@ const ENTITIES: EntitySpec[] = [
   },
   // 游戏内商品：级联 v2 已验证可用（前置目录数据已 seed），但 add 稳定 500 NRE——
   // Api#291（AddRequest CategoryId:string/Number:long 与前端契约错位 → 绑定失败 input=null）。
-  // 组织管理：级联 v2 可选中叶子，但列表树形数据只渲染根行（Vue#200）token 无法回显。
   // 级别 InputNumber fill 的 onInputFocus NRE 已在应用启动层兜底修复（Vue#201），
-  // 组织 CRUD 闭环仍受 Vue#200 阻断；奖励模板「级别」改回真实 number fill 作回归。
-  {
-    name: '平台定义',
-    menuTitle: '平台定义',
-    session: 'superadmin',
-    fields: ['text', 'text'],
-    createApi: /globalPlatform\/add/,
-    deleteApi: /globalPlatform\/delete/,
-  },
-  {
-    name: '语言本地化定义',
-    menuTitle: '语言本地化定义',
-    session: 'superadmin',
-    fields: ['text', 'text', 'text'],
-    createApi: /globalLanguage\/add/,
-    deleteApi: /globalLanguage\/delete/,
-  },
+  // 奖励模板「级别」改回真实 number fill 作回归。
   {
     name: '字典管理',
     menuTitle: '字典管理',

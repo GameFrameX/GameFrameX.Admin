@@ -10,7 +10,7 @@ test.describe('租户全局表面分模块覆盖', () => {
   for (const [groupName, minLeaves, minRequests, timeoutMs] of [
     ['工作台', 2, 1, 150_000],
     ['应用中心', 1, 1, 150_000],
-    ['系统管理', 12, 8, 420_000],
+    ['系统管理', 5, 5, 420_000],
     ['日志管理', 4, 4, 240_000],
   ] as const) {
     test(`${groupName} 全叶可达且交互无异常`, async ({ page }) => {

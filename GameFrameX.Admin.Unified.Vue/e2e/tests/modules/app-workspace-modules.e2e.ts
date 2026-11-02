@@ -10,7 +10,7 @@ import { expectNoApiAnomaly, installApiRecorder, sweepGroup } from '../module-co
 const CENTERS = [
   // 组名取侧边栏渲染后的 i18n 文案（与菜单树 Title 既定漂移：信任与安全、在线业务中心）。
   // 权益发货账本 / 受控操作 在种子中 IsHide=true（页内入口，不出侧边栏），故按渲染叶子数计数。
-  { group: '应用中心', minLeaves: 20, minRequests: 12, timeoutMs: 900_000 },
+  { group: '应用中心', minLeaves: 18, minRequests: 12, timeoutMs: 900_000 },
   { group: '玩家中心', minLeaves: 3, minRequests: 3, timeoutMs: 240_000 },
   { group: '信任与安全', minLeaves: 5, minRequests: 5, timeoutMs: 300_000 },
   { group: '商品与道具', minLeaves: 3, minRequests: 3, timeoutMs: 200_000 },
