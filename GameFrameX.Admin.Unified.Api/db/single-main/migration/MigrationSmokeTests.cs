@@ -1,4 +1,5 @@
 using GameFrameX.Entity.System;
+using GameFrameX.Entity.Log;
 using GameFrameX.Entity.Tenant.Game;
 using SqlSugar;
 
@@ -15,26 +16,46 @@ internal static class MigrationSmokeTests
             using (var source = SingleMainMigration.Connect(DbType.Sqlite, $"DataSource={Path.Combine(directory, "source.db")}"))
             using (var target = SingleMainMigration.Connect(DbType.Sqlite, $"DataSource={Path.Combine(directory, "target.db")}"))
             {
-                var types = new[] { typeof(TenantGameHomeOnlineSampleEntity) };
+                var types = new[] { typeof(TenantGameHomeOnlineSampleEntity), typeof(TenantGameGoodsEntity), typeof(SystemUserEntity), typeof(SystemLogVisitEntity) };
                 target.Ado.ExecuteCommand("CREATE TABLE system_tenant_entity (id BIGINT PRIMARY KEY, is_deleted BOOLEAN)");
                 target.Ado.ExecuteCommand("INSERT INTO system_tenant_entity VALUES (1300000000001, 0)");
+                target.CodeFirst.InitTables<SystemUserEntity>();
+                target.Ado.ExecuteCommand("ALTER TABLE system_user_entity ADD COLUMN tenant_id BIGINT NOT NULL DEFAULT 0");
+                target.CodeFirst.InitTables<SystemLogVisitEntity>();
+                source.CodeFirst.InitTables<TenantGameGoodsEntity>();
+                source.Insertable(new TenantGameGoodsEntity { Id = 8001, Name = "主库资源", ConfigId = 42 }).ExecuteCommand();
                 source.CodeFirst.InitTables<TenantGameHomeOnlineSampleEntity>();
-                source.Insertable(new TenantGameHomeOnlineSampleEntity { Id = 7001, TenantId = 1300000000001, SampleTime = 1000, OnlineCount = 42 }).ExecuteCommand();
+                source.Insertable(new TenantGameHomeOnlineSampleEntity { Id = 7001, SampleTime = 1000, OnlineCount = 42 }).ExecuteCommand();
+                source.Ado.ExecuteCommand("ALTER TABLE tenant_game_home_online_sample_entity ADD COLUMN tenant_id BIGINT NOT NULL DEFAULT 1300000000001");
+                source.Ado.ExecuteCommand("ALTER TABLE tenant_game_home_online_sample_entity ADD COLUMN app_id BIGINT NOT NULL DEFAULT 100");
+                target.CodeFirst.InitTables<TenantGameHomeOnlineSampleEntity>();
+                target.Ado.ExecuteCommand("DROP INDEX ux_home_online_sample_tenant_time");
+                target.Ado.ExecuteCommand("ALTER TABLE tenant_game_home_online_sample_entity ADD COLUMN tenant_id BIGINT NOT NULL DEFAULT 1300000000001");
+                target.Ado.ExecuteCommand("ALTER TABLE tenant_game_home_online_sample_entity ADD COLUMN app_id BIGINT NOT NULL DEFAULT 100");
+                target.Ado.ExecuteCommand("CREATE UNIQUE INDEX ux_home_online_sample_tenant_time ON tenant_game_home_online_sample_entity (tenant_id, sample_time)");
                 SingleMainMigration.Run(source, target, true, types);
-                Require(!target.DbMaintenance.IsAnyTable("tenant_game_home_online_sample_entity", false), "dry-run 建表必须回滚");
+                Require(target.DbMaintenance.GetColumnInfosByTableName("tenant_game_home_online_sample_entity", false).Any(column => column.DbColumnName == "tenant_id"), "dry-run 删列必须回滚");
+                Require(target.Queryable<TenantGameHomeOnlineSampleEntity>().Count() == 0, "dry-run 数据复制必须回滚");
+                Require(!target.DbMaintenance.IsAnyTable("tenant_game_goods_entity", false), "dry-run 新建表必须回滚");
+                Require(target.DbMaintenance.GetColumnInfosByTableName("system_user_entity", false).Any(column => column.DbColumnName == "tenant_id"), "dry-run 系统表删列必须回滚");
                 SingleMainMigration.Run(source, target, false, types);
                 SingleMainMigration.Run(source, target, false, types);
                 Require(target.Queryable<TenantGameHomeOnlineSampleEntity>().Count() == 1, "重复迁移必须幂等");
+                Require(!target.DbMaintenance.GetColumnInfosByTableName("tenant_game_home_online_sample_entity", false).Any(column => column.DbColumnName is "tenant_id" or "app_id"), "业务作用域列必须删除");
+                Require(!target.DbMaintenance.GetColumnInfosByTableName("system_user_entity", false).Any(column => column.DbColumnName == "tenant_id"), "系统表作用域列必须删除");
+                Require(target.DbMaintenance.GetColumnInfosByTableName("system_log_visit_entity", false).Any(column => column.DbColumnName == "tenant_id"), "历史审计归属列必须保留");
+                Require(target.Queryable<TenantGameGoodsEntity>().Single().ConfigId == 42, "新建业务表应保真复制");
+                Reject(() => target.Insertable(new TenantGameHomeOnlineSampleEntity { Id = 7002, SampleTime = 1000, OnlineCount = 1 }).ExecuteCommand(), "业务时间键仍应唯一", "UNIQUE");
                 Require(target.Queryable<TenantGameHomeOnlineSampleEntity>().Single().OnlineCount == 42, "业务字段必须保真");
                 target.Updateable<TenantGameHomeOnlineSampleEntity>().SetColumns(row => row.OnlineCount == 99).Where(row => row.Id == 7001).ExecuteCommand();
-                Reject(() => SingleMainMigration.Run(source, target, false, types), "冲突必须拒绝");
+                Reject(() => SingleMainMigration.Run(source, target, false, types), "冲突必须拒绝", "主键碰撞");
                 Require(target.Queryable<TenantGameHomeOnlineSampleEntity>().Single().OnlineCount == 99, "冲突不得覆盖目标");
                 target.Ado.ExecuteCommand("INSERT INTO system_tenant_entity VALUES (9000, 0)");
-                Reject(() => SingleMainMigration.Run(source, target, true, types), "多租户必须拒绝");
+                Reject(() => SingleMainMigration.Run(source, target, true, types), "多租户必须拒绝", "多租户");
                 Require(source.Queryable<TenantGameHomeOnlineSampleEntity>().Single().OnlineCount == 42, "源库必须不变");
             }
 
-            Console.WriteLine("迁移自测通过：dry-run 回滚、保真复制、幂等重跑、冲突拒绝、多租户拒绝、源库只读。");
+            Console.WriteLine("迁移自测通过：dry-run 删列/复制回滚、业务索引重建、保真复制、幂等重跑、冲突拒绝、多租户拒绝、源库只读。");
         }
         finally
         {
@@ -42,14 +63,15 @@ internal static class MigrationSmokeTests
         }
     }
 
-    private static void Reject(Action operation, string message)
+    private static void Reject(Action operation, string message, string expectedError)
     {
         try
         {
             operation();
         }
-        catch (InvalidOperationException)
+        catch (Exception error)
         {
+            Require(error.Message.Contains(expectedError, StringComparison.OrdinalIgnoreCase), message + "，实际异常：" + error.Message);
             return;
         }
 

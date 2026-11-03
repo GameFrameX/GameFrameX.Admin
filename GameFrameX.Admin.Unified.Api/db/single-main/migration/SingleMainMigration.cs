@@ -50,10 +50,11 @@ internal static class SingleMainMigration
             source.Ado.ExecuteCommand(source.CurrentConnectionConfig.DbType == DatabaseType.Sqlite
                 ? "PRAGMA query_only = ON" : "SET TRANSACTION READ ONLY");
             ValidateDefaultInstance(source, target);
-            var types = entityTypes ?? typeof(TenantUserEntity).Assembly.GetTypes()
+            var currentTypes = entityTypes ?? typeof(TenantUserEntity).Assembly.GetTypes()
                 .Where(type => type.IsClass && !type.IsAbstract && type.IsDefined(typeof(SugarTable), false))
-                .Where(SqlSugarEntityBoundary.IsTenantTable)
                 .OrderBy(type => type.FullName, StringComparer.Ordinal).ToArray();
+            ScopeColumnRetirement.Apply(target, currentTypes);
+            var types = currentTypes.Where(SqlSugarEntityBoundary.IsTenantTable).ToArray();
             var sourceTables = source.DbMaintenance.GetTableInfoList(false).Select(table => table.Name).ToHashSet(StringComparer.OrdinalIgnoreCase);
             var copiedTables = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             foreach (var entityType in types)
@@ -78,7 +79,7 @@ internal static class SingleMainMigration
             if (dryRun)
             {
                 target.Ado.RollbackTran();
-                Console.WriteLine("dry-run 完成：已执行建表、碰撞核对、复制并回滚全部目标变更。");
+                Console.WriteLine("dry-run 完成：已执行删列、业务索引重建、建表、碰撞核对、复制并回滚全部目标变更。");
             }
             else
             {
