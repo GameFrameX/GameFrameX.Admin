@@ -27,7 +27,7 @@ public class ScheduledTaskHostedService : BackgroundService
 
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        // GFX-872 / C380：SqlSugarScope 的 AsyncLocal 槽位可能沿宿主启动链
+        // SqlSugarScope 的 AsyncLocal 槽位可能沿宿主启动链
         // ExecutionContext 携带共享 client 向下继承（docker 栈 2026-09-27 17:04:07 实测：本服务首查与 Worker
         // 并发流共享同一 client，SqlSugar 内部 MappingColumns 列表枚举竞态抛 "Collection was modified"，
         // 未捕获直接 StopHost → Hosting failed to start）。整个执行体在 ExecutionContext.SuppressFlow() 下

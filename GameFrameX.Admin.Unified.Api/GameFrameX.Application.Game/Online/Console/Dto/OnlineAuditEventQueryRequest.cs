@@ -2,7 +2,7 @@ namespace GameFrameX.Application.Game.Online.Console.Dto;
 
 /// <summary>
 /// Online 审计事件查询线缆请求（vault:C9 S8.2 契约；mock 先行，联调以 vault 详表为准）。
-/// <para>作用域三元组由 OnlineScopeContext 注入，不在线缆体内重复。</para>
+/// <para>区服 ServerId由 OnlineScopeContext 注入，不在线缆体内重复。</para>
 /// </summary>
 public class OnlineAuditEventQueryRequest
 {

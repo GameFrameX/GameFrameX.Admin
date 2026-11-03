@@ -36,7 +36,6 @@ public sealed class OnlineServerClient : IOnlineServerClient
     public async Task<TResponse> GetAsync<TResponse>(string action, OnlineScopeContext scope) where TResponse : class
     {
         var url = await ResolveUrlAsync(action, scope);
-        // S3/C401 断链修复点
         var urlWithScope = url + (url.Contains('?') ? "&" : "?")
             + "serverId=" + scope.ServerId;
 
@@ -112,7 +111,6 @@ public sealed class OnlineServerClient : IOnlineServerClient
             }
         }
 
-        // S3/C401 断链修复点
         merged["ServerId"] = scope.ServerId;
         return merged;
     }

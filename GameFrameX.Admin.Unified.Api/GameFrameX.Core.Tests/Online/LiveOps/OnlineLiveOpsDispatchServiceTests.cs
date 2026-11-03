@@ -19,7 +19,6 @@ using GameFrameX.Foundation.Orm.Entity;
 using Microsoft.AspNetCore.Http;
 using SqlSugar;
 
-// S3/C401 断链修复点
 namespace GameFrameX.Core.Tests.Online.LiveOps;
 
 // C343 / GFX-755（vault:C8 S7.7）：统一下发服务行为测试（mock-first：fake IOnlineServerClient，联调延后）。
@@ -351,7 +350,7 @@ public sealed class OnlineLiveOpsDispatchServiceTests : IDisposable
         public OnlineScopeContext Scope { get; }
 
         /// <summary>
-        /// 读取匿名载荷对象的属性值（作用域三元组由 OnlineServerClient 注入，不在业务载荷内）。
+        /// 读取匿名载荷对象的属性值（区服 ServerId由 OnlineServerClient 注入，不在业务载荷内）。
         /// </summary>
         public object? PayloadProperty(string name)
         {

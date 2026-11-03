@@ -7,7 +7,6 @@ using GameFrameX.Core.SqlSugar;
 using GameFrameX.Entity.Tenant.Game;
 using SqlSugar;
 
-// S3/C401 断链修复点
 namespace GameFrameX.Core.Tests.Online.Console;
 
 // C344 / GFX-760（vault:C9 S8.1）：在线总览快照 Service 契约自检。
@@ -36,7 +35,7 @@ public sealed class OnlineOverviewQueryServiceTests : IDisposable
     }
 
     /// <summary>
-    /// 快照透传：action=query_online_overview，作用域三元组经 scope 注入（线缆请求体为空），
+    /// 快照透传：action=query_online_overview，区服 ServerId经 scope 注入（线缆请求体为空），
     /// 快照字段原值往返 + SnapshotNote 注明「运行态快照非权威状态」。
     /// </summary>
     [Fact]

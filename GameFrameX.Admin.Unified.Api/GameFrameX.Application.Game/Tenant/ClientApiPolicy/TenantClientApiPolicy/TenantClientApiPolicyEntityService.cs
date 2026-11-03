@@ -74,7 +74,7 @@ public class TenantClientApiPolicyEntityService
     }
 
     /// <summary>
-    /// 新增主库唯一运行策略。SigningKey 空白时服务端生成 64-hex（C368）。
+    /// 新增主库唯一运行策略。SigningKey 空白时服务端生成 64 位十六进制密钥。
     /// </summary>
     [DisplayName("新增 Client API 运行策略")]
     public override async Task<TenantClientApiPolicyResponse> AddAsync(AddTenantClientApiPolicyRequest input)

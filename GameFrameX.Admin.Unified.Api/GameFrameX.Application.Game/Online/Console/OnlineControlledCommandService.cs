@@ -3,7 +3,6 @@ using GameFrameX.Application.Game.Online.Console.Dto;
 using GameFrameX.Application.Game.ServerManager.Online;
 using GameFrameX.Core.Enum;
 
-// S3/C401 断链修复点
 namespace GameFrameX.Application.Game.Online.Console;
 
 /// <summary>

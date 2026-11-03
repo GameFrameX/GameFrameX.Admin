@@ -6,12 +6,8 @@ using GameFrameX.Core.Service.Auth;
 namespace GameFrameX.Core.Tests.Authorization;
 
 /// <summary>
-/// 登录态白名单 ↔ 逃生通道端点对齐守护（C275 / GFX-683；C277 / GFX-684 特性化改造）。
-/// <para>「仅需登录」档已收敛为 <see cref="AuthenticatedOnlyAttribute"/> 声明即登记，
-/// 不再有手写路由清单。租户到期门禁（TenantExpirationFilter）的非匿名逃生通道端点
-/// （Logout / GetRefreshTokenAsync / GetTenantExpirationStatusAsync）必须同时标注 <c>[AuthenticatedOnly]</c>——
-/// 否则被自动隐藏按钮挡成 403（自动按钮默认不授权任何租户角色），到期租户用户将被锁死在系统内。</para>
-/// <para>另含防回潮守护：Web.Api/Handlers 生产代码不得重建路由字符串静态清单（GFX-684）。</para>
+/// 登录态端点由 AuthenticatedOnlyAttribute 声明登记，避免退出与刷新等基础动作依赖业务菜单权限。
+/// 生产代码不得重建手写路由白名单。
 /// </summary>
 public sealed class AuthenticatedOnlyRouteWhitelistTests
 {

@@ -14,7 +14,6 @@ using GameFrameX.Foundation.Orm.Entity;
 using Microsoft.AspNetCore.Http;
 using SqlSugar;
 
-// S3/C401 断链修复点
 namespace GameFrameX.Core.Tests.ServerManager.Online;
 
 // C339 / GFX-750（vault:C2 S1.7）：Online 管理 API 客户端契约自检（typed client 基座）。

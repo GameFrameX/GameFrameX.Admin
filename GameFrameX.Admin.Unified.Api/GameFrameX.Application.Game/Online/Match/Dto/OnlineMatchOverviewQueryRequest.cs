@@ -2,7 +2,7 @@ namespace GameFrameX.Application.Game.Online.Match.Dto;
 
 /// <summary>
 /// 队列总览 Online 查询请求载荷（Admin → Online 线缆契约，query_match_queue_overview；mock 先行，联调以 vault C5 详表回写）。
-/// <para>不含作用域字段——作用域三元组由 <c>IOnlineServerClient</c> 按 C339 契约注入。</para>
+/// <para>不含作用域字段——区服 ServerId由 <c>IOnlineServerClient</c> 按区服上下文注入。</para>
 /// </summary>
 public class OnlineMatchOverviewQueryRequest
 {

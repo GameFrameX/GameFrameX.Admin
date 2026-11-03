@@ -2,7 +2,7 @@ namespace GameFrameX.Application.Game.Online.Asset.Dto;
 
 /// <summary>
 /// 资产审计分页查询输入参数（操作者/时间/作用域/命令类型 + 目标玩家；Cursor 翻页，vault:C2 S1.2）。
-/// <para>ServerId 必填（EXECUTE 期回写：C339 作用域三元组为每次 Online 调用硬前置，审计查询无跨区服聚合端点）。</para>
+/// <para>ServerId 必填；审计查询无跨区服聚合端点。</para>
 /// </summary>
 public class PageOnlineAssetAuditRequest
 {

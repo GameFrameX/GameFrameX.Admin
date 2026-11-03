@@ -51,7 +51,7 @@ public class TenantGameOnlinePlayerSegmentEntity : EntityBasic
     public long LastSyncTime { get; set; }
 
     /// <summary>
-    /// 最近一次同步的目标区服Id（Online 作用域三元组的 ServerId）。
+    /// 最近一次同步的目标区服Id（Online 区服 ServerId的 ServerId）。
     /// </summary>
     [SugarColumn(ColumnDescription = "最近同步区服Id", DefaultValue = "0")]
     public long LastSyncServerId { get; set; }

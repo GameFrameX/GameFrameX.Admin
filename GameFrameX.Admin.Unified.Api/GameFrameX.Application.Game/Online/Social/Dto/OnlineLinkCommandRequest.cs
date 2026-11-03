@@ -2,7 +2,7 @@ namespace GameFrameX.Application.Game.Online.Social.Dto;
 
 /// <summary>
 /// Online 联动命令请求体（Admin → Online 线缆契约；属性 PascalCase 为 mock 先行口径，联调以 vault 详表回写）。
-/// <para>作用域三元组（TenantId/ServerId）由 OnlineServerClient 在传输层并入请求体顶层，不在此声明。</para>
+/// <para>区服 ServerId由 OnlineServerClient 在传输层并入请求体顶层，不在此声明。</para>
 /// </summary>
 public class OnlineLinkCommandRequest
 {

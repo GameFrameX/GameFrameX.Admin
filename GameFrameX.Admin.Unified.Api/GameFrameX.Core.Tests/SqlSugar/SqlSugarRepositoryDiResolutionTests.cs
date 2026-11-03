@@ -14,11 +14,8 @@ using SqlSugar;
 
 namespace GameFrameX.Core.Tests.SqlSugar;
 
-// C276（GFX-682）：SimpleClient.ChangeRepository<T>() 无参重载在仓储存在带参 public 构造时，
-// 用 Activator.CreateInstance(type, new string[1]) 寻找 (string) 单参构造，对本项目带
-// (ISqlSugarClient, ISqlSugarClient) 双参构造的 SqlSugarRepository<T> 必抛
-// MissingMethodException（AddTenantAsync 报 "Constructor on type ... not found" 的根因）。
-// 本测试锁定替代路径：经 DI open generic（AddScoped(typeof(SqlSugarRepository<>))）解析目标仓储。
+// 仓储通过依赖注入解析，使用已注册的主库客户端。
+// 锁定 open generic 注册可以解析不同实体仓储，避免恢复隐式连接构造。
 public sealed class SqlSugarRepositoryDiResolutionTests : IDisposable
 {
     private readonly SqlSugarScope _client;

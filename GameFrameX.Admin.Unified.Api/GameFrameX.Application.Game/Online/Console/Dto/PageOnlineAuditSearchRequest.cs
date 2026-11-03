@@ -5,7 +5,7 @@ namespace GameFrameX.Application.Game.Online.Console.Dto;
 /// <para>
 /// 作用域维度（ServerId）在此是可选过滤而非调用前置：本地两来源（Admin 操作日志 / 域命令记录）
 /// 支持无作用域全量检索；Online 审计事件来源仅在 ServerId 提供时参与聚合
-/// （C339 作用域三元组是每次 Online 调用硬前置），未锚定时该来源静默跳过（三来源口径见 OnlineAuditSourceMap）。
+/// （区服上下文是每次 Online 调用的前置条件），未锚定时该来源静默跳过（三来源口径见 OnlineAuditSourceMap）。
 /// </para>
 /// </summary>
 public class PageOnlineAuditSearchRequest

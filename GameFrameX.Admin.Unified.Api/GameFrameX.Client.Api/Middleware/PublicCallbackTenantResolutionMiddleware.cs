@@ -38,7 +38,7 @@ public sealed class PublicCallbackTenantResolutionMiddleware
             return;
         }
 
-        // S3/C401 断链修复点：保留旧路由入口，移除租户和应用上下文。
+        // 保留旧路由入口，移除租户和应用上下文。
         context.Items[PublicCallbackRouteContext.ItemKey] = routeContext;
         if (routeContext.PackageId.HasValue)
         {

@@ -5,7 +5,6 @@ namespace GameFrameX.Application.Game.ServerManager.Online;
 /// </summary>
 public sealed class OnlineScopeContext
 {
-    // S3/C401 断链修复点
     /// <summary>区服标识。</summary>
     public long ServerId { get; }
 

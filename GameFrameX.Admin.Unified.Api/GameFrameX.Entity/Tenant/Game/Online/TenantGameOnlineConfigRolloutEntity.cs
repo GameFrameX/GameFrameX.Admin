@@ -20,7 +20,7 @@ public class TenantGameOnlineConfigRolloutEntity : EntityBasic
 {
 
     /// <summary>
-    /// 目标区服Id（Online 作用域三元组的 ServerId；灰度下发面向特定区服的 Online Runtime）。
+    /// 目标区服Id（Online 区服 ServerId的 ServerId；灰度下发面向特定区服的 Online Runtime）。
     /// </summary>
     [SugarColumn(ColumnDescription = "目标区服Id", DefaultValue = "0")]
     public long ServerId { get; set; }

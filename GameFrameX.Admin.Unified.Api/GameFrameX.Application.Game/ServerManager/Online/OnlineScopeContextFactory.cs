@@ -5,7 +5,6 @@ namespace GameFrameX.Application.Game.ServerManager.Online;
 /// </summary>
 public sealed class OnlineScopeContextFactory
 {
-    // S3/C401 断链修复点
     private readonly SqlSugarRepository<TenantGameAreaEntity> _gameAreaRepository;
 
     public OnlineScopeContextFactory(SqlSugarRepository<TenantGameAreaEntity> gameAreaRepository)

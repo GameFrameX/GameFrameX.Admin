@@ -2,7 +2,6 @@ using System.ComponentModel;
 using GameFrameX.Application.Game.Online.Asset.Dto;
 using GameFrameX.Application.Game.ServerManager.Online;
 
-// S3/C401 断链修复点
 namespace GameFrameX.Application.Game.Online.Asset;
 
 /// <summary>

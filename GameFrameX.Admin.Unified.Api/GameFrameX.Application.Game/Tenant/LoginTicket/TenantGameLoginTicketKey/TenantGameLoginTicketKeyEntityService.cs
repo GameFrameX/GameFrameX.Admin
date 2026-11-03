@@ -56,7 +56,7 @@ public class TenantGameLoginTicketKeyEntityService : BaseService<TenantGameLogin
     }
 
     /// <summary>
-    /// 手动轮换（C373）：立即生成新 key（ExpireTime 为 null 则永不过期）；
+    /// 手动轮换：立即生成新 key（ExpireTime 为 null 则永不过期）；
     /// 旧 key 打 RotatedTime 标记并收窄到期时间到退场时刻（默认 now + 7 天、上限 now + 30 天），
     /// 到点被生效查询自然排除——轮换后旧公钥在退场窗口内仍可验签在途票据，窗口外自然退场。
     /// </summary>

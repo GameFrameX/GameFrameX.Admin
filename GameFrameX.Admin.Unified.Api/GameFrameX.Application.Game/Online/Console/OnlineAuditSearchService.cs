@@ -6,7 +6,6 @@ using GameFrameX.Entity.Log;
 using GameFrameX.Entity.Tenant.Game;
 using GameFrameX.Entity.Tenant.Game.Online;
 
-// S3/C401 断链修复点
 namespace GameFrameX.Application.Game.Online.Console;
 
 /// <summary>
@@ -18,7 +17,7 @@ namespace GameFrameX.Application.Game.Online.Console;
 /// 三来源 → 五维统一字段的映射唯一来源是 <see cref="OnlineAuditSourceMap"/>，本 Service 不散落第二套映射。
 /// </para>
 /// <para>
-/// OnlineAuditEvent 来源参与前置：作用域三元组是每次 Online 调用硬前置（C339），ServerId 提供时才
+/// OnlineAuditEvent 来源需要区服上下文，ServerId 提供时才
 /// 查询该来源，否则静默跳过（本地两来源仍支持无作用域全量检索）；该来源查询失败按异常原样透传，不软化降级——
 /// 审计检索宁可失败不可静默缺源。
 /// </para>

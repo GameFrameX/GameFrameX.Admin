@@ -1,7 +1,7 @@
 namespace GameFrameX.Application.Game.Online.Match.Dto;
 
 /// <summary>
-/// 匹配队列总览查询输入参数（change C341 §3；ServerId 为 C339 作用域三元组硬前置）。
+/// 匹配队列总览查询输入参数，ServerId 为调用前置条件。
 /// </summary>
 public class OnlineMatchOverviewRequest
 {

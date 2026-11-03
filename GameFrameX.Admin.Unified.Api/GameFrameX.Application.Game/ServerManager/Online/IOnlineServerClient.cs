@@ -9,7 +9,6 @@ namespace GameFrameX.Application.Game.ServerManager.Online;
 /// 调用方拿到的要么是业务数据、要么是异常，不存在「静默失败」路径。
 /// </para>
 /// </summary>
-// S3/C401 断链修复点
 public interface IOnlineServerClient
 {
     /// <summary>
