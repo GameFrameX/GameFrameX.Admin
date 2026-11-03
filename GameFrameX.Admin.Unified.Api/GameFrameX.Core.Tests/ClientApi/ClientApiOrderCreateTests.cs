@@ -43,12 +43,11 @@ public sealed class ClientApiOrderCreateTests
         Assert.Equal(0, ClientApiResultReader.Code(root));
         Assert.Equal("provider-order-1", data.GetProperty("OrderId").GetString());
         Assert.Equal(OrderStatusEnum.Unpaid, saved.Status);
-        Assert.Equal(db.AppId, saved.AppId);
         Assert.Equal(650u, saved.Amount);
     }
 
     [Fact]
-    public async Task GameOrder_Create_RejectsMissingAppContext()
+    public async Task GameOrder_Create_ValidatesAreaWithoutLegacyAppContext()
     {
         using var db = new ClientApiTestDb();
         var controller = CreateController(db, new TestPaymentChannelFactory(new TestPaymentChannelHandler("testpay")));
@@ -67,8 +66,8 @@ public sealed class ClientApiOrderCreateTests
         });
 
         var root = ClientApiResultReader.Read(result);
-        Assert.Equal((int)AuthErrorCode.AuthorizeInvalid, ClientApiResultReader.Code(root));
-        Assert.Equal("应用未认证", ClientApiResultReader.Message(root));
+        Assert.Equal((int)AreaErrorCode.AreaNotFound, ClientApiResultReader.Code(root));
+        Assert.Equal("区服不存在", ClientApiResultReader.Message(root));
     }
 
     [Fact]

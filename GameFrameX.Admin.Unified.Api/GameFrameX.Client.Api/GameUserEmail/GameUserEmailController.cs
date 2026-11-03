@@ -1,7 +1,5 @@
 using System.Collections.Concurrent;
-using GameFrameX.Application.Game.App.AppScope;
 using GameFrameX.Client.Api.GameUserEmail.Dto;
-using GameFrameX.Client.Api.Middleware;
 using GameFrameX.Client.Api.Services.Email;
 using GameFrameX.Core.Service;
 
@@ -48,14 +46,6 @@ public class GameUserEmailController : BaseController<TenantGameUserEmailEntity>
     [HttpPost]
     public async Task<HttpJsonResultData<BaseOperationAckResponse>> SendRegister(GameUserMailRegisterEntityRequest input)
     {
-        // 应用作用域：AppId 只来自可信中间件上下文，不接受请求体覆盖（app-scope-backend-foundation.md §5.2）。
-        if (!TryGetContextLong(AppResolutionMiddleware.AppIdKey, out var appId))
-        {
-            return GameApiResult.Error<BaseOperationAckResponse>(AuthErrorCode.AuthorizeInvalid, "应用未认证");
-        }
-
-        AppScopeRules.EnsureFactAppId(appId, "用户邮箱验证码");
-
         var rateLimitError = CheckEmailRateLimit(input.Email);
         if (rateLimitError != null)
         {
@@ -66,8 +56,7 @@ public class GameUserEmailController : BaseController<TenantGameUserEmailEntity>
         entity.UserName = input.Email;
         entity.Code = Random.Shared.Next(100000, 1000000).ToString();
         entity.ExpirationTime = TimerHelper.UnixTimeSeconds() + 5 * 60; //设置过期时间为5分钟后
-        // 事实数据应用作用域，来自可信中间件上下文
-        entity.AppId = appId;
+
         if (input.Language.Contains("zh"))
         {
             entity.TemplateId = 145225.ToString();
@@ -126,14 +115,6 @@ public class GameUserEmailController : BaseController<TenantGameUserEmailEntity>
     [HttpPost]
     public async Task<HttpJsonResultData<BaseOperationAckResponse>> SendReset(GameUserMailResetEntityRequest input)
     {
-        // 应用作用域：AppId 只来自可信中间件上下文，不接受请求体覆盖（app-scope-backend-foundation.md §5.2）。
-        if (!TryGetContextLong(AppResolutionMiddleware.AppIdKey, out var appId))
-        {
-            return GameApiResult.Error<BaseOperationAckResponse>(AuthErrorCode.AuthorizeInvalid, "应用未认证");
-        }
-
-        AppScopeRules.EnsureFactAppId(appId, "用户邮箱验证码");
-
         var rateLimitError = CheckEmailRateLimit(input.Email);
         if (rateLimitError != null)
         {
@@ -151,8 +132,7 @@ public class GameUserEmailController : BaseController<TenantGameUserEmailEntity>
         entity.UserName = input.Email;
         entity.Code = Random.Shared.Next(100000, 1000000).ToString();
         entity.ExpirationTime = TimerHelper.UnixTimeSeconds() + 5 * 60; //设置过期时间为5分钟后
-        // 事实数据应用作用域，来自可信中间件上下文
-        entity.AppId = appId;
+
         if (input.Language.Contains("zh"))
         {
             entity.TemplateId = 145227.ToString();
@@ -218,17 +198,4 @@ public class GameUserEmailController : BaseController<TenantGameUserEmailEntity>
         _dailySendCounter.AddOrUpdate(dailyKey, 1, (_, v) => v + 1);
     }
 
-    /// <summary>
-    /// 从 <see cref="HttpContext.Items"/> 读取中间件写入的 long 型上下文值（应用 / 租户等）。
-    /// </summary>
-    private bool TryGetContextLong(string key, out long value)
-    {
-        value = 0;
-        if (!HttpContext.Items.TryGetValue(key, out var item) || item == null)
-        {
-            return false;
-        }
-
-        return long.TryParse(item.ToString(), out value);
-    }
 }

@@ -12,9 +12,7 @@ namespace GameFrameX.Client.Api.GameUserPay;
 /// <summary>
 /// 游戏玩家支付控制器（C11 支付域：Create/Verify/Query/Report 四 op 自建）
 /// <para>路由：POST /api/GameUserPay/{Action}（继承 BaseController 基类路由）。</para>
-/// <para>App 级鉴权：AppId 事实数据取自 <see cref="ClientApiAppContext"/>（中间件上下文优先，
-/// 缺失时内联读 AppId 头。本 host 的 AppResolutionMiddleware 仅在 App-Id + App-Secret 双头齐全时才校验拦截，
-/// 游戏侧请求仅带 AppId 头、走头回退解析，App 级鉴权由签名中间件兜底）。</para>
+/// <para>由签名中间件验证请求，订单写入主库。</para>
 /// </summary>
 public class GameUserPayController : BaseController
 {
@@ -53,11 +51,9 @@ public class GameUserPayController : BaseController
     [HttpPost]
     public async Task<HttpJsonResultData<GameUserPayCreateResponse>> Create([FromBody] GameUserPayCreateRequest request)
     {
-        var appId = ClientApiAppContext.ResolveAppId(HttpContext);
-        var enableSandbox = await IsSandboxRechargeEnabledAsync(appId);
+        var enableSandbox = await IsSandboxRechargeEnabledAsync();
         var entity = new TenantGameOrderEntity
         {
-            AppId = appId,
             AccountId = request.UserId.ToString(CultureInfo.InvariantCulture),
             RoleId = request.UserId.ToString(CultureInfo.InvariantCulture),
             AreaId = 0,
@@ -207,7 +203,6 @@ public class GameUserPayController : BaseController
             LogHelper.Warning($"GameUserPay.Report 订单不存在，按流水记账 - OrderId:{request.OrderId}, UserId:{request.UserId}");
             order = new TenantGameOrderEntity
             {
-                AppId = ClientApiAppContext.ResolveAppId(HttpContext),
                 AccountId = request.UserId.ToString(CultureInfo.InvariantCulture),
                 RoleId = request.UserId.ToString(CultureInfo.InvariantCulture),
                 AreaId = 0,
@@ -237,10 +232,9 @@ public class GameUserPayController : BaseController
     }
 
     /// <summary>
-    /// 沙箱充值发货开关（服务端权威）：经租户配置 Provider 读取策略合并表输出节，
-    /// 作用域优先级 应用级（TenantId+AppId）&gt; 租户默认（AppId=0），与 Client.Api 下单尾部同源（C378 收敛）。
+    /// 从主库策略读取服务端权威沙箱充值发货开关。
     /// </summary>
-    private async Task<bool> IsSandboxRechargeEnabledAsync(long appId)
+    private async Task<bool> IsSandboxRechargeEnabledAsync()
     {
         var policy = await _optionsProvider.GetOrderPolicyAsync();
         return policy.EnableSandBoxRecharge;

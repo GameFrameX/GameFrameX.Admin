@@ -1,11 +1,9 @@
 using GameFrameX.Client.Api.Services.PayVerification;
 using GameFrameX.Client.Api.Services.PublicCallback;
 using GameFrameX.Application.Game.ServerManager;
-using GameFrameX.Application.Game.App.AppScope;
 using GameFrameX.Application.Game.Order.GameOrder;
 using GameFrameX.Client.Api.GameWebShop.Dto;
 using GameFrameX.Client.Api.Integrations.Payment.Dto;
-using GameFrameX.Client.Api.Middleware;
 using GameFrameX.Client.Api.Services;
 using GameFrameX.Client.Api.Services.ClientApiTenantOptions;
 using GameFrameX.Core.Service;
@@ -67,14 +65,6 @@ public partial class GameOrderController : BaseController<TenantGameOrderEntity>
     [ProducesResponseType(typeof(HttpJsonResultData<AddTenantGameOrderEntityResponse>), 200)]
     public async Task<HttpJsonResultData<AddTenantGameOrderEntityResponse>> Create([FromBody] CreateTenantGameOrderEntityRequest input)
     {
-        // 应用作用域：AppId 只来自可信中间件上下文，不接受请求体覆盖（app-scope-backend-foundation.md §5.2）
-        if (!TryGetContextLong(AppResolutionMiddleware.AppIdKey, out var appId))
-        {
-            return GameApiResult.Error<AddTenantGameOrderEntityResponse>(AuthErrorCode.AuthorizeInvalid, "应用未认证");
-        }
-
-        AppScopeRules.EnsureFactAppId(appId, "游戏订单");
-
         var gameAreaEntity = await PRepository.AsSugarClient().Queryable<TenantGameAreaEntity>().Filter(null, true).Where(u => u.IsDeleted == false).Where(u => u.Id == input.AreaId).FirstAsync();
         if (gameAreaEntity == null)
         {
@@ -112,7 +102,7 @@ public partial class GameOrderController : BaseController<TenantGameOrderEntity>
 
         var entity = input.Adapt<TenantGameOrderEntity>();
         entity.Id = SnowFlakeIdHelper.Instance.NextId();
-        entity.AppId = appId; // 事实数据应用作用域，来自可信中间件上下文
+
         entity.PayChannel = input.PayChannel;
         entity.Amount = resultData.Data.Amount;
         entity.AccountId = gameRoleEntity.UserId.ToString();
@@ -225,17 +215,4 @@ public partial class GameOrderController : BaseController<TenantGameOrderEntity>
         return await _shipService.ShipAsync(gameOrderEntity.Id, isRecharge, isSandBox);
     }
 
-    /// <summary>
-    /// 从 HttpContext.Items 读取长整型上下文值（租户 / 应用等）。
-    /// </summary>
-    private bool TryGetContextLong(string key, out long value)
-    {
-        value = 0;
-        if (!HttpContext.Items.TryGetValue(key, out var item) || item == null)
-        {
-            return false;
-        }
-
-        return long.TryParse(item.ToString(), out value);
-    }
 }

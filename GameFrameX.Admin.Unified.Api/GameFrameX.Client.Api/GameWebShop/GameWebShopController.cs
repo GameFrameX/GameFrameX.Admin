@@ -5,8 +5,6 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using GameFrameX.Application.Game.ServerManager;
-using GameFrameX.Application.Game.App.AppScope;
-using GameFrameX.Client.Api.Middleware;
 using GameFrameX.Client.Api.GameUserEmail.Dto;
 using GameFrameX.Client.Api.GameWebShop.Dto;
 using GameFrameX.Client.Api.Services;
@@ -195,14 +193,6 @@ public class GameWebShopController : BaseController<TenantGameWebShopEntity>
     [HttpGet("{tenantId:long}/{appId:long}/{packageId:long?}")]
     public async Task<HttpJsonResultData<BaseOperationAckResponse>> NotifyWebShop([FromQuery] TenantGameWebShopEntityBuyNotifyRequest data)
     {
-        // 公开回调端点：appId 由 PublicCallbackTenantResolutionMiddleware 从路由 {appId} 解析并写入 AppIdKey
-        if (!TryGetContextLong(AppResolutionMiddleware.AppIdKey, out var appId))
-        {
-            return GameApiResult.Error<BaseOperationAckResponse>(AuthErrorCode.AuthorizeInvalid, "应用未认证");
-        }
-
-        AppScopeRules.EnsureFactAppId(appId, "网页商城订单");
-
         if (data.TradeStatus != "TRADE_SUCCESS")
         {
             return HttpJsonResultData<BaseOperationAckResponse>.Success();
@@ -212,7 +202,7 @@ public class GameWebShopController : BaseController<TenantGameWebShopEntity>
         var systemConfigParams = systemConfig == null ? null : JsonHelper.Deserialize<GameWebConfig>(systemConfig.Value);
         if (systemConfigParams == null)
         {
-            await InsertFailedWebShopOrderAsync(appId, data.OutTradeNo, 0, 0, 0, "订单服务器参数错误");
+            await InsertFailedWebShopOrderAsync(data.OutTradeNo, 0, 0, 0, "订单服务器参数错误");
             return GameApiResult.Error<BaseOperationAckResponse>(AreaErrorCode.AreaCannotBuy, "当前状态不能购买,联系管理员进行补发");
         }
 
@@ -224,7 +214,7 @@ public class GameWebShopController : BaseController<TenantGameWebShopEntity>
             LogHelper.Warning($"网页商城回调验签不匹配：out_trade_no={data.OutTradeNo} expected={expectedSign} received={data.Sign}");
             if (IsEnforceVerifySignMode(systemConfigParams))
             {
-                await InsertFailedWebShopOrderAsync(appId, data.OutTradeNo, 0, 0, 0, "验签失败");
+                await InsertFailedWebShopOrderAsync(data.OutTradeNo, 0, 0, 0, "验签失败");
                 return GameApiResult.Error<BaseOperationAckResponse>(AuthErrorCode.SignatureVerifyFailed, "签名验证失败");
             }
         }
@@ -233,7 +223,7 @@ public class GameWebShopController : BaseController<TenantGameWebShopEntity>
         var order = await _gameOrderEntity.GetAsync(g => g.OrderId == data.OutTradeNo);
         if (order == null)
         {
-            await InsertFailedWebShopOrderAsync(appId, data.OutTradeNo, 0, 0, 0, "预创建订单不存在");
+            await InsertFailedWebShopOrderAsync(data.OutTradeNo, 0, 0, 0, "预创建订单不存在");
             return GameApiResult.Error<BaseOperationAckResponse>(OrderErrorCode.NotifyOrderNotFound, "回调订单不存在");
         }
 
@@ -246,7 +236,7 @@ public class GameWebShopController : BaseController<TenantGameWebShopEntity>
         // 用 decimal 直接比较（uint 隐式提升），避免不可信金额经 decimal→uint 强转溢出抛异常。
         if (data.Money <= 0 || data.Money * 100 != order.Amount)
         {
-            await InsertFailedWebShopOrderAsync(appId, data.OutTradeNo, long.TryParse(order.RoleId, out var snapshotRoleId) ? snapshotRoleId : 0, order.AreaId, order.Sku, "金额不符");
+            await InsertFailedWebShopOrderAsync(data.OutTradeNo, long.TryParse(order.RoleId, out var snapshotRoleId) ? snapshotRoleId : 0, order.AreaId, order.Sku, "金额不符");
             return GameApiResult.Error<BaseOperationAckResponse>(OrderErrorCode.NotifyAmountMismatch, "支付金额与订单不符");
         }
 
@@ -256,7 +246,6 @@ public class GameWebShopController : BaseController<TenantGameWebShopEntity>
         var shopId = order.Sku;
         var entity = new TenantGameWebShopOrderEntity
         {
-            AppId = appId, // 事实数据应用作用域，来自公开回调路由 {appId}
             RoleId = roleId,
             AreaId = areaId,
             OrderId = data.OutTradeNo,
@@ -399,7 +388,7 @@ public class GameWebShopController : BaseController<TenantGameWebShopEntity>
     }
 
     /// <summary>
-    /// Buy 校验全部通过后预创建 Unpaid 订单：快照 RoleId/AreaId/Sku/AppId/实付金额（分）与发货道具列表（PlayerCreateOrderResponse 形状）。
+    /// Buy 校验全部通过后预创建 Unpaid 订单：快照 RoleId/AreaId/Sku/实付金额（分）与发货道具列表（PlayerCreateOrderResponse 形状）。
     /// 回调按 out_trade_no 回读此单完成状态迁移，业务参数不取自回调；预创建失败则 Buy 报错且不向网关提交。
     /// </summary>
     /// <param name="input">下单参数（RoleId/AreaId/商品 Id）。</param>
@@ -410,12 +399,6 @@ public class GameWebShopController : BaseController<TenantGameWebShopEntity>
     /// <returns>预创建是否成功。</returns>
     private async Task<bool> InsertPreCreatedOrderAsync(TenantGameWebShopEntityBuyRequest input, TenantGameRoleEntity role, TenantGameWebShopEntity shop, string outTradeNo, decimal realPrice)
     {
-        // notify_url 构造已确保租户/应用上下文存在，此处缺失属于不可达防御路径，按预创建失败处理
-        if (!TryGetContextLong(AppResolutionMiddleware.AppIdKey, out var appId))
-        {
-            return false;
-        }
-
         var snapshot = new PlayerCreateOrderResponse
         {
             RoleId = input.RoleId,
@@ -426,7 +409,6 @@ public class GameWebShopController : BaseController<TenantGameWebShopEntity>
         };
         var order = new TenantGameOrderEntity
         {
-            AppId = appId,
             Sku = input.Id,
             AreaId = input.AreaId,
             OrderId = outTradeNo,
@@ -479,17 +461,15 @@ public class GameWebShopController : BaseController<TenantGameWebShopEntity>
     /// <summary>
     /// 落网页商城失败单（保留排障语义）：验签失败/查无订单时无预创建快照可回读，RoleId/AreaId/GameShopId 以 0 填充。
     /// </summary>
-    /// <param name="appId">公开回调路由解析出的事实 appId。</param>
     /// <param name="outTradeNo">回传订单号。</param>
     /// <param name="roleId">失败单角色 id（无快照时 0）。</param>
     /// <param name="areaId">失败单区服 id（无快照时 0）。</param>
     /// <param name="gameShopId">失败单商品 id（无快照时 0）。</param>
     /// <param name="reason">失败原因。</param>
-    private async Task InsertFailedWebShopOrderAsync(long appId, string outTradeNo, long roleId, long areaId, long gameShopId, string reason)
+    private async Task InsertFailedWebShopOrderAsync(string outTradeNo, long roleId, long areaId, long gameShopId, string reason)
     {
         await _webShopOrderService.InsertAsync(new TenantGameWebShopOrderEntity
         {
-            AppId = appId,
             RoleId = roleId,
             AreaId = areaId,
             OrderId = outTradeNo,
@@ -506,12 +486,4 @@ public class GameWebShopController : BaseController<TenantGameWebShopEntity>
         return null;
     }
 
-    private bool TryGetContextLong(string key, out long value)
-    {
-        value = 0;
-        return HttpContext.Items.TryGetValue(key, out var item) &&
-               item != null &&
-               long.TryParse(item.ToString(), out value) &&
-               value > 0;
-    }
 }

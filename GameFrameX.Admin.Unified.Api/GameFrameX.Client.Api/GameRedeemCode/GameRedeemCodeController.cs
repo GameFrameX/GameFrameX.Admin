@@ -1,8 +1,6 @@
 using GameFrameX.Application.Game.ServerManager;
-using GameFrameX.Application.Game.App.AppScope;
 using GameFrameX.Client.Api.GameRedeemCode.Dto;
 using GameFrameX.Client.Api.GameWebShop.Dto;
-using GameFrameX.Client.Api.Middleware;
 using GameFrameX.Core.Service;
 using GameFrameX.Entity.Enum;
 
@@ -51,22 +49,8 @@ public class GameRedeemCodeController : BaseController<TenantGameRedeemCodeEntit
     [ProducesResponseType(typeof(BaseOperationAckResponse), 200)]
     public async Task<HttpJsonResultData<BaseOperationAckResponse>> Consume([FromBody] GameRedeemCodeConsumeEntityRequest input)
     {
-        // 应用作用域：AppId 只来自可信中间件上下文，不接受请求体覆盖（app-scope-backend-foundation.md §5.2）
-        if (!TryGetContextLong(AppResolutionMiddleware.AppIdKey, out var appId))
-        {
-            return GameApiResult.Error<BaseOperationAckResponse>(AuthErrorCode.AuthorizeInvalid, "应用未认证");
-        }
-
-        AppScopeRules.EnsureFactAppId(appId, "游戏兑换码使用记录");
-
         var gameRedeemCodeEntity = await PRepository.GetAsync(m => m.Code == input.Code);
         if (gameRedeemCodeEntity == null)
-        {
-            return GameApiResult.Error<BaseOperationAckResponse>(RedeemCodeErrorCode.RedeemCodeNotFound, "兑换码不存在");
-        }
-
-        // 兑换码必须属于当前应用，禁止跨应用兑换
-        if (gameRedeemCodeEntity.AppId != appId)
         {
             return GameApiResult.Error<BaseOperationAckResponse>(RedeemCodeErrorCode.RedeemCodeNotFound, "兑换码不存在");
         }
@@ -115,9 +99,9 @@ public class GameRedeemCodeController : BaseController<TenantGameRedeemCodeEntit
             return GameApiResult.Error<BaseOperationAckResponse>(RedeemCodeErrorCode.RedeemCodeUsed, "兑换码已使用");
         }
 
-        // 组级角色次数预检：兑换码归属渠道/分组时，按 (TenantId, AppId, ChannelId, RoleId) 维度校验每角色可用次数。
-        // 客户端请求体不传 ChannelId，服务端从兑换码反推，禁止跨应用或已删除渠道兑换。
-        var channelContext = await ResolveChannelRoleUsageAsync(appId, gameRedeemCodeEntity, input.RoleId);
+        // 组级角色次数预检：兑换码归属渠道/分组时，按 (ChannelId, RoleId) 维度校验每角色可用次数。
+        // 客户端请求体不传 ChannelId，服务端从兑换码反推，禁止已删除渠道兑换。
+        var channelContext = await ResolveChannelRoleUsageAsync(gameRedeemCodeEntity, input.RoleId);
         if (channelContext.Rejected)
         {
             return GameApiResult.Error<BaseOperationAckResponse>(RedeemCodeErrorCode.RedeemCodeNotFound, "兑换码不存在");
@@ -151,7 +135,6 @@ public class GameRedeemCodeController : BaseController<TenantGameRedeemCodeEntit
             // 更新兑换码使用记录
             var gameRedeemCodeUseRecord = new TenantGameRedeemCodeUseRecordEntity
             {
-                AppId = appId, // 事实数据应用作用域，来自可信中间件上下文
                 AreaId = gameAreaEntity.Id,
                 PlayerId = input.RoleId,
                 Code = gameRedeemCodeEntity.Code,
@@ -174,9 +157,9 @@ public class GameRedeemCodeController : BaseController<TenantGameRedeemCodeEntit
 
     /// <summary>
     /// 解析兑换码归属渠道/分组并预检组级角色次数。客户端不传 ChannelId，服务端从兑换码反推。
-    /// <para>无 ChannelId / 渠道未配置限制时返回 Neutral；渠道不存在或跨应用返回 Rejected；次数达上限返回 LimitReached。</para>
+    /// <para>无 ChannelId / 渠道未配置限制时返回 Neutral；渠道不存在返回 Rejected；次数达上限返回 LimitReached。</para>
     /// </summary>
-    private async Task<ChannelRoleUsageContext> ResolveChannelRoleUsageAsync(long appId, TenantGameRedeemCodeEntity code, long roleId)
+    private async Task<ChannelRoleUsageContext> ResolveChannelRoleUsageAsync(TenantGameRedeemCodeEntity code, long roleId)
     {
         if (!code.ChannelId.HasValue || code.ChannelId.Value <= 0)
         {
@@ -184,8 +167,8 @@ public class GameRedeemCodeController : BaseController<TenantGameRedeemCodeEntit
         }
 
         var channel = await _channelRepository.GetSingleAsync(c => c.Id == code.ChannelId.Value);
-        // 渠道不存在或跨应用：按配置异常安全拒绝（不向客户端泄露具体原因）
-        if (channel == null || channel.AppId != appId)
+        // 渠道不存在：按配置异常安全拒绝（不向客户端泄露具体原因）
+        if (channel == null)
         {
             return ChannelRoleUsageContext.AsRejected();
         }
@@ -196,7 +179,7 @@ public class GameRedeemCodeController : BaseController<TenantGameRedeemCodeEntit
         }
 
         var existing = await _channelRoleUsageRepository.GetFirstAsync(u =>
-                                                                           u.AppId == appId && u.ChannelId == channel.Id && u.RoleId == roleId);
+                                                                           u.ChannelId == channel.Id && u.RoleId == roleId);
 
         if (existing != null && existing.UsedCount >= channel.RoleUsageLimit)
         {
@@ -209,7 +192,7 @@ public class GameRedeemCodeController : BaseController<TenantGameRedeemCodeEntit
     /// <summary>
     /// 发奖成功后递增组级角色使用累计。
     /// <para>事务边界：与使用记录插入、兑换码 UsedCount 递增同处发奖成功路径；累计写失败不回滚已发奖励，由日志显性化（与既有使用记录写失败同款风险）。</para>
-    /// <para>并发兜底：累计表 ux_redeem_channel_role_usage 唯一约束保证 (TenantId, AppId, ChannelId, RoleId) 只有一行；递增走条件更新 WHERE UsedCount &lt; limit 避免超计数。</para>
+    /// <para>并发兜底：累计表 ux_redeem_channel_role_usage 唯一约束保证 (ChannelId, RoleId) 只有一行；递增走条件更新 WHERE UsedCount &lt; limit 避免超计数。</para>
     /// </summary>
     private async Task AccumulateChannelRoleUsageAsync(ChannelRoleUsageContext context, TenantGameRedeemCodeEntity code, long roleId)
     {
@@ -226,7 +209,6 @@ public class GameRedeemCodeController : BaseController<TenantGameRedeemCodeEntit
             {
                 await _channelRoleUsageRepository.InsertAsync(new TenantGameRedeemCodeChannelRoleUsageEntity
                 {
-                    AppId = context.AppId,
                     ChannelId = context.ChannelId,
                     RoleId = roleId,
                     UsedCount = 1,
@@ -250,22 +232,8 @@ public class GameRedeemCodeController : BaseController<TenantGameRedeemCodeEntit
                                              LastCode = code.Code,
                                              LastUseTime = now,
                                          })
-                                         .Where(u => u.AppId == context.AppId && u.ChannelId == context.ChannelId && u.RoleId == roleId && u.UsedCount < limit)
+                                         .Where(u => u.ChannelId == context.ChannelId && u.RoleId == roleId && u.UsedCount < limit)
                                          .ExecuteCommandAsync();
-    }
-
-    /// <summary>
-    /// 从 HttpContext.Items 读取长整型上下文值（租户 / 应用等）。
-    /// </summary>
-    private bool TryGetContextLong(string key, out long value)
-    {
-        value = 0;
-        if (!HttpContext.Items.TryGetValue(key, out var item) || item == null)
-        {
-            return false;
-        }
-
-        return long.TryParse(item.ToString(), out value);
     }
 
     private struct ChannelRoleUsageContext
@@ -275,8 +243,6 @@ public class GameRedeemCodeController : BaseController<TenantGameRedeemCodeEntit
         public bool LimitReached { get; private set; }
 
         public bool ShouldAccumulate { get; private set; }
-
-        public long AppId { get; private set; }
 
         public long ChannelId { get; private set; }
 
@@ -304,7 +270,6 @@ public class GameRedeemCodeController : BaseController<TenantGameRedeemCodeEntit
             return new ChannelRoleUsageContext
             {
                 ShouldAccumulate = true,
-                AppId = channel.AppId,
                 ChannelId = channel.Id,
                 RoleUsageLimit = channel.RoleUsageLimit,
                 Existing = existing,

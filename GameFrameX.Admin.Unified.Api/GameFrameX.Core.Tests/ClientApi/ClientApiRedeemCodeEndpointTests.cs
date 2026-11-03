@@ -113,7 +113,7 @@ public sealed class ClientApiRedeemCodeEndpointTests
     }
 
     [Fact]
-    public async Task GameRedeemCode_Consume_RejectsMissingAppContext()
+    public async Task GameRedeemCode_Consume_ValidatesCodeWithoutLegacyAppContext()
     {
         using var db = new ClientApiTestDb();
         var controller = CreateController(db);
@@ -127,8 +127,8 @@ public sealed class ClientApiRedeemCodeEndpointTests
         });
 
         var root = ClientApiResultReader.Read(result);
-        Assert.Equal((int)AuthErrorCode.AuthorizeInvalid, ClientApiResultReader.Code(root));
-        Assert.Equal("应用未认证", ClientApiResultReader.Message(root));
+        Assert.Equal((int)RedeemCodeErrorCode.RedeemCodeNotFound, ClientApiResultReader.Code(root));
+        Assert.Equal("兑换码不存在", ClientApiResultReader.Message(root));
     }
 
     [Fact]

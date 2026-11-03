@@ -10,13 +10,11 @@ namespace GameFrameX.Entity.Tenant.Game;
 
 /// <summary>
 /// 游戏兑换码渠道角色使用累计。承载兑换码分组（渠道）下每个角色的成功兑换次数，是组级角色限制额度的事实源。
-/// <para>应用作用域事实数据（TenantId + AppId），AppId 跟随兑换码自身 AppId，必须 &gt; 0。</para>
-/// <para>幂等：ux_redeem_channel_role_usage 在数据库层保证 (TenantId, AppId, ChannelId, RoleId) 全局唯一，并发兑换只产生一行累计，重复回调/并发请求不会插入重复行。</para>
+/// <para>幂等：ux_redeem_channel_role_usage 在数据库层保证 (ChannelId, RoleId) 全局唯一，并发兑换只产生一行累计，重复回调/并发请求不会插入重复行。</para>
 /// <para>边界：该表只承担组级额度累计与并发兜底；兑换流水仍由 <see cref="TenantGameRedeemCodeUseRecordEntity"/> 记录，不在此表保存兑换码快照之外的审计字段。</para>
 /// </summary>
 [SugarTable(null, "游戏兑换码渠道角色使用累计")]
-[SugarIndex("ux_redeem_channel_role_usage", "TenantId", OrderByType.Asc, nameof(AppId), OrderByType.Asc, nameof(ChannelId), OrderByType.Asc, nameof(RoleId), OrderByType.Asc, true)]
-[SugarIndex("idx_redeem_channel_role_usage_tenant_app", "TenantId", OrderByType.Asc, nameof(AppId), OrderByType.Asc)]
+[SugarIndex("ux_redeem_channel_role_usage", nameof(ChannelId), OrderByType.Asc, nameof(RoleId), OrderByType.Asc, true)]
 [TenantTable]
 [IncrementTable]
 public class TenantGameRedeemCodeChannelRoleUsageEntity : EntityBasic, IAppScoped

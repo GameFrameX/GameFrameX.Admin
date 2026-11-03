@@ -32,7 +32,7 @@ public sealed class ClientApiWebShopEndpointTests
     }
 
     [Fact]
-    public async Task GameWebShop_Buy_AppendsTrustedCallbackRouteToNotifyUrl()
+    public async Task GameWebShop_Buy_RejectsUntilCallbackRouteUpgrade()
     {
         using var db = new ClientApiTestDb();
         db.SeedAreaClassify(10);
@@ -53,14 +53,12 @@ public sealed class ClientApiWebShopEndpointTests
         });
 
         var root = ClientApiResultReader.Read(result);
-        var body = WebUtility.UrlDecode(handler.RequestBodies.Single());
-        Assert.Equal(0, ClientApiResultReader.Code(root));
-        Assert.Contains($"/{db.TenantId}/{db.AppId}/7001", body);
-        Assert.StartsWith("https://zlpay.zilancreative.com/pay/ok", ClientApiResultReader.Data(root).GetProperty("Html").GetString());
+        Assert.Equal((int)AreaErrorCode.AreaCannotBuy, ClientApiResultReader.Code(root));
+        Assert.Empty(handler.RequestBodies);
     }
 
     [Fact]
-    public async Task GameWebShop_Buy_RejectsMissingContextForCallbackUrl()
+    public async Task GameWebShop_Buy_RejectsWithoutLegacyContextUntilCallbackRouteUpgrade()
     {
         using var db = new ClientApiTestDb();
         db.SeedAreaClassify(10);
@@ -81,11 +79,11 @@ public sealed class ClientApiWebShopEndpointTests
 
         var root = ClientApiResultReader.Read(result);
         Assert.Equal(60300006, ClientApiResultReader.Code(root));
-        Assert.Equal("回调地址缺少租户或应用上下文", ClientApiResultReader.Message(root));
+        Assert.Equal("无法构造完整支付回调路由，请完成回调路由升级后重试", ClientApiResultReader.Message(root));
     }
 
     [Fact]
-    public async Task GameWebShop_Buy_PreCreatesUnpaidOrderWithSnapshot()
+    public async Task GameWebShop_Buy_DoesNotPersistOrderUntilCallbackRouteUpgrade()
     {
         using var db = new ClientApiTestDb();
         db.SeedAreaClassify(10);
@@ -106,24 +104,9 @@ public sealed class ClientApiWebShopEndpointTests
         });
 
         var root = ClientApiResultReader.Read(result);
-        Assert.Equal(0, ClientApiResultReader.Code(root));
-        var outTradeNo = ClientApiResultReader.Data(root).GetProperty("OrderId").GetString();
-        Assert.False(string.IsNullOrWhiteSpace(outTradeNo));
-        Assert.True(long.TryParse(outTradeNo, out _), "out_trade_no 应为雪花 ID（可解析长整数）");
-
-        var order = await db.TenantDb.Queryable<TenantGameOrderEntity>().FirstAsync(u => u.OrderId == outTradeNo);
-        Assert.NotNull(order);
-        Assert.Equal(OrderStatusEnum.Unpaid, order.Status);
-        Assert.Equal(650u, order.Amount);
-        Assert.Equal("3001", order.RoleId);
-        Assert.Equal(2001, order.AreaId);
-        Assert.Equal(5001, order.Sku);
-        Assert.Equal("1001", order.AccountId);
-        Assert.Equal(db.AppId, order.AppId);
-        Assert.Equal("网页支付", order.PayChannel);
-        Assert.Equal("聚支付平台", order.Channel);
-        Assert.Equal("web", order.Platform);
-        Assert.Contains("RewardsItem", order.Content);
+        Assert.Equal((int)AreaErrorCode.AreaCannotBuy, ClientApiResultReader.Code(root));
+        Assert.Equal(0, await db.MainDb.Queryable<TenantGameOrderEntity>().CountAsync());
+        Assert.Empty(handler.RequestBodies);
     }
 
     [Fact]
@@ -140,14 +123,13 @@ public sealed class ClientApiWebShopEndpointTests
         var controller = CreateController(db, handler);
         db.AttachContext(controller);
 
-        var outTradeNo = await BuyAndGetOrderIdAsync(controller);
+        var outTradeNo = await SeedUnpaidOrderAsync(db);
         var result = await controller.NotifyWebShop(BuildSignedNotifyRequest(outTradeNo, 6.50m, "sign-secret"));
 
         var root = ClientApiResultReader.Read(result);
         var order = await db.TenantDb.Queryable<TenantGameOrderEntity>().FirstAsync(u => u.OrderId == outTradeNo);
         var role = await db.TenantDb.Queryable<TenantGameRoleEntity>().FirstAsync(u => u.Id == 3001);
         Assert.Equal(0, ClientApiResultReader.Code(root));
-        Assert.Equal(db.AppId, order.AppId);
         Assert.Equal(OrderStatusEnum.Shipped, order.Status);
         Assert.Equal(650, role.AllRecharge);
         Assert.Equal(1, handler.Count("/game/api/post_mail"));
@@ -167,7 +149,7 @@ public sealed class ClientApiWebShopEndpointTests
         var controller = CreateController(db, handler);
         db.AttachContext(controller);
 
-        var outTradeNo = await BuyAndGetOrderIdAsync(controller);
+        var outTradeNo = await SeedUnpaidOrderAsync(db);
         var result = await controller.NotifyWebShop(BuildSignedNotifyRequest(outTradeNo, 6.50m, "sign-secret", "forged-sign"));
 
         var root = ClientApiResultReader.Read(result);
@@ -196,7 +178,7 @@ public sealed class ClientApiWebShopEndpointTests
         var controller = CreateController(db, handler);
         db.AttachContext(controller);
 
-        var outTradeNo = await BuyAndGetOrderIdAsync(controller);
+        var outTradeNo = await SeedUnpaidOrderAsync(db);
         var request = BuildSignedNotifyRequest(outTradeNo, 6.50m, "sign-secret");
         var first = ClientApiResultReader.Read(await controller.NotifyWebShop(request));
         var second = ClientApiResultReader.Read(await controller.NotifyWebShop(request));
@@ -224,7 +206,7 @@ public sealed class ClientApiWebShopEndpointTests
         var controller = CreateController(db, handler);
         db.AttachContext(controller);
 
-        var outTradeNo = await BuyAndGetOrderIdAsync(controller);
+        var outTradeNo = await SeedUnpaidOrderAsync(db);
         var result = await controller.NotifyWebShop(BuildSignedNotifyRequest(outTradeNo, 1.00m, "sign-secret"));
 
         var root = ClientApiResultReader.Read(result);
@@ -253,7 +235,7 @@ public sealed class ClientApiWebShopEndpointTests
         var controller = CreateController(db, handler);
         db.AttachContext(controller);
 
-        var outTradeNo = await BuyAndGetOrderIdAsync(controller);
+        var outTradeNo = await SeedUnpaidOrderAsync(db);
         var result = await controller.NotifyWebShop(BuildSignedNotifyRequest(outTradeNo, 6.50m, "sign-secret", "forged-sign"));
 
         var root = ClientApiResultReader.Read(result);
@@ -291,32 +273,40 @@ public sealed class ClientApiWebShopEndpointTests
     }
 
     [Fact]
-    public async Task GameWebShop_NotifyWebShop_RejectsMissingAppContext()
+    public async Task GameWebShop_NotifyWebShop_ValidatesConfigurationWithoutLegacyAppContext()
     {
         using var db = new ClientApiTestDb();
         var controller = CreateController(db);
         db.AttachContext(controller, includeApp: false);
 
-        var result = await controller.NotifyWebShop(new TenantGameWebShopEntityBuyNotifyRequest { TradeStatus = "TRADE_SUCCESS", });
+        var result = await controller.NotifyWebShop(new TenantGameWebShopEntityBuyNotifyRequest { OutTradeNo = "unknown-order", TradeStatus = "TRADE_SUCCESS", });
 
         var root = ClientApiResultReader.Read(result);
-        Assert.Equal((int)AuthErrorCode.AuthorizeInvalid, ClientApiResultReader.Code(root));
-        Assert.Equal("应用未认证", ClientApiResultReader.Message(root));
+        Assert.Equal((int)AreaErrorCode.AreaCannotBuy, ClientApiResultReader.Code(root));
+        Assert.Contains("联系管理员", ClientApiResultReader.Message(root));
     }
 
-    private static async Task<string> BuyAndGetOrderIdAsync(GameWebShopController controller)
+    // 当前下单因回调升级而拒绝，入站回调测试使用发布前已创建的订单快照。
+    private static async Task<string> SeedUnpaidOrderAsync(ClientApiTestDb db)
     {
-        var result = await controller.Buy(new TenantGameWebShopEntityBuyRequest
+        const string orderId = "800000000000001";
+        await db.MainDb.Insertable(new TenantGameOrderEntity
         {
-            Id = 5001,
+            Id = 800000000000001,
+            OrderId = orderId,
+            RoleId = "3001",
             AreaId = 2001,
-            RoleId = 3001,
-            Type = "alipay",
-        });
-
-        var root = ClientApiResultReader.Read(result);
-        Assert.Equal(0, ClientApiResultReader.Code(root));
-        return ClientApiResultReader.Data(root).GetProperty("OrderId").GetString() ?? string.Empty;
+            Sku = 5001,
+            AccountId = "1001",
+            Amount = 650,
+            Status = OrderStatusEnum.Unpaid,
+            Content = "{}",
+            Channel = "聚支付平台",
+            PayChannel = "网页支付",
+            Platform = "web",
+            AdventureSuffix = string.Empty,
+        }).ExecuteCommandAsync();
+        return orderId;
     }
 
     /// <summary>
@@ -370,7 +360,8 @@ public sealed class ClientApiWebShopEndpointTests
             typeof(TenantGameAreaEntity),
             typeof(TenantGameWebShopOrderEntity),
             typeof(TenantGameOrderEntity),
-            typeof(TenantGameGoodsEntity));
+            typeof(TenantGameGoodsEntity),
+            typeof(SystemConfigEntity));
         return new GameWebShopController(
             new HttpClient(handler ?? ClientApiRecordingHttpHandler.WithGameServerDefaults(), false),
             db.Repository<TenantGameWebShopEntity>(),
