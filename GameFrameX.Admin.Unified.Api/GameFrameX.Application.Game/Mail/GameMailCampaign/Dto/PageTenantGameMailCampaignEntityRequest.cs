@@ -14,11 +14,6 @@ namespace GameFrameX.Application.Game.Mail.GameMailCampaign.Dto;
 public sealed class PageTenantGameMailCampaignEntityRequest : BasePageRequest
 {
     /// <summary>
-    /// 应用Id（可选过滤，按当前应用筛选）。
-    /// </summary>
-    public long? AppId { get; set; }
-
-    /// <summary>
     /// 名称模糊过滤。
     /// </summary>
     public string Name { get; set; } = null!;

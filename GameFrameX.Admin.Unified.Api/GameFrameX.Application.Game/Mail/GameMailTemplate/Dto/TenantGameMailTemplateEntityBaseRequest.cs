@@ -8,12 +8,6 @@ namespace GameFrameX.Application.Game.Mail.GameMailTemplate.Dto;
 public class TenantGameMailTemplateEntityBaseRequest : BaseAddRequest
 {
     /// <summary>
-    /// 应用Id。邮件模板属于应用内容，必须 &gt; 0。
-    /// </summary>
-    [Required(ErrorMessage = "应用Id不能为空")]
-    public long AppId { get; set; }
-
-    /// <summary>
     /// 名称
     /// </summary>
     [Required(ErrorMessage = "名称不能为空")]

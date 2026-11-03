@@ -1,4 +1,3 @@
-using GameFrameX.Application.Game.App.AppScope;
 using GameFrameX.Application.Game.Mail.GameMailTemplate.Dto;
 
 #pragma warning disable CS8602, CS8604, CS8629 // SqlSugar WhereIF(condition, lambda)：lambda 仅在 condition=true 时执行；NRT 无法跨方法传播条件守卫，lambda 内 .Trim()/.Value 实际安全
@@ -14,32 +13,26 @@ public class TenantGameMailTemplateEntityService
         TenantGameMailTemplateEntityResponse, PageTenantGameMailTemplateEntityRequest>
 {
     private readonly SqlSugarRepository<Entity.Tenant.Game.TenantGameMailTemplateCategoryEntity> _categoryRepository;
-    private readonly SqlSugarRepository<Entity.Tenant.Game.TenantGameAppEntity> _gameAppRepository;
 
     public TenantGameMailTemplateEntityService(
         SqlSugarRepository<Entity.Tenant.Game.TenantGameMailTemplateEntity> repository,
-        SqlSugarRepository<Entity.Tenant.Game.TenantGameMailTemplateCategoryEntity> categoryRepository,
-        SqlSugarRepository<Entity.Tenant.Game.TenantGameAppEntity> gameAppRepository)
+        SqlSugarRepository<Entity.Tenant.Game.TenantGameMailTemplateCategoryEntity> categoryRepository)
         : base(repository)
     {
         _categoryRepository = categoryRepository;
-        _gameAppRepository = gameAppRepository;
     }
 
     protected override ISugarQueryable<TenantGameMailTemplateEntityResponse> BuildPageQuery(PageTenantGameMailTemplateEntityRequest input)
     {
-        var appId = AppScopeRules.EnsureFactAppId(input.AppId, "邮件模板");
         return Repository.AsQueryable()
                          .WhereIF(!string.IsNullOrWhiteSpace(input.SearchKey), u => u.Name.Contains(input.SearchKey.Trim()))
                          .WhereIF(!string.IsNullOrWhiteSpace(input.Name), u => u.Name.Contains(input.Name.Trim()))
                          .WhereIF(input.CategoryId.HasValue, u => u.CategoryId == input.CategoryId.Value)
                          .WhereIF(input.IsEnabled.HasValue, u => u.IsEnabled == input.IsEnabled.Value)
-                         .Where(u => u.AppId == appId)
                          .LeftJoin<Entity.Tenant.Game.TenantGameMailTemplateCategoryEntity>((t, c) => t.CategoryId == c.Id)
                          .Select((t, c) => new TenantGameMailTemplateEntityResponse
                          {
                              Id = t.Id,
-                             AppId = t.AppId,
                              Name = t.Name,
                              Description = t.Description,
                              CategoryId = t.CategoryId,
@@ -63,16 +56,7 @@ public class TenantGameMailTemplateEntityService
     }
 
     /// <summary>
-    /// 新增前：邮件模板属于应用内容，AppId 必须为当前应用。
-    /// </summary>
-    protected override async Task OnAddingAsync(AddTenantGameMailTemplateEntityRequest input)
-    {
-        AppScopeRules.EnsureFactAppId(input.AppId, "邮件模板");
-        await _gameAppRepository.ValidateGameAppBelongsToTenantAsync(input.AppId);
-    }
-
-    /// <summary>
-    /// 更新前：AppId 不可变（从既有实体回填），并按应用内容规则校验。
+    /// 更新前校验记录存在。
     /// </summary>
     protected override async Task OnUpdatingAsync(UpdateTenantGameMailTemplateEntityRequest input)
     {
@@ -81,10 +65,6 @@ public class TenantGameMailTemplateEntityService
         {
             throw BusinessError.Oh(CommonErrorCode.RecordNotFound);
         }
-
-        input.AppId = existing.AppId;
-        AppScopeRules.EnsureFactAppId(input.AppId, "邮件模板");
-        await _gameAppRepository.ValidateGameAppBelongsToTenantAsync(input.AppId);
     }
 }
 #pragma warning restore CS8602, CS8604, CS8629

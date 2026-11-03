@@ -37,7 +37,7 @@ public class MailCampaignEntityServiceContractTests
     {
         var props = PropNames<PageTenantGameMailCampaignEntityRequest>();
 
-        Assert.Contains("AppId", props);
+        Assert.DoesNotContain("AppId", props);
         Assert.Contains("AreaId", props);
         Assert.Contains("Name", props);
         Assert.Contains("MailType", props);
@@ -51,7 +51,7 @@ public class MailCampaignEntityServiceContractTests
     {
         var props = PropNames<AddTenantGameMailCampaignEntityRequest>();
 
-        Assert.Contains("AppId", props);
+        Assert.DoesNotContain("AppId", props);
         Assert.Contains("AreaId", props);
         Assert.Contains("Name", props);
         Assert.Contains("TemplateId", props);

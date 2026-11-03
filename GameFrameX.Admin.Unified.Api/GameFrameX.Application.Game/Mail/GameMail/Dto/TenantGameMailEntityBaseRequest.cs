@@ -8,13 +8,6 @@ namespace GameFrameX.Application.Game.Mail.GameMail.Dto;
 public abstract class TenantGameMailEntityBaseRequest : BaseUpdateRequest
 {
     /// <summary>
-    /// 应用Id。事实数据应用作用域，必须 &gt; 0。
-    /// <para>过渡期：后台运营当前应用上下文尚未建立（前端「当前应用」选择器待统一应用上下文 change 落地），由前端手填。</para>
-    /// </summary>
-    [Required(ErrorMessage = "应用Id不能为空")]
-    public long AppId { get; set; }
-
-    /// <summary>
     /// 标题
     /// </summary>
     [Required(ErrorMessage = "标题不能为空")]

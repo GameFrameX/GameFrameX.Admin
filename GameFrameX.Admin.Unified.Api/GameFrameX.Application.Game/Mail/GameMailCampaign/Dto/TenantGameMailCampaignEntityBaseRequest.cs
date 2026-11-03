@@ -15,12 +15,6 @@ namespace GameFrameX.Application.Game.Mail.GameMailCampaign.Dto;
 public abstract class TenantGameMailCampaignEntityBaseRequest : BaseUpdateRequest
 {
     /// <summary>
-    /// 应用Id。事实数据应用作用域，必须 &gt; 0。
-    /// </summary>
-    [Required(ErrorMessage = "应用Id不能为空")]
-    public long AppId { get; set; }
-
-    /// <summary>
     /// 区服Id。用于解析目标游戏服 HttpManageUrl 调用 Server 发布接口。
     /// </summary>
     [Required(ErrorMessage = "区服Id不能为空")]

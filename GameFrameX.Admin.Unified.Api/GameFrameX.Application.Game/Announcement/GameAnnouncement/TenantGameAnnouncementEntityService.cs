@@ -1,6 +1,5 @@
 using System.ComponentModel;
 using GameFrameX.Application.Game.Announcement.GameAnnouncement.Dto;
-using GameFrameX.Application.Game.App.AppScope;
 using GameFrameX.Application.Game.Online.LiveOps.Dispatch;
 using GameFrameX.Application.Game.Online.LiveOps.Dispatch.Dto;
 using GameFrameX.Entity.Game.Online;
@@ -15,15 +14,12 @@ namespace GameFrameX.Application.Game.Announcement.GameAnnouncement;
 public class TenantGameAnnouncementEntityService : GenericCrudService<Entity.Tenant.Game.Announcement.TenantGameAnnouncementEntity, AddTenantGameAnnouncementEntityRequest, UpdateTenantGameAnnouncementEntityRequest, TenantGameAnnouncementEntityResponse, PageTenantGameAnnouncementEntityRequest>
 {
     private const string DefaultLanguage = "default";
-    private readonly SqlSugarRepository<Entity.Tenant.Game.TenantGameAppEntity> _gameAppRepository;
     private readonly IOnlineLiveOpsDispatchService _dispatchService;
 
     public TenantGameAnnouncementEntityService(
         SqlSugarRepository<Entity.Tenant.Game.Announcement.TenantGameAnnouncementEntity> repository,
-        SqlSugarRepository<Entity.Tenant.Game.TenantGameAppEntity> gameAppRepository,
         IOnlineLiveOpsDispatchService dispatchService) : base(repository)
     {
-        _gameAppRepository = gameAppRepository;
         _dispatchService = dispatchService;
     }
 
@@ -32,7 +28,6 @@ public class TenantGameAnnouncementEntityService : GenericCrudService<Entity.Ten
     /// </summary>
     protected override ISugarQueryable<TenantGameAnnouncementEntityResponse> BuildPageQuery(PageTenantGameAnnouncementEntityRequest input)
     {
-        var appId = AppScopeRules.EnsureFactAppId(input.AppId, "游戏公告");
         var language = input.Language?.Trim();
         var hasLanguage = !string.IsNullOrWhiteSpace(language);
         var isDefaultLanguage = language == DefaultLanguage;
@@ -41,7 +36,6 @@ public class TenantGameAnnouncementEntityService : GenericCrudService<Entity.Ten
                               .WhereIF(hasLanguage && isDefaultLanguage, u => u.Language == language || u.Language == null || u.Language == string.Empty)
                               .WhereIF(input.AreaId > 0, u => u.AreaId == input.AreaId)
                               .WhereIF(!string.IsNullOrWhiteSpace(input.Title), u => u.Title.Contains(input.Title.Trim()))
-                              .Where(u => u.AppId == appId)
                               .Select<TenantGameAnnouncementEntityResponse>()
             ;
 
@@ -52,17 +46,16 @@ public class TenantGameAnnouncementEntityService : GenericCrudService<Entity.Ten
     }
 
     /// <summary>
-    /// 新增前：AppId 必填且必须属于当前租户（运营内容，禁止 AppId=0），并标准化多语言字段。
+    /// 新增前标准化多语言字段。
     /// </summary>
-    protected override async Task OnAddingAsync(AddTenantGameAnnouncementEntityRequest input)
+    protected override Task OnAddingAsync(AddTenantGameAnnouncementEntityRequest input)
     {
-        AppScopeRules.EnsureFactAppId(input.AppId, "游戏公告");
-        await _gameAppRepository.ValidateGameAppBelongsToTenantAsync(input.AppId);
         NormalizeInput(input);
+        return Task.CompletedTask;
     }
 
     /// <summary>
-    /// 更新前：AppId 不可变（从既有实体回填）并校验应用归属，并标准化多语言字段。
+    /// 更新前校验记录存在并标准化多语言字段。
     /// </summary>
     protected override async Task OnUpdatingAsync(UpdateTenantGameAnnouncementEntityRequest input)
     {
@@ -72,9 +65,6 @@ public class TenantGameAnnouncementEntityService : GenericCrudService<Entity.Ten
             throw BusinessError.Oh(CommonErrorCode.RecordNotFound);
         }
 
-        input.AppId = existing.AppId;
-        AppScopeRules.EnsureFactAppId(input.AppId, "游戏公告");
-        await _gameAppRepository.ValidateGameAppBelongsToTenantAsync(input.AppId);
         NormalizeInput(input);
     }
 
@@ -100,7 +90,6 @@ public class TenantGameAnnouncementEntityService : GenericCrudService<Entity.Ten
         {
             Source = LiveOpsSourceKind.Announcement,
             BusinessKey = input.BusinessKey,
-            AppId = input.AppId,
             ServerId = input.ServerId,
             SegmentId = input.SegmentId,
             Reason = input.Reason,

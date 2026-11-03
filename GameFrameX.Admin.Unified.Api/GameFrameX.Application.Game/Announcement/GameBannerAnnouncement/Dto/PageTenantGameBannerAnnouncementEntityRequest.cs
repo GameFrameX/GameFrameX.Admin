@@ -6,11 +6,6 @@ namespace GameFrameX.Application.Game.Announcement.GameBannerAnnouncement.Dto;
 public class PageTenantGameBannerAnnouncementEntityRequest : BaseAreaPageRequest
 {
     /// <summary>
-    /// 应用Id
-    /// </summary>
-    public long? AppId { get; set; }
-
-    /// <summary>
     /// 内容
     /// </summary>
     public string Content { get; set; } = null!;

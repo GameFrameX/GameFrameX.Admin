@@ -21,11 +21,6 @@ public class TenantGameMailTemplateCategoryEntityResponse : IBasePageResponse<En
     public string Description { get; set; } = null!;
 
     /// <summary>
-    /// 应用Id。应用内容作用域（TenantId + AppId），必须 &gt; 0。
-    /// </summary>
-    public long AppId { get; set; }
-
-    /// <summary>
     /// 图标
     /// </summary>
     public string Icon { get; set; } = null!;

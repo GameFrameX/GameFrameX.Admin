@@ -6,12 +6,6 @@ namespace GameFrameX.Application.Game.Announcement.GameBannerAnnouncement.Dto;
 public abstract class TenantGameBannerAnnouncementEntityBaseRequest : BaseUpdateRequest
 {
     /// <summary>
-    /// 应用Id。运营内容应用作用域，必须 > 0。
-    /// </summary>
-    [Required(ErrorMessage = "应用Id不能为空")]
-    public long AppId { get; set; }
-
-    /// <summary>
     /// 区服ID
     /// </summary>
     [Required(ErrorMessage = "区服ID不能为空")]

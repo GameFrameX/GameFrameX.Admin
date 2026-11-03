@@ -1,6 +1,5 @@
 using GameFrameX.Application.Game.Job;
 using GameFrameX.Application.Game.ServerManager;
-using GameFrameX.Application.Game.App.AppScope;
 using GameFrameX.Application.Game.Mail.GameMail.Dto;
 using GameFrameX.Entity.Enum;
 using GameFrameX.Foundation.Http.Extension;
@@ -21,7 +20,6 @@ public class TenantGameMailEntityService
 {
     private ScheduledTaskHostedService SendEmailJob { get; }
     private readonly SqlSugarRepository<Entity.Tenant.Game.TenantGameAreaEntity> _gameAreaEntityRepository;
-    private readonly SqlSugarRepository<Entity.Tenant.Game.TenantGameAppEntity> _gameAppRepository;
     private readonly HttpClient _httpClientFactory;
 
     /// <summary>
@@ -29,21 +27,18 @@ public class TenantGameMailEntityService
     /// </summary>
     /// <param name="repository"></param>
     /// <param name="systemTenantGameAreaEntity"></param>
-    /// <param name="gameAppRepository"></param>
     /// <param name="httpClientFactory"></param>
     /// <param name="sendEmailJob"></param>
-    public TenantGameMailEntityService(SqlSugarRepository<Entity.Tenant.Game.TenantGameMailEntity> repository, SqlSugarRepository<Entity.Tenant.Game.TenantGameAreaEntity> systemTenantGameAreaEntity, SqlSugarRepository<Entity.Tenant.Game.TenantGameAppEntity> gameAppRepository, HttpClient httpClientFactory, ScheduledTaskHostedService sendEmailJob)
+    public TenantGameMailEntityService(SqlSugarRepository<Entity.Tenant.Game.TenantGameMailEntity> repository, SqlSugarRepository<Entity.Tenant.Game.TenantGameAreaEntity> systemTenantGameAreaEntity, HttpClient httpClientFactory, ScheduledTaskHostedService sendEmailJob)
         : base(repository)
     {
         _httpClientFactory = httpClientFactory;
         _gameAreaEntityRepository = systemTenantGameAreaEntity;
-        _gameAppRepository = gameAppRepository;
         SendEmailJob = sendEmailJob;
     }
 
     protected override ISugarQueryable<TenantGameMailEntityResponse> BuildPageQuery(PageTenantGameMailEntityRequest input)
     {
-        var appId = AppScopeRules.EnsureFactAppId(input.AppId, "游戏邮件");
         return Repository.AsQueryable()
                          .WhereIF(!string.IsNullOrWhiteSpace(input.SearchKey), u =>
                                       u.Title.Contains(input.SearchKey.Trim()))
@@ -51,17 +46,14 @@ public class TenantGameMailEntityService
                          .WhereIF(input.IsAllPost.HasValue, u => u.IsAllPost == input.IsAllPost.Value)
                          .WhereIF(input.Status.HasValue, u => u.Status == input.Status.Value)
                          .WhereIF(input.MailType.HasValue, u => u.MailType == input.MailType.Value)
-                         .Where(u => u.AppId == appId)
                          .Select<TenantGameMailEntityResponse>();
     }
 
     /// <summary>
-    /// 新增前：保留既有附件道具解析，并校验 AppId 必填且必须属于当前租户（事实数据，禁止 AppId=0）。
+    /// 新增前校验角色并解析附件道具。
     /// </summary>
     protected override async Task OnAddingAsync(AddTenantGameMailEntityRequest input)
     {
-        AppScopeRules.EnsureFactAppId(input.AppId, "游戏邮件");
-        await _gameAppRepository.ValidateGameAppBelongsToTenantAsync(input.AppId);
 
         if (!input.IsAllPost)
         {
@@ -101,7 +93,7 @@ public class TenantGameMailEntityService
     }
 
     /// <summary>
-    /// 更新前：AppId 不可变（从既有实体回填，禁止邮件跨应用迁移）并校验应用归属。
+    /// 更新前校验记录存在。
     /// </summary>
     protected override async Task OnUpdatingAsync(UpdateTenantGameMailEntityRequest input)
     {
@@ -110,9 +102,6 @@ public class TenantGameMailEntityService
         {
             throw BusinessError.Oh(CommonErrorCode.RecordNotFound);
         }
-
-        input.AppId = existing.AppId;
-        await _gameAppRepository.ValidateGameAppBelongsToTenantAsync(input.AppId);
     }
 
     /// <summary>

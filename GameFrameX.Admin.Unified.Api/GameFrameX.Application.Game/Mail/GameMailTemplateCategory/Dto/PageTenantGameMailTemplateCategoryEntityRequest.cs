@@ -6,11 +6,6 @@ namespace GameFrameX.Application.Game.Mail.GameMailTemplateCategory.Dto;
 public class PageTenantGameMailTemplateCategoryEntityRequest : BasePageRequest
 {
     /// <summary>
-    /// 应用Id
-    /// </summary>
-    public long? AppId { get; set; }
-
-    /// <summary>
     /// 名称
     /// </summary>
     public string Name { get; set; } = null!;

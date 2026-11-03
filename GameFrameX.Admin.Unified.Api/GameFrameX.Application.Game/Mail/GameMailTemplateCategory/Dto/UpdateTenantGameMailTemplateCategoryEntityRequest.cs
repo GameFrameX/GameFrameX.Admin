@@ -6,12 +6,6 @@ namespace GameFrameX.Application.Game.Mail.GameMailTemplateCategory.Dto;
 public class UpdateTenantGameMailTemplateCategoryEntityRequest : BaseUpdateRequest
 {
     /// <summary>
-    /// 应用Id。不可变，更新时由服务端从既有实体回填。
-    /// </summary>
-    [Required(ErrorMessage = "应用Id不能为空")]
-    public long AppId { get; set; }
-
-    /// <summary>
     /// 名称
     /// </summary>
     [Required(ErrorMessage = "名称不能为空")]

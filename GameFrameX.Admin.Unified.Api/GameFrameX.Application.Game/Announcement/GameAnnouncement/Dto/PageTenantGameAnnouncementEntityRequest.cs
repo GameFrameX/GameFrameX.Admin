@@ -6,11 +6,6 @@ namespace GameFrameX.Application.Game.Announcement.GameAnnouncement.Dto;
 public class PageTenantGameAnnouncementEntityRequest : BaseAreaPageRequest
 {
     /// <summary>
-    /// 应用Id
-    /// </summary>
-    public long? AppId { get; set; }
-
-    /// <summary>
     /// 语言
     /// </summary>
     public string Language { get; set; } = null!;

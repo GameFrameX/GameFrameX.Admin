@@ -13,11 +13,6 @@ public class TenantGameMailEntityResponse : IBasePageResponse<Entity.Tenant.Game
     public long Id { get; set; }
 
     /// <summary>
-    /// 应用Id。事实数据应用作用域（TenantId + AppId），必须 &gt; 0。
-    /// </summary>
-    public long AppId { get; set; }
-
-    /// <summary>
     /// 区服ID
     /// </summary>
     public long AreaId { get; set; }

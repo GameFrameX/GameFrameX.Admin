@@ -5,12 +5,6 @@ namespace GameFrameX.Application.Game.Announcement.GameAnnouncement.Dto;
 /// </summary>
 public class TenantGameAnnouncementEntityBaseRequest : BaseAddRequest, ITenantGameAnnouncementEntityRequest
 {
-    /// <summary>
-    /// 应用Id。运营内容应用作用域，必须 &gt; 0。
-    /// </summary>
-    [Required(ErrorMessage = "应用Id不能为空")]
-    public long AppId { get; set; }
-
     /// <inheritdoc />
     public string Language { get; set; } = null!;
 

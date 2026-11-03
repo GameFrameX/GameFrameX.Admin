@@ -6,7 +6,6 @@
 
 using System.ComponentModel;
 using GameFrameX.Application.Game.ServerManager.Mail;
-using GameFrameX.Application.Game.App.AppScope;
 using GameFrameX.Application.Game.Mail.GameMailCampaign.Dto;
 using GameFrameX.Application.Game.Online.LiveOps.Dispatch;
 using GameFrameX.Application.Game.Online.LiveOps.Dispatch.Dto;
@@ -29,7 +28,6 @@ public class TenantGameMailCampaignEntityService
         AddTenantGameMailCampaignEntityRequest, UpdateTenantGameMailCampaignEntityRequest,
         TenantGameMailCampaignEntityResponse, PageTenantGameMailCampaignEntityRequest>
 {
-    private readonly SqlSugarRepository<Entity.Tenant.Game.TenantGameAppEntity> _gameAppRepository;
     private readonly SqlSugarRepository<Entity.Tenant.Game.TenantGameAreaEntity> _gameAreaRepository;
     private readonly IMailCampaignServerClient _serverClient;
     private readonly IOnlineLiveOpsDispatchService _dispatchService;
@@ -39,20 +37,17 @@ public class TenantGameMailCampaignEntityService
     ///
     /// </summary>
     /// <param name="repository"></param>
-    /// <param name="gameAppRepository"></param>
     /// <param name="gameAreaRepository"></param>
     /// <param name="serverClient"></param>
     /// <param name="dispatchService"></param>
     /// <param name="currentUserContext"></param>
     public TenantGameMailCampaignEntityService(SqlSugarRepository<TenantGameMailCampaignEntity> repository,
-        SqlSugarRepository<Entity.Tenant.Game.TenantGameAppEntity> gameAppRepository,
         SqlSugarRepository<Entity.Tenant.Game.TenantGameAreaEntity> gameAreaRepository,
         IMailCampaignServerClient serverClient,
         IOnlineLiveOpsDispatchService dispatchService,
         CurrentUserContext currentUserContext)
         : base(repository)
     {
-        _gameAppRepository = gameAppRepository;
         _gameAreaRepository = gameAreaRepository;
         _serverClient = serverClient;
         _dispatchService = dispatchService;
@@ -60,13 +55,11 @@ public class TenantGameMailCampaignEntityService
     }
 
     /// <summary>
-    /// 分页查询：按 AppId / Name / MailType / PublishStatus / TemplateId / ServerCampaignId / AreaId 过滤。
+    /// 分页查询：按 Name / MailType / PublishStatus / TemplateId / ServerCampaignId / AreaId 过滤。
     /// </summary>
     protected override ISugarQueryable<TenantGameMailCampaignEntityResponse> BuildPageQuery(PageTenantGameMailCampaignEntityRequest input)
     {
-        var appId = AppScopeRules.EnsureFactAppId(input.AppId, "运营邮件Campaign");
         return Repository.AsQueryable()
-                         .Where(u => u.AppId == appId)
                          .WhereIF(input.AreaId.HasValue, u => u.AreaId == input.AreaId.Value)
                          .WhereIF(!string.IsNullOrWhiteSpace(input.Name), u => u.Name.Contains(input.Name.Trim()))
                          .WhereIF(input.MailType.HasValue, u => u.MailType == input.MailType.Value)
@@ -77,17 +70,16 @@ public class TenantGameMailCampaignEntityService
     }
 
     /// <summary>
-    /// 新增前：应用作用域 EnsureFactAppId（事实数据，AppId&gt;0）+ 校验应用归属当前租户 + 内容校验（多语言标题至少 1 项、附件数量&gt;0）。
+    /// 新增前校验内容（多语言标题至少 1 项、附件数量&gt;0）。
     /// </summary>
-    protected override async Task OnAddingAsync(AddTenantGameMailCampaignEntityRequest input)
+    protected override Task OnAddingAsync(AddTenantGameMailCampaignEntityRequest input)
     {
-        AppScopeRules.EnsureFactAppId(input.AppId, "运营邮件Campaign");
-        await _gameAppRepository.ValidateGameAppBelongsToTenantAsync(input.AppId);
         ValidateDraftContent(input.TitlesJson, input.AttachmentsJson);
+        return Task.CompletedTask;
     }
 
     /// <summary>
-    /// 更新前：仅 Draft 可编辑（Published/Revoked 主体不可变 B1）；AppId/AreaId 从既有实体回填不可变。
+    /// 更新前：仅 Draft 可编辑（Published/Revoked 主体不可变 B1）；AreaId 从既有实体回填不可变。
     /// </summary>
     protected override async Task OnUpdatingAsync(UpdateTenantGameMailCampaignEntityRequest input)
     {
@@ -102,13 +94,11 @@ public class TenantGameMailCampaignEntityService
             throw BusinessError.Oh(MailCampaignErrorCode.AlreadyPublishedOrRevoked);
         }
 
-        input.AppId = existing.AppId;
         input.AreaId = existing.AreaId;
         // 状态机字段回填：编辑只改内容，发布状态/最近服务端结果保持原值
         input.PublishStatus = existing.PublishStatus;
         input.LastServerCode = existing.LastServerCode;
         input.LastServerMessage = existing.LastServerMessage;
-        await _gameAppRepository.ValidateGameAppBelongsToTenantAsync(input.AppId);
         ValidateDraftContent(input.TitlesJson, input.AttachmentsJson);
     }
 
@@ -282,7 +272,6 @@ public class TenantGameMailCampaignEntityService
         {
             Source = LiveOpsSourceKind.MailCampaign,
             BusinessKey = input.BusinessKey,
-            AppId = input.AppId,
             ServerId = input.ServerId,
             SegmentId = input.SegmentId,
             Reason = input.Reason,
