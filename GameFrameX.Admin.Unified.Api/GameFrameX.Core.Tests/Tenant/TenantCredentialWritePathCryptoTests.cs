@@ -29,7 +29,7 @@ public sealed class TenantCredentialWritePathCryptoTests : IDisposable
     {
         _originalKey = Environment.GetEnvironmentVariable(TenantSecretCrypto.KeyEnvironmentVariable);
         Environment.SetEnvironmentVariable(TenantSecretCrypto.KeyEnvironmentVariable, "unit-test-secret-key");
-        _db.InitTenantTables(typeof(TenantAppSignatureKeyEntity), typeof(TenantEmailConfigEntity), typeof(TenantAdvertisementCallbackConfigEntity));
+        _db.InitTenantTables(typeof(TenantAppSignatureKeyEntity), typeof(TenantAdvertisementCallbackConfigEntity));
     }
 
     public void Dispose()
