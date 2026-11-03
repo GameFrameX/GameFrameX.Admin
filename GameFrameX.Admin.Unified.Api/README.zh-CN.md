@@ -143,12 +143,12 @@ GameFrameX.Admin.Unified.Api/
 ├── GameFrameX.Core.Utility/       # 工具类
 ├── GameFrameX.Core.BaseInputOutput/ # 基础输入输出模型
 ├── Payment/                       # 支付集成（仅 Client API 引用）
-│   ├── GameFrameX.Pay.Abstract/          # 支付抽象接口（先定义后实现）
-│   ├── GameFrameX.Pay.AliPay/            # 支付宝
-│   ├── GameFrameX.Pay.Apple/             # Apple IAP（内购验证）
-│   ├── GameFrameX.Pay.Apple.AppStoreServer/  # App Store Server API v2
-│   ├── GameFrameX.Pay.Google/            # Google Play
-│   └── GameFrameX.Pay.Xsolla/            # Xsolla
+│   ├── GameFrameX.Payment.Abstract/          # 支付抽象接口（先定义后实现）
+│   ├── GameFrameX.Payment.AliPay/            # 支付宝
+│   ├── GameFrameX.Payment.Apple/             # Apple IAP（内购验证）
+│   ├── GameFrameX.Payment.Apple.AppStoreServer/  # App Store Server API v2
+│   ├── GameFrameX.Payment.Google/            # Google Play
+│   └── GameFrameX.Payment.Xsolla/            # Xsolla
 ├── Dockerfile.web-api             # Admin API 的 Dockerfile（sdk:10.0 → aspnet:10.0）
 ├── Dockerfile.client-api          # Client API 的 Dockerfile
 ├── Dockerfile.hub-api             # Hub API 的 Dockerfile
@@ -386,8 +386,9 @@ Hub API（`GameFrameX.Hub.Api`，端口 `20806`）是给**外部系统**用的�
 
 | 调用方 | 干啥 | 对应 Controller |
 |--------|------|-----------------|
-| 游戏端 / 运营工具 | 拉区服、查资源版本 | `GameAreaController` / `GameAssetPackageVersionController` |
+| 游戏服务器 / 运营工具 | 容器编排、资源版本回写 | `GameAreaController` / `GameAssetPackageVersionController` |
 | CI / 打包机 | 打包完成后回写资源版本 / 整包版本 | `PackageBuildReportController` |
+| 游戏服务器 | 功能开关同步 | `FeatureSwitchSyncController` |
 | 第三方平台 | Hub 当前无编译中的 WebHook；已退役的 Tapd 示例位于 `../samples/` | - |
 
 它有几个和别人不一样的地方，写代码前一定要知道：
@@ -404,9 +405,9 @@ Hub API（`GameFrameX.Hub.Api`，端口 `20806`）是给**外部系统**用的�
 
 | 场景 | 怎么鉴权 | 租户怎么来 | 示例 |
 |------|----------|-----------|------|
-| 登录用户 | JWT（`BaseController` 默认 `[Authorize]`） | 从 JWT 解析 | 区服 / 资源查询 |
+| 登录用户 | JWT（各控制器显式声明 `[Authorize]`） | 从 JWT 解析 | 容器编排 / 资源版本回写 |
 | 匿名 WebHook | - | - | 当前宿主无编译中的 WebHook |
-| 机器对机器 | `[AllowAnonymous]` + `TenantGameAppOpenAccessAuthMiddleware` | 凭证绑定的 App | `PackageBuildReportController`（打包上报） |
+| 机器对机器 | `[AllowAnonymous]` + `TenantGameAppOpenAccessAuthMiddleware` | 凭证绑定的 App | `PackageBuildReportController` / `FeatureSwitchSyncController` |
 
 机器凭证那套校验的是 AccessKey + 签名 + scope，**不是 JWT**，所以 Controller 标 `[AllowAnonymous]` 跳过 JWT，由专用中间件接管。
 
@@ -424,7 +425,7 @@ OptimisticConcurrencyMiddleware
   → CORS
   → Authentication → Authorization
   → HubTenantMiddleware（/health 除外；写租户 Id；拒绝超管）
-  → TenantGameAppOpenAccessAuthMiddleware（仅 /api/PackageBuildReport）
+  → TenantGameAppOpenAccessAuthMiddleware（/api/PackageBuildReport / /api/FeatureSwitchSync）
   → HealthChecks / MapControllers
 ```
 
@@ -435,11 +436,6 @@ Admin API 的独立 JSON 配置都在 `GameFrameX.Application/Configuration/`，
 | 文件 | 管什么 |
 |------|--------|
 | `Database.json` | 数据库连接、Code-First 开关、种子数据开关 |
-| `Swagger.json` | Swagger / Knife4j UI 配置 |
-| `SMS.json` | 短信服务配置 |
-| `Upload.json` | 文件上传、OSS 配置 |
-| `Wechat.json` | 微信公众号 / 小程序配置 |
-| `Enum.json` | 枚举扫描程序集 |
 
 有两个"已经搬家"的配置要留意，别再到处找它们了：
 
@@ -459,7 +455,7 @@ Admin API 的独立 JSON 配置都在 `GameFrameX.Application/Configuration/`，
 
 | 功能 | 服务类 | 干啥的 |
 |------|--------|--------|
-| 认证登录 | `SystemAuthService` | 账号密码、手机验证码登录，签发 JWT + 自动续签，验证码 |
+| 认证登录 | `SystemAuthService` | 账号密码登录，签发 JWT + 自动续签，验证码 |
 | 用户管理 | `SystemUserService` | 用户增删改查、密码重置、用户-角色绑定（注意：这个服务实际管的是 `TenantUser`，命名有点误导） |
 | 角色管理 | `TenantRoleService` | 角色 CRUD、数据范围控制、角色-菜单权限绑定 |
 | 菜单权限 | `GlobalMenuService` | 树形菜单、按钮级权限解析、路由与 API 映射 |
@@ -531,9 +527,10 @@ Admin API 的独立 JSON 配置都在 `GameFrameX.Application/Configuration/`，
 
 | 接口 | Controller | 鉴权 | 干啥 |
 |------|-----------|------|------|
-| 区服查询 | `GameAreaController` | JWT | 给游戏端拉区服列表 |
-| 资源包版本 | `GameAssetPackageVersionController` | JWT | 查资源版本、带乐观锁更新 |
+| 容器编排 | `GameAreaController` | JWT | 区服容器开服 / 停服 / 移除、登记服务器版本 |
+| 资源版本回写 | `GameAssetPackageVersionController` | JWT | 带乐观锁更新资源版本 |
 | 打包上报 | `PackageBuildReportController` | 机器凭证 | CI / 打包机回写资源版本 / 整包版本（幂等 upsert） |
+| 功能开关同步 | `FeatureSwitchSyncController` | 机器凭证 | 向游戏服务器同步功能开关 |
 
 ### 支付集成
 
@@ -541,11 +538,11 @@ Admin API 的独立 JSON 配置都在 `GameFrameX.Application/Configuration/`，
 
 | 渠道 | 项目 |
 |------|------|
-| 支付宝 | `GameFrameX.Pay.AliPay` |
-| Apple IAP | `GameFrameX.Pay.Apple`（内购收据验证） |
-| App Store Server | `GameFrameX.Pay.Apple.AppStoreServer`（API v2 通知处理） |
-| Google Play | `GameFrameX.Pay.Google` |
-| Xsolla | `GameFrameX.Pay.Xsolla` |
+| 支付宝 | `GameFrameX.Payment.AliPay` |
+| Apple IAP | `GameFrameX.Payment.Apple`（内购收据验证） |
+| App Store Server | `GameFrameX.Payment.Apple.AppStoreServer`（API v2 通知处理） |
+| Google Play | `GameFrameX.Payment.Google` |
+| Xsolla | `GameFrameX.Payment.Xsolla` |
 
 ---
 

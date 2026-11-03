@@ -143,12 +143,12 @@ GameFrameX.Admin.Unified.Api/
 ├── GameFrameX.Core.Utility/       # Utility classes
 ├── GameFrameX.Core.BaseInputOutput/ # Base input/output models
 ├── Payment/                       # Payment integrations (referenced only by Client API)
-│   ├── GameFrameX.Pay.Abstract/          # Payment abstractions (define first, implement after)
-│   ├── GameFrameX.Pay.AliPay/            # Alipay
-│   ├── GameFrameX.Pay.Apple/             # Apple IAP (in-app purchase verification)
-│   ├── GameFrameX.Pay.Apple.AppStoreServer/  # App Store Server API v2
-│   ├── GameFrameX.Pay.Google/            # Google Play
-│   └── GameFrameX.Pay.Xsolla/            # Xsolla
+│   ├── GameFrameX.Payment.Abstract/          # Payment abstractions (define first, implement after)
+│   ├── GameFrameX.Payment.AliPay/            # Alipay
+│   ├── GameFrameX.Payment.Apple/             # Apple IAP (in-app purchase verification)
+│   ├── GameFrameX.Payment.Apple.AppStoreServer/  # App Store Server API v2
+│   ├── GameFrameX.Payment.Google/            # Google Play
+│   └── GameFrameX.Payment.Xsolla/            # Xsolla
 ├── Dockerfile.web-api             # Admin API Dockerfile (sdk:10.0 → aspnet:10.0)
 ├── Dockerfile.client-api          # Client API Dockerfile
 ├── Dockerfile.hub-api             # Hub API Dockerfile
@@ -386,8 +386,9 @@ Hub API (`GameFrameX.Hub.Api`, port `20806`) is the aggregate API for **external
 
 | Caller | What They Do | Controller |
 |--------|------|-----------------|
-| Game servers / ops tools | Fetch zones and query asset versions | `GameAreaController` / `GameAssetPackageVersionController` |
+| Game servers / ops tools | Container orchestration and asset-version writeback | `GameAreaController` / `GameAssetPackageVersionController` |
 | CI / build machines | Write back asset versions / full-package versions after a build | `PackageBuildReportController` |
+| Game servers | Synchronize feature switches | `FeatureSwitchSyncController` |
 | Third-party platforms | No compiled Hub webhook endpoint; the retired Tapd sample is under `../samples/` | - |
 
 It has a few things that differ from the others — know these before writing code:
@@ -404,9 +405,9 @@ This is the iron law of Hub.Api. Controllers inject repositories in their constr
 
 | Scenario | How Auth Works | Where Tenant Comes From | Example |
 |------|----------|-----------|------|
-| Logged-in user | JWT (`BaseController` defaults to `[Authorize]`) | Parsed from JWT | Zone / asset queries |
+| Logged-in user | JWT (`[Authorize]` declared on each controller) | Parsed from JWT | Container orchestration / asset-version writeback |
 | Anonymous WebHook | - | - | None compiled in this host |
-| Machine to machine | `[AllowAnonymous]` + `TenantGameAppOpenAccessAuthMiddleware` | The credential's bound App | `PackageBuildReportController` (build reporting) |
+| Machine to machine | `[AllowAnonymous]` + `TenantGameAppOpenAccessAuthMiddleware` | The credential's bound App | `PackageBuildReportController` / `FeatureSwitchSyncController` |
 
 The machine-credential path validates AccessKey + signature + scope, **not JWT**, so the Controller is marked `[AllowAnonymous]` to skip JWT and a dedicated middleware takes over.
 
@@ -424,7 +425,7 @@ OptimisticConcurrencyMiddleware
   → CORS
   → Authentication → Authorization
   → HubTenantMiddleware (except /health; writes tenant Id; rejects super admin)
-  → TenantGameAppOpenAccessAuthMiddleware (only /api/PackageBuildReport)
+  → TenantGameAppOpenAccessAuthMiddleware (/api/PackageBuildReport / /api/FeatureSwitchSync)
   → HealthChecks / MapControllers
 ```
 
@@ -435,11 +436,6 @@ Admin API's standalone JSON configs all live in `GameFrameX.Application/Configur
 | File | What It Governs |
 |------|--------|
 | `Database.json` | Database connections, Code-First switches, seed data switch |
-| `Swagger.json` | Swagger / Knife4j UI configuration |
-| `SMS.json` | SMS service configuration |
-| `Upload.json` | File upload, OSS configuration |
-| `Wechat.json` | WeChat official account / mini program configuration |
-| `Enum.json` | Enum scanning assemblies |
 
 Two configs "have already moved" — stop hunting for them:
 
@@ -459,7 +455,7 @@ A complete back-office management module built on the in-house dynamic API routi
 
 | Feature | Service Class | What It Does |
 |------|--------|--------|
-| Auth login | `SystemAuthService` | Account/password and SMS-code login, JWT issuance + auto renewal, captcha |
+| Auth login | `SystemAuthService` | Account/password login, JWT issuance + auto renewal, captcha |
 | User management | `SystemUserService` | User CRUD, password reset, user-role binding (note: this service actually manages `TenantUser`; the naming is a bit misleading) |
 | Role management | `TenantRoleService` | Role CRUD, data-scope control, role-menu permission binding |
 | Menu permissions | `GlobalMenuService` | Tree menus, button-level permission resolution, route-to-API mapping |
@@ -531,9 +527,10 @@ These are traditional Controllers running on Hub API (20806); they **do not use 
 
 | Endpoint | Controller | Auth | What It Does |
 |------|-----------|------|------|
-| Zone queries | `GameAreaController` | JWT | Lets game servers pull zone lists |
-| Asset package versions | `GameAssetPackageVersionController` | JWT | Query asset versions, update with optimistic lock |
+| Container orchestration | `GameAreaController` | JWT | Start / stop / remove zone containers and register server versions |
+| Asset-version writeback | `GameAssetPackageVersionController` | JWT | Update asset versions with optimistic locking |
 | Build reporting | `PackageBuildReportController` | Machine credentials | CI / build machines write back asset versions / full-package versions (idempotent upsert) |
+| Feature-switch synchronization | `FeatureSwitchSyncController` | Machine credentials | Synchronize feature switches to game servers |
 
 ### Payment Integration
 
@@ -541,11 +538,11 @@ Used only by Client API. An abstraction layer plus multiple channel implementati
 
 | Channel | Project |
 |------|------|
-| Alipay | `GameFrameX.Pay.AliPay` |
-| Apple IAP | `GameFrameX.Pay.Apple` (in-app purchase receipt verification) |
-| App Store Server | `GameFrameX.Pay.Apple.AppStoreServer` (API v2 notification handling) |
-| Google Play | `GameFrameX.Pay.Google` |
-| Xsolla | `GameFrameX.Pay.Xsolla` |
+| Alipay | `GameFrameX.Payment.AliPay` |
+| Apple IAP | `GameFrameX.Payment.Apple` (in-app purchase receipt verification) |
+| App Store Server | `GameFrameX.Payment.Apple.AppStoreServer` (API v2 notification handling) |
+| Google Play | `GameFrameX.Payment.Google` |
+| Xsolla | `GameFrameX.Payment.Xsolla` |
 
 ---
 
