@@ -141,7 +141,7 @@ public class GameWebShopController : BaseController<TenantGameWebShopEntity>
             var notifyUrl = BuildWebShopNotifyUrl(systemConfigParams.NotifyUrl, role.IsSandbox ?? false);
             if (string.IsNullOrWhiteSpace(notifyUrl))
             {
-                return GameApiResult.Error<TenantGameWebShopEntityBuyResponse>(AreaErrorCode.AreaCannotBuy, "回调地址缺少租户或应用上下文");
+                return GameApiResult.Error<TenantGameWebShopEntityBuyResponse>(AreaErrorCode.AreaCannotBuy, "无法构造完整支付回调路由，请完成回调路由升级后重试");
             }
 
             postParams["notify_url"] = notifyUrl;
@@ -502,19 +502,8 @@ public class GameWebShopController : BaseController<TenantGameWebShopEntity>
 
     private string? BuildWebShopNotifyUrl(string notifyUrl, bool isSandbox)
     {
-        if (!TryGetContextLong(TenantContextAccessor.TenantIdKey, out var tenantId) ||
-            !TryGetContextLong(AppResolutionMiddleware.AppIdKey, out var appId))
-        {
-            return null;
-        }
-
-        var routeContext = new PublicCallbackRouteContext(
-            tenantId,
-            appId,
-            "webshop",
-            "payment",
-            TryGetContextLong(PaymentOptionSettingProvider.PackageIdKey, out var packageId) ? packageId : null);
-        return PublicCallbackRouteResolver.AppendRouteParameters(notifyUrl, routeContext);
+        // S3/C401 断链修复点：预下单必须有完整回调路由，不能提交裸基础 URL。
+        return null;
     }
 
     private bool TryGetContextLong(string key, out long value)

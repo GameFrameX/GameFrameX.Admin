@@ -138,7 +138,16 @@ public partial class GameOrderController : BaseController<TenantGameOrderEntity>
         }
 
         // 获取支付配置
-        var optionSetting = _paymentChannelFactory.GetOptionSetting(input.PayChannel);
+        IPaymentOptionSetting optionSetting;
+        try
+        {
+            optionSetting = _paymentChannelFactory.GetOptionSetting(input.PayChannel);
+        }
+        catch (InvalidOperationException exception)
+        {
+            // S3/C401 断链修复点：把回调路由不完整的拒单原因返回给客户端。
+            return GameApiResult.Error<AddTenantGameOrderEntityResponse>(PaymentErrorCode.PayChannelNotSupported, exception.Message);
+        }
         if (optionSetting == null)
         {
             return GameApiResult.Error<AddTenantGameOrderEntityResponse>(PaymentErrorCode.PayChannelNotSupported, "支付渠道配置未找到");

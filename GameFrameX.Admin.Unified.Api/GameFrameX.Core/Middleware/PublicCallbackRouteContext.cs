@@ -2,11 +2,9 @@ namespace GameFrameX.Core.Middleware;
 
 /// <summary>
 /// 公开 provider 回调路由上下文。
-/// <para>这些字段只用于在控制器构造前定位租户库和读取 provider 验签配置，不代表业务授权；订单、广告发放等业务动作仍必须通过 provider 签名或 JWT 校验。</para>
+/// <para>这些字段只标记 provider 与分包，不代表业务授权；业务动作仍必须通过 provider 签名或 JWT 校验。</para>
 /// </summary>
 public sealed record PublicCallbackRouteContext(
-    long TenantId,
-    long AppId,
     string Provider,
     string CallbackKind,
     long? PackageId)

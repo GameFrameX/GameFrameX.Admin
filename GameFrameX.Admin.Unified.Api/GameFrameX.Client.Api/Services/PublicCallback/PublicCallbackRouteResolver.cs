@@ -5,19 +5,14 @@ namespace GameFrameX.Client.Api.Services.PublicCallback;
 
 /// <summary>
 /// 公开 provider 回调 URL 路由参数解析与校验服务。
-/// <para>URL 中只放租户、应用和可选分包；provider 与回调类型由命中的 action 确定。服务不会把这些参数视为支付成功或广告发放授权。</para>
+/// <para>旧 URL 的租户与应用段仅保留参数绑定；provider 与回调类型由 action 确定，配置始终读取主库。</para>
 /// </summary>
 public sealed class PublicCallbackRouteResolver
 {
     private readonly ISqlSugarClient _db;
-    private readonly ISqlSugarClient _tenantDbProvider;
-    private readonly AppCacheService _appCacheService;
-
-    public PublicCallbackRouteResolver(ISqlSugarClient db, ISqlSugarClient tenantDbProvider, AppCacheService appCacheService)
+    public PublicCallbackRouteResolver(ISqlSugarClient db)
     {
         _db = db;
-        _tenantDbProvider = tenantDbProvider;
-        _appCacheService = appCacheService;
     }
 
     /// <summary>
@@ -39,12 +34,12 @@ public sealed class PublicCallbackRouteResolver
             return PublicCallbackRouteResolveResponse.NotPublicCallback();
         }
 
-        if (!TryReadPositiveLong(context, "tenantId", out var tenantId))
+        if (!TryReadPositiveLong(context, "tenantId", out _))
         {
             return PublicCallbackRouteResolveResponse.Fail("缺少或非法的 tenantId");
         }
 
-        if (!TryReadPositiveLong(context, "appId", out var appId))
+        if (!TryReadPositiveLong(context, "appId", out _))
         {
             return PublicCallbackRouteResolveResponse.Fail("缺少或非法的 appId");
         }
@@ -60,69 +55,22 @@ public sealed class PublicCallbackRouteResolver
             packageId = parsedPackageId;
         }
 
-        var tenant = _db.Queryable<SystemTenantEntity>()
-                        .Filter(null, true)
-                        .First(u => u.Id == tenantId);
-        if (tenant == null || tenant.IsEnabled == false || string.IsNullOrWhiteSpace(tenant.Connection))
+        // S3/C401 断链修复点：旧 URL 段不再选择数据库或安全配置。
+        if (packageId.HasValue && !PackageMatches(packageId.Value))
         {
-            return PublicCallbackRouteResolveResponse.Fail("租户不存在、未启用或缺少连接配置");
-        }
-
-        context.Items[TenantContextAccessor.TenantIdKey] = tenantId;
-        if (!_appCacheService.TryGetApp(appId, out var app) ||
-            app.TenantId != tenantId ||
-            app.IsEnabled == false)
-        {
-            context.Items.Remove(TenantContextAccessor.TenantIdKey);
-            return PublicCallbackRouteResolveResponse.Fail("应用不存在、未启用或不属于当前租户");
-        }
-
-        if (packageId.HasValue && !PackageMatches(tenantId, appId, packageId.Value))
-        {
-            context.Items.Remove(TenantContextAccessor.TenantIdKey);
-            return PublicCallbackRouteResolveResponse.Fail("分包不存在、未启用或不属于当前应用");
+            return PublicCallbackRouteResolveResponse.Fail("分包不存在或未启用");
         }
 
         return PublicCallbackRouteResolveResponse.Success(new PublicCallbackRouteContext(
-                                                            tenantId,
-                                                            appId,
                                                             endpoint.Provider,
                                                             endpoint.CallbackKind,
                                                             packageId));
     }
 
-    /// <summary>
-    /// 生成带公开回调路由参数的 URL。
-    /// </summary>
-    public static string AppendRouteParameters(string url, PublicCallbackRouteContext routeContext)
+    private bool PackageMatches(long packageId)
     {
-        if (string.IsNullOrWhiteSpace(url))
-        {
-            return url;
-        }
-
-        var queryIndex = url.IndexOf('?');
-        var baseUrl = queryIndex >= 0 ? url[..queryIndex] : url;
-        var query = queryIndex >= 0 ? url[queryIndex..] : string.Empty;
-        var routeUrl = $"{baseUrl.TrimEnd('/')}" +
-                       $"/{Uri.EscapeDataString(routeContext.TenantId.ToString())}" +
-                       $"/{Uri.EscapeDataString(routeContext.AppId.ToString())}";
-        if (routeContext.PackageId.HasValue)
-        {
-            routeUrl += $"/{Uri.EscapeDataString(routeContext.PackageId.Value.ToString())}";
-        }
-
-        return routeUrl + query;
-    }
-
-    private bool PackageMatches(long tenantId, long appId, long packageId)
-    {
-        var tenantDb = _tenantDbProvider;
-        return tenantDb.Queryable<TenantGameAppPackageEntity>()
-                       .Any(u => u.Id == packageId &&
-                                 u.TenantId == tenantId &&
-                                 u.GameAppId == appId &&
-                                 u.IsEnabled != false);
+        return _db.Queryable<TenantGameAppPackageEntity>()
+                  .Any(package => package.Id == packageId && package.IsEnabled == true);
     }
 
     private static bool TryReadPositiveLong(HttpContext context, string name, out long value)

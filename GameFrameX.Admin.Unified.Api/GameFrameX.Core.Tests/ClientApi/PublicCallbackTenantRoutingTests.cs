@@ -27,7 +27,7 @@ public sealed class PublicCallbackTenantRoutingTests : IDisposable
     private bool _postgresAvailable;
 
     [PostgreSqlFact]
-    public async Task Middleware_WithValidRouteParameters_EstablishesTenantContextBeforeNext()
+    public async Task Middleware_WithValidRouteParameters_EstablishesCallbackContextBeforeNext()
     {
         const long tenantId = 1900000000001;
         const long appId = 1900000000101;
@@ -44,11 +44,10 @@ public sealed class PublicCallbackTenantRoutingTests : IDisposable
         var middleware = new PublicCallbackTenantResolutionMiddleware(context =>
         {
             nextCalled = true;
-            Assert.Equal(tenantId, context.Items[TenantContextAccessor.TenantIdKey]);
-            Assert.Equal(tenantId, context.Items[ClaimConst.TenantId]);
-            Assert.Equal(appId, context.Items[AppResolutionMiddleware.AppIdKey]);
+            Assert.False(context.Items.ContainsKey(TenantContextAccessor.TenantIdKey));
+            Assert.False(context.Items.ContainsKey(AppResolutionMiddleware.AppIdKey));
+            Assert.IsType<PublicCallbackRouteContext>(context.Items[PublicCallbackRouteContext.ItemKey]);
             Assert.Equal(packageId, context.Items[PaymentOptionSettingProvider.PackageIdKey]);
-            Assert.Equal(tenantId, TenantOperationContext.GetEffectiveTenantId());
             return Task.CompletedTask;
         });
 
@@ -93,7 +92,7 @@ public sealed class PublicCallbackTenantRoutingTests : IDisposable
     }
 
     [PostgreSqlFact]
-    public void PaymentProvider_AddsPublicCallbackRouteParametersToAliPayNotifyUrl()
+    public void PaymentProvider_RejectsOutboundAliPayUntilCallbackRouteUpgrade()
     {
         const long tenantId = 1900000003001;
         const long appId = 1900000003101;
@@ -107,10 +106,8 @@ public sealed class PublicCallbackTenantRoutingTests : IDisposable
         httpContext.Items[PaymentOptionSettingProvider.PaymentIsSandboxKey] = true;
         var provider = new PaymentOptionSettingProvider(fixture.TenantDbProvider, new HttpContextAccessor { HttpContext = httpContext, });
 
-        var setting = provider.GetOptionSetting<AliPayOptionSetting>("alipay");
-
-        Assert.NotNull(setting);
-        Assert.EndsWith($"/{tenantId}/{appId}/{packageId}", setting.AliPayNotifyUrl);
+        var error = Assert.Throws<InvalidOperationException>(() => provider.GetOptionSetting<AliPayOptionSetting>("alipay"));
+        Assert.Contains("完整支付回调路由", error.Message);
     }
 
     [PostgreSqlFact]
@@ -145,7 +142,7 @@ public sealed class PublicCallbackTenantRoutingTests : IDisposable
         var httpContext = new DefaultHttpContext();
         httpContext.Items[TenantContextAccessor.TenantIdKey] = tenantId;
         httpContext.Items[AppResolutionMiddleware.AppIdKey] = appId;
-        httpContext.Items[PublicCallbackRouteContext.ItemKey] = new PublicCallbackRouteContext(tenantId, appId, "pangle", "ad", null);
+        httpContext.Items[PublicCallbackRouteContext.ItemKey] = new PublicCallbackRouteContext("pangle", "ad", null);
         var provider = new ClientApiTenantOptionsProvider(fixture.TenantDbProvider, new HttpContextAccessor { HttpContext = httpContext, });
 
         var options = await provider.GetAdvertisementCallbackOptionsAsync();
@@ -228,7 +225,7 @@ public sealed class PublicCallbackTenantRoutingTests : IDisposable
                                                                     : null);
         var tenantDbProvider = mainDb;
         var appCacheService = new AppCacheService(tenantDbProvider, resolver);
-        var routeResolver = new PublicCallbackRouteResolver(mainDb, tenantDbProvider, appCacheService);
+        var routeResolver = new PublicCallbackRouteResolver(tenantDb);
         return new PostgresFixture(mainDb, tenantDb, tenantDbProvider, routeResolver, context => currentContext = context);
     }
 

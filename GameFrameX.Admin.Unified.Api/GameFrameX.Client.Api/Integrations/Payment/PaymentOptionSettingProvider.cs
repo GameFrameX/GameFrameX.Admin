@@ -169,44 +169,22 @@ public class PaymentOptionSettingProvider : IPaymentOptionSettingProvider
         }
     }
 
-    private static IPaymentOptionSetting? ApplyPublicCallbackRoute(string channelName, IPaymentOptionSetting? setting, HttpContext? context)
+    internal static IPaymentOptionSetting? ApplyPublicCallbackRoute(string channelName, IPaymentOptionSetting? setting, HttpContext? context)
     {
-        if (setting == null || context == null)
+        if (setting == null)
+        {
+            return null;
+        }
+
+        var requiresCallback = string.Equals(channelName, "alipay", StringComparison.OrdinalIgnoreCase) ||
+                               string.Equals(channelName, "wechat", StringComparison.OrdinalIgnoreCase);
+        if (!requiresCallback || context?.Items.ContainsKey(PublicCallbackRouteContext.ItemKey) == true)
         {
             return setting;
         }
 
-        var isAliPay = string.Equals(channelName, "alipay", StringComparison.OrdinalIgnoreCase);
-        var isWechat = string.Equals(channelName, "wechat", StringComparison.OrdinalIgnoreCase);
-        if (!isAliPay && !isWechat)
-        {
-            return setting;
-        }
-
-        var tenantId = GetCurrentTenantId(context);
-        var appId = GetCurrentAppId(context);
-        if (!tenantId.HasValue || !appId.HasValue)
-        {
-            return setting;
-        }
-
-        var routeContext = new PublicCallbackRouteContext(
-            tenantId.Value,
-            appId.Value,
-            isAliPay ? "alipay" : "wechat",
-            "payment",
-            GetCurrentPackageId(context));
-
-        if (setting is AliPayOptionSetting aliPayOptionSetting)
-        {
-            aliPayOptionSetting.AliPayNotifyUrl = PublicCallbackRouteResolver.AppendRouteParameters(aliPayOptionSetting.AliPayNotifyUrl, routeContext);
-        }
-        else if (setting is WechatPayOptionSetting wechatPayOptionSetting)
-        {
-            wechatPayOptionSetting.WechatPayNotifyUrl = PublicCallbackRouteResolver.AppendRouteParameters(wechatPayOptionSetting.WechatPayNotifyUrl, routeContext);
-        }
-
-        return setting;
+        // S3/C401 断链修复点：出站回调路由待线缆阶段对齐，禁止将裸基础 URL 发给支付网关。
+        throw new InvalidOperationException("无法构造完整支付回调路由，暂不支持该渠道下单；请完成回调路由升级后重试。");
     }
 
     internal static long? GetCurrentTenantId(HttpContext? context)
