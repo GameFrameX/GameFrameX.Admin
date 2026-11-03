@@ -12,7 +12,7 @@ using SqlSugar;
 namespace GameFrameX.Core.Tests.SqlSugar;
 
 /// <summary>
-/// 资源包版本选择器回归测试：验证 AppId + AppPackageId 仅返回当前分包下的去重资源版本。
+/// 资源包版本选择器回归测试：验证 AppPackageId 仅返回当前分包下的去重资源版本。
 /// </summary>
 public sealed class GameAppAssetPackageVersionSelectTests : IDisposable
 {
@@ -37,7 +37,7 @@ public sealed class GameAppAssetPackageVersionSelectTests : IDisposable
     {
         await SeedAsync();
 
-        var rows = await BuildSelectAsync(100, 1);
+        var rows = await BuildSelectAsync(1);
 
         Assert.Equal(new[] { "2.0.0", "1.0.0", }, rows.Select(u => u.Value).ToArray());
         Assert.Equal(rows.Select(u => u.Value), rows.Select(u => u.Label));
@@ -48,7 +48,7 @@ public sealed class GameAppAssetPackageVersionSelectTests : IDisposable
     {
         await SeedAsync();
 
-        await Assert.ThrowsAsync<BusinessException>(() => BuildSelectAsync(100, 999));
+        await Assert.ThrowsAsync<BusinessException>(() => BuildSelectAsync(999));
     }
 
     [Fact]
@@ -56,12 +56,12 @@ public sealed class GameAppAssetPackageVersionSelectTests : IDisposable
     {
         await SeedAsync();
 
-        var rows = await BuildSelectAsync(100, null);
+        var rows = await BuildSelectAsync(null);
 
         Assert.Empty(rows);
     }
 
-    private async Task<List<BaseSelectPageResponse>> BuildSelectAsync(long appId, long? appPackageId, string? searchKey = null)
+    private async Task<List<BaseSelectPageResponse>> BuildSelectAsync(long? appPackageId, string? searchKey = null)
     {
         var service = new TenantGameAppAssetPackageVersionService(
             Repository<TenantGameAppAssetPackageVersionEntity>(),
@@ -71,7 +71,6 @@ public sealed class GameAppAssetPackageVersionSelectTests : IDisposable
 
         return await service.SelectAsync(new PageGameAppAssetPackageVersionSelectRequest
         {
-            AppId = appId,
             AppPackageId = appPackageId,
             SearchKey = searchKey,
         });

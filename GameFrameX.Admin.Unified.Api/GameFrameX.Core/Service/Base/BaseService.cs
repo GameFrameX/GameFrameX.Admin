@@ -63,8 +63,7 @@ public class BaseService<T> : IAdminApiController where T : EntityBasic, new()
     /// 更新版本管理。
     /// <para>语义（2026-10-20 修正，C395 浏览器覆盖发现）：Update DTO 是字段级契约——
     /// 先取当前行，把 DTO 映射到<b>已加载实体</b>上再整行更新；DTO 未声明的列保持库中原值。
-    /// 此前 <c>input.Adapt&lt;T&gt;()</c> 映射到新实体，DTO 未声明的非空值类型列
-    /// （如资源包 <c>GameAppId</c>）落默认值 0 后写库，编辑即把行挪出应用作用域（数据损坏）。</para>
+    /// 避免映射到新实体时把未声明的业务列覆盖为默认值。</para>
     /// </summary>
     /// <param name="input"></param>
     /// <returns></returns>

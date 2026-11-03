@@ -50,8 +50,5 @@ public class AssetPackageVersionRequest : IPackageRequest
     /// </summary>
     public string DeviceUniqueIdentifier { get; set; } = null!;
 
-    /// <summary>
-    /// 应用作用域；null / 0 表示仅匹配租户默认配置，正值表示要求应用级覆盖（由服务端从应用上下文注入，客户端勿依赖）
-    /// </summary>
-    public long? AppId { get; set; }
+
 }

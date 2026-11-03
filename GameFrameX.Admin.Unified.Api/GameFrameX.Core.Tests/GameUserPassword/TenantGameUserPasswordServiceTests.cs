@@ -5,7 +5,7 @@ namespace GameFrameX.Core.Tests.GameUserPassword;
 /// <summary>
 /// TenantGameUserPasswordService 单测：纯 Argon2id 哈希 / 校验，非法格式（含历史 PBKDF2/MD5）一律 false。
 /// <para>常量时间比对由 Foundation <c>PasswordHashHelper.Verify</c> 算法层保证，此处不重复测时间维度。</para>
-/// <para>C198 → C215 迁移：内部从 PBKDF2（AppSecretHasher）换为 Argon2id（Foundation.PasswordHashHelper）。
+/// <para>C198 → C215 迁移：内部从 PBKDF2 换为 Argon2id（Foundation.PasswordHashHelper）。
 /// 接口签名（<c>Hash(string) / Verify(string,string)</c>）保持不变，19 处调用方零改动。</para>
 /// </summary>
 public class TenantGameUserPasswordServiceTests

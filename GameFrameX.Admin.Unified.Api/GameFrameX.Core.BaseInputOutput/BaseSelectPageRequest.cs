@@ -22,10 +22,7 @@ public class BaseSelectPageRequest : IBaseRequest
     /// </summary>
     public string? SearchKey { get; set; }
 
-    /// <summary>
-    /// 应用作用域筛选。未实现应用隔离的选择器可忽略该字段。
-    /// </summary>
-    public long? AppId { get; set; }
+
 
     /// <summary>
     /// 返回数量上限。默认 500，最大 1000。

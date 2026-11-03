@@ -93,11 +93,6 @@ internal static class Program
         // 基类服务面：FeatureSwitchDeliveryResolver 等共享实现以 SqlSugarRepository<T> 为构造参数（C345 冻结契约），
         // DI 不做基类向上匹配，须显式注册开放泛型基类 -> Repository<T> 实现（与上行为不同 descriptor，仓储无状态可各自实例化）
         builder.Services.AddScoped(typeof(SqlSugarRepository<>), typeof(Repository<>));
-        // Core 服务（如 TenantAccessGate）按基类 SqlSugarRepository<T> 注入；映射到 Client.Api 的 Repository<T>，
-        // 其构造已用 ISqlSugarClient 正确接入主库 / 租户库 Context，避免基类回退无参构造导致 Context 为空、查询 NRE。
-        builder.Services.AddScoped(typeof(SqlSugarRepository<>), typeof(Repository<>));
-        // 租户访问门禁依赖链：TenantExpirationMiddleware 解析 TenantAccessGate，进而依赖 ICache / SystemCacheService / TenantExpirationService。
-        // 这组 Core 服务历史上未在 Client.Api 注册，导致中间件抛 InvalidOperationException、所有请求（含 /health 探针）返回 500。
         builder.Services.AddCache(); // 注册 ICache（MemoryCacheService 实现）
         // C1 传输签名验证：SignatureValidation 节配置，默认关闭，与客户端同版本上线时打开
         builder.Services.Configure<SignatureValidationOptions>(builder.Configuration.GetSection("SignatureValidation"));

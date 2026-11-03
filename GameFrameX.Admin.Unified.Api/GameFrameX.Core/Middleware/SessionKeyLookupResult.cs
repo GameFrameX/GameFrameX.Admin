@@ -13,7 +13,7 @@ public enum SessionKeyLookupResult
     Active = 0,
 
     /// <summary>
-    /// 密钥域内不存在该 Kid 的 key（含 AppId 不匹配），拒收 60104。
+    /// 密钥域内不存在该 Kid 的 key，拒收 60104。
     /// </summary>
     NotFound = 1,
 

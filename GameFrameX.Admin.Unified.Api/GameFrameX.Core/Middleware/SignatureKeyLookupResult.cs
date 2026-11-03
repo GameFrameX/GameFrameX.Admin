@@ -13,7 +13,7 @@ public enum SignatureKeyLookupResult
     Active = 0,
 
     /// <summary>
-    /// 密钥域内不存在该 Kid 的 key（含 AppId 不匹配），拒签 60102。
+    /// 密钥域内不存在该 Kid 的 key，拒签 60102。
     /// </summary>
     NotFound = 1,
 

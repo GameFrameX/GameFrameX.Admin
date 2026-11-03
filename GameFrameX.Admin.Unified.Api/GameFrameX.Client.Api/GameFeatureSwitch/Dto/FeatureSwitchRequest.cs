@@ -5,9 +5,7 @@ using GameFrameX.Client.Api.Services.PackageVersion;
 namespace GameFrameX.Client.Api.GameFeatureSwitch.Dto;
 
 /// <summary>
-/// 活动/功能开关聚合下发请求（C347 客户端通道）。
-/// <para>请求经 <c>RequireTenantAppContext</c> 强制租户 + 应用上下文（缺失 fail-fast，C314 语义）；
-/// 应用作用域由服务端从应用上下文注入，客户端勿依赖请求体 AppId。</para>
+/// 活动/功能开关聚合下发请求，按分包与投放条件匹配主库配置。
 /// </summary>
 public class FeatureSwitchRequest : IPackageRequest
 {
@@ -40,10 +38,7 @@ public class FeatureSwitchRequest : IPackageRequest
     /// </summary>
     public string AppVersion { get; set; } = null!;
 
-    /// <summary>
-    /// 应用作用域；由服务端从应用上下文注入（请求体声明不作为授权来源）
-    /// </summary>
-    public long? AppId { get; set; }
+
 
     /// <summary>
     /// 设备稳定标识，用于记录级灰度取模与白名单旁路；缺失时仅命中全量投放（与远程配置投放同语义）
