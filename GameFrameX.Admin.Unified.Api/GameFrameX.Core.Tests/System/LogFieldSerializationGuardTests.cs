@@ -124,6 +124,5 @@ public class LogFieldSerializationGuardTests
         var scope = DatabaseLoggingWriter.TryReadLoginScope(parametersJson);
         Assert.NotNull(scope);
         Assert.Equal("admin", scope.Account);
-        Assert.Equal(1300000000001, scope.TenantId);
     }
 }

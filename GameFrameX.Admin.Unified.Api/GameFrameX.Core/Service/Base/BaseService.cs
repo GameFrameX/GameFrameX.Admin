@@ -85,7 +85,7 @@ public class BaseService<T> : IAdminApiController where T : EntityBasic, new()
 
     private static void ApplyUpdateAudit(T entity)
     {
-        var userId = TenantOperationContext.CurrentUser?.FindFirst(ClaimConst.UserId)?.Value;
+        var userId = new Microsoft.AspNetCore.Http.HttpContextAccessor().HttpContext?.User?.FindFirst(ClaimConst.UserId)?.Value;
         if (long.TryParse(userId, out var parsedUserId))
         {
             entity.UpdatedId = parsedUserId;
@@ -97,13 +97,13 @@ public class BaseService<T> : IAdminApiController where T : EntityBasic, new()
 
     private static string? GetCurrentUserDisplayName()
     {
-        var realName = TenantOperationContext.CurrentUser?.FindFirst(ClaimConst.RealName)?.Value;
+        var realName = new Microsoft.AspNetCore.Http.HttpContextAccessor().HttpContext?.User?.FindFirst(ClaimConst.RealName)?.Value;
         if (!string.IsNullOrWhiteSpace(realName))
         {
             return realName;
         }
 
-        return TenantOperationContext.CurrentUser?.FindFirst(ClaimConst.Account)?.Value;
+        return new Microsoft.AspNetCore.Http.HttpContextAccessor().HttpContext?.User?.FindFirst(ClaimConst.Account)?.Value;
     }
 
     /// <summary>

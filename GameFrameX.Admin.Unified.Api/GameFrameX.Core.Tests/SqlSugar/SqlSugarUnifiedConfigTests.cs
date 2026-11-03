@@ -85,40 +85,6 @@ public class SqlSugarUnifiedConfigTests
         Assert.Null(exception);
     }
 
-    // --- ConfigureAdminFilters ---
-
-    [Fact]
-    public void ConfigureAdminFilters_WithTenantId_DoesNotThrow()
-    {
-        var config = new ConnectionConfig
-        {
-            DbType = DbType.Sqlite,
-            ConnectionString = "DataSource=:memory:",
-            IsAutoCloseConnection = true,
-        };
-        using var scope = new SqlSugarScope(config);
-        var db = scope.GetConnectionScope("");
-
-        var exception = Record.Exception(() => SqlSugarUnifiedConfig.ConfigureAdminFilters(db, 100));
-        Assert.Null(exception);
-    }
-
-    [Fact]
-    public void ConfigureAdminFilters_WithoutTenantId_DoesNotThrow()
-    {
-        var config = new ConnectionConfig
-        {
-            DbType = DbType.Sqlite,
-            ConnectionString = "DataSource=:memory:",
-            IsAutoCloseConnection = true,
-        };
-        using var scope = new SqlSugarScope(config);
-        var db = scope.GetConnectionScope("");
-
-        var exception = Record.Exception(() => SqlSugarUnifiedConfig.ConfigureAdminFilters(db, null));
-        Assert.Null(exception);
-    }
-
     // --- ConfigureClientFilters ---
 
     [Fact]
@@ -135,50 +101,6 @@ public class SqlSugarUnifiedConfigTests
 
         var exception = Record.Exception(() => SqlSugarUnifiedConfig.ConfigureClientFilters(db));
         Assert.Null(exception);
-    }
-
-    // --- DelegateSqlSugarTenantIdResolver ---
-
-    [Fact]
-    public void DelegateSqlSugarTenantIdResolver_WithoutResolver_ReturnsNull()
-    {
-#pragma warning disable CS8625 // 测试意图：未注入 resolver 委托，验证 GetTenantId 回退为 null
-        var resolver = new DelegateSqlSugarTenantIdResolver(null);
-#pragma warning restore CS8625
-
-        var result = resolver.GetTenantId();
-
-        Assert.Null(result);
-    }
-
-    [Fact]
-    public void DelegateSqlSugarTenantIdResolver_WithResolver_ReturnsValue()
-    {
-        var resolver = new DelegateSqlSugarTenantIdResolver(() => 42);
-
-        var result = resolver.GetTenantId();
-
-        Assert.Equal(42, result);
-    }
-
-    [Fact]
-    public void DelegateSqlSugarTenantIdResolver_WithResolver_ReturnsNull()
-    {
-        var resolver = new DelegateSqlSugarTenantIdResolver(() => null);
-
-        var result = resolver.GetTenantId();
-
-        Assert.Null(result);
-    }
-
-    [Fact]
-    public void DelegateSqlSugarTenantIdResolver_InstancesAreIsolated()
-    {
-        var firstResolver = new DelegateSqlSugarTenantIdResolver(() => 1);
-        var secondResolver = new DelegateSqlSugarTenantIdResolver(() => 99);
-
-        Assert.Equal(1, firstResolver.GetTenantId());
-        Assert.Equal(99, secondResolver.GetTenantId());
     }
 
     /// <summary>

@@ -45,7 +45,6 @@ internal sealed class ClientApiTestDb : IDisposable
             IsEnabled = true,
         }).ExecuteCommand();
 
-        TenantIdResolver = new DelegateSqlSugarTenantIdResolver(() => TenantId);
         TenantDbProvider = MainDb;
         TenantDb = TenantDbProvider;
     }
@@ -62,7 +61,6 @@ internal sealed class ClientApiTestDb : IDisposable
 
     public ISqlSugarClient TenantDbProvider { get; }
 
-    public ISqlSugarTenantIdResolver TenantIdResolver { get; }
 
     public Repository<T> Repository<T>() where T : EntityBase, new()
     {
@@ -85,7 +83,7 @@ internal sealed class ClientApiTestDb : IDisposable
         var context = new DefaultHttpContext();
         if (includeTenant)
         {
-            context.Items[TenantContextAccessor.TenantIdKey] = TenantId;
+            context.Items["TenantId"] = TenantId;
         }
 
         if (packageId.HasValue)
@@ -536,7 +534,7 @@ internal sealed class ClientApiTestDb : IDisposable
             IsAutoCloseConnection = true,
         };
         SqlSugarUnifiedConfig.ConfigureBaseSettings(config);
-        return SqlSugarClientConfig.AddSqlSugarClientService(config, new DelegateSqlSugarTenantIdResolver(() => TenantId));
+        return SqlSugarClientConfig.AddSqlSugarClientService(config);
     }
 
     private string CreateDatabasePath(string name)

@@ -68,14 +68,13 @@ public class TenantGameHomeEntityServiceTests : IDisposable
         });
         var service = CreateService(new HttpClient(handler));
 
-        using (TenantOperationContext.UseTenant(TenantId))
-        {
-            var result = await service.GetOnlineAsync();
+        var result = await service.GetOnlineAsync();
 
-            Assert.Equal(10, result.Data.OnlineCount);
-            Assert.Equal(2, handler.Requests.Count);
-            Assert.All(handler.Requests, u => Assert.EndsWith("/game/api/GetOnlinePlayer", u.AbsoluteUri));
-        }
+        Assert.Equal(10, result.Data.OnlineCount);
+        Assert.Equal(2, handler.Requests.Count);
+        Assert.All(handler.Requests, u => Assert.EndsWith("/game/api/GetOnlinePlayer", u.AbsoluteUri));
+
+
     }
 
     [Fact]
@@ -84,13 +83,12 @@ public class TenantGameHomeEntityServiceTests : IDisposable
         var handler = new StubHandler(_ => throw new InvalidOperationException("should not call"));
         var service = CreateService(new HttpClient(handler));
 
-        using (TenantOperationContext.UseTenant(TenantId))
-        {
-            var result = await service.GetOnlineAsync();
+        var result = await service.GetOnlineAsync();
 
-            Assert.Equal(0, result.Data.OnlineCount);
-            Assert.Empty(handler.Requests);
-        }
+        Assert.Equal(0, result.Data.OnlineCount);
+        Assert.Empty(handler.Requests);
+
+
     }
 
     [Fact]
@@ -101,13 +99,12 @@ public class TenantGameHomeEntityServiceTests : IDisposable
         var handler = new StubHandler(_ => throw new InvalidOperationException("should not call without Control prefix"));
         var service = CreateService(new HttpClient(handler));
 
-        using (TenantOperationContext.UseTenant(TenantId))
-        {
-            var result = await service.GetOnlineAsync();
+        var result = await service.GetOnlineAsync();
 
-            Assert.Equal(0, result.Data.OnlineCount);
-            Assert.Empty(handler.Requests);
-        }
+        Assert.Equal(0, result.Data.OnlineCount);
+        Assert.Empty(handler.Requests);
+
+
     }
 
     [Fact]
@@ -117,21 +114,21 @@ public class TenantGameHomeEntityServiceTests : IDisposable
         var handler = new StubHandler(_ => throw new HttpRequestException("connection refused"));
         var service = CreateService(new HttpClient(handler));
 
-        using (TenantOperationContext.UseTenant(TenantId))
-        {
-            var result = await service.GetOnlineAsync();
+        var result = await service.GetOnlineAsync();
 
-            Assert.Equal(0, result.Data.OnlineCount);
-        }
+        Assert.Equal(0, result.Data.OnlineCount);
+
+
     }
 
     [Fact]
-    public async Task GetOnline_ThrowsBusinessErrorOnPlatformContext()
+    public async Task GetOnline_UsesMainDatabaseWithoutTenantContext()
     {
         // C321：平台面（SuperAdmin 无目标租户）不落到主库查租户表触发 42P01 裸 500，而是抛明确业务错误
         var service = CreateService();
 
-        await Assert.ThrowsAsync<BusinessException>(() => service.GetOnlineAsync());
+        var result = await service.GetOnlineAsync();
+        Assert.Equal(0, result.Data.OnlineCount);
     }
 
     [Fact]
@@ -155,29 +152,29 @@ public class TenantGameHomeEntityServiceTests : IDisposable
         await SeedAreaAsync(10003L, "", "", GameServerStatus.Offline);
         var service = CreateService();
 
-        using (TenantOperationContext.UseTenant(TenantId))
-        {
-            var result = await service.OverviewAsync();
+        var result = await service.OverviewAsync();
 
-            var overview = result.Data;
-            Assert.Equal(4, overview.TodayOrderCount);
-            Assert.Equal(2, overview.PendingShipmentCount);
-            Assert.Equal(2, overview.RefundingCount);
-            Assert.Equal(3, overview.PlayerTotalCount);
-            Assert.Equal(2, overview.PlayerTodayNewCount);
-            Assert.Equal(3, overview.AreaTotalCount);
-            Assert.Equal(1, overview.AreaRunningCount);
-            Assert.Equal(1, overview.AreaMaintenanceCount);
-            Assert.Equal(0, overview.OnlineCount);
-        }
+        var overview = result.Data;
+        Assert.Equal(4, overview.TodayOrderCount);
+        Assert.Equal(2, overview.PendingShipmentCount);
+        Assert.Equal(2, overview.RefundingCount);
+        Assert.Equal(3, overview.PlayerTotalCount);
+        Assert.Equal(2, overview.PlayerTodayNewCount);
+        Assert.Equal(3, overview.AreaTotalCount);
+        Assert.Equal(1, overview.AreaRunningCount);
+        Assert.Equal(1, overview.AreaMaintenanceCount);
+        Assert.Equal(0, overview.OnlineCount);
+
+
     }
 
     [Fact]
-    public async Task Overview_ThrowsBusinessErrorOnPlatformContext()
+    public async Task Overview_UsesMainDatabaseWithoutTenantContext()
     {
         var service = CreateService();
 
-        await Assert.ThrowsAsync<BusinessException>(() => service.OverviewAsync());
+        var result = await service.OverviewAsync();
+        Assert.NotNull(result.Data);
     }
 
     [Fact]
@@ -192,30 +189,30 @@ public class TenantGameHomeEntityServiceTests : IDisposable
         await SeedSampleAsync(currentHour - 3 * 3600 + 900, 9);
         var service = CreateService();
 
-        using (TenantOperationContext.UseTenant(TenantId))
-        {
-            var result = await service.OnlineTrendAsync();
+        var result = await service.OnlineTrendAsync();
 
-            var points = result.Data.Points;
-            Assert.Equal(24, points.Count);
-            Assert.Equal(currentHour - 23 * 3600, points[0].BucketTime);
-            Assert.Equal(currentHour, points[23].BucketTime);
-            // 当前小时桶取最后采样值
-            Assert.Equal(15, points[23].OnlineCount);
-            // 3 小时前的桶有采样
-            Assert.Equal(9, points[20].OnlineCount);
-            // 无采样桶为 null（相邻两桶）
-            Assert.Null(points[22].OnlineCount);
-            Assert.Null(points[19].OnlineCount);
-        }
+        var points = result.Data.Points;
+        Assert.Equal(24, points.Count);
+        Assert.Equal(currentHour - 23 * 3600, points[0].BucketTime);
+        Assert.Equal(currentHour, points[23].BucketTime);
+        // 当前小时桶取最后采样值
+        Assert.Equal(15, points[23].OnlineCount);
+        // 3 小时前的桶有采样
+        Assert.Equal(9, points[20].OnlineCount);
+        // 无采样桶为 null（相邻两桶）
+        Assert.Null(points[22].OnlineCount);
+        Assert.Null(points[19].OnlineCount);
+
+
     }
 
     [Fact]
-    public async Task OnlineTrend_ThrowsBusinessErrorOnPlatformContext()
+    public async Task OnlineTrend_UsesMainDatabaseWithoutTenantContext()
     {
         var service = CreateService();
 
-        await Assert.ThrowsAsync<BusinessException>(() => service.OnlineTrendAsync());
+        var result = await service.OnlineTrendAsync();
+        Assert.NotNull(result.Data.Points);
     }
 
     private async Task SeedAreaAsync(long id, string httpManageUrl, string controlPrefix, GameServerStatus serverStatus = GameServerStatus.Online)

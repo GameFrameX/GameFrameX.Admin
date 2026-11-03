@@ -33,7 +33,6 @@ public static class SqlSugarSetup
     {
         // 注册雪花Id-支持分布式
         var effectiveTypes = ProjectTypeCatalog.EffectiveTypes;
-        TenantOperationContext.Configure(httpContextAccessor);
         SqlSugarFilter.Configure(cache, httpContextAccessor, effectiveTypes);
         SqlSugarCache.Configure(cache);
 
@@ -48,18 +47,16 @@ public static class SqlSugarSetup
 
         dbOptions.ConnectionConfigs.ForEach(SetDbConfig);
 
-        var tenantIdResolver = new DelegateSqlSugarTenantIdResolver(TenantOperationContext.GetEffectiveTenantId);
 
         var sqlSugar = new SqlSugarScope(dbOptions.ConnectionConfigs.Adapt<List<ConnectionConfig>>(), db =>
         {
             dbOptions.ConnectionConfigs.ForEach(config =>
             {
                 var dbProvider = db.GetConnectionScope(config.ConfigId);
-                SetDbAop(dbProvider, dbOptions.EnableConsoleSql, tenantIdResolver, httpContextAccessor);
+                SetDbAop(dbProvider, dbOptions.EnableConsoleSql, httpContextAccessor);
                 SetDbDiffLog(dbProvider, config);
             });
         });
-        services.AddSingleton<ISqlSugarTenantIdResolver>(tenantIdResolver);
         services.AddSingleton<ISqlSugarClient>(sqlSugar); // 单例注册
         services.AddScoped(typeof(SqlSugarRepository<>)); // 仓储注册
 
@@ -85,10 +82,8 @@ public static class SqlSugarSetup
     /// </summary>
     /// <param name="db"></param>
     /// <param name="enableConsoleSql"></param>
-    /// <param name="tenantIdResolver"></param>
     public static void SetDbAop(SqlSugarScopeProvider db,
         bool enableConsoleSql,
-        ISqlSugarTenantIdResolver tenantIdResolver,
         IHttpContextAccessor httpContextAccessor)
     {
         var config = db.CurrentConnectionConfig;
@@ -160,15 +155,7 @@ public static class SqlSugarSetup
                 var user = httpContextAccessor.HttpContext?.User;
                 if (user != null)
                 {
-                    if (entityInfo.PropertyName == nameof(EntityTenantBase.TenantId))
-                    {
-                        var tenantId = ((dynamic)entityInfo.EntityValue).TenantId;
-                        if (tenantId == null || tenantId == 0)
-                        {
-                            entityInfo.SetValue(tenantIdResolver.GetTenantId());
-                        }
-                    }
-                    else if (entityInfo.PropertyName == nameof(EntityBasic.CreatedId))
+                    if (entityInfo.PropertyName == nameof(EntityBasic.CreatedId))
                     {
                         var createUserId = ((dynamic)entityInfo.EntityValue).CreatedId;
                         if (createUserId == 0 || createUserId == null)
@@ -210,25 +197,16 @@ public static class SqlSugarSetup
         // 配置假删除过滤器
         SqlSugarUnifiedConfig.ConfigureBaseFilters(db);
 
-        // 配置租户过滤器
-        var currentTenantId = tenantIdResolver.GetTenantId();
-        SqlSugarUnifiedConfig.ConfigureAdminFilters(db, currentTenantId);
-
         // 配置 启用/禁用过滤器（ISafeEnabledFilter）。
         SqlSugarUnifiedConfig.ConfigureClientFilters(db);
 
-        // 配置用户机构（数据范围）过滤器。
-        // 数据范围依赖 tenant_user_role / tenant_role，只能在当前登录租户库连接上查询；
-        // 主库或其它租户库在 AOP 初始化阶段安装该过滤器会错误访问不存在或不属于当前用户的租户表。
-        if (currentTenantId > 0 && db.CurrentConnectionConfig.ConfigId.ToString() == currentTenantId.ToString())
-        {
-            SqlSugarFilter.SetDataScopeFilter(db);
-        }
+        // 主库同时承载角色和用户数据范围。
+        SqlSugarFilter.SetDataScopeFilter(db);
 
     }
 
     /// <summary>
-    /// 开启库表差异化日志。差异日志按当前操作库归属写入：主库写 SystemLogDiffEntity，租户库写 TenantLogDiffEntity。
+    /// 开启主库差异日志，使用 SystemLogDiffEntity 保存。
     /// </summary>
     /// <param name="db">当前操作库连接（差异日志写入目标）</param>
     /// <param name="config">当前操作库配置（提供 DbType 用于 SQL 还原）</param>
@@ -261,24 +239,10 @@ public static class SqlSugarSetup
             }
             // DeleteAsync：保留 BeforeData 全字段，不加快照（无 AfterData）
 
-            // C156：差异日志按当前操作库归属写入——主库操作写 SystemLogDiffEntity（system_log_diff），
-            // 租户库操作写 TenantLogDiffEntity（tenant_log_diff），不再路由到独立日志库。
-            var isMainDb = db.CurrentConnectionConfig.ConfigId?.ToString() == SqlSugarConst.MainConfigId;
-            string serialized;
-            if (isMainDb)
-            {
-                var logDiff = new SystemLogDiffEntity();
-                FillDiffLogFields(logDiff, u, config, beforeList, afterList, snapshot);
-                await db.Insertable(logDiff).ExecuteCommandAsync();
-                serialized = Json.Serialize(logDiff);
-            }
-            else
-            {
-                var logDiff = new TenantLogDiffEntity();
-                FillDiffLogFields(logDiff, u, config, beforeList, afterList, snapshot);
-                await db.Insertable(logDiff).ExecuteCommandAsync();
-                serialized = Json.Serialize(logDiff);
-            }
+            var logDiff = new SystemLogDiffEntity();
+            FillDiffLogFields(logDiff, u, config, beforeList, afterList, snapshot);
+            await db.Insertable(logDiff).ExecuteCommandAsync();
+            var serialized = Json.Serialize(logDiff);
 
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine(DateTime.Now + $"\r\n*****差异日志开始*****\r\n{Environment.NewLine}{serialized}{Environment.NewLine}*****差异日志结束*****\r\n");

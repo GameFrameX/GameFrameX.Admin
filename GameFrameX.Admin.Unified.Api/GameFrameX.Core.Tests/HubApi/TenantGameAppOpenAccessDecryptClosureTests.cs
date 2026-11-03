@@ -134,7 +134,7 @@ public sealed class TenantGameAppOpenAccessDecryptClosureTests : IDisposable
         {
             nextCount++;
             Assert.Equal("7801", context.User.FindFirst(GameFrameX.Core.Const.ClaimConst.UserId)?.Value);
-            Assert.Null(context.User.FindFirst(GameFrameX.Core.Const.ClaimConst.TenantId));
+            Assert.Null(context.User.FindFirst("TenantId"));
             return Task.CompletedTask;
         });
         await middleware.InvokeAsync(first, cache);
@@ -191,7 +191,6 @@ public sealed class TenantGameAppOpenAccessDecryptClosureTests : IDisposable
         var services = new ServiceCollection();
         services.AddSingleton<ISqlSugarClient>(_db.MainDb);
         services.AddSingleton<ISqlSugarClient>(_db.TenantDbProvider);
-        services.AddSingleton<ISqlSugarTenantIdResolver>(_db.TenantIdResolver);
         services.AddScoped(typeof(Repository<>));
         return services.BuildServiceProvider();
     }

@@ -43,19 +43,6 @@ public static class SqlSugarUnifiedConfig
     }
 
     /// <summary>
-    /// 配置 Admin 端专用过滤器: ITenantIdFilter（需要外部调用 SqlSugarFilter 完成机构和自定义过滤器）
-    /// </summary>
-    /// <param name="db">SqlSugar 作用域提供者</param>
-    /// <param name="tenantId">租户ID，由调用方获取</param>
-    public static void ConfigureAdminFilters(ISqlSugarClient db, long? tenantId = null)
-    {
-        if (tenantId.HasValue)
-        {
-            db.QueryFilter.AddTableFilter<ITenantIdFilter>(u => u.TenantId == null || u.TenantId == tenantId.Value);
-        }
-    }
-
-    /// <summary>
     /// 配置 启用/禁用过滤器: ISafeEnabledFilter（Admin/Hub/Client 通用）
     /// </summary>
     public static void ConfigureClientFilters(ISqlSugarClient db)

@@ -137,12 +137,11 @@ public sealed class GameAppPackageResolverInheritanceTests : IDisposable
         scope.CodeFirst.InitTables(typeof(SystemTenantEntity));
         scope.Insertable(CreateTenant(tenantId, tenantConfig.ConnectionString)).ExecuteCommand();
 
-        var tenantIdResolver = new DelegateSqlSugarTenantIdResolver(() => tenantId);
         var provider = scope;
         var tenantDb = provider;
         tenantDb.CodeFirst.InitTables(typeof(TenantGameAppPackageEntity));
 
-        return new ResolverFixture(scope, provider, tenantIdResolver, tenantDb, tenantId);
+        return new ResolverFixture(scope, provider, tenantDb, tenantId);
     }
 
     private ConnectionConfig CreateConfig(string configId)
@@ -190,7 +189,7 @@ public sealed class GameAppPackageResolverInheritanceTests : IDisposable
         private readonly ISqlSugarClient _tenantDb;
         private readonly long _tenantId;
 
-        public ResolverFixture(SqlSugarScope scope, ISqlSugarClient provider, ISqlSugarTenantIdResolver tenantIdResolver, ISqlSugarClient tenantDb, long tenantId)
+        public ResolverFixture(SqlSugarScope scope, ISqlSugarClient provider, ISqlSugarClient tenantDb, long tenantId)
         {
             _scope = scope;
             _tenantDb = tenantDb;

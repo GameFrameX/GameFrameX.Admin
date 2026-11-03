@@ -61,7 +61,7 @@ public class TenantClientApiPolicyEntityService
                         .ExecuteCommandAsync();
 
         // 审计（C373）：密钥生命周期操作结构化审计行；DB 操作日志管线断链期先落应用日志，管线修复后统一接入
-        LogHelper.Info($"[KeyAudit] action=PolicySigningKeyRotate tenant={_currentUserContext.TenantId} app={entity.AppId} policyId={entity.Id} oldKeyRevoked=immediately operator={_currentUserContext.Account}");
+        LogHelper.Info($"[KeyAudit] action=PolicySigningKeyRotate policyId={entity.Id} oldKeyRevoked=immediately operator={_currentUserContext.Account}");
     }
 
     protected override ISugarQueryable<TenantClientApiPolicyResponse> BuildPageQuery(PageTenantClientApiPolicyRequest input)

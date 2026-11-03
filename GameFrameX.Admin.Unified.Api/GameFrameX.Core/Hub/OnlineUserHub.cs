@@ -1,4 +1,4 @@
-﻿using GameFrameX.Core.Service.Cache;
+using GameFrameX.Core.Service.Cache;
 using GameFrameX.Core.Service.Message;
 using GameFrameX.Core.Service.Message.Dto;
 using GameFrameX.Core.Service.Tenant;
@@ -51,12 +51,6 @@ public class OnlineUserHub : Hub<IOnlineUserHub>
         var client = Parser.GetDefault().Parse(httpContext.Request.Headers["User-Agent"]);
 
         var userId = claims.FirstOrDefault(u => u.Type == ClaimConst.UserId)?.Value;
-        var tenantId = ResolveTenantId(claims);
-        if (!tenantId.HasValue)
-        {
-            return;
-        }
-
         var user = new TenantOnlineUserEntity
         {
             ConnectionId = Context.ConnectionId,
@@ -67,10 +61,8 @@ public class OnlineUserHub : Hub<IOnlineUserHub>
             Ip = httpContext.GetRemoteIpAddressToIPv4(),
             Browser = client.UA.Family + client.UA.Major,
             Os = client.OS.Family + client.OS.Major,
-            TenantId = tenantId.Value,
         };
 
-        using var tenantScope = TenantOperationContext.UseTenant(tenantId.Value);
         var systemOnlineUserRepository = httpContext.RequestServices.GetRequiredService<SqlSugarRepository<TenantOnlineUserEntity>>();
         await systemOnlineUserRepository.InsertAsync(user);
         _systemCacheService.Set(CacheConst.KeyUserOnline + user.UserId, user);
@@ -89,16 +81,12 @@ public class OnlineUserHub : Hub<IOnlineUserHub>
         }
 
         var httpContext = Context.GetHttpContext();
-        var token = httpContext?.Request.Query["access_token"];
-        var claims = ProjectJwtReader.ReadJwtToken(token)?.Claims;
-        var tenantId = ResolveTenantId(claims);
-        if (!tenantId.HasValue)
+        if (httpContext == null)
         {
             return;
         }
 
-        using var tenantScope = TenantOperationContext.UseTenant(tenantId.Value);
-        var systemOnlineUserRepository = httpContext!.RequestServices.GetRequiredService<SqlSugarRepository<TenantOnlineUserEntity>>();
+        var systemOnlineUserRepository = httpContext.RequestServices.GetRequiredService<SqlSugarRepository<TenantOnlineUserEntity>>();
         var user = await systemOnlineUserRepository.AsQueryable().Filter("", true).FirstAsync(u => u.ConnectionId == Context.ConnectionId);
         if (user == null)
         {
@@ -110,7 +98,7 @@ public class OnlineUserHub : Hub<IOnlineUserHub>
         await systemOnlineUserRepository.DeleteAsync(u => u.Id == user.Id);
 
         var hasOtherConnection = await systemOnlineUserRepository.AsQueryable().Filter("", true)
-                                                          .AnyAsync(u => u.TenantId == user.TenantId && u.UserId == user.UserId);
+                                                          .AnyAsync(u => u.UserId == user.UserId);
         if (hasOtherConnection)
         {
             return;
@@ -159,9 +147,4 @@ public class OnlineUserHub : Hub<IOnlineUserHub>
         await _systemMessageService.SendUsersAsync(message);
     }
 
-    private static long? ResolveTenantId(IEnumerable<Claim>? claims)
-    {
-        var tenantIdText = claims?.FirstOrDefault(u => u.Type == ClaimConst.TenantId)?.Value;
-        return long.TryParse(tenantIdText, out var tenantId) && tenantId > 0 ? tenantId : null;
-    }
 }

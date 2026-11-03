@@ -40,14 +40,13 @@ internal static class Program
         builder.Services.AddHostHealthChecks();
 
         builder.Services.AddSingleton<LauncherOptions>(launcherOptions);
-        // 租户解析接线（C260 共享扩展）：IHttpContextAccessor + 读取统一键 TenantContextAccessor.TenantIdKey 的解析器一次注册（HubTenantMiddleware 写入）
         var httpContextAccessor = new HttpContextAccessor();
-        var tenantIdResolver = builder.Services.AddSqlSugarTenantResolution(httpContextAccessor);
+        builder.Services.AddSingleton<IHttpContextAccessor>(httpContextAccessor);
         builder.Services.AddHttpClient();
 
         // 主库连接统一走 DbConnection 节 + GFX_MAIN_DB_* 单一入口（C269）；LauncherOptions 裸参数仅作兼容兜底
         var mainDbConfig = HostMainDbConnectionResolver.Resolve(builder.Configuration, launcherOptions);
-        var sqlSugar = SqlSugarClientConfig.AddSqlSugarClientService(mainDbConfig, tenantIdResolver, HubUserAuditHandler.Handle(httpContextAccessor));
+        var sqlSugar = SqlSugarClientConfig.AddSqlSugarClientService(mainDbConfig, HubUserAuditHandler.Handle(httpContextAccessor));
 
         builder.Services.AddSingleton<ISqlSugarClient>(sqlSugar); // 主库（连 SystemTenantEntity 等平台表）
         builder.Services.AddScoped(typeof(Repository<>)); // 仓储（按租户路由数据库）
@@ -89,11 +88,7 @@ internal static class Program
         // 鉴权与授权（顺序：UseAuthentication 必须在 UseAuthorization 之前）
         app.UseAuthentication();
         app.UseAuthorization();
-        // Hub 租户中间件：拒绝超级管理员、统一将租户 Id 写入 HttpContext.Items（鉴权请求取 JWT，匿名 WebHook 取请求头）
-        app.UseWhen(context => !context.Request.Path.StartsWithSegments("/health"),
-                    branch => branch.UseMiddleware<HubTenantMiddleware>());
-
-        // 应用开放访问凭证鉴权（机器对机器调用，如打包上报）：声明租户由 HubTenantMiddleware 写入，本中间件校验凭证 + 签名 + scope
+        // 机器凭证、签名和授权范围校验。
         app.UseWhen(context => context.Request.Path.StartsWithSegments("/api/PackageBuildReport", StringComparison.OrdinalIgnoreCase),
                     branch => branch.UseMiddleware<TenantGameAppOpenAccessAuthMiddleware>());
 

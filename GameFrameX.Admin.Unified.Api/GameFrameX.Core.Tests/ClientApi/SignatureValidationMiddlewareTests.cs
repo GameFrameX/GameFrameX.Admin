@@ -85,7 +85,7 @@ public sealed class SignatureValidationMiddlewareTests
 
         if (appId.HasValue)
         {
-            context.Request.Headers[GlobalConst.AppIdHeader] = appId.Value.ToString();
+            context.Request.Headers["GameFrameX-App-Id"] = appId.Value.ToString();
         }
 
         return context;
@@ -128,7 +128,7 @@ public sealed class SignatureValidationMiddlewareTests
         context.Request.Headers[SignatureValidationMiddleware.ColaSignatureHeader] = V2Header(keyId, ts, mid, signatureBase64);
         if (appId.HasValue)
         {
-            context.Request.Headers[GlobalConst.AppIdHeader] = appId.Value.ToString();
+            context.Request.Headers["GameFrameX-App-Id"] = appId.Value.ToString();
         }
 
         return context;

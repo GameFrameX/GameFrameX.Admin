@@ -66,7 +66,6 @@ public abstract class ChannelDefinitionManagementServiceBase<TEntity>
                          // Filter(null,true) 绕过租户过滤的同时也关掉了软删全局过滤，显式恢复（Api#287）
                          .Where(u => u.IsDeleted == false)
                          .Where(u => u.Scope == ManagedScope)
-                         .WhereIF(ManagedScope == ChannelScopeEnum.Tenant, u => u.TenantId == _currentUserContext.TenantId)
                          .WhereIF(!string.IsNullOrWhiteSpace(searchKey), u =>
                                       u.Name.Contains(searchKey!) || u.Code.Contains(searchKey!))
                          .WhereIF(!string.IsNullOrWhiteSpace(code), u => u.Code.Contains(code!))
@@ -92,7 +91,6 @@ public abstract class ChannelDefinitionManagementServiceBase<TEntity>
                         {
                             u.Code,
                             u.Scope,
-                            u.TenantId,
                             u.PlatformCode,
                             u.ChannelType,
                             u.IsSystemLocked,
@@ -117,11 +115,6 @@ public abstract class ChannelDefinitionManagementServiceBase<TEntity>
         if (ManagedScope == ChannelScopeEnum.System && !_currentUserContext.SuperAdmin)
         {
             throw BusinessError.Oh("租户不能编辑系统渠道");
-        }
-
-        if (ManagedScope == ChannelScopeEnum.Tenant && existing.TenantId != _currentUserContext.TenantId)
-        {
-            throw BusinessError.Oh("只能编辑本租户渠道");
         }
 
         EnsureScopePermission();
@@ -150,8 +143,7 @@ public abstract class ChannelDefinitionManagementServiceBase<TEntity>
                              u.Description,
                              u.IsDefault,
                              u.Scope,
-                             u.TenantId,
-                             u.PlatformCode,
+                              u.PlatformCode,
                              u.ChannelType,
                              u.IsSystemLocked,
                              u.IsEnabled,
@@ -187,7 +179,7 @@ public abstract class ChannelDefinitionManagementServiceBase<TEntity>
                                           .Filter(null, true)
                                           .Where(u => u.IsDeleted == false)
                                           .Where(u => (u.IsEnabled == true || u.IsEnabled == null) &&
-                                                      u.TenantId == _currentUserContext.TenantId)
+                                                      u.Scope == ManagedScope)
                                           .WhereIF(!string.IsNullOrWhiteSpace(searchKey), u =>
                                                        u.Name.Contains(searchKey!) || u.Code.Contains(searchKey!))
                                           .OrderBy(u => u.Name)
@@ -223,11 +215,6 @@ public abstract class ChannelDefinitionManagementServiceBase<TEntity>
         if (ManagedScope == ChannelScopeEnum.System && !_currentUserContext.SuperAdmin)
         {
             throw BusinessError.Oh("租户不能删除系统渠道");
-        }
-
-        if (ManagedScope == ChannelScopeEnum.Tenant && entity.TenantId != _currentUserContext.TenantId)
-        {
-            throw BusinessError.Oh("只能删除本租户渠道");
         }
 
         var referenced = await IsPackageReferencedAsync(input.Id);
@@ -283,16 +270,13 @@ public abstract class ChannelDefinitionManagementServiceBase<TEntity>
             throw BusinessError.Oh("租户渠道编码不能与系统渠道重复");
         }
 
-        var tenantId = _currentUserContext.TenantId;
         var existsTenantCode = excludeId.HasValue
                                    ? await Repository.AsQueryable().Filter(null, true)
                                                      .AnyAsync(u => u.Scope == ChannelScopeEnum.Tenant &&
-                                                                    u.TenantId == tenantId &&
                                                                     u.Code == code &&
                                                                     u.Id != excludeId.Value)
                                    : await Repository.AsQueryable().Filter(null, true)
                                                      .AnyAsync(u => u.Scope == ChannelScopeEnum.Tenant &&
-                                                                    u.TenantId == tenantId &&
                                                                     u.Code == code);
         if (existsTenantCode)
         {
@@ -311,7 +295,6 @@ public abstract class ChannelDefinitionManagementServiceBase<TEntity>
     private void ApplyScope(GameFrameX.Entity.System.ChannelDefinition entity, ChannelScopeEnum scope)
     {
         entity.Scope = scope;
-        entity.TenantId = scope == ChannelScopeEnum.System ? 0 : _currentUserContext.TenantId;
         entity.PlatformCode = string.IsNullOrWhiteSpace(entity.PlatformCode) ? "all" : entity.PlatformCode.Trim();
         entity.Code = entity.Code?.Trim() ?? string.Empty;
     }

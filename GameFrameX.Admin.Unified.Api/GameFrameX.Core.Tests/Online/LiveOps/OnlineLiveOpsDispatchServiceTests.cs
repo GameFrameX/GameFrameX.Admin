@@ -243,7 +243,7 @@ public sealed class OnlineLiveOpsDispatchServiceTests : IDisposable
         var identity = new ClaimsIdentity("TestAuth");
         if (tenantId.HasValue)
         {
-            identity.AddClaim(new Claim(ClaimConst.TenantId, tenantId.Value.ToString()));
+            identity.AddClaim(new Claim("TenantId", tenantId.Value.ToString()));
         }
 
         var httpContext = new DefaultHttpContext { User = new ClaimsPrincipal(identity), };

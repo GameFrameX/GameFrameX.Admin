@@ -157,12 +157,6 @@ public class TenantGameHomeEntityService : IAdminApiController
     /// </summary>
     private ISqlSugarClient ResolveTenantDb(string operationName)
     {
-        var tenantId = TenantOperationContext.GetEffectiveTenantId();
-        if (!tenantId.HasValue)
-        {
-            throw BusinessError.Oh(GameHomeErrorCode.TenantContextRequired);
-        }
-
         var tenantDb = _tenantDbConnectionProvider;
         if (tenantDb == null)
         {

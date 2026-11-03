@@ -44,7 +44,7 @@ public sealed class PublicCallbackTenantRoutingTests : IDisposable
         var middleware = new PublicCallbackTenantResolutionMiddleware(context =>
         {
             nextCalled = true;
-            Assert.False(context.Items.ContainsKey(TenantContextAccessor.TenantIdKey));
+            Assert.False(context.Items.ContainsKey("TenantId"));
             Assert.IsType<PublicCallbackRouteContext>(context.Items[PublicCallbackRouteContext.ItemKey]);
             Assert.Equal(packageId, context.Items[PaymentOptionSettingProvider.PackageIdKey]);
             return Task.CompletedTask;
@@ -71,7 +71,7 @@ public sealed class PublicCallbackTenantRoutingTests : IDisposable
         await middleware.InvokeAsync(httpContext, fixture.RouteResolver);
 
         Assert.Equal(400, httpContext.Response.StatusCode);
-        Assert.False(httpContext.Items.ContainsKey(TenantContextAccessor.TenantIdKey));
+        Assert.False(httpContext.Items.ContainsKey("TenantId"));
     }
 
     [PostgreSqlFact]
@@ -99,7 +99,7 @@ public sealed class PublicCallbackTenantRoutingTests : IDisposable
         using var fixture = CreatePostgresFixture(tenantId, appId, packageId);
         InsertAliPayConfig(fixture.TenantDb, tenantId, appId, true);
         var httpContext = new DefaultHttpContext();
-        httpContext.Items[TenantContextAccessor.TenantIdKey] = tenantId;
+        httpContext.Items["TenantId"] = tenantId;
         httpContext.Items[PaymentOptionSettingProvider.PackageIdKey] = packageId;
         httpContext.Items[PaymentOptionSettingProvider.PaymentIsSandboxKey] = true;
         var provider = new PaymentOptionSettingProvider(fixture.TenantDbProvider, new HttpContextAccessor { HttpContext = httpContext, });
@@ -138,7 +138,7 @@ public sealed class PublicCallbackTenantRoutingTests : IDisposable
             },
         }).ExecuteCommand();
         var httpContext = new DefaultHttpContext();
-        httpContext.Items[TenantContextAccessor.TenantIdKey] = tenantId;
+        httpContext.Items["TenantId"] = tenantId;
         httpContext.Items[PublicCallbackRouteContext.ItemKey] = new PublicCallbackRouteContext("pangle", "ad", null);
         var provider = new ClientApiTenantOptionsProvider(fixture.TenantDbProvider, new HttpContextAccessor { HttpContext = httpContext, });
 
@@ -205,11 +205,6 @@ public sealed class PublicCallbackTenantRoutingTests : IDisposable
         }
 
         var currentContext = new DefaultHttpContext();
-        var resolver = new DelegateSqlSugarTenantIdResolver(() =>
-                                                                currentContext.Items.TryGetValue(TenantContextAccessor.TenantIdKey, out var value) &&
-                                                                long.TryParse(value?.ToString(), out var parsed)
-                                                                    ? parsed
-                                                                    : null);
         var tenantDbProvider = mainDb;
         var routeResolver = new PublicCallbackRouteResolver(tenantDb);
         return new PostgresFixture(mainDb, tenantDb, tenantDbProvider, routeResolver, context => currentContext = context);

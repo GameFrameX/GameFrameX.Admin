@@ -77,7 +77,7 @@ public class LogTenantQueryIsolationTests
     }
 
     [Fact]
-    public void TryReadLoginScope_LoginParameters_ReturnsTenantAndAccount()
+    public void TryReadLoginScope_LoginParameters_ReturnsAccount()
     {
         var parametersJson = JsonSerializer.Serialize(new[]
         {
@@ -97,6 +97,5 @@ public class LogTenantQueryIsolationTests
 
         Assert.NotNull(scope);
         Assert.Equal("admin", scope.Account);
-        Assert.Equal(1300000000001, scope.TenantId);
     }
 }

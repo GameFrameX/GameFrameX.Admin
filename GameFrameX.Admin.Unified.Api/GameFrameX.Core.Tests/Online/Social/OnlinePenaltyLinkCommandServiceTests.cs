@@ -296,7 +296,7 @@ public sealed class OnlinePenaltyLinkCommandServiceTests : IDisposable
     private static CurrentUserContext CreateUserContext(long tenantId)
     {
         var identity = new ClaimsIdentity("TestAuth");
-        identity.AddClaim(new Claim(ClaimConst.TenantId, tenantId.ToString()));
+        identity.AddClaim(new Claim("TenantId", tenantId.ToString()));
         var httpContext = new DefaultHttpContext { User = new ClaimsPrincipal(identity), };
         var accessor = new HttpContextAccessor { HttpContext = httpContext, };
         return new CurrentUserContext(accessor);

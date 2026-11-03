@@ -29,7 +29,6 @@ public class MenuSeedPermissionRouteReconciliationTests
     {
         "tenantGameAppAssetPackageVersion:history", // 版本历史改由 tenantGameAppAssetPackageVersionHistory 域承载
         "tenantGameAppAssetPackageVersion:restore", // 动作语义变更为 return
-        "tenantGameAppEntity:package", // 分包管理独立成 gameAppPackage 页
         "tenantGamePaymentConfigEntity:copyNotifyUrl", // 端点下线，前端改从详情复制
         "tenantGameLoginTicketKeyEntity:update", // 动作被 rotate 取代
         "tenantAppSignatureKeyEntity:update", // 动作被 renew/rotate 取代

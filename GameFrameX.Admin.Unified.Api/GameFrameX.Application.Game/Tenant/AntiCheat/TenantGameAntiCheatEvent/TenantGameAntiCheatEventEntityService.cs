@@ -159,7 +159,7 @@ public sealed class TenantGameAntiCheatEventEntityService
 
     private static long? TryGetCurrentUserId()
     {
-        var userId = TenantOperationContext.CurrentUser?.FindFirst(ClaimConst.UserId)?.Value;
+        var userId = new Microsoft.AspNetCore.Http.HttpContextAccessor().HttpContext?.User?.FindFirst(ClaimConst.UserId)?.Value;
         if (long.TryParse(userId, out var parsedUserId))
         {
             return parsedUserId;

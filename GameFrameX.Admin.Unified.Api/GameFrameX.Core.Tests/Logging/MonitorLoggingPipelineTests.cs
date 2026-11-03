@@ -78,6 +78,7 @@ public sealed class MonitorLoggingPipelineTests : IAsyncLifetime
             typeof(TenantLogVisitEntity),
             typeof(TenantLogExceptionEntity),
         });
+        _db.GetConnectionScope(MainConfigId).Aop.DataExecuting = SqlSugarAopHelper.HandleBaseAudit;
         await SeedSysOpLogEnabledAsync();
 
         _host = await BuildHostAsync();
@@ -158,25 +159,25 @@ public sealed class MonitorLoggingPipelineTests : IAsyncLifetime
     /// 验收 5（C156）：租户上下文操作日志路由到租户库 TenantLog*，主库不落任何该调用行。
     /// </summary>
     [Fact]
-    public async Task Page_WithTenantIdentity_WritesOperationRowToTenantDatabase()
+    public async Task Page_WithUserIdentity_WritesOperationRowToMainDatabase()
     {
         var statusCode = await PostAsync("/api/monitorPipeline/page", TenantIdentity, "{\"keyword\":\"tenant-query\"}");
 
         Assert.Equal(HttpStatusCode.OK, statusCode);
-        var tenantDb = _db.GetConnectionScope(TenantConfigId);
-        var tenantRows = await tenantDb.Queryable<TenantLogOperationEntity>()
+        var tenantDb = _db.GetConnectionScope(MainConfigId);
+        var tenantRows = await tenantDb.Queryable<SystemLogOperationEntity>()
             .Where(u => u.RequestUrl.Contains("/api/monitorPipeline/page"))
             .ToListAsync();
 
         var row = Assert.Single(tenantRows);
-        Assert.Equal(1001L, row.TenantId);
+        Assert.Null(row.TenantId);
         Assert.Equal("tenant-admin", row.Account);
         Assert.Equal("GetPage", row.ActionName);
         Assert.Contains("tenant-query", row.RequestParam);
 
         var mainDb = _db.GetConnectionScope(MainConfigId);
-        Assert.Empty(await mainDb.Queryable<SystemLogOperationEntity>().Where(u => u.RequestUrl.Contains("/api/monitorPipeline/page")).ToListAsync());
-        Assert.Empty(await tenantDb.Queryable<TenantLogVisitEntity>().Where(u => u.ActionName == "GetPage").ToListAsync());
+        Assert.Single(await mainDb.Queryable<SystemLogOperationEntity>().Where(u => u.RequestUrl.Contains("/api/monitorPipeline/page")).ToListAsync());
+        Assert.Empty(await tenantDb.Queryable<SystemLogVisitEntity>().Where(u => u.ActionName == "GetPage").ToListAsync());
     }
 
     /// <summary>
@@ -208,7 +209,7 @@ public sealed class MonitorLoggingPipelineTests : IAsyncLifetime
     }
 
     /// <summary>
-    /// 验收 4（lesson 2026-07-11）：userInfo/logout 路由段仅落 visit 表（按上下文分平台/租户库），不落 operation。
+    /// 验收 4（lesson 2026-07-11）：userInfo/logout 路由段仅落主库 visit 表，不落 operation。
     /// </summary>
     [Fact]
     public async Task UserInfoAndLogout_WriteVisitRowsOnly()
@@ -219,10 +220,10 @@ public sealed class MonitorLoggingPipelineTests : IAsyncLifetime
         Assert.Equal(HttpStatusCode.OK, userInfoStatus);
         Assert.Equal(HttpStatusCode.OK, logoutStatus);
 
-        var tenantDb = _db.GetConnectionScope(TenantConfigId);
-        var tenantVisitRows = await tenantDb.Queryable<TenantLogVisitEntity>().Where(u => u.ActionName == "GetUserInfo").ToListAsync();
+        var tenantDb = _db.GetConnectionScope(MainConfigId);
+        var tenantVisitRows = await tenantDb.Queryable<SystemLogVisitEntity>().Where(u => u.ActionName == "GetUserInfo").ToListAsync();
         Assert.Single(tenantVisitRows);
-        Assert.Equal(1001L, tenantVisitRows[0].TenantId);
+        Assert.Null(tenantVisitRows[0].TenantId);
         Assert.Equal("tenant-admin", tenantVisitRows[0].Account);
 
         var mainDb = _db.GetConnectionScope(MainConfigId);
@@ -231,7 +232,7 @@ public sealed class MonitorLoggingPipelineTests : IAsyncLifetime
         Assert.True(mainVisitRows[0].LogDateTime > 0, "visit 行 LogDateTime 必须写入");
 
         // visit 不落 operation / exception
-        Assert.Empty(await tenantDb.Queryable<TenantLogOperationEntity>().Where(u => u.RequestUrl.Contains("/api/monitorPipeline/userInfo")).ToListAsync());
+        Assert.Empty(await tenantDb.Queryable<SystemLogOperationEntity>().Where(u => u.RequestUrl.Contains("/api/monitorPipeline/userInfo")).ToListAsync());
         Assert.Empty(await mainDb.Queryable<SystemLogOperationEntity>().Where(u => u.RequestUrl.Contains("/api/monitorPipeline/logout")).ToListAsync());
     }
 
@@ -245,11 +246,11 @@ public sealed class MonitorLoggingPipelineTests : IAsyncLifetime
 
         Assert.Equal(HttpStatusCode.OK, statusCode);
         var mainDb = _db.GetConnectionScope(MainConfigId);
-        var tenantDb = _db.GetConnectionScope(TenantConfigId);
+        var tenantDb = _db.GetConnectionScope(MainConfigId);
         Assert.Empty(await mainDb.Queryable<SystemLogOperationEntity>().Where(u => u.RequestUrl.Contains("/api/monitorPipeline/suppressed")).ToListAsync());
         Assert.Empty(await mainDb.Queryable<SystemLogVisitEntity>().Where(u => u.ActionName == "Suppressed").ToListAsync());
         Assert.Empty(await mainDb.Queryable<SystemLogExceptionEntity>().Where(u => u.RequestUrl.Contains("/api/monitorPipeline/suppressed")).ToListAsync());
-        Assert.Empty(await tenantDb.Queryable<TenantLogOperationEntity>().ToListAsync());
+        Assert.Empty(await tenantDb.Queryable<SystemLogOperationEntity>().ToListAsync());
     }
 
     /// <summary>
@@ -371,7 +372,6 @@ public sealed class MonitorLoggingPipelineTests : IAsyncLifetime
                     services.AddSingleton<SystemCacheService>();
                     services.AddScoped<SystemConfigService>();
                     services.AddSingleton<PlatformLoggingConfigProvider>();
-                    services.AddSingleton<ISqlSugarTenantIdResolver>(new NullTenantIdResolver());
                     services.AddScoped(typeof(SqlSugarRepository<>));
                     services.AddSingleton<IEventPublisher, CaptureEventPublisher>();
                     services.AddElasticSearch();
@@ -439,7 +439,7 @@ public sealed class MonitorLoggingPipelineTests : IAsyncLifetime
             claims.Add(new Claim(ClaimConst.Account, "tenant-admin"));
             claims.Add(new Claim(ClaimConst.RealName, "租户管理员"));
             claims.Add(new Claim(ClaimConst.UserId, "2001"));
-            claims.Add(new Claim(ClaimConst.TenantId, TenantConfigId));
+            claims.Add(new Claim("TenantId", TenantConfigId));
             claims.Add(new Claim(ClaimConst.AccountType, ((int)AccountTypeEnum.NormalUser).ToString()));
         }
 
@@ -463,17 +463,6 @@ public sealed class MonitorLoggingPipelineTests : IAsyncLifetime
         };
         SqlSugarSetup.SetDbConfig(config);
         return config;
-    }
-
-    /// <summary>
-    /// 无环境租户解析器：租户归属只来自日志 claims，与 Writer 独立作用域语义一致。
-    /// </summary>
-    private sealed class NullTenantIdResolver : ISqlSugarTenantIdResolver
-    {
-        public long? GetTenantId()
-        {
-            return null;
-        }
     }
 
     /// <summary>

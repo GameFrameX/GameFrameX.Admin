@@ -66,7 +66,7 @@ internal static class OnlineAssetTestSupport
     public static CurrentUserContext CreateUserContext(long tenantId = TenantA)
     {
         var identity = new global::System.Security.Claims.ClaimsIdentity("TestAuth");
-        identity.AddClaim(new global::System.Security.Claims.Claim(ClaimConst.TenantId, tenantId.ToString()));
+        identity.AddClaim(new global::System.Security.Claims.Claim("TenantId", tenantId.ToString()));
         var httpContext = new DefaultHttpContext { User = new global::System.Security.Claims.ClaimsPrincipal(identity), };
         var accessor = new HttpContextAccessor { HttpContext = httpContext, };
         return new CurrentUserContext(accessor);

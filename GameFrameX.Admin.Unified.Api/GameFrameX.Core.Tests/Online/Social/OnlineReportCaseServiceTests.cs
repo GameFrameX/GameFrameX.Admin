@@ -325,7 +325,7 @@ public sealed class OnlineReportCaseServiceTests : IDisposable
     private static CurrentUserContext CreateUserContext(long tenantId, long userId)
     {
         var identity = new ClaimsIdentity("TestAuth");
-        identity.AddClaim(new Claim(ClaimConst.TenantId, tenantId.ToString()));
+        identity.AddClaim(new Claim("TenantId", tenantId.ToString()));
         identity.AddClaim(new Claim(ClaimConst.UserId, userId.ToString()));
         var httpContext = new DefaultHttpContext { User = new ClaimsPrincipal(identity), };
         var accessor = new HttpContextAccessor { HttpContext = httpContext, };

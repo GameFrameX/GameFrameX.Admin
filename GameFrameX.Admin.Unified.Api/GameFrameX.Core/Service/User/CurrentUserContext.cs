@@ -1,4 +1,4 @@
-﻿using GameFrameX.Entity.Enum;
+using GameFrameX.Entity.Enum;
 
 namespace GameFrameX.Core.Service.User;
 
@@ -8,7 +8,6 @@ namespace GameFrameX.Core.Service.User;
 public class CurrentUserContext
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
-    private long _tenantId;
 
     public long UserId
     {
@@ -17,16 +16,6 @@ public class CurrentUserContext
             var idText = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimConst.UserId)?.Value;
             return long.TryParse(idText, out var id) ? id : 0;
         }
-    }
-
-    public long TenantId
-    {
-        get
-        {
-            var tId = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimConst.TenantId)?.Value;
-            return string.IsNullOrWhiteSpace(tId) ? _tenantId : long.Parse(tId);
-        }
-        set { _tenantId = value; }
     }
 
     public string? Account
@@ -42,15 +31,6 @@ public class CurrentUserContext
     public bool SuperAdmin
     {
         get => _httpContextAccessor?.HttpContext?.User.FindFirst(ClaimConst.AccountType)?.Value == ((int)AccountTypeEnum.SuperAdmin).ToString();
-    }
-
-    public long OrganizationId
-    {
-        get
-        {
-            var orgId = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimConst.OrganizationId)?.Value;
-            return string.IsNullOrWhiteSpace(orgId) ? 0 : long.Parse(orgId);
-        }
     }
 
     public string? OpenId

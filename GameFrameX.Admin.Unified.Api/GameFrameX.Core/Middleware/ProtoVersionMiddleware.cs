@@ -35,7 +35,7 @@ public sealed class ProtoVersionMiddleware
             }
 
             // 缺版本头一律拒绝；记录 path/appId 便于定位未携带头的接入方
-            logger.LogWarning("缺失协议版本头，拒绝请求：path={Path} appId={AppId}", context.Request.Path, context.Request.Headers[GlobalConst.AppIdHeader].FirstOrDefault());
+            logger.LogWarning("缺失协议版本头，拒绝请求：path={Path}", context.Request.Path);
             await MiddlewareResponseWriter.WriteRejectedAsync(context, StatusCodes.Status400BadRequest, "缺少协议版本头（X-Proto-Ver）");
             return;
         }
@@ -44,8 +44,8 @@ public sealed class ProtoVersionMiddleware
         if (!options.AllowedVersions.Contains(headerValue, StringComparer.Ordinal))
         {
             // AuditOnly：只告警不拦截（major 变更时才收紧）；记录 appId/租户便于定位未升级客户端
-            logger.LogWarning("未知协议版本放行（AuditOnly）：protoVer={ProtoVer} allowed=[{Allowed}] path={Path} appId={AppId}",
-                              headerValue, string.Join(",", options.AllowedVersions), context.Request.Path, context.Request.Headers[GlobalConst.AppIdHeader].FirstOrDefault());
+            logger.LogWarning("未知协议版本放行（AuditOnly）：protoVer={ProtoVer} allowed=[{Allowed}] path={Path}",
+                              headerValue, string.Join(",", options.AllowedVersions), context.Request.Path);
         }
 
         await _next(context);

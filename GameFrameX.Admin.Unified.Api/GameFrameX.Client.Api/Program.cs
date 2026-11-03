@@ -78,8 +78,7 @@ internal static class Program
         Ip2LocationManager.Init();
 
         builder.Services.AddSingleton<LauncherOptions>(launcherOptions);
-        // 租户解析接线（C260 共享扩展）：IHttpContextAccessor + 读取统一键 TenantContextAccessor.TenantIdKey 的解析器一次注册
-        var tenantIdResolver = builder.Services.AddSqlSugarTenantResolution(new HttpContextAccessor());
+        builder.Services.AddHttpContextAccessor();
         builder.Services.AddHttpClient();
         // 共享 MVC 装配（请求/响应日志两件套 + PascalCase JSON，C261 收敛至 Core）；
         // Client 特有：登录阻断异常（处罚事实源命中）→ HttpJsonResultData<BaseOperationAckResponse>.Error（不进共享层）
@@ -87,7 +86,7 @@ internal static class Program
 
         // 主库连接统一走 DbConnection 节 + GFX_MAIN_DB_* 单一入口（C269）；LauncherOptions 裸参数仅作兼容兜底
         var mainDbConfig = HostMainDbConnectionResolver.Resolve(builder.Configuration, launcherOptions);
-        var sqlSugar = SqlSugarClientConfig.AddSqlSugarClientService(mainDbConfig, tenantIdResolver);
+        var sqlSugar = SqlSugarClientConfig.AddSqlSugarClientService(mainDbConfig);
 
         builder.Services.AddSingleton<ISqlSugarClient>(sqlSugar); // 单例注册
         builder.Services.AddScoped(typeof(Repository<>)); // 仓储注册
@@ -183,7 +182,6 @@ internal static class Program
         app.UseRouting();
 
         // 租户解析中间件
-        app.UseMiddleware<TenantResolutionMiddleware>();
 
         // 公开 provider 回调租户解析中间件
         app.UseMiddleware<PublicCallbackTenantResolutionMiddleware>();

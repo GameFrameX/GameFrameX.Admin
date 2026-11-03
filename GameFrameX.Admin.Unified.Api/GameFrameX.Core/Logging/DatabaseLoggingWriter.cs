@@ -10,23 +10,17 @@ using IPTools.Core;
 namespace GameFrameX.Core.Logging;
 
 /// <summary>
-/// 数据库日志写入器。C156 起：日志不再写入独立日志库，而是按当前运行上下文分流——
-/// 平台上下文（SuperAdmin / 平台启动 / 无租户上下文）写 <see cref="SystemLogOperationEntity"/> 等平台日志到主库，
-/// 租户上下文（租户管理员 / 租户业务接口）写 <see cref="TenantLogOperationEntity"/> 等租户日志到当前租户库。
-/// 写入器运行在独立 <see cref="IServiceScope"/>，无 HTTP 租户上下文，因此租户库连接通过
-/// 所有日志均写入主库，历史实体分类保留供审计查询。
+/// 主库日志写入器。访问、操作和异常分别写入 SystemLog 表，历史日志表继续供审计查询。
 /// </summary>
 public class DatabaseLoggingWriter : IDatabaseLoggingWriter, IDisposable
 {
     private readonly IServiceScope _serviceScope;
-    private readonly SqlSugarRepository<SystemTenantEntity> _systemTenantRepository; // 租户
     private readonly SystemConfigService _systemConfigService; // 参数配置服务
     private readonly IEventPublisher _eventPublisher;
 
     public DatabaseLoggingWriter(IServiceScopeFactory scopeFactory)
     {
         _serviceScope = scopeFactory.CreateScope();
-        _systemTenantRepository = _serviceScope.ServiceProvider.GetRequiredService<SqlSugarRepository<SystemTenantEntity>>();
         _systemConfigService = _serviceScope.ServiceProvider.GetRequiredService<SystemConfigService>();
         _eventPublisher = _serviceScope.ServiceProvider.GetRequiredService<IEventPublisher>();
     }
@@ -63,7 +57,7 @@ public class DatabaseLoggingWriter : IDatabaseLoggingWriter, IDisposable
         }
 
         // 获取当前操作者
-        string account = "", realName = "", userId = "", tenantId = "", accountType = "";
+        string account = "", realName = "", userId = "";
         var authorizationClaims = loggingMonitor["authorizationClaims"]?.AsArray();
         if (authorizationClaims != null)
         {
@@ -85,31 +79,21 @@ public class DatabaseLoggingWriter : IDatabaseLoggingWriter, IDisposable
                     realName = (string?)item["value"] ?? string.Empty;
                 }
 
-                if (claimType == ClaimConst.TenantId)
-                {
-                    tenantId = (string?)item["value"] ?? string.Empty;
-                }
-
                 if (claimType == ClaimConst.UserId)
                 {
                     userId = (string?)item["value"] ?? string.Empty;
                 }
 
-                if (claimType == ClaimConst.AccountType)
-                {
-                    accountType = (string?)item["value"] ?? string.Empty;
-                }
             }
         }
 
-        if (string.IsNullOrWhiteSpace(tenantId))
+        if (string.IsNullOrWhiteSpace(account))
         {
-            TryFillTenantFromSuccessfulLoginParameters(
+            TryFillAccountFromSuccessfulLoginParameters(
                 (string?)loggingMonitor["actionTypeName"],
                 loggingMonitor["parameters"]?.ToJsonString(),
                 loggingMonitor["returnInformation"]?.ToJsonString(),
-                ref account,
-                ref tenantId);
+                ref account);
         }
 
         var remoteIPv4 = (string?)loggingMonitor["remoteIPv4"] ?? string.Empty;
@@ -129,7 +113,6 @@ public class DatabaseLoggingWriter : IDatabaseLoggingWriter, IDisposable
             Account = account,
             RealName = realName,
             UserId = userId,
-            TenantId = tenantId,
             RemoteIp = remoteIPv4,
             IpLocation = ipLocation,
             Longitude = longitude,
@@ -138,28 +121,16 @@ public class DatabaseLoggingWriter : IDatabaseLoggingWriter, IDisposable
             Os = os,
         };
 
-        var target = ResolveLogContext(tenantId, accountType);
-        var db = target.Db;
-        var usePlatformEntity = target.UsePlatformEntity;
+        var sqlSugarClient = _serviceScope.ServiceProvider.GetRequiredService<ISqlSugarClient>();
+        var db = sqlSugarClient.AsTenant().GetConnectionScope(SqlSugarConst.MainConfigId);
 
-        // 记录异常日志并发送邮件
+        // 异常日志优先记录，并继续发布错误邮件事件。
         if (logMsg.Exception != null || loggingMonitor["exception"] != null)
         {
-            if (usePlatformEntity)
-            {
-                var entity = new SystemLogExceptionEntity();
-                FillOperationFields(entity, ctx);
-                entity.Exception = loggingMonitor["exception"]?.ToJsonString();
-                await db.Insertable(entity).ExecuteCommandAsync();
-            }
-            else
-            {
-                var entity = new TenantLogExceptionEntity();
-                FillOperationFields(entity, ctx);
-                entity.Exception = loggingMonitor["exception"]?.ToJsonString();
-                await db.Insertable(entity).ExecuteCommandAsync();
-            }
-
+            var entity = new SystemLogExceptionEntity();
+            FillOperationFields(entity, ctx);
+            entity.Exception = loggingMonitor["exception"]?.ToJsonString();
+            await db.Insertable(entity).ExecuteCommandAsync();
             try
             {
                 await _eventPublisher.PublishAsync("Send:ErrorMail", loggingMonitor["exception"]);
@@ -171,69 +142,23 @@ public class DatabaseLoggingWriter : IDatabaseLoggingWriter, IDisposable
             return;
         }
 
-        // 记录访问日志-登录登出
         if ((string?)loggingMonitor["actionName"] == "userInfo" || (string?)loggingMonitor["actionName"] == "logout")
         {
-            if (usePlatformEntity)
-            {
-                var entity = new SystemLogVisitEntity();
-                FillVisitFields(entity, ctx);
-                await db.Insertable(entity).ExecuteCommandAsync();
-            }
-            else
-            {
-                var entity = new TenantLogVisitEntity();
-                FillVisitFields(entity, ctx);
-                await db.Insertable(entity).ExecuteCommandAsync();
-            }
-
+            var entity = new SystemLogVisitEntity();
+            FillVisitFields(entity, ctx);
+            await db.Insertable(entity).ExecuteCommandAsync();
             return;
         }
 
-        // 记录操作日志
-        var systemOpLogEnabled = await _systemConfigService.GetConfigValueAsync<bool>(CommonConst.SysOpLog);
-        if (!systemOpLogEnabled)
+        if (!await _systemConfigService.GetConfigValueAsync<bool>(CommonConst.SysOpLog))
         {
             return;
         }
 
-        if (usePlatformEntity)
-        {
-            var entity = new SystemLogOperationEntity();
-            FillOperationFields(entity, ctx);
-            entity.Exception = loggingMonitor["exception"]?.ToJsonString();
-            await db.Insertable(entity).ExecuteCommandAsync();
-        }
-        else
-        {
-            var entity = new TenantLogOperationEntity();
-            FillOperationFields(entity, ctx);
-            entity.Exception = loggingMonitor["exception"]?.ToJsonString();
-            await db.Insertable(entity).ExecuteCommandAsync();
-        }
-    }
-
-    /// <summary>
-    /// 解析日志写入目标库与实体归属。平台上下文（SuperAdmin 或无租户上下文）写入主库并使用 SystemLog* 实体；
-    /// 租户上下文写入当前租户库并使用 TenantLog* 实体。租户库未就绪时归类为平台日志，避免日志写入失败影响业务线程。
-    /// </summary>
-    /// <param name="tenantId">从日志 claims/登录参数解析到的租户 Id 字符串（可能为空）。</param>
-    /// <param name="accountType">从日志 claims 解析到的账号类型（SuperAdmin 判定依据）。</param>
-    /// <returns>写入目标连接与是否使用平台日志实体的标志。</returns>
-    private LogWriteTarget ResolveLogContext(string tenantId, string accountType)
-    {
-        var sqlSugarClient = _serviceScope.ServiceProvider.GetRequiredService<ISqlSugarClient>();
-        var tenant = sqlSugarClient.AsTenant();
-        var isSuperAdmin = accountType == ((int)AccountTypeEnum.SuperAdmin).ToString();
-        var tenantIdValue = string.IsNullOrWhiteSpace(tenantId) ? 0 : long.Parse(tenantId);
-        var mainDb = tenant.GetConnectionScope(SqlSugarConst.MainConfigId);
-
-        if (isSuperAdmin || tenantIdValue == 0)
-        {
-            return new LogWriteTarget { Db = mainDb, UsePlatformEntity = true, };
-        }
-
-        return new LogWriteTarget { Db = mainDb, UsePlatformEntity = false, };
+        var operation = new SystemLogOperationEntity();
+        FillOperationFields(operation, ctx);
+        operation.Exception = loggingMonitor["exception"]?.ToJsonString();
+        await db.Insertable(operation).ExecuteCommandAsync();
     }
 
     /// <summary>
@@ -257,7 +182,6 @@ public class DatabaseLoggingWriter : IDatabaseLoggingWriter, IDisposable
         target.Account = ctx.Account;
         target.RealName = ctx.RealName;
         target.CreatedId = string.IsNullOrWhiteSpace(ctx.UserId) ? 0 : long.Parse(ctx.UserId);
-        target.TenantId = string.IsNullOrWhiteSpace(ctx.TenantId) ? 0 : long.Parse(ctx.TenantId);
         target.LogLevel = ctx.LogMsg.LogLevel;
     }
 
@@ -280,12 +204,11 @@ public class DatabaseLoggingWriter : IDatabaseLoggingWriter, IDisposable
         target.Message = ctx.LogMsg.Message;
     }
 
-    private void TryFillTenantFromSuccessfulLoginParameters(
+    private void TryFillAccountFromSuccessfulLoginParameters(
         string? actionTypeName,
         string? parametersJson,
         string? returnInformationJson,
-        ref string account,
-        ref string tenantId)
+        ref string account)
     {
         if (!string.Equals(actionTypeName, "Login", StringComparison.Ordinal))
         {
@@ -308,26 +231,6 @@ public class DatabaseLoggingWriter : IDatabaseLoggingWriter, IDisposable
             account = scope.Account;
         }
 
-        if (scope.TenantId > 0)
-        {
-            tenantId = scope.TenantId.ToString();
-            return;
-        }
-
-        if (string.IsNullOrWhiteSpace(scope.TenantHost))
-        {
-            return;
-        }
-
-        var resolvedTenantId = _systemTenantRepository.AsQueryable()
-                                               .Filter(null, true)
-                                               .Where(u => u.Host == scope.TenantHost)
-                                               .Select(u => (long?)u.Id)
-                                               .First();
-        if (resolvedTenantId.HasValue && resolvedTenantId.Value > 0)
-        {
-            tenantId = resolvedTenantId.Value.ToString();
-        }
     }
 
     /// <summary>
@@ -344,11 +247,13 @@ public class DatabaseLoggingWriter : IDatabaseLoggingWriter, IDisposable
 
         try
         {
-            using var document = JsonDocument.Parse(returnInformationJson);
-            var root = document.RootElement;
-            return TryGetProperty(root, "httpStatusCode", out var statusCode)
-                   && statusCode.TryGetInt32(out var httpStatusCode)
-                   && httpStatusCode == StatusCodes.Status200OK;
+            using (var document = JsonDocument.Parse(returnInformationJson))
+            {
+                var root = document.RootElement;
+                return TryGetProperty(root, "httpStatusCode", out var statusCode)
+                       && statusCode.TryGetInt32(out var httpStatusCode)
+                       && httpStatusCode == StatusCodes.Status200OK;
+            }
         }
         catch
         {
@@ -357,7 +262,7 @@ public class DatabaseLoggingWriter : IDatabaseLoggingWriter, IDisposable
     }
 
     /// <summary>
-    /// 从登录参数中读取租户范围。
+    /// 从登录参数中读取操作账号。
     /// </summary>
     /// <param name="parametersJson">日志监控记录的参数 JSON。</param>
     /// <returns>登录范围。</returns>
@@ -370,41 +275,31 @@ public class DatabaseLoggingWriter : IDatabaseLoggingWriter, IDisposable
 
         try
         {
-            using var document = JsonDocument.Parse(parametersJson);
-            if (document.RootElement.ValueKind != JsonValueKind.Array)
+            using (var document = JsonDocument.Parse(parametersJson))
             {
-                return null;
-            }
-
-            foreach (var parameter in document.RootElement.EnumerateArray())
-            {
-                if (!TryGetProperty(parameter, "value", out var value)
-                    || value.ValueKind != JsonValueKind.Object)
+                if (document.RootElement.ValueKind != JsonValueKind.Array)
                 {
-                    continue;
+                    return null;
                 }
 
-                var scope = new LoginScope();
-                if (TryGetProperty(value, "account", out var account) && account.ValueKind == JsonValueKind.String)
+                foreach (var parameter in document.RootElement.EnumerateArray())
                 {
-                    scope.Account = account.GetString();
-                }
+                    if (!TryGetProperty(parameter, "value", out var value)
+                        || value.ValueKind != JsonValueKind.Object)
+                    {
+                        continue;
+                    }
 
-                if (TryGetProperty(value, "tenantId", out var tenantId)
-                    && tenantId.ValueKind == JsonValueKind.Number
-                    && tenantId.TryGetInt64(out var id))
-                {
-                    scope.TenantId = id;
-                }
+                    var scope = new LoginScope();
+                    if (TryGetProperty(value, "account", out var account) && account.ValueKind == JsonValueKind.String)
+                    {
+                        scope.Account = account.GetString();
+                    }
 
-                if (TryGetProperty(value, "tenantHost", out var tenantHost) && tenantHost.ValueKind == JsonValueKind.String)
-                {
-                    scope.TenantHost = tenantHost.GetString();
-                }
-
-                if (!string.IsNullOrWhiteSpace(scope.Account) || scope.TenantId > 0 || !string.IsNullOrWhiteSpace(scope.TenantHost))
-                {
-                    return scope;
+                    if (!string.IsNullOrWhiteSpace(scope.Account))
+                    {
+                        return scope;
+                    }
                 }
             }
         }
@@ -420,20 +315,7 @@ public class DatabaseLoggingWriter : IDatabaseLoggingWriter, IDisposable
     {
         public string? Account { get; set; }
 
-        public long TenantId { get; set; }
 
-        public string? TenantHost { get; set; }
-    }
-
-    /// <summary>
-    /// 日志写入目标（连接 + 是否使用平台日志实体），由 <see cref="ResolveLogContext"/> 按运行上下文解析。
-    /// 用具名类型承载多值返回，避免 C# 元组语法（项目架构约束禁用元组）。
-    /// </summary>
-    private sealed class LogWriteTarget
-    {
-        public SqlSugarScopeProvider Db { get; set; } = null!;
-
-        public bool UsePlatformEntity { get; set; }
     }
 
     /// <summary>
@@ -451,7 +333,6 @@ public class DatabaseLoggingWriter : IDatabaseLoggingWriter, IDisposable
 
         public string UserId { get; set; } = null!;
 
-        public string TenantId { get; set; } = null!;
 
         public string RemoteIp { get; set; } = null!;
 

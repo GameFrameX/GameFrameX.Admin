@@ -1,4 +1,4 @@
-﻿namespace GameFrameX.Core.Const;
+namespace GameFrameX.Core.Const;
 
 /// <summary>
 /// Claim相关常量
@@ -29,26 +29,6 @@ public sealed class ClaimConst
     /// 账号类型
     /// </summary>
     public const string AccountType = "AccountType";
-
-    /// <summary>
-    /// 租户Id
-    /// </summary>
-    public const string TenantId = "TenantId";
-
-    /// <summary>
-    /// 组织机构Id
-    /// </summary>
-    public const string OrganizationId = "OrganizationId";
-
-    /// <summary>
-    /// 组织机构名称
-    /// </summary>
-    public const string OrganizationName = "OrganizationName";
-
-    /// <summary>
-    /// 组织机构类型
-    /// </summary>
-    public const string OrganizationType = "OrganizationType";
 
     /// <summary>
     /// 微信OpenId

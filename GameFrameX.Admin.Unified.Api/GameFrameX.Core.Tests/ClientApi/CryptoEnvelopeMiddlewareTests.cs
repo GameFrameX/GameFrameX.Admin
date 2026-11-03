@@ -91,12 +91,12 @@ public sealed class CryptoEnvelopeMiddlewareTests
 
         if (appId.HasValue)
         {
-            context.Request.Headers[GlobalConst.AppIdHeader] = appId.Value.ToString();
+            context.Request.Headers["GameFrameX-App-Id"] = appId.Value.ToString();
         }
 
         if (tenantId.HasValue)
         {
-            context.Items[TenantContextAccessor.TenantIdKey] = tenantId.Value;
+            context.Items["TenantId"] = tenantId.Value;
         }
 
         return context;
