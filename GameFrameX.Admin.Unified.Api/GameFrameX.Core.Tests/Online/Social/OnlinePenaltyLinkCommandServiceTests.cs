@@ -47,7 +47,7 @@ public sealed class OnlinePenaltyLinkCommandServiceTests : IDisposable
         _db = _scopeOwner.GetConnectionScope("penalty-link");
         SqlSugarUnifiedConfig.ConfigureBaseFilters(_db);
         _db.CodeFirst.InitTables(
-            typeof(TenantGameAppEntity),
+
             typeof(TenantGameAreaEntity),
             typeof(TenantGamePenaltyEntity));
     }
@@ -232,13 +232,6 @@ public sealed class OnlinePenaltyLinkCommandServiceTests : IDisposable
     private async Task SeedScopeAsync(bool appServers = true)
     {
         var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-        await _db.Insertable(new TenantGameAppEntity
-        {
-            Id = App100,
-            Name = "app-100",
-            CreatedTime = now,
-            IsDeleted = false,
-        }).ExecuteCommandAsync();
 
         if (appServers)
         {

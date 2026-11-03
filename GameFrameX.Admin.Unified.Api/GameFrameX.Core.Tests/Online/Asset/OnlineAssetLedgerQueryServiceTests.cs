@@ -31,7 +31,7 @@ public sealed class OnlineAssetLedgerQueryServiceTests : IDisposable
         _db = _scopeOwner.GetConnectionScope("online-asset-ledger");
         SqlSugarUnifiedConfig.ConfigureBaseFilters(_db);
         _db.CodeFirst.InitTables(
-            typeof(TenantGameAppEntity),
+
             typeof(TenantGameAreaEntity));
     }
 

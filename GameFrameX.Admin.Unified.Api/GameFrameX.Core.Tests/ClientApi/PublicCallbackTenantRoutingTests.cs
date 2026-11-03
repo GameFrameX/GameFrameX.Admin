@@ -45,7 +45,6 @@ public sealed class PublicCallbackTenantRoutingTests : IDisposable
         {
             nextCalled = true;
             Assert.False(context.Items.ContainsKey(TenantContextAccessor.TenantIdKey));
-            Assert.False(context.Items.ContainsKey(AppResolutionMiddleware.AppIdKey));
             Assert.IsType<PublicCallbackRouteContext>(context.Items[PublicCallbackRouteContext.ItemKey]);
             Assert.Equal(packageId, context.Items[PaymentOptionSettingProvider.PackageIdKey]);
             return Task.CompletedTask;
@@ -101,7 +100,6 @@ public sealed class PublicCallbackTenantRoutingTests : IDisposable
         InsertAliPayConfig(fixture.TenantDb, tenantId, appId, true);
         var httpContext = new DefaultHttpContext();
         httpContext.Items[TenantContextAccessor.TenantIdKey] = tenantId;
-        httpContext.Items[AppResolutionMiddleware.AppIdKey] = appId;
         httpContext.Items[PaymentOptionSettingProvider.PackageIdKey] = packageId;
         httpContext.Items[PaymentOptionSettingProvider.PaymentIsSandboxKey] = true;
         var provider = new PaymentOptionSettingProvider(fixture.TenantDbProvider, new HttpContextAccessor { HttpContext = httpContext, });
@@ -141,7 +139,6 @@ public sealed class PublicCallbackTenantRoutingTests : IDisposable
         }).ExecuteCommand();
         var httpContext = new DefaultHttpContext();
         httpContext.Items[TenantContextAccessor.TenantIdKey] = tenantId;
-        httpContext.Items[AppResolutionMiddleware.AppIdKey] = appId;
         httpContext.Items[PublicCallbackRouteContext.ItemKey] = new PublicCallbackRouteContext("pangle", "ad", null);
         var provider = new ClientApiTenantOptionsProvider(fixture.TenantDbProvider, new HttpContextAccessor { HttpContext = httpContext, });
 
@@ -178,7 +175,7 @@ public sealed class PublicCallbackTenantRoutingTests : IDisposable
         _scopes.Add(mainDb);
         _scopes.Add(tenantDb);
         mainDb.CodeFirst.InitTables(typeof(SystemTenantEntity));
-        tenantDb.CodeFirst.InitTables(typeof(TenantGameAppEntity), typeof(TenantGameAppPackageEntity), typeof(TenantGamePaymentConfigEntity), typeof(TenantAdvertisementCallbackConfigEntity));
+        tenantDb.CodeFirst.InitTables(typeof(TenantGameAppPackageEntity), typeof(TenantGamePaymentConfigEntity), typeof(TenantAdvertisementCallbackConfigEntity));
         var tenantConnection = BuildConnectionString(_tenantDatabase);
         mainDb.Insertable(new SystemTenantEntity
         {
@@ -188,16 +185,6 @@ public sealed class PublicCallbackTenantRoutingTests : IDisposable
             Connection = tenantConnection,
             ConfigId = tenantId.ToString(),
             IsEnabled = true,
-        }).ExecuteCommand();
-        tenantDb.Insertable(new TenantGameAppEntity
-        {
-            Id = appId,
-            TenantId = tenantId,
-            Name = "C59 Test App",
-            AppSecret = "secret",
-            IsEnabled = true,
-            IsDeleted = false,
-            UpdateTime = 1,
         }).ExecuteCommand();
         if (packageId.HasValue)
         {
@@ -224,7 +211,6 @@ public sealed class PublicCallbackTenantRoutingTests : IDisposable
                                                                     ? parsed
                                                                     : null);
         var tenantDbProvider = mainDb;
-        var appCacheService = new AppCacheService(tenantDbProvider, resolver);
         var routeResolver = new PublicCallbackRouteResolver(tenantDb);
         return new PostgresFixture(mainDb, tenantDb, tenantDbProvider, routeResolver, context => currentContext = context);
     }

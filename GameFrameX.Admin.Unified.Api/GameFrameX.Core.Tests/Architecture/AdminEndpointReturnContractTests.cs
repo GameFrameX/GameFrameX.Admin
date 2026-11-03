@@ -33,7 +33,6 @@ public sealed class AdminEndpointReturnContractTests
     private static readonly HashSet<string> SensitiveDisplayFieldAllowlist = new(StringComparer.Ordinal)
     {
         // GameApp 创建/重置一次性回传明文，列表与详情恒 ******（TenantGameAppEntityService）
-        "GameFrameX.Application.Game.App.GameApp.Dto.GameAppResponse.AppSecret",
         // App 签名密钥环：列表/详情恒 ******（PageAsync 强制重置）；AddAsync/RotateAsync 响应一次性回传明文（C2 TenantAppSignatureKeyEntityService）
         "GameFrameX.Application.Game.Tenant.Security.TenantAppSignatureKey.Dto.TenantAppSignatureKeyResponse.Secret",
         "GameFrameX.Application.Game.Tenant.Security.TenantAppSignatureKey.Dto.TenantAppSignatureKeyRevealResponse.Secret",

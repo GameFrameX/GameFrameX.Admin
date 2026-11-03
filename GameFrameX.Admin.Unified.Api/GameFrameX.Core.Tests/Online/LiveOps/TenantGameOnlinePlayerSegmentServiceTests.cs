@@ -42,7 +42,7 @@ public sealed class TenantGameOnlinePlayerSegmentServiceTests : IDisposable
         _db = _scopeOwner.GetConnectionScope("online-segment");
         SqlSugarUnifiedConfig.ConfigureBaseFilters(_db);
         _db.CodeFirst.InitTables(
-            typeof(TenantGameAppEntity),
+
             typeof(TenantGameOnlinePlayerSegmentEntity),
             typeof(TenantGameOnlineConfigRolloutEntity));
     }
@@ -214,13 +214,6 @@ public sealed class TenantGameOnlinePlayerSegmentServiceTests : IDisposable
 
     private async Task SeedAsync()
     {
-        await _db.Insertable(new TenantGameAppEntity
-        {
-            Id = App100,
-            Name = "app-100",
-            CreatedTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
-            IsDeleted = false,
-        }).ExecuteCommandAsync();
     }
 
     private sealed class FakeDispatchService : IOnlineLiveOpsDispatchService

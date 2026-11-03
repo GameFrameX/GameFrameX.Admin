@@ -1,6 +1,5 @@
 using System.Security.Cryptography;
 using GameFrameX.Entity.Tenant.Game;
-using GameFrameX.Application.Game.App.AppScope;
 using GameFrameX.Application.Game.Tenant.Security.TenantAppSignatureKey.Dto;
 using GameFrameX.Core.Service;
 using GameFrameX.Core.Service.Tenant;
@@ -32,7 +31,6 @@ public class TenantAppSignatureKeyEntityService : BaseService<TenantAppSignature
         var appId = input.AppId;
         var page = await Repository.AsQueryable()
                                    .Where(u => u.IsDeleted == false)
-                                   .ApplyAppIdFilter(appId, u => u.AppId)
                                    .WhereIF(input.IsActive.HasValue, u => u.IsEnabled == input.IsActive.Value)
                                    .OrderBy(u => u.CreatedTime, OrderByType.Desc)
                                    .Select<TenantAppSignatureKeyResponse>()

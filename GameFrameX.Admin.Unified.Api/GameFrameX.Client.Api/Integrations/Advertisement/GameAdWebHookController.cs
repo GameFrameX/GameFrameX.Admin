@@ -2,7 +2,6 @@ using GameFrameX.Client.Api.Services.PublicCallback;
 using GameFrameX.Advertisement.Abstract;
 using GameFrameX.Advertisement.AdMob;
 using GameFrameX.Advertisement.Pangle;
-using GameFrameX.Application.Game.App.AppScope;
 using GameFrameX.Client.Api.Integrations.Advertisement.Dto;
 using GameFrameX.Client.Api.Services;
 using GameFrameX.Client.Api.Services.ClientApiTenantOptions;
@@ -151,7 +150,6 @@ public class GameAdWebHookController : BaseController<TenantGameRoleAdvertisemen
                 RoleId = playerId.ToString(),
                 AreaId = gameRoleEntity.AreaId,
                 // 事实数据应用作用域：AppId 来自已通过签名验证并按 playerId 查到的角色实体（C75 落地），不接受请求体或路由参数覆盖。
-                AppId = AppScopeRules.EnsureFactAppId(gameRoleEntity.AppId, "游戏角色广告"),
                 IsSendSuccess = true,
                 CreatedTime = TimerHelper.UnixTimeSeconds(),
             };

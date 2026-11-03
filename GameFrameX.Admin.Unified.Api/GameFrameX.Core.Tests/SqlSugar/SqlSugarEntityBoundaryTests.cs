@@ -24,9 +24,9 @@ public class SqlSugarEntityBoundaryTests
     [Fact]
     public void TenantGameEntity_IsTenantDatabase()
     {
-        Assert.True(SqlSugarEntityBoundary.IsTenantTable(typeof(TenantGameAppEntity)));
-        Assert.False(SqlSugarEntityBoundary.IsPlatformTable(typeof(TenantGameAppEntity)));
-        Assert.Equal("tenant_game_app_entity", SqlSugarEntityBoundary.GetPhysicalTableName(typeof(TenantGameAppEntity), nameof(TenantGameAppEntity)));
+        Assert.True(SqlSugarEntityBoundary.IsTenantTable(typeof(TenantGameGoodsEntity)));
+        Assert.False(SqlSugarEntityBoundary.IsPlatformTable(typeof(TenantGameGoodsEntity)));
+        Assert.Equal("tenant_game_goods_entity", SqlSugarEntityBoundary.GetPhysicalTableName(typeof(TenantGameGoodsEntity), nameof(TenantGameGoodsEntity)));
     }
 
     [Fact]
@@ -49,15 +49,14 @@ public class SqlSugarEntityBoundaryTests
     [Fact]
     public void TenantGameEntity_IsInitializedInMainDatabase()
     {
-        Assert.True(SqlSugarEntityBoundary.IsMainDatabaseTable(typeof(TenantGameAppEntity)));
+        Assert.True(SqlSugarEntityBoundary.IsMainDatabaseTable(typeof(TenantGameGoodsEntity)));
     }
 
     [Fact]
-    public void TenantGameAppEntityFamily_UsesTenantGameAppPrefixAndEntitySuffix()
+    public void TenantGameGoodsEntityFamily_UsesTenantGameAppPrefixAndEntitySuffix()
     {
         var entityTypes = new[]
         {
-            typeof(TenantGameAppEntity),
             typeof(TenantGameAppPackageEntity),
             typeof(TenantGameAppOpenAccessEntity),
             typeof(TenantGameAppAssetPackageEntity),

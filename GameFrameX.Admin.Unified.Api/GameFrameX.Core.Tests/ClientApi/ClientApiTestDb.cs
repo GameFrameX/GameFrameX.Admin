@@ -88,11 +88,6 @@ internal sealed class ClientApiTestDb : IDisposable
             context.Items[TenantContextAccessor.TenantIdKey] = TenantId;
         }
 
-        if (includeApp)
-        {
-            context.Items[AppResolutionMiddleware.AppIdKey] = AppId;
-        }
-
         if (packageId.HasValue)
         {
             context.Items[PaymentOptionSettingProvider.PackageIdKey] = packageId.Value;
@@ -104,22 +99,6 @@ internal sealed class ClientApiTestDb : IDisposable
     public void AttachContext(Controller controller, bool includeTenant = true, bool includeApp = true)
     {
         controller.ControllerContext = new ControllerContext { HttpContext = CreateHttpContext(includeTenant, includeApp), };
-    }
-
-    public TenantGameAppEntity SeedApp(string appSecret = "secret")
-    {
-        InitTenantTables(typeof(TenantGameAppEntity));
-        var entity = WithBasic(new TenantGameAppEntity
-        {
-            Id = AppId,
-            Name = "C108 Test App",
-            AppSecret = appSecret,
-            IsEnabled = true,
-            IsDeleted = false,
-            UpdateTime = 1,
-        });
-        TenantDb.Insertable(entity).ExecuteCommand();
-        return entity;
     }
 
     public TenantGameAppPackageEntity SeedPackage(long packageId, string packageName)

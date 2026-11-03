@@ -14,15 +14,6 @@ GameFrameX.Application.Game.App.FeatureSwitch.TenantGameAppFeatureSwitchService|
 GameFrameX.Application.Game.App.FeatureSwitch.TenantGameAppFeatureSwitchService|api/tenantGameAppFeatureSwitch/detail|GET
 GameFrameX.Application.Game.App.FeatureSwitch.TenantGameAppFeatureSwitchService|api/tenantGameAppFeatureSwitch/page|POST
 GameFrameX.Application.Game.App.FeatureSwitch.TenantGameAppFeatureSwitchService|api/tenantGameAppFeatureSwitch/update|POST
-GameFrameX.Application.Game.App.GameApp.TenantGameAppEntityService|api/tenantGameAppEntity/add|POST
-GameFrameX.Application.Game.App.GameApp.TenantGameAppEntityService|api/tenantGameAppEntity/delete|POST
-GameFrameX.Application.Game.App.GameApp.TenantGameAppEntityService|api/tenantGameAppEntity/detail|GET
-GameFrameX.Application.Game.App.GameApp.TenantGameAppEntityService|api/tenantGameAppEntity/list|GET
-GameFrameX.Application.Game.App.GameApp.TenantGameAppEntityService|api/tenantGameAppEntity/page|POST
-GameFrameX.Application.Game.App.GameApp.TenantGameAppEntityService|api/tenantGameAppEntity/resetSecret|POST
-GameFrameX.Application.Game.App.GameApp.TenantGameAppEntityService|api/tenantGameAppEntity/selectString|POST
-GameFrameX.Application.Game.App.GameApp.TenantGameAppEntityService|api/tenantGameAppEntity/select|POST
-GameFrameX.Application.Game.App.GameApp.TenantGameAppEntityService|api/tenantGameAppEntity/update|POST
 GameFrameX.Application.Game.App.GameAppAssetPackage.TenantGameAppAssetPackageService|api/tenantGameAppAssetPackage/add|POST
 GameFrameX.Application.Game.App.GameAppAssetPackage.TenantGameAppAssetPackageService|api/tenantGameAppAssetPackage/delete|POST
 GameFrameX.Application.Game.App.GameAppAssetPackage.TenantGameAppAssetPackageService|api/tenantGameAppAssetPackage/detail|GET

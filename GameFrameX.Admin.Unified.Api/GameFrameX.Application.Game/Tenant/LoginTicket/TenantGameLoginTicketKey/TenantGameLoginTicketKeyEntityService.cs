@@ -1,7 +1,6 @@
 using System.Security.Cryptography;
 using GameFrameX.Foundation.Logger;
 using GameFrameX.Entity.Tenant.Game;
-using GameFrameX.Application.Game.App.AppScope;
 using GameFrameX.Application.Game.Tenant.LoginTicket.TenantGameLoginTicketKey.Dto;
 using GameFrameX.Core.Service.Tenant;
 using GameFrameX.Core.Service.User;
@@ -35,7 +34,6 @@ public class TenantGameLoginTicketKeyEntityService : BaseService<TenantGameLogin
         var appId = input.AppId;
         return await Repository.AsQueryable()
                                .Where(u => u.IsDeleted == false)
-                               .ApplyAppIdFilter(appId, u => u.AppId)
                                .WhereIF(input.IsActive.HasValue, u => u.IsEnabled == input.IsActive.Value)
                                .OrderBy(u => u.CreatedTime, OrderByType.Desc)
                                .Select<TenantGameLoginTicketKeyResponse>()

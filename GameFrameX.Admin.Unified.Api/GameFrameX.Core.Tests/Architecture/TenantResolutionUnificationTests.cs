@@ -1,4 +1,4 @@
-using GameFrameX.Client.Api.Middleware;
+using GameFrameX.Client.Api.Services.PackageVersion;
 using GameFrameX.Core.Const;
 using GameFrameX.Core.Middleware;
 using GameFrameX.Hub.Api.Middleware;
@@ -14,7 +14,7 @@ public class TenantResolutionUnificationTests
     private static readonly global::System.Reflection.Assembly[] HostAssemblies =
     {
         typeof(TenantResolutionMiddleware).Assembly,
-        typeof(AppResolutionMiddleware).Assembly,
+        typeof(GameAppPackageResolver).Assembly,
         typeof(HubTenantMiddleware).Assembly,
     };
 

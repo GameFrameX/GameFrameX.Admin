@@ -102,7 +102,7 @@ internal static class Program
         builder.Services.AddCache(); // 注册 ICache（MemoryCacheService 实现）
         // C1 传输签名验证：SignatureValidation 节配置，默认关闭，与客户端同版本上线时打开
         builder.Services.Configure<SignatureValidationOptions>(builder.Configuration.GetSection("SignatureValidation"));
-        // C2 签名密钥环：App 级 v2 密钥解析（依赖均为 Singleton，缓存为进程内懒刷新，同 AppCacheService 口径）
+        // 签名密钥解析使用进程内缓存，按需刷新。
         builder.Services.AddSingleton<ISignatureKeyResolver, SignatureKeyResolver>();
         // C2 验签灰度分流：App 级 RiskEnforcementMode（依赖 Scoped 仓储，随请求作用域解析）
         builder.Services.AddScoped<IGameAppRiskEnforcementModeResolver, GameAppRiskEnforcementModeResolver>();
@@ -115,7 +115,6 @@ internal static class Program
         builder.Services.AddSingleton<SystemCacheService>(); // 仅依赖 ICache + IOptions<CacheOptions>
         builder.Services.AddTransient<TenantGameOrderShipService>(); // 订单发货/退款服务
         builder.Services.AddSingleton<GameAppPackageResolver>(); // 包名解析服务
-        builder.Services.AddSingleton<AppCacheService>(); // 应用缓存服务
         builder.Services.AddSingleton<PublicCallbackRouteResolver>(); // 公开 provider 回调 URL -> 租户/应用上下文解析
         // Client API 请求期租户配置 Provider：依赖 IHttpContextAccessor + ISqlSugarClient，按请求作用域读取租户库配置
         builder.Services.AddScoped<IClientApiTenantOptionsProvider, ClientApiTenantOptionsProvider>();
@@ -199,30 +198,6 @@ internal static class Program
         app.UseMiddleware<CryptoEnvelopeMiddleware>();
 
         // 租户到期拦截中间件
-
-        // 应用验证中间件
-        app.UseMiddleware<AppResolutionMiddleware>();
-
-        // 启动时加载应用缓存
-        var appCacheService = app.Services.GetRequiredService<AppCacheService>();
-        await appCacheService.InitializeAsync();
-
-        // 后台定时刷新应用缓存（每 30 秒检查一次）
-        _ = Task.Run(async () =>
-        {
-            using var timer = new PeriodicTimer(TimeSpan.FromSeconds(30));
-            while (await timer.WaitForNextTickAsync())
-            {
-                try
-                {
-                    await appCacheService.CheckAndRefreshAsync();
-                }
-                catch
-                {
-                    /* 静默失败，下次重试 */
-                }
-            }
-        });
 
         // 启动时加载包映射缓存
         var packageResolver = app.Services.GetRequiredService<GameAppPackageResolver>();

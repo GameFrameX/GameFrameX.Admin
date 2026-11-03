@@ -1,5 +1,4 @@
 using System.Security.Cryptography;
-using GameFrameX.Application.Game.App.AppScope;
 using GameFrameX.Application.Game.Tenant.Security.TenantSessionKey.Dto;
 using GameFrameX.Core.Service.Base;
 using GameFrameX.Core.Service;
@@ -32,7 +31,6 @@ public class TenantSessionKeyEntityService : BaseService<TenantSessionKeyEntity>
         var appId = input.AppId;
         var page = await Repository.AsQueryable()
                                    .Where(u => u.IsDeleted == false)
-                                   .ApplyAppIdFilter(appId, u => u.AppId)
                                    .WhereIF(input.IsActive.HasValue, u => u.IsEnabled == input.IsActive.Value)
                                    .OrderBy(u => u.CreatedTime, OrderByType.Desc)
                                    .Select<TenantSessionKeyResponse>()

@@ -32,7 +32,7 @@ public sealed class OnlineControlledCommandServiceTests : IDisposable
         _db = _scopeOwner.GetConnectionScope("online-controlled-command");
         SqlSugarUnifiedConfig.ConfigureBaseFilters(_db);
         _db.CodeFirst.InitTables(
-            typeof(TenantGameAppEntity),
+
             typeof(TenantGameAreaEntity));
     }
 

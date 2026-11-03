@@ -52,7 +52,7 @@ public sealed class OnlineLiveOpsDispatchServiceTests : IDisposable
         _db = _scopeOwner.GetConnectionScope("online-liveops");
         SqlSugarUnifiedConfig.ConfigureBaseFilters(_db);
         _db.CodeFirst.InitTables(
-            typeof(TenantGameAppEntity),
+
             typeof(TenantGameAreaEntity),
             typeof(TenantGameAppRemoteConfigEntity),
             typeof(TenantGameAppDeviceGroupEntity),
@@ -260,8 +260,6 @@ public sealed class OnlineLiveOpsDispatchServiceTests : IDisposable
     {
         var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
-        await _db.Insertable(new TenantGameAppEntity { Id = App100, Name = "app-100", CreatedTime = now, IsDeleted = false, }).ExecuteCommandAsync();
-        await _db.Insertable(new TenantGameAppEntity { Id = App200, Name = "app-200", CreatedTime = now, IsDeleted = false, }).ExecuteCommandAsync();
         await _db.Insertable(NewArea(Area1001, App100, now)).ExecuteCommandAsync();
 
         // 四类配置来源各一行（归属 App100）；公告 9005 归属 App200（构造跨应用场景）

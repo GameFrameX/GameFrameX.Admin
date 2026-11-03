@@ -27,7 +27,7 @@ public class SqlSugarDatabaseInitializationTests : IDisposable
         typeof(GlobalDictionaryDataEntity),
         typeof(GlobalChannelDefinitionEntity),
         typeof(TenantChannelDefinitionEntity),
-        typeof(TenantGameAppEntity),
+        typeof(TenantGameGoodsEntity),
         typeof(SystemLogVisitEntity),
         typeof(SystemLogOperationEntity),
         typeof(SystemLogDiffEntity),
@@ -57,7 +57,7 @@ public class SqlSugarDatabaseInitializationTests : IDisposable
         Assert.True(TableExists(mainDb, typeof(GlobalChannelDefinitionEntity)));
         Assert.True(TableExists(mainDb, typeof(TenantUserEntity)));
         Assert.True(TableExists(mainDb, typeof(TenantChannelDefinitionEntity)));
-        Assert.True(TableExists(mainDb, typeof(TenantGameAppEntity)));
+        Assert.True(TableExists(mainDb, typeof(TenantGameGoodsEntity)));
         Assert.True(TableExists(mainDb, typeof(SystemLogVisitEntity)));
         Assert.True(TableExists(mainDb, typeof(SystemLogOperationEntity)));
         Assert.True(TableExists(mainDb, typeof(SystemLogDiffEntity)));

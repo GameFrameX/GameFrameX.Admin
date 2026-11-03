@@ -31,7 +31,7 @@ public sealed class OnlineOverviewQueryServiceTests : IDisposable
         _db = _scopeOwner.GetConnectionScope("online-overview");
         SqlSugarUnifiedConfig.ConfigureBaseFilters(_db);
         _db.CodeFirst.InitTables(
-            typeof(TenantGameAppEntity),
+
             typeof(TenantGameAreaEntity));
     }
 

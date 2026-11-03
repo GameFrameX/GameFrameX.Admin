@@ -103,13 +103,6 @@ internal static class OnlineAssetTestSupport
     public static async Task SeedScopeAsync(SqlSugarScopeProvider db, bool secondArea = false)
     {
         var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-        await db.Insertable(new TenantGameAppEntity
-        {
-            Id = App100,
-            Name = "app-100",
-            CreatedTime = now,
-            IsDeleted = false,
-        }).ExecuteCommandAsync();
         await db.Insertable(NewArea(Area1001, App100, now)).ExecuteCommandAsync();
         if (secondArea)
         {

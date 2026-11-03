@@ -32,7 +32,7 @@ public sealed class OnlineAssetGrantCommandServiceTests : IDisposable
         _db = _scopeOwner.GetConnectionScope("online-asset-grant");
         SqlSugarUnifiedConfig.ConfigureBaseFilters(_db);
         _db.CodeFirst.InitTables(
-            typeof(TenantGameAppEntity),
+
             typeof(TenantGameAreaEntity));
     }
 

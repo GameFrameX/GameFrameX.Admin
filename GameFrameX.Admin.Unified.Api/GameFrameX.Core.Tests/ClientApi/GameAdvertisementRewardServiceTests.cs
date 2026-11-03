@@ -48,7 +48,6 @@ public sealed class GameAdvertisementRewardServiceTests
         var rows = await db.TenantDb.Queryable<TenantGameAdvertisementRewardEntity>().ToListAsync();
         Assert.Single(rows);
         Assert.Equal(AdvertisementRewardStatusEnum.Success, rows[0].Status);
-        Assert.Equal(db.AppId, rows[0].AppId);
     }
 
     [Fact]

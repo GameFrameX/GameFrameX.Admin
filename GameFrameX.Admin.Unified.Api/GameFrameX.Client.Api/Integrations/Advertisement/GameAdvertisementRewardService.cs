@@ -1,5 +1,4 @@
 using GameFrameX.Advertisement.Abstract;
-using GameFrameX.Application.Game.App.AppScope;
 using GameFrameX.Application.Game.ServerManager;
 using GameFrameX.Client.Api.Services.ClientApiTenantOptions;
 using GameFrameX.Entity.Enum;
@@ -154,7 +153,7 @@ public sealed class GameAdvertisementRewardService
             return new AdvertisementRewardReceiveResult(false, CodeGeneral, "奖励发放处理中", idempotencyKey, AdvertisementRewardStatusEnum.Pending);
         }
 
-        // 5. 解析角色 + 应用作用域（仅占位成功后执行）
+        // 5. 解析角色（仅占位成功后执行）
         RoleResolution? resolution = null;
         string? roleFailureReason = null;
         try
@@ -163,11 +162,6 @@ public sealed class GameAdvertisementRewardService
             if (resolution?.Role == null)
             {
                 roleFailureReason = "角色或区服不存在";
-            }
-            else if (!AppScopeRules.IsValidFactAppId(resolution.Role.AppId))
-            {
-                roleFailureReason = "应用作用域无效";
-                resolution = null;
             }
         }
         catch (Exception ex)
@@ -180,8 +174,6 @@ public sealed class GameAdvertisementRewardService
         var ledger = await _rewardRepository.GetFirstAsync(x => x.IdempotencyKey == idempotencyKey);
         if (resolution != null)
         {
-            // 应用作用域事实守卫（双保险，Valid 已过；保留 EnsureFactAppId 链式赋值语义）
-            ledger.AppId = AppScopeRules.EnsureFactAppId(resolution.Role.AppId, "游戏广告奖励");
             ledger.RoleId = resolution.Role.Id.ToString();
             ledger.UserId = resolution.UserId;
             ledger.AreaId = resolution.Role.AreaId;

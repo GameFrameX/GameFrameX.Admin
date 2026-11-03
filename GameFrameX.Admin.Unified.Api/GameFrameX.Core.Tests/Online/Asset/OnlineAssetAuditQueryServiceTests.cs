@@ -30,7 +30,7 @@ public sealed class OnlineAssetAuditQueryServiceTests : IDisposable
         _db = _scopeOwner.GetConnectionScope("online-asset-audit");
         SqlSugarUnifiedConfig.ConfigureBaseFilters(_db);
         _db.CodeFirst.InitTables(
-            typeof(TenantGameAppEntity),
+
             typeof(TenantGameAreaEntity));
     }
 

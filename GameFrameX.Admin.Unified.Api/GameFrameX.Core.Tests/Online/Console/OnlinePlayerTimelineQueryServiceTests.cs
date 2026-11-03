@@ -31,7 +31,7 @@ public sealed class OnlinePlayerTimelineQueryServiceTests : IDisposable
         _db = _scopeOwner.GetConnectionScope("online-player-timeline");
         SqlSugarUnifiedConfig.ConfigureBaseFilters(_db);
         _db.CodeFirst.InitTables(
-            typeof(TenantGameAppEntity),
+
             typeof(TenantGameAreaEntity));
     }
 

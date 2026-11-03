@@ -17,7 +17,6 @@ public sealed class BusinessPageSearchKeyRemovalGuardTests
     {
         "TenantGameAnnouncementEntityService",
         "TenantGameBannerAnnouncementEntityService",
-        "TenantGameAppEntityService",
         "TenantGameAppAssetPackageService",
         "TenantGameAppAssetPackageVersionService",
         "TenantGameAppPackageService",

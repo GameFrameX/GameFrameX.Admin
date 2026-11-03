@@ -31,7 +31,7 @@ public sealed class OnlineAssetTransactionQueryServiceTests : IDisposable
         _db = _scopeOwner.GetConnectionScope("online-asset-detail");
         SqlSugarUnifiedConfig.ConfigureBaseFilters(_db);
         _db.CodeFirst.InitTables(
-            typeof(TenantGameAppEntity),
+
             typeof(TenantGameAreaEntity));
     }
 

@@ -47,7 +47,7 @@ public sealed class OnlineReportCaseServiceTests : IDisposable
         _db = _scopeOwner.GetConnectionScope("report-case");
         SqlSugarUnifiedConfig.ConfigureBaseFilters(_db);
         _db.CodeFirst.InitTables(
-            typeof(TenantGameAppEntity),
+
             typeof(TenantGameAreaEntity),
             typeof(TenantGamePenaltyEntity));
     }
@@ -290,13 +290,6 @@ public sealed class OnlineReportCaseServiceTests : IDisposable
     private async Task SeedScopeAsync()
     {
         var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-        await _db.Insertable(new TenantGameAppEntity
-        {
-            Id = App100,
-            Name = "app-100",
-            CreatedTime = now,
-            IsDeleted = false,
-        }).ExecuteCommandAsync();
 
         await _db.Insertable(new TenantGameAreaEntity
         {

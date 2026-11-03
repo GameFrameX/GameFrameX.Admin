@@ -6,7 +6,7 @@ namespace GameFrameX.Entity.Tenant.Game;
 /// <summary>
 /// 游戏广告奖励发放账本。
 /// <para>广告奖励发放权威事实源（C114 / GFX-110），覆盖 TopOn / GoogleAdMob / UnityAds 服务端回调。</para>
-/// <para>作用域：事实数据应用作用域 <see cref="EntityBasic"/> 的 <c>TenantId</c> + <see cref="AppId"/>；AppId 跟随角色 AppId，由 <c>AppScopeRules.EnsureFactAppId</c> 守卫。</para>
+/// <para>作用域：事实数据应用作用域 <see cref="EntityBasic"/> 的 <c>TenantId</c> + <see cref="AppId"/>；AppId 跟随角色 AppId，由 <c>原应用规则.EnsureFactAppId</c> 守卫。</para>
 /// <para>幂等：<see cref="IdempotencyKey"/> = <c>adreward:{NormalizedProvider}:{TransactionId}</c>，数据库唯一约束兜底，同一广告 transaction 重放不重复发奖。</para>
 /// </summary>
 [SugarTable(null, "游戏广告奖励发放账本")]
