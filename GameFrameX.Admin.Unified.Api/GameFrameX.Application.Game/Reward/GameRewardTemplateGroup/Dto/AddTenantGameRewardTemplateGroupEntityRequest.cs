@@ -6,12 +6,6 @@ namespace GameFrameX.Application.Game.Reward.GameRewardTemplateGroup.Dto;
 public class AddTenantGameRewardTemplateGroupEntityRequest : BaseAddRequest
 {
     /// <summary>
-    /// 应用Id。奖励模板分组必须绑定具体应用，禁止 AppId=0。
-    /// </summary>
-    [Required(ErrorMessage = "应用Id不能为空")]
-    public long AppId { get; set; }
-
-    /// <summary>
     /// 名称。
     /// </summary>
     [Required(ErrorMessage = "名称不能为空")]

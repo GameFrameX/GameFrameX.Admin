@@ -33,15 +33,15 @@ public class RewardTemplateContractTests
     }
 
     [Fact]
-    public void RewardTemplateInputs_ExposeRequiredAppAndRewardFields()
+    public void RewardTemplateInputs_ExposeRewardFieldsWithoutApplication()
     {
-        AssertRequired<AddTenantGameRewardTemplateGroupEntityRequest>(nameof(AddTenantGameRewardTemplateGroupEntityRequest.AppId));
+        Assert.Null(typeof(AddTenantGameRewardTemplateGroupEntityRequest).GetProperty("AppId"));
         Assert.Null(typeof(AddTenantGameRewardTemplateGroupEntityRequest).GetProperty("Code"));
         Assert.Null(typeof(AddTenantGameRewardTemplateGroupEntityRequest).GetProperty("Icon"));
-        AssertRequired<AddTenantGameRewardTemplateEntityRequest>(nameof(AddTenantGameRewardTemplateEntityRequest.AppId));
+        Assert.Null(typeof(AddTenantGameRewardTemplateEntityRequest).GetProperty("AppId"));
         AssertRequired<AddTenantGameRewardTemplateEntityRequest>(nameof(AddTenantGameRewardTemplateEntityRequest.GroupId));
         AssertRequired<AddTenantGameRewardTemplateEntityRequest>(nameof(AddTenantGameRewardTemplateEntityRequest.RewardItemsJson));
-        AssertRequired<TenantGameRewardTemplateSnapshotRequest>(nameof(TenantGameRewardTemplateSnapshotRequest.AppId));
+        Assert.Null(typeof(TenantGameRewardTemplateSnapshotRequest).GetProperty("AppId"));
     }
 
     [Fact]
@@ -75,19 +75,19 @@ public class RewardTemplateContractTests
     }
 
     [Fact]
-    public void RewardTemplateServices_GuardAppScopeAndRewardSnapshotContracts()
+    public void RewardTemplateServices_GuardRewardSnapshotContracts()
     {
         var groupSource = File.ReadAllText(Path.Combine(FindRepoRoot(), "GameFrameX.Application.Game/Reward/GameRewardTemplateGroup/TenantGameRewardTemplateGroupEntityService.cs"));
         var templateSource = File.ReadAllText(Path.Combine(FindRepoRoot(), "GameFrameX.Application.Game/Reward/GameRewardTemplate/TenantGameRewardTemplateEntityService.cs"));
 
-        Assert.Contains("EnsureFactAppId(input.AppId", groupSource);
-        Assert.Contains("EnsureFactAppId(input.AppId", templateSource);
-        Assert.Contains("ValidateGroupBelongsToAppAsync(input.GroupId, input.AppId)", templateSource);
+        Assert.DoesNotContain("EnsureFactAppId", groupSource);
+        Assert.DoesNotContain("EnsureFactAppId", templateSource);
+        Assert.Contains("ValidateGroupAsync(input.GroupId)", templateSource);
         Assert.Contains("ValidateRewardItemsJson(input.RewardItemsJson)", templateSource);
         Assert.Contains("RowVersion = t.RowVersion", templateSource);
         Assert.DoesNotContain("GroupCode", templateSource);
         Assert.DoesNotContain("EnsureCodeUniqueAsync", groupSource);
-        Assert.Contains("entity.AppId != appId", templateSource);
+        Assert.DoesNotContain("entity.AppId", templateSource);
         Assert.Contains("entity.IsEnabled == false", templateSource);
     }
 

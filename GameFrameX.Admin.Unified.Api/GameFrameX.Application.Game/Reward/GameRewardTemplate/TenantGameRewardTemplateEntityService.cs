@@ -1,4 +1,3 @@
-using GameFrameX.Application.Game.App.AppScope;
 using GameFrameX.Application.Game.Reward.GameRewardTemplate.Dto;
 using GameFrameX.Foundation.Json;
 
@@ -14,33 +13,27 @@ public class TenantGameRewardTemplateEntityService
         AddTenantGameRewardTemplateEntityRequest, UpdateTenantGameRewardTemplateEntityRequest,
         TenantGameRewardTemplateEntityResponse, PageTenantGameRewardTemplateEntityRequest>
 {
-    private readonly SqlSugarRepository<Entity.Tenant.Game.TenantGameAppEntity> _gameAppRepository;
     private readonly SqlSugarRepository<Entity.Tenant.Game.TenantGameRewardTemplateGroupEntity> _groupRepository;
 
     public TenantGameRewardTemplateEntityService(
         SqlSugarRepository<Entity.Tenant.Game.TenantGameRewardTemplateEntity> repository,
-        SqlSugarRepository<Entity.Tenant.Game.TenantGameAppEntity> gameAppRepository,
         SqlSugarRepository<Entity.Tenant.Game.TenantGameRewardTemplateGroupEntity> groupRepository)
         : base(repository)
     {
-        _gameAppRepository = gameAppRepository;
         _groupRepository = groupRepository;
     }
 
     protected override ISugarQueryable<TenantGameRewardTemplateEntityResponse> BuildPageQuery(PageTenantGameRewardTemplateEntityRequest input)
     {
-        var appId = AppScopeRules.EnsureFactAppId(input.AppId, "奖励模板");
         return Repository.AsQueryable()
                          .WhereIF(!string.IsNullOrWhiteSpace(input.SearchKey), u => u.Name.Contains(input.SearchKey.Trim()))
                          .WhereIF(!string.IsNullOrWhiteSpace(input.Name), u => u.Name.Contains(input.Name.Trim()))
                          .WhereIF(input.GroupId.HasValue, u => u.GroupId == input.GroupId.Value)
                          .WhereIF(input.IsEnabled.HasValue, u => u.IsEnabled == input.IsEnabled.Value)
-                         .Where(u => u.AppId == appId)
-                         .LeftJoin<Entity.Tenant.Game.TenantGameRewardTemplateGroupEntity>((t, g) => t.GroupId == g.Id && t.AppId == g.AppId)
+                         .LeftJoin<Entity.Tenant.Game.TenantGameRewardTemplateGroupEntity>((t, g) => t.GroupId == g.Id)
                          .Select((t, g) => new TenantGameRewardTemplateEntityResponse
                          {
                              Id = t.Id,
-                             AppId = t.AppId,
                              Name = t.Name,
                              Description = t.Description,
                              GroupId = t.GroupId,
@@ -58,19 +51,17 @@ public class TenantGameRewardTemplateEntityService
     }
 
     /// <summary>
-    /// 获取当前应用下启用的奖励模板。
+    /// 获取主库中启用的奖励模板。
     /// </summary>
     [HttpPost(CrudActionRoutes.Select)]
     [ApiDescriptionSettings(Name = "Select")]
     public override async Task<List<BaseSelectPageResponse>> SelectAsync(BaseSelectPageRequest input)
     {
-        var appId = AppScopeRules.EnsureFactAppId(input.AppId, "奖励模板");
         var searchKey = input.SearchKey?.Trim() ?? string.Empty;
         var pageSize = Math.Min(input.PageSize > 0 ? input.PageSize : BaseSelectPageRequest.DefaultPageSize, BaseSelectPageRequest.MaxPageSize);
         var rows = await Repository.AsQueryable()
                                    .Where(u => u.IsDeleted == false)
                                    .Where(u => u.IsEnabled != false)
-                                   .Where(u => u.AppId == appId)
                                    .WhereIF(!string.IsNullOrWhiteSpace(searchKey), u => u.Name.Contains(searchKey))
                                    .OrderBy(u => u.Sort)
                                    .OrderBy(u => u.Id)
@@ -87,16 +78,10 @@ public class TenantGameRewardTemplateEntityService
     [ApiDescriptionSettings(Name = "CopySnapshot")]
     public async Task<TenantGameRewardTemplateSnapshotResponse> CopySnapshotAsync(TenantGameRewardTemplateSnapshotRequest input)
     {
-        var appId = AppScopeRules.EnsureFactAppId(input.AppId, "奖励模板");
         var entity = await Repository.GetFirstAsync(u => u.Id == input.Id && u.IsDeleted == false);
         if (entity == null)
         {
             throw BusinessError.Oh(CommonErrorCode.RecordNotFound);
-        }
-
-        if (entity.AppId != appId)
-        {
-            throw BusinessError.Oh("奖励模板不属于当前应用");
         }
 
         if (entity.IsEnabled == false)
@@ -108,7 +93,6 @@ public class TenantGameRewardTemplateEntityService
         return new TenantGameRewardTemplateSnapshotResponse
         {
             Id = entity.Id,
-            AppId = entity.AppId,
             Name = entity.Name,
             GroupId = entity.GroupId,
             RewardItemsJson = entity.RewardItemsJson,
@@ -118,9 +102,7 @@ public class TenantGameRewardTemplateEntityService
 
     protected override async Task OnAddingAsync(AddTenantGameRewardTemplateEntityRequest input)
     {
-        AppScopeRules.EnsureFactAppId(input.AppId, "奖励模板");
-        await _gameAppRepository.ValidateGameAppBelongsToTenantAsync(input.AppId);
-        await ValidateGroupBelongsToAppAsync(input.GroupId, input.AppId);
+        await ValidateGroupAsync(input.GroupId);
         ValidateRewardItemsJson(input.RewardItemsJson);
         input.SnapshotSchemaVersion = 1;
     }
@@ -133,10 +115,7 @@ public class TenantGameRewardTemplateEntityService
             throw BusinessError.Oh(CommonErrorCode.RecordNotFound);
         }
 
-        input.AppId = existing.AppId;
-        AppScopeRules.EnsureFactAppId(input.AppId, "奖励模板");
-        await _gameAppRepository.ValidateGameAppBelongsToTenantAsync(input.AppId);
-        await ValidateGroupBelongsToAppAsync(input.GroupId, input.AppId);
+        await ValidateGroupAsync(input.GroupId);
         ValidateRewardItemsJson(input.RewardItemsJson);
         input.SnapshotSchemaVersion = 1;
     }
@@ -174,17 +153,17 @@ public class TenantGameRewardTemplateEntityService
         }
     }
 
-    private async Task ValidateGroupBelongsToAppAsync(long groupId, long appId)
+    private async Task ValidateGroupAsync(long groupId)
     {
         if (groupId <= 0)
         {
             throw BusinessError.Oh("奖励模板分组不能为空");
         }
 
-        var group = await _groupRepository.GetFirstAsync(u => u.Id == groupId && u.AppId == appId && u.IsEnabled != false);
+        var group = await _groupRepository.GetFirstAsync(u => u.Id == groupId && u.IsEnabled != false);
         if (group == null)
         {
-            throw BusinessError.Oh("奖励模板分组不存在或不属于当前应用");
+            throw BusinessError.Oh("奖励模板分组不存在或已禁用");
         }
     }
 }

@@ -21,11 +21,6 @@ public class TenantGameRewardTemplateEntityResponse : IBasePageResponse<Entity.T
     public string Description { get; set; } = null!;
 
     /// <summary>
-    /// 应用Id。奖励模板属于应用内容作用域（TenantId + AppId），必须 &gt; 0。
-    /// </summary>
-    public long AppId { get; set; }
-
-    /// <summary>
     /// 分组Id。必须属于同一应用下的奖励模板分组。
     /// </summary>
     public long GroupId { get; set; }

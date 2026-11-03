@@ -21,11 +21,6 @@ public class TenantGameRewardTemplateGroupEntityResponse : IBasePageResponse<Ent
     public string Description { get; set; } = null!;
 
     /// <summary>
-    /// 应用Id
-    /// </summary>
-    public long AppId { get; set; }
-
-    /// <summary>
     /// 排序
     /// </summary>
     public int Sort { get; set; }
