@@ -30,7 +30,7 @@
 
 > 一句话定位：**面向独立游戏开发者的运营 + 联运后台平台**。后端 `.NET 10 + SqlSugar` 三主机（Admin / Client / Hub），前端 `Vue 3 + PrimeVue`，从管理员登录到玩家支付回调一条链路全栈跑通，开箱即用。
 
-**GameFrameX Admin** 是一套**面向游戏运营**的后台系统：管理端给运营 / GM / 客服改菜单、查订单、推版本、看日志；客户端 API 给游戏端登录 / 支付 / 拉配置；Hub API 给外部系统（CI 打包、Tapd WebHook、第三方回调）。一套仓库三套主机，分库部署互不拖累。
+**GameFrameX Admin** 是一套**面向游戏运营**的后台系统：管理端给运营 / GM / 客服改菜单、查订单、推版本、看日志；客户端 API 给游戏端登录 / 支付 / 拉配置；Hub API 给外部系统（CI 打包、容器编排、功能开关同步）。一套仓库三套主机，分库部署互不拖累。
 
 它**不是**通用 OA / CRM / 商城系统。菜单、权限、字典、表单、客户端配置等都是围绕"游戏后台"的真实业务场景设计的。
 
@@ -173,7 +173,6 @@ App 应用（租户下的具体游戏 / 产品）── AppId 作用域
 |---|---|
 | 平台租户管理 | 租户 CRUD、租户库自动开通 / 停用 / 到期 |
 | 全局平台 / 语言 / 渠道定义 | 平台级枚举与多语言基线 |
-| 区域管理 | 行政区划 5 级树，支持从统计局同步 |
 | 系统配置 | 键值对；高频配置迁入主库 `SystemConfig`（JWT / 密码策略 / 图形验证码） |
 | 数据库管理 | 表 / 列 CRUD、库表结构在线管理 |
 
@@ -181,15 +180,13 @@ App 应用（租户下的具体游戏 / 产品）── AppId 作用域
 
 | 模块 | 干啥 |
 |---|---|
-| 服务监控 | 主机信息、CPU / 内存 / 磁盘 / 已加载程序集 |
 | 在线用户 | 实时列表 + 强制下线，基于 SignalR |
 | 公告管理 | 系统通知 + SignalR 实时推送 |
 | 文件管理 | 本地存储 + 阿里云 OSS + 腾讯 COS（多 provider） |
-| 定时任务 | `ProjectScheduler` 项目自有调度器；内置 / 脚本编译 / HTTP 三类；运行时编译 C# 动态 API |
-| 邮件 / 短信 | `Mail.Abstract` 多 provider + `Sms.Abstract` Aliyun 实现 |
+| 定时任务 | `ProjectScheduler` 项目自有调度器；内置 / 脚本编译 / HTTP 三类 |
+| 邮件 | `GameFrameX.Email.Abstract` 多 Provider |
 | 系统接口 | Swashbuckle Swagger；生产默认不挂（需 `Swagger__Enabled=true`） |
 | 四类日志 | 操作 / 异常 / 访问 / 数据变更（字段级 Diff 审计），支持 Excel 导出 |
-| 运行时插件 | C# 代码动态编译并注册为 API 端点 |
 | 缓存管理 | Memory / Redis 统一抽象 |
 
 **游戏后台（76 个 Application.Game 服务）**
@@ -212,11 +209,9 @@ App 应用（租户下的具体游戏 / 产品）── AppId 作用域
 
 | 集成 | 说明 |
 |---|---|
-| 微信 | `Wechat.Abstract` + `Wechat.Open` 双 SDK；公众号 OAuth2、小程序登录、模板消息、JS-SDK |
 | 微信支付 | JSAPI 下单（直连 / 服务商）+ 支付回调（`Payment.Wechat`） |
 | 支付 | 支付宝 / Apple IAP（含 App Store Server API v2）/ Google Play / Xsolla，抽象层 + 多 provider |
 | 对象存储 | Local / Tencent COS（多 provider） |
-| 短信 | Aliyun 短信 Provider |
 | 邮件 | Tencent SES / SMTP（多 provider） |
 
 **前端框架特性**
@@ -297,10 +292,7 @@ CI 门禁（防回潮）：
 ![参数配置](doc/img/4.png)
 ![字典管理](doc/img/5.png)
 ![任务调度](doc/img/6.png)
-![服务监控](doc/img/7.png)
 ![缓存管理](doc/img/8.png)
-![行政区划](doc/img/9.png)
-![动态插件](doc/img/10.png)
 ![开放接口](doc/img/11.png)
 ![验证码配置](doc/img/12.png)
 ![租户管理](doc/img/13.png)

@@ -1,7 +1,6 @@
+using GameFrameX.Application.System.GlobalPlatform;
 using GameFrameX.Core.Job;
 using GameFrameX.Application.System.Job;
-using GameFrameX.Application.System.Plugin;
-using GameFrameX.Wechat.Abstract;
 using GameFrameX.Core.Service.Tenant;
 using GameFrameX.Core.Service.User;
 using GameFrameX.Foundation.Localization.Providers;
@@ -22,9 +21,8 @@ public class ProjectDependencyInjectionSetupTests
 
         services.AddProjectDependencyInjection();
 
+        AssertDescriptor(services, typeof(GlobalPlatformService), typeof(GlobalPlatformService), ServiceLifetime.Transient);
         AssertDescriptor(services, typeof(TenantUserService), typeof(TenantUserService), ServiceLifetime.Transient);
-        AssertDescriptor(services, typeof(TenantWechatConfigResolver), typeof(TenantWechatConfigResolver), ServiceLifetime.Transient);
-        AssertDescriptor(services, typeof(SystemPluginService), typeof(SystemPluginService), ServiceLifetime.Transient);
         AssertDescriptor(services, typeof(DynamicJobCompiler), typeof(DynamicJobCompiler), ServiceLifetime.Singleton);
         AssertDescriptor(services, typeof(IJobClusterServer), typeof(JobClusterServer), ServiceLifetime.Singleton);
         AssertDescriptor(services, typeof(TenantAccessGate), typeof(TenantAccessGate), ServiceLifetime.Transient);

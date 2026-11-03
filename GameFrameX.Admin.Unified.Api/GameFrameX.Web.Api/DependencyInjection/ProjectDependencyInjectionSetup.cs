@@ -12,7 +12,6 @@ public static class ProjectDependencyInjectionSetup
     private static readonly HashSet<string> SingletonTypes = new(StringComparer.Ordinal)
     {
         "GameFrameX.Core.EventBus.AppEventSubscriber",
-"GameFrameX.Wechat.Abstract.WechatApiHttpClientFactory",
         "GameFrameX.Core.Service.Cache.SystemCacheService",
         "GameFrameX.Core.Job.DynamicJobCompiler",
         "GameFrameX.Core.Service.PlatformCaptcha.PlatformCaptchaStorage",
@@ -69,8 +68,7 @@ public static class ProjectDependencyInjectionSetup
                    or "GameFrameX.Application.System"
                    or "GameFrameX.Core"
                    or "GameFrameX.Core.Utility"
-                   or "GameFrameX.ObjectStorage.Local"
-                   or "GameFrameX.Wechat.Abstract";
+                   or "GameFrameX.ObjectStorage.Local";
     }
 
     private static bool IsServiceLikeName(string name)

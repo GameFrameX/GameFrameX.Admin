@@ -2,8 +2,6 @@ using System.Text.Json.Nodes;
 using GameFrameX.Advertisement.Abstract;
 using GameFrameX.Application.Game.Tenant.Integration.TenantAdvertisementCallbackConfig;
 using GameFrameX.Application.Game.Tenant.Integration.TenantAdvertisementCallbackConfig.Dto;
-using GameFrameX.Application.Game.Tenant.Integration.TenantEmailConfig;
-using GameFrameX.Application.Game.Tenant.Integration.TenantEmailConfig.Dto;
 using GameFrameX.Application.Game.Tenant.Security.TenantAppSignatureKey;
 using GameFrameX.Application.Game.Tenant.Security.TenantAppSignatureKey.Dto;
 using GameFrameX.Core.Service;
@@ -16,12 +14,11 @@ using Microsoft.Extensions.Logging.Abstractions;
 
 namespace GameFrameX.Core.Tests.Tenant;
 
-// C371（GFX-838）T6：凭证写入路径「确定最终明文之后、落库之前加密」三条代表链路。
+// C371（GFX-838）T6：凭证写入路径「确定最终明文之后、落库之前加密」两条代表链路。
 // change：gfx-doc/dev/game-business/changes/C371-tenant-credential-encryption-application/change.md
 // 密钥环（SignatureKey）：Add/Rotate 响应一次性回显明文，库内密文且可解密还原；
-// 配置对（Email）：Add 落密文，Update 回传 ****** 保留原密文、改传新明文换新密文；
 // JSON 凭证（Advertisement）：Add 后汇总列密文 + ConfigJson 敏感字段密文、非敏感字段明文，Update 掩码保留。
-// 其余实体（SessionKey / TicketKey / Policy / OpenAccess / Sms / Wechat / Payment）与上述同型插入，
+// 其余实体（SessionKey / TicketKey / Policy / OpenAccess / Payment）与上述同型插入，
 // 由 TenantCredentialWritePathGuardTests 源码级守护覆盖。
 public sealed class TenantCredentialWritePathCryptoTests : IDisposable
 {
@@ -32,7 +29,7 @@ public sealed class TenantCredentialWritePathCryptoTests : IDisposable
     {
         _originalKey = Environment.GetEnvironmentVariable(TenantSecretCrypto.KeyEnvironmentVariable);
         Environment.SetEnvironmentVariable(TenantSecretCrypto.KeyEnvironmentVariable, "unit-test-secret-key");
-        _db.InitTenantTables(typeof(TenantAppSignatureKeyEntity), typeof(TenantEmailConfigEntity), typeof(TenantAdvertisementCallbackConfigEntity));
+        _db.InitTenantTables(typeof(TenantAppSignatureKeyEntity), typeof(TenantAdvertisementCallbackConfigEntity));
     }
 
     public void Dispose()
@@ -59,57 +56,6 @@ public sealed class TenantCredentialWritePathCryptoTests : IDisposable
         Assert.NotEqual(storedAdded.Secret, storedRotated.Secret);
     }
 
-    [Fact]
-    public async Task EmailConfig_AddStoresCipher_UpdateMaskPreserves_NewPlaintextReEncrypts()
-    {
-        var service = new TenantEmailConfigEntityService(
-            new Repository<TenantEmailConfigEntity>(_db.MainDb, _db.TenantDbProvider, _db.TenantIdResolver),
-            NullLogger<TenantEmailConfigEntityService>.Instance);
-
-        var added = await service.AddAsync(new AddTenantEmailConfigRequest
-        {
-            AppId = 0,
-            Purpose = 1,
-            FromEmailAddress = "noreply@example.com",
-            FromEmailSecretId = "plain-id",
-            FromEmailSecretKey = "plain-key",
-        });
-        var stored = _db.TenantDb.Queryable<TenantEmailConfigEntity>().Filter(null, true).First(u => u.Id == added.Id);
-        Assert.StartsWith(TenantSecretCrypto.EncryptedPrefix, stored.FromEmailSecretId, StringComparison.Ordinal);
-        Assert.Equal("plain-id", TenantSecretCrypto.Decrypt(stored.FromEmailSecretId));
-
-        // 回传 ******：保留库内原值（密文原串不变）
-        var cipherBefore = stored.FromEmailSecretKey;
-        await service.UpdateAsync(new UpdateTenantEmailConfigRequest
-        {
-            Id = added.Id,
-            AppId = 0,
-            Purpose = 1,
-            Provider = stored.Provider,
-            FromEmailAddress = stored.FromEmailAddress,
-            FromEmailSecretId = SensitiveFieldMask.MaskValue,
-            FromEmailSecretKey = SensitiveFieldMask.MaskValue,
-            RowVersion = stored.RowVersion,
-        });
-        stored = _db.TenantDb.Queryable<TenantEmailConfigEntity>().Filter(null, true).First(u => u.Id == added.Id);
-        Assert.Equal(cipherBefore, stored.FromEmailSecretKey);
-
-        // 改传新明文：换新密文，可解密还原
-        await service.UpdateAsync(new UpdateTenantEmailConfigRequest
-        {
-            Id = added.Id,
-            AppId = 0,
-            Purpose = 1,
-            Provider = stored.Provider,
-            FromEmailAddress = stored.FromEmailAddress,
-            FromEmailSecretId = "new-plain-id",
-            FromEmailSecretKey = "new-plain-key",
-            RowVersion = stored.RowVersion,
-        });
-        stored = _db.TenantDb.Queryable<TenantEmailConfigEntity>().Filter(null, true).First(u => u.Id == added.Id);
-        Assert.Equal("new-plain-id", TenantSecretCrypto.Decrypt(stored.FromEmailSecretId));
-        Assert.Equal("new-plain-key", TenantSecretCrypto.Decrypt(stored.FromEmailSecretKey));
-    }
 
     [Fact]
     public async Task AdvertisementConfig_AddEncryptsColumnsAndSensitiveJsonFields_MaskUpdatePreserves()

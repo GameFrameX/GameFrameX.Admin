@@ -79,4 +79,3 @@ GameFrameX.Payment.Xsolla|GameFrameX.Payment.Xsolla.Order.OrderManager+OrderPara
 GameFrameX.Payment.Xsolla|GameFrameX.Payment.Xsolla.Order.OrderManager+OrderParamsCreateSettings|Type|OrderParamsCreateSettings # Params
 GameFrameX.Payment.Xsolla|GameFrameX.Payment.Xsolla.Order.OrderManager+OrderParamsCreateUser|Type|OrderParamsCreateUser # Params
 GameFrameX.Payment.Xsolla|GameFrameX.Payment.Xsolla.Order.OrderManager+OrderParamsCreate|Type|OrderParamsCreate # Params
-GameFrameX.Sms.Abstract|GameFrameX.Sms.Abstract.SmsSendOptions|Property|TemplateParamJson # Param

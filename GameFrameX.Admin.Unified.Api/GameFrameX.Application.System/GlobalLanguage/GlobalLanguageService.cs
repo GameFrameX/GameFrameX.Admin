@@ -1,35 +1,33 @@
-using GameFrameX.Application.System.GlobalLanguage.Dto;
-
 namespace GameFrameX.Application.System.GlobalLanguage;
 
 /// <summary>
-/// 语言管理服务
+/// 语言定义选择器服务（仅保留下拉数据源端点，供保留页的语言选择器调用）
 /// </summary>
 [ApiDescriptionSettings(Order = 100)]
-public class GlobalLanguageService
-    : GenericCrudSelectService<GameFrameX.Entity.Global.GlobalLanguageEntity,
-        AddGlobalLanguageRequest, UpdateGlobalLanguageRequest,
-        GlobalLanguageResponse, PageGlobalLanguageRequest>
+public class GlobalLanguageService : IAdminApiController
 {
+    private readonly SqlSugarRepository<GameFrameX.Entity.Global.GlobalLanguageEntity> _repository;
+
     public GlobalLanguageService(SqlSugarRepository<GameFrameX.Entity.Global.GlobalLanguageEntity> repository)
-        : base(repository)
     {
+        _repository = repository;
     }
 
     /// <summary>
     /// 获取语言选择器列表
     /// </summary>
     [HttpPost(CrudActionRoutes.Select)]
+    [DisplayName("获取语言选择器列表")]
     [ApiDescriptionSettings(Name = "Select")]
-    public override async Task<List<BaseSelectPageResponse>> SelectAsync(BaseSelectPageRequest input)
+    public async Task<List<BaseSelectPageResponse>> SelectAsync(BaseSelectPageRequest input)
     {
         var searchKey = input.SearchKey?.Trim() ?? string.Empty;
-        var query = await Repository.AsQueryable()
-                                    .WhereIF(!string.IsNullOrWhiteSpace(searchKey), u =>
+        var query = await _repository.AsQueryable()
+                                     .WhereIF(!string.IsNullOrWhiteSpace(searchKey), u =>
                                                  (u.Name ?? string.Empty).Contains(searchKey)
                                                  || (u.Description ?? string.Empty).Contains(searchKey)
                                                  || (u.Code ?? string.Empty).Contains(searchKey))
-                                    .ToListAsync();
+                                     .ToListAsync();
 
         return query.OrderByDescending(u => u.IsDefault == true
                                             || u.Name == "default"
@@ -44,8 +42,23 @@ public class GlobalLanguageService
                     .ToList();
     }
 
-    protected override async Task OnAddingAsync(AddGlobalLanguageRequest input)
+    /// <summary>
+    /// 获取语言选择器列表（字符串 ID）
+    /// </summary>
+    [HttpPost(CrudActionRoutes.SelectString)]
+    [DisplayName("获取语言选择器列表（字符串 ID）")]
+    [ApiDescriptionSettings(Name = "SelectString")]
+    public async Task<List<BaseSelectPageStringResponse>> SelectStringAsync(BaseSelectPageRequest input)
     {
-        await CheckNameUniqueAsync(input.Name);
+        var searchKey = input.SearchKey?.Trim() ?? string.Empty;
+        var pageSize = Math.Min(input.PageSize > 0 ? input.PageSize : BaseSelectPageRequest.DefaultPageSize, BaseSelectPageRequest.MaxPageSize);
+        var query = await _repository.AsQueryable()
+                                     .Where(u => u.IsDeleted == false)
+                                     .WhereIF(!string.IsNullOrWhiteSpace(searchKey), u => (u.Name ?? string.Empty).Contains(searchKey))
+                                     .Take(pageSize)
+                                     .ToListAsync();
+
+        return query.Select(u => new BaseSelectPageStringResponse { Id = u.Id.ToString(), Value = u.Name ?? string.Empty, Label = u.Description, })
+                     .ToList();
     }
 }

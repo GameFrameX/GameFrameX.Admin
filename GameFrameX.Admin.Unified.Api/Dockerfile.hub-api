@@ -38,9 +38,6 @@ COPY ["Payment/GameFrameX.Payment.Apple.AppStoreServer/GameFrameX.Payment.Apple.
 COPY ["Payment/GameFrameX.Payment.Google/GameFrameX.Payment.Google.csproj", "Payment/GameFrameX.Payment.Google/"]
 COPY ["Payment/GameFrameX.Payment.Xsolla/GameFrameX.Payment.Xsolla.csproj", "Payment/GameFrameX.Payment.Xsolla/"]
 COPY ["Payment/GameFrameX.Payment.Wechat/GameFrameX.Payment.Wechat.csproj", "Payment/GameFrameX.Payment.Wechat/"]
-COPY ["Sms/GameFrameX.Sms.Abstract/GameFrameX.Sms.Abstract.csproj", "Sms/GameFrameX.Sms.Abstract/"]
-COPY ["Sms/GameFrameX.Sms.Aliyun/GameFrameX.Sms.Aliyun.csproj", "Sms/GameFrameX.Sms.Aliyun/"]
-COPY ["Wechat/GameFrameX.Wechat.Abstract/GameFrameX.Wechat.Abstract.csproj", "Wechat/GameFrameX.Wechat.Abstract/"]
 
 # Restore dependencies
 RUN dotnet restore "GameFrameX.Hub.Api/GameFrameX.Hub.Api.csproj"

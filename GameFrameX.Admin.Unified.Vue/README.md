@@ -233,7 +233,7 @@ src/
 │   └── http/                       Interceptor split
 │
 ├── views/                        # Business pages
-│   ├── system/                     System management (users / roles / menus / orgs / tenants / dictionaries / logs / config / notifications / plugins / printing / regions / online users …)
+│   ├── system/                     System management (users / roles / menus / orgs / tenants / dictionaries / logs / config / notifications / online users …)
 │   ├── game/                       Game management (zones / goods / orders / mail / redeem codes / shop / announcements / items / props …)
 │   ├── client/                     Client management (platforms / versions / channels / devices / languages / asset packages / open APIs …)
 │   ├── appCenter/                  App center (appEntry / appSelector / appWorkspace / gameAppEntity, etc.)

@@ -39,9 +39,6 @@ COPY ["Payment/GameFrameX.Payment.Google/GameFrameX.Payment.Google.csproj", "Pay
 COPY ["Payment/GameFrameX.Payment.Wechat/GameFrameX.Payment.Wechat.csproj", "Payment/GameFrameX.Payment.Wechat/"]
 COPY ["Payment/GameFrameX.Payment.Xsolla/GameFrameX.Payment.Xsolla.csproj", "Payment/GameFrameX.Payment.Xsolla/"]
 
-COPY ["Sms/GameFrameX.Sms.Abstract/GameFrameX.Sms.Abstract.csproj", "Sms/GameFrameX.Sms.Abstract/"]
-COPY ["Sms/GameFrameX.Sms.Aliyun/GameFrameX.Sms.Aliyun.csproj", "Sms/GameFrameX.Sms.Aliyun/"]
-COPY ["Wechat/GameFrameX.Wechat.Abstract/GameFrameX.Wechat.Abstract.csproj", "Wechat/GameFrameX.Wechat.Abstract/"]
 
 # Restore dependencies
 RUN dotnet restore "GameFrameX.Client.Api/GameFrameX.Client.Api.csproj"

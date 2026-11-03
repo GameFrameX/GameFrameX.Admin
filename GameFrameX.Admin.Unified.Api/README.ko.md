@@ -95,8 +95,8 @@ Client API와 Hub API는 더 "가볍습니다": Client API는 Entity + Payment�
 Admin API（20802）              Client API（20808）            Hub API（20806）
     │                              │                              │
     │ 관리 백오피스용                │ 게임 클라이언트용              │ 외부 시스템 / 게임 클라이언트 / CI용
-    │ 로그인 / 사용자 / 메뉴 /       │ 로그인 / 결제 / 설정 조회      │ 구역 서버 / 리소스 버전 / 아이템 /
-    │ 주문 / 로그 / 정기 작업        │                              │ 교환 코드 / 빌드 보고 / Tapd WebHook
+    │ 로그인 / 사용자 / 메뉴 /       │ 로그인 / 결제 / 설정 조회      │ 구역 서버 / 리소스 버전 /
+    │ 주문 / 로그 / 정기 작업        │                              │ 빌드 보고 / 기능 스위치 동기화
     │                              │                              │
     └──────────── Entity 공유 ──────────────┬─────────────────────┘
                                            │
@@ -143,12 +143,12 @@ GameFrameX.Admin.Unified.Api/
 ├── GameFrameX.Core.Utility/       # 유틸리티 클래스
 ├── GameFrameX.Core.BaseInputOutput/ # 기본 입출력 모델
 ├── Payment/                       # 결제 연동(Client API만 참조)
-│   ├── GameFrameX.Pay.Abstract/          # 결제 추상 인터페이스(정의 먼저, 구현 나중)
-│   ├── GameFrameX.Pay.AliPay/            # Alipay
-│   ├── GameFrameX.Pay.Apple/             # Apple IAP(인앱 결제 검증)
-│   ├── GameFrameX.Pay.Apple.AppStoreServer/  # App Store Server API v2
-│   ├── GameFrameX.Pay.Google/            # Google Play
-│   └── GameFrameX.Pay.Xsolla/            # Xsolla
+│   ├── GameFrameX.Payment.Abstract/          # 결제 추상 인터페이스(정의 먼저, 구현 나중)
+│   ├── GameFrameX.Payment.AliPay/            # Alipay
+│   ├── GameFrameX.Payment.Apple/             # Apple IAP(인앱 결제 검증)
+│   ├── GameFrameX.Payment.Apple.AppStoreServer/  # App Store Server API v2
+│   ├── GameFrameX.Payment.Google/            # Google Play
+│   └── GameFrameX.Payment.Xsolla/            # Xsolla
 ├── Dockerfile.web-api             # Admin API의 Dockerfile(sdk:10.0 → aspnet:10.0)
 ├── Dockerfile.client-api          # Client API의 Dockerfile
 ├── Dockerfile.hub-api             # Hub API의 Dockerfile
@@ -386,9 +386,10 @@ Hub API(`GameFrameX.Hub.Api`, 포트 `20806`)는 **외부 시스템**을 위한 
 
 | 호출자 | 하는 일 | 해당 Controller |
 |--------|------|-----------------|
-| 게임 클라이언트 / 운영 도구 | 구역 서버 조회, 리소스 버전 조회, 아이템 조회, 교환 코드 검증 | `GameAreaController` / `GameAssetPackageVersionController` / `GameGoodsController` / `GameRedeemCodeController` |
+| 게임 서버 / 운영 도구 | 컨테이너 관리, 리소스 버전 기록 | `GameAreaController` / `GameAssetPackageVersionController` |
 | CI / 빌드 머신 | 빌드 완료 후 리소스 버전 / 패키지 버전 기록 | `PackageBuildReportController` |
-| 서드파티 플랫폼 | Tapd WebHook 콜백 수신 | `TapdWebHookController` |
+| 게임 서버 | 기능 스위치 동기화 | `FeatureSwitchSyncController` |
+| 서드파티 플랫폼 | Hub에 컴파일된 WebHook 없음. 종료된 Tapd 샘플은 `../samples/`에 있음 | - |
 
 코드를 작성하기 전에 반드시 알아야 할 남들과 다른 특징들:
 
@@ -404,9 +405,9 @@ Hub API(`GameFrameX.Hub.Api`, 포트 `20806`)는 **외부 시스템**을 위한 
 
 | 시나리오 | 인증 방식 | 테넌트 출처 | 예시 |
 |------|----------|-----------|------|
-| 로그인 사용자 | JWT(`BaseController` 기본 `[Authorize]`) | JWT에서 파싱 | 구역 서버 / 리소스 / 아이템 / 교환 코드 조회 |
-| 익명 WebHook | `[AllowAnonymous]` | 요청 헤더에서 | `TapdWebHookController` |
-| 머신 간 통신 | `[AllowAnonymous]` + `TenantGameAppOpenAccessAuthMiddleware` | 자격 증명에 바인딩된 App | `PackageBuildReportController`(빌드 보고) |
+| 로그인 사용자 | JWT(각 컨트롤러에 `[Authorize]` 명시) | JWT에서 파싱 | 컨테이너 관리 / 리소스 버전 기록 |
+| 익명 WebHook | - | - | 이 호스트에 컴파일된 WebHook 없음 |
+| 머신 간 통신 | `[AllowAnonymous]` + `TenantGameAppOpenAccessAuthMiddleware` | 자격 증명에 바인딩된 App | `PackageBuildReportController` / `FeatureSwitchSyncController` |
 
 머신 자격 증명 방식은 AccessKey + 서명 + scope를 검증하며 **JWT가 아닙니다**. 따라서 Controller에 `[AllowAnonymous]`를 표시해 JWT를 건너뛰고, 전용 미들웨어가 처리합니다.
 
@@ -424,7 +425,7 @@ OptimisticConcurrencyMiddleware
   → CORS
   → Authentication → Authorization
   → HubTenantMiddleware(/health 제외; 테넌트 Id 기록; 슈퍼 관리자 거부)
-  → TenantGameAppOpenAccessAuthMiddleware(仅 /api/PackageBuildReport)
+  → TenantGameAppOpenAccessAuthMiddleware(/api/PackageBuildReport / /api/FeatureSwitchSync)
   → HealthChecks / MapControllers
 ```
 
@@ -435,11 +436,6 @@ Admin API의 독립 JSON 구성은 모두 `GameFrameX.Application/Configuration/
 | 파일 | 관리 항목 |
 |------|--------|
 | `Database.json` | 데이터베이스 연결, Code-First 스위치, 시드 데이터 스위치 |
-| `Swagger.json` | Swagger / Knife4j UI 구성 |
-| `SMS.json` | SMS 서비스 구성 |
-| `Upload.json` | 파일 업로드, OSS 구성 |
-| `Wechat.json` | WeChat 공식 계정 / 미니 프로그램 구성 |
-| `Enum.json` | 열거형 스캔 어셈블리 |
 
 이미 "이사 간" 구성 두 개가 있으니 더 찾아다니지 마세요:
 
@@ -459,7 +455,7 @@ Admin API의 독립 JSON 구성은 모두 `GameFrameX.Application/Configuration/
 
 | 기능 | 서비스 클래스 | 설명 |
 |------|--------|--------|
-| 인증 로그인 | `SystemAuthService` | 계정 비밀번호, 휴대폰 인증 코드 로그인, JWT 발급 + 자동 갱신, 캡차 |
+| 인증 로그인 | `SystemAuthService` | 계정 비밀번호 로그인, JWT 발급 + 자동 갱신, 캡차 |
 | 사용자 관리 | `SystemUserService` | 사용자 CRUD, 비밀번호 초기화, 사용자-역할 바인딩(주의: 이 서비스가 실제로 관리하는 것은 `TenantUser`이며, 명명이 다소 오해의 소지가 있음) |
 | 역할 관리 | `TenantRoleService` | 역할 CRUD, 데이터 범위 제어, 역할-메뉴 권한 바인딩 |
 | 메뉴 권한 | `GlobalMenuService` | 트리 메뉴, 버튼 수준 권한 파싱, 라우팅과 API 매핑 |
@@ -477,14 +473,7 @@ Admin API의 독립 JSON 구성은 모두 `GameFrameX.Application/Configuration/
 | 시스템 구성 | `SystemConfigService` | 키-값 쌍 구성 CRUD |
 | 열거형 서비스 | `SystemEnumService` | 리플렉션으로 어셈블리의 열거형 타입과 값 조회 |
 | 상수 서비스 | `SystemConstService` | `[ConstAttribute]`로 표시된 상수 값 조회 |
-| SMS 서비스 | `SystemSmsService` | Alibaba Cloud SMS 인증 코드, 60초 TTL |
-| 지역 관리 | `SystemRegionService` | 행정구역 5단계 트리, 통계국 동기화 지원 |
-| 인쇄 템플릿 | `TenantPrintService` | 인쇄 템플릿 CRUD |
 | 개방형 인터페이스 | `SystemOpenAccessService` | AccessKey / Secret 관리, HMAC 서명 인증 |
-| 플러그인 관리 | `SystemPluginService` | 런타임에 C# 코드 컴파일, 동적으로 API 엔드포인트로 등록 |
-| WeChat | `SystemWechatService` / `SystemWxOpenService` | 공식 계정 OAuth2, 미니 프로그램 로그인, 템플릿 메시지, JS-SDK |
-| WeChat Pay | `SystemWechatPayService` | JSAPI 주문(직렬 / 파트너), 결제 콜백 |
-| 서버 모니터링 | `SystemServerService` | 호스트 정보, CPU / 메모리, 디스크, 로드된 어셈블리 |
 
 ### 게임 관리
 
@@ -538,12 +527,10 @@ Admin API의 독립 JSON 구성은 모두 `GameFrameX.Application/Configuration/
 
 | 인터페이스 | Controller | 인증 | 설명 |
 |------|-----------|------|------|
-| 구역 서버 조회 | `GameAreaController` | JWT | 게임 클라이언트에 구역 서버 목록 제공 |
-| 리소스 패키지 버전 | `GameAssetPackageVersionController` | JWT | 리소스 버전 조회, 낙관적 잠금 업데이트 |
-| 아이템 조회 | `GameGoodsController` | JWT | 게임 내 아이템 조회 |
-| 교환 코드 | `GameRedeemCodeController` | JWT | 교환 코드 검증 관련 |
+| 컨테이너 관리 | `GameAreaController` | JWT | 구역 서버 컨테이너 시작 / 중지 / 삭제 및 서버 버전 등록 |
+| 리소스 버전 기록 | `GameAssetPackageVersionController` | JWT | 낙관적 잠금으로 리소스 버전 업데이트 |
 | 빌드 보고 | `PackageBuildReportController` | 머신 자격 증명 | CI / 빌드 머신의 리소스 버전 / 패키지 버전 기록(멱등 upsert) |
-| Tapd WebHook | `TapdWebHookController` | 익명(요청 헤더에서 테넌트 추출) | Tapd 콜백 수신 |
+| 기능 스위치 동기화 | `FeatureSwitchSyncController` | 머신 자격 증명 | 게임 서버에 기능 스위치 동기화 |
 
 ### 결제 연동
 
@@ -551,11 +538,11 @@ Client API 전용입니다. 추상 계층 + 다중 채널 구현이며, 새 채�
 
 | 채널 | 프로젝트 |
 |------|------|
-| Alipay | `GameFrameX.Pay.AliPay` |
-| Apple IAP | `GameFrameX.Pay.Apple`(인앱 결제 영수증 검증) |
-| App Store Server | `GameFrameX.Pay.Apple.AppStoreServer`(API v2 알림 처리) |
-| Google Play | `GameFrameX.Pay.Google` |
-| Xsolla | `GameFrameX.Pay.Xsolla` |
+| Alipay | `GameFrameX.Payment.AliPay` |
+| Apple IAP | `GameFrameX.Payment.Apple`(인앱 결제 영수증 검증) |
+| App Store Server | `GameFrameX.Payment.Apple.AppStoreServer`(API v2 알림 처리) |
+| Google Play | `GameFrameX.Payment.Google` |
+| Xsolla | `GameFrameX.Payment.Xsolla` |
 
 ---
 

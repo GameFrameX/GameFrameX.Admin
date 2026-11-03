@@ -40,12 +40,4 @@
         <Project Path="Email\GameFrameX.Email.TencentSes\GameFrameX.Email.TencentSes.csproj"/>
         <Project Path="Email\GameFrameX.Email.Smtp\GameFrameX.Email.Smtp.csproj"/>
     </Folder>
-    <Folder Name="/Sms/">
-        <Project Path="Sms\GameFrameX.Sms.Abstract\GameFrameX.Sms.Abstract.csproj"/>
-        <Project Path="Sms\GameFrameX.Sms.Aliyun\GameFrameX.Sms.Aliyun.csproj"/>
-    </Folder>
-    <Folder Name="/Wechat/">
-        <Project Path="Wechat\GameFrameX.Wechat.Abstract\GameFrameX.Wechat.Abstract.csproj"/>
-        <Project Path="Wechat\GameFrameX.Wechat.Open\GameFrameX.Wechat.Open.csproj"/>
-    </Folder>
 </Solution>

@@ -30,7 +30,7 @@ All-in-One Solution for Indie Game Development · Empowering Indie Developers' D
 
 > One-line positioning: **an operations + publishing backend platform for indie game developers**. Backend `.NET 10 + SqlSugar` with three hosts (Admin / Client / Hub), frontend `Vue 3 + PrimeVue` — a full-stack pipeline from admin login to player payment callbacks, ready out of the box.
 
-**GameFrameX Admin** is a **game-operations-oriented** backend system: the Admin API lets operations / GM / customer service staff edit menus, query orders, push versions, and view logs; the Client API handles game-side login / payments / config fetching; the Hub API serves external systems (CI builds, Tapd WebHooks, third-party callbacks). One repository, three hosts, deployed on separate databases so they never drag each other down.
+**GameFrameX Admin** is a **game-operations-oriented** backend system: the Admin API lets operations / GM / customer service staff edit menus, query orders, push versions, and view logs; the Client API handles game-side login / payments / config fetching; the Hub API serves external systems (CI builds, container orchestration, feature-switch synchronization). One repository, three hosts, deployed on separate databases so they never drag each other down.
 
 It is **not** a generic OA / CRM / e-commerce system. Menus, permissions, dictionaries, forms, and client configs are all designed around real "game backend" business scenarios.
 
@@ -173,7 +173,6 @@ Grouped by "the scenarios you'll actually use", not by directory structure.
 |---|---|
 | Platform tenant management | Tenant CRUD, automatic tenant database provisioning / disabling / expiry |
 | Global platform / language / channel definitions | Platform-level enums and multilingual baselines |
-| Region management | 5-level administrative division tree, supports syncing from the statistics bureau |
 | System config | Key-value pairs; high-frequency configs migrated into the main database `SystemConfig` (JWT / password policy / captcha) |
 | Database management | Table / column CRUD, online schema management |
 
@@ -181,15 +180,13 @@ Grouped by "the scenarios you'll actually use", not by directory structure.
 
 | Module | What it does |
 |---|---|
-| Service monitoring | Host info, CPU / memory / disk / loaded assemblies |
 | Online users | Real-time list + forced sign-out, based on SignalR |
 | Announcement management | System notifications + real-time SignalR push |
 | File management | Local storage + Aliyun OSS + Tencent COS (multi-provider) |
-| Scheduled jobs | `ProjectScheduler` project-owned scheduler; built-in / script-compiled / HTTP job types; runtime-compiled C# dynamic APIs |
-| Email / SMS | `Mail.Abstract` multi-provider + `Sms.Abstract` Aliyun implementation |
+| Scheduled jobs | `ProjectScheduler` project-owned scheduler; built-in / script-compiled / HTTP job types |
+| Email | `GameFrameX.Email.Abstract` with multiple providers |
 | System APIs | Swashbuckle Swagger; not mounted in production by default (requires `Swagger__Enabled=true`) |
 | Four log types | Operation / exception / access / data-change (field-level diff audit), with Excel export |
-| Runtime plugins | C# code dynamically compiled and registered as API endpoints |
 | Cache management | Unified Memory / Redis abstraction |
 
 **Game Backend (76 Application.Game services)**
@@ -212,11 +209,9 @@ Grouped by "the scenarios you'll actually use", not by directory structure.
 
 | Integration | Notes |
 |---|---|
-| WeChat | `Wechat.Abstract` + `Wechat.Open` dual SDK; Official Account OAuth2, Mini Program login, template messages, JS-SDK |
 | WeChat Pay | JSAPI orders (direct / ISV) + payment callbacks (`Payment.Wechat`) |
 | Payments | Alipay / Apple IAP (incl. App Store Server API v2) / Google Play / Xsolla, abstraction layer + multi-provider |
 | Object storage | Local / Tencent COS (multi-provider) |
-| SMS | Aliyun SMS provider |
 | Email | Tencent SES / SMTP (multi-provider) |
 
 **Frontend Framework Features**
@@ -297,10 +292,7 @@ CI gates (anti-regression):
 ![Config parameters](doc/img/4.png)
 ![Dictionary management](doc/img/5.png)
 ![Job scheduling](doc/img/6.png)
-![Service monitoring](doc/img/7.png)
 ![Cache management](doc/img/8.png)
-![Administrative divisions](doc/img/9.png)
-![Dynamic plugins](doc/img/10.png)
 ![Open APIs](doc/img/11.png)
 ![Captcha config](doc/img/12.png)
 ![Tenant management](doc/img/13.png)

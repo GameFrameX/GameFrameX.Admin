@@ -30,7 +30,7 @@
 
 > 한 줄 정의: **인디 게임 개발자를 위한 운영 + 퍼블리싱 백오피스 플랫폼**. 백엔드는 `.NET 10 + SqlSugar` 기반 3개 호스트(Admin / Client / Hub), 프론트엔드는 `Vue 3 + PrimeVue`. 관리자 로그인부터 플레이어 결제 콜백까지 한 번의 흐름으로 풀스택 구동, 바로 사용 가능합니다.
 
-**GameFrameX Admin**은 **게임 운영 지향** 백오피스 시스템입니다: 관리 화면은 운영 / GM / 고객지원 담당자가 메뉴를 수정하고, 주문을 조회하고, 버전을 푸시하고, 로그를 확인할 수 있게 합니다. 클라이언트 API는 게임 클라이언트의 로그인 / 결제 / 설정 조회를 담당하고, Hub API는 외부 시스템(CI 빌드, Tapd WebHook, 서드파티 콜백)을 위한 것입니다. 하나의 저장소에 세 개의 호스트가 있으며, 데이터베이스를 분리해 배포하므로 서로 간섭하지 않습니다.
+**GameFrameX Admin**은 **게임 운영 지향** 백오피스 시스템입니다: 관리 화면은 운영 / GM / 고객지원 담당자가 메뉴를 수정하고, 주문을 조회하고, 버전을 푸시하고, 로그를 확인할 수 있게 합니다. 클라이언트 API는 게임 클라이언트의 로그인 / 결제 / 설정 조회를 담당하고, Hub API는 외부 시스템(CI 빌드, 컨테이너 오케스트레이션, 기능 스위치 동기화)을 위한 것입니다. 하나의 저장소에 세 개의 호스트가 있으며, 데이터베이스를 분리해 배포하므로 서로 간섭하지 않습니다.
 
 이 프로젝트는 **범용 OA / CRM / 쇼핑몰 시스템이 아닙니다**. 메뉴, 권한, 사전, 폼, 클라이언트 설정 등은 모두 "게임 백오피스"라는 실제 비즈니스 시나리오를 중심으로 설계되었습니다.
 
@@ -173,7 +173,6 @@ App 앱(테넌트 하위의 개별 게임 / 제품)── AppId 스코프
 |---|---|
 | 플랫폼 테넌트 관리 | 테넌트 CRUD, 테넌트 DB 자동 개통 / 정지 / 만료 |
 | 전역 플랫폼 / 언어 / 채널 정의 | 플랫폼급 열거형과 다국어 기준선 |
-| 지역 관리 | 행정구역 5단계 트리, 통계국 동기화 지원 |
 | 시스템 설정 | 키-값 쌍; 고빈도 설정은 메인 DB `SystemConfig`로 이동(JWT / 비밀번호 정책 / 이미지 캡차) |
 | 데이터베이스 관리 | 테이블 / 컬럼 CRUD, DB 테이블 구조 온라인 관리 |
 
@@ -181,15 +180,13 @@ App 앱(테넌트 하위의 개별 게임 / 제품)── AppId 스코프
 
 | 모듈 | 기능 |
 |---|---|
-| 서비스 모니터링 | 호스트 정보, CPU / 메모리 / 디스크 / 로드된 어셈블리 |
 | 온라인 사용자 | 실시간 목록 + 강제 로그아웃, SignalR 기반 |
 | 공지 관리 | 시스템 알림 + SignalR 실시간 푸시 |
 | 파일 관리 | 로컬 저장소 + Aliyun OSS + Tencent COS(다중 provider) |
-| 예약 작업 | `ProjectScheduler` 프로젝트 자체 스케줄러; 내장 / 스크립트 컴파일 / HTTP 세 가지; 런타임 C# 동적 API 컴파일 |
-| 메일 / SMS | `Mail.Abstract` 다중 provider + `Sms.Abstract` Aliyun 구현 |
+| 예약 작업 | `ProjectScheduler` 프로젝트 자체 스케줄러; 내장 / 스크립트 컴파일 / HTTP 세 가지 |
+| 메일 | `GameFrameX.Email.Abstract` 다중 Provider |
 | 시스템 인터페이스 | Swashbuckle Swagger; 프로덕션에서는 기본 비활성(`Swagger__Enabled=true` 필요) |
 | 4종 로그 | 조작 / 예외 / 접근 / 데이터 변경(필드 단위 Diff 감사), Excel 내보내기 지원 |
-| 런타임 플러그인 | C# 코드 동적 컴파일 후 API 엔드포인트로 등록 |
 | 캐시 관리 | Memory / Redis 통합 추상화 |
 
 **게임 백오피스(76개 Application.Game 서비스)**
@@ -212,11 +209,9 @@ App 앱(테넌트 하위의 개별 게임 / 제품)── AppId 스코프
 
 | 연동 | 설명 |
 |---|---|
-| WeChat | `Wechat.Abstract` + `Wechat.Open` 듀얼 SDK; 공식 계정 OAuth2, 미니프로그램 로그인, 템플릿 메시지, JS-SDK |
 | WeChat Pay | JSAPI 주문(직접 연결 / 서비스 제공자) + 결제 콜백(`Payment.Wechat`) |
 | 결제 | Alipay / Apple IAP(App Store Server API v2 포함) / Google Play / Xsolla, 추상화 레이어 + 다중 provider |
 | 오브젝트 스토리지 | Local / Tencent COS(다중 provider) |
-| SMS | Aliyun SMS Provider |
 | 메일 | Tencent SES / SMTP(다중 provider) |
 
 **프론트엔드 프레임워크 특성**
@@ -297,10 +292,7 @@ CI 게이트(회귀 방지):
 ![파라미터 설정](doc/img/4.png)
 ![사전 관리](doc/img/5.png)
 ![작업 스케줄링](doc/img/6.png)
-![서비스 모니터링](doc/img/7.png)
 ![캐시 관리](doc/img/8.png)
-![행정구역](doc/img/9.png)
-![동적 플러그인](doc/img/10.png)
 ![오픈 인터페이스](doc/img/11.png)
 ![캡차 설정](doc/img/12.png)
 ![테넌트 관리](doc/img/13.png)

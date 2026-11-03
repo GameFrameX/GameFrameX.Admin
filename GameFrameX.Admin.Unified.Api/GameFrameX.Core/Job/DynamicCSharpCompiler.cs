@@ -5,7 +5,7 @@ using System.Runtime.Loader;
 namespace GameFrameX.Core.Job;
 
 /// <summary>
-/// 动态 C# 代码编译器，集中承接运行时作业和动态插件编译。
+/// 动态 C# 代码编译器，集中承接运行时作业编译。
 /// </summary>
 public static class DynamicCSharpCompiler
 {
