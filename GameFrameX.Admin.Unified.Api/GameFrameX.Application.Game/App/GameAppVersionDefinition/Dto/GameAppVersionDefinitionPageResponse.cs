@@ -12,10 +12,6 @@ public class GameAppVersionDefinitionPageResponse : IBasePageResponse<TenantGame
     /// </summary>
     public long Id { get; set; }
 
-    /// <summary>
-    /// 游戏应用Id。版本定义必须绑定具体应用，必须 &gt; 0。
-    /// </summary>
-    public long AppId { get; set; }
 
     /// <summary>
     /// 名称

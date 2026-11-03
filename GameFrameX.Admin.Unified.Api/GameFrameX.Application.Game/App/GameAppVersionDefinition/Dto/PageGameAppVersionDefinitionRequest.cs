@@ -5,8 +5,4 @@
 /// </summary>
 public class PageGameAppVersionDefinitionRequest : BasePageRequest
 {
-    /// <summary>
-    /// 游戏应用Id筛选；null 不筛选。
-    /// </summary>
-    public long? AppId { get; set; }
 }

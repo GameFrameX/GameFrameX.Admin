@@ -5,10 +5,6 @@
 /// </summary>
 public class UpdateGameAppVersionDefinitionRequest : BaseUpdateRequest
 {
-    /// <summary>
-    /// 游戏应用Id。不可变：服务层从既有实体回填，禁止跨应用迁移。
-    /// </summary>
-    public long AppId { get; set; }
 
     /// <summary>
     /// 名称

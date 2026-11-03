@@ -12,32 +12,24 @@ public class TenantGameAppVersionDefinitionService
         AddGameAppVersionDefinitionRequest, UpdateGameAppVersionDefinitionRequest,
         GameAppVersionDefinitionPageResponse, PageGameAppVersionDefinitionRequest>
 {
-    private readonly SqlSugarRepository<Entity.Tenant.Game.TenantGameAppEntity> _gameAppRepository;
-
     public TenantGameAppVersionDefinitionService(
-        SqlSugarRepository<Entity.Tenant.Game.Release.TenantGameAppVersionDefinitionEntity> repository,
-        SqlSugarRepository<Entity.Tenant.Game.TenantGameAppEntity> gameAppRepository)
+        SqlSugarRepository<Entity.Tenant.Game.Release.TenantGameAppVersionDefinitionEntity> repository)
         : base(repository)
     {
-        _gameAppRepository = gameAppRepository;
     }
 
     protected override ISugarQueryable<GameAppVersionDefinitionPageResponse> BuildPageQuery(PageGameAppVersionDefinitionRequest input)
     {
         var searchKey = input.SearchKey?.Trim() ?? string.Empty;
-        var hasAppId = input.AppId.HasValue;
-        var appId = input.AppId.GetValueOrDefault();
         return Repository.AsQueryable()
                          .Where(u => u.IsDeleted == false)
                          .WhereIF(!string.IsNullOrWhiteSpace(searchKey), u => (u.Name ?? string.Empty).Contains(searchKey))
-                         .WhereIF(hasAppId, u => u.AppId == appId)
                          .Select<GameAppVersionDefinitionPageResponse>();
     }
 
     protected override async Task OnAddingAsync(AddGameAppVersionDefinitionRequest input)
     {
-        await ValidateGameAppBelongsToTenantAsync(input.AppId);
-        await CheckNameUniqueInAppAsync(input.AppId, input.Name ?? string.Empty);
+        await CheckNameUniqueAsync(input.Name ?? string.Empty);
     }
 
     protected override async Task OnUpdatingAsync(UpdateGameAppVersionDefinitionRequest input)
@@ -48,26 +40,21 @@ public class TenantGameAppVersionDefinitionService
             throw BusinessError.Oh(CommonErrorCode.RecordNotFound);
         }
 
-        input.AppId = existing.AppId;
-        await ValidateGameAppBelongsToTenantAsync(input.AppId);
-        await CheckNameUniqueInAppAsync(input.AppId, input.Name ?? string.Empty, input.Id);
+        await CheckNameUniqueAsync(input.Name ?? string.Empty, input.Id);
     }
 
     /// <summary>
-    /// 获取当前应用下的版本定义选择器列表。
+    /// 获取主库版本定义选择器列表。
     /// </summary>
     [HttpPost(CrudActionRoutes.Select)]
     [ApiDescriptionSettings(Name = "Select")]
     public override async Task<List<BaseSelectPageResponse>> SelectAsync(BaseSelectPageRequest input)
     {
         var searchKey = input.SearchKey?.Trim() ?? string.Empty;
-        var hasAppId = input.AppId.HasValue;
-        var appId = input.AppId.GetValueOrDefault();
         var pageSize = Math.Min(input.PageSize > 0 ? input.PageSize : BaseSelectPageRequest.DefaultPageSize, BaseSelectPageRequest.MaxPageSize);
         var query = await Repository.AsQueryable()
                                     .Where(u => u.IsDeleted == false)
                                     .WhereIF(!string.IsNullOrWhiteSpace(searchKey), u => (u.Name ?? string.Empty).Contains(searchKey))
-                                    .WhereIF(hasAppId, u => u.AppId == appId)
                                     .Take(pageSize)
                                     .ToListAsync();
         var list = new List<BaseSelectPageResponse>(query.Count);
@@ -75,31 +62,15 @@ public class TenantGameAppVersionDefinitionService
         return list;
     }
 
-    private async Task CheckNameUniqueInAppAsync(long appId, string name, long? excludeId = null)
+    private async Task CheckNameUniqueAsync(string name, long? excludeId = null)
     {
         var exists = excludeId.HasValue
-                         ? await Repository.IsAnyAsync(x => x.AppId == appId && x.Name == name && x.Id != excludeId.Value)
-                         : await Repository.IsAnyAsync(x => x.AppId == appId && x.Name == name);
+                         ? await Repository.IsAnyAsync(x => x.Name == name && x.Id != excludeId.Value)
+                         : await Repository.IsAnyAsync(x => x.Name == name);
         if (exists)
         {
             throw BusinessError.Oh(CommonErrorCode.RecordAlreadyExists);
         }
     }
 
-    /// <summary>
-    /// 校验游戏应用属于当前租户：Id 必须大于 0，且多租户过滤仓储能查到。
-    /// </summary>
-    private async Task ValidateGameAppBelongsToTenantAsync(long appId)
-    {
-        if (appId <= 0)
-        {
-            throw BusinessError.Oh("游戏应用Id不能为空");
-        }
-
-        var gameApp = await _gameAppRepository.GetFirstAsync(u => u.Id == appId);
-        if (gameApp == null)
-        {
-            throw BusinessError.Oh("游戏应用不存在");
-        }
-    }
 }
