@@ -30,7 +30,7 @@
 
 > 一句話定位：**面向獨立遊戲開發者的營運 + 聯運後台平台**。後端 `.NET 10 + SqlSugar` 三主機（Admin / Client / Hub），前端 `Vue 3 + PrimeVue`，從管理員登入到玩家支付回調一條鏈路全棧跑通，開箱即用。
 
-**GameFrameX Admin** 是一套**面向遊戲營運**的後台系統：管理端給營運 / GM / 客服改選單、查訂單、推版本、看日誌；客戶端 API 給遊戲端登入 / 支付 / 拉配置；Hub API 給外部系統（CI 打包、Tapd WebHook、第三方回調）。一套倉庫三套主機，分庫部署互不拖累。
+**GameFrameX Admin** 是一套**面向遊戲營運**的後台系統：管理端給營運 / GM / 客服改選單、查訂單、推版本、看日誌；客戶端 API 給遊戲端登入 / 支付 / 拉配置；Hub API 給外部系統（CI 打包、容器編排、功能開關同步）。一套倉庫三套主機，分庫部署互不拖累。
 
 它**不是**通用 OA / CRM / 商城系統。選單、權限、字典、表單、客戶端配置等都是圍繞「遊戲後台」的真實業務場景設計的。
 
@@ -173,7 +173,6 @@ App 應用（租戶下的具體遊戲 / 產品）── AppId 作用域
 |---|---|
 | 平台租戶管理 | 租戶 CRUD、租戶庫自動開通 / 停用 / 到期 |
 | 全域平台 / 語言 / 渠道定義 | 平台級枚舉與多語言基線 |
-| 區域管理 | 行政區劃 5 級樹，支援從統計局同步 |
 | 系統配置 | 鍵值對；高頻配置遷入主庫 `SystemConfig`（JWT / 密碼策略 / 圖形驗證碼） |
 | 資料庫管理 | 表 / 列 CRUD、庫表結構線上管理 |
 
@@ -181,15 +180,13 @@ App 應用（租戶下的具體遊戲 / 產品）── AppId 作用域
 
 | 模組 | 用途 |
 |---|---|
-| 服務監控 | 主機資訊、CPU / 記憶體 / 磁碟 / 已載入程式集 |
 | 線上使用者 | 即時列表 + 強制下線，基於 SignalR |
 | 公告管理 | 系統通知 + SignalR 即時推送 |
 | 檔案管理 | 本地儲存 + 阿里雲 OSS + 騰訊 COS（多 provider） |
-| 定時任務 | `ProjectScheduler` 項目自有調度器；內建 / 腳本編譯 / HTTP 三類；執行時編譯 C# 動態 API |
-| 郵件 / 簡訊 | `Mail.Abstract` 多 provider + `Sms.Abstract` Aliyun 實作 |
+| 定時任務 | `ProjectScheduler` 項目自有調度器；內建 / 腳本編譯 / HTTP 三類 |
+| 郵件 | `GameFrameX.Email.Abstract` 多 Provider |
 | 系統介面 | Swashbuckle Swagger；生產預設不掛（需 `Swagger__Enabled=true`） |
 | 四類日誌 | 操作 / 異常 / 存取 / 資料變更（欄位級 Diff 稽核），支援 Excel 匯出 |
-| 執行時插件 | C# 程式碼動態編譯並註冊為 API 端點 |
 | 快取管理 | Memory / Redis 統一抽象 |
 
 **遊戲後台（76 個 Application.Game 服務）**
@@ -212,11 +209,9 @@ App 應用（租戶下的具體遊戲 / 產品）── AppId 作用域
 
 | 整合 | 說明 |
 |---|---|
-| 微信 | `Wechat.Abstract` + `Wechat.Open` 雙 SDK；公眾號 OAuth2、小程式登入、模板訊息、JS-SDK |
 | 微信支付 | JSAPI 下單（直連 / 服務商）+ 支付回調（`Payment.Wechat`） |
 | 支付 | 支付寶 / Apple IAP（含 App Store Server API v2）/ Google Play / Xsolla，抽象層 + 多 provider |
 | 物件儲存 | Local / Tencent COS（多 provider） |
-| 簡訊 | Aliyun 簡訊 Provider |
 | 郵件 | Tencent SES / SMTP（多 provider） |
 
 **前端框架特性**
@@ -297,10 +292,7 @@ CI 門禁（防回潮）：
 ![參數配置](doc/img/4.png)
 ![字典管理](doc/img/5.png)
 ![任務調度](doc/img/6.png)
-![服務監控](doc/img/7.png)
 ![快取管理](doc/img/8.png)
-![行政區劃](doc/img/9.png)
-![動態插件](doc/img/10.png)
 ![開放介面](doc/img/11.png)
 ![驗證碼配置](doc/img/12.png)
 ![租戶管理](doc/img/13.png)
