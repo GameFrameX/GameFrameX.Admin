@@ -72,6 +72,7 @@ internal static class MigrationSmokeTests
                 Require(source.Queryable<TenantGameHomeOnlineSampleEntity>().Single().OnlineCount == 42, "源库必须不变");
             }
 
+            LegacyRiskPolicySmokeTests.Run(directory);
             Console.WriteLine("迁移自测通过：dry-run 删列/复制回滚、业务索引重建、保真复制、幂等重跑、冲突拒绝、多租户拒绝、源库只读。");
         }
         finally

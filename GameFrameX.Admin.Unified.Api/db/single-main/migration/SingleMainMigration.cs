@@ -51,12 +51,14 @@ internal static class SingleMainMigration
             source.Ado.ExecuteCommand(source.CurrentConnectionConfig.DbType == DatabaseType.Sqlite
                 ? "PRAGMA query_only = ON" : "SET TRANSACTION READ ONLY");
             ValidateDefaultInstance(source, target);
+            var riskMigration = LegacyRiskPolicyMigration.Prepare(source, target);
             ConfigurationCollisionGuard.Validate(source, true);
             ConfigurationCollisionGuard.Validate(target, true);
             var currentTypes = entityTypes ?? typeof(TenantUserEntity).Assembly.GetTypes()
                 .Where(type => type.IsClass && !type.IsAbstract && type.IsDefined(typeof(SugarTable), false))
                 .OrderBy(type => type.FullName, StringComparer.Ordinal).ToArray();
             ScopeColumnRetirement.Apply(target, currentTypes);
+            riskMigration?.CompleteLegacyTarget(target);
             NormalizeMenuScope(target);
             var types = currentTypes.Where(SqlSugarEntityBoundary.IsTenantTable).ToArray();
             var sourceTables = source.DbMaintenance.GetTableInfoList(false).Select(table => table.Name).ToHashSet(StringComparer.OrdinalIgnoreCase);
@@ -71,10 +73,11 @@ internal static class SingleMainMigration
 
                 // 目标业务表按当前实体创建；已退场实体不在程序集清单，不搬运。
                 target.CodeFirst.InitTables(entityType);
-                CopyTable(source, target, tableName);
+                CopyTable(source, target, tableName, riskMigration);
                 copiedTables.Add(tableName);
             }
 
+            riskMigration?.Apply(target);
             ConfigurationCollisionGuard.Validate(target, false);
 
             foreach (var ignored in sourceTables.Except(copiedTables).OrderBy(name => name, StringComparer.Ordinal))
@@ -144,7 +147,7 @@ internal static class SingleMainMigration
         }
     }
 
-    private static void CopyTable(ISqlSugarClient source, ISqlSugarClient target, string tableName)
+    private static void CopyTable(ISqlSugarClient source, ISqlSugarClient target, string tableName, LegacyRiskPolicyMigration? riskMigration)
     {
         var sourceColumns = source.DbMaintenance.GetColumnInfosByTableName(tableName, false);
         var targetColumns = target.DbMaintenance.GetColumnInfosByTableName(tableName, false);
@@ -162,8 +165,11 @@ internal static class SingleMainMigration
             throw new InvalidOperationException($"表 {tableName} 含非默认租户记录。");
         }
 
+        var sourceColumnList = string.Join(", ", columns.Select(Quote));
+        var rows = source.Ado.GetDataTable($"SELECT {sourceColumnList} FROM {Quote(tableName)} ORDER BY id");
+        riskMigration?.EnrichCopiedPolicy(tableName, rows);
+        columns = rows.Columns.Cast<DataColumn>().Select(column => column.ColumnName).ToArray();
         var columnList = string.Join(", ", columns.Select(Quote));
-        var rows = source.Ado.GetDataTable($"SELECT {columnList} FROM {Quote(tableName)} ORDER BY id");
         var inserted = 0;
         foreach (DataRow row in rows.Rows)
         {
@@ -191,6 +197,11 @@ internal static class SingleMainMigration
         if (left is DBNull || right is DBNull)
         {
             return left is DBNull && right is DBNull;
+        }
+
+        if (left is bool || right is bool)
+        {
+            return Convert.ToBoolean(left, CultureInfo.InvariantCulture) == Convert.ToBoolean(right, CultureInfo.InvariantCulture);
         }
 
         if (left is byte[] leftBytes && right is byte[] rightBytes)
