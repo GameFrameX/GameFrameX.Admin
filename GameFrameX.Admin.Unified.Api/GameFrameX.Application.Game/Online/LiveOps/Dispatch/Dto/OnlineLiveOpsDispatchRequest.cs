@@ -5,7 +5,7 @@ namespace GameFrameX.Application.Game.Online.LiveOps.Dispatch.Dto;
 
 /// <summary>
 /// LiveOps 统一下发输入（来源 change C343 / vault:C8 S7.7）。
-/// <para>五类来源硬枚举 + 业务主键 + Online 作用域三元组的 AppId/ServerId（TenantId 由鉴权上下文强制注入）；
+/// <para>五类来源硬枚举 + 业务主键 + 目标区服 ServerId；
 /// <c>Reason</c> 必填进审计；<c>SegmentId</c> 可选定向分群。越枚举值 / 越作用域在入口即拒绝。</para>
 /// </summary>
 public sealed class OnlineLiveOpsDispatchRequest
@@ -24,14 +24,7 @@ public sealed class OnlineLiveOpsDispatchRequest
     public long BusinessKey { get; set; }
 
     /// <summary>
-    /// 目标应用Id（经 Online 作用域三元组租户归属校验）。
-    /// </summary>
-    [Required(ErrorMessage = "应用Id不能为空")]
-    [Range(1, long.MaxValue, ErrorMessage = "应用Id必须大于0")]
-    public long AppId { get; set; }
-
-    /// <summary>
-    /// 目标区服Id（经 Online 作用域三元组租户归属校验；Online 命令按区服路由到对应 Runtime）。
+    /// 目标区服Id（Online 命令按区服路由到对应 Runtime）。
     /// </summary>
     [Required(ErrorMessage = "区服Id不能为空")]
     [Range(1, long.MaxValue, ErrorMessage = "区服Id必须大于0")]

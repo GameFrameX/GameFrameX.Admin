@@ -10,12 +10,6 @@ namespace GameFrameX.Application.Game.Online.LiveOps.PlayerSegment.Dto;
 public sealed class PageTenantGameOnlinePlayerSegmentRequest : BasePageRequest
 {
     /// <summary>
-    /// 应用Id（事实数据必填，按当前应用筛选）。
-    /// </summary>
-    [Required(ErrorMessage = "应用Id不能为空")]
-    public long AppId { get; set; }
-
-    /// <summary>
     /// 名称模糊过滤。
     /// </summary>
     public string Name { get; set; } = null!;

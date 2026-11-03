@@ -40,8 +40,8 @@ namespace GameFrameX.Application.Game.Online.LiveOps.Dispatch;
 /// <item><term>MailCampaign</term><description>publish_mail_campaign（既有链路标识）</description><description>不重复下发：仅收 Published，同目标合并返回首次发布回执（方案C）</description><description>发布动作本身由既有 Campaign publish 链路完成且幂等，本入口只做合并回执</description></item>
 /// </list>
 /// </para>
-/// <para>入口校验序：越枚举拒绝（<see cref="Enum.IsDefined"/>）→ 来源记录存在性 → 应用归属（AppId 与来源事实行一致）→
-/// 作用域三元组（Factory：TenantId 鉴权强制注入 + AppId/ServerId 租户归属）→ Online 调用（非 0 协议码由 Client 按八段镜像抛出）。</para>
+/// <para>入口校验序：越枚举拒绝（<see cref="Enum.IsDefined"/>）→ 来源记录存在性 →
+/// 目标区服（Factory：记录存在性）→ Online 调用（非 0 协议码由 Client 按八段镜像抛出）。</para>
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
 public class OnlineLiveOpsDispatchService : IOnlineLiveOpsDispatchService, IAdminApiController
@@ -137,7 +137,7 @@ public class OnlineLiveOpsDispatchService : IOnlineLiveOpsDispatchService, IAdmi
             case LiveOpsSourceKind.RemoteConfig:
             {
                 channel = ActionPublishRemoteConfig;
-                await EnsureSourceExistsAsync(LiveOpsSourceKind.RemoteConfig, input.BusinessKey, input.AppId);
+                await EnsureSourceExistsAsync(LiveOpsSourceKind.RemoteConfig, input.BusinessKey);
                 ack = await PostOnlineAsync(ActionPublishRemoteConfig, new { ConfigId = input.BusinessKey, Reason = input.Reason, }, input);
                 break;
             }
@@ -145,7 +145,7 @@ public class OnlineLiveOpsDispatchService : IOnlineLiveOpsDispatchService, IAdmi
             case LiveOpsSourceKind.DeviceGroup:
             {
                 channel = ActionSyncDeviceGroup;
-                await EnsureSourceExistsAsync(LiveOpsSourceKind.DeviceGroup, input.BusinessKey, input.AppId);
+                await EnsureSourceExistsAsync(LiveOpsSourceKind.DeviceGroup, input.BusinessKey);
                 ack = await PostOnlineAsync(ActionSyncDeviceGroup, new { DeviceGroupId = input.BusinessKey, Reason = input.Reason, }, input);
                 break;
             }
@@ -153,7 +153,7 @@ public class OnlineLiveOpsDispatchService : IOnlineLiveOpsDispatchService, IAdmi
             case LiveOpsSourceKind.ScheduledTask:
             {
                 channel = ActionSyncScheduledTask;
-                await EnsureSourceExistsAsync(LiveOpsSourceKind.ScheduledTask, input.BusinessKey, input.AppId);
+                await EnsureSourceExistsAsync(LiveOpsSourceKind.ScheduledTask, input.BusinessKey);
                 ack = await PostOnlineAsync(ActionSyncScheduledTask, new { JobId = input.BusinessKey, Reason = input.Reason, }, input);
                 break;
             }
@@ -161,7 +161,7 @@ public class OnlineLiveOpsDispatchService : IOnlineLiveOpsDispatchService, IAdmi
             case LiveOpsSourceKind.Announcement:
             {
                 channel = ActionPushAnnouncement;
-                await EnsureSourceExistsAsync(LiveOpsSourceKind.Announcement, input.BusinessKey, input.AppId);
+                await EnsureSourceExistsAsync(LiveOpsSourceKind.Announcement, input.BusinessKey);
                 ack = await PostOnlineAsync(ActionPushAnnouncement, new { AnnouncementId = input.BusinessKey, Reason = input.Reason, }, input);
                 break;
             }
@@ -173,7 +173,6 @@ public class OnlineLiveOpsDispatchService : IOnlineLiveOpsDispatchService, IAdmi
                 channel = ChannelPublishMailCampaign;
                 var campaign = await _mailCampaignRepository.GetFirstAsync(u => u.Id == input.BusinessKey)
                                ?? throw BusinessError.Oh(CommonErrorCode.RecordNotFound, new { input.BusinessKey, });
-                EnsureSourceAppScope(campaign.AppId, input.AppId, "运营邮件Campaign");
 
                 if (campaign.PublishStatus != MailCampaignPublishStatus.Published)
                 {
@@ -282,10 +281,10 @@ public class OnlineLiveOpsDispatchService : IOnlineLiveOpsDispatchService, IAdmi
     }
 
     /// <summary>
-    /// 来源存在性 + 应用归属校验（不下发；灰度发布前校验 ConfigKey 指向的来源记录复用此处，避免散落第二套来源 switch）。
+    /// 来源存在性校验（不下发；灰度发布前校验 ConfigKey 指向的来源记录复用此处，避免散落第二套来源 switch）。
     /// </summary>
     [NonAction]
-    public async Task EnsureSourceExistsAsync(LiveOpsSourceKind source, long businessKey, long appId)
+    public async Task EnsureSourceExistsAsync(LiveOpsSourceKind source, long businessKey)
     {
         if (!Enum.IsDefined(typeof(LiveOpsSourceKind), source))
         {
@@ -298,7 +297,6 @@ public class OnlineLiveOpsDispatchService : IOnlineLiveOpsDispatchService, IAdmi
             {
                 var entity = await _remoteConfigRepository.GetFirstAsync(u => u.Id == businessKey)
                              ?? throw BusinessError.Oh(CommonErrorCode.RecordNotFound, new { businessKey, });
-                EnsureSourceAppScope(entity.AppId, appId, "客户端远程配置");
                 break;
             }
 
@@ -306,7 +304,6 @@ public class OnlineLiveOpsDispatchService : IOnlineLiveOpsDispatchService, IAdmi
             {
                 var entity = await _deviceGroupRepository.GetFirstAsync(u => u.Id == businessKey)
                              ?? throw BusinessError.Oh(CommonErrorCode.RecordNotFound, new { businessKey, });
-                EnsureSourceAppScope(entity.AppId, appId, "设备分群");
                 break;
             }
 
@@ -314,7 +311,6 @@ public class OnlineLiveOpsDispatchService : IOnlineLiveOpsDispatchService, IAdmi
             {
                 var entity = await _timeJobRepository.GetFirstAsync(u => u.Id == businessKey)
                              ?? throw BusinessError.Oh(CommonErrorCode.RecordNotFound, new { businessKey, });
-                EnsureSourceAppScope(entity.AppId, appId, "定时任务");
                 break;
             }
 
@@ -322,7 +318,6 @@ public class OnlineLiveOpsDispatchService : IOnlineLiveOpsDispatchService, IAdmi
             {
                 var entity = await _announcementRepository.GetFirstAsync(u => u.Id == businessKey)
                              ?? throw BusinessError.Oh(CommonErrorCode.RecordNotFound, new { businessKey, });
-                EnsureSourceAppScope(entity.AppId, appId, "公告");
                 break;
             }
 
@@ -343,19 +338,6 @@ public class OnlineLiveOpsDispatchService : IOnlineLiveOpsDispatchService, IAdmi
     {
         var scope = await _scopeFactory.CreateAsync(input.ServerId, action + ":" + input.BusinessKey);
         return await _onlineServerClient.PostAsync<OnlineLiveOpsResponse>(action, payload, scope);
-    }
-
-    /// <summary>
-    /// 来源事实行应用归属校验：来源行 AppId 必须与下发目标 AppId 一致（RemoteConfig 租户默认行 AppId 为 null/0 时对任意本租户应用可用）。
-    /// </summary>
-    private static void EnsureSourceAppScope(long? sourceAppId, long targetAppId, string sourceName)
-    {
-        var resolved = sourceAppId ?? 0;
-        if (resolved != 0 && resolved != targetAppId)
-        {
-            throw BusinessError.Oh(CommonErrorCode.ParameterValidationFailed,
-                new { sourceAppId = resolved, targetAppId, message = sourceName + "记录不属于目标应用", });
-        }
     }
 
     /// <summary>

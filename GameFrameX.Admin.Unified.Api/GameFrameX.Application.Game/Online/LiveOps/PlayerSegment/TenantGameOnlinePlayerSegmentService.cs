@@ -5,12 +5,10 @@
 // 不得利用本项目从事危害国家安全、扰乱社会秩序、侵犯用户合法权益等法律法规禁止的活动！任何基于本项目二次开发而产生的一切法律纠纷和责任，我们不承担任何责任！
 
 using System.ComponentModel;
-using GameFrameX.Application.Game.App.AppScope;
 using GameFrameX.Application.Game.Online.LiveOps.Dispatch;
 using GameFrameX.Application.Game.Online.LiveOps.PlayerSegment.Dto;
 using GameFrameX.Application.Game.Online.RolloutSemanticMap;
 using GameFrameX.Entity.Game.Online;
-using GameFrameX.Entity.Tenant.Game;
 using GameFrameX.Entity.Tenant.Game.Online;
 using GameFrameX.Foundation.Json;
 
@@ -29,7 +27,6 @@ public class TenantGameOnlinePlayerSegmentService
         AddTenantGameOnlinePlayerSegmentRequest, UpdateTenantGameOnlinePlayerSegmentRequest,
         TenantGameOnlinePlayerSegmentResponse, PageTenantGameOnlinePlayerSegmentRequest>
 {
-    private readonly SqlSugarRepository<TenantGameAppEntity> _gameAppRepository;
     private readonly SqlSugarRepository<TenantGameOnlineConfigRolloutEntity> _rolloutRepository;
     private readonly IOnlineLiveOpsDispatchService _dispatchService;
 
@@ -37,45 +34,39 @@ public class TenantGameOnlinePlayerSegmentService
     ///
     /// </summary>
     /// <param name="repository"></param>
-    /// <param name="gameAppRepository"></param>
     /// <param name="rolloutRepository"></param>
     /// <param name="dispatchService"></param>
     public TenantGameOnlinePlayerSegmentService(SqlSugarRepository<TenantGameOnlinePlayerSegmentEntity> repository,
-        SqlSugarRepository<TenantGameAppEntity> gameAppRepository,
         SqlSugarRepository<TenantGameOnlineConfigRolloutEntity> rolloutRepository,
         IOnlineLiveOpsDispatchService dispatchService)
         : base(repository)
     {
-        _gameAppRepository = gameAppRepository;
         _rolloutRepository = rolloutRepository;
         _dispatchService = dispatchService;
     }
 
     /// <summary>
-    /// 分页查询：按 AppId（必填事实作用域）/ Name / SyncStatus 过滤。
+    /// 分页查询：按 Name / SyncStatus 过滤。
     /// </summary>
     protected override ISugarQueryable<TenantGameOnlinePlayerSegmentResponse> BuildPageQuery(PageTenantGameOnlinePlayerSegmentRequest input)
     {
-        var appId = AppScopeRules.EnsureFactAppId(input.AppId, "玩家分群");
         return Repository.AsQueryable()
-                         .Where(u => u.AppId == appId)
                          .WhereIF(!string.IsNullOrWhiteSpace(input.Name), u => u.Name.Contains(input.Name.Trim()))
                          .WhereIF(input.SyncStatus.HasValue, u => u.SyncStatus == input.SyncStatus.Value)
                          .Select<TenantGameOnlinePlayerSegmentResponse>();
     }
 
     /// <summary>
-    /// 新增前：事实作用域 AppId + 应用归属校验 + 条件白名单校验（初始 NotSynced，须 syncOnline 后才可被灰度引用）。
+    /// 新增前：条件白名单校验（初始 NotSynced，须 syncOnline 后才可被灰度引用）。
     /// </summary>
-    protected override async Task OnAddingAsync(AddTenantGameOnlinePlayerSegmentRequest input)
+    protected override Task OnAddingAsync(AddTenantGameOnlinePlayerSegmentRequest input)
     {
-        AppScopeRules.EnsureFactAppId(input.AppId, "玩家分群");
-        await _gameAppRepository.ValidateGameAppBelongsToTenantAsync(input.AppId);
         ValidateConditions(input.ConditionsJson);
+        return Task.CompletedTask;
     }
 
     /// <summary>
-    /// 更新前：AppId 与同步状态机字段从既有实体回填不可变（AppId 不可改、同步回执不可经编辑清除）。
+    /// 更新前：同步状态机字段从既有实体回填（同步回执不可经编辑清除）。
     /// </summary>
     protected override async Task OnUpdatingAsync(UpdateTenantGameOnlinePlayerSegmentRequest input)
     {
@@ -85,7 +76,6 @@ public class TenantGameOnlinePlayerSegmentService
             throw BusinessError.Oh(CommonErrorCode.RecordNotFound);
         }
 
-        input.AppId = existing.AppId;
         // 状态机字段回填：编辑只改定义，同步状态/回执保持原值（编辑后须重新 syncOnline 生效）
         input.SyncStatus = existing.SyncStatus;
         input.LastSyncTime = existing.LastSyncTime;

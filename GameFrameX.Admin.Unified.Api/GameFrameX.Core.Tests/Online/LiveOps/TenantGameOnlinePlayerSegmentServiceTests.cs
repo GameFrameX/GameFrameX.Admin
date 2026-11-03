@@ -101,7 +101,7 @@ public sealed class TenantGameOnlinePlayerSegmentServiceTests : IDisposable
         var persisted = await _db.Queryable<TenantGameOnlinePlayerSegmentEntity>().FirstAsync(u => u.Id == response.Id);
         Assert.NotNull(persisted);
         Assert.Equal(OnlinePlayerSegmentSyncStatus.NotSynced, persisted.SyncStatus);
-        Assert.Equal(App100, persisted.AppId);
+        Assert.Equal(0, persisted.AppId);
     }
 
     /// <summary>
@@ -193,7 +193,6 @@ public sealed class TenantGameOnlinePlayerSegmentServiceTests : IDisposable
     {
         return new AddTenantGameOnlinePlayerSegmentRequest
         {
-            AppId = App100,
             Name = "unit-segment",
             Description = null,
             ConditionsJson = conditionsJson,
@@ -204,7 +203,6 @@ public sealed class TenantGameOnlinePlayerSegmentServiceTests : IDisposable
     {
         return new TenantGameOnlinePlayerSegmentService(
             Repository<TenantGameOnlinePlayerSegmentEntity>(),
-            Repository<TenantGameAppEntity>(),
             Repository<TenantGameOnlineConfigRolloutEntity>(),
             _dispatch);
     }
@@ -238,7 +236,7 @@ public sealed class TenantGameOnlinePlayerSegmentServiceTests : IDisposable
             throw new NotSupportedException("统一下发入口行为由 OnlineLiveOpsDispatchServiceTests 覆盖");
         }
 
-        public Task EnsureSourceExistsAsync(LiveOpsSourceKind source, long businessKey, long appId)
+        public Task EnsureSourceExistsAsync(LiveOpsSourceKind source, long businessKey)
         {
             return Task.CompletedTask;
         }

@@ -193,7 +193,6 @@ public sealed class TenantGameOnlineConfigRolloutServiceTests : IDisposable
     {
         return new PublishConfigRolloutRequest
         {
-            AppId = App100,
             ServerId = Area1001,
             ConfigKind = OnlineConfigRolloutKind.RemoteConfig,
             ConfigKey = "9001",
@@ -207,7 +206,6 @@ public sealed class TenantGameOnlineConfigRolloutServiceTests : IDisposable
     {
         return new RollbackConfigRolloutRequest
         {
-            AppId = App100,
             ServerId = Area1001,
             ConfigKind = OnlineConfigRolloutKind.RemoteConfig,
             ConfigKey = "9001",
@@ -279,7 +277,7 @@ public sealed class TenantGameOnlineConfigRolloutServiceTests : IDisposable
             throw new NotSupportedException("统一下发入口行为由 OnlineLiveOpsDispatchServiceTests 覆盖");
         }
 
-        public Task EnsureSourceExistsAsync(LiveOpsSourceKind source, long businessKey, long appId)
+        public Task EnsureSourceExistsAsync(LiveOpsSourceKind source, long businessKey)
         {
             return Task.CompletedTask; // 来源校验行为由 OnlineLiveOpsDispatchServiceTests 覆盖
         }

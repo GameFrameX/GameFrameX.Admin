@@ -5,7 +5,6 @@
 // 不得利用本项目从事危害国家安全、扰乱社会秩序、侵犯用户合法权益等法律法规禁止的活动！任何基于本项目二次开发而产生的一切法律纠纷和责任，我们不承担任何责任！
 
 using System.ComponentModel;
-using GameFrameX.Application.Game.App.AppScope;
 using GameFrameX.Application.Game.Online.LiveOps.ConfigRollout.Dto;
 using GameFrameX.Application.Game.Online.LiveOps.Dispatch;
 using GameFrameX.Application.Game.Online.RolloutSemanticMap;
@@ -19,7 +18,7 @@ namespace GameFrameX.Application.Game.Online.LiveOps.ConfigRollout;
 /// <summary>
 /// 配置灰度发布（Rollout）版本行管理服务（来源 change C343 / vault:C8 S7.7-S7.8）。路由前缀 /api/tenantGameOnlineConfigRollout（去后缀 + lowerCamelCase）。
 /// <para>版本化铁律：版本行只由 publish / rollback 两个动作追加，历史行不可修改不可删除（无 add/update/delete action）；
-/// <c>ConfigVersion</c> 按 AppId + ConfigKind + ConfigKey 维度递增分配（发布与回滚共用序列）；
+/// <c>ConfigVersion</c> 按 ConfigKind + ConfigKey 维度递增分配（发布与回滚共用序列）；
 /// 回滚 = 版本化新下发（新行 + TargetVersion 指向恢复目标，语义对照见 <c>OnlineRolloutSemanticMap</c>），
 /// 生效/被替代由 Status 表达（Published=生效中，RolledBack=已被替代的历史版本）。</para>
 /// <para>下发经 <see cref="IOnlineLiveOpsDispatchService"/> 单一入口（publishConfigRollout / rollbackConfigRollout 通道）；
@@ -52,16 +51,14 @@ public class TenantGameOnlineConfigRolloutService : IAdminApiController
     }
 
     /// <summary>
-    /// 分页查询版本行：按 AppId（必填事实作用域）/ ConfigKind / ConfigKey / Status / ServerId 过滤，新版本在前。
+    /// 分页查询版本行：按 ConfigKind / ConfigKey / Status / ServerId 过滤，新版本在前。
     /// </summary>
     [HttpPost(CrudActionRoutes.Page)]
     [ApiDescriptionSettings(Name = "Page")]
     [DisplayName("分页查询灰度版本行")]
     public async Task<SqlSugarPagedList<TenantGameOnlineConfigRolloutResponse>> PageAsync(PageTenantGameOnlineConfigRolloutRequest input)
     {
-        var appId = AppScopeRules.EnsureFactAppId(input.AppId, "配置灰度发布");
         return await _repository.AsQueryable()
-                         .Where(u => u.AppId == appId)
                          .WhereIF(input.ConfigKind.HasValue, u => u.ConfigKind == input.ConfigKind.Value)
                          .WhereIF(!string.IsNullOrWhiteSpace(input.ConfigKey), u => u.ConfigKey == input.ConfigKey.Trim())
                          .WhereIF(input.Status.HasValue, u => u.Status == input.Status.Value)
@@ -72,7 +69,7 @@ public class TenantGameOnlineConfigRolloutService : IAdminApiController
     }
 
     /// <summary>
-    /// 灰度发布：校验（Percent 边界 / 来源存在归属 / 分群已同步）→ 分配 ConfigVersion → 落版本行 → 经单一入口下发 Online → 回写确认版本并替代旧生效行。
+    /// 灰度发布：校验（Percent 边界 / 来源存在 / 分群已同步）→ 分配 ConfigVersion → 落版本行 → 经单一入口下发 Online → 回写确认版本并替代旧生效行。
     /// <para>下发失败（Online 非 0 协议码 / 作用域拒绝）时删除刚插入的版本行后原样抛出——Online 未确认即无生效事实，不留半生效审计行，可整重试。</para>
     /// </summary>
     [HttpPost("publish")]
@@ -81,16 +78,15 @@ public class TenantGameOnlineConfigRolloutService : IAdminApiController
     public async Task<PublishConfigRolloutResponse> PublishAsync(PublishConfigRolloutRequest input)
     {
         EnsurePublishPercent(input.Percent);
-        await EnsureConfigSourceAsync(input.ConfigKind, input.ConfigKey, input.AppId);
-        var segment = await EnsureSegmentSyncedAsync(input.SegmentId, input.AppId);
+        await EnsureConfigSourceAsync(input.ConfigKind, input.ConfigKey);
+        var segment = await EnsureSegmentSyncedAsync(input.SegmentId);
 
         var entity = new TenantGameOnlineConfigRolloutEntity
         {
-            AppId = input.AppId,
             ServerId = input.ServerId,
             ConfigKind = input.ConfigKind,
             ConfigKey = input.ConfigKey.Trim(),
-            ConfigVersion = await AllocateConfigVersionAsync(input.AppId, input.ConfigKind, input.ConfigKey.Trim()),
+            ConfigVersion = await AllocateConfigVersionAsync(input.ConfigKind, input.ConfigKey.Trim()),
             SegmentId = segment.Id,
             Percent = input.Percent,
             Status = OnlineConfigRolloutStatus.Published,
@@ -125,11 +121,10 @@ public class TenantGameOnlineConfigRolloutService : IAdminApiController
     [DisplayName("回滚配置灰度版本")]
     public async Task<RollbackConfigRolloutResponse> RollbackAsync(RollbackConfigRolloutRequest input)
     {
-        await EnsureConfigSourceAsync(input.ConfigKind, input.ConfigKey, input.AppId);
+        await EnsureConfigSourceAsync(input.ConfigKind, input.ConfigKey);
 
         var configKey = input.ConfigKey.Trim();
-        var target = await _repository.GetFirstAsync(u => u.AppId == input.AppId
-                                                       && u.ConfigKind == input.ConfigKind
+        var target = await _repository.GetFirstAsync(u => u.ConfigKind == input.ConfigKind
                                                        && u.ConfigKey == configKey
                                                        && u.ConfigVersion == input.TargetVersion);
         if (target == null)
@@ -140,11 +135,10 @@ public class TenantGameOnlineConfigRolloutService : IAdminApiController
 
         var entity = new TenantGameOnlineConfigRolloutEntity
         {
-            AppId = input.AppId,
             ServerId = input.ServerId,
             ConfigKind = input.ConfigKind,
             ConfigKey = configKey,
-            ConfigVersion = await AllocateConfigVersionAsync(input.AppId, input.ConfigKind, configKey),
+            ConfigVersion = await AllocateConfigVersionAsync(input.ConfigKind, configKey),
             SegmentId = target.SegmentId,
             Percent = target.Percent,
             Status = OnlineConfigRolloutStatus.Published,
@@ -187,9 +181,9 @@ public class TenantGameOnlineConfigRolloutService : IAdminApiController
     }
 
     /// <summary>
-    /// 配置来源校验：ConfigKey 必须是来源实体 Id 数字串，且来源存在并归属目标 App（校验收口在统一下发入口，此处转调）。
+    /// 配置来源校验：ConfigKey 必须是来源实体 Id 数字串，且来源存在（校验收口在统一下发入口，此处转调）。
     /// </summary>
-    private async Task EnsureConfigSourceAsync(OnlineConfigRolloutKind kind, string configKey, long appId)
+    private async Task EnsureConfigSourceAsync(OnlineConfigRolloutKind kind, string configKey)
     {
         if (!Enum.IsDefined(typeof(OnlineConfigRolloutKind), kind))
         {
@@ -202,24 +196,18 @@ public class TenantGameOnlineConfigRolloutService : IAdminApiController
                 new { configKey, message = "配置业务键必须是所辖配置域实体 Id（正整数）", });
         }
 
-        await _dispatchService.EnsureSourceExistsAsync(MapToLiveOpsSource(kind), businessKey, appId);
+        await _dispatchService.EnsureSourceExistsAsync(MapToLiveOpsSource(kind), businessKey);
     }
 
     /// <summary>
-    /// 分群校验：必须存在、归属目标 App 且已同步 Online（未同步分群 Online 无法解释命中）。
+    /// 分群校验：必须存在且已同步 Online（未同步分群 Online 无法解释命中）。
     /// </summary>
-    private async Task<TenantGameOnlinePlayerSegmentEntity> EnsureSegmentSyncedAsync(long segmentId, long appId)
+    private async Task<TenantGameOnlinePlayerSegmentEntity> EnsureSegmentSyncedAsync(long segmentId)
     {
         var segment = await _segmentRepository.GetFirstAsync(u => u.Id == segmentId);
         if (segment == null)
         {
             throw BusinessError.Oh(CommonErrorCode.RecordNotFound, new { segmentId, });
-        }
-
-        if (segment.AppId != appId)
-        {
-            throw BusinessError.Oh(CommonErrorCode.ParameterValidationFailed,
-                new { segmentId, appId, message = "分群不属于目标应用", });
         }
 
         if (segment.SyncStatus != OnlinePlayerSegmentSyncStatus.Synced)
@@ -232,13 +220,13 @@ public class TenantGameOnlineConfigRolloutService : IAdminApiController
     }
 
     /// <summary>
-    /// 分配下一个 ConfigVersion（AppId + ConfigKind + ConfigKey 维度递增；发布与回滚共用序列。
+    /// 分配下一个 ConfigVersion（ConfigKind + ConfigKey 维度递增；发布与回滚共用序列。
     /// 当前实现为 max+1 非原子自增，极端并发下可能同号——灰度发布为低频运营操作且入口经操作人确认，残余风险记录于 change review）。
     /// </summary>
-    private async Task<int> AllocateConfigVersionAsync(long appId, OnlineConfigRolloutKind kind, string configKey)
+    private async Task<int> AllocateConfigVersionAsync(OnlineConfigRolloutKind kind, string configKey)
     {
         var maxVersion = await _repository.AsQueryable()
-            .Where(u => u.AppId == appId && u.ConfigKind == kind && u.ConfigKey == configKey)
+            .Where(u => u.ConfigKind == kind && u.ConfigKey == configKey)
             .MaxAsync(u => u.ConfigVersion);
         return maxVersion + 1;
     }
@@ -255,8 +243,7 @@ public class TenantGameOnlineConfigRolloutService : IAdminApiController
 
         await _repository.Context.Updateable<TenantGameOnlineConfigRolloutEntity>()
             .SetColumns(p => p.Status == OnlineConfigRolloutStatus.RolledBack)
-            .Where(u => u.AppId == entity.AppId
-                     && u.ConfigKind == entity.ConfigKind
+            .Where(u => u.ConfigKind == entity.ConfigKind
                      && u.ConfigKey == entity.ConfigKey
                      && u.Status == OnlineConfigRolloutStatus.Published
                      && u.Id != entity.Id)

@@ -15,11 +15,6 @@ public class TenantGameOnlineConfigRolloutResponse
     public long Id { get; set; }
 
     /// <summary>
-    /// 应用Id。
-    /// </summary>
-    public long AppId { get; set; }
-
-    /// <summary>
     /// 目标区服Id。
     /// </summary>
     public long ServerId { get; set; }

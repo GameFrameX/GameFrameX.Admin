@@ -16,11 +16,6 @@ public sealed class TenantGameOnlinePlayerSegmentResponse
     public long Id { get; set; }
 
     /// <summary>
-    /// 应用Id。
-    /// </summary>
-    public long AppId { get; set; }
-
-    /// <summary>
     /// 分群名称。
     /// </summary>
     public string Name { get; set; } = null!;

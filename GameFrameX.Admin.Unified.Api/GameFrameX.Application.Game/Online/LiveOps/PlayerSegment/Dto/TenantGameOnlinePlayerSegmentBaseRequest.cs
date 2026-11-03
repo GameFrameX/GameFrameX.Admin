@@ -13,12 +13,6 @@ namespace GameFrameX.Application.Game.Online.LiveOps.PlayerSegment.Dto;
 public abstract class TenantGameOnlinePlayerSegmentBaseRequest : BaseUpdateRequest
 {
     /// <summary>
-    /// 应用Id。事实数据应用作用域，必须 &gt; 0。
-    /// </summary>
-    [Required(ErrorMessage = "应用Id不能为空")]
-    public long AppId { get; set; }
-
-    /// <summary>
     /// 分群名称。
     /// </summary>
     [Required(ErrorMessage = "分群名称不能为空")]

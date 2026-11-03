@@ -125,19 +125,16 @@ public sealed class OnlineLiveOpsDispatchServiceTests : IDisposable
     }
 
     /// <summary>
-    /// 来源记录归属其它应用（AppId 不一致）：拒绝，杜绝跨应用误下发。
+    /// 主库来源按业务主键下发，不依赖旧应用维度。
     /// </summary>
     [Fact]
-    public async Task DispatchAsync_RejectsSourceFromOtherApp()
+    public async Task DispatchAsync_AcceptsMainDatabaseSourceWithoutApplication()
     {
-        await SeedAsync(); // 公告 9005 归属 App200
+        await SeedAsync();
         var service = CreateService();
-
-        var exception = await Assert.ThrowsAsync<BusinessException>(
-            () => service.DispatchAsync(NewRequest(LiveOpsSourceKind.Announcement, 9005)));
-
-        Assert.Equal(20000002, exception.Code);
-        Assert.Empty(_client.Calls);
+        var response = await service.DispatchAsync(NewRequest(LiveOpsSourceKind.Announcement, 9005));
+        Assert.Equal(9005, response.BusinessKey);
+        Assert.Single(_client.Calls);
     }
 
     /// <summary>
@@ -224,7 +221,6 @@ public sealed class OnlineLiveOpsDispatchServiceTests : IDisposable
         {
             Source = source,
             BusinessKey = businessKey,
-            AppId = App100,
             ServerId = Area1001,
             Reason = "unit-test",
         };

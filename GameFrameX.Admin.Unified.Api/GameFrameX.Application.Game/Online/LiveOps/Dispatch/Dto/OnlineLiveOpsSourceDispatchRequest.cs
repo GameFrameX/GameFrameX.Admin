@@ -17,13 +17,6 @@ public sealed class OnlineLiveOpsSourceDispatchRequest
     public long BusinessKey { get; set; }
 
     /// <summary>
-    /// 目标应用Id（页面应用作用域上下文提供）。
-    /// </summary>
-    [Required(ErrorMessage = "应用Id不能为空")]
-    [Range(1, long.MaxValue, ErrorMessage = "应用Id必须大于0")]
-    public long AppId { get; set; }
-
-    /// <summary>
     /// 目标区服Id（Online 命令按区服路由到对应 Runtime）。
     /// </summary>
     [Required(ErrorMessage = "区服Id不能为空")]

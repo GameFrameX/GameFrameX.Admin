@@ -11,12 +11,6 @@ namespace GameFrameX.Application.Game.Online.LiveOps.ConfigRollout.Dto;
 public sealed class PageTenantGameOnlineConfigRolloutRequest : BasePageRequest
 {
     /// <summary>
-    /// 应用Id（事实数据必填，按当前应用筛选）。
-    /// </summary>
-    [Required(ErrorMessage = "应用Id不能为空")]
-    public long AppId { get; set; }
-
-    /// <summary>
     /// 配置族过滤。
     /// </summary>
     public OnlineConfigRolloutKind? ConfigKind { get; set; }

@@ -193,7 +193,7 @@ public class TenantGameAppRemoteConfigService : GenericCrudService<Entity.Tenant
 
     /// <summary>
     /// 经 Online 统一下发当前远程配置（来源 change C343 / vault:C8 S7.7）：转调 OnlineLiveOpsDispatchService 单一入口（publishRemoteConfig 通道），
-    /// 来源类型固定注入 RemoteConfig，存在性 / 应用归属 / 作用域校验在单一入口完成。
+    /// 来源类型固定注入 RemoteConfig，存在性 / 区服校验在单一入口完成。
     /// </summary>
     [HttpPost("dispatchOnline")]
     [ApiDescriptionSettings(Name = "DispatchOnline")]
@@ -204,7 +204,6 @@ public class TenantGameAppRemoteConfigService : GenericCrudService<Entity.Tenant
         {
             Source = LiveOpsSourceKind.RemoteConfig,
             BusinessKey = input.BusinessKey,
-            AppId = input.AppId,
             ServerId = input.ServerId,
             SegmentId = input.SegmentId,
             Reason = input.Reason,
