@@ -20,7 +20,7 @@ public sealed class OnlineAssetMenuSeedTests
         // C324：Dir 无 /app 受众段；C366：提升为顶层根（Pid=0），OrderNo=550 紧邻区服运维 500。
         Assert.Equal("/onlineCenter", container.Path);
         Assert.Equal(0, container.Pid);
-        Assert.Equal(MenuAppScopeEnum.App, container.AppScope);
+        Assert.Equal(MenuAppScopeEnum.Console, container.AppScope);
         Assert.Equal("message.menu.onlineCenter", container.TitleCode);
         Assert.Equal("在线平台", container.Title);
         Assert.Equal(550, container.OrderNo);
@@ -38,7 +38,7 @@ public sealed class OnlineAssetMenuSeedTests
         var page = Assert.Single(menus, m => m.Key == key);
 
         Assert.Equal(MenuTypeEnum.Menu, page.Type);
-        Assert.Equal(MenuAppScopeEnum.App, page.AppScope);
+        Assert.Equal(MenuAppScopeEnum.Console, page.AppScope);
         Assert.Equal(StableSeedId.Menu("route:onlineCenter"), page.Pid);
         Assert.Equal(title, page.Title);
         Assert.Equal(titleCode, page.TitleCode);

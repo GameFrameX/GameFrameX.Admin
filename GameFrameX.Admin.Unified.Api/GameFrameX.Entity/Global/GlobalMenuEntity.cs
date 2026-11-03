@@ -134,9 +134,9 @@ public sealed class GlobalMenuEntity : EntityBasic
     public bool AllowTenantWhenSuperAdminOnly { get; set; }
 
     /// <summary>
-    /// 应用作用域（Tenant 租户默认 / Platform 仅超管 / App 应用工作台）。显式声明菜单归属域，取代路由前缀推断。
+    /// 控制台作用域。所有菜单共用工作台，可见权限由用户角色与超管标记控制。
     /// </summary>
-    [SugarColumn(ColumnDescription = "应用作用域", DefaultValue = "0")]
+    [SugarColumn(ColumnDescription = "控制台作用域", DefaultValue = "0")]
     public MenuAppScopeEnum AppScope { get; set; }
 
     /// <summary>

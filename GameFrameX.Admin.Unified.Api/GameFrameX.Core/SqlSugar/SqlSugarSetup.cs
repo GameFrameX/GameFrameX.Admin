@@ -9,6 +9,7 @@ using GameFrameX.Entity.Enum;
 using GameFrameX.Entity.System;
 using GameFrameX.Entity.Global;
 using GameFrameX.Entity.Log;
+using GameFrameX.Entity.Tenant.ObjectStorage;
 using GameFrameX.Foundation.Orm.Entity;
 using Microsoft.Extensions.Hosting;
 using MySqlConnector;
@@ -499,6 +500,13 @@ public static class SqlSugarSetup
 
             if (config.ConfigId.ToString() == SqlSugarConst.MainConfigId)
             {
+                // 新装主库空配置时提供本地存储；已有配置（包括停用或软删）不覆盖。
+                if (effectiveTypes.Contains(typeof(TenantObjectStorageConfigEntity))
+                    && dbProvider.DbMaintenance.IsAnyTable(dbProvider.EntityMaintenance.GetEntityInfo<TenantObjectStorageConfigEntity>().DbTableName, false))
+                {
+                    DefaultTenantDatabaseSeeder.SeedDefaultObjectStorageConfigIfEmpty(dbProvider);
+                }
+
                 // C117 (GFX-117)：8 棵游戏业务菜单路径已收敛到新前缀（appCenter/playerCenter/goodsCenter/
                 // redeemCenter/webShopCenter/contentCenter/opsCenter/automationCenter），旧 /game/<子域> 兼容迁移兜底已移除。
                 // global_menu.path / component 由 GlobalMenuSeedData upsert 作为唯一权威纠正源；

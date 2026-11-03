@@ -1,5 +1,7 @@
 using GameFrameX.Entity.System;
 using GameFrameX.Entity.Log;
+using GameFrameX.Entity.Global;
+using GameFrameX.Entity.Enum;
 using GameFrameX.Entity.Tenant.Game;
 using SqlSugar;
 
@@ -22,6 +24,8 @@ internal static class MigrationSmokeTests
                 target.CodeFirst.InitTables<SystemUserEntity>();
                 target.Ado.ExecuteCommand("ALTER TABLE system_user_entity ADD COLUMN tenant_id BIGINT NOT NULL DEFAULT 0");
                 target.CodeFirst.InitTables<SystemLogVisitEntity>();
+                target.CodeFirst.InitTables<GlobalMenuEntity>();
+                target.Insertable(new GlobalMenuEntity { Id = 9001, Key = "permission:auto:migration", Title = "迁移菜单", AppScope = (MenuAppScopeEnum)2 }).ExecuteCommand();
                 source.CodeFirst.InitTables<TenantGameGoodsEntity>();
                 source.Insertable(new TenantGameGoodsEntity { Id = 8001, Name = "主库资源", ConfigId = 42 }).ExecuteCommand();
                 source.CodeFirst.InitTables<TenantGameHomeOnlineSampleEntity>();
@@ -36,6 +40,7 @@ internal static class MigrationSmokeTests
                 SingleMainMigration.Run(source, target, true, types);
                 Require(target.DbMaintenance.GetColumnInfosByTableName("tenant_game_home_online_sample_entity", false).Any(column => column.DbColumnName == "tenant_id"), "dry-run 删列必须回滚");
                 Require(target.Queryable<TenantGameHomeOnlineSampleEntity>().Count() == 0, "dry-run 数据复制必须回滚");
+                Require((int)target.Queryable<GlobalMenuEntity>().Single().AppScope == 2, "dry-run 菜单作用域更新必须回滚");
                 Require(!target.DbMaintenance.IsAnyTable("tenant_game_goods_entity", false), "dry-run 新建表必须回滚");
                 Require(target.DbMaintenance.GetColumnInfosByTableName("system_user_entity", false).Any(column => column.DbColumnName == "tenant_id"), "dry-run 系统表删列必须回滚");
                 SingleMainMigration.Run(source, target, false, types);
@@ -45,6 +50,7 @@ internal static class MigrationSmokeTests
                 Require(!target.DbMaintenance.GetColumnInfosByTableName("system_user_entity", false).Any(column => column.DbColumnName == "tenant_id"), "系统表作用域列必须删除");
                 Require(target.DbMaintenance.GetColumnInfosByTableName("system_log_visit_entity", false).Any(column => column.DbColumnName == "tenant_id"), "历史审计归属列必须保留");
                 Require(target.Queryable<TenantGameGoodsEntity>().Single().ConfigId == 42, "新建业务表应保真复制");
+                Require(target.Queryable<GlobalMenuEntity>().Single().AppScope == MenuAppScopeEnum.Console, "手建菜单作用域必须塌缩");
                 Reject(() => target.Insertable(new TenantGameHomeOnlineSampleEntity { Id = 7002, SampleTime = 1000, OnlineCount = 1 }).ExecuteCommand(), "业务时间键仍应唯一", "UNIQUE");
                 Require(target.Queryable<TenantGameHomeOnlineSampleEntity>().Single().OnlineCount == 42, "业务字段必须保真");
                 target.Updateable<TenantGameHomeOnlineSampleEntity>().SetColumns(row => row.OnlineCount == 99).Where(row => row.Id == 7001).ExecuteCommand();

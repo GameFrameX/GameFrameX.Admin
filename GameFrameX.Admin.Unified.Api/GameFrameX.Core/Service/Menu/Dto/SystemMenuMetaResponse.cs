@@ -46,14 +46,12 @@ public class SystemMenuMetaResponse
     public bool IsAffix { get; set; }
 
     /// <summary>
-    /// 菜单上下文：tenantShell / appWorkspace。
-    /// <para>tenantShell 是默认菜单（平台域页面同在此上下文，侧边栏保持完整菜单）；appWorkspace 只在当前应用工作台中展示。</para>
+    /// 菜单上下文：console。
     /// </summary>
     public string MenuContext { get; set; } = null!;
 
     /// <summary>
-    /// 菜单应用作用域：platform / tenant / app。
-    /// <para>platform 只允许 SuperAdmin 平台能力；tenant 只在租户 Shell 下可见；app 必须绑定具体 AppId > 0。</para>
+    /// 菜单作用域：console。
     /// </summary>
     public string AppScope { get; set; } = null!;
 }

@@ -69,7 +69,7 @@ public sealed class CodeFirstSchemaEvolutionPostgresTests
             Assert.False((bool)legacyRow.super_admin_only);
             Assert.Equal(0, (int)legacyRow.sync_roles);
             Assert.False((bool)legacyRow.allow_tenant_when_super_admin_only);
-            Assert.Equal((int)MenuAppScopeEnum.Tenant, (int)legacyRow.app_scope);
+            Assert.Equal((int)MenuAppScopeEnum.Console, (int)legacyRow.app_scope);
         }
     }
 

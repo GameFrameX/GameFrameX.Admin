@@ -13,18 +13,15 @@ namespace GameFrameX.Core.Tests.System;
 /// </summary>
 public class MenuOutputScopeTests
 {
-    [Theory]
-    [InlineData(MenuAppScopeEnum.Tenant, "tenant", "tenantShell")]
-    [InlineData(MenuAppScopeEnum.Platform, "platform", "tenantShell")]
-    [InlineData(MenuAppScopeEnum.App, "app", "appWorkspace")]
-    public void MenuOutputMeta_MapsAppScopeToContextCodes(MenuAppScopeEnum scope, string appScope, string menuContext)
+    [Fact]
+    public void MenuOutputMeta_UsesConsoleContext()
     {
         var config = new TypeAdapterConfig();
         new SystemMenuMapper().Register(config);
 
-        var output = new GlobalMenuEntity { AppScope = scope, }.Adapt<MenuResponse>(config);
+        var output = new GlobalMenuEntity { AppScope = MenuAppScopeEnum.Console, }.Adapt<MenuResponse>(config);
 
-        Assert.Equal(appScope, output.Meta.AppScope);
-        Assert.Equal(menuContext, output.Meta.MenuContext);
+        Assert.Equal("console", output.Meta.AppScope);
+        Assert.Equal("console", output.Meta.MenuContext);
     }
 }

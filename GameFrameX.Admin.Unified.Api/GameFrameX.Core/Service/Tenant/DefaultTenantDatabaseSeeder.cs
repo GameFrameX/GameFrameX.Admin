@@ -5,7 +5,7 @@ namespace GameFrameX.Core.Service.Tenant;
 public static class DefaultTenantDatabaseSeeder
 {
     /// <summary>
-    /// 为新租户构建默认启用的本地对象存储配置，保证租户开箱即用、上传不报错。
+    /// 为新装主库构建默认启用的本地对象存储配置。
     /// </summary>
     public static TenantObjectStorageConfigEntity BuildDefaultObjectStorageConfig()
     {
@@ -27,11 +27,11 @@ public static class DefaultTenantDatabaseSeeder
     }
 
     /// <summary>
-    /// 为新租户在对象存储配置为空时写入默认启用的本地配置，保证租户开箱即用、上传不报错。
+    /// 仅在主库对象存储配置为空时写入默认本地配置。
     /// </summary>
-    public static void SeedDefaultObjectStorageConfigIfEmpty(SqlSugarScopeProvider tenantDb)
+    public static void SeedDefaultObjectStorageConfigIfEmpty(SqlSugarScopeProvider database)
     {
-        var hasAny = tenantDb.Queryable<TenantObjectStorageConfigEntity>()
+        var hasAny = database.Queryable<TenantObjectStorageConfigEntity>()
                              .Filter(null, true)
                              .Any();
         if (hasAny)
@@ -39,11 +39,11 @@ public static class DefaultTenantDatabaseSeeder
             return;
         }
 
-        tenantDb.Insertable(BuildDefaultObjectStorageConfig()).ExecuteCommand();
+        database.Insertable(BuildDefaultObjectStorageConfig()).ExecuteCommand();
     }
 
     /// <summary>仅插入缺失的种子行，保留用户修改。</summary>
-    internal static void Upsert<T>(SqlSugarScopeProvider tenantDb, IEnumerable<T> data) where T : class, new()
+    internal static void Upsert<T>(SqlSugarScopeProvider database, IEnumerable<T> data) where T : class, new()
     {
         var items = data.ToList();
         if (items.Count == 0)
@@ -51,25 +51,25 @@ public static class DefaultTenantDatabaseSeeder
             return;
         }
 
-        var entityInfo = tenantDb.EntityMaintenance.GetEntityInfo<T>();
+        var entityInfo = database.EntityMaintenance.GetEntityInfo<T>();
         var primaryKeyColumns = entityInfo.Columns.Where(u => u.IsPrimarykey).Select(u => u.PropertyName).ToArray();
         if (primaryKeyColumns.Length == 0)
         {
-            tenantDb.Insertable(items).ExecuteCommand();
+            database.Insertable(items).ExecuteCommand();
             return;
         }
 
-        tenantDb.QueryFilter.ClearAndBackup();
+        database.QueryFilter.ClearAndBackup();
         try
         {
-            var storageable = tenantDb.Storageable(items);
+            var storageable = database.Storageable(items);
             storageable.WhereColumns(primaryKeyColumns);
             var storage = storageable.ToStorage();
             storage.AsInsertable.ExecuteCommand();
         }
         finally
         {
-            tenantDb.QueryFilter.Restore();
+            database.QueryFilter.Restore();
         }
     }
 

@@ -1,6 +1,5 @@
 using GameFrameX.Entity.Global;
 using GameFrameX.Core.Service.Menu.Dto;
-using GameFrameX.Entity.Enum;
 
 namespace GameFrameX.Core.Service.Menu;
 
@@ -20,34 +19,8 @@ public class SystemMenuMapper : IRegister
               .Map(t => t.Meta.IsHide, o => o.IsHide)
               .Map(t => t.Meta.IsKeepAlive, o => o.IsKeepAlive)
               .Map(t => t.Meta.IsAffix, o => o.IsAffix)
-              .Map(t => t.Meta.AppScope, o => ScopeCode(o.AppScope))
-              .Map(t => t.Meta.MenuContext, o => ContextCode(o.AppScope));
+              .Map(t => t.Meta.AppScope, o => "console")
+              .Map(t => t.Meta.MenuContext, o => "console");
     }
 
-    /// <summary>
-    /// AppScope 枚举 → 前端约定字符串（platform / tenant / app）。
-    /// </summary>
-    private static string ScopeCode(MenuAppScopeEnum scope)
-    {
-        return scope switch
-        {
-            MenuAppScopeEnum.Platform => "platform",
-            MenuAppScopeEnum.App      => "app",
-            _                         => "tenant",
-        };
-    }
-
-    /// <summary>
-    /// AppScope 枚举 → MenuContext 字符串（tenantShell / appWorkspace）。
-    /// 平台域页面不切换菜单上下文：侧边栏在平台管理子页下保持完整菜单（platform 子菜单就地展开），
-    /// 仅应用工作台（App 域）切换为 appWorkspace 上下文。
-    /// </summary>
-    private static string ContextCode(MenuAppScopeEnum scope)
-    {
-        return scope switch
-        {
-            MenuAppScopeEnum.App => "appWorkspace",
-            _                    => "tenantShell",
-        };
-    }
 }

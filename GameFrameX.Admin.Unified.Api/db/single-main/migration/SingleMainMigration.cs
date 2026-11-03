@@ -2,6 +2,7 @@ using System.Data;
 using System.Globalization;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Entity.System;
+using GameFrameX.Entity.Global;
 using GameFrameX.Entity.Tenant;
 using SqlSugar;
 using DatabaseType = SqlSugar.DbType;
@@ -54,6 +55,7 @@ internal static class SingleMainMigration
                 .Where(type => type.IsClass && !type.IsAbstract && type.IsDefined(typeof(SugarTable), false))
                 .OrderBy(type => type.FullName, StringComparer.Ordinal).ToArray();
             ScopeColumnRetirement.Apply(target, currentTypes);
+            NormalizeMenuScope(target);
             var types = currentTypes.Where(SqlSugarEntityBoundary.IsTenantTable).ToArray();
             var sourceTables = source.DbMaintenance.GetTableInfoList(false).Select(table => table.Name).ToHashSet(StringComparer.OrdinalIgnoreCase);
             var copiedTables = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -101,6 +103,16 @@ internal static class SingleMainMigration
             }
 
             target.Utilities.RemoveCacheAll();
+        }
+    }
+
+    private static void NormalizeMenuScope(ISqlSugarClient target)
+    {
+        var tableName = target.EntityMaintenance.GetEntityInfo<GlobalMenuEntity>().DbTableName;
+        if (target.DbMaintenance.IsAnyTable(tableName, false)
+            && target.DbMaintenance.GetColumnInfosByTableName(tableName, false).Any(column => column.DbColumnName == "app_scope"))
+        {
+            target.Ado.ExecuteCommand($"UPDATE {Quote(tableName)} SET app_scope = 0 WHERE app_scope <> 0");
         }
     }
 

@@ -31,7 +31,7 @@ public sealed class OnlineConsoleMenuSeedTests
         var page = Assert.Single(menus, m => m.Key == key);
 
         Assert.Equal(MenuTypeEnum.Menu, page.Type);
-        Assert.Equal(MenuAppScopeEnum.App, page.AppScope);
+        Assert.Equal(MenuAppScopeEnum.Console, page.AppScope);
         Assert.Equal(StableSeedId.Menu("route:onlineCenter"), page.Pid);
         Assert.Equal(title, page.Title);
         Assert.Equal(titleCode, page.TitleCode);

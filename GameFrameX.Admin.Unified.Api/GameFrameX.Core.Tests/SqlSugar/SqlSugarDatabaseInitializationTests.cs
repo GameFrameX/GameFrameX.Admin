@@ -1,4 +1,7 @@
 using GameFrameX.Core.Option;
+using GameFrameX.Application.SeedData.System;
+using GameFrameX.Core.Cache;
+using GameFrameX.Core.Tests.System;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Core.Enum;
 using GameFrameX.Core.Const.MenuSeed;
@@ -8,6 +11,7 @@ using GameFrameX.Entity.Tenant.Game;
 using GameFrameX.Entity.Global;
 using GameFrameX.Entity.System;
 using GameFrameX.Entity.Log;
+using GameFrameX.Entity.Tenant.ObjectStorage;
 using SqlSugar;
 
 namespace GameFrameX.Core.Tests.SqlSugar;
@@ -36,6 +40,36 @@ public class SqlSugarDatabaseInitializationTests : IDisposable
     };
 
     private readonly List<string> _dbPaths = new();
+
+    [Theory]
+    [InlineData(false, false)]
+    [InlineData(true, true)]
+    public void InitDatabase_SeedsLocalStorageOnceAndPreservesExistingConfiguration(bool enabled, bool deleted)
+    {
+        SqlSugarCache.Configure(new FakeCache());
+        using (var scope = CreateScope("main"))
+        {
+            var config = CreateConfig("main");
+            config.SeedSettings.EnableInitSeed = true;
+            var types = new[] { typeof(GlobalMenuEntity), typeof(GlobalMenuSeedData), typeof(TenantObjectStorageConfigEntity) };
+            SqlSugarSetup.InitDatabase(scope, config, types);
+            var database = scope.GetConnectionScope("main");
+            var initial = database.Queryable<TenantObjectStorageConfigEntity>().Single();
+            Assert.Equal("local", initial.Provider);
+            Assert.True(initial.IsEnabled);
+            database.Updateable<TenantObjectStorageConfigEntity>()
+                .SetColumns(row => new TenantObjectStorageConfigEntity { IsEnabled = enabled, IsDeleted = deleted, Remark = "保留运维配置" })
+                .Where(row => row.Id == initial.Id).ExecuteCommand();
+
+            SqlSugarSetup.InitDatabase(scope, config, types);
+            var existing = database.Queryable<TenantObjectStorageConfigEntity>().Filter(null, true).ToList();
+            var actual = Assert.Single(existing);
+            Assert.Equal(initial.Id, actual.Id);
+            Assert.Equal(enabled, actual.IsEnabled);
+            Assert.Equal(deleted, actual.IsDeleted);
+            Assert.Equal("保留运维配置", actual.Remark);
+        }
+    }
 
     [Fact]
     public void InitDatabase_ForMainConfig_CreatesAllManagedTables()
@@ -122,7 +156,7 @@ public class SqlSugarDatabaseInitializationTests : IDisposable
             new SugarParameter("@updateCount", 0),
             new SugarParameter("@trueValue", true),
             new SugarParameter("@falseValue", false),
-            new SugarParameter("@appScope", (int)MenuAppScopeEnum.Tenant));
+            new SugarParameter("@appScope", (int)MenuAppScopeEnum.Console));
 
         ResetMenuSeedCatalogDbCache();
         MenuSeedCatalog.LoadFromDb(mainDb);
