@@ -20,5 +20,7 @@ jobs:
       # 传递参数给外部工作流
       target_branch: ${{ github.ref_name }}
       repository_name: ${{ github.repository }}
+      # Gitee 免费版不支持 LFS、本仓图片已转普通文件直存：跳过 LFS 上传防止历史指针阻塞镜像推送
+      skip_lfs: true
     # 组织级别已配置密钥，可以使用 inherit 继承所有密钥
     secrets: inherit
