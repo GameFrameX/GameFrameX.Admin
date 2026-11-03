@@ -12,15 +12,12 @@ using SqlSugar;
 namespace GameFrameX.Core.Tests.GameBusiness;
 
 /// <summary>
-/// C314 游戏运营配置管理服务测试。
+/// 游戏运营配置管理服务测试。
 /// <para>覆盖：md5 版本号构造保证（改内容必变、同内容幂等）、非法 JSON 拒绝、
-/// 同应用键唯一（跨应用允许同键）、分页按应用收口（AppId=null 基线行不出现在管理面）、键级启停读写。</para>
+/// 主库键唯一、分页筛选与键级启停读写。</para>
 /// </summary>
 public sealed class TenantGameAppServerConfigServiceTests : IDisposable
 {
-    private const long App100 = 100;
-    private const long App200 = 200;
-
     private readonly string _dbPath = Path.Combine(Path.GetTempPath(), $"game_server_config_{Guid.NewGuid():N}.db");
     private readonly SqlSugarScope _db;
 
@@ -46,7 +43,6 @@ public sealed class TenantGameAppServerConfigServiceTests : IDisposable
         var service = CreateService();
         var row = await service.AddAsync(new AddGameAppServerConfigRequest
         {
-            AppId = App100,
             Key = "frame",
             Config = "{ \"list\": [1, 2] }", // 带空白，归一化后应与紧凑形同 md5
             Md5 = "attacker-forged-md5",
@@ -68,44 +64,37 @@ public sealed class TenantGameAppServerConfigServiceTests : IDisposable
         var service = CreateService();
         await Assert.ThrowsAsync<BusinessException>(() => service.AddAsync(new AddGameAppServerConfigRequest
         {
-            AppId = App100,
             Key = "badge",
             Config = "not-a-json{",
         }));
     }
 
     /// <summary>
-    /// 同应用下配置键唯一：重复键新增被拒。
+    /// 主库配置键唯一，重复键新增被拒。
     /// </summary>
     [Fact]
-    public async Task Add_RejectsDuplicateKeyInSameApp()
+    public async Task Add_RejectsDuplicateKey()
     {
         var service = CreateService();
-        await InsertAsync(App100, "frame", "{}");
+        await InsertAsync("frame", "{}");
         await Assert.ThrowsAsync<BusinessException>(() => service.AddAsync(new AddGameAppServerConfigRequest
         {
-            AppId = App100,
             Key = "frame",
             Config = "{}",
         }));
     }
 
     /// <summary>
-    /// 跨应用允许同键（应用行互不干扰），且分页按当前应用收口、AppId=null 基线行不出现在管理面。
+    /// 主库分页支持键与启停筛选。
     /// </summary>
     [Fact]
-    public async Task Page_ReturnsOnlyCurrentAppRows_ExcludesBaselineRows()
+    public async Task Page_FiltersMainDatabaseByKeyAndEnabled()
     {
-        await InsertAsync(App100, "frame", "{}");
-        await InsertAsync(App200, "frame", "{}");
-        await InsertAsync(null, "bakeOut", "{}"); // 种子基线行
-
+        await InsertAsync("frame", "{}");
+        await InsertAsync("badge", "{}");
         var service = CreateService();
-        var page = await service.PageAsync(new PageGameAppServerConfigRequest { AppId = App100, });
-
-        var row = Assert.Single(page.Items);
-        Assert.Equal("frame", row.Key);
-        Assert.Equal(App100, row.AppId);
+        var page = await service.PageAsync(new PageGameAppServerConfigRequest { Key = "frame", Enabled = true });
+        Assert.Equal("frame", Assert.Single(page.Items).Key);
     }
 
     /// <summary>
@@ -117,7 +106,6 @@ public sealed class TenantGameAppServerConfigServiceTests : IDisposable
         var service = CreateService();
         var row = await service.AddAsync(new AddGameAppServerConfigRequest
         {
-            AppId = App100,
             Key = "notify",
             Config = "{\"throttle\":1}",
         });
@@ -145,7 +133,6 @@ public sealed class TenantGameAppServerConfigServiceTests : IDisposable
         var service = CreateService();
         var row = await service.AddAsync(new AddGameAppServerConfigRequest
         {
-            AppId = App100,
             Key = "general_conf",
             Config = "{\"flag\":true}",
         });
@@ -164,7 +151,7 @@ public sealed class TenantGameAppServerConfigServiceTests : IDisposable
     }
 
     /// <summary>
-    /// 键级启停可编辑回读（Enabled=false 登录下发侧消费，见 C315）。
+    /// 键级启停可编辑回读（禁用键不下发）。
     /// </summary>
     [Fact]
     public async Task Update_TogglesEnabled()
@@ -172,7 +159,6 @@ public sealed class TenantGameAppServerConfigServiceTests : IDisposable
         var service = CreateService();
         var row = await service.AddAsync(new AddGameAppServerConfigRequest
         {
-            AppId = App100,
             Key = "bakeOut",
             Config = "{}",
             Enabled = true,
@@ -192,13 +178,15 @@ public sealed class TenantGameAppServerConfigServiceTests : IDisposable
     }
 
     /// <summary>
-    /// Page 不带 AppId（null）被守卫拒绝（Nullable 守卫须显式判 null，lesson 2026-08-11）。
+    /// 无旧应用上下文时可以读取主库所有配置。
     /// </summary>
     [Fact]
-    public async Task Page_WithoutAppId_IsRejected()
+    public async Task Page_WithoutLegacyContext_ReturnsMainDatabaseRows()
     {
-        var service = CreateService();
-        await Assert.ThrowsAsync<BusinessException>(() => service.PageAsync(new PageGameAppServerConfigRequest()));
+        await InsertAsync("frame", "{}");
+        await InsertAsync("badge", "{}");
+        var page = await CreateService().PageAsync(new PageGameAppServerConfigRequest());
+        Assert.Equal(2, page.Items.Count());
     }
 
     private TenantGameAppServerConfigService CreateService()
@@ -208,12 +196,11 @@ public sealed class TenantGameAppServerConfigServiceTests : IDisposable
 
     private long _nextSeedId = 900000;
 
-    private async Task InsertAsync(long? appId, string key, string config)
+    private async Task InsertAsync(string key, string config)
     {
         await _db.Insertable(new TenantGameAppServerConfigEntity
         {
             Id = _nextSeedId++,
-            AppId = appId,
             Key = key,
             Config = config,
             Md5 = Md5Of(config),

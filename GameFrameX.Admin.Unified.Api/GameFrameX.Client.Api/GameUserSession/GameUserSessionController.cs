@@ -11,8 +11,7 @@ namespace GameFrameX.Client.Api.GameUserSession;
 /// <summary>
 /// 游戏玩家登录会话控制器（C13 登录控制面：LoginAsync 自建，承接原 BLLogin）
 /// <para>路由：POST /api/GameUserSession/{Action}（继承 BaseController 基类路由）。</para>
-/// <para>App 级信任链：用户身份由 body.UserId 携带（不经 SsoManager token），AppId 取自
-/// <see cref="ClientApiAppContext"/>（同 C11：中间件上下文优先，无中间件时内联读头）。</para>
+/// <para>签名中间件验证请求，用户身份由请求正文携带，配置从主库读取。</para>
 /// </summary>
 public class GameUserSessionController : BaseController
 {
@@ -41,7 +40,7 @@ public class GameUserSessionController : BaseController
     /// <param name="archiveRepository">玩家存档仓储（C8 存档行 + P0-2 会话列）</param>
     /// <param name="userRepository">玩家账号仓储（注销判定）</param>
     /// <param name="orderRepository">支付订单仓储（累计充值汇总）</param>
-    /// <param name="serverConfigRepository">游戏运营配置仓储（C315：Login config 数据源切租户库）</param>
+    /// <param name="serverConfigRepository">游戏运营配置主库仓储</param>
     public GameUserSessionController(Repository<TenantGameUserArchiveEntity> archiveRepository,
         Repository<TenantGameUserEntity> userRepository,
         Repository<TenantGameOrderEntity> orderRepository,
@@ -143,12 +142,11 @@ public class GameUserSessionController : BaseController
     }
 
     /// <summary>
-    /// config 差异下发（C280，原 P0-1 回显法升级；C315 数据源切租户库）：对齐原厂 BLLogin 语义——
+    /// 配置差异下发：对齐原厂登录语义，
     /// 上行 md5 与服务端 md5 相等 → 只回 {"md5"}（客户端不写不删不重启，省流量）；
     /// 不等或上行缺失 → 回 {"md5","config"}（客户端整体覆盖）；
     /// 上行有但服务端没有的键不回显（客户端删除本地该键，与原厂「无内容不下发」一致）。
-    /// <para>生效行 = AppId=null 出厂基线打底 + 当前应用行按 Key 覆盖，Enabled=false 键不下发
-    /// （GameServerConfigProvider）；运营改配置经 C314 管理面保存即自动重算 md5。</para>
+    /// <para>主库启用配置按键下发，运营管理面保存时自动重算内容版本号。</para>
     /// <para>"md5"/"config" 为协议小写键（客户端 ConfigModel 按 value.md5 / value.config 读取）。</para>
     /// </summary>
     private async Task<string> BuildConfigAsync(List<Models.GameUserSessionConfigEntry>? entries)
@@ -162,7 +160,7 @@ public class GameUserSessionController : BaseController
             }
         }
 
-        var effective = await GameServerConfigProvider.LoadEffectiveAsync(_serverConfigRepository, ClientApiAppContext.ResolveAppId(HttpContext));
+        var effective = await GameServerConfigProvider.LoadEffectiveAsync(_serverConfigRepository);
         var config = new Dictionary<string, object>(effective.Count);
         foreach (var pair in effective)
         {

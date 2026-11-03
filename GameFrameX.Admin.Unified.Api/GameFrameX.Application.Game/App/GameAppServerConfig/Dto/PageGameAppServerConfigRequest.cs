@@ -6,11 +6,6 @@ namespace GameFrameX.Application.Game.App.GameAppServerConfig.Dto;
 public class PageGameAppServerConfigRequest : BaseAppFilterPageRequest
 {
     /// <summary>
-    /// 应用作用域筛选。游戏运营配置是应用工作台页面，分页查询必须提供具体应用，值必须大于 0
-    /// </summary>
-    public long? AppId { get; set; }
-
-    /// <summary>
     /// 配置键精确筛选
     /// </summary>
     public string? Key { get; set; }

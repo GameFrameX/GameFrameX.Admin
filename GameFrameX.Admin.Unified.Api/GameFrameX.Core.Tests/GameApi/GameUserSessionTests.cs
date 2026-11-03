@@ -210,7 +210,7 @@ public sealed class GameUserSessionTests
     }
 
     [Fact]
-    public async Task GameServerConfigProvider_MergesAppRowOverBaseline_FiltersDisabled()
+    public async Task GameServerConfigProvider_SelectsLatestEnabledRowPerKey()
     {
         using (var db = new ClientApiTestDb())
         {
@@ -218,20 +218,16 @@ public sealed class GameUserSessionTests
             await repository.InsertAsync(MakeServerConfig(319200000000101, "frame", "[1,2,3]", Md5Frame));
             await repository.InsertAsync(MakeServerConfig(319200000000102, "badge", "[4,5]", Md5Badge));
             await repository.InsertAsync(MakeServerConfig(319200000000103, "notify", "{}", Md5Badge, enabled: false));
-            await repository.InsertAsync(MakeServerConfig(319200000000201, "frame", "[9]", Md5FrameApp, appId: 901));
+            await repository.InsertAsync(MakeServerConfig(319200000000201, "frame", "[9]", Md5FrameApp));
 
-            // 应用视角（appId=901）：应用行按 Key 覆盖基线行，badge 落基线，Enabled=false 键剔除
-            var appView = await GameServerConfigProvider.LoadEffectiveAsync(repository, 901);
+            // 同键启用记录主键较大者生效，禁用键不下发。
+            var appView = await GameServerConfigProvider.LoadEffectiveAsync(repository);
             Assert.Equal(2, appView.Count);
             Assert.Equal(Md5FrameApp, appView["frame"].Md5);
             Assert.Equal("[9]", appView["frame"].Config);
             Assert.Equal(Md5Badge, appView["badge"].Md5);
             Assert.False(appView.ContainsKey("notify"));
 
-            // 无 App 上下文（appId=0）：仅基线行生效，应用行不外漏
-            var baselineView = await GameServerConfigProvider.LoadEffectiveAsync(repository, 0);
-            Assert.Equal(2, baselineView.Count);
-            Assert.Equal(Md5Frame, baselineView["frame"].Md5);
         }
     }
 
@@ -292,12 +288,11 @@ public sealed class GameUserSessionTests
     private const string Md5Badge = "0f1e2d3c4b5a69788796a5b4c3d2e1f0";
     private const string Md5FrameApp = "1a2b3c4d5e6f708192a3b4c5d6e7f809";
 
-    private static TenantGameAppServerConfigEntity MakeServerConfig(long id, string key, string config, string md5, bool enabled = true, long? appId = null)
+    private static TenantGameAppServerConfigEntity MakeServerConfig(long id, string key, string config, string md5, bool enabled = true)
     {
         return new TenantGameAppServerConfigEntity
         {
             Id = id,
-            AppId = appId,
             Key = key,
             Config = config,
             Md5 = md5,

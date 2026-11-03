@@ -13,11 +13,6 @@ public class GameAppServerConfigResponse : IBasePageResponse<TenantGameAppServer
     public long Id { get; set; }
 
     /// <summary>
-    /// 应用作用域，0 / null 表示租户默认配置
-    /// </summary>
-    public long? AppId { get; set; }
-
-    /// <summary>
     /// 配置键
     /// </summary>
     public string Key { get; set; } = null!;

@@ -6,12 +6,7 @@ namespace GameFrameX.Application.Game.App.GameAppServerConfig.Dto;
 public class GameAppServerConfigBaseRequest : BaseAddRequest
 {
     /// <summary>
-    /// 应用作用域（应用工作台上下文必填；租户默认基线行只能由种子产生）
-    /// </summary>
-    public long? AppId { get; set; }
-
-    /// <summary>
-    /// 配置键（AppId + Key 唯一）
+    /// 配置键（主库唯一）
     /// </summary>
     public string Key { get; set; } = null!;
 
