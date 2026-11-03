@@ -1,7 +1,7 @@
 using GameFrameX.Client.Api.Services.PublicCallback;
 using GameFrameX.Entity.Tenant.Game.App;
 using System.Text.Json;
-using GameFrameX.Client.Api.Middleware;
+using GameFrameX.Application.Game.Order.GamePaymentConfig;
 using GameFrameX.Client.Api.Services;
 using GameFrameX.Core.Service.Tenant;
 using GameFrameX.Payment.Abstract;
@@ -101,41 +101,15 @@ public class PaymentOptionSettingProvider : IPaymentOptionSettingProvider
     private List<TenantGamePaymentConfigEntity> GetPaymentConfigs(string channelName)
     {
         var context = _httpContextAccessor.HttpContext;
-        if (context == null)
-        {
-            LogHelper.Warning($"获取支付配置失败，缺少 HTTP 上下文 - channel:{channelName}");
-            return new List<TenantGamePaymentConfigEntity>();
-        }
-
-        var tenantId = GetCurrentTenantId(context);
-        if (!tenantId.HasValue)
-        {
-            LogHelper.Warning($"获取支付配置失败，缺少租户上下文 - channel:{channelName}");
-            return new List<TenantGamePaymentConfigEntity>();
-        }
-
-        var appId = GetCurrentAppId(context);
         var db = _tenantDbProvider;
-        var packageId = ResolveCurrentPackageId(context, tenantId.Value, appId, db);
+        var packageId = ResolveCurrentPackageId(context, db);
         var environments = GetRequestedEnvironments(context);
-
-        // 可空判断在表达式树外求值为局部布尔：SqlSugar 对闭包内 Nullable.HasValue 的 SQL 翻译
-        // 生成非法片段（SQLite 报 near "IS"、PG 报 near "NOT"），提为常量语义等价且两方言均合法。
-        var hasAppId = appId.HasValue;
         var hasPackageId = packageId.HasValue;
-        var appIdValue = appId.GetValueOrDefault();
         var packageIdValue = packageId.GetValueOrDefault();
         var query = db.Queryable<TenantGamePaymentConfigEntity>()
-                      .Where(u => u.TenantId == tenantId.Value &&
-                                  u.PayChannel == channelName &&
-                                  (
-                                      (u.GameAppIdNormalized == 0 && u.PackageIdNormalized == 0 && u.AppId == 0) ||
-                                      (hasAppId &&
-                                       (
-                                           (u.GameAppIdNormalized == appIdValue && u.PackageIdNormalized == 0) ||
-                                           (hasPackageId && u.GameAppIdNormalized == appIdValue && u.PackageIdNormalized == packageIdValue)
-                                       ))
-                                  ));
+                      .Where(u => u.PayChannel == channelName && u.IsEnabled == true &&
+                                  (u.PackageIdNormalized == 0 ||
+                                   (hasPackageId && u.PackageIdNormalized == packageIdValue)));
         if (environments.Length == 1)
         {
             var isSandbox = environments[0];
@@ -144,7 +118,7 @@ public class PaymentOptionSettingProvider : IPaymentOptionSettingProvider
 
         return query.ToList()
                     .GroupBy(u => u.IsSandbox)
-                    .Select(group => PickBestConfig(group, appId, packageId))
+                    .Select(group => TenantGamePaymentConfigEntityService.PickBestConfig(group, packageId))
                     .OfType<TenantGamePaymentConfigEntity>()
                     .OrderBy(u => u.IsSandbox)
                     .ToList();
@@ -187,51 +161,9 @@ public class PaymentOptionSettingProvider : IPaymentOptionSettingProvider
         throw new InvalidOperationException("无法构造完整支付回调路由，暂不支持该渠道下单；请完成回调路由升级后重试。");
     }
 
-    internal static long? GetCurrentTenantId(HttpContext? context)
+    private static long? ResolveCurrentPackageId(HttpContext? context, ISqlSugarClient db)
     {
         if (context == null)
-        {
-            return null;
-        }
-
-        if (context.Items.TryGetValue(TenantContextAccessor.TenantIdKey, out var tenantIdObj) &&
-            tenantIdObj != null &&
-            long.TryParse(tenantIdObj.ToString(), out var tenantIdFromContext))
-        {
-            return tenantIdFromContext;
-        }
-
-        return null;
-    }
-
-    /// <summary>
-    /// 解析当前请求的 AppId；仅承认 <see cref="AppResolutionMiddleware.AppIdKey"/>，禁止回退到请求头或查询参数。
-    /// <para>应用上下文由 <c>AppResolutionMiddleware</c>（凭证校验）或公开回调路由解析（<c>PublicCallbackTenantResolutionMiddleware</c>）写入；
-    /// 支付配置的应用作用域选择必须只信任中间件解析后的 AppId，未命中时按「无应用上下文」语义返回 null，
-    /// 与 <see cref="ClientApiTenantOptions.ClientApiTenantOptionsProvider"/> 的权威来源保持一致。</para>
-    /// </summary>
-    /// <param name="context">当前 HTTP 上下文</param>
-    /// <returns>中间件解析出的 AppId；缺少应用上下文时返回 null</returns>
-    internal static long? GetCurrentAppId(HttpContext? context)
-    {
-        if (context == null)
-        {
-            return null;
-        }
-
-        if (context.Items.TryGetValue(AppResolutionMiddleware.AppIdKey, out var appIdObj) &&
-            appIdObj != null &&
-            long.TryParse(appIdObj.ToString(), out var appIdFromContext))
-        {
-            return appIdFromContext;
-        }
-
-        return null;
-    }
-
-    private long? ResolveCurrentPackageId(HttpContext context, long tenantId, long? appId, ISqlSugarClient db)
-    {
-        if (!appId.HasValue)
         {
             return null;
         }
@@ -240,17 +172,8 @@ public class PaymentOptionSettingProvider : IPaymentOptionSettingProvider
         if (packageId.HasValue)
         {
             var package = db.Queryable<TenantGameAppPackageEntity>()
-                            .First(u => u.Id == packageId.Value &&
-                                        u.TenantId == tenantId &&
-                                        u.GameAppId == appId.Value &&
-                                        u.IsEnabled != false);
-            if (PackageMatchesScope(package, tenantId, appId.Value))
-            {
-                return packageId;
-            }
-
-            LogHelper.Warning($"忽略无效支付分包范围 - tenant:{tenantId}, app:{appId}, package:{packageId}");
-            return null;
+                            .First(u => u.Id == packageId.Value && u.IsEnabled == true);
+            return PackageMatchesScope(package) ? packageId : null;
         }
 
         var packageName = GetCurrentPackageName(context);
@@ -260,19 +183,13 @@ public class PaymentOptionSettingProvider : IPaymentOptionSettingProvider
         }
 
         var namedPackage = db.Queryable<TenantGameAppPackageEntity>()
-                             .First(u => u.TenantId == tenantId &&
-                                         u.GameAppId == appId.Value &&
-                                         u.PackageName == packageName.Trim() &&
-                                         u.IsEnabled != false);
-        return PackageMatchesScope(namedPackage, tenantId, appId.Value) ? namedPackage.Id : null;
+                             .First(u => u.PackageName == packageName.Trim() && u.IsEnabled == true);
+        return PackageMatchesScope(namedPackage) ? namedPackage.Id : null;
     }
 
-    public static bool PackageMatchesScope(TenantGameAppPackageEntity package, long tenantId, long appId)
+    public static bool PackageMatchesScope(TenantGameAppPackageEntity? package)
     {
-        return package != null &&
-               package.TenantId == tenantId &&
-               package.GameAppId == appId &&
-               package.IsEnabled != false;
+        return package != null && package.IsEnabled == true;
     }
 
     private static long? GetCurrentPackageId(HttpContext context)
@@ -316,7 +233,7 @@ public class PaymentOptionSettingProvider : IPaymentOptionSettingProvider
         return !string.IsNullOrWhiteSpace(packageName) ? packageName : null;
     }
 
-    private static bool[] GetRequestedEnvironments(HttpContext context)
+    private static bool[] GetRequestedEnvironments(HttpContext? context)
     {
         if (context == null)
         {
@@ -357,35 +274,6 @@ public class PaymentOptionSettingProvider : IPaymentOptionSettingProvider
     private static string? NormalizeChannel(string channelName)
     {
         return channelName?.Trim().ToLowerInvariant();
-    }
-
-    private static TenantGamePaymentConfigEntity? PickBestConfig(
-        IEnumerable<TenantGamePaymentConfigEntity> configs,
-        long? gameAppId,
-        long? packageId)
-    {
-        var normalizedGameAppId = gameAppId.GetValueOrDefault() > 0 ? gameAppId.GetValueOrDefault() : 0;
-        var normalizedPackageId = packageId.GetValueOrDefault() > 0 ? packageId.GetValueOrDefault() : 0;
-        return configs
-               .OrderByDescending(config => GetScopePriority(config, normalizedGameAppId, normalizedPackageId))
-               .FirstOrDefault(config => GetScopePriority(config, normalizedGameAppId, normalizedPackageId) > 0);
-    }
-
-    private static int GetScopePriority(TenantGamePaymentConfigEntity config, long gameAppId, long packageId)
-    {
-        var configGameAppId = config.GameAppIdNormalized;
-        var configPackageId = config.PackageIdNormalized;
-        if (gameAppId > 0 && packageId > 0 && configGameAppId == gameAppId && configPackageId == packageId)
-        {
-            return 3;
-        }
-
-        if (gameAppId > 0 && configGameAppId == gameAppId && configPackageId == 0)
-        {
-            return 2;
-        }
-
-        return configGameAppId == 0 && configPackageId == 0 ? 1 : 0;
     }
 
     private static string NormalizeEnvironment(string env)

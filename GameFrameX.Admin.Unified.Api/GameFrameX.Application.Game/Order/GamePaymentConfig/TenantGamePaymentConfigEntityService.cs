@@ -1,5 +1,4 @@
 using GameFrameX.Entity.Tenant.Game.App;
-using GameFrameX.Application.Game.App.AppScope;
 using GameFrameX.Application.Game.Order.GamePaymentConfig.Dto;
 using GameFrameX.Payment.Abstract;
 using GameFrameX.Core.Service;
@@ -17,31 +16,26 @@ public class TenantGamePaymentConfigEntityService
         AddGamePaymentConfigRequest, UpdateGamePaymentConfigRequest,
         GamePaymentConfigResponse, PageGamePaymentConfigRequest>
 {
-    private readonly SqlSugarRepository<Entity.Tenant.Game.TenantGameAppEntity> _gameAppRepository;
     private readonly SqlSugarRepository<TenantGameAppPackageEntity> _packageRepository;
     private readonly IPaymentConfigSchemaProvider _schemaProvider;
 
     public TenantGamePaymentConfigEntityService(
         SqlSugarRepository<Entity.Tenant.Game.TenantGamePaymentConfigEntity> repository,
-        SqlSugarRepository<Entity.Tenant.Game.TenantGameAppEntity> gameAppRepository,
         SqlSugarRepository<TenantGameAppPackageEntity> packageRepository,
         IPaymentConfigSchemaProvider schemaProvider)
         : base(repository)
     {
-        _gameAppRepository = gameAppRepository;
         _packageRepository = packageRepository;
         _schemaProvider = schemaProvider;
     }
 
     protected override ISugarQueryable<GamePaymentConfigResponse> BuildPageQuery(PageGamePaymentConfigRequest input)
     {
-        var appId = AppScopeRules.EnsureFactAppId(input.GameAppId, "支付配置");
         var searchKey = input.SearchKey?.Trim();
         return Repository.AsQueryable()
                          .WhereIF(!string.IsNullOrWhiteSpace(searchKey), u =>
                                       u.PayChannel.Contains(searchKey) ||
                                       u.Remark.Contains(searchKey))
-                         .Where(u => u.GameAppIdNormalized == appId)
                          .WhereIF(input.PackageId.HasValue, u => u.PackageIdNormalized == input.PackageId.Value)
                          .WhereIF(!string.IsNullOrWhiteSpace(input.PayChannel), u => u.PayChannel == NormalizeChannel(input.PayChannel))
                          .WhereIF(input.IsSandbox.HasValue, u => u.IsSandbox == input.IsSandbox.Value)
@@ -56,9 +50,9 @@ public class TenantGamePaymentConfigEntityService
     {
         ValidateConfigJson(input.ConfigJson);
         var payChannel = NormalizeChannel(input.PayChannel);
-        var scope = BuildInputScope(input.GameAppId, input.PackageId);
-        await ValidateScopeAsync(scope.GameAppId, scope.PackageId);
-        await CheckUniqueAsync(scope.GameAppId, scope.PackageId, payChannel, input.IsSandbox);
+        var scope = BuildScope(input.PackageId);
+        await ValidateScopeAsync(scope.PackageId);
+        await CheckUniqueAsync(scope.PackageId, payChannel, input.IsSandbox);
 
         var entity = input.Adapt<Entity.Tenant.Game.TenantGamePaymentConfigEntity>();
         entity.PayChannel = payChannel;
@@ -82,9 +76,9 @@ public class TenantGamePaymentConfigEntityService
         }
 
         var payChannel = NormalizeChannel(input.PayChannel);
-        var scope = BuildInputScope(input.GameAppId, input.PackageId);
-        await ValidateScopeAsync(scope.GameAppId, scope.PackageId);
-        await CheckUniqueAsync(scope.GameAppId, scope.PackageId, payChannel, input.IsSandbox, input.Id);
+        var scope = BuildScope(input.PackageId);
+        await ValidateScopeAsync(scope.PackageId);
+        await CheckUniqueAsync(scope.PackageId, payChannel, input.IsSandbox, input.Id);
 
         ApplyScope(entity, scope);
         entity.PayChannel = payChannel;
@@ -99,10 +93,7 @@ public class TenantGamePaymentConfigEntityService
         await Repository.AsUpdateable(entity)
                         .UpdateColumns(e => new
                         {
-                            e.AppId,
-                            e.GameAppId,
                             e.PackageId,
-                            e.GameAppIdNormalized,
                             e.PackageIdNormalized,
                             e.PayChannel,
                             e.IsSandbox,
@@ -159,104 +150,48 @@ public class TenantGamePaymentConfigEntityService
         return _schemaProvider.GetChannels();
     }
 
-    public static PaymentConfigScope BuildScope(long? gameAppId, long? packageId)
+    public static PaymentConfigScope BuildScope(long? packageId)
     {
-        var normalizedGameAppId = NormalizeNullableId(gameAppId);
         var normalizedPackageId = NormalizeNullableId(packageId);
-        return new PaymentConfigScope(
-            normalizedGameAppId == 0 ? null : normalizedGameAppId,
-            normalizedPackageId == 0 ? null : normalizedPackageId,
-            normalizedGameAppId,
-            normalizedPackageId);
-    }
-
-    public static string? GetScopeError(long? gameAppId, long? packageId)
-    {
-        var scope = BuildScope(gameAppId, packageId);
-        if (scope.PackageId.HasValue && !scope.GameAppId.HasValue)
-        {
-            return "分包支付配置必须指定应用";
-        }
-
-        return null;
+        return new PaymentConfigScope(normalizedPackageId == 0 ? null : normalizedPackageId, normalizedPackageId);
     }
 
     public static Entity.Tenant.Game.TenantGamePaymentConfigEntity? PickBestConfig(
         IEnumerable<Entity.Tenant.Game.TenantGamePaymentConfigEntity> configs,
-        long? gameAppId,
         long? packageId)
     {
-        var scope = BuildScope(gameAppId, packageId);
-        return configs
-               .OrderByDescending(config => GetScopePriority(config, scope))
-               .FirstOrDefault(config => GetScopePriority(config, scope) > 0);
+        var scope = BuildScope(packageId);
+        return configs.OrderByDescending(config => GetScopePriority(config, scope))
+                      .ThenByDescending(config => config.Id)
+                      .FirstOrDefault(config => GetScopePriority(config, scope) > 0);
     }
 
-    private async Task CheckUniqueAsync(long? gameAppId, long? packageId, string payChannel, bool isSandbox, long? excludeId = null)
+    private async Task CheckUniqueAsync(long? packageId, string payChannel, bool isSandbox, long? excludeId = null)
     {
-        var scope = BuildScope(gameAppId, packageId);
-        var gameAppIdNormalized = scope.GameAppIdNormalized;
-        var packageIdNormalized = scope.PackageIdNormalized;
-        var exists = excludeId.HasValue
-                         ? await Repository.IsAnyAsync(x => x.GameAppIdNormalized == gameAppIdNormalized &&
-                                                             x.PackageIdNormalized == packageIdNormalized &&
-                                                             x.PayChannel == payChannel &&
-                                                             x.IsSandbox == isSandbox &&
-                                                             x.Id != excludeId.Value)
-                         : await Repository.IsAnyAsync(x => x.GameAppIdNormalized == gameAppIdNormalized &&
-                                                             x.PackageIdNormalized == packageIdNormalized &&
-                                                             x.PayChannel == payChannel &&
-                                                             x.IsSandbox == isSandbox);
-
+        var packageIdNormalized = BuildScope(packageId).PackageIdNormalized;
+        var exists = await Repository.AsQueryable()
+                                     .Where(x => x.PackageIdNormalized == packageIdNormalized &&
+                                                 x.PayChannel == payChannel && x.IsSandbox == isSandbox)
+                                     .WhereIF(excludeId.HasValue, x => x.Id != excludeId.Value)
+                                     .AnyAsync();
         if (exists)
         {
             throw BusinessError.Oh("同一配置范围、支付渠道和沙盒标记下的支付配置已存在");
         }
     }
 
-    private async Task ValidateScopeAsync(long? gameAppId, long? packageId)
+    private async Task ValidateScopeAsync(long? packageId)
     {
-        var error = GetScopeError(gameAppId, packageId);
-        if (!string.IsNullOrWhiteSpace(error))
+        if (packageId.HasValue && !await _packageRepository.IsAnyAsync(u => u.Id == packageId.Value && u.IsEnabled == true))
         {
-            throw BusinessError.Oh(error);
+            throw BusinessError.Oh("分包不存在或已禁用");
         }
-
-        if (gameAppId.HasValue && !await _gameAppRepository.IsAnyAsync(u => u.Id == gameAppId.Value))
-        {
-            throw BusinessError.Oh("游戏应用不存在或无权限");
-        }
-
-        if (!packageId.HasValue)
-        {
-            return;
-        }
-
-        var package = await _packageRepository.GetFirstAsync(u => u.Id == packageId.Value);
-        if (package == null)
-        {
-            throw BusinessError.Oh("分包不存在或无权限");
-        }
-
-        if (package.GameAppId != gameAppId)
-        {
-            throw BusinessError.Oh("分包不属于当前应用");
-        }
-    }
-
-    private static PaymentConfigScope BuildInputScope(long gameAppId, long? packageId)
-    {
-        var effectiveGameAppId = AppScopeRules.EnsureFactAppId(gameAppId, "支付配置");
-        return BuildScope(effectiveGameAppId, packageId);
     }
 
     private static void ApplyScope(Entity.Tenant.Game.TenantGamePaymentConfigEntity entity, PaymentConfigScope scope)
     {
-        entity.GameAppId = scope.GameAppId;
         entity.PackageId = scope.PackageId;
-        entity.GameAppIdNormalized = scope.GameAppIdNormalized;
         entity.PackageIdNormalized = scope.PackageIdNormalized;
-        entity.AppId = scope.GameAppIdNormalized;
     }
 
     private static long NormalizeNullableId(long? id)
@@ -267,24 +202,12 @@ public class TenantGamePaymentConfigEntityService
 
     private static int GetScopePriority(Entity.Tenant.Game.TenantGamePaymentConfigEntity config, PaymentConfigScope scope)
     {
-        var configGameAppId = config.GameAppIdNormalized;
-        var configPackageId = config.PackageIdNormalized;
-        if (scope.GameAppIdNormalized > 0 &&
-            scope.PackageIdNormalized > 0 &&
-            configGameAppId == scope.GameAppIdNormalized &&
-            configPackageId == scope.PackageIdNormalized)
-        {
-            return 3;
-        }
-
-        if (scope.GameAppIdNormalized > 0 &&
-            configGameAppId == scope.GameAppIdNormalized &&
-            configPackageId == 0)
+        if (scope.PackageIdNormalized > 0 && config.PackageIdNormalized == scope.PackageIdNormalized)
         {
             return 2;
         }
 
-        return configGameAppId == 0 && configPackageId == 0 ? 1 : 0;
+        return config.PackageIdNormalized == 0 ? 1 : 0;
     }
 
     private static string NormalizeChannel(string payChannel)
@@ -301,10 +224,12 @@ public class TenantGamePaymentConfigEntityService
 
         try
         {
-            using var document = JsonDocument.Parse(configJson);
-            if (document.RootElement.ValueKind != JsonValueKind.Object)
+            using (var document = JsonDocument.Parse(configJson))
             {
-                throw BusinessError.Oh("支付配置必须是JSON对象");
+                if (document.RootElement.ValueKind != JsonValueKind.Object)
+                {
+                    throw BusinessError.Oh("支付配置必须是JSON对象");
+                }
             }
         }
         catch (JsonException ex)

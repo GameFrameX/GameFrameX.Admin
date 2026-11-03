@@ -42,8 +42,7 @@ public sealed class PaymentOptionSettingDecryptClosureTests
             }).ExecuteCommand();
 
             var httpContext = new DefaultHttpContext();
-            httpContext.Items[TenantContextAccessor.TenantIdKey] = tenantId;
-            httpContext.Items[AppResolutionMiddleware.AppIdKey] = appId;
+            httpContext.Items[GameFrameX.Core.Middleware.PublicCallbackRouteContext.ItemKey] = true;
             var provider = new PaymentOptionSettingProvider(fixture.TenantDbProvider, new HttpContextAccessor { HttpContext = httpContext, });
 
             var setting = provider.GetOptionSetting<AliPayOptionSetting>("alipay");

@@ -6,13 +6,7 @@ namespace GameFrameX.Application.Game.Order.GamePaymentConfig.Dto;
 public class AddGamePaymentConfigRequest : BaseAddRequest
 {
     /// <summary>
-    /// 游戏应用ID。管理端支付配置必须绑定具体应用，值必须大于 0。
-    /// </summary>
-    [Required(ErrorMessage = "游戏应用Id不能为空")]
-    public long GameAppId { get; set; }
-
-    /// <summary>
-    /// 分包ID。空表示应用默认配置。
+    /// 分包ID。空表示默认配置。
     /// </summary>
     public long? PackageId { get; set; }
 

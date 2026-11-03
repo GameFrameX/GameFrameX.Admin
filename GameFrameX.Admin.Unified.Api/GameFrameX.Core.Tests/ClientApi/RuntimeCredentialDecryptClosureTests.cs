@@ -209,7 +209,7 @@ public sealed class RuntimeCredentialDecryptClosureTests : IDisposable
     }
 
     [Fact]
-    public void PaymentProvider_Sqlite_AppScopedQuery_ReturnsDecryptedOption()
+    public void PaymentProvider_Sqlite_MainDatabaseQuery_ReturnsDecryptedOption()
     {
         // 回归锁定：作用域 Where 的 Nullable.HasValue 闭包曾使 SqlSugar 生成非法 SQL
         // （SQLite 报 near "IS"、PG 报 near "NOT"），已提为表达式树外局部布尔修复
@@ -218,10 +218,12 @@ public sealed class RuntimeCredentialDecryptClosureTests : IDisposable
             "{\"AliPayAppId\":\"2021001\",\"AliPayMerchantPrivateKey\":\"plain-merchant-key\",\"AliPayGatewayUrl\":\"https://openapi.alipay.com/gateway.do\"}");
         _db.TenantDb.Insertable(new TenantGamePaymentConfigEntity
         {
-            Id = 7701, TenantId = _db.TenantId, AppId = _db.AppId, GameAppIdNormalized = _db.AppId, PayChannel = "alipay", ConfigJson = configJson,
+            Id = 7701, PayChannel = "alipay", ConfigJson = configJson, IsEnabled = true,
         }).ExecuteCommand();
 
-        var provider = new PaymentOptionSettingProvider(_db.TenantDbProvider, new HttpContextAccessor { HttpContext = _db.CreateHttpContext(), });
+        var context = _db.CreateHttpContext(includeTenant: false, includeApp: false);
+        context.Items[GameFrameX.Core.Middleware.PublicCallbackRouteContext.ItemKey] = true;
+        var provider = new PaymentOptionSettingProvider(_db.TenantDbProvider, new HttpContextAccessor { HttpContext = context, });
 
         var setting = provider.GetOptionSetting<AliPayOptionSetting>("alipay");
 
