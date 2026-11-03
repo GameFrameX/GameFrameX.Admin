@@ -324,7 +324,7 @@ public sealed class PublicCallbackTenantRoutingTests : IDisposable
 
     private static string BuildConnectionString(string databaseName)
     {
-        return $"Host=127.0.0.1;Port=5432;Database={databaseName};Username=postgres;Password=postgres;Maximum Pool Size=20";
+        return new Npgsql.NpgsqlConnectionStringBuilder(Environment.GetEnvironmentVariable("GFX_TEST_PG_CONNECTION_STRING")) { Database = databaseName }.ConnectionString;
     }
 
     private static string CreateDatabaseName(string suffix)
@@ -334,7 +334,7 @@ public sealed class PublicCallbackTenantRoutingTests : IDisposable
 
     private sealed class PostgreSqlFactAttribute : FactAttribute
     {
-        internal const string SkipReason = "PostgreSQL integration tests require local PostgreSQL at 127.0.0.1:5432 with postgres/postgres.";
+        internal const string SkipReason = "PostgreSQL integration tests require an explicit GFX_TEST_PG_CONNECTION_STRING.";
         private static readonly Lazy<bool> IsPostgreSqlAvailable = new(CheckPostgreSqlAvailable);
 
         public PostgreSqlFactAttribute()
@@ -347,6 +347,11 @@ public sealed class PublicCallbackTenantRoutingTests : IDisposable
 
         private static bool CheckPostgreSqlAvailable()
         {
+            if (string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("GFX_TEST_PG_CONNECTION_STRING")))
+            {
+                return false;
+            }
+
             try
             {
                 using var scope = CreateAdminScope();

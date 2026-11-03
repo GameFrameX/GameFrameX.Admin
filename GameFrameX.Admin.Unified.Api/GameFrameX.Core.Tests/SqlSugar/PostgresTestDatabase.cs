@@ -10,16 +10,13 @@ namespace GameFrameX.Core.Tests.SqlSugar;
 /// <para>背景：SQLite provider 的 CodeFirst 行为与生产 PostgreSQL 不一致——存量表静默不加列、
 /// <c>DefaultValue</c> 不进建表 DDL。SQLite 单测验证不了 schema 演化（2026-09-11 password_configured 23502
 /// 事故根因之一：全部 SQLite 测试绿、真实 PG 一启动即炸）。DDL 行为测试必须连真实 PostgreSQL。</para>
-/// <para>连接串：环境变量 <c>GFX_TEST_PG_CONNECTION_STRING</c> 覆盖，缺省指向本地 docker
-/// <c>gameframex-postgres</c> 的维护库（postgres）。PG 不可达时 <see cref="TryCreate"/> 返回 false，
-/// 调用方 <c>Assert.Skip</c> 黄跳过（CI 未配 PG service 时不阻塞），本地常驻 PG 环境真实执行。</para>
+/// <para>必须显式设置 <c>GFX_TEST_PG_CONNECTION_STRING</c> 指向获授权的隔离测试实例；
+/// 未配置或不可达时跳过，不自动连接本机常驻数据库。</para>
 /// </summary>
 public sealed class PostgresTestDatabase : IDisposable
 {
     /// <summary>PG 维护库连接串的环境变量名（指向 postgres 维护库，用于建/删测试库）。</summary>
     public const string ConnectionStringEnvironmentVariable = "GFX_TEST_PG_CONNECTION_STRING";
-
-    private const string DefaultMaintainConnectionString = "Host=localhost;Port=5432;Database=postgres;Username=gameframex;Password=GameFrameX@Local2026";
 
     private readonly string _maintainConnectionString;
 
@@ -33,7 +30,7 @@ public sealed class PostgresTestDatabase : IDisposable
     {
         DatabaseName = databaseName;
         _maintainConnectionString = maintainConnectionString;
-        ConnectionString = $"Host=localhost;Port=5432;Database={databaseName};Username=gameframex;Password=GameFrameX@Local2026";
+        ConnectionString = new NpgsqlConnectionStringBuilder(maintainConnectionString) { Database = databaseName }.ConnectionString;
     }
 
     /// <summary>
@@ -45,7 +42,9 @@ public sealed class PostgresTestDatabase : IDisposable
         var maintainConnectionString = Environment.GetEnvironmentVariable(ConnectionStringEnvironmentVariable);
         if (string.IsNullOrWhiteSpace(maintainConnectionString))
         {
-            maintainConnectionString = DefaultMaintainConnectionString;
+            database = null;
+            unavailableReason = "未配置 " + ConnectionStringEnvironmentVariable + "，跳过 PostgreSQL 集成测试。";
+            return false;
         }
 
         try

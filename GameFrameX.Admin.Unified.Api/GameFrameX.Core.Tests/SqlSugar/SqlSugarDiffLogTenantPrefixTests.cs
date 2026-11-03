@@ -19,8 +19,6 @@ public class SqlSugarDiffLogTenantPrefixTests : IDisposable
     private const string ConfigId = "10001";
     private const string TenantPhysicalTable = "tenant_game_app_remote_config_entity";
     private const string LegacyUnprefixedTable = "game_app_client_config_entity";
-    private const string PostgresConnectionString = "Host=127.0.0.1;Port=5432;Database=postgres;Username=postgres;Password=postgres;";
-    private const string PostgresReproDatabase = "gameframex_difflog_repro";
 
     private static readonly Regex InsertTableNameRegex = new("^INSERT\\s+INTO\\s+[`\"]?([A-Za-z0-9_]+)[`\"]?", RegexOptions.IgnoreCase | RegexOptions.Compiled);
     private static readonly Regex SelectTableNameRegex = new("FROM\\s+[`\"]?([A-Za-z0-9_]+)[`\"]?", RegexOptions.IgnoreCase | RegexOptions.Compiled);
@@ -141,82 +139,50 @@ public class SqlSugarDiffLogTenantPrefixTests : IDisposable
         }
     }
 
-    [Fact]
+    [SkippableFact]
     public async Task Insert_InsertWithDiffLogAsync_WritesTenantPrefixTable_Postgres()
     {
-        // 本地 postgres 容器（postgres-gameframex）真库复验，排除 SQLite provider 特有行为。
-        // 连不上（无本地容器/CI 环境）则跳过本用例。
-        SqlSugarClient? master = null;
-        try
+        Skip.IfNot(PostgresTestDatabase.TryCreate(out var postgres, out var unavailableReason), unavailableReason);
+        using (postgres)
         {
-            master = new SqlSugarClient(new ConnectionConfig
+            var config = new DbConnectionConfig
             {
+                ConfigId = ConfigId,
                 DbType = DbType.PostgreSQL,
-                ConnectionString = PostgresConnectionString,
-                IsAutoCloseConnection = true,
-            });
-            master.Ado.ExecuteCommand($"DROP DATABASE IF EXISTS {PostgresReproDatabase} WITH (FORCE)");
-            master.Ado.ExecuteCommand($"CREATE DATABASE {PostgresReproDatabase}");
-        }
-        catch (Exception e)
-        {
-            _output.WriteLine($"[SKIP] 本地 postgres 不可用（{e.Message}），跳过真库复验。");
-            if (master != null)
+                ConnectionString = postgres!.ConnectionString,
+                DbSettings = new DbSettings { EnableDiffLog = true, },
+            };
+            SqlSugarUnifiedConfig.ConfigureBaseSettings(config);
+            using (var scope = new SqlSugarScope(new List<ConnectionConfig> { config, }))
             {
-                master.Dispose();
+                var db = scope.GetConnectionScope(ConfigId);
+                db.Aop.OnError = ex => { _output.WriteLine("[PG-ERROR] " + ex.Sql); };
+                db.CodeFirst.InitTables(typeof(TenantGameAppRemoteConfigEntity));
+                db.Ado.ExecuteCommand($"CREATE TABLE {LegacyUnprefixedTable} AS SELECT * FROM {TenantPhysicalTable} WHERE false");
+
+                var observers = AttachObservers(db);
+
+                var plainEntity = NewEntity(990004, "difflog-repro-pg-plain");
+                await db.Insertable(plainEntity).ExecuteCommandAsync();
+
+                var diffLogEntity = NewEntity(990005, "difflog-repro-pg-difflog");
+                await db.InsertWithDiffLogAsync(diffLogEntity);
+
+                DumpSql(observers.CapturedSqls, observers.DiffLogSqls);
+
+                var insertTableNames = observers.CapturedSqls
+                                                .Where(u => u.StartsWith("INSERT", StringComparison.OrdinalIgnoreCase))
+                                                .Select(u => InsertTableNameRegex.Match(u).Groups[1].Value)
+                                                .ToList();
+                Assert.Equal(2, insertTableNames.Count);
+                Assert.All(insertTableNames, name => Assert.Equal(TenantPhysicalTable, name));
+
+                var tenantRows = db.Ado.SqlQuery<long>($"SELECT COUNT(*) FROM {TenantPhysicalTable} WHERE id IN (990004, 990005)");
+                var legacyRows = db.Ado.SqlQuery<long>($"SELECT COUNT(*) FROM {LegacyUnprefixedTable}");
+                Assert.Equal(2, tenantRows.Single());
+                Assert.Equal(0, legacyRows.Single());
             }
 
-            return;
-        }
-
-        master.Dispose();
-
-        var config = new DbConnectionConfig
-        {
-            ConfigId = ConfigId,
-            DbType = DbType.PostgreSQL,
-            ConnectionString = PostgresConnectionString.Replace("Database=postgres", $"Database={PostgresReproDatabase}"),
-            DbSettings = new DbSettings { EnableDiffLog = true, },
-        };
-        SqlSugarUnifiedConfig.ConfigureBaseSettings(config);
-        using (var scope = new SqlSugarScope(new List<ConnectionConfig> { config, }))
-        {
-            var db = scope.GetConnectionScope(ConfigId);
-            db.Aop.OnError = ex => { _output.WriteLine("[PG-ERROR] " + ex.Sql); };
-            db.CodeFirst.InitTables(typeof(TenantGameAppRemoteConfigEntity));
-            db.Ado.ExecuteCommand($"CREATE TABLE {LegacyUnprefixedTable} AS SELECT * FROM {TenantPhysicalTable} WHERE false");
-
-            var observers = AttachObservers(db);
-
-            var plainEntity = NewEntity(990004, "difflog-repro-pg-plain");
-            await db.Insertable(plainEntity).ExecuteCommandAsync();
-
-            var diffLogEntity = NewEntity(990005, "difflog-repro-pg-difflog");
-            await db.InsertWithDiffLogAsync(diffLogEntity);
-
-            DumpSql(observers.CapturedSqls, observers.DiffLogSqls);
-
-            var insertTableNames = observers.CapturedSqls
-                                            .Where(u => u.StartsWith("INSERT", StringComparison.OrdinalIgnoreCase))
-                                            .Select(u => InsertTableNameRegex.Match(u).Groups[1].Value)
-                                            .ToList();
-            Assert.Equal(2, insertTableNames.Count);
-            Assert.All(insertTableNames, name => Assert.Equal(TenantPhysicalTable, name));
-
-            var tenantRows = db.Ado.SqlQuery<long>($"SELECT COUNT(*) FROM {TenantPhysicalTable} WHERE id IN (990004, 990005)");
-            var legacyRows = db.Ado.SqlQuery<long>($"SELECT COUNT(*) FROM {LegacyUnprefixedTable}");
-            Assert.Equal(2, tenantRows.Single());
-            Assert.Equal(0, legacyRows.Single());
-        }
-
-        using (var cleanup = new SqlSugarClient(new ConnectionConfig
-               {
-                   DbType = DbType.PostgreSQL,
-                   ConnectionString = PostgresConnectionString,
-                   IsAutoCloseConnection = true,
-               }))
-        {
-            cleanup.Ado.ExecuteCommand($"DROP DATABASE IF EXISTS {PostgresReproDatabase} WITH (FORCE)");
         }
     }
 
