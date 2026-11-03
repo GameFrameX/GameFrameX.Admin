@@ -148,7 +148,6 @@ public sealed class KeyLifecycleRotateTests : IDisposable
     {
         var added = await CreatePolicyService().AddAsync(new AddTenantClientApiPolicyRequest
         {
-            AppId = 0,
             SigningKey = string.Empty,
             LifetimeMinutes = 30,
             TicketExpireTime = 0,

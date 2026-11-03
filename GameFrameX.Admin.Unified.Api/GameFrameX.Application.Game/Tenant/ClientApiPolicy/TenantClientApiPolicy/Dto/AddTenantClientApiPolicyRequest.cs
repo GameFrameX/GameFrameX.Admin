@@ -21,11 +21,6 @@ public class AddTenantClientApiPolicyRequest : BaseAddRequest
     public string RiskPolicy { get; set; } = string.Empty;
 
     /// <summary>
-    /// 应用 ID。0 表示租户默认行；大于 0 表示应用级覆盖。令牌节字段仅 AppId=0 行被消费。
-    /// </summary>
-    public long AppId { get; set; }
-
-    /// <summary>
     /// 访问令牌签名密钥。留空（null / 空白）时服务端自动生成 64-hex；该密钥纯服务端内部使用，不回显。
     /// </summary>
     public string SigningKey { get; set; } = null!;

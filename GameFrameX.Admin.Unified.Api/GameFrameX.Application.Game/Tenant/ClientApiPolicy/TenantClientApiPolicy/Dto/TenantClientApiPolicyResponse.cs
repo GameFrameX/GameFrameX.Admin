@@ -26,12 +26,7 @@ public class TenantClientApiPolicyResponse : IBasePageResponse<GameFrameX.Entity
     public long Id { get; set; }
 
     /// <summary>
-    /// 应用 ID。0 表示租户默认行；大于 0 表示应用级覆盖。
-    /// </summary>
-    public long AppId { get; set; }
-
-    /// <summary>
-    /// 访问令牌签名密钥（输出恒为脱敏占位，仅 AppId=0 行被运行时消费）
+    /// 访问令牌签名密钥（输出恒为脱敏占位）
     /// </summary>
     public string SigningKey { get; set; } = string.Empty;
 

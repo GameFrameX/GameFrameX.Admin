@@ -11,7 +11,7 @@ namespace GameFrameX.Application.Game.Tenant.ClientApiPolicy.TenantClientApiPoli
 
 /// <summary>
 /// 租户 Client API 运行策略管理服务（C378 四表合一：Token / 登录票据 / 区服输出 / 订单策略单页管理）。
-/// <para>作用域 (TenantId, AppId) 唯一，AppId=0 为租户默认行；令牌节仅 AppId=0 行被运行时消费。</para>
+/// <para>主库保存唯一运行策略，所有请求读取同一行。</para>
 /// <para>敏感字段（SigningKey）承载 C368 空值防护语义：新增空白自动生成 64-hex、更新空白与 <c>******</c> 同义保留原值；
 /// 输出恒为脱敏占位；该密钥纯服务端内部使用，任何响应均不回显明文。</para>
 /// <para>签名密钥以 <see cref="TenantSecretCrypto"/> 密文落库（C371）：PreserveIfMasked 先换回库中原值（密文形态），
@@ -69,18 +69,17 @@ public class TenantClientApiPolicyEntityService
         var searchKey = input.SearchKey?.Trim();
         return Repository.AsQueryable()
                          .WhereIF(!string.IsNullOrWhiteSpace(searchKey), u => u.Remark.Contains(searchKey))
-                         .WhereIF(input.AppId.HasValue, u => u.AppId == input.AppId.Value)
                          .WhereIF(input.IsActive.HasValue, u => u.IsEnabled == input.IsActive.Value)
                          .Select<TenantClientApiPolicyResponse>();
     }
 
     /// <summary>
-    /// 新增运行策略（(TenantId, AppId) 作用域唯一）。SigningKey 空白时服务端生成 64-hex（C368）。
+    /// 新增主库唯一运行策略。SigningKey 空白时服务端生成 64-hex（C368）。
     /// </summary>
     [DisplayName("新增 Client API 运行策略")]
     public override async Task<TenantClientApiPolicyResponse> AddAsync(AddTenantClientApiPolicyRequest input)
     {
-        await CheckUniqueScopeAsync(input.AppId, null);
+        await CheckUniqueScopeAsync(null);
         ValidateTicketExpireTime(input.TicketExpireTime);
 
         var entity = input.Adapt<GameFrameX.Entity.Tenant.ClientApiConfig.TenantClientApiPolicyEntity>();
@@ -107,10 +106,9 @@ public class TenantClientApiPolicyEntityService
             }
         }
 
-        await CheckUniqueScopeAsync(input.AppId, input.Id);
+        await CheckUniqueScopeAsync(input.Id);
         ValidateTicketExpireTime(input.TicketExpireTime);
 
-        entity.AppId = input.AppId;
         entity.SigningKey = ResolveSigningKeyForStorage(input.SigningKey, entity.SigningKey);
         entity.LifetimeMinutes = input.LifetimeMinutes;
         entity.TicketExpireTime = input.TicketExpireTime;
@@ -126,7 +124,6 @@ public class TenantClientApiPolicyEntityService
         await Repository.AsUpdateable(entity)
                         .UpdateColumns(e => new
                         {
-                            e.AppId,
                             e.SigningKey,
                             e.LifetimeMinutes,
                             e.TicketExpireTime,
@@ -207,16 +204,16 @@ public class TenantClientApiPolicyEntityService
     }
 
     /// <summary>
-    /// 校验同一 (TenantId, AppId) 作用域唯一性。
+    /// 校验主库运行策略唯一性。
     /// </summary>
-    private async Task CheckUniqueScopeAsync(long appId, long? excludeId)
+    private async Task CheckUniqueScopeAsync(long? excludeId)
     {
         var exists = excludeId.HasValue
-                         ? await Repository.IsAnyAsync(x => x.AppId == appId && x.Id != excludeId.Value)
-                         : await Repository.IsAnyAsync(x => x.AppId == appId);
+                         ? await Repository.IsAnyAsync(x => x.Id != excludeId.Value)
+                         : await Repository.IsAnyAsync(x => true);
         if (exists)
         {
-            throw BusinessError.Oh(CommonErrorCode.RecordAlreadyExists, "当前作用域（应用或租户默认）的 Client API 运行策略已存在");
+            throw BusinessError.Oh(CommonErrorCode.RecordAlreadyExists, "Client API 运行策略已存在");
         }
     }
 
