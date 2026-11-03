@@ -10,8 +10,4 @@ public class PageTenantGameDockerTagEntityRequest : BasePageRequest
     /// </summary>
     public string Name { get; set; } = null!;
 
-    /// <summary>
-    /// 应用Id（可选过滤）
-    /// </summary>
-    public long? AppId { get; set; }
 }

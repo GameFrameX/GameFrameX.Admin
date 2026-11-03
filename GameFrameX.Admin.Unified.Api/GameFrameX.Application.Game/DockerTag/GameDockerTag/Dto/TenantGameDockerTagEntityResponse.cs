@@ -20,10 +20,6 @@ public class TenantGameDockerTagEntityResponse : IBasePageResponse<Entity.Tenant
     /// </summary>
     public string Description { get; set; } = null!;
 
-    /// <summary>
-    /// 应用Id。运营内容应用作用域（TenantId + AppId），必须 &gt; 0。
-    /// </summary>
-    public long AppId { get; set; }
 
     /// <summary>
     /// 是否是默认

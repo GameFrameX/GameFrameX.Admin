@@ -25,9 +25,4 @@ public class AddTenantGameDockerTagEntityRequest : BaseAddRequest
     /// </summary>
     public string ServerVersion { get; set; } = null!;
 
-    /// <summary>
-    /// 应用Id。运营内容应用作用域，必须 &gt; 0；由 Admin 后台当前应用上下文写入。
-    /// </summary>
-    [Required(ErrorMessage = "应用Id不能为空")]
-    public long AppId { get; set; }
 }

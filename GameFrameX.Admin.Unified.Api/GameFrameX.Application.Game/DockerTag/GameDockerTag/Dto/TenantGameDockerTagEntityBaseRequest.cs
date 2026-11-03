@@ -22,8 +22,4 @@ public abstract class TenantGameDockerTagEntityBaseRequest : BaseUpdateRequest
     /// </summary>
     public string ServerVersion { get; set; } = null!;
 
-    /// <summary>
-    /// 应用Id。不可变（服务端从既有实体回填）；声明于 Base 供 UpdateAsync 契约对称。
-    /// </summary>
-    public long AppId { get; set; }
 }
