@@ -1,4 +1,3 @@
-using GameFrameX.Application.Game.App.AppScope;
 using GameFrameX.Application.Game.TimeJob.GameTimeJob.Dto;
 
 namespace GameFrameX.Application.Game.TimeJob.GameTimeJob;
@@ -12,28 +11,23 @@ public class TenantGameTimeJobEntityService
         AddTenantGameTimeJobEntityRequest, UpdateTenantGameTimeJobEntityRequest,
         TenantGameTimeJobEntityResponse, PageTenantGameTimeJobEntityRequest>
 {
-    private readonly SqlSugarRepository<Entity.Tenant.Game.TenantGameAppEntity> _gameAppRepository;
-
-    public TenantGameTimeJobEntityService(SqlSugarRepository<Entity.Tenant.Game.TenantGameTimeJobEntity> repository,
-        SqlSugarRepository<Entity.Tenant.Game.TenantGameAppEntity> gameAppRepository)
+    public TenantGameTimeJobEntityService(SqlSugarRepository<Entity.Tenant.Game.TenantGameTimeJobEntity> repository)
         : base(repository)
     {
-        _gameAppRepository = gameAppRepository;
     }
 
     /// <summary>
-    /// 新增前校验：AppId 必填且必须属于当前租户（运营内容，禁止 AppId=0）。
+    /// 手动新增时由服务端固定任务来源。
     /// </summary>
-    protected override async Task OnAddingAsync(AddTenantGameTimeJobEntityRequest input)
+    protected override Task OnAddingAsync(AddTenantGameTimeJobEntityRequest input)
     {
-        AppScopeRules.EnsureFactAppId(input.AppId, "定时任务");
-        await _gameAppRepository.ValidateGameAppBelongsToTenantAsync(input.AppId);
         // 任务来源是系统标记非用户输入字段，手动新增固定 Manual，否则实体 NOT NULL 列 insert 500
         input.Source = "Manual";
+        return Task.CompletedTask;
     }
 
     /// <summary>
-    /// 更新前：AppId 不可变（从既有实体回填）并校验应用归属。
+    /// 更新前验证记录存在。
     /// </summary>
     protected override async Task OnUpdatingAsync(UpdateTenantGameTimeJobEntityRequest input)
     {
@@ -42,17 +36,11 @@ public class TenantGameTimeJobEntityService
         {
             throw BusinessError.Oh(CommonErrorCode.RecordNotFound);
         }
-
-        input.AppId = existing.AppId;
-        AppScopeRules.EnsureFactAppId(input.AppId, "定时任务");
-        await _gameAppRepository.ValidateGameAppBelongsToTenantAsync(input.AppId);
     }
 
     protected override ISugarQueryable<TenantGameTimeJobEntityResponse> BuildPageQuery(PageTenantGameTimeJobEntityRequest input)
     {
-        var appId = AppScopeRules.EnsureFactAppId(input.AppId, "定时任务");
         return Repository.AsQueryable()
-                         .Where(u => u.AppId == appId)
                          .WhereIF(!string.IsNullOrWhiteSpace(input.Name), u => u.Name.Contains(input.Name.Trim()))
                          .Select<TenantGameTimeJobEntityResponse>();
     }

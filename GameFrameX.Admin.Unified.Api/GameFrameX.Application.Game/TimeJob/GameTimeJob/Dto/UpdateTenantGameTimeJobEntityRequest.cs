@@ -5,10 +5,6 @@ namespace GameFrameX.Application.Game.TimeJob.GameTimeJob.Dto;
 /// </summary>
 public class UpdateTenantGameTimeJobEntityRequest : BaseUpdateRequest
 {
-    /// <summary>
-    /// 应用Id。不可变（服务端从既有实体回填）；声明于 DTO 仅为契约对称。
-    /// </summary>
-    public long AppId { get; set; }
 
     /// <summary>
     /// 名称。此前 UpdateRequest 缺此声明：编辑提交的 name 被绑定丢弃，Adapt 后实体 Name=null，

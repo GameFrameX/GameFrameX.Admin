@@ -11,11 +11,6 @@ public class AddTenantGameTimeJobEntityRequest : BaseAddRequest
     [Required(ErrorMessage = "主键Id不能为空")]
     public long Id { get; set; }
 
-    /// <summary>
-    /// 应用Id。运营内容应用作用域，必须 &gt; 0；由 Admin 后台当前应用上下文写入。
-    /// </summary>
-    [Required(ErrorMessage = "应用Id不能为空")]
-    public long AppId { get; set; }
 
     /// <summary>
     /// 名称。此前 AddRequest 缺此声明：表单提交的 name 被绑定丢弃，Adapt 后实体 Name=null，

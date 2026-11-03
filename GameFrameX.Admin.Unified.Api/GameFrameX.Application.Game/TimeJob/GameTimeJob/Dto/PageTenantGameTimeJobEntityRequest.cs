@@ -5,10 +5,6 @@
 /// </summary>
 public class PageTenantGameTimeJobEntityRequest : BasePageRequest
 {
-    /// <summary>
-    /// 应用Id（可选过滤）
-    /// </summary>
-    public long? AppId { get; set; }
 
     /// <summary>
     /// 名称
