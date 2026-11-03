@@ -11,7 +11,7 @@ namespace GameFrameX.Core.Tests.ClientApi;
 public sealed class ClientApiSessionKeyIssuerTests
 {
     private static readonly Regex KidWirePattern = new("^[A-Za-z0-9._-]{1,64}$", RegexOptions.Compiled);
-    private static readonly Regex KidShapePattern = new(@"^sess-app-\d+-\d{14}-[0-9a-f]{4}$", RegexOptions.Compiled);
+    private static readonly Regex KidShapePattern = new(@"^[0-9a-f]{32}$", RegexOptions.Compiled);
 
     [Fact]
     public async Task Issue_PersistsKeyWithLeaseAlignedToExpire()
@@ -22,7 +22,7 @@ public sealed class ClientApiSessionKeyIssuerTests
         var before = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
         var expireAt = before + 3600;
 
-        var result = await issuer.IssueAsync(db.AppId, expireAt);
+        var result = await issuer.IssueAsync(expireAt);
 
         Assert.Matches(KidShapePattern, result.Kid);
         Assert.Matches(KidWirePattern, result.Kid);
@@ -31,7 +31,6 @@ public sealed class ClientApiSessionKeyIssuerTests
 
         var saved = await db.TenantDb.Queryable<TenantSessionKeyEntity>().FirstAsync(e => e.Kid == result.Kid);
         Assert.NotNull(saved);
-        Assert.Equal(db.AppId, saved.AppId);
         Assert.Equal(result.Secret, saved.Secret);
         Assert.Equal(expireAt, saved.ExpireTime);
         Assert.NotNull(saved.NotBeforeTime);
@@ -41,7 +40,7 @@ public sealed class ClientApiSessionKeyIssuerTests
     }
 
     [Fact]
-    public async Task Issue_DeletesExpiredKeysOfSameApp_KeepsLiveAndOtherAppKeys()
+    public async Task Issue_DeletesExpiredKeysFromMainDatabase_KeepsLiveKeys()
     {
         using var db = new ClientApiTestDb();
         db.InitTenantTables(typeof(TenantSessionKeyEntity));
@@ -54,13 +53,12 @@ public sealed class ClientApiSessionKeyIssuerTests
         }).ExecuteCommand();
 
         var issuer = new ClientApiSessionKeyIssuer(db.Repository<TenantSessionKeyEntity>());
-        await issuer.IssueAsync(db.AppId, now + 120);
+        await issuer.IssueAsync(now + 120);
 
         var kids = await db.TenantDb.Queryable<TenantSessionKeyEntity>().Select(e => e.Kid).ToListAsync();
         Assert.DoesNotContain("sess-app-1-expired", kids);
         Assert.Contains("sess-app-1-live", kids);
-        // 其它 AppId 的过期行不在本次签发清理范围
-        Assert.Contains("sess-app-2-expired", kids);
+        Assert.DoesNotContain("sess-app-2-expired", kids);
     }
 
     private static TenantSessionKeyEntity Seed(long appId, string kid, long expireTime)

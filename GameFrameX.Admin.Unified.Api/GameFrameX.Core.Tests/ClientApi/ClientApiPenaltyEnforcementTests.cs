@@ -20,7 +20,7 @@ public sealed class ClientApiPenaltyEnforcementTests
         SeedPenalty(db, 1, PenaltyActionTypeEnum.Ban, PenaltyStatusEnum.Active, null, db.AppId);
 
         var service = new TenantGamePenaltyEnforcementService(db.Repository<TenantGamePenaltyEntity>());
-        var hit = await service.GetLoginBlockingPenaltyAsync(PenaltyTargetTypeEnum.Account, "user-1001", db.AppId);
+        var hit = await service.GetLoginBlockingPenaltyAsync(PenaltyTargetTypeEnum.Account, "user-1001");
 
         Assert.NotNull(hit);
         Assert.Equal(1, hit.Id);
@@ -34,7 +34,7 @@ public sealed class ClientApiPenaltyEnforcementTests
         SeedPenalty(db, 2, PenaltyActionTypeEnum.RestrictLogin, PenaltyStatusEnum.Active, null, db.AppId);
 
         var service = new TenantGamePenaltyEnforcementService(db.Repository<TenantGamePenaltyEntity>());
-        var hit = await service.GetLoginBlockingPenaltyAsync(PenaltyTargetTypeEnum.Account, "user-1001", db.AppId);
+        var hit = await service.GetLoginBlockingPenaltyAsync(PenaltyTargetTypeEnum.Account, "user-1001");
 
         Assert.NotNull(hit);
     }
@@ -47,7 +47,7 @@ public sealed class ClientApiPenaltyEnforcementTests
         SeedPenalty(db, 3, PenaltyActionTypeEnum.Mute, PenaltyStatusEnum.Active, null, db.AppId);
 
         var service = new TenantGamePenaltyEnforcementService(db.Repository<TenantGamePenaltyEntity>());
-        var hit = await service.GetLoginBlockingPenaltyAsync(PenaltyTargetTypeEnum.Account, "user-1001", db.AppId);
+        var hit = await service.GetLoginBlockingPenaltyAsync(PenaltyTargetTypeEnum.Account, "user-1001");
 
         Assert.Null(hit);
     }
@@ -60,7 +60,7 @@ public sealed class ClientApiPenaltyEnforcementTests
         SeedPenalty(db, 4, PenaltyActionTypeEnum.Ban, PenaltyStatusEnum.Revoked, null, db.AppId);
 
         var service = new TenantGamePenaltyEnforcementService(db.Repository<TenantGamePenaltyEntity>());
-        var hit = await service.GetLoginBlockingPenaltyAsync(PenaltyTargetTypeEnum.Account, "user-1001", db.AppId);
+        var hit = await service.GetLoginBlockingPenaltyAsync(PenaltyTargetTypeEnum.Account, "user-1001");
 
         Assert.Null(hit);
     }
@@ -73,21 +73,20 @@ public sealed class ClientApiPenaltyEnforcementTests
         SeedPenalty(db, 5, PenaltyActionTypeEnum.Ban, PenaltyStatusEnum.Active, DateTimeOffset.UtcNow.AddMinutes(-1), db.AppId);
 
         var service = new TenantGamePenaltyEnforcementService(db.Repository<TenantGamePenaltyEntity>());
-        var hit = await service.GetLoginBlockingPenaltyAsync(PenaltyTargetTypeEnum.Account, "user-1001", db.AppId);
+        var hit = await service.GetLoginBlockingPenaltyAsync(PenaltyTargetTypeEnum.Account, "user-1001");
 
         Assert.Null(hit);
     }
 
     [Fact]
-    public async Task Ban_GlobalAppIdZero_MatchesAnyApp()
+    public async Task Ban_MainDatabaseDefault_BlocksAccount()
     {
         using var db = new ClientApiTestDb();
         db.InitTenantTables(typeof(TenantGamePenaltyEntity));
-        // AppId=0 表示租户级全应用封禁
         SeedPenalty(db, 6, PenaltyActionTypeEnum.Ban, PenaltyStatusEnum.Active, null, 0);
 
         var service = new TenantGamePenaltyEnforcementService(db.Repository<TenantGamePenaltyEntity>());
-        var hit = await service.GetLoginBlockingPenaltyAsync(PenaltyTargetTypeEnum.Account, "user-1001", db.AppId);
+        var hit = await service.GetLoginBlockingPenaltyAsync(PenaltyTargetTypeEnum.Account, "user-1001");
 
         Assert.NotNull(hit);
     }
@@ -102,11 +101,11 @@ public sealed class ClientApiPenaltyEnforcementTests
         var service = new TenantGamePenaltyEnforcementService(db.Repository<TenantGamePenaltyEntity>());
 
         // 同区服命中
-        var hitSame = await service.GetLoginBlockingPenaltyAsync(PenaltyTargetTypeEnum.Role, "role-3001", db.AppId, 2001);
+        var hitSame = await service.GetLoginBlockingPenaltyAsync(PenaltyTargetTypeEnum.Role, "role-3001", 2001);
         Assert.NotNull(hitSame);
 
         // 异区服不命中（AreaId IS NULL OR AreaId = @areaId）
-        var hitOther = await service.GetLoginBlockingPenaltyAsync(PenaltyTargetTypeEnum.Role, "role-3001", db.AppId, 9999);
+        var hitOther = await service.GetLoginBlockingPenaltyAsync(PenaltyTargetTypeEnum.Role, "role-3001", 9999);
         Assert.Null(hitOther);
     }
 

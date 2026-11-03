@@ -1227,8 +1227,7 @@ public class GameUserController : BaseController<TenantGameUserEntity>
     private async Task<GetTenantGameUserEntityResponse> CreateLoginOutputAsync(TenantGameUserEntity entity, string provider)
     {
         // 处罚事实源登录阻断漏斗：账号级封禁/限制登录命中即拦截 Token 签发
-        var appId = ResolveContextAppId();
-        var blocking = await _tenantGamePenaltyEnforcementService.GetLoginBlockingPenaltyAsync(PenaltyTargetTypeEnum.Account, entity.Id.ToString(), appId);
+        var blocking = await _tenantGamePenaltyEnforcementService.GetLoginBlockingPenaltyAsync(PenaltyTargetTypeEnum.Account, entity.Id.ToString());
         if (blocking != null)
         {
             throw new PenaltyLoginBlockedException((int)AccountErrorCode.AccountBanned, $"账号已被封禁：{blocking.Reason}");
@@ -1241,22 +1240,10 @@ public class GameUserController : BaseController<TenantGameUserEntity>
         output.Provider = provider;
 
         // C7: token 签发后签发 per-session 会话密钥（AES-256-GCM 信封 kid/secret），到期与 AccessToken 对齐
-        var sessionKey = await _clientApiSessionKeyIssuer.IssueAsync(appId, token.ExpireTime);
+        var sessionKey = await _clientApiSessionKeyIssuer.IssueAsync(token.ExpireTime);
         output.SessionKeyId = sessionKey.Kid;
         output.SessionKeySecret = sessionKey.Secret;
         return output;
-    }
-
-    private long ResolveContextAppId()
-    {
-        if (HttpContext.Items.TryGetValue(AppResolutionMiddleware.AppIdKey, out var appIdObj) &&
-            appIdObj != null &&
-            long.TryParse(appIdObj.ToString(), out var appId))
-        {
-            return appId;
-        }
-
-        return 0;
     }
 
     private GetTenantGameUserEntityResponse CreateAccountOutput(TenantGameUserEntity entity)

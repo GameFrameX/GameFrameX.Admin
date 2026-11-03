@@ -4,10 +4,10 @@ namespace GameFrameX.Application.Game.Penalty.GamePenalty;
 
 /// <summary>
 /// 处罚事实源登录阻断查询实现。
-/// <para>查询严格按 change C115 §3.3 锁定：</para>
+/// <para>查询以主库处罚状态和区服范围为准：</para>
 /// <para>TargetType = @targetType AND TargetId = @targetId AND Status = Active</para>
 /// <para>AND (ExpireTime IS NULL OR ExpireTime &gt; now) AND ActionType IN (BanAsync, RestrictLogin)</para>
-/// <para>AND (AppId = @appId OR AppId = 0) AND (AreaId IS NULL OR AreaId = @areaId)</para>
+/// <para>AND (AreaId IS NULL OR AreaId = @areaId)</para>
 /// <para>ORDER BY Id，取第一条。</para>
 /// </summary>
 public class TenantGamePenaltyEnforcementService : ITenantGamePenaltyEnforcementService
@@ -21,7 +21,7 @@ public class TenantGamePenaltyEnforcementService : ITenantGamePenaltyEnforcement
 
     /// <inheritdoc />
     public async Task<Entity.Tenant.Game.TenantGamePenaltyEntity> GetLoginBlockingPenaltyAsync(
-        PenaltyTargetTypeEnum targetType, string targetId, long appId, long? areaId = null)
+        PenaltyTargetTypeEnum targetType, string targetId, long? areaId = null)
     {
         if (string.IsNullOrEmpty(targetId))
         {
@@ -38,7 +38,6 @@ public class TenantGamePenaltyEnforcementService : ITenantGamePenaltyEnforcement
                                        .Where(p => p.ExpireTime == null || p.ExpireTime > now)
                                        .Where(p => p.ActionType == PenaltyActionTypeEnum.Ban
                                                    || p.ActionType == PenaltyActionTypeEnum.RestrictLogin)
-                                       .Where(p => p.AppId == appId || p.AppId == 0)
                                        .Where(p => p.AreaId == null || p.AreaId == areaId)
                                        .OrderBy(p => p.Id)
                                        .FirstAsync();

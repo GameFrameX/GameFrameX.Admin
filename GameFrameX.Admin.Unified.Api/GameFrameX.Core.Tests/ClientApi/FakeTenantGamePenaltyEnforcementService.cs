@@ -20,7 +20,7 @@ internal sealed class FakeTenantGamePenaltyEnforcementService : ITenantGamePenal
     }
 
     public Task<TenantGamePenaltyEntity> GetLoginBlockingPenaltyAsync(
-        PenaltyTargetTypeEnum targetType, string targetId, long appId, long? areaId = null)
+        PenaltyTargetTypeEnum targetType, string targetId, long? areaId = null)
     {
         return Task.FromResult(_blocking);
     }

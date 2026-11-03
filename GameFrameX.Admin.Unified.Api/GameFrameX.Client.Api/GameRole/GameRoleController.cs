@@ -103,14 +103,6 @@ public class GameRoleController : BaseController<TenantGameRoleEntity>
     [ProducesResponseType(200, Type = typeof(TenantGameRoleEntityResponse))]
     public async Task<HttpJsonResultData<TenantGameRoleEntityResponse>> Add([FromBody] AddTenantGameRoleEntityRequest input)
     {
-        // 应用作用域：AppId 只来自可信中间件上下文，不接受请求体覆盖（app-scope-backend-foundation.md §5.2）
-        if (!TryGetContextLong(AppResolutionMiddleware.AppIdKey, out var appId))
-        {
-            return GameApiResult.Error<TenantGameRoleEntityResponse>(AuthErrorCode.AuthorizeInvalid, "应用未认证");
-        }
-
-        AppScopeRules.EnsureFactAppId(appId, "游戏角色");
-
         var user = await PRepository.AsSugarClient().Queryable<TenantGameUserEntity>().Where(u => u.Id == input.UserId).FirstAsync();
         if (user == null)
         {
@@ -153,7 +145,6 @@ public class GameRoleController : BaseController<TenantGameRoleEntity>
             entity.Id = respPlayerCreate.Data.PlayerInfo.Id;
             entity.Level = (int)respPlayerCreate.Data.PlayerInfo.Level;
             entity.CreatedTime = TimerHelper.UnixTimeSeconds();
-            entity.AppId = appId; // 事实数据应用作用域，来自可信中间件上下文
             // entity.LastLoginTime = DateTime.Now;
             var res = await PRepository.InsertAsync(entity);
             if (res)
@@ -196,14 +187,7 @@ public class GameRoleController : BaseController<TenantGameRoleEntity>
     [ProducesResponseType(200, Type = typeof(TenantGameRoleEntityResponse))]
     public async Task<HttpJsonResultData<TenantGameRoleEntityResponse>> Update([FromBody] UpdateTenantGameRoleEntityRequest input)
     {
-        var existing = await PRepository.GetFirstAsync(u => u.Id == input.Id);
         var entity = input.Adapt<TenantGameRoleEntity>();
-        // 应用归属不可变：从既有实体回填 AppId，避免 Adapt 默认值覆盖为 0 导致角色跨应用丢失边界。
-        if (existing != null)
-        {
-            entity.AppId = existing.AppId;
-        }
-
         var res = await PRepository.AsUpdateable(entity).IgnoreColumns(true).ExecuteCommandWithOptLockAsync(true);
         var result = entity.Adapt<TenantGameRoleEntityResponse>();
         return HttpJsonResultData<TenantGameRoleEntityResponse>.Success(result);
@@ -243,11 +227,6 @@ public class GameRoleController : BaseController<TenantGameRoleEntity>
             return GameApiResult.Error<GameLoginTicketResponse>(AuthErrorCode.AuthorizeInvalid, "请求体不能包含租户、应用或账号上下文字段");
         }
 
-        if (!TryGetContextLong(AppResolutionMiddleware.AppIdKey, out var appId))
-        {
-            return GameApiResult.Error<GameLoginTicketResponse>(AuthErrorCode.AuthorizeInvalid, "应用未认证");
-        }
-
         var tokenValidation = await _clientApiTokenIssuer.ValidateAsync(input.AccessToken);
         if (!tokenValidation.IsValid)
         {
@@ -274,7 +253,7 @@ public class GameRoleController : BaseController<TenantGameRoleEntity>
         }
 
         // 处罚事实源登录阻断漏斗：账号级封禁/限制登录命中即拦截
-        var accountBlocking = await _tenantGamePenaltyEnforcementService.GetLoginBlockingPenaltyAsync(PenaltyTargetTypeEnum.Account, user.Id.ToString(), appId);
+        var accountBlocking = await _tenantGamePenaltyEnforcementService.GetLoginBlockingPenaltyAsync(PenaltyTargetTypeEnum.Account, user.Id.ToString());
         if (accountBlocking != null)
         {
             _gameLoginTicketIssuer.AuditRejected(user.Id, input.PlayerId, input.AreaId, "account_banned");
@@ -312,7 +291,7 @@ public class GameRoleController : BaseController<TenantGameRoleEntity>
         }
 
         // 处罚事实源登录阻断漏斗：角色级封禁/限制登录命中即拦截（按区服作用域过滤）
-        var roleBlocking = await _tenantGamePenaltyEnforcementService.GetLoginBlockingPenaltyAsync(PenaltyTargetTypeEnum.Role, entity.Id.ToString(), appId, input.AreaId);
+        var roleBlocking = await _tenantGamePenaltyEnforcementService.GetLoginBlockingPenaltyAsync(PenaltyTargetTypeEnum.Role, entity.Id.ToString(), input.AreaId);
         if (roleBlocking != null)
         {
             _gameLoginTicketIssuer.AuditRejected(user.Id, input.PlayerId, input.AreaId, "role_banned");

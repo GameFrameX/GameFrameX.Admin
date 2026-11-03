@@ -13,7 +13,7 @@ namespace GameFrameX.Core.Tests.ClientApi;
 public sealed class ClientApiRoleEndpointTests
 {
     [Fact]
-    public async Task GameRole_Add_CreatesRoleWithTrustedAppContext()
+    public async Task GameRole_Add_CreatesRoleWithoutAppContext()
     {
         using var db = new ClientApiTestDb();
         db.SeedUser(1001, "role-user");
@@ -21,7 +21,7 @@ public sealed class ClientApiRoleEndpointTests
         db.SeedArea(2001, 10);
         var handler = ClientApiRecordingHttpHandler.WithGameServerDefaults(3001);
         var controller = CreateController(db, handler);
-        db.AttachContext(controller);
+        db.AttachContext(controller, includeApp: false);
 
         var result = await controller.Add(new AddTenantGameRoleEntityRequest
         {
@@ -35,12 +35,12 @@ public sealed class ClientApiRoleEndpointTests
         var root = ClientApiResultReader.Read(result);
         var saved = await db.TenantDb.Queryable<TenantGameRoleEntity>().FirstAsync(u => u.Id == 3001);
         Assert.Equal(0, ClientApiResultReader.Code(root));
-        Assert.Equal(db.AppId, saved.AppId);
+        Assert.Equal(1001, saved.UserId);
         Assert.Equal(1, handler.Count("/game/api/req_player_create"));
     }
 
     [Fact]
-    public async Task GameRole_Add_RejectsMissingAppContextBeforeInsert()
+    public async Task GameRole_Add_RejectsMissingAccountWithoutAppContext()
     {
         using var db = new ClientApiTestDb();
         var controller = CreateController(db);
@@ -49,8 +49,8 @@ public sealed class ClientApiRoleEndpointTests
         var result = await controller.Add(new AddTenantGameRoleEntityRequest { UserId = 1001, AreaId = 2001, Name = "Hero", });
 
         var root = ClientApiResultReader.Read(result);
-        Assert.Equal((int)AuthErrorCode.AuthorizeInvalid, ClientApiResultReader.Code(root));
-        Assert.Equal("应用未认证", ClientApiResultReader.Message(root));
+        Assert.Equal((int)AccountErrorCode.AccountExists, ClientApiResultReader.Code(root));
+        Assert.Equal("账号不存在", ClientApiResultReader.Message(root));
     }
 
     [Fact]
