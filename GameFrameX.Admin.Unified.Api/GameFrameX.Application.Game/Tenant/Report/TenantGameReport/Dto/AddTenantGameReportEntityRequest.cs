@@ -8,12 +8,6 @@ namespace GameFrameX.Application.Game.Tenant.Report.TenantGameReport.Dto;
 public class AddTenantGameReportEntityRequest : BaseAddRequest
 {
     /// <summary>
-    /// 应用作用域。举报是应用级事实数据，必须大于 0。
-    /// </summary>
-    [Required(ErrorMessage = "应用Id不能为空")]
-    public long AppId { get; set; }
-
-    /// <summary>
     /// 举报人 UserId。
     /// </summary>
     [Required(ErrorMessage = "举报人不能为空")]

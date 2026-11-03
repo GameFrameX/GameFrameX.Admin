@@ -76,7 +76,7 @@ public sealed class OnlineReportCaseServiceTests : IDisposable
         // 事实源：Mute 处罚一行，审计字段由服务端强制（Active + 当前操作人）。
         var penalty = await _db.Queryable<TenantGamePenaltyEntity>().FirstAsync(u => u.TargetId == "player-9");
         Assert.NotNull(penalty);
-        Assert.Equal(App100, penalty.AppId);
+        Assert.Equal(0, penalty.AppId);
         Assert.Equal(Area1001, penalty.AreaId);
         Assert.Equal(PenaltyTargetTypeEnum.Account, penalty.TargetType);
         Assert.Equal(PenaltyActionTypeEnum.Mute, penalty.ActionType);

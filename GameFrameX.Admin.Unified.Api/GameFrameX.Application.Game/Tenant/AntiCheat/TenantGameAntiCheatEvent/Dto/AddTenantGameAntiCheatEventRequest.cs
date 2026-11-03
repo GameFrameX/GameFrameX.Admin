@@ -8,12 +8,6 @@ namespace GameFrameX.Application.Game.Tenant.AntiCheat.TenantGameAntiCheatEvent.
 public class AddTenantGameAntiCheatEventRequest : BaseAddRequest
 {
     /// <summary>
-    /// 应用 Id（事实数据应用作用域，跟随上报来源应用）。
-    /// </summary>
-    [Required(ErrorMessage = "应用Id不能为空")]
-    public long AppId { get; set; }
-
-    /// <summary>
     /// 上报来源 Provider。
     /// </summary>
     public AntiCheatProviderEnum Provider { get; set; }

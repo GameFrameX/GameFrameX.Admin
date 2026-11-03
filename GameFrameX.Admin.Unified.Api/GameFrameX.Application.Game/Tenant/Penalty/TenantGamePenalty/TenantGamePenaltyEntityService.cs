@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using GameFrameX.Application.Game.App.AppScope;
 using GameFrameX.Application.Game.Online.Social;
 using GameFrameX.Application.Game.Online.Social.Dto;
 using GameFrameX.Application.Game.Tenant.Penalty.TenantGamePenalty.Dto;
@@ -34,11 +33,10 @@ public class TenantGamePenaltyEntityService
     }
 
     /// <summary>
-    /// 新增处罚。AppId 必填且必须大于 0；审计字段服务端强制。
+    /// 新增处罚。审计字段服务端强制。
     /// </summary>
     public override async Task<TenantGamePenaltyEntityResponse> AddAsync(AddTenantGamePenaltyEntityRequest input)
     {
-        AppScopeRules.EnsureFactAppId(input.AppId, "处罚");
         if (string.IsNullOrWhiteSpace(input.TargetId))
         {
             throw BusinessError.Oh("对象标识不能为空");
@@ -57,13 +55,12 @@ public class TenantGamePenaltyEntityService
     }
 
     /// <summary>
-    /// 分页查询：按 AppId / TargetType / TargetId / Status / ActionType 过滤。
+    /// 分页查询：按 TargetType / TargetId / Status / ActionType 过滤。
     /// </summary>
     protected override ISugarQueryable<TenantGamePenaltyEntityResponse> BuildPageQuery(PageTenantGamePenaltyEntityRequest input)
     {
-        var appId = AppScopeRules.EnsureFactAppId(input.AppId, "处罚");
         return Repository.AsQueryable()
-                         .Where(p => p.AppId == appId)
+
                          .WhereIF(input.TargetType.HasValue, p => p.TargetType == input.TargetType.Value)
                          .WhereIF(!string.IsNullOrWhiteSpace(input.TargetId), p => p.TargetId == input.TargetId)
                          .WhereIF(input.Status.HasValue, p => p.Status == input.Status.Value)

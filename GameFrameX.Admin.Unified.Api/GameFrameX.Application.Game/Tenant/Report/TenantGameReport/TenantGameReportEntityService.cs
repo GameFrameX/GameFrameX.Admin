@@ -1,4 +1,3 @@
-using GameFrameX.Application.Game.App.AppScope;
 using GameFrameX.Application.Game.Tenant.Report.TenantGameReport.Dto;
 using GameFrameX.Core.Service.User;
 using GameFrameX.Entity.Enum;
@@ -30,11 +29,10 @@ public class TenantGameReportEntityService
     }
 
     /// <summary>
-    /// 录入举报：AppId 必填且必须大于 0；Status/HandlerId 服务端强制。
+    /// 录入举报：Status/HandlerId 服务端强制。
     /// </summary>
     public override async Task<TenantGameReportEntityResponse> AddAsync(AddTenantGameReportEntityRequest input)
     {
-        AppScopeRules.EnsureFactAppId(input.AppId, "举报");
         if (string.IsNullOrWhiteSpace(input.TargetId))
         {
             throw BusinessError.Oh("被举报对象标识不能为空");
@@ -53,13 +51,12 @@ public class TenantGameReportEntityService
     }
 
     /// <summary>
-    /// 分页查询：按 AppId / TargetType / TargetId / ReportType / Status 过滤。
+    /// 分页查询：按 TargetType / TargetId / ReportType / Status 过滤。
     /// </summary>
     protected override ISugarQueryable<TenantGameReportEntityResponse> BuildPageQuery(PageTenantGameReportEntityRequest input)
     {
-        var appId = AppScopeRules.EnsureFactAppId(input.AppId, "举报");
         return Repository.AsQueryable()
-                         .Where(r => r.AppId == appId)
+
                          .WhereIF(input.TargetType.HasValue, r => r.TargetType == input.TargetType.Value)
                          .WhereIF(!string.IsNullOrWhiteSpace(input.TargetId), r => r.TargetId == input.TargetId)
                          .WhereIF(input.ReportType.HasValue, r => r.ReportType == input.ReportType.Value)
@@ -90,11 +87,6 @@ public class TenantGameReportEntityService
         if (penalty == null)
         {
             throw BusinessError.Oh("处罚不存在");
-        }
-
-        if (penalty.AppId != report.AppId)
-        {
-            throw BusinessError.Oh("举报只能关联同应用下的处罚");
         }
 
         report.ResultPenaltyId = input.PenaltyId;

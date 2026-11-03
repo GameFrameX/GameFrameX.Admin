@@ -13,11 +13,6 @@ public class TenantGameReportEntityResponse : IBasePageResponse<Entity.Tenant.Ga
     public long Id { get; set; }
 
     /// <summary>
-    /// 应用作用域。举报是应用级事实数据，必须大于 0。
-    /// </summary>
-    public long AppId { get; set; }
-
-    /// <summary>
     /// 举报人 UserId。
     /// </summary>
     public long ReporterId { get; set; }

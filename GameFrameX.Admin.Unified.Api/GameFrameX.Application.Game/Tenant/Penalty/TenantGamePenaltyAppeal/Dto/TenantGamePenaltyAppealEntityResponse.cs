@@ -13,11 +13,6 @@ public class TenantGamePenaltyAppealEntityResponse : IBasePageResponse<Entity.Te
     public long Id { get; set; }
 
     /// <summary>
-    /// 应用作用域，跟随关联处罚 AppId。
-    /// </summary>
-    public long AppId { get; set; }
-
-    /// <summary>
     /// 关联处罚 Id（TenantGamePenaltyEntity.Id）。
     /// </summary>
     public long PenaltyId { get; set; }

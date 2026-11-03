@@ -1,6 +1,5 @@
 using GameFrameX.Application.Game.Tenant.AntiCheat.TenantGameAntiCheatEvent.Dto;
 using GameFrameX.Entity.Tenant.Game;
-using GameFrameX.Application.Game.App.AppScope;
 using GameFrameX.Core.Const;
 using GameFrameX.Core.Service.Tenant;
 using GameFrameX.Entity.Enum;
@@ -34,18 +33,17 @@ public sealed class TenantGameAntiCheatEventEntityService
     }
 
     /// <summary>
-    /// 分页查询反作弊事件（按 AppId / Provider / RiskLevel / ManualReviewState / TargetType / TargetId 过滤）。
+    /// 分页查询反作弊事件（按 Provider / RiskLevel / ManualReviewState / TargetType / TargetId 过滤）。
     /// </summary>
     [HttpPost(CrudActionRoutes.Page)]
     [ApiDescriptionSettings(Name = "Page")]
     public async Task<SqlSugarPagedList<TenantGameAntiCheatEventResponse>> PageAsync(
         PageTenantGameAntiCheatEventRequest input)
     {
-        var appId = AppScopeRules.EnsureFactAppId(input.AppId, "反作弊事件");
         var targetId = string.IsNullOrWhiteSpace(input.TargetId) ? null : input.TargetId.Trim();
         var query = Repository.AsQueryable()
                               .Where(u => u.IsDeleted == false)
-                              .Where(u => u.AppId == appId)
+
                               .WhereIF(input.Provider.HasValue, u => u.Provider == input.Provider.Value)
                               .WhereIF(input.RiskLevel.HasValue, u => u.RiskLevel == input.RiskLevel.Value)
                               .WhereIF(input.ManualReviewState.HasValue,
@@ -80,7 +78,6 @@ public sealed class TenantGameAntiCheatEventEntityService
     [ApiDescriptionSettings(Name = "Submit")]
     public async Task<TenantGameAntiCheatEventResponse> SubmitAsync(AddTenantGameAntiCheatEventRequest input)
     {
-        AppScopeRules.EnsureFactAppId(input.AppId, "反作弊事件");
         var idempotencyKey = input.IdempotencyKey?.Trim() ?? string.Empty;
         if (idempotencyKey.Length == 0)
         {

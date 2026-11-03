@@ -9,10 +9,6 @@ public class TenantGameAntiCheatEventResponse
 {
     public long Id { get; set; }
 
-    public long TenantId { get; set; }
-
-    public long AppId { get; set; }
-
     public AntiCheatProviderEnum Provider { get; set; }
 
     public string? ProviderName { get; set; }

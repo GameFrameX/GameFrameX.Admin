@@ -8,12 +8,6 @@ namespace GameFrameX.Application.Game.Tenant.Penalty.TenantGamePenalty.Dto;
 public class AddTenantGamePenaltyEntityRequest : BaseAddRequest
 {
     /// <summary>
-    /// 应用作用域。处罚是应用级事实数据，必须大于 0。
-    /// </summary>
-    [Required(ErrorMessage = "应用Id不能为空")]
-    public long AppId { get; set; }
-
-    /// <summary>
     /// 区服作用域。null = 全区服生效。
     /// </summary>
     public long? AreaId { get; set; }

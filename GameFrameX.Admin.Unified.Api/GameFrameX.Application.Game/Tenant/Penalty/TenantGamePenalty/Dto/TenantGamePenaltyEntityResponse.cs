@@ -13,11 +13,6 @@ public class TenantGamePenaltyEntityResponse : IBasePageResponse<Entity.Tenant.G
     public long Id { get; set; }
 
     /// <summary>
-    /// 应用作用域。处罚是应用级事实数据，必须大于 0。
-    /// </summary>
-    public long AppId { get; set; }
-
-    /// <summary>
     /// 区服作用域。null = 全区服生效。
     /// </summary>
     public long? AreaId { get; set; }

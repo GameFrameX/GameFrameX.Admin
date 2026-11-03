@@ -1,7 +1,7 @@
 namespace GameFrameX.Application.Game.Tenant.Penalty.TenantGamePenaltyAppeal.Dto;
 
 /// <summary>
-/// 申诉新增输入参数。AppId 由服务端从关联处罚回填，不在此暴露。
+/// 申诉新增输入参数。关联处罚由服务端验证。
 /// </summary>
 public class AddTenantGamePenaltyAppealEntityRequest : BaseAddRequest
 {

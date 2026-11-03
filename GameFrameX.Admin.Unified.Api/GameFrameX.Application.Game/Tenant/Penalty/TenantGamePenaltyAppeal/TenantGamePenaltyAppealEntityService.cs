@@ -1,5 +1,4 @@
 using GameFrameX.Application.Game.Tenant.Penalty.TenantGamePenaltyAppeal.Dto;
-using GameFrameX.Application.Game.App.AppScope;
 using GameFrameX.Core.Service.User;
 using GameFrameX.Entity.Enum;
 
@@ -8,7 +7,7 @@ namespace GameFrameX.Application.Game.Tenant.Penalty.TenantGamePenaltyAppeal;
 
 /// <summary>
 /// 申诉事实源管理服务。路由前缀 /api/tenantGamePenaltyAppealEntity。
-/// <para>AddAsync：校验关联处罚生效中 + 同一处罚不存在待审申诉；AppId 从处罚回填；服务端强制 Status=Pending。</para>
+/// <para>AddAsync：校验关联处罚生效中 + 同一处罚不存在待审申诉；服务端强制 Status=Pending。</para>
 /// <para>ReviewAsync：通过→同步撤销关联处罚（写 RevokeAsync* + SourceAppealId 审计链）；驳回→写 Rejected。同一申诉不可重复 ReviewAsync。</para>
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
@@ -30,7 +29,7 @@ public class TenantGamePenaltyAppealEntityService
     }
 
     /// <summary>
-    /// 提交申诉：校验处罚生效中、同一处罚无待审申诉；AppId 跟随处罚；Status 服务端强制为 Pending。
+    /// 提交申诉：校验处罚生效中、同一处罚无待审申诉；Status 服务端强制为 Pending。
     /// </summary>
     public override async Task<TenantGamePenaltyAppealEntityResponse> AddAsync(AddTenantGamePenaltyAppealEntityRequest input)
     {
@@ -45,7 +44,6 @@ public class TenantGamePenaltyAppealEntityService
             throw BusinessError.Oh("关联处罚不是生效状态，无法申诉");
         }
 
-        AppScopeRules.EnsureFactAppId(penalty.AppId, "处罚申诉");
 
         var pendingExists = await Repository.IsAnyAsync(a => a.PenaltyId == input.PenaltyId
                                                              && a.Status == AppealStatusEnum.Pending);
@@ -60,20 +58,18 @@ public class TenantGamePenaltyAppealEntityService
         }
 
         var entity = input.Adapt<Entity.Tenant.Game.TenantGamePenaltyAppealEntity>();
-        entity.AppId = penalty.AppId;
         entity.Status = AppealStatusEnum.Pending;
         await Repository.InsertWithDiffLogAsync(entity);
         return entity.Adapt<TenantGamePenaltyAppealEntityResponse>();
     }
 
     /// <summary>
-    /// 分页查询：按 AppId / PenaltyId / Status 过滤。
+    /// 分页查询：按 PenaltyId / Status 过滤。
     /// </summary>
     protected override ISugarQueryable<TenantGamePenaltyAppealEntityResponse> BuildPageQuery(PageTenantGamePenaltyAppealEntityRequest input)
     {
-        var appId = AppScopeRules.EnsureFactAppId(input.AppId, "处罚申诉");
         return Repository.AsQueryable()
-                         .Where(a => a.AppId == appId)
+
                          .WhereIF(input.PenaltyId.HasValue, a => a.PenaltyId == input.PenaltyId.Value)
                          .WhereIF(input.Status.HasValue, a => a.Status == input.Status.Value)
                          .Select<TenantGamePenaltyAppealEntityResponse>();

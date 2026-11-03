@@ -180,7 +180,6 @@ public class OnlineReportCaseService : IAdminApiController
 
         return await _penaltyEntityService.AddAsync(new AddTenantGamePenaltyEntityRequest
         {
-            AppId = input.AppId,
             AreaId = input.ServerId,
             TargetType = PenaltyTargetTypeEnum.Account,
             TargetId = input.ReportedPlayerId,
