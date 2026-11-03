@@ -12,10 +12,6 @@ public class OnlineReportCaseResponse
     /// </summary>
     public string CaseId { get; set; } = null!;
 
-    /// <summary>
-    /// 应用 Id。
-    /// </summary>
-    public long AppId { get; set; }
 
     /// <summary>
     /// 区服 Id。

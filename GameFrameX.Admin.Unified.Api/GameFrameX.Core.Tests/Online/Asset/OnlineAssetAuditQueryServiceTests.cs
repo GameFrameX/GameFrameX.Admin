@@ -64,7 +64,6 @@ public sealed class OnlineAssetAuditQueryServiceTests : IDisposable
 
         var response = await service.PageAsync(new PageOnlineAssetAuditRequest
         {
-            AppId = OnlineAssetTestSupport.App100,
             ServerId = OnlineAssetTestSupport.Area1001,
             OperatorId = "op-1",
             PlayerId = "player-1",

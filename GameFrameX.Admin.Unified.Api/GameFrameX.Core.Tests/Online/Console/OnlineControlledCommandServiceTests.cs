@@ -49,7 +49,6 @@ public sealed class OnlineControlledCommandServiceTests : IDisposable
 
         await service.ExecuteAsync(new OnlineControlledCommandRequest
         {
-            AppId = OnlineAssetTestSupport.App100,
             ServerId = OnlineAssetTestSupport.Area1001,
             Command = OnlineControlledCommandKind.CancelTicket,
             TicketId = "ticket-1",
@@ -58,7 +57,6 @@ public sealed class OnlineControlledCommandServiceTests : IDisposable
         });
         await service.ExecuteAsync(new OnlineControlledCommandRequest
         {
-            AppId = OnlineAssetTestSupport.App100,
             ServerId = OnlineAssetTestSupport.Area1001,
             Command = OnlineControlledCommandKind.EndAbnormalMatch,
             MatchId = "match-1",
@@ -67,7 +65,6 @@ public sealed class OnlineControlledCommandServiceTests : IDisposable
         });
         await service.ExecuteAsync(new OnlineControlledCommandRequest
         {
-            AppId = OnlineAssetTestSupport.App100,
             ServerId = OnlineAssetTestSupport.Area1001,
             Command = OnlineControlledCommandKind.SuspendResumePlayer,
             PlayerId = "player-9",
@@ -77,7 +74,6 @@ public sealed class OnlineControlledCommandServiceTests : IDisposable
         });
         await service.ExecuteAsync(new OnlineControlledCommandRequest
         {
-            AppId = OnlineAssetTestSupport.App100,
             ServerId = OnlineAssetTestSupport.Area1001,
             Command = OnlineControlledCommandKind.MatchIsolation,
             PlayerId = "player-9",
@@ -142,7 +138,6 @@ public sealed class OnlineControlledCommandServiceTests : IDisposable
         await service.ExecuteAsync(suspendOtherServer);
         await service.ExecuteAsync(new OnlineControlledCommandRequest
         {
-            AppId = OnlineAssetTestSupport.App100,
             ServerId = OnlineAssetTestSupport.Area1001,
             Command = OnlineControlledCommandKind.CancelTicket,
             TicketId = "ticket-1",
@@ -170,7 +165,6 @@ public sealed class OnlineControlledCommandServiceTests : IDisposable
 
         var exception = await Assert.ThrowsAsync<BusinessException>(() => service.ExecuteAsync(new OnlineControlledCommandRequest
         {
-            AppId = OnlineAssetTestSupport.App100,
             ServerId = OnlineAssetTestSupport.Area1001,
             Command = OnlineControlledCommandKind.SuspendResumePlayer,
             PlayerId = "player-9",
@@ -194,7 +188,6 @@ public sealed class OnlineControlledCommandServiceTests : IDisposable
 
         var exception = await Assert.ThrowsAsync<BusinessException>(() => service.ExecuteAsync(new OnlineControlledCommandRequest
         {
-            AppId = OnlineAssetTestSupport.App100,
             ServerId = OnlineAssetTestSupport.Area1001,
             Command = OnlineControlledCommandKind.CancelTicket,
             TicketId = "ticket-1",
@@ -219,7 +212,6 @@ public sealed class OnlineControlledCommandServiceTests : IDisposable
 
         var mismatched = await Assert.ThrowsAsync<BusinessException>(() => service.ExecuteAsync(new OnlineControlledCommandRequest
         {
-            AppId = OnlineAssetTestSupport.App100,
             ServerId = OnlineAssetTestSupport.Area1001,
             Command = OnlineControlledCommandKind.EndAbnormalMatch,
             MatchId = "match-1",
@@ -231,7 +223,6 @@ public sealed class OnlineControlledCommandServiceTests : IDisposable
 
         var missing = await Assert.ThrowsAsync<BusinessException>(() => service.ExecuteAsync(new OnlineControlledCommandRequest
         {
-            AppId = OnlineAssetTestSupport.App100,
             ServerId = OnlineAssetTestSupport.Area1001,
             Command = OnlineControlledCommandKind.EndAbnormalMatch,
             Reason = "对局卡死",
@@ -254,7 +245,6 @@ public sealed class OnlineControlledCommandServiceTests : IDisposable
 
         var noReason = await Assert.ThrowsAsync<BusinessException>(() => service.ExecuteAsync(new OnlineControlledCommandRequest
         {
-            AppId = OnlineAssetTestSupport.App100,
             ServerId = OnlineAssetTestSupport.Area1001,
             Command = OnlineControlledCommandKind.CancelTicket,
             TicketId = "ticket-1",
@@ -265,7 +255,6 @@ public sealed class OnlineControlledCommandServiceTests : IDisposable
 
         var noReviewer = await Assert.ThrowsAsync<BusinessException>(() => service.ExecuteAsync(new OnlineControlledCommandRequest
         {
-            AppId = OnlineAssetTestSupport.App100,
             ServerId = OnlineAssetTestSupport.Area1001,
             Command = OnlineControlledCommandKind.CancelTicket,
             TicketId = "ticket-1",
@@ -281,7 +270,6 @@ public sealed class OnlineControlledCommandServiceTests : IDisposable
     {
         return new OnlineControlledCommandRequest
         {
-            AppId = OnlineAssetTestSupport.App100,
             ServerId = serverId,
             Command = OnlineControlledCommandKind.SuspendResumePlayer,
             PlayerId = "player-9",

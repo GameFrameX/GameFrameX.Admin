@@ -21,10 +21,6 @@ public class OnlineAuditSearchEntryResponse
     /// </summary>
     public string? TargetPlayerIdentifier { get; set; }
 
-    /// <summary>
-    /// 应用作用域（提取不到时为 null）。
-    /// </summary>
-    public long? AppId { get; set; }
 
     /// <summary>
     /// 区服作用域（提取不到时为 null）。

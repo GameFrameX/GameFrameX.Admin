@@ -46,6 +46,7 @@ public sealed class OnlineAuditSearchServiceTests : IDisposable
 
             typeof(TenantGameAreaEntity),
             typeof(TenantLogOperationEntity),
+            typeof(SystemLogOperationEntity),
             typeof(TenantGamePenaltyEntity),
             typeof(TenantGameOnlineConfigRolloutEntity));
     }
@@ -63,7 +64,6 @@ public sealed class OnlineAuditSearchServiceTests : IDisposable
 
         var response = await service.PageAsync(new PageOnlineAuditSearchRequest
         {
-            AppId = OnlineAssetTestSupport.App100,
             ServerId = OnlineAssetTestSupport.Area1001,
         });
 
@@ -77,12 +77,10 @@ public sealed class OnlineAuditSearchServiceTests : IDisposable
         Assert.Equal(OnlineAuditSourceKind.AdminOperation, response.Items[0].Source);
         Assert.Equal("admin-op", response.Items[0].OperatorIdentifier);
         Assert.Equal("player-9", response.Items[0].TargetPlayerIdentifier);
-        Assert.Equal(OnlineAssetTestSupport.App100, response.Items[0].AppId);
         Assert.Equal(OnlineAssetTestSupport.Area1001, response.Items[0].ServerId);
         Assert.Equal("OnlinePenaltyLinkCommand.Execute", response.Items[0].CommandType);
 
         Assert.Equal(OnlineAuditSourceKind.OnlineAuditEvent, response.Items[1].Source);
-        Assert.Equal(OnlineAssetTestSupport.App100, response.Items[1].AppId);
         Assert.Equal(OnlineAssetTestSupport.Area1001, response.Items[1].ServerId);
         Assert.Equal("asset.grant", response.Items[1].CommandType);
 
@@ -111,7 +109,6 @@ public sealed class OnlineAuditSearchServiceTests : IDisposable
 
         var response = await service.PageAsync(new PageOnlineAuditSearchRequest
         {
-            AppId = OnlineAssetTestSupport.App100,
             ServerId = OnlineAssetTestSupport.Area1001,
             TargetPlayerId = "player-9",
         });
@@ -134,7 +131,6 @@ public sealed class OnlineAuditSearchServiceTests : IDisposable
 
         var firstPage = await service.PageAsync(new PageOnlineAuditSearchRequest
         {
-            AppId = OnlineAssetTestSupport.App100,
             ServerId = OnlineAssetTestSupport.Area1001,
             PageSize = 2,
         });
@@ -146,7 +142,6 @@ public sealed class OnlineAuditSearchServiceTests : IDisposable
 
         var secondPage = await service.PageAsync(new PageOnlineAuditSearchRequest
         {
-            AppId = OnlineAssetTestSupport.App100,
             ServerId = OnlineAssetTestSupport.Area1001,
             PageSize = 2,
             Cursor = firstPage.NextCursor,
@@ -213,7 +208,6 @@ public sealed class OnlineAuditSearchServiceTests : IDisposable
 
         var exception = await Assert.ThrowsAsync<BusinessException>(() => service.PageAsync(new PageOnlineAuditSearchRequest
         {
-            AppId = OnlineAssetTestSupport.App100,
             ServerId = OnlineAssetTestSupport.Area1001,
         }));
 
@@ -247,7 +241,7 @@ public sealed class OnlineAuditSearchServiceTests : IDisposable
     {
         await OnlineAssetTestSupport.SeedScopeAsync(_db);
 
-        await _db.Insertable(new TenantLogOperationEntity
+        await _db.Insertable(new SystemLogOperationEntity
         {
             Id = 1,
             HttpMethod = "POST",
@@ -313,7 +307,7 @@ public sealed class OnlineAuditSearchServiceTests : IDisposable
     {
         var factory = new OnlineScopeContextFactory(OnlineAssetTestSupport.Repository<TenantGameAreaEntity>(_db));
         return new OnlineAuditSearchService(
-            new SqlSugarRepository<TenantLogOperationEntity> { Context = _db, },
+            new SqlSugarRepository<SystemLogOperationEntity> { Context = _db, },
             OnlineAssetTestSupport.Repository<TenantGamePenaltyEntity>(_db),
             OnlineAssetTestSupport.Repository<TenantGameOnlineConfigRolloutEntity>(_db),
             onlineServerClient,

@@ -4,7 +4,7 @@ namespace GameFrameX.Application.Game.Online.Social.Dto;
 
 /// <summary>
 /// 处罚联动命令输入参数（高危端点，权限码 onlinePenaltyLinkCommand:execute 仅同步 TenantAdmin）。
-/// <para>作用域从处罚事实源行推导（AppId 必有；AreaId 有值 = 单区服联动，null = App 下全部区服逐一联动）。</para>
+/// <para>作用域从处罚事实源行推导（AreaId 有值 = 单区服联动，null = 主库全部区服逐一联动）。</para>
 /// </summary>
 public class OnlinePenaltyLinkRequest
 {

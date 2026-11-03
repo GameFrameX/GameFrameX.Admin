@@ -7,12 +7,6 @@ namespace GameFrameX.Application.Game.Online.Social.Dto;
 /// </summary>
 public class OnlineReportHandleRequest
 {
-    /// <summary>
-    /// 应用作用域（案件所在应用，经 OnlineScopeContextFactory 校验租户归属）。
-    /// </summary>
-    [Required(ErrorMessage = "应用Id不能为空")]
-    [Range(1, long.MaxValue, ErrorMessage = "应用Id必须大于0")]
-    public long AppId { get; set; }
 
     /// <summary>
     /// 区服作用域（案件所在区服，经 OnlineScopeContextFactory 校验租户与应用归属）。

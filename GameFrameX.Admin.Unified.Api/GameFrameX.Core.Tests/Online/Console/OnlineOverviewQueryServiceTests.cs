@@ -60,7 +60,6 @@ public sealed class OnlineOverviewQueryServiceTests : IDisposable
 
         var response = await service.SnapshotAsync(new OnlineOverviewRequest
         {
-            AppId = OnlineAssetTestSupport.App100,
             ServerId = OnlineAssetTestSupport.Area1001,
         });
 

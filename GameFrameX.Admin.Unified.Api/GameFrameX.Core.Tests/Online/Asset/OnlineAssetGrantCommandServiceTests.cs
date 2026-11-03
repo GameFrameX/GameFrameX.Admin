@@ -55,7 +55,6 @@ public sealed class OnlineAssetGrantCommandServiceTests : IDisposable
 
         var response = await service.GrantAsync(new OnlineAssetGrantRequest
         {
-            AppId = OnlineAssetTestSupport.App100,
             ServerId = OnlineAssetTestSupport.Area1001,
             PlayerId = "player-1",
             Reason = "manual grant",
@@ -92,7 +91,6 @@ public sealed class OnlineAssetGrantCommandServiceTests : IDisposable
 
         var response = await service.GrantAsync(new OnlineAssetGrantRequest
         {
-            AppId = OnlineAssetTestSupport.App100,
             ServerId = OnlineAssetTestSupport.Area1001,
             PlayerId = "player-1",
             Reason = "manual grant",
@@ -122,7 +120,6 @@ public sealed class OnlineAssetGrantCommandServiceTests : IDisposable
 
         var exception = await Assert.ThrowsAsync<BusinessException>(() => service.GrantAsync(new OnlineAssetGrantRequest
         {
-            AppId = OnlineAssetTestSupport.App100,
             ServerId = OnlineAssetTestSupport.Area1001,
             PlayerId = "player-1",
             Reason = string.Empty,
@@ -148,7 +145,6 @@ public sealed class OnlineAssetGrantCommandServiceTests : IDisposable
 
         var exception = await Assert.ThrowsAsync<BusinessException>(() => service.GrantAsync(new OnlineAssetGrantRequest
         {
-            AppId = OnlineAssetTestSupport.App100,
             ServerId = OnlineAssetTestSupport.Area1001,
             PlayerId = "player-1",
             Reason = "manual",
@@ -171,7 +167,6 @@ public sealed class OnlineAssetGrantCommandServiceTests : IDisposable
 
         var exception = await Assert.ThrowsAsync<BusinessException>(() => service.GrantAsync(new OnlineAssetGrantRequest
         {
-            AppId = OnlineAssetTestSupport.App100,
             ServerId = OnlineAssetTestSupport.Area1001,
             PlayerId = "player-1",
             Reason = "manual",
@@ -198,7 +193,6 @@ public sealed class OnlineAssetGrantCommandServiceTests : IDisposable
 
         var response = await service.RevokeAsync(new OnlineAssetRevokeRequest
         {
-            AppId = OnlineAssetTestSupport.App100,
             ServerId = OnlineAssetTestSupport.Area1001,
             PlayerId = "player-1",
             TransactionId = "tx-original",
@@ -226,7 +220,6 @@ public sealed class OnlineAssetGrantCommandServiceTests : IDisposable
 
         var exception = await Assert.ThrowsAsync<BusinessException>(() => service.RevokeAsync(new OnlineAssetRevokeRequest
         {
-            AppId = OnlineAssetTestSupport.App100,
             ServerId = OnlineAssetTestSupport.Area1001,
             PlayerId = "player-1",
             TransactionId = string.Empty,
@@ -251,7 +244,6 @@ public sealed class OnlineAssetGrantCommandServiceTests : IDisposable
 
         var exception = await Assert.ThrowsAsync<BusinessException>(() => service.GrantAsync(new OnlineAssetGrantRequest
         {
-            AppId = OnlineAssetTestSupport.App100,
             ServerId = OnlineAssetTestSupport.Area1001,
             PlayerId = "player-1",
             Reason = "manual",

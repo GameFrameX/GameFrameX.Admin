@@ -69,7 +69,6 @@ public sealed class OnlineAssetLedgerQueryServiceTests : IDisposable
 
         var response = await service.PageAsync(new PageOnlineAssetLedgerRequest
         {
-            AppId = OnlineAssetTestSupport.App100,
             ServerId = OnlineAssetTestSupport.Area1001,
             PlayerId = "player-1",
             CurrencyOrItemType = "gold",

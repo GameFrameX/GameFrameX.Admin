@@ -65,7 +65,6 @@ public sealed class OnlinePlayerTimelineQueryServiceTests : IDisposable
 
         var response = await service.QueryAsync(new OnlinePlayerTimelineRequest
         {
-            AppId = OnlineAssetTestSupport.App100,
             ServerId = OnlineAssetTestSupport.Area1001,
             PlayerId = "player-9",
             EventGroup = OnlinePlayerTimelineEventGroup.Penalty,
@@ -111,7 +110,6 @@ public sealed class OnlinePlayerTimelineQueryServiceTests : IDisposable
 
         var response = await service.QueryAsync(new OnlinePlayerTimelineRequest
         {
-            AppId = OnlineAssetTestSupport.App100,
             ServerId = OnlineAssetTestSupport.Area1001,
             PlayerId = "player-9",
         });

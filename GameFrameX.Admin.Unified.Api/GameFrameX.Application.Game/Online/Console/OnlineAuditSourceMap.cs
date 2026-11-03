@@ -31,7 +31,6 @@ public static class OnlineAuditSourceMap
     {
         public string? TargetIdentifier { get; set; }
 
-        public long? AppId { get; set; }
 
         public long? ServerId { get; set; }
     }
@@ -48,12 +47,12 @@ public static class OnlineAuditSourceMap
     /// <summary>
     /// RequestParam JSON 中探测作用域的已知键（appId/serverId 双形态）。
     /// </summary>
-    private static readonly string[] ScopeKeys = { "appId", "AppId", "serverId", "ServerId", };
+    private static readonly string[] ScopeKeys = { "serverId", "ServerId", };
 
     /// <summary>
     /// Admin 操作日志行 → 统一审计行。
     /// </summary>
-    public static OnlineAuditSearchEntryResponse FromAdminOperation(TenantLogOperationEntity row)
+    public static OnlineAuditSearchEntryResponse FromAdminOperation(LogOperationFields row)
     {
         var probe = ExtractIdentifiersFromRequestJson(row.RequestParam);
         return new OnlineAuditSearchEntryResponse
@@ -61,7 +60,6 @@ public static class OnlineAuditSourceMap
             Source = OnlineAuditSourceKind.AdminOperation,
             OperatorIdentifier = FirstNonEmpty(row.Account, row.RealName),
             TargetPlayerIdentifier = probe.TargetIdentifier,
-            AppId = probe.AppId,
             ServerId = probe.ServerId,
             CommandType = BuildAdminOperationCommandType(row),
             OccurredAt = row.LogDateTime ?? row.CreatedTime,
@@ -80,7 +78,6 @@ public static class OnlineAuditSourceMap
             Source = OnlineAuditSourceKind.OnlineAuditEvent,
             OperatorIdentifier = entry.OperatorId,
             TargetPlayerIdentifier = entry.TargetPlayerId,
-            AppId = null,
             ServerId = null,
             CommandType = entry.CommandType,
             OccurredAt = entry.OccurredAt,
@@ -99,7 +96,6 @@ public static class OnlineAuditSourceMap
             Source = OnlineAuditSourceKind.DomainCommandRecord,
             OperatorIdentifier = penalty.OperatorId.ToString(),
             TargetPlayerIdentifier = penalty.TargetId,
-            AppId = penalty.AppId,
             ServerId = penalty.AreaId,
             CommandType = "penalty." + penalty.ActionType,
             OccurredAt = penalty.CreatedTime,
@@ -118,7 +114,6 @@ public static class OnlineAuditSourceMap
             Source = OnlineAuditSourceKind.DomainCommandRecord,
             OperatorIdentifier = rollout.DispatchOperator,
             TargetPlayerIdentifier = null,
-            AppId = rollout.AppId,
             ServerId = rollout.ServerId,
             CommandType = "configRollout." + rollout.ConfigKind,
             OccurredAt = rollout.PublishedTime,
@@ -162,8 +157,7 @@ public static class OnlineAuditSourceMap
                 return new RequestJsonProbe
                 {
                     TargetIdentifier = target,
-                    AppId = ProbeInt64Deep(root, ScopeKeys[0], ScopeKeys[1]),
-                    ServerId = ProbeInt64Deep(root, ScopeKeys[2], ScopeKeys[3]),
+                    ServerId = ProbeInt64Deep(root, ScopeKeys[0], ScopeKeys[1]),
                 };
             }
         }
@@ -268,7 +262,7 @@ public static class OnlineAuditSourceMap
     /// <summary>
     /// Admin 操作日志命令类型：Controller.Action 优先，缺失回退 RequestUrl。
     /// </summary>
-    private static string BuildAdminOperationCommandType(TenantLogOperationEntity row)
+    private static string BuildAdminOperationCommandType(LogOperationFields row)
     {
         var controller = FirstNonEmpty(row.ControllerName, string.Empty);
         var action = FirstNonEmpty(row.ActionName, string.Empty);

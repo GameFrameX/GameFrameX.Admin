@@ -12,10 +12,6 @@ public class OnlineReportCaseItemResponse
     /// </summary>
     public string CaseId { get; set; } = null!;
 
-    /// <summary>
-    /// 应用作用域。
-    /// </summary>
-    public long AppId { get; set; }
 
     /// <summary>
     /// 区服作用域。

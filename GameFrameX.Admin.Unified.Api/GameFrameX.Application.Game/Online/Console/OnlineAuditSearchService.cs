@@ -18,7 +18,7 @@ namespace GameFrameX.Application.Game.Online.Console;
 /// 三来源 → 五维统一字段的映射唯一来源是 <see cref="OnlineAuditSourceMap"/>，本 Service 不散落第二套映射。
 /// </para>
 /// <para>
-/// OnlineAuditEvent 来源参与前置：作用域三元组是每次 Online 调用硬前置（C339），AppId + ServerId 均提供时才
+/// OnlineAuditEvent 来源参与前置：作用域三元组是每次 Online 调用硬前置（C339），ServerId 提供时才
 /// 查询该来源，否则静默跳过（本地两来源仍支持无作用域全量检索）；该来源查询失败按异常原样透传，不软化降级——
 /// 审计检索宁可失败不可静默缺源。
 /// </para>
@@ -31,7 +31,7 @@ public class OnlineAuditSearchService : IAdminApiController
     /// </summary>
     private const string QueryOnlineAuditEventsAction = "query_online_audit_events";
 
-    private readonly SqlSugarRepository<TenantLogOperationEntity> _operationLogRepository;
+    private readonly SqlSugarRepository<SystemLogOperationEntity> _operationLogRepository;
     private readonly SqlSugarRepository<TenantGamePenaltyEntity> _penaltyRepository;
     private readonly SqlSugarRepository<TenantGameOnlineConfigRolloutEntity> _rolloutRepository;
     private readonly IOnlineServerClient _onlineServerClient;
@@ -41,7 +41,7 @@ public class OnlineAuditSearchService : IAdminApiController
     /// Online 控制台统一审计检索服务构造函数。
     /// </summary>
     public OnlineAuditSearchService(
-        SqlSugarRepository<TenantLogOperationEntity> operationLogRepository,
+        SqlSugarRepository<SystemLogOperationEntity> operationLogRepository,
         SqlSugarRepository<TenantGamePenaltyEntity> penaltyRepository,
         SqlSugarRepository<TenantGameOnlineConfigRolloutEntity> rolloutRepository,
         IOnlineServerClient onlineServerClient,
@@ -121,7 +121,16 @@ public class OnlineAuditSearchService : IAdminApiController
     /// </summary>
     private async Task<List<OnlineAuditSearchEntryResponse>> QueryAdminOperationSourceAsync(PageOnlineAuditSearchRequest input, long? cursorSeconds)
     {
-        var rows = await _operationLogRepository.AsQueryable()
+        var current = await QueryOperationLogsAsync(_operationLogRepository.AsQueryable(), input, cursorSeconds);
+        var historical = await QueryOperationLogsAsync(_operationLogRepository.Context.Queryable<TenantLogOperationEntity>(), input, cursorSeconds);
+        current.AddRange(historical);
+        return current;
+    }
+
+    private static async Task<List<OnlineAuditSearchEntryResponse>> QueryOperationLogsAsync<T>(ISugarQueryable<T> query, PageOnlineAuditSearchRequest input, long? cursorSeconds)
+        where T : LogOperationFields, new()
+    {
+        var rows = await query
                          .WhereIF(input.StartTime.HasValue, u => (u.LogDateTime ?? 0) >= input.StartTime.Value)
                          .WhereIF(input.EndTime.HasValue, u => (u.LogDateTime ?? 0) <= input.EndTime.Value)
                          .WhereIF(cursorSeconds.HasValue, u => (u.LogDateTime ?? 0) < cursorSeconds.Value)
@@ -134,15 +143,15 @@ public class OnlineAuditSearchService : IAdminApiController
     }
 
     /// <summary>
-    /// B 来源：Online 审计事件实时透传。仅 AppId + ServerId 均提供（Online 调用硬前置）时参与，否则返回空集。
+    /// B 来源：Online 审计事件实时透传。仅 ServerId 提供（Online 调用硬前置）时参与，否则返回空集。
     /// <para>
     /// 统一 keyset 下推方式：不启用 Online 原生游标，把 cursor 折进时间窗终点（整数秒下 EndTime = cursor - 1
-    /// 与严格小于 cursor 精确等价）；作用域回填：事件行的 AppId/ServerId 即本次查询锚定的作用域。
+    /// 与严格小于 cursor 精确等价）；作用域回填：事件行的 ServerId 即本次查询锚定的作用域。
     /// </para>
     /// </summary>
     private async Task<List<OnlineAuditSearchEntryResponse>> QueryOnlineAuditEventSourceAsync(PageOnlineAuditSearchRequest input, long? cursorSeconds)
     {
-        if (!input.AppId.HasValue || !input.ServerId.HasValue)
+        if (!input.ServerId.HasValue)
         {
             // 作用域未锚定：本地两来源仍全量检索，本来源静默跳过（非错误）。
             return new List<OnlineAuditSearchEntryResponse>();
@@ -164,7 +173,6 @@ public class OnlineAuditSearchService : IAdminApiController
         foreach (var entry in mapped)
         {
             // 回填查询锚定作用域：Online 事件线缆不重复携带作用域，归属即本次查询锚点。
-            entry.AppId = input.AppId;
             entry.ServerId = input.ServerId;
         }
 
@@ -197,7 +205,6 @@ public class OnlineAuditSearchService : IAdminApiController
     private async Task<List<OnlineAuditSearchEntryResponse>> QueryDomainCommandSourceAsync(PageOnlineAuditSearchRequest input, long? cursorSeconds)
     {
         var penalties = await _penaltyRepository.AsQueryable()
-                          .WhereIF(input.AppId.HasValue, u => u.AppId == input.AppId.Value)
                           .WhereIF(input.ServerId.HasValue, u => u.AreaId == input.ServerId.Value)
                           .WhereIF(!string.IsNullOrWhiteSpace(input.TargetPlayerId), u => u.TargetId == input.TargetPlayerId)
                           .WhereIF(input.StartTime.HasValue, u => u.CreatedTime >= input.StartTime.Value)
@@ -208,7 +215,6 @@ public class OnlineAuditSearchService : IAdminApiController
                           .ToListAsync();
 
         var rollouts = await _rolloutRepository.AsQueryable()
-                         .WhereIF(input.AppId.HasValue, u => u.AppId == input.AppId.Value)
                          .WhereIF(input.ServerId.HasValue, u => u.ServerId == input.ServerId.Value)
                          .WhereIF(input.StartTime.HasValue, u => u.PublishedTime >= input.StartTime.Value)
                          .WhereIF(input.EndTime.HasValue, u => u.PublishedTime <= input.EndTime.Value)
@@ -234,11 +240,6 @@ public class OnlineAuditSearchService : IAdminApiController
         }
 
         if (!string.IsNullOrWhiteSpace(input.TargetPlayerId) && !string.Equals(entry.TargetPlayerIdentifier, input.TargetPlayerId, StringComparison.Ordinal))
-        {
-            return false;
-        }
-
-        if (input.AppId.HasValue && entry.AppId != input.AppId.Value)
         {
             return false;
         }

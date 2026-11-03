@@ -64,7 +64,6 @@ public sealed class OnlineAssetTransactionQueryServiceTests : IDisposable
 
         var detail = await service.DetailAsync(new OnlineAssetTransactionDetailRequest
         {
-            AppId = OnlineAssetTestSupport.App100,
             ServerId = OnlineAssetTestSupport.Area1001,
             TransactionId = "tx-9527",
         });
@@ -96,7 +95,6 @@ public sealed class OnlineAssetTransactionQueryServiceTests : IDisposable
 
         var exception = await Assert.ThrowsAsync<BusinessException>(() => service.DetailAsync(new OnlineAssetTransactionDetailRequest
         {
-            AppId = OnlineAssetTestSupport.App100,
             ServerId = OnlineAssetTestSupport.Area1001,
             TransactionId = string.Empty,
         }));
@@ -117,7 +115,6 @@ public sealed class OnlineAssetTransactionQueryServiceTests : IDisposable
 
         var exception = await Assert.ThrowsAsync<BusinessException>(() => service.DetailAsync(new OnlineAssetTransactionDetailRequest
         {
-            AppId = OnlineAssetTestSupport.App100,
             ServerId = 9999,
             TransactionId = "tx-1",
         }));

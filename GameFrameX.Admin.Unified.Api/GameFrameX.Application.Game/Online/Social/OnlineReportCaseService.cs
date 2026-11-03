@@ -295,7 +295,6 @@ public class OnlineReportCaseService : IAdminApiController
         return new OnlineReportCaseItemResponse
         {
             CaseId = item.CaseId,
-            AppId = item.AppId,
             ServerId = item.ServerId,
             ReporterPlayerId = item.ReporterPlayerId,
             ReportedPlayerId = item.ReportedPlayerId,

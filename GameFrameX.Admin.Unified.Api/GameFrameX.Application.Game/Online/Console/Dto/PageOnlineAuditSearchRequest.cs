@@ -3,8 +3,8 @@ namespace GameFrameX.Application.Game.Online.Console.Dto;
 /// <summary>
 /// 统一审计检索分页输入参数（五维过滤：操作者/对象/作用域/命令类型/时间窗；change C344 / vault:C9 S8.2）。
 /// <para>
-/// 作用域维度（AppId/ServerId）在此是可选过滤而非调用前置：本地两来源（Admin 操作日志 / 域命令记录）
-/// 支持无作用域全量检索；Online 审计事件来源仅在 AppId + ServerId 均提供时参与聚合
+/// 作用域维度（ServerId）在此是可选过滤而非调用前置：本地两来源（Admin 操作日志 / 域命令记录）
+/// 支持无作用域全量检索；Online 审计事件来源仅在 ServerId 提供时参与聚合
 /// （C339 作用域三元组是每次 Online 调用硬前置），未锚定时该来源静默跳过（三来源口径见 OnlineAuditSourceMap）。
 /// </para>
 /// </summary>
@@ -22,14 +22,9 @@ public class PageOnlineAuditSearchRequest
     [MaxLength(EntityStringLength.Length256)]
     public string? TargetPlayerId { get; set; }
 
-    /// <summary>
-    /// 应用作用域过滤（null = 全部应用；Online 审计事件来源要求与 ServerId 同时提供才参与聚合）。
-    /// </summary>
-    [Range(1, long.MaxValue, ErrorMessage = "应用Id必须大于0")]
-    public long? AppId { get; set; }
 
     /// <summary>
-    /// 区服作用域过滤（null = 全部区服；Online 审计事件来源要求与 AppId 同时提供才参与聚合）。
+    /// 区服作用域过滤（null = 全部区服；Online 审计事件来源提供时参与聚合）。
     /// </summary>
     [Range(1, long.MaxValue, ErrorMessage = "区服Id必须大于0")]
     public long? ServerId { get; set; }

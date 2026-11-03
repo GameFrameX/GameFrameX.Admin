@@ -64,7 +64,6 @@ public sealed class OnlineReportCaseServiceTests : IDisposable
 
         var response = await service.HandleAsync(new OnlineReportHandleRequest
         {
-            AppId = App100,
             ServerId = Area1001,
             CaseId = "case-0001",
             ReportedPlayerId = "player-9",
@@ -113,7 +112,6 @@ public sealed class OnlineReportCaseServiceTests : IDisposable
 
         var response = await service.HandleAsync(new OnlineReportHandleRequest
         {
-            AppId = App100,
             ServerId = Area1001,
             CaseId = "case-0002",
             ReportedPlayerId = "player-9",
@@ -144,7 +142,6 @@ public sealed class OnlineReportCaseServiceTests : IDisposable
 
         var response = await service.HandleAsync(new OnlineReportHandleRequest
         {
-            AppId = App100,
             ServerId = Area1001,
             CaseId = "case-0003",
             ReportedPlayerId = "player-9",
@@ -175,7 +172,6 @@ public sealed class OnlineReportCaseServiceTests : IDisposable
 
         var response = await service.HandleAsync(new OnlineReportHandleRequest
         {
-            AppId = App100,
             ServerId = Area1001,
             CaseId = "case-0004",
             ReportedPlayerId = "player-9",
@@ -200,7 +196,6 @@ public sealed class OnlineReportCaseServiceTests : IDisposable
 
         var exception = await Assert.ThrowsAsync<BusinessException>(() => service.HandleAsync(new OnlineReportHandleRequest
         {
-            AppId = App100,
             ServerId = Area1001,
             CaseId = "case-0005",
             ReportedPlayerId = "player-9",
@@ -227,7 +222,6 @@ public sealed class OnlineReportCaseServiceTests : IDisposable
                 new()
                 {
                     CaseId = "case-0001",
-                    AppId = App100,
                     ServerId = Area1001,
                     ReporterPlayerId = "player-1",
                     ReportedPlayerId = "player-9",
@@ -249,7 +243,6 @@ public sealed class OnlineReportCaseServiceTests : IDisposable
 
         var page = await service.PageAsync(new PageOnlineReportCaseRequest
         {
-            AppId = App100,
             ServerId = Area1001,
             Status = OnlineReportCaseStatusKind.Pending,
             ReporterPlayerId = "player-1",

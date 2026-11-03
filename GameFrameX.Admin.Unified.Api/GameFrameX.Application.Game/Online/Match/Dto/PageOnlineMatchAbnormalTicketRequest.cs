@@ -5,12 +5,6 @@ namespace GameFrameX.Application.Game.Online.Match.Dto;
 /// </summary>
 public class PageOnlineMatchAbnormalTicketRequest
 {
-    /// <summary>
-    /// 应用作用域（必填，经 OnlineScopeContextFactory 校验租户归属）。
-    /// </summary>
-    [Required(ErrorMessage = "应用Id不能为空")]
-    [Range(1, long.MaxValue, ErrorMessage = "应用Id必须大于0")]
-    public long AppId { get; set; }
 
     /// <summary>
     /// 区服作用域（必填，经 OnlineScopeContextFactory 校验租户与应用归属）。

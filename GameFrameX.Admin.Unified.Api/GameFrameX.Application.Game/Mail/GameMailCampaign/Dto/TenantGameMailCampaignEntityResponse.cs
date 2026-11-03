@@ -16,8 +16,6 @@ public sealed class TenantGameMailCampaignEntityResponse
     /// <summary>主键Id。</summary>
     public long Id { get; set; }
 
-    /// <summary>应用Id。</summary>
-    public long AppId { get; set; }
 
     /// <summary>区服Id。</summary>
     public long AreaId { get; set; }

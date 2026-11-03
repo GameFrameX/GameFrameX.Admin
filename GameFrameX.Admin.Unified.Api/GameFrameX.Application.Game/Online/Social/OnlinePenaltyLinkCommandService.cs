@@ -129,12 +129,11 @@ public class OnlinePenaltyLinkCommandService : IAdminApiController
         }
 
         var serverIds = await _gameAreaRepository.AsQueryable()
-                          .Where(u => u.GameAppId == penalty.AppId)
                           .Select(u => u.Id)
                           .ToListAsync();
         if (serverIds.Count == 0)
         {
-            throw BusinessError.Oh(OnlineModerationErrorCode.PenaltyLinkTargetMissing, new { penaltyId = penalty.Id, appId = penalty.AppId, });
+            throw BusinessError.Oh(OnlineModerationErrorCode.PenaltyLinkTargetMissing, new { penaltyId = penalty.Id, });
         }
 
         return serverIds;
