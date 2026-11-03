@@ -12,8 +12,4 @@ public sealed class CryptoEnvelopeOptions
     /// </summary>
     public bool IsEnabled { get; set; }
 
-    /// <summary>
-    /// 测试租户 ID 列表：命中的租户即使 IsEnabled 打开也旁路信封（Swagger/联调明文可用，坑清单 #6）。
-    /// </summary>
-    public List<long> TestTenantIds { get; set; } = new();
 }

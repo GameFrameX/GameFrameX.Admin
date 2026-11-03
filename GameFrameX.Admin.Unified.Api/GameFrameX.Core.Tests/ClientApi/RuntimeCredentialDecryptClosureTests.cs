@@ -51,15 +51,15 @@ public sealed class RuntimeCredentialDecryptClosureTests : IDisposable
             Id = 7102, TenantId = _db.TenantId, AppId = _db.AppId, Kid = "kid-cipher", Secret = TenantSecretCrypto.Encrypt("sig-cipher")!, IsEnabled = true,
         }).ExecuteCommand();
 
-        var resolver = new SignatureKeyResolver(_db.TenantDbProvider, _db.TenantIdResolver);
+        var resolver = new SignatureKeyResolver(_db.TenantDbProvider);
 
-        var plainLookup = await resolver.ResolveAsync(_db.AppId, "kid-plain");
-        var cipherLookup = await resolver.ResolveAsync(_db.AppId, "kid-cipher");
+        var plainLookup = await resolver.ResolveAsync("kid-plain");
+        var cipherLookup = await resolver.ResolveAsync("kid-cipher");
 
         Assert.Equal("sig-plain", plainLookup.Secret);
         Assert.Equal("sig-cipher", cipherLookup.Secret);
 
-        var activeKeys = await resolver.GetActiveKeysAsync(_db.AppId);
+        var activeKeys = await resolver.GetActiveKeysAsync();
         Assert.Equal(new[] { "sig-cipher", "sig-plain" }, activeKeys.Select(k => k.Secret).OrderBy(s => s, StringComparer.Ordinal).ToArray());
     }
 
@@ -76,10 +76,10 @@ public sealed class RuntimeCredentialDecryptClosureTests : IDisposable
             Id = 7202, TenantId = _db.TenantId, AppId = _db.AppId, Kid = "kid-cipher", Secret = TenantSecretCrypto.Encrypt("session-cipher")!, IsEnabled = true,
         }).ExecuteCommand();
 
-        var resolver = new SessionKeyResolver(_db.TenantDbProvider, _db.TenantIdResolver);
+        var resolver = new SessionKeyResolver(_db.TenantDbProvider);
 
-        var plainLookup = await resolver.ResolveAsync(_db.AppId, "kid-plain");
-        var cipherLookup = await resolver.ResolveAsync(_db.AppId, "kid-cipher");
+        var plainLookup = await resolver.ResolveAsync("kid-plain");
+        var cipherLookup = await resolver.ResolveAsync("kid-cipher");
 
         Assert.Equal("session-plain", plainLookup.Secret);
         Assert.Equal("session-cipher", cipherLookup.Secret);

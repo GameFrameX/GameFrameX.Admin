@@ -64,12 +64,11 @@ public sealed class CryptoEnvelopeMiddlewareTests
     private const string E2PayloadHex = "7b22726f7773223a5b7b226964223a302c2273636f7265223a307d2c7b226964223a312c2273636f7265223a377d2c7b226964223a322c2273636f7265223a31347d2c7b226964223a332c2273636f7265223a32317d2c7b226964223a342c2273636f7265223a32387d2c7b226964223a352c2273636f7265223a33357d2c7b226964223a362c2273636f7265223a34327d2c7b226964223a372c2273636f7265223a34397d2c7b226964223a382c2273636f7265223a35367d2c7b226964223a392c2273636f7265223a36337d2c7b226964223a31302c2273636f7265223a37307d2c7b226964223a31312c2273636f7265223a37377d2c7b226964223a31322c2273636f7265223a38347d2c7b226964223a31332c2273636f7265223a39317d2c7b226964223a31342c2273636f7265223a39387d2c7b226964223a31352c2273636f7265223a3130357d2c7b226964223a31362c2273636f7265223a3131327d2c7b226964223a31372c2273636f7265223a3131397d2c7b226964223a31382c2273636f7265223a3132367d2c7b226964223a31392c2273636f7265223a3133337d2c7b226964223a32302c2273636f7265223a3134307d2c7b226964223a32312c2273636f7265223a3134377d2c7b226964223a32322c2273636f7265223a3135347d2c7b226964223a32332c2273636f7265223a3136317d2c7b226964223a32342c2273636f7265223a3136387d2c7b226964223a32352c2273636f7265223a3137357d2c7b226964223a32362c2273636f7265223a3138327d2c7b226964223a32372c2273636f7265223a3138397d2c7b226964223a32382c2273636f7265223a3139367d2c7b226964223a32392c2273636f7265223a3230337d2c7b226964223a33302c2273636f7265223a3231307d2c7b226964223a33312c2273636f7265223a3231377d2c7b226964223a33322c2273636f7265223a3232347d2c7b226964223a33332c2273636f7265223a3233317d2c7b226964223a33342c2273636f7265223a3233387d2c7b226964223a33352c2273636f7265223a3234357d2c7b226964223a33362c2273636f7265223a3235327d2c7b226964223a33372c2273636f7265223a3235397d2c7b226964223a33382c2273636f7265223a3236367d2c7b226964223a33392c2273636f7265223a3237337d5d7d";
     private const string E2OracleCtBase64 = "fLNKLSeKC6OJpLW1eVgbzamOBJ4xi8Z7Z6RaV4CKSftA0Mpz3rvnQAyJr05vYuIxrGOiKcxuqIcH4casPVzb6dcgtmlxyAABDzf2kzYXPBzQb0ejiKuO7O6jjeozErkaId7C1/UoM5M9r/nDCbTQ8cP6WCC9oyH8vnpKSTcC8Q+XleXiFK8uzWAmLGyUNBXsI7XJ1pD6njk2uAm7qi55pg3h6i481UjJ4Nl96kJGBUlNQe17rVo0DX+C7b7+E4cqJdOEjc3BRpAWKOL+lDxQv1Ms/KsLrYhOjgY6X+ukfs6NITdXMvo=";
 
-    private static CryptoEnvelopeOptions CreateOptions(bool enabled, List<long>? testTenantIds = null)
+    private static CryptoEnvelopeOptions CreateOptions(bool enabled)
     {
         return new CryptoEnvelopeOptions
         {
             IsEnabled = enabled,
-            TestTenantIds = testTenantIds ?? new List<long>(),
         };
     }
 
@@ -504,19 +503,17 @@ public sealed class CryptoEnvelopeMiddlewareTests
     }
 
     [Fact]
-    public async Task MissingAppHeader_RejectedWith60104()
+    public async Task WithoutAppHeader_ValidEnvelopeUsesMainKey()
     {
         var nextCalled = false;
         var context = CreateEnvelopeContext(BuildEnvelopeJson(E1Path, E1Mid, E1Ts, HexToBytes(E1PayloadHex), false), appId: null);
-
         await InvokeAsync(context, CreateOptions(true), () =>
         {
             nextCalled = true;
             return Task.CompletedTask;
         });
-
-        Assert.False(nextCalled);
-        Assert.Equal(CryptoEnvelopeMiddleware.UnknownKidRejectedCode, await ReadEnvelopeCodeAsync(context));
+        Assert.True(nextCalled);
+        Assert.Equal(E1PayloadHex, Convert.ToHexString(await ReadRequestBodyAsync(context)).ToLowerInvariant());
     }
 
     [Fact]
@@ -592,23 +589,17 @@ public sealed class CryptoEnvelopeMiddlewareTests
     }
 
     [Fact]
-    public async Task TestTenant_BypassesEnvelopeEvenWhenEnabled()
+    public async Task LegacyTenantContext_DoesNotBypassDecryption()
     {
-        // 命中 TestTenantIds 的测试租户：请求不解密（body 原样进管线）、响应不加密（明文直出）
+        var context = CreateEnvelopeContext("{}", tenantId: 999);
         var nextCalled = false;
-        var context = CreateEnvelopeContext(BuildEnvelopeJson(E1Path, E1Mid, E1Ts, HexToBytes(E1PayloadHex), false), tenantId: 999);
-
-        await InvokeAsync(context, CreateOptions(true, new List<long> { 999, }), async () =>
+        await InvokeAsync(context, CreateOptions(true), () =>
         {
             nextCalled = true;
-            await context.Response.Body.WriteAsync(Encoding.UTF8.GetBytes("PLAIN"));
+            return Task.CompletedTask;
         });
-
-        Assert.True(nextCalled);
-        // 原信封 JSON 未被解密改写（body 仍以 { 开头而非明文 payload）
-        var body = await ReadRequestBodyAsync(context);
-        Assert.StartsWith("{\"v\":1", Encoding.UTF8.GetString(body));
-        Assert.Equal("PLAIN", Encoding.UTF8.GetString(await ReadResponseBodyAsync(context)));
+        Assert.False(nextCalled);
+        Assert.Equal(CryptoEnvelopeMiddleware.EnvelopeDecryptRejectedCode, await ReadEnvelopeCodeAsync(context));
     }
 
     // ==================== 响应侧加密：s2c 往返（双端契约） ====================
@@ -702,7 +693,7 @@ public sealed class CryptoEnvelopeMiddlewareTests
 
         public void AddKey(long appId, string kid, string secret, bool enabled, long? notBefore, long? expire)
         {
-            _keys.RemoveAll(x => x.AppId == appId && x.Kid == kid);
+            _keys.RemoveAll(x => x.Kid == kid);
             _keys.Add(new TenantSessionKeyEntity
             {
                 AppId = appId,
@@ -715,9 +706,9 @@ public sealed class CryptoEnvelopeMiddlewareTests
             });
         }
 
-        public Task<SessionKeyLookup> ResolveAsync(long appId, string kid)
+        public Task<SessionKeyLookup> ResolveAsync(string kid)
         {
-            var entity = _keys.FirstOrDefault(x => x.AppId == appId && x.Kid == kid);
+            var entity = _keys.FirstOrDefault(x => x.Kid == kid);
             if (entity == null)
             {
                 return Task.FromResult(new SessionKeyLookup(SessionKeyLookupResult.NotFound, kid, null));

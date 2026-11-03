@@ -4,34 +4,22 @@ using GameFrameX.Entity.Tenant.Game;
 namespace GameFrameX.Core.Middleware;
 
 /// <summary>
-/// <see cref="ISignatureKeyResolver"/> 默认实现：租户库驱动的 App 签名密钥环解析（change C2 sig-keyring-server）。
-/// <para>缓存照 <see cref="AppCacheService"/> 同款懒刷新：访问时比对租户库信号值，变化才整租户重载（密钥行数少，全量代价可忽略）。</para>
-/// <para>缓存加载<b>不过滤</b>禁用/租约外 key（60103 需要查到「存在但不可用」的 key 并区分原因），
-/// 生效判定在每次请求时以当前时刻重新计算（<see cref="Judge"/>），保证到期/启用变更即时生效（更新后信号变化触发重载）。</para>
+/// 主库驱动的签名密钥环。每次读取当前启用状态与租约，密文解密使用进程缓存。
 /// </summary>
 public sealed class SignatureKeyResolver : ISignatureKeyResolver
 {
-    private readonly ConcurrentDictionary<long, TenantSignatureKeyCache> _tenantCaches = new();
     private readonly ISqlSugarClient _tenantDbProvider;
-    private readonly ISqlSugarTenantIdResolver _tenantIdResolver;
 
-    public SignatureKeyResolver(ISqlSugarClient tenantDbProvider, ISqlSugarTenantIdResolver tenantIdResolver)
+    public SignatureKeyResolver(ISqlSugarClient tenantDbProvider)
     {
         _tenantDbProvider = tenantDbProvider;
-        _tenantIdResolver = tenantIdResolver;
     }
 
     /// <inheritdoc />
-    public async Task<SignatureKeyLookup> ResolveAsync(long appId, string kid)
+    public async Task<SignatureKeyLookup> ResolveAsync(string kid)
     {
-        var tenantId = _tenantIdResolver.GetTenantId();
-        if (!tenantId.HasValue)
-        {
-            return new SignatureKeyLookup(SignatureKeyLookupResult.NotFound, kid, null);
-        }
-
-        var keys = await GetTenantKeysAsync(tenantId.Value);
-        var entity = keys.FirstOrDefault(x => x.AppId == appId && x.Kid == kid);
+        var keys = await GetKeysAsync();
+        var entity = keys.FirstOrDefault(x => x.Kid == kid);
         if (entity == null)
         {
             return new SignatureKeyLookup(SignatureKeyLookupResult.NotFound, kid, null);
@@ -42,18 +30,13 @@ public sealed class SignatureKeyResolver : ISignatureKeyResolver
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<SignatureKeyMaterial>> GetActiveKeysAsync(long appId)
+    public async Task<IReadOnlyList<SignatureKeyMaterial>> GetActiveKeysAsync()
     {
-        var tenantId = _tenantIdResolver.GetTenantId();
-        if (!tenantId.HasValue)
-        {
-            return Array.Empty<SignatureKeyMaterial>();
-        }
-
         var now = TimerHelper.UnixTimeSeconds();
-        var keys = await GetTenantKeysAsync(tenantId.Value);
-        return keys.Where(x => x.AppId == appId && Judge(x, now) == SignatureKeyLookupResult.Active)
-                   .OrderByDescending(x => x.CreatedTime) // 最新 key 优先尝试：v1 遍历语义下旧客户端签名也能命中旧 key
+        var keys = await GetKeysAsync();
+        return keys.Where(x => Judge(x, now) == SignatureKeyLookupResult.Active)
+                   .OrderByDescending(x => x.CreatedTime)
+                   .ThenByDescending(x => x.Id)
                    .Select(x => new SignatureKeyMaterial(x.Kid, x.Secret))
                    .ToList();
     }
@@ -84,30 +67,21 @@ public sealed class SignatureKeyResolver : ISignatureKeyResolver
     }
 
     /// <summary>
-    /// 取当前租户全量密钥（含禁用/租约外），按需懒刷新。
+    /// 取主库全量密钥（含禁用/租约外），每次读取当前状态。
     /// </summary>
-    private async Task<List<TenantAppSignatureKeyEntity>> GetTenantKeysAsync(long tenantId)
+    private async Task<List<TenantAppSignatureKeyEntity>> GetKeysAsync()
     {
         var db = _tenantDbProvider;
         db.QueryFilter.ClearAndBackup();
         try
         {
-            var signal = await GetSignalVersionAsync(db);
-            if (_tenantCaches.TryGetValue(tenantId, out var existing) && existing.Signal == signal)
-            {
-                return existing.Keys;
-            }
-
             var refreshed = await db.Queryable<TenantAppSignatureKeyEntity>().ToListAsync();
-            // C372（GFX-838）：密钥环缓存加载边界解密（C371 起库内为密文；无前缀明文直通兼容存量行）。
-            // 缓存持有明文实体，命中路径零派生；signal 变更整租户重载时未变行由 TenantSecretCrypto 进程级密文缓存兜底。
+            // 状态直接读取主库，避免同秒更新或非最大行删除导致撤销失效。
             foreach (var key in refreshed)
             {
                 key.Secret = TenantSecretCrypto.DecryptCached(key.Secret) ?? string.Empty;
             }
 
-            var cache = new TenantSignatureKeyCache(signal, refreshed);
-            _tenantCaches[tenantId] = cache;
             return refreshed;
         }
         finally
@@ -116,23 +90,4 @@ public sealed class SignatureKeyResolver : ISignatureKeyResolver
         }
     }
 
-    /// <summary>
-    /// 租户库变更信号：MAX(UpdateTime) 与 MAX(CreatedTime) 取大。
-    /// <para>SqlSugar 审计 AOP 只在 Insert 写 CreatedTime、UpdateAsync 写 UpdateTime，
-    /// 纯 MAX(UpdateTime)（<see cref="AppCacheService"/> 既有口径）对「新插入行」不敏感；
-    /// 而密钥环的主变更路径恰是 AddAsync/Rotate 插入新 key，故信号必须叠加 MAX(CreatedTime)，
-    /// 否则管理面新增的 key 在缓存里不可见、验签 60102。任何插入/更新都会使两个最大值之一变化。</para>
-    /// <para>ponytail: MAX 信号无法感知「删除非最大行」（不改变最大值即不触发刷新）；
-    /// 本实体 API 层已禁删（DeleteAsync 被 override 封死），仅直连 DB 删除可触发该盲区，
-    /// 与 <see cref="AppCacheService"/> 同款天花板。升级路径：改行数 COUNT 参与信号或版本表。</para>
-    /// </summary>
-    private static async Task<long> GetSignalVersionAsync(ISqlSugarClient db)
-    {
-        var queryable = db.Queryable<TenantAppSignatureKeyEntity>();
-        var maxUpdated = await queryable.MaxAsync<long?>(u => u.UpdateTime) ?? 0;
-        var maxCreated = await queryable.MaxAsync<long?>(u => u.CreatedTime) ?? 0;
-        return Math.Max(maxUpdated, maxCreated);
-    }
-
-    private sealed record TenantSignatureKeyCache(long Signal, List<TenantAppSignatureKeyEntity> Keys);
 }

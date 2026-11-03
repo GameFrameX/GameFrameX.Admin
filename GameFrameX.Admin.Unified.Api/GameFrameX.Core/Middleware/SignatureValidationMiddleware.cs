@@ -16,9 +16,9 @@ namespace GameFrameX.Core.Middleware;
 /// （拼装与 HMAC 计算均委托 <see cref="CanonicalRequestBuilder"/>，规范正文 gfx-doc/dev/signature/spec.md）——
 /// keyId 进 message 防「签名挪用」降级攻击（把 A key 的签名配 B 的 keyId 重放必然验签失败），
 /// query 按 RFC 3986 canonical（key 字典序 + percent-encoding），前置代理改写参数顺序/编码不再破签，
-/// 密钥来自 App 级密钥环（<see cref="ISignatureKeyResolver"/>，按 (AppId, Kid) 定位）。</para>
+/// 密钥来自 主库密钥环（<see cref="ISignatureKeyResolver"/>，按 Kid 定位）。</para>
 /// <para>启用语义（C2 起）：<see cref="SignatureValidationOptions.IsEnabled"/> 降级为灰度总开关 ——
-/// false = 完全旁路（现网默认，与 C1 行为一致）；true = 验签失败后按 App 级
+/// false = 完全旁路（现网默认，与 C1 行为一致）；true = 验签失败后按运行配置
 /// <see cref="RiskEnforcementModeEnum"/> 分流：FailClosed 拒绝（默认安全），AuditOnly/FailOpen 记录后放行。</para>
 /// <para>拒签信封码分级（HTTP 401 + camelCase 小写信封，与 C1 同形态）：60101 签名不符（含缺头/格式/时间窗/重放）、
 /// 60102 keyId 未知、60103 key 禁用或租约到期。</para>
@@ -38,7 +38,7 @@ public sealed class SignatureValidationMiddleware
     public const int SignatureRejectedCode = 60101;
 
     /// <summary>
-    /// v2 keyId 在 (AppId, Kid) 密钥域内未找到的信封 code。
+    /// v2 keyId 在 Kid 密钥域内未找到的信封 code。
     /// </summary>
     public const int UnknownKeyIdRejectedCode = 60102;
 
@@ -176,37 +176,27 @@ public sealed class SignatureValidationMiddleware
         if (keyId == null)
         {
             // v1 过渡期：C1 全局常量优先回退（客户端未注入密钥环时行为与 C1 完全一致），
-            // 再遍历 App 域生效密钥环（无 keyId 寻址，只能逐把尝试）
+            // 再遍历 主库生效密钥环（无 keyId 寻址，只能逐把尝试）
             var message = BuildSignatureMessage(method, path, query, ts, mid, bodyBytes);
             if (VerifyHmac(Encoding.UTF8.GetBytes(options.Secret), message, provided))
             {
                 return RegisterReplayGuard(cache, "sig:mid:v1:" + mid.ToString(), options, SignatureRejectedCode);
             }
 
-            var appId = TryResolveAppId(context);
-            if (appId.HasValue)
+            var activeKeys = await keyResolver.GetActiveKeysAsync();
+            foreach (var key in activeKeys)
             {
-                var activeKeys = await keyResolver.GetActiveKeysAsync(appId.Value);
-                foreach (var key in activeKeys)
+                if (VerifyHmac(Encoding.UTF8.GetBytes(key.Secret), message, provided))
                 {
-                    if (VerifyHmac(Encoding.UTF8.GetBytes(key.Secret), message, provided))
-                    {
-                        return RegisterReplayGuard(cache, "sig:mid:v1:" + mid.ToString(), options, SignatureRejectedCode);
-                    }
+                    return RegisterReplayGuard(cache, "sig:mid:v1:" + mid.ToString(), options, SignatureRejectedCode);
                 }
             }
 
             return new SignatureRejection(SignatureRejectedCode, "签名不匹配");
         }
 
-        // v2：按 (AppId, Kid) 精确择 key；keyId 进 message 串防签名挪用
-        var resolvedAppId = TryResolveAppId(context);
-        if (!resolvedAppId.HasValue)
-        {
-            return new SignatureRejection(UnknownKeyIdRejectedCode, "无法定位签名密钥域（缺少应用标识）");
-        }
-
-        var lookup = await keyResolver.ResolveAsync(resolvedAppId.Value, keyId);
+        // keyId 同时参与主库密钥选择与签名消息，防止签名挪用。
+        var lookup = await keyResolver.ResolveAsync(keyId);
         if (lookup.Result == SignatureKeyLookupResult.NotFound)
         {
             return new SignatureRejection(UnknownKeyIdRejectedCode, "签名 keyId 未知");
@@ -245,7 +235,7 @@ public sealed class SignatureValidationMiddleware
     }
 
     /// <summary>
-    /// 解析 App 级风险生效模式；解析器异常（如租户库不可达）按默认安全 FailClosed 处理。
+    /// 解析运行风险生效模式；解析器异常（如主库不可达）按默认安全 FailClosed 处理。
     /// </summary>
     private static RiskEnforcementModeEnum ResolveEnforcementMode(IGameAppRiskEnforcementModeResolver resolver)
     {
@@ -257,24 +247,6 @@ public sealed class SignatureValidationMiddleware
         {
             return RiskEnforcementModeEnum.FailClosed;
         }
-    }
-
-    /// <summary>
-    /// 内联读取 GameFrameX-App-Id 头定位密钥域（C2 定稿：不动管线顺序）。
-    /// <para>AppResolutionMiddleware 不前移的原因：它做 AppSecret 凭证校验 + 租户归属校验并写 AppId 上下文，
-    /// 前移会让「应用凭证失败」先于「签名失败」返回且信封格式不同（PascalCase Code/Message vs 客户端依赖的
-    /// camelCase code/message），改变 C1 已上线的拒签契约；而验签本身即持密钥证明，无需依赖 AppSecret 校验结果，
-    /// 伪造 AppId 头只会导致密钥域错位、验签必然失败，无放大面。</para>
-    /// </summary>
-    private static long? TryResolveAppId(HttpContext context)
-    {
-        var headerValue = context.Request.Headers[GlobalConst.AppIdHeader].FirstOrDefault();
-        if (long.TryParse(headerValue, out var appId) && appId > 0)
-        {
-            return appId;
-        }
-
-        return null;
     }
 
     /// <summary>

@@ -5,7 +5,7 @@ namespace GameFrameX.Core.Middleware;
 
 /// <summary>
 /// 加密信封中间件（change C5 server-envelope-middleware，对端 = 客户端 NetLib.EnvelopeCrypto）。
-/// <para>请求侧：X-Crypto: 1 头 → 解析信封 kid → 按 (AppId, Kid) 查会话密钥（<see cref="ISessionKeyResolver"/>）→
+/// <para>请求侧：X-Crypto: 1 头 → 解析信封 kid → 按 Kid 查会话密钥（<see cref="ISessionKeyResolver"/>）→
 /// HKDF c2s 派生 → AAD 解密 → 明文重写 Request.Body 进管线；无 X-Crypto 头原样放行（灰度窗口双形态）。</para>
 /// <para>响应侧：仅当请求是「信封且解密成功」时，响应 body 加密回信封（s2c key，方向与解密相反）；
 /// 响应信封 AAD 的 path 用<b>请求 path</b>、mid 回显<b>请求信封 mid</b>、ts/iv 现生成、ct 前加压缩标记 0x00（raw，
@@ -23,7 +23,7 @@ public sealed class CryptoEnvelopeMiddleware
     public const string CryptoHeader = "X-Crypto";
 
     /// <summary>
-    /// 信封 kid 在 (AppId, Kid) 密钥域内未找到的信封 code。
+    /// 信封 kid 在 Kid 密钥域内未找到的信封 code。
     /// </summary>
     public const int UnknownKidRejectedCode = 60104;
 
@@ -79,13 +79,6 @@ public sealed class CryptoEnvelopeMiddleware
             return;
         }
 
-        // 测试租户旁路：命中即按明文处理（Swagger/联调可用），请求不解密、响应不加密
-        if (IsTestTenant(context, options))
-        {
-            await _next(context);
-            return;
-        }
-
         // 灰度窗口双形态：未启用加密的客户端不发 X-Crypto 头，原样放行
         if (context.Request.Headers[CryptoHeader].FirstOrDefault() != "1")
         {
@@ -106,14 +99,7 @@ public sealed class CryptoEnvelopeMiddleware
             return;
         }
 
-        var appId = TryResolveAppId(context);
-        if (!appId.HasValue)
-        {
-            await MiddlewareResponseWriter.WriteEnvelopeRejectedAsync(context, StatusCodes.Status400BadRequest, UnknownKidRejectedCode, "无法定位会话密钥域（缺少应用标识）");
-            return;
-        }
-
-        var lookup = await keyResolver.ResolveAsync(appId.Value, fields.Kid);
+        var lookup = await keyResolver.ResolveAsync(fields.Kid);
         if (lookup.Result == SessionKeyLookupResult.NotFound)
         {
             await MiddlewareResponseWriter.WriteEnvelopeRejectedAsync(context, StatusCodes.Status400BadRequest, UnknownKidRejectedCode, "信封 kid 未知");
@@ -139,7 +125,7 @@ public sealed class CryptoEnvelopeMiddleware
         if (sessionKey.Length != KeyBytes)
         {
             // 存储侧密钥材料损坏（非 hex / 非 32B）：数据问题而非客户端问题，按解密失败拒收并留痕
-            logger.LogError("会话密钥材料非法（长度 {Length}），kid={Kid} appId={AppId}", sessionKey.Length, fields.Kid, appId.Value);
+            logger.LogError("会话密钥材料非法（长度 {Length}），kid={Kid}", sessionKey.Length, fields.Kid);
             await MiddlewareResponseWriter.WriteEnvelopeRejectedAsync(context, StatusCodes.Status400BadRequest, EnvelopeDecryptRejectedCode, "会话密钥材料非法");
             return;
         }
@@ -188,17 +174,6 @@ public sealed class CryptoEnvelopeMiddleware
     }
 
     /// <summary>
-    /// 测试租户判定：TenantResolutionMiddleware 已写入的 TenantId 命中 <see cref="CryptoEnvelopeOptions.TestTenantIds"/>。
-    /// </summary>
-    private static bool IsTestTenant(HttpContext context, CryptoEnvelopeOptions options)
-    {
-        return options.TestTenantIds.Count > 0
-               && context.Items.TryGetValue(GlobalConst.TenantIdContextKey, out var value)
-               && value is long tenantId
-               && options.TestTenantIds.Contains(tenantId);
-    }
-
-    /// <summary>
     /// 响应加密：s2c 派生 + raw 标记 + 新 ts/iv，AAD 用请求 path、mid 回显请求信封 mid（双端契约）。
     /// </summary>
     private static async Task<byte[]> EncryptResponseAsync(EnvelopeRequestState state, MemoryStream buffered)
@@ -213,20 +188,6 @@ public sealed class CryptoEnvelopeMiddleware
         var ts = TimerHelper.UnixTimeSeconds();
         var iv = RandomNumberGenerator.GetBytes(IvBytes);
         return EncodeEnvelope(DeriveDirectionalKey(state.SessionKey, S2cInfo), state.Kid, state.Mid, ts, state.RequestPath, iv, plain);
-    }
-
-    /// <summary>
-    /// 内联读取 GameFrameX-App-Id 头定位密钥域（与 SignatureValidationMiddleware 同方案：不动管线顺序）。
-    /// </summary>
-    private static long? TryResolveAppId(HttpContext context)
-    {
-        var headerValue = context.Request.Headers[GlobalConst.AppIdHeader].FirstOrDefault();
-        if (long.TryParse(headerValue, out var appId) && appId > 0)
-        {
-            return appId;
-        }
-
-        return null;
     }
 
     /// <summary>

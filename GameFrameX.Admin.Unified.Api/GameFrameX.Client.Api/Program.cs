@@ -108,7 +108,7 @@ internal static class Program
         builder.Services.AddScoped<IGameAppRiskEnforcementModeResolver, GameAppRiskEnforcementModeResolver>();
         // C5 加密信封：会话密钥环解析（Singleton + 进程内懒刷新，同 SignatureKeyResolver 口径）
         builder.Services.AddSingleton<ISessionKeyResolver, SessionKeyResolver>();
-        // C5 信封灰度配置：默认关闭 = 完全旁路（不解密不加密）；CryptoEnvelope:TestTenantIds 命中的测试租户即使打开也旁路
+        // 信封灰度配置：默认关闭，启用后按请求声明处理加密信封。
         builder.Services.Configure<CryptoEnvelopeOptions>(builder.Configuration.GetSection("CryptoEnvelope"));
         // C5 协议版本白名单配置（缺头拒绝；未知版本 AuditOnly 仅告警放行）
         builder.Services.Configure<ProtoVersionOptions>(builder.Configuration.GetSection("ProtoVersion"));

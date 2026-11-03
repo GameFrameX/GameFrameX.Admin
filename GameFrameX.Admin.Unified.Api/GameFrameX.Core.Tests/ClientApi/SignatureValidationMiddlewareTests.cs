@@ -412,17 +412,12 @@ public sealed class SignatureValidationMiddlewareTests
     }
 
     [Fact]
-    public async Task V2_MissingAppHeader_RejectedWith60102()
+    public async Task V2_WithoutAppHeader_ValidSignatureUsesMainKey()
     {
-        // 无 GameFrameX-App-Id 头 → 无法定位密钥域（AppId 内联读方案）
         var nextCalled = false;
         var context = CreateV2Context(KeyAId, 1755244800, 1, W1Signature, appId: null);
-
         await InvokeAsync(context, CreateOptions(true), new MemoryCacheService(), () => nextCalled = true, CreateDualKeyRing());
-
-        Assert.False(nextCalled);
-        Assert.Equal(StatusCodes.Status401Unauthorized, context.Response.StatusCode);
-        Assert.Equal(SignatureValidationMiddleware.UnknownKeyIdRejectedCode, await ReadEnvelopeCodeAsync(context));
+        Assert.True(nextCalled);
     }
 
     [Fact]
@@ -718,7 +713,7 @@ public sealed class SignatureValidationMiddlewareTests
 
         public void AddKey(long appId, string kid, string secret, bool enabled, long? notBefore, long? expire)
         {
-            _keys.RemoveAll(x => x.AppId == appId && x.Kid == kid);
+            _keys.RemoveAll(x => x.Kid == kid);
             _keys.Add(new TenantAppSignatureKeyEntity
             {
                 AppId = appId,
@@ -731,9 +726,9 @@ public sealed class SignatureValidationMiddlewareTests
             });
         }
 
-        public Task<SignatureKeyLookup> ResolveAsync(long appId, string kid)
+        public Task<SignatureKeyLookup> ResolveAsync(string kid)
         {
-            var entity = _keys.FirstOrDefault(x => x.AppId == appId && x.Kid == kid);
+            var entity = _keys.FirstOrDefault(x => x.Kid == kid);
             if (entity == null)
             {
                 return Task.FromResult(new SignatureKeyLookup(SignatureKeyLookupResult.NotFound, kid, null));
@@ -743,10 +738,10 @@ public sealed class SignatureValidationMiddlewareTests
             return Task.FromResult(new SignatureKeyLookup(result, kid, result == SignatureKeyLookupResult.Active ? entity.Secret : null));
         }
 
-        public Task<IReadOnlyList<SignatureKeyMaterial>> GetActiveKeysAsync(long appId)
+        public Task<IReadOnlyList<SignatureKeyMaterial>> GetActiveKeysAsync()
         {
             var now = TimerHelper.UnixTimeSeconds();
-            IReadOnlyList<SignatureKeyMaterial> active = _keys.Where(x => x.AppId == appId && SignatureKeyResolver.Judge(x, now) == SignatureKeyLookupResult.Active)
+            IReadOnlyList<SignatureKeyMaterial> active = _keys.Where(x => SignatureKeyResolver.Judge(x, now) == SignatureKeyLookupResult.Active)
                                                               .OrderByDescending(x => x.CreatedTime)
                                                               .Select(x => new SignatureKeyMaterial(x.Kid, x.Secret))
                                                               .ToList();
