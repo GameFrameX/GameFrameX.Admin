@@ -7,10 +7,6 @@ namespace GameFrameX.Application.Game.WebShop.GameWebShop.Dto;
 /// </summary>
 public class PageTenantGameWebShopEntityRequest : BaseAreaPageRequest
 {
-    /// <summary>
-    /// 应用Id（可选过滤，按当前应用筛选网页商城）
-    /// </summary>
-    public long? AppId { get; set; }
 
     /// <summary>
     /// 标题

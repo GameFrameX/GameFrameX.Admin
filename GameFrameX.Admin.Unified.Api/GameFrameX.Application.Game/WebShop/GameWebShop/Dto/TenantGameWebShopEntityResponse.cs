@@ -20,10 +20,6 @@ public class TenantGameWebShopEntityResponse : IBasePageResponse<Entity.Tenant.G
     /// </summary>
     public string Description { get; set; } = null!;
 
-    /// <summary>
-    /// 应用Id
-    /// </summary>
-    public long AppId { get; set; }
 
     /// <summary>
     /// 商品图

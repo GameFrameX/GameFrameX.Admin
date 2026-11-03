@@ -8,12 +8,6 @@ namespace GameFrameX.Application.Game.WebShop.GameWebShop.Dto;
 // 导致新增报 {"Version":["版本号不能为空"]}。业务字段在此直接声明，与 B1 约定一致。
 public class AddTenantGameWebShopEntityRequest : BaseAddRequest
 {
-    /// <summary>
-    /// 应用Id。事实数据应用作用域，必须 &gt; 0。
-    /// <para>过渡期：后台运营当前应用上下文尚未建立，由前端手填。</para>
-    /// </summary>
-    [Required(ErrorMessage = "应用Id不能为空")]
-    public long AppId { get; set; }
 
     /// <summary>
     /// 商品名称
