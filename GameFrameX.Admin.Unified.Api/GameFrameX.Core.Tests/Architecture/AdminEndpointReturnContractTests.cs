@@ -50,11 +50,6 @@ public sealed class AdminEndpointReturnContractTests
         "GameFrameX.Application.Game.Tenant.Integration.TenantAdvertisementCallbackConfig.Dto.TenantAdvertisementCallbackConfigResponse.SigningSecret",
         "GameFrameX.Application.Game.Tenant.Integration.TenantAdvertisementCallbackConfig.Dto.TenantAdvertisementCallbackConfigResponse.VerificationKeys",
         "GameFrameX.Application.Game.Tenant.ClientApiPolicy.TenantClientApiPolicy.Dto.TenantClientApiPolicyResponse.SigningKey",
-        "GameFrameX.Application.Game.Tenant.Integration.TenantEmailConfig.Dto.TenantEmailConfigResponse.FromEmailSecretId",
-        "GameFrameX.Application.Game.Tenant.Integration.TenantEmailConfig.Dto.TenantEmailConfigResponse.FromEmailSecretKey",
-        "GameFrameX.Application.Game.Tenant.Integration.TenantSmsConfig.Dto.TenantSmsConfigResponse.AccessKeySecret",
-        "GameFrameX.Application.Game.Tenant.Integration.TenantWechatConfig.Dto.TenantWechatConfigResponse.WechatAppSecret",
-        "GameFrameX.Application.Game.Tenant.Integration.TenantWechatConfig.Dto.TenantWechatConfigResponse.WxOpenSecret",
         // 平台 JWT 配置：IssuerSigningKey 恒为掩码常量（C244），Has*/Validate* 为布尔标志/配置（PlatformJwtConfigService）
         "GameFrameX.Core.Service.PlatformJwt.Dto.PlatformJwtConfigResponse.IssuerSigningKey",
         "GameFrameX.Core.Service.PlatformJwt.Dto.PlatformJwtConfigResponse.HasSigningKey",

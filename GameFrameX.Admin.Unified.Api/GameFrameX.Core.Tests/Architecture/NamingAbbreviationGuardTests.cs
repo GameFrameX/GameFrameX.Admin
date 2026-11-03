@@ -300,10 +300,6 @@ public sealed class NamingAbbreviationGuardTests
         "GameFrameX.Payment.Google",
         "GameFrameX.Payment.Wechat",
         "GameFrameX.Payment.Xsolla",
-        "GameFrameX.Sms.Abstract",
-        "GameFrameX.Sms.Aliyun",
-        "GameFrameX.Wechat.Abstract",
-        "GameFrameX.Wechat.Open",
     };
 
     /// <summary>守护范围 = slnx 产线程序集（RequiredAssemblies）；GameFrameX.Foundation.* 外部 NuGet 包不在治理范围。</summary>

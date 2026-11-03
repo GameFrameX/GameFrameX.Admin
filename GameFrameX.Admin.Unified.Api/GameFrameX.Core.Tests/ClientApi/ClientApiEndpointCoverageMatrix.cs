@@ -27,7 +27,6 @@ internal static class ClientApiEndpointCoverageMatrix
         Endpoint("GameOrder.NotifyApple", "POST", "api/GameOrder/NotifyApple/{tenantId:long}/{appId:long}/{packageId:long?}", "payment-callback", true, true, false, true, "valid Apple notification ships once", "invalid-route", "signature-failed", "order-not-found", "duplicate-callback", "refund-boundary"),
         Endpoint("GameOrder.NotifyGoogle", "POST", "api/GameOrder/NotifyGoogle/{tenantId:long}/{appId:long}/{packageId:long?}", "payment-callback", true, true, false, true, "valid Google Pub/Sub ships once", "invalid-route", "jwt-failed", "purchase-invalid", "order-not-found", "duplicate-callback"),
         Endpoint("GameOrder.NotifyWeChatPay", "POST", "api/GameOrder/NotifyWeChatPay/{tenantId:long}/{appId:long}/{packageId:long?}", "payment-callback", true, true, false, true, "valid WeChat Pay callback ships once", "invalid-route", "signature-failed", "amount-mismatch", "duplicate-callback"),
-        Endpoint("GameOrder.NotifyXsolla", "POST", "api/GameOrder/NotifyXsolla/{tenantId:long}/{appId:long}/{packageId:long?}", "payment-callback", true, true, false, true, "valid Xsolla webhook ships once", "invalid-route", "signature-failed", "notification-unsupported", "order-not-found", "duplicate-callback"),
 
         Endpoint("GameRedeemCode.Consume", "POST", "api/GameRedeemCode/Consume", "redeem-code", true, true, false, false, "consumes active code once and sends item", "missing-app", "code-not-found", "not-active", "expired", "limit-exhausted", "already-used", "area-not-found"),
 

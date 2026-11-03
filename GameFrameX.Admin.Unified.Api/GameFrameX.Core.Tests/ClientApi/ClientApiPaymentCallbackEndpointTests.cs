@@ -68,47 +68,6 @@ public sealed class ClientApiPaymentCallbackEndpointTests
         Assert.Equal(OrderStatusEnum.Unpaid, order.Status);
     }
 
-    [Fact]
-    public async Task GameOrder_NotifyXsolla_ValidSignatureShipsOrderOnce()
-    {
-        using var db = new ClientApiTestDb();
-        SeedOrderGraph(db, 7001, "xsolla", "9007001");
-        var secret = "xsolla-secret";
-        var body = JsonSerializer.Serialize(new
-        {
-            notification_type = "order_paid",
-            order = new { id = 9007001, mode = "default", amount = "6.50", },
-            user = new { external_id = "3001", },
-        });
-        var handler = ClientApiRecordingHttpHandler.WithGameServerDefaults();
-        var controller = CreateController(db, handler, CallbackPaymentFactory.WithXsolla(secret));
-        AttachBody(controller, db, body);
-        controller.Request.Headers.Authorization = "Signature " + Sha1Hex($"{body}{secret}", Encoding.ASCII);
-
-        var result = await controller.NotifyXsolla();
-
-        var root = ClientApiResultReader.Read(result);
-        var order = await db.TenantDb.Queryable<TenantGameOrderEntity>().FirstAsync(u => u.Id == 7001);
-        Assert.Equal(0, ClientApiResultReader.Code(root));
-        Assert.Equal(OrderStatusEnum.Shipped, order.Status);
-        Assert.Equal("9007001", order.ProviderTransactionId);
-    }
-
-    [Fact]
-    public async Task GameOrder_NotifyXsolla_RejectsMissingSignature()
-    {
-        using var db = new ClientApiTestDb();
-        SeedOrderGraph(db, 7001, "xsolla", "9007001");
-        var body = JsonSerializer.Serialize(new { notification_type = "order_paid", });
-        var controller = CreateController(db, ClientApiRecordingHttpHandler.WithGameServerDefaults(), CallbackPaymentFactory.WithXsolla("secret"));
-        AttachBody(controller, db, body);
-
-        var result = await controller.NotifyXsolla();
-
-        var root = ClientApiResultReader.Read(result);
-        Assert.Equal(400, controller.Response.StatusCode);
-        Assert.NotEqual(0, ClientApiResultReader.Code(root));
-    }
 
     [Fact]
     public async Task GameOrder_NotifyGoogle_ValidAuthenticatedPushShipsOrderOnce()

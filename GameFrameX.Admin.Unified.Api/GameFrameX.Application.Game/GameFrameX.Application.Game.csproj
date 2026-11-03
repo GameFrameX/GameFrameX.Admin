@@ -16,7 +16,6 @@
 
     <ItemGroup>
         <ProjectReference Include="..\GameFrameX.Core\GameFrameX.Core.csproj"/>
-        <ProjectReference Include="..\Wechat\GameFrameX.Wechat.Abstract\GameFrameX.Wechat.Abstract.csproj"/>
         <ProjectReference Include="..\Email\GameFrameX.Email.Abstract\GameFrameX.Email.Abstract.csproj"/>
         <ProjectReference Include="..\Email\GameFrameX.Email.TencentSes\GameFrameX.Email.TencentSes.csproj"/>
         <ProjectReference Include="..\Email\GameFrameX.Email.Smtp\GameFrameX.Email.Smtp.csproj"/>
@@ -31,8 +30,6 @@
         <ProjectReference Include="..\Payment\GameFrameX.Payment.Xsolla\GameFrameX.Payment.Xsolla.csproj"/>
         <ProjectReference Include="..\Payment\GameFrameX.Payment.AliPay\GameFrameX.Payment.AliPay.csproj"/>
         <ProjectReference Include="..\Payment\GameFrameX.Payment.Wechat\GameFrameX.Payment.Wechat.csproj"/>
-        <ProjectReference Include="..\Sms\GameFrameX.Sms.Abstract\GameFrameX.Sms.Abstract.csproj"/>
-        <ProjectReference Include="..\Sms\GameFrameX.Sms.Aliyun\GameFrameX.Sms.Aliyun.csproj"/>
         <ProjectReference Include="..\Advertisement\GameFrameX.Advertisement.Abstract\GameFrameX.Advertisement.Abstract.csproj"/>
         <ProjectReference Include="..\Advertisement\GameFrameX.Advertisement.AdMob\GameFrameX.Advertisement.AdMob.csproj"/>
         <ProjectReference Include="..\Advertisement\GameFrameX.Advertisement.Pangle\GameFrameX.Advertisement.Pangle.csproj"/>

@@ -10,7 +10,7 @@ using GameFrameX.Entity.Tenant.Game;
 namespace GameFrameX.Hub.Api.Controllers;
 
 /// <summary>
-/// 游戏区服控制器
+/// 游戏区服控制器（Hub 侧容器编排端点，三宿主终态阶段并回 Web.Api，届时整体移除）
 /// </summary>
 [Authorize]
 public class GameAreaController : BaseController<TenantGameAreaEntity>

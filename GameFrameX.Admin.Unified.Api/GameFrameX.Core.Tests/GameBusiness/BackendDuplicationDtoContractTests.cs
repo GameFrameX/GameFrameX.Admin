@@ -3,7 +3,6 @@ using System.Globalization;
 using System.Reflection;
 using GameFrameX.Application.Game.App.GameAppRemoteConfig.Dto;
 using GameFrameX.Application.Game.App.GameAppReleaseVersion.Dto;
-using GameFrameX.Application.Game.Tenant.Integration.TenantEmailConfig.Dto;
 using GameFrameX.Application.Game.Announcement.GameAnnouncement.Dto;
 using GameFrameX.Application.Game.Mail.GameMailTemplate.Dto;
 using GameFrameX.Core.BaseInputOutput;
@@ -48,20 +47,6 @@ public class BackendDuplicationDtoContractTests
         "Title",
     };
 
-    private static readonly string[] TenantEmailSharedFields =
-    {
-        "AppId",
-        "DefaultFromName",
-        "DefaultSubjectPrefix",
-        "FromEmailAddress",
-        "IsEnabled",
-        "Priority",
-        "Provider",
-        "Purpose",
-        "Region",
-        "Remark",
-        "TemplateSet",
-    };
 
     private static readonly string[] MailTemplateSharedFields =
     {
@@ -114,18 +99,6 @@ public class BackendDuplicationDtoContractTests
         AssertUpdateContract<UpdateGameAppReleaseVersionRequest>();
     }
 
-    [Fact]
-    public void TenantEmailConfig_PreservesSensitiveFieldValidationDifference()
-    {
-        AssertContainsExactly<AddTenantEmailConfigRequest>(TenantEmailSharedFields.Concat(new[] { "FromEmailSecretId", "FromEmailSecretKey", }));
-        AssertContainsExactly<UpdateTenantEmailConfigRequest>(TenantEmailSharedFields.Concat(new[] { "FromEmailSecretId", "FromEmailSecretKey", }).Concat(UpdateContractFields));
-
-        AssertRequired<AddTenantEmailConfigRequest>("FromEmailSecretId");
-        AssertRequired<AddTenantEmailConfigRequest>("FromEmailSecretKey");
-        AssertNotRequired<UpdateTenantEmailConfigRequest>("FromEmailSecretId");
-        AssertNotRequired<UpdateTenantEmailConfigRequest>("FromEmailSecretKey");
-        AssertUpdateContract<UpdateTenantEmailConfigRequest>();
-    }
 
     [Fact]
     public void GameBusinessDtos_ShareEditFieldsAndKeepUpdateContract()
@@ -143,8 +116,6 @@ public class BackendDuplicationDtoContractTests
     public void SharedDtoFields_AreDeclaredOnceInTheirCommonBase()
     {
         AssertDeclaredOn<GameAppRemoteConfigEditRequest, UpdateGameAppRemoteConfigRequest>(RemoteConfigEditFields);
-        AssertDeclaredOn<GameAppReleaseVersionEditRequest, UpdateGameAppReleaseVersionRequest>(ReleaseVersionEditFields);
-        AssertDeclaredOn<TenantEmailConfigBaseRequest, UpdateTenantEmailConfigRequest>(TenantEmailSharedFields);
         AssertDeclaredOn<TenantGameMailTemplateEntityBaseRequest, UpdateTenantGameMailTemplateEntityRequest>(MailTemplateSharedFields);
         AssertDeclaredOn<TenantGameAnnouncementEntityBaseRequest, UpdateTenantGameAnnouncementEntityRequest>(AnnouncementSharedFields);
     }

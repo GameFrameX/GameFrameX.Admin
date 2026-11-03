@@ -1,7 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using GameFrameX.Application.System.Dictionary.Dto;
-using GameFrameX.Wechat.Open.Dto;
 using GameFrameX.Core.BaseInputOutput;
 
 namespace GameFrameX.Core.Tests.BaseInputOutput;
@@ -116,27 +115,6 @@ public class BaseInputOutputValidationTests
         Assert.Contains(results, result => result.MemberNames.Contains(nameof(GetDataDictionaryDataRequest.DictionaryTypeId)));
     }
 
-    [Theory]
-    [InlineData("123")]
-    [InlineData("abcdefghijk")]
-    public void WxPhoneLoginInput_InvalidPhoneNumber_IsInvalid(string phoneNumber)
-    {
-        var input = new WxPhoneLoginRequest { PhoneNumber = phoneNumber, };
-
-        var results = Validate(input);
-
-        Assert.Contains(results, result => result.MemberNames.Contains(nameof(WxPhoneLoginRequest.PhoneNumber)));
-    }
-
-    [Fact]
-    public void WxPhoneLoginInput_ChinaMobileNumber_IsValid()
-    {
-        var input = new WxPhoneLoginRequest { PhoneNumber = "13800138000", };
-
-        var results = Validate(input);
-
-        Assert.Empty(results);
-    }
 
     [Fact]
     public void BaseInputs_DoNotUse历史框架DataValidationAttribute()
@@ -147,7 +125,6 @@ public class BaseInputOutputValidationTests
             typeof(BasePageRequest).GetProperty(nameof(BasePageRequest.Page)),
             typeof(BasePageRequest).GetProperty(nameof(BasePageRequest.PageSize)),
             typeof(GetDataDictionaryDataRequest).GetProperty(nameof(GetDataDictionaryDataRequest.DictionaryTypeId)),
-            typeof(WxPhoneLoginRequest).GetProperty(nameof(WxPhoneLoginRequest.PhoneNumber)),
         };
 
         foreach (var property in properties)

@@ -15,11 +15,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ActionConstraints;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Routing;
-// Client / Hub 存在同名控制器（GameArea / GameRedeemCode / GameGoods / GameAssetPackageVersion），Hub 侧用别名消歧
+// Client / Hub 存在同名控制器（GameArea / GameAssetPackageVersion），Hub 侧用别名消歧
 using HubGameAreaController = GameFrameX.Hub.Api.Controllers.GameAreaController;
 using HubGameAssetPackageVersionController = GameFrameX.Hub.Api.Controllers.GameAssetPackageVersionController;
-using HubGameGoodsController = GameFrameX.Hub.Api.Controllers.GameGoodsController;
-using HubGameRedeemCodeController = GameFrameX.Hub.Api.Controllers.GameRedeemCodeController;
 
 namespace GameFrameX.Core.Tests.Architecture;
 
@@ -62,7 +60,6 @@ public sealed class ThreeHostApiRoutingContractTests
         // C236：Hub 本地 BaseController 副本已回收，token 路由模板唯一来源为 Core 共享版，Client/Hub 控制器经继承链取用
         AssertTokenRoute(typeof(Service.BaseController));
         AssertTokenRoute(typeof(HubGameAreaController));
-        AssertTokenRoute(typeof(HubGameRedeemCodeController));
     }
 
     [Fact]
@@ -86,11 +83,8 @@ public sealed class ThreeHostApiRoutingContractTests
         // C236：Hub BaseController 副本回收后，JWT 默认鉴权显式化到各非匿名控制器类；共享基类不带 [Authorize]（Client 无 auth handler）
         Assert.False(typeof(Service.BaseController).IsDefined(typeof(AuthorizeAttribute), true));
         Assert.True(typeof(HubGameAreaController).IsDefined(typeof(AuthorizeAttribute), true));
-        Assert.True(typeof(HubGameRedeemCodeController).IsDefined(typeof(AuthorizeAttribute), true));
         Assert.True(typeof(HubGameAssetPackageVersionController).IsDefined(typeof(AuthorizeAttribute), true));
-        Assert.True(typeof(HubGameGoodsController).IsDefined(typeof(AuthorizeAttribute), true));
-        // TapdWebHook：类级 [Authorize] fail-closed + 唯一 action 带 [AllowAnonymous]；PackageBuildReport：类级 [AllowAnonymous] + OpenAccess 中间件鉴权
-        Assert.True(typeof(TapdWebHookController).IsDefined(typeof(AuthorizeAttribute), true));
+        // PackageBuildReport：类级 [AllowAnonymous] + OpenAccess 中间件鉴权
         Assert.True(typeof(PackageBuildReportController).IsDefined(typeof(AllowAnonymousAttribute), false));
     }
 
@@ -100,11 +94,8 @@ public sealed class ThreeHostApiRoutingContractTests
     [InlineData(typeof(GameWebShopController), nameof(GameWebShopController.NotifyWebShop), "GET", "{tenantId:long}/{appId:long}/{packageId:long?}")]
     [InlineData(typeof(GameOrderController), nameof(GameOrderController.Create), "POST", null)]
     [InlineData(typeof(GameLoginTicketKeyController), nameof(GameLoginTicketKeyController.PublicKeys), "GET", null)]
-    [InlineData(typeof(GameGoodsController), nameof(GameGoodsController.AddOrUpdate), "POST", null)]
     [InlineData(typeof(HubGameAreaController), nameof(HubGameAreaController.ServerVersionAdd), "POST", null)]
-    [InlineData(typeof(TapdWebHookController), nameof(TapdWebHookController.WebHookTaskFinish), "POST", null)]
     [InlineData(typeof(PackageBuildReportController), nameof(PackageBuildReportController.Report), "POST", null)]
-    [InlineData(typeof(HubGameRedeemCodeController), nameof(HubGameRedeemCodeController.Add), "POST", null)]
     public void ClientHub_SampleEndpoints_DeclareExplicitVerbAndTemplate(Type controllerType, string methodName, string expectedVerb, string? expectedTemplate)
     {
         var method = controllerType.GetMethod(methodName, BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);

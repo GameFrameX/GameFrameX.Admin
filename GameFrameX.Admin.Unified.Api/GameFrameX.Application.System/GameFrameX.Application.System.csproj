@@ -13,8 +13,6 @@
     <ItemGroup>
         <ProjectReference Include="..\GameFrameX.Core\GameFrameX.Core.csproj"/>
         <ProjectReference Include="..\Payment\GameFrameX.Payment.Wechat\GameFrameX.Payment.Wechat.csproj"/>
-        <ProjectReference Include="..\Wechat\GameFrameX.Wechat.Abstract\GameFrameX.Wechat.Abstract.csproj"/>
-        <ProjectReference Include="..\Wechat\GameFrameX.Wechat.Open\GameFrameX.Wechat.Open.csproj"/>
         <ProjectReference Include="..\Email\GameFrameX.Email.Smtp\GameFrameX.Email.Smtp.csproj"/>
     </ItemGroup>
     <ItemGroup>
