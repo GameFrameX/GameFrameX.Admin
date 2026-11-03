@@ -1,8 +1,5 @@
 using GameFrameX.Entity.Tenant.Game.App;
 using GameFrameX.Application.Game.App.GameAppPackage.Dto;
-using GameFrameX.Application.Game.App.AppScope;
-using GameFrameX.Core.Service.Tenant;
-using GameFrameX.Core.Service.User;
 using GameFrameX.Entity.Enum;
 using GameFrameX.Entity.Global;
 using GameFrameX.Entity.System;
@@ -19,37 +16,27 @@ public class TenantGameAppPackageService
         AddGameAppPackageRequest, UpdateGameAppPackageRequest,
         GameAppPackageResponse, PageGameAppPackageRequest>
 {
-    private readonly SqlSugarRepository<Entity.Tenant.Game.TenantGameAppEntity> _gameAppRepository;
     private readonly SqlSugarRepository<GlobalPlatformEntity> _globalPlatformRepository;
     private readonly SqlSugarRepository<GlobalChannelDefinitionEntity> _globalChannelDefinitionRepository;
     private readonly SqlSugarRepository<TenantChannelDefinitionEntity> _tenantChannelDefinitionRepository;
-    private readonly CurrentUserContext _currentUserContext;
 
     public TenantGameAppPackageService(
         SqlSugarRepository<TenantGameAppPackageEntity> repository,
-        SqlSugarRepository<Entity.Tenant.Game.TenantGameAppEntity> gameAppRepository,
         SqlSugarRepository<GlobalPlatformEntity> globalPlatformRepository,
         SqlSugarRepository<GlobalChannelDefinitionEntity> globalChannelDefinitionRepository,
-        SqlSugarRepository<TenantChannelDefinitionEntity> tenantChannelDefinitionRepository,
-        CurrentUserContext currentUserContext)
+        SqlSugarRepository<TenantChannelDefinitionEntity> tenantChannelDefinitionRepository)
         : base(repository)
     {
-        _gameAppRepository = gameAppRepository;
         _globalPlatformRepository = globalPlatformRepository;
         _globalChannelDefinitionRepository = globalChannelDefinitionRepository;
         _tenantChannelDefinitionRepository = tenantChannelDefinitionRepository;
-        _currentUserContext = currentUserContext;
     }
 
     protected override ISugarQueryable<GameAppPackageResponse> BuildPageQuery(PageGameAppPackageRequest input)
     {
-        var gameAppId = AppScopeRules.EnsureFactAppId(input.AppId, "游戏应用分包");
-        var tenantId = TenantOperationContext.GetEffectiveTenantId();
         return Repository.AsQueryable()
                          .Filter(null, true)
                          .Where(u => u.IsDeleted == false)
-                         .WhereIF(tenantId.HasValue, u => u.TenantId == null || u.TenantId == tenantId.Value)
-                         .Where(u => u.GameAppId == gameAppId)
                          .WhereIF(!string.IsNullOrWhiteSpace(input.Name), u => u.Name.Contains(input.Name.Trim()))
                          .WhereIF(!string.IsNullOrWhiteSpace(input.PackageName), u => u.PackageName.Contains(input.PackageName.Trim()))
                          .WhereIF(!string.IsNullOrWhiteSpace(input.PackageVersion), u => u.PackageVersion.Contains(input.PackageVersion.Trim()))
@@ -57,7 +44,6 @@ public class TenantGameAppPackageService
                          .Select(u => new GameAppPackageResponse
                          {
                              Id = u.Id,
-                             AppId = u.GameAppId,
                              Name = u.Name,
                              PackageName = u.PackageName,
                              PlatformCode = u.PlatformCode,
@@ -91,12 +77,10 @@ public class TenantGameAppPackageService
     [ApiDescriptionSettings(Name = "Select")]
     public override async Task<List<BaseSelectPageResponse>> SelectAsync(BaseSelectPageRequest input)
     {
-        var gameAppId = AppScopeRules.EnsureFactAppId(input.AppId, "游戏应用分包");
         var searchKey = input.SearchKey?.Trim() ?? string.Empty;
         var pageSize = Math.Min(input.PageSize > 0 ? input.PageSize : BaseSelectPageRequest.DefaultPageSize, BaseSelectPageRequest.MaxPageSize);
         var packages = await Repository.AsQueryable()
                                        .Where(u => u.IsEnabled != false)
-                                       .Where(u => u.GameAppId == gameAppId)
                                        .WhereIF(!string.IsNullOrWhiteSpace(searchKey), u =>
                                                     u.Name.Contains(searchKey) ||
                                                     u.PackageName.Contains(searchKey) ||
@@ -127,8 +111,8 @@ public class TenantGameAppPackageService
     /// </summary>
     public override async Task<GameAppPackageResponse> AddAsync(AddGameAppPackageRequest input)
     {
-        await ValidateParentPackageAsync(input.AppId, input.ParentPackageId, input.PackageKind);
-        var channel = await ValidatePackageAsync(input.AppId, input.PackageName, input.PlatformCode, input.ChannelId);
+        await ValidateParentPackageAsync(input.ParentPackageId, input.PackageKind);
+        var channel = await ValidatePackageAsync(input.PackageName, input.PlatformCode, input.ChannelId);
 
         var entity = input.Adapt<TenantGameAppPackageEntity>();
         NormalizePackageKind(entity);
@@ -139,12 +123,10 @@ public class TenantGameAppPackageService
 
         if (entity.IsDefault)
         {
-            await ClearOtherDefaultsAsync(entity.GameAppId, entity.Id);
+            await ClearOtherDefaultsAsync(entity.Id);
         }
 
-        // 实体 GameAppId 与 Output AppId 名不一致，Mapster 直映会丢失，显式补齐
         var output = entity.Adapt<GameAppPackageResponse>();
-        output.AppId = entity.GameAppId;
         return output;
     }
 
@@ -154,8 +136,8 @@ public class TenantGameAppPackageService
     public override async Task UpdateAsync(UpdateGameAppPackageRequest input)
     {
         await ApplyImmutableFieldsAsync(input);
-        await ValidateParentPackageAsync(input.AppId, input.ParentPackageId, input.PackageKind, input.Id);
-        var channel = await ValidatePackageAsync(input.AppId, input.PackageName, input.PlatformCode, input.ChannelId, input.Id);
+        await ValidateParentPackageAsync(input.ParentPackageId, input.PackageKind, input.Id);
+        var channel = await ValidatePackageAsync(input.PackageName, input.PlatformCode, input.ChannelId, input.Id);
 
         var entity = input.Adapt<TenantGameAppPackageEntity>();
         NormalizePackageKind(entity);
@@ -168,14 +150,14 @@ public class TenantGameAppPackageService
 
         if (input.IsDefault)
         {
-            await ClearOtherDefaultsAsync(input.AppId, input.Id);
+            await ClearOtherDefaultsAsync(input.Id);
         }
     }
 
     protected override async Task OnAddingAsync(AddGameAppPackageRequest input)
     {
-        await ValidateParentPackageAsync(input.AppId, input.ParentPackageId, input.PackageKind);
-        await ValidatePackageAsync(input.AppId, input.PackageName, input.PlatformCode, input.ChannelId);
+        await ValidateParentPackageAsync(input.ParentPackageId, input.PackageKind);
+        await ValidatePackageAsync(input.PackageName, input.PlatformCode, input.ChannelId);
     }
 
     protected override async Task OnAddedAsync(AddGameAppPackageRequest input, TenantGameAppPackageEntity entity)
@@ -196,15 +178,15 @@ public class TenantGameAppPackageService
 
         if (entity.IsDefault)
         {
-            await ClearOtherDefaultsAsync(entity.GameAppId, entity.Id);
+            await ClearOtherDefaultsAsync(entity.Id);
         }
     }
 
     protected override async Task OnUpdatingAsync(UpdateGameAppPackageRequest input)
     {
         await ApplyImmutableFieldsAsync(input);
-        await ValidateParentPackageAsync(input.AppId, input.ParentPackageId, input.PackageKind, input.Id);
-        await ValidatePackageAsync(input.AppId, input.PackageName, input.PlatformCode, input.ChannelId, input.Id);
+        await ValidateParentPackageAsync(input.ParentPackageId, input.PackageKind, input.Id);
+        await ValidatePackageAsync(input.PackageName, input.PlatformCode, input.ChannelId, input.Id);
     }
 
     protected override async Task OnUpdatedAsync(UpdateGameAppPackageRequest input, TenantGameAppPackageEntity before, TenantGameAppPackageEntity after)
@@ -229,26 +211,24 @@ public class TenantGameAppPackageService
 
         if (input.IsDefault)
         {
-            await ClearOtherDefaultsAsync(input.AppId, input.Id);
+            await ClearOtherDefaultsAsync(input.Id);
         }
     }
 
     /// <summary>
-    /// 获取应用下启用分包列表
+    /// 获取主库启用分包列表
     /// </summary>
     [HttpGet]
     [ApiDescriptionSettings(Name = "List")]
-    public async Task<List<GameAppPackageListResponse>> ListAsync([FromQuery] long appId)
+    public async Task<List<GameAppPackageListResponse>> ListAsync()
     {
-        AppScopeRules.EnsureFactAppId(appId, "游戏应用分包");
         return await Repository.AsQueryable()
-                               .Where(u => u.GameAppId == appId && u.IsEnabled != false)
+                               .Where(u => u.IsEnabled != false)
                                .OrderByDescending(u => u.IsDefault)
                                .OrderBy(u => u.CreatedTime)
                                .Select(u => new GameAppPackageListResponse
                                {
                                    Id = u.Id,
-                                   AppId = u.GameAppId,
                                    Name = u.Name,
                                    PackageName = u.PackageName,
                                    PackageVersion = u.PackageVersion,
@@ -264,11 +244,9 @@ public class TenantGameAppPackageService
     [ApiDescriptionSettings(Name = "SetStatus")]
     public async Task SetStatusAsync(SetGameAppPackageStatusRequest input)
     {
-        var tenantId = TenantOperationContext.GetEffectiveTenantId();
         var entity = await Repository.AsQueryable()
                                      .Filter(null, true)
                                      .Where(u => u.IsDeleted == false)
-                                     .WhereIF(tenantId.HasValue, u => u.TenantId == null || u.TenantId == tenantId.Value)
                                      .FirstAsync(u => u.Id == input.Id) ?? throw BusinessError.Oh("分包不存在");
         entity.IsEnabled = input.IsEnabled;
         if (!input.IsEnabled)
@@ -292,7 +270,7 @@ public class TenantGameAppPackageService
             throw BusinessError.Oh("停用分包不能设为默认");
         }
 
-        await ClearOtherDefaultsAsync(entity.GameAppId, entity.Id);
+        await ClearOtherDefaultsAsync(entity.Id);
         entity.IsDefault = true;
         await Repository.AsUpdateable(entity).UpdateColumns(u => u.IsDefault).ExecuteCommandAsync();
     }
@@ -308,14 +286,8 @@ public class TenantGameAppPackageService
         await Repository.FakeDeleteAsync(entity);
     }
 
-    private async Task<ChannelDefinition> ValidatePackageAsync(long gameAppId, string packageName, string platformCode, long channelId, long? excludeId = null)
+    private async Task<ChannelDefinition> ValidatePackageAsync(string packageName, string platformCode, long channelId, long? excludeId = null)
     {
-        var gameApp = await _gameAppRepository.GetFirstAsync(u => u.Id == gameAppId);
-        if (gameApp == null)
-        {
-            throw BusinessError.Oh("游戏应用不存在");
-        }
-
         var exists = excludeId.HasValue
                          ? await Repository.IsAnyAsync(u => u.PackageName == packageName && u.Id != excludeId.Value)
                          : await Repository.IsAnyAsync(u => u.PackageName == packageName);
@@ -336,13 +308,12 @@ public class TenantGameAppPackageService
     private async Task ApplyImmutableFieldsAsync(UpdateGameAppPackageRequest input)
     {
         var existing = await Repository.GetFirstAsync(u => u.Id == input.Id) ?? throw BusinessError.Oh("分包不存在");
-        input.AppId = existing.GameAppId;
         input.PackageName = existing.PackageName;
         input.PlatformCode = existing.PlatformCode;
         input.ChannelId = existing.ChannelId;
     }
 
-    private async Task ValidateParentPackageAsync(long gameAppId, long? parentPackageId, PackageKindEnum packageKind, long? currentId = null)
+    private async Task ValidateParentPackageAsync(long? parentPackageId, PackageKindEnum packageKind, long? currentId = null)
     {
         EnsurePackageKindConsistency(parentPackageId, packageKind);
 
@@ -357,11 +328,6 @@ public class TenantGameAppPackageService
         }
 
         var parent = await Repository.GetFirstAsync(u => u.Id == parentPackageId.Value) ?? throw BusinessError.Oh("母包不存在");
-        if (parent.GameAppId != gameAppId)
-        {
-            throw BusinessError.Oh("子包只能继承同应用下的母包");
-        }
-
         if (parent.ParentPackageId.HasValue)
         {
             throw BusinessError.Oh("子包最多只能继承一层母包");
@@ -432,8 +398,7 @@ public class TenantGameAppPackageService
         return await _tenantChannelDefinitionRepository.AsQueryable()
                                                        .Filter(null, true)
                                                        .Where(u => u.IsDeleted == false)
-                                                       .Where(u => (u.IsEnabled == true || u.IsEnabled == null) &&
-                                                                   u.TenantId == _currentUserContext.TenantId)
+                                                       .Where(u => (u.IsEnabled == true || u.IsEnabled == null))
                                                        .FirstAsync(u => u.Id == channelId);
     }
 
@@ -451,11 +416,11 @@ public class TenantGameAppPackageService
                    : $"{packageName} / {packageVersion}";
     }
 
-    private async Task ClearOtherDefaultsAsync(long gameAppId, long currentPackageId)
+    private async Task ClearOtherDefaultsAsync(long currentPackageId)
     {
         await Repository.AsUpdateable()
                         .SetColumns(u => u.IsDefault == false)
-                        .Where(u => u.GameAppId == gameAppId && u.Id != currentPackageId && u.IsDefault)
+                        .Where(u => u.Id != currentPackageId && u.IsDefault)
                         .ExecuteCommandAsync();
     }
 }

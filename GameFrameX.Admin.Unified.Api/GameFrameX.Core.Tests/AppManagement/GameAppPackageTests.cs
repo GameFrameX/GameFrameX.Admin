@@ -67,7 +67,7 @@ public class GameAppPackageTests
         var isValid = Validator.TryValidateObject(input, new ValidationContext(input), results, true);
 
         Assert.False(isValid);
-        Assert.Contains(results, result => result.MemberNames.Contains(nameof(AddGameAppPackageRequest.AppId)));
+        Assert.Null(typeof(AddGameAppPackageRequest).GetProperty("AppId"));
         Assert.Contains(results, result => result.MemberNames.Contains(nameof(AddGameAppPackageRequest.Name)));
         Assert.Contains(results, result => result.MemberNames.Contains(nameof(AddGameAppPackageRequest.PackageName)));
         Assert.Contains(results, result => result.MemberNames.Contains(nameof(AddGameAppPackageRequest.PlatformCode)));
@@ -79,7 +79,6 @@ public class GameAppPackageTests
     {
         var input = new AddGameAppPackageRequest
         {
-            AppId = 100,
             Name = "Android Official",
             PackageName = "com.demo.game",
             PlatformCode = "Android",

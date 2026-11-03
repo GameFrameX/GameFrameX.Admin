@@ -7,12 +7,6 @@ namespace GameFrameX.Application.Game.App.GameAppPackage.Dto;
 /// </summary>
 public class GameAppPackageBaseRequest : BaseAddRequest
 {
-    /// <summary>
-    /// 游戏应用Id
-    /// </summary>
-    [Range(1, long.MaxValue, ErrorMessage = "游戏应用Id不能为空")]
-    [AdaptMember("GameAppId")]
-    public long AppId { get; set; }
 
     /// <summary>
     /// 分包名称

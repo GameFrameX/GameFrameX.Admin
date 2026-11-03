@@ -5,10 +5,6 @@ namespace GameFrameX.Application.Game.App.GameAppPackage.Dto;
 /// </summary>
 public class PageGameAppPackageRequest : BasePageRequest
 {
-    /// <summary>
-    /// 游戏应用Id
-    /// </summary>
-    public long? AppId { get; set; }
 
     /// <summary>
     /// 分包名称
