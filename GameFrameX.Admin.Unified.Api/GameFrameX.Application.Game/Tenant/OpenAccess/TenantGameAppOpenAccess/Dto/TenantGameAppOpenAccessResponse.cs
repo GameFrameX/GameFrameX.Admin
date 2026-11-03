@@ -13,12 +13,7 @@ public class TenantGameAppOpenAccessResponse
     public long Id { get; set; }
 
     /// <summary>
-    /// 应用作用域。强制绑定具体应用，不支持 0 或租户默认凭证。
-    /// </summary>
-    public long AppId { get; set; }
-
-    /// <summary>
-    /// 绑定的租户系统用户 Id。Hub.Api 写入版本数据和审计列时使用该用户身份。
+    /// 绑定的系统用户 Id。Hub.Api 写入版本数据和审计列时使用该用户身份。
     /// </summary>
     public long BindUserId { get; set; }
 
@@ -28,7 +23,7 @@ public class TenantGameAppOpenAccessResponse
     public string Scenario { get; set; } = null!;
 
     /// <summary>
-    /// 使用目的说明，用于区分同一应用下多个凭证的职责边界。
+    /// 使用目的说明，用于区分多个凭证的职责边界。
     /// </summary>
     public string Purpose { get; set; } = null!;
 
@@ -43,7 +38,7 @@ public class TenantGameAppOpenAccessResponse
     public string ScopesJson { get; set; } = null!;
 
     /// <summary>
-    /// 访问 Key。租户内唯一，鉴权时按声明租户路由租户库查询。
+    /// 访问 Key。主库唯一，鉴权时按访问 Key 查询。
     /// </summary>
     public string AccessKey { get; set; } = null!;
 

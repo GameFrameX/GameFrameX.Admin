@@ -37,7 +37,6 @@ public class TenantGameAppOpenAccessEntityTests
         var isValid = Validator.TryValidateObject(input, new ValidationContext(input), results, true);
 
         Assert.False(isValid);
-        Assert.Contains(results, r => r.MemberNames.Contains(nameof(AddTenantGameAppOpenAccessRequest.AppId)));
         Assert.Contains(results, r => r.MemberNames.Contains(nameof(AddTenantGameAppOpenAccessRequest.BindUserId)));
         Assert.Contains(results, r => r.MemberNames.Contains(nameof(AddTenantGameAppOpenAccessRequest.Scenario)));
         Assert.Contains(results, r => r.MemberNames.Contains(nameof(AddTenantGameAppOpenAccessRequest.Purpose)));
@@ -50,7 +49,6 @@ public class TenantGameAppOpenAccessEntityTests
     {
         var input = new AddTenantGameAppOpenAccessRequest
         {
-            AppId = 100,
             BindUserId = 200,
             Scenario = "ci",
             Purpose = "build pipeline",
@@ -64,12 +62,10 @@ public class TenantGameAppOpenAccessEntityTests
     }
 
     [Fact]
-    public void AddTenantGameAppOpenAccessInput_RejectsAppIdZero()
+    public void AddTenantGameAppOpenAccessInput_AcceptsWithoutApplication()
     {
-        // AppId=0 必须被拒绝（强制 AppId > 0，不允许租户默认凭证）。
         var input = new AddTenantGameAppOpenAccessRequest
         {
-            AppId = 0,
             BindUserId = 1,
             Scenario = "ci",
             Purpose = "x",
@@ -79,32 +75,30 @@ public class TenantGameAppOpenAccessEntityTests
         var results = new List<ValidationResult>();
         var isValid = Validator.TryValidateObject(input, new ValidationContext(input), results, true);
 
-        Assert.False(isValid);
-        Assert.Contains(results, r => r.MemberNames.Contains(nameof(AddTenantGameAppOpenAccessRequest.AppId)));
+        Assert.True(isValid);
     }
 
     [Fact]
-    public void UpdateTenantGameAppOpenAccessInput_RequiresAppId_ForOwnershipCheck()
+    public void UpdateTenantGameAppOpenAccessInput_RequiresUserAndScopes()
     {
         var input = new UpdateTenantGameAppOpenAccessRequest();
         var results = new List<ValidationResult>();
         var isValid = Validator.TryValidateObject(input, new ValidationContext(input), results, true);
 
         Assert.False(isValid);
-        Assert.Contains(results, r => r.MemberNames.Contains(nameof(UpdateTenantGameAppOpenAccessRequest.AppId)));
         Assert.Contains(results, r => r.MemberNames.Contains(nameof(UpdateTenantGameAppOpenAccessRequest.BindUserId)));
         Assert.Contains(results, r => r.MemberNames.Contains(nameof(UpdateTenantGameAppOpenAccessRequest.ScopesJson)));
     }
 
     [Fact]
-    public void TenantGameAppOpenAccessActionInput_RequiresAppId()
+    public void TenantGameAppOpenAccessActionInput_HasNoApplicationDimension()
     {
         var input = new TenantGameAppOpenAccessActionRequest();
         var results = new List<ValidationResult>();
         var isValid = Validator.TryValidateObject(input, new ValidationContext(input), results, true);
 
         Assert.False(isValid);
-        Assert.Contains(results, r => r.MemberNames.Contains(nameof(TenantGameAppOpenAccessActionRequest.AppId)));
+        Assert.Null(typeof(TenantGameAppOpenAccessActionRequest).GetProperty("AppId"));
     }
 
     [Fact]

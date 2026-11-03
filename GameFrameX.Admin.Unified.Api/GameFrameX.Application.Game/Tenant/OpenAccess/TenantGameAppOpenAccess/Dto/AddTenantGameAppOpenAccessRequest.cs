@@ -6,13 +6,7 @@ namespace GameFrameX.Application.Game.Tenant.OpenAccess.TenantGameAppOpenAccess.
 public class AddTenantGameAppOpenAccessRequest : BaseAddRequest
 {
     /// <summary>
-    /// 当前应用 Id。必须大于 0。
-    /// </summary>
-    [Range(1, long.MaxValue, ErrorMessage = "请选择应用后再签发应用开放访问凭证")]
-    public long AppId { get; set; }
-
-    /// <summary>
-    /// 绑定的租户系统用户 Id。
+    /// 绑定的系统用户 Id。
     /// </summary>
     [Range(1, long.MaxValue, ErrorMessage = "请选择绑定用户")]
     public long BindUserId { get; set; }

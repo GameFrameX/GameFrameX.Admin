@@ -6,11 +6,6 @@ namespace GameFrameX.Application.Game.Tenant.OpenAccess.TenantGameAppOpenAccess.
 public class PageTenantGameAppOpenAccessRequest : BasePageRequest
 {
     /// <summary>
-    /// 当前应用 Id。凭证页只能在应用工作台内查询。
-    /// </summary>
-    public long? AppId { get; set; }
-
-    /// <summary>
     /// 访问 Key 关键字。
     /// </summary>
     public string? AccessKey { get; set; }

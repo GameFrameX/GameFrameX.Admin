@@ -1,18 +1,12 @@
 namespace GameFrameX.Application.Game.Tenant.OpenAccess.TenantGameAppOpenAccess.Dto;
 
 /// <summary>
-/// 更新应用开放访问凭证输入。AppId 不可变（编辑态由服务端按行原值回填）。
+/// 更新应用开放访问凭证输入。绑定用户和接口范围由服务端校验。
 /// </summary>
 public class UpdateTenantGameAppOpenAccessRequest : BaseUpdateRequest
 {
     /// <summary>
-    /// 当前应用 Id（用于校验凭证归属当前 App；AppId 本身不可变，由服务端按行原值回填）。
-    /// </summary>
-    [Range(1, long.MaxValue, ErrorMessage = "请选择应用")]
-    public long AppId { get; set; }
-
-    /// <summary>
-    /// 绑定的租户系统用户 Id。
+    /// 绑定的系统用户 Id。
     /// </summary>
     [Range(1, long.MaxValue, ErrorMessage = "请选择绑定用户")]
     public long BindUserId { get; set; }
