@@ -30,7 +30,6 @@ public class TenantGameAppRemoteConfigService : GenericCrudService<Entity.Tenant
     /// </summary>
     protected override ISugarQueryable<GameAppRemoteConfigResponse> BuildPageQuery(PageGameAppRemoteConfigRequest input)
     {
-        var appId = RequireAppId(input.AppId, "请选择应用后再维护客户端远程配置");
         var searchKey = input.SearchKey?.Trim() ?? string.Empty;
         var channel = input.Channel?.Trim() ?? string.Empty;
         var content = input.Content?.Trim() ?? string.Empty;
@@ -68,7 +67,7 @@ public class TenantGameAppRemoteConfigService : GenericCrudService<Entity.Tenant
                          .WhereIF(!string.IsNullOrEmpty(createUserName), u => (u.CreatedName ?? string.Empty).Contains(createUserName))
                          .WhereIF(!string.IsNullOrEmpty(updateUserName), u => (u.UpdatedName ?? string.Empty).Contains(updateUserName))
                          .WhereIF(!string.IsNullOrEmpty(description), u => u.Description.Contains(description))
-                         .Where(u => u.AppId == appId)
+
                          .Select<GameAppRemoteConfigResponse>();
     }
 
@@ -77,8 +76,7 @@ public class TenantGameAppRemoteConfigService : GenericCrudService<Entity.Tenant
     /// </summary>
     protected override async Task OnAddingAsync(AddGameAppRemoteConfigRequest input)
     {
-        input.AppId = RequireAppId(input.AppId, "请选择应用后再新增客户端远程配置");
-        await PackageScopeValidator.ValidateAsync(input.AppId, input.Package, _packageRepository.AsQueryable());
+        await PackageScopeValidator.ValidateAsync(input.Package, _packageRepository.AsQueryable());
         ValidateDeliveryFields(input);
         ResolveContentFromMode(input);
     }
@@ -94,23 +92,12 @@ public class TenantGameAppRemoteConfigService : GenericCrudService<Entity.Tenant
             throw BusinessError.Oh(CommonErrorCode.RecordNotFound);
         }
 
-        input.AppId = existing.AppId;
-        RequireAppId(input.AppId, "客户端远程配置不属于当前应用");
-        await PackageScopeValidator.ValidateAsync(input.AppId, input.Package, _packageRepository.AsQueryable());
+        await PackageScopeValidator.ValidateAsync(input.Package, _packageRepository.AsQueryable());
         ValidateDeliveryFields(input);
         ResolveContentFromMode(input);
     }
 
-    private static long RequireAppId(long? appId, string message)
-    {
-        var resolvedAppId = appId ?? 0;
-        if (resolvedAppId <= 0)
-        {
-            throw BusinessError.Oh(message);
-        }
 
-        return resolvedAppId;
-    }
 
     /// <summary>
     /// 校验记录级投放字段，避免非法灰度比例或白名单 JSON 写入配置事实源。

@@ -1,15 +1,10 @@
-﻿namespace GameFrameX.Application.Game.App.GameAppRemoteConfig.Dto;
+namespace GameFrameX.Application.Game.App.GameAppRemoteConfig.Dto;
 
 /// <summary>
 /// 远程配置管理新增/更新共有输入参数
 /// </summary>
 public class GameAppRemoteConfigEditRequest : BaseAddRequest
 {
-    /// <summary>
-    /// 应用作用域。管理端客户端远程配置必须从应用工作台维护，值必须大于 0。
-    /// </summary>
-    public virtual long? AppId { get; set; }
-
     /// <summary>
     /// Channel
     /// </summary>

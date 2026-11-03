@@ -32,16 +32,6 @@ public class AppScopedServiceSourceGuardTests
     }
 
     [Fact]
-    public void ClientRemoteConfigAdminPageAndWrites_RequireExplicitCurrentApp()
-    {
-        var source = File.ReadAllText(Path.Combine(FindRepoRoot(), "GameFrameX.Application.Game/App/GameAppRemoteConfig/TenantGameAppRemoteConfigService.cs"));
-
-        Assert.Contains("RequireAppId(input.AppId", source);
-        Assert.Contains("input.AppId = RequireAppId(input.AppId", source);
-        Assert.DoesNotContain("WhereIF(input.AppId.HasValue", source);
-    }
-
-    [Fact]
     public void PaymentConfigAdminPageAndWrites_RequireExplicitCurrentApp()
     {
         var source = File.ReadAllText(Path.Combine(FindRepoRoot(), "GameFrameX.Application.Game/Order/GamePaymentConfig/TenantGamePaymentConfigEntityService.cs"));

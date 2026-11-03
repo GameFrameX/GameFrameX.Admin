@@ -6,11 +6,6 @@ namespace GameFrameX.Application.Game.App.GameAppReleaseVersion.Dto;
 public class GameAppReleaseVersionEditRequest : BaseAddRequest
 {
     /// <summary>
-    /// 应用作用域，0 / null 表示租户默认配置
-    /// </summary>
-    public virtual long? AppId { get; set; }
-
-    /// <summary>
     /// Channel
     /// </summary>
     public virtual string? Channel { get; set; }

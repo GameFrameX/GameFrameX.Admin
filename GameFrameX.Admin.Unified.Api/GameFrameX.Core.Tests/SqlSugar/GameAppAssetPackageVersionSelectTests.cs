@@ -44,11 +44,11 @@ public sealed class GameAppAssetPackageVersionSelectTests : IDisposable
     }
 
     [Fact]
-    public async Task Select_RejectsCrossAppPackageId()
+    public async Task Select_RejectsMissingPackageId()
     {
         await SeedAsync();
 
-        await Assert.ThrowsAsync<BusinessException>(() => BuildSelectAsync(100, 3));
+        await Assert.ThrowsAsync<BusinessException>(() => BuildSelectAsync(100, 999));
     }
 
     [Fact]

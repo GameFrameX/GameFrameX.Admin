@@ -13,11 +13,6 @@ public class GameAppReleaseVersionResponse : IBasePageResponse<TenantGameAppRele
     public long Id { get; set; }
 
     /// <summary>
-    /// 应用作用域，0 / null 表示租户默认配置
-    /// </summary>
-    public long? AppId { get; set; }
-
-    /// <summary>
     /// 渠道
     /// </summary>
     public string Channel { get; set; } = null!;

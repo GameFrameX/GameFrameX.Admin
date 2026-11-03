@@ -34,35 +34,22 @@ public sealed class AssetPackageScopeValidatorTests : IDisposable
     {
         await SeedAsync();
 
-        await AssetPackageScopeValidator.ValidateAsync(100, "base", Query());
+        await AssetPackageScopeValidator.ValidateAsync("base", Query());
     }
 
     /// <summary>
     /// 同名资源包属于其它应用时拒绝，避免跨应用引用。
     /// </summary>
     [Fact]
-    public async Task AssetPackageBelongsToOtherApp_Throws()
+    public async Task MissingAssetPackage_Throws()
     {
         await SeedAsync();
 
         Assert.ThrowsAny<Exception>(() =>
-                                        AssetPackageScopeValidator.ValidateAsync(200, "base", Query()).GetAwaiter().GetResult());
+                                        AssetPackageScopeValidator.ValidateAsync("missing", Query()).GetAwaiter().GetResult());
     }
 
-    /// <summary>
-    /// 缺少应用时拒绝，资源包版本不能落到租户默认层。
-    /// </summary>
-    [Theory]
-    [InlineData(0L)]
-    [InlineData(-1L)]
-    [InlineData(null)]
-    public async Task MissingAppId_Throws(long? appId)
-    {
-        await SeedAsync();
 
-        Assert.ThrowsAny<Exception>(() =>
-                                        AssetPackageScopeValidator.ValidateAsync(appId, "base", Query()).GetAwaiter().GetResult());
-    }
 
     /// <summary>
     /// 空资源包名称拒绝。
@@ -76,7 +63,7 @@ public sealed class AssetPackageScopeValidatorTests : IDisposable
         await SeedAsync();
 
         Assert.ThrowsAny<Exception>(() =>
-                                        AssetPackageScopeValidator.ValidateAsync(100, assetPackageName, Query()).GetAwaiter().GetResult());
+                                        AssetPackageScopeValidator.ValidateAsync(assetPackageName, Query()).GetAwaiter().GetResult());
     }
 
     private ISugarQueryable<TenantGameAppAssetPackageEntity> Query()

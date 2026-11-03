@@ -6,11 +6,6 @@ namespace GameFrameX.Application.Game.App.GameAppAssetPackageVersion.Dto;
 public class AddGameAppAssetPackageVersionRequest : BaseAddRequest
 {
     /// <summary>
-    /// 应用作用域，0 / null 表示租户默认配置
-    /// </summary>
-    public virtual long? AppId { get; set; }
-
-    /// <summary>
     /// 主键Id
     /// </summary>
     [Required(ErrorMessage = "主键Id不能为空")]

@@ -6,11 +6,6 @@ namespace GameFrameX.Application.Game.App.GameAppReleaseVersion.Dto;
 public class PageGameAppReleaseVersionRequest : BaseAppFilterPageRequest
 {
     /// <summary>
-    /// 应用作用域筛选；null 不筛，0 表示租户默认
-    /// </summary>
-    public long? AppId { get; set; }
-
-    /// <summary>
     /// OldVersion
     /// </summary>
     public string? OldVersion { get; set; }

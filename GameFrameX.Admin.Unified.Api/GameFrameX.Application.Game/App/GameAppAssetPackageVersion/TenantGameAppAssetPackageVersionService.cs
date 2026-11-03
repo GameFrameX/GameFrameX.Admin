@@ -33,11 +33,6 @@ public class TenantGameAppAssetPackageVersionService : GenericCrudService<Entity
     /// </summary>
     protected override ISugarQueryable<GameAppAssetPackageVersionResponse> BuildPageQuery(PageGameAppAssetPackageVersionRequest input)
     {
-        if (input.AppId is null or <= 0)
-        {
-            throw BusinessError.Oh("请选择应用后再维护资源包版本");
-        }
-
         var channel = input.Channel?.Trim() ?? string.Empty;
         var platform = input.Platform?.Trim() ?? string.Empty;
         var appVersion = input.AppVersion?.Trim() ?? string.Empty;
@@ -51,50 +46,44 @@ public class TenantGameAppAssetPackageVersionService : GenericCrudService<Entity
                          .WhereIF(!string.IsNullOrEmpty(package), u => u.Package == package)
                          .WhereIF(!string.IsNullOrEmpty(language), u => (u.Language ?? string.Empty).Contains(language))
                          .WhereIF(!string.IsNullOrEmpty(assetPackageName), u => (u.AssetPackageName ?? string.Empty).Contains(assetPackageName))
-                         .Where(u => u.AppId == input.AppId.Value)
+
                          .Select<GameAppAssetPackageVersionResponse>();
     }
 
     /// <summary>
-    /// 新增前：校验包名属于当前租户 + 当前应用下启用分包或为 default
+    /// 新增前：校验包名属于主库中启用分包或为 default
     /// </summary>
     protected override async Task OnAddingAsync(AddGameAppAssetPackageVersionRequest input)
     {
-        await PackageScopeValidator.ValidateAsync(input.AppId, input.Package, _packageRepository.AsQueryable());
-        await AssetPackageScopeValidator.ValidateAsync(input.AppId, input.AssetPackageName, _assetPackageRepository.AsQueryable());
-        await CheckAssetPackageVersionUniqueAsync(input.AppId.GetValueOrDefault(), input.Channel, input.Platform, input.AppVersion, input.Package, input.Language, input.AssetPackageName);
+        await PackageScopeValidator.ValidateAsync(input.Package, _packageRepository.AsQueryable());
+        await AssetPackageScopeValidator.ValidateAsync(input.AssetPackageName, _assetPackageRepository.AsQueryable());
+        await CheckAssetPackageVersionUniqueAsync(input.Channel, input.Platform, input.AppVersion, input.Package, input.Language, input.AssetPackageName);
     }
 
     /// <summary>
-    /// 获取当前应用 + 当前分包下可选的资源版本列表。
+    /// 获取当前分包下可选的资源版本列表。
     /// </summary>
     [HttpPost(CrudActionRoutes.Select)]
     [ApiDescriptionSettings(Name = "Select")]
     public async Task<List<BaseSelectPageResponse>> SelectAsync(PageGameAppAssetPackageVersionSelectRequest input)
     {
-        if (input.AppId is null or <= 0)
-        {
-            throw BusinessError.Oh("请选择应用后再查询资源版本");
-        }
-
-        var appId = input.AppId.Value;
         if (input.AppPackageId is null or <= 0)
         {
             return new List<BaseSelectPageResponse>();
         }
 
         var package = await _packageRepository.AsQueryable()
-                                              .Where(u => u.Id == input.AppPackageId.Value && u.GameAppId == appId)
+                                              .Where(u => u.Id == input.AppPackageId.Value)
                                               .Select(u => new { u.Id, u.PackageName, })
                                               .FirstAsync();
         if (package == null)
         {
-            throw BusinessError.Oh("分包不属于当前应用");
+            throw BusinessError.Oh("分包不存在");
         }
 
         var searchKey = input.SearchKey?.Trim() ?? string.Empty;
         var versions = await Repository.AsQueryable()
-                                       .Where(u => u.AppId == appId && u.Package == package.PackageName)
+                                       .Where(u => u.Package == package.PackageName)
                                        .WhereIF(!string.IsNullOrWhiteSpace(searchKey), u =>
                                                     (u.ResourceVersion ?? string.Empty).Contains(searchKey)
                                                     || (u.Description ?? string.Empty).Contains(searchKey))
@@ -129,7 +118,7 @@ public class TenantGameAppAssetPackageVersionService : GenericCrudService<Entity
         return list;
     }
 
-    private async Task CheckAssetPackageVersionUniqueAsync(long appId, string? channel, string? platform, string? appVersion, string? package, string? language, string? assetPackageName)
+    private async Task CheckAssetPackageVersionUniqueAsync(string? channel, string? platform, string? appVersion, string? package, string? language, string? assetPackageName)
     {
         var normalizedChannel = channel?.Trim() ?? string.Empty;
         var normalizedPlatform = platform?.Trim() ?? string.Empty;
@@ -138,8 +127,7 @@ public class TenantGameAppAssetPackageVersionService : GenericCrudService<Entity
         var normalizedLanguage = language?.Trim() ?? string.Empty;
         var normalizedAssetPackageName = assetPackageName?.Trim() ?? string.Empty;
         var exists = await Repository.AsQueryable()
-                                     .Where(u => u.AppId == appId
-                                                 && u.Channel == normalizedChannel
+                                     .Where(u => u.Channel == normalizedChannel
                                                  && u.Platform == normalizedPlatform
                                                  && u.AppVersion == normalizedAppVersion
                                                  && u.Package == normalizedPackage

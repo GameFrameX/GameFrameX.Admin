@@ -6,13 +6,6 @@ namespace GameFrameX.Application.Game.App.GameAppAssetPackage.Dto;
 public class AddGameAppAssetPackageRequest : BaseAddRequest
 {
     /// <summary>
-    /// 游戏应用标识。资源包定义必须绑定具体应用，不能写入 0。
-    /// </summary>
-    [Required(ErrorMessage = "游戏应用不能为空")]
-    [AdaptMember("GameAppId")]
-    public long AppId { get; set; }
-
-    /// <summary>
     /// 主键Id
     /// </summary>
     [Required(ErrorMessage = "主键Id不能为空")]

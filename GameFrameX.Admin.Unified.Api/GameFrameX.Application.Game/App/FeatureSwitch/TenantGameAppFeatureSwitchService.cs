@@ -9,7 +9,7 @@ namespace GameFrameX.Application.Game.App.FeatureSwitch;
 /// <summary>
 /// 活动/功能开关管理服务（开关注册表的运营维护面）。
 /// <para>写入侧负责把作用域语义固化为可投放事实：消费方标记合法、时间窗不倒置、作用域维度空值归一为
-/// Default 哨兵、租户默认层不得携带具体包名、同作用域组合不重复。</para>
+/// Default 哨兵、同作用域组合不重复。</para>
 /// </summary>
 [ApiDescriptionSettings(ClientConst.GroupName, Order = 100)]
 public class TenantGameAppFeatureSwitchService : GenericCrudService<TenantGameAppFeatureSwitchEntity, AddGameAppFeatureSwitchRequest, UpdateGameAppFeatureSwitchRequest, GameAppFeatureSwitchResponse, PageGameAppFeatureSwitchRequest>
@@ -28,7 +28,7 @@ public class TenantGameAppFeatureSwitchService : GenericCrudService<TenantGameAp
     }
 
     /// <summary>
-    /// 构建分页查询条件：应用作用域按「正值看应用行、留空看租户默认层」收口，避免两层行混列。
+    /// 构建分页查询条件：按开关键、消费方和启用状态过滤。
     /// </summary>
     /// <param name="input">分页查询输入。</param>
     /// <returns>分页查询。</returns>
@@ -36,11 +36,7 @@ public class TenantGameAppFeatureSwitchService : GenericCrudService<TenantGameAp
     {
         var switchKey = input.SwitchKey?.Trim() ?? string.Empty;
         var audience = input.Audience?.Trim() ?? string.Empty;
-        var appId = input.AppId.GetValueOrDefault();
         var query = Repository.AsQueryable();
-        query = appId > 0
-                    ? query.Where(u => u.AppId == appId)
-                    : query.Where(u => u.AppId == null || u.AppId == 0);
         return query.WhereIF(!string.IsNullOrEmpty(switchKey), u => u.SwitchKey.Contains(switchKey))
                     .WhereIF(!string.IsNullOrEmpty(audience), u => u.Audience == audience)
                     .WhereIF(input.IsEnabled.HasValue, u => u.IsEnabled == input.IsEnabled.Value)
@@ -55,12 +51,12 @@ public class TenantGameAppFeatureSwitchService : GenericCrudService<TenantGameAp
     protected override async Task OnAddingAsync(AddGameAppFeatureSwitchRequest input)
     {
         NormalizeAndValidate(input);
-        await PackageScopeValidator.ValidateAsync(input.AppId, input.Package, _packageRepository.AsQueryable());
+        await PackageScopeValidator.ValidateAsync(input.Package, _packageRepository.AsQueryable());
         await EnsureScopeUniqueAsync(input, null);
     }
 
     /// <summary>
-    /// 更新前：记录存在 + 应用作用域锁定（不可跨应用改挂）+ 归一化与校验 + 包名作用域校验 + 同作用域组合查重（排除自身）。
+    /// 更新前：记录存在+ 归一化与校验 + 包名作用域校验 + 同作用域组合查重（排除自身）。
     /// </summary>
     /// <param name="input">更新输入。</param>
     /// <returns>异步任务。</returns>
@@ -72,9 +68,8 @@ public class TenantGameAppFeatureSwitchService : GenericCrudService<TenantGameAp
             throw BusinessError.Oh(CommonErrorCode.RecordNotFound);
         }
 
-        input.AppId = existing.AppId;
         NormalizeAndValidate(input);
-        await PackageScopeValidator.ValidateAsync(input.AppId, input.Package, _packageRepository.AsQueryable());
+        await PackageScopeValidator.ValidateAsync(input.Package, _packageRepository.AsQueryable());
         await EnsureScopeUniqueAsync(input, input.Id);
     }
 
@@ -189,18 +184,17 @@ public class TenantGameAppFeatureSwitchService : GenericCrudService<TenantGameAp
     }
 
     /// <summary>
-    /// 同作用域组合查重：开关键 + 应用作用域 + 四个作用域维度全部相同即视为重复（租户维度由仓储过滤器收口）。
-    /// <para>排重不下沉到 DB 唯一索引：作用域维度可空组合多，索引无法表达「租户默认层」的等价类。</para>
+    /// 同作用域组合查重：开关键 + 四个投放维度全部相同即视为重复。
+    /// <para>排重不下沉到 DB 唯一索引：投放维度可空组合多，统一归一化后检查唯一性。</para>
     /// </summary>
     /// <param name="input">新增或更新输入，作用域维度须已归一化。</param>
     /// <param name="excludeId">更新时排除自身；新增传 null。</param>
     /// <returns>异步任务。</returns>
     private async Task EnsureScopeUniqueAsync(GameAppFeatureSwitchBaseRequest input, long? excludeId)
     {
-        var appId = input.AppId.GetValueOrDefault();
         var duplicated = await Repository.AsQueryable()
-                                         .WhereIF(appId > 0, u => u.AppId == appId)
-                                         .WhereIF(appId <= 0, u => u.AppId == null || u.AppId == 0)
+
+
                                          .Where(u => u.SwitchKey == input.SwitchKey
                                                      && u.Platform == input.Platform
                                                      && u.Package == input.Package

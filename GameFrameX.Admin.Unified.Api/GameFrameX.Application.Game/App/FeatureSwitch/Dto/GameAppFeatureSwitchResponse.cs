@@ -13,11 +13,6 @@ public class GameAppFeatureSwitchResponse : IBasePageResponse<TenantGameAppFeatu
     public long Id { get; set; }
 
     /// <summary>
-    /// 应用作用域，0 / null 表示租户默认层
-    /// </summary>
-    public long? AppId { get; set; }
-
-    /// <summary>
     /// 开关键
     /// </summary>
     public string SwitchKey { get; set; } = null!;

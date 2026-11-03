@@ -8,12 +8,7 @@ namespace GameFrameX.Application.Game.App.FeatureSwitch.Dto;
 public class GameAppFeatureSwitchBaseRequest : BaseAddRequest
 {
     /// <summary>
-    /// 应用作用域；null / 0 表示租户默认层
-    /// </summary>
-    public long? AppId { get; set; }
-
-    /// <summary>
-    /// 开关键（同一应用作用域 + 相同作用域维度组合内唯一）
+    /// 开关键（相同投放维度组合内唯一）
     /// </summary>
     public string SwitchKey { get; set; } = null!;
 
@@ -53,7 +48,7 @@ public class GameAppFeatureSwitchBaseRequest : BaseAddRequest
     public string? Platform { get; set; }
 
     /// <summary>
-    /// 包名作用域；空 / default 表示不限，租户默认层不允许携带具体包名
+    /// 包名作用域；空 / default 表示不限
     /// </summary>
     public string? Package { get; set; }
 

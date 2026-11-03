@@ -17,33 +17,22 @@ public class TenantGameAppAssetPackageService : GenericCrudSelectService<Entity.
     /// </summary>
     protected override ISugarQueryable<GameAppAssetPackageResponse> BuildPageQuery(PageGameAppAssetPackageRequest input)
     {
-        if (input.AppId is null or <= 0)
-        {
-            throw BusinessError.Oh("请选择应用后再维护资源包");
-        }
-
         var name = input.Name?.Trim() ?? string.Empty;
         return Repository.AsQueryable()
-                         .Where(u => u.GameAppId == input.AppId.Value)
-                         .WhereIF(!string.IsNullOrEmpty(name), u => u.Name.Contains(name))
+                                                  .WhereIF(!string.IsNullOrEmpty(name), u => u.Name.Contains(name))
                          .Select<GameAppAssetPackageResponse>();
     }
 
     /// <summary>
-    /// 获取当前应用下的资源包选择器列表。
+    /// 获取主库中的资源包选择器列表。
     /// </summary>
     [HttpPost(CrudActionRoutes.Select)]
     public override async Task<List<BaseSelectPageResponse>> SelectAsync(BaseSelectPageRequest input)
     {
-        if (input.AppId is null or <= 0)
-        {
-            return new List<BaseSelectPageResponse>();
-        }
-
         var searchKey = input.SearchKey?.Trim() ?? string.Empty;
         var pageSize = Math.Min(input.PageSize > 0 ? input.PageSize : BaseSelectPageRequest.DefaultPageSize, BaseSelectPageRequest.MaxPageSize);
         var query = await Repository.AsQueryable()
-                                    .Where(u => u.IsDeleted == false && u.GameAppId == input.AppId.Value)
+                                    .Where(u => u.IsDeleted == false)
                                     .WhereIF(!string.IsNullOrWhiteSpace(searchKey), u =>
                                                  (u.Name ?? string.Empty).Contains(searchKey))
                                     .OrderBy(u => u.CreatedTime)
@@ -53,20 +42,15 @@ public class TenantGameAppAssetPackageService : GenericCrudSelectService<Entity.
     }
 
     /// <summary>
-    /// 新增前强制资源包绑定具体应用，并校验同一应用内名称唯一。
+    /// 新增前校验主库内资源包名称唯一。
     /// </summary>
     protected override async Task OnAddingAsync(AddGameAppAssetPackageRequest input)
     {
-        if (input.AppId <= 0)
-        {
-            throw BusinessError.Oh("请选择应用后再新增资源包");
-        }
-
-        await CheckAppPackageNameUniqueAsync(input.AppId, input.Name);
+        await CheckPackageNameUniqueAsync(input.Name);
     }
 
     /// <summary>
-    /// 更新前校验记录仍属于当前应用，并校验同一应用内名称唯一。
+    /// 更新前校验记录存在并校验主库内名称唯一。
     /// </summary>
     protected override async Task OnUpdatingAsync(UpdateGameAppAssetPackageRequest input)
     {
@@ -76,18 +60,13 @@ public class TenantGameAppAssetPackageService : GenericCrudSelectService<Entity.
             throw BusinessError.Oh(CommonErrorCode.RecordNotFound);
         }
 
-        if (input.AppId.HasValue && input.AppId.Value > 0 && existing.GameAppId != input.AppId.Value)
-        {
-            throw BusinessError.Oh("资源包不属于当前应用");
-        }
-
-        await CheckAppPackageNameUniqueAsync(existing.GameAppId, input.Name, input.Id);
+        await CheckPackageNameUniqueAsync(input.Name, input.Id);
     }
 
-    private async Task CheckAppPackageNameUniqueAsync(long gameAppId, string name, long? excludeId = null)
+    private async Task CheckPackageNameUniqueAsync(string name, long? excludeId = null)
     {
         var normalized = name?.Trim() ?? string.Empty;
-        var query = Repository.AsQueryable().Where(u => u.GameAppId == gameAppId && u.Name == normalized);
+        var query = Repository.AsQueryable().Where(u => u.Name == normalized);
         if (excludeId.HasValue)
         {
             var id = excludeId.Value;

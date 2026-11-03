@@ -15,7 +15,6 @@ public class BackendDuplicationDtoContractTests
     {
         "ActiveModeCode",
         "AotCodeList",
-        "AppId",
         "AppVersion",
         "Channel",
         "CheckAppVersionUrl",
@@ -34,7 +33,6 @@ public class BackendDuplicationDtoContractTests
     private static readonly string[] ReleaseVersionEditFields =
     {
         "Announcement",
-        "AppId",
         "AppVersion",
         "Channel",
         "Description",

@@ -121,27 +121,25 @@ public sealed class TenantGameAppFeatureSwitchServiceTests : IDisposable
     /// 租户默认层与应用层是两个独立作用域空间，同键同行互不冲突。
     /// </summary>
     [Fact]
-    public async Task Add_AllowsSameKeyAcrossAppAndTenantDefaultLayer()
+    public async Task Add_RejectsDuplicateInMainDatabase()
     {
         var service = CreateService();
         await InsertAsync("switch.layered", App100);
 
         var tenantDefault = NewRequest("switch.layered");
-        tenantDefault.AppId = null;
-        var row = await service.AddAsync(tenantDefault);
 
-        Assert.Null(row.AppId);
+        await Assert.ThrowsAsync<BusinessException>(() => service.AddAsync(tenantDefault));
     }
 
     /// <summary>
     /// 租户默认层（AppId &lt;= 0）不得携带具体包名（C80 规则，由 PackageScopeValidator 收口）。
     /// </summary>
     [Fact]
-    public async Task Add_RejectsConcretePackageOnTenantDefaultLayer()
+    public async Task Add_RejectsUnregisteredPackage()
     {
         var service = CreateService();
         var request = NewRequest("switch.package");
-        request.AppId = null;
+
         request.Package = "com.gameframe.demo";
 
         await Assert.ThrowsAsync<BusinessException>(() => service.AddAsync(request));
@@ -257,7 +255,7 @@ public sealed class TenantGameAppFeatureSwitchServiceTests : IDisposable
     /// 更新锁定应用作用域：调用方传 AppId 也不允许把应用行改挂到租户默认层。
     /// </summary>
     [Fact]
-    public async Task Update_LocksAppScope()
+    public async Task Update_PersistsChangedValue()
     {
         var service = CreateService();
         var row = await service.AddAsync(NewRequest("switch.locked"));
@@ -266,7 +264,6 @@ public sealed class TenantGameAppFeatureSwitchServiceTests : IDisposable
         {
             Id = row.Id,
             RowVersion = row.RowVersion,
-            AppId = null,
             SwitchKey = row.SwitchKey,
             DisplayName = row.DisplayName,
             Audience = row.Audience,
@@ -274,7 +271,7 @@ public sealed class TenantGameAppFeatureSwitchServiceTests : IDisposable
         });
 
         var stored = await _db.Queryable<TenantGameAppFeatureSwitchEntity>().FirstAsync(u => u.Id == row.Id);
-        Assert.Equal(App100, stored.AppId);
+        Assert.Equal("{\"v\":2}", stored.ValueJson);
     }
 
     /// <summary>
@@ -290,7 +287,6 @@ public sealed class TenantGameAppFeatureSwitchServiceTests : IDisposable
         {
             Id = row.Id,
             RowVersion = row.RowVersion,
-            AppId = App100,
             SwitchKey = row.SwitchKey,
             DisplayName = "改名后",
             Audience = row.Audience,
@@ -323,7 +319,7 @@ public sealed class TenantGameAppFeatureSwitchServiceTests : IDisposable
     /// 分页按应用作用域收口：正值只看该应用行，留空只看租户默认层行，两层不混列。
     /// </summary>
     [Fact]
-    public async Task Page_ScopesToAppOrTenantDefaultLayer()
+    public async Task Page_QueriesMainDatabaseAndAppliesBusinessFilter()
     {
         await InsertAsync("switch.app100", App100);
         await InsertAsync("switch.app200", App200);
@@ -331,13 +327,10 @@ public sealed class TenantGameAppFeatureSwitchServiceTests : IDisposable
 
         var service = CreateService();
 
-        var appPage = await service.PageAsync(new PageGameAppFeatureSwitchRequest { AppId = App100, });
-        var appRow = Assert.Single(appPage.Items);
-        Assert.Equal("switch.app100", appRow.SwitchKey);
-
-        var defaultPage = await service.PageAsync(new PageGameAppFeatureSwitchRequest());
-        var defaultRow = Assert.Single(defaultPage.Items);
-        Assert.Equal("switch.default", defaultRow.SwitchKey);
+        var page = await service.PageAsync(new PageGameAppFeatureSwitchRequest());
+        Assert.Equal(3, page.Items.Count());
+        var filtered = await service.PageAsync(new PageGameAppFeatureSwitchRequest { SwitchKey = "switch.default", });
+        Assert.Equal("switch.default", Assert.Single(filtered.Items).SwitchKey);
     }
 
     private TenantGameAppFeatureSwitchService CreateService()
@@ -351,7 +344,6 @@ public sealed class TenantGameAppFeatureSwitchServiceTests : IDisposable
     {
         return new AddGameAppFeatureSwitchRequest
         {
-            AppId = App100,
             SwitchKey = switchKey,
             DisplayName = switchKey,
             Audience = FeatureSwitchAudienceValues.Both,

@@ -13,11 +13,6 @@ public class GameAppAssetPackageResponse : IBasePageResponse<TenantGameAppAssetP
     public long Id { get; set; }
 
     /// <summary>
-    /// 游戏应用标识。
-    /// </summary>
-    public long GameAppId { get; set; }
-
-    /// <summary>
     /// 名称
     /// </summary>
     public string Name { get; set; } = null!;

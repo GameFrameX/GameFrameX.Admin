@@ -49,8 +49,8 @@ public sealed class PackageScopeValidatorTests : IDisposable
         await SeedAsync();
 
         // AppId=null / 0 均应放行（兜底语义不要求应用作用域）
-        await PackageScopeValidator.ValidateAsync(null, package, Query());
-        await PackageScopeValidator.ValidateAsync(0, package, Query());
+        await PackageScopeValidator.ValidateAsync(package, Query());
+        await PackageScopeValidator.ValidateAsync(package, Query());
     }
 
     /// <summary>
@@ -62,7 +62,7 @@ public sealed class PackageScopeValidatorTests : IDisposable
         await SeedAsync();
 
         // com.app.a 属于 GameAppId=100 且启用
-        await PackageScopeValidator.ValidateAsync(100, "com.app.a", Query());
+        await PackageScopeValidator.ValidateAsync("com.app.a", Query());
     }
 
     /// <summary>
@@ -75,20 +75,19 @@ public sealed class PackageScopeValidatorTests : IDisposable
 
         // com.app.b 属于 GameAppId=100 但 IsEnabled=false
         Assert.ThrowsAny<Exception>(() =>
-                                        PackageScopeValidator.ValidateAsync(100, "com.app.b", Query()).GetAwaiter().GetResult());
+                                        PackageScopeValidator.ValidateAsync("com.app.b", Query()).GetAwaiter().GetResult());
     }
 
     /// <summary>
-    /// 具体包名属于其它应用（跨应用）→ 抛错。
+    /// 主库登记的启用分包可以使用。
     /// </summary>
     [Fact]
-    public async Task SpecificPackage_BelongingToOtherApp_Throws()
+    public async Task SpecificPackage_InMainDatabase_Passes()
     {
         await SeedAsync();
 
         // com.app.c 属于 GameAppId=200，当前作用域 100 下不应命中
-        Assert.ThrowsAny<Exception>(() =>
-                                        PackageScopeValidator.ValidateAsync(100, "com.app.c", Query()).GetAwaiter().GetResult());
+        await PackageScopeValidator.ValidateAsync("com.app.c", Query());
     }
 
     /// <summary>
@@ -100,23 +99,10 @@ public sealed class PackageScopeValidatorTests : IDisposable
         await SeedAsync();
 
         Assert.ThrowsAny<Exception>(() =>
-                                        PackageScopeValidator.ValidateAsync(100, "com.unknown", Query()).GetAwaiter().GetResult());
+                                        PackageScopeValidator.ValidateAsync("com.unknown", Query()).GetAwaiter().GetResult());
     }
 
-    /// <summary>
-    /// 具体包名 + AppId<=0（租户默认层）→ 抛错，禁止「租户默认 + 具体包名」组合。
-    /// </summary>
-    [Theory]
-    [InlineData(0L)]
-    [InlineData(-1L)]
-    [InlineData(null)]
-    public async Task SpecificPackage_AtTenantDefaultLayer_Throws(long? appId)
-    {
-        await SeedAsync();
 
-        Assert.ThrowsAny<Exception>(() =>
-                                        PackageScopeValidator.ValidateAsync(appId, "com.app.a", Query()).GetAwaiter().GetResult());
-    }
 
     private ISugarQueryable<TenantGameAppPackageEntity> Query()
     {
