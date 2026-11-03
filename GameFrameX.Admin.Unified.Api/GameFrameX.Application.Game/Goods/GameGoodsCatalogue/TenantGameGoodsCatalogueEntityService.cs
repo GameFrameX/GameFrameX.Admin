@@ -1,4 +1,3 @@
-using GameFrameX.Application.Game.App.AppScope;
 using GameFrameX.Application.Game.Goods.GameGoodsCatalogue.Dto;
 
 #pragma warning disable CS8602, CS8604, CS8629 // SqlSugar WhereIF(condition, lambda)：lambda 仅在 condition=true 时执行；NRT 无法跨方法传播条件守卫，lambda 内 .Trim()/.Value 实际安全
@@ -13,18 +12,13 @@ public class TenantGameGoodsCatalogueEntityService
         AddTenantGameGoodsCatalogueEntityRequest, UpdateTenantGameGoodsCatalogueEntityRequest,
         TenantGameGoodsCatalogueEntityResponse, PageTenantGameGoodsCatalogueEntityRequest>
 {
-    private readonly SqlSugarRepository<Entity.Tenant.Game.TenantGameAppEntity> _gameAppRepository;
-
-    public TenantGameGoodsCatalogueEntityService(SqlSugarRepository<Entity.Tenant.Game.TenantGameGoodsCatalogueEntity> repository, SqlSugarRepository<Entity.Tenant.Game.TenantGameAppEntity> gameAppRepository)
+    public TenantGameGoodsCatalogueEntityService(SqlSugarRepository<Entity.Tenant.Game.TenantGameGoodsCatalogueEntity> repository)
         : base(repository)
     {
-        _gameAppRepository = gameAppRepository;
     }
 
     protected override async Task OnAddingAsync(AddTenantGameGoodsCatalogueEntityRequest input)
     {
-        AppScopeRules.EnsureFactAppId(input.AppId, "游戏资源分类");
-        await _gameAppRepository.ValidateGameAppBelongsToTenantAsync(input.AppId);
         await CheckNameUniqueAsync(input.Name);
     }
 
@@ -36,19 +30,14 @@ public class TenantGameGoodsCatalogueEntityService
             throw BusinessError.Oh(CommonErrorCode.RecordNotFound);
         }
 
-        input.AppId = existing.AppId;
-        AppScopeRules.EnsureFactAppId(input.AppId, "游戏资源分类");
-        await _gameAppRepository.ValidateGameAppBelongsToTenantAsync(input.AppId);
         await CheckNameUniqueAsync(input.Name, input.Id);
     }
 
     protected override ISugarQueryable<TenantGameGoodsCatalogueEntityResponse> BuildPageQuery(PageTenantGameGoodsCatalogueEntityRequest input)
     {
-        var appId = AppScopeRules.EnsureFactAppId(input.AppId, "游戏资源分类");
         return Repository.AsQueryable()
                          .WhereIF(!string.IsNullOrWhiteSpace(input.Name), u => u.Name.Contains(input.Name.Trim()))
                          .WhereIF(!string.IsNullOrWhiteSpace(input.Description), u => u.Description.Contains(input.Description.Trim()))
-                         .Where(u => u.AppId == appId)
                          .Select<TenantGameGoodsCatalogueEntityResponse>();
     }
 }

@@ -25,7 +25,7 @@ public class TenantGameCommodityEntityContractTests
         var request = JsonSerializer.Deserialize<AddTenantGameCommodityEntityRequest>(payload, CreateOptions());
 
         Assert.NotNull(request);
-        Assert.Equal(1300000000001, request.AppId);
+        Assert.Null(typeof(AddTenantGameCommodityEntityRequest).GetProperty("AppId"));
         Assert.Equal("OnSale", request.Status);
         Assert.Equal(7451234567890123, request.CategoryId);
         Assert.Equal(5, request.Number);

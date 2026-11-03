@@ -8,11 +8,6 @@ namespace GameFrameX.Application.Game.Goods.GameCommodity.Dto;
 public class PageTenantGameCommodityEntityRequest : BasePageRequest
 {
     /// <summary>
-    /// 应用Id（可选过滤，按当前应用筛选商品交易）
-    /// </summary>
-    public long? AppId { get; set; }
-
-    /// <summary>
     /// 状态
     /// </summary>
     public string Status { get; set; } = null!;

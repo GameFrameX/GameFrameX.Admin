@@ -11,11 +11,6 @@ public class TenantGameCommodityEntityResponse : IBasePageResponse<Entity.Tenant
     public long Id { get; set; }
 
     /// <summary>
-    /// 应用Id。运营内容应用作用域（TenantId + AppId），必须 &gt; 0。
-    /// </summary>
-    public long AppId { get; set; }
-
-    /// <summary>
     /// Status
     ///</summary>
     public string Status { get; set; } = null!;

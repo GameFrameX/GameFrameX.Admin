@@ -6,11 +6,6 @@ namespace GameFrameX.Application.Game.Goods.GameGoods.Dto;
 public class PageTenantGameGoodsEntityRequest : BasePageRequest
 {
     /// <summary>
-    /// 应用Id（可选过滤，按当前应用筛选游戏资源）
-    /// </summary>
-    public long? AppId { get; set; }
-
-    /// <summary>
     /// 配置ID
     /// </summary>
     public int? ConfigId { get; set; }

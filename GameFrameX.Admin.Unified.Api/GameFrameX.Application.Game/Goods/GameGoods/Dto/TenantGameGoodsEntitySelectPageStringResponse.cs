@@ -6,11 +6,6 @@
 public class TenantGameGoodsEntitySelectPageStringResponse : BaseSelectPageStringResponse
 {
     /// <summary>
-    /// 应用Id
-    /// </summary>
-    public long AppId { get; set; }
-
-    /// <summary>
     /// 星级
     /// </summary>
     public bool? Star { get; set; }

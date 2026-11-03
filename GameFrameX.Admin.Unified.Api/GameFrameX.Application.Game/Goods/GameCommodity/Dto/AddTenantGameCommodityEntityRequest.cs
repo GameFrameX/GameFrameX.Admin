@@ -12,13 +12,6 @@ namespace GameFrameX.Application.Game.Goods.GameCommodity.Dto;
 public class AddTenantGameCommodityEntityRequest : BaseAddRequest
 {
     /// <summary>
-    /// 应用Id。事实数据应用作用域，必须 &gt; 0。
-    /// <para>过渡期：后台运营当前应用上下文尚未建立，由前端手填。</para>
-    /// </summary>
-    [Required(ErrorMessage = "应用Id不能为空")]
-    public long AppId { get; set; }
-
-    /// <summary>
     /// 状态
     /// </summary>
     [Required(ErrorMessage = "状态不能为空")]
