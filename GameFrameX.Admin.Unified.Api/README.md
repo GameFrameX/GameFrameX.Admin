@@ -67,7 +67,7 @@ Client API and Hub API are both "leaner": Client API only references Entity + Pa
 
 1. **Write a Service and you get APIs for free** (Admin API). Implement `IDynamicApiController`, and the public methods in your class automatically become REST endpoints — no hand-written Controllers, no hand-pasted `[Route]`. This is the soul of Admin API.
 2. **Write an entity and tables get created for free**. SqlSugar Code-First: at startup it scans entity classes → creates tables → fills seed data. You never write a line of DDL SQL; change a field, restart, and the table schema catches up.
-3. **Multi-tenancy comes out of the box**. Tag an entity, and queries automatically get a `TenantId` filter plus automatic soft delete; only SuperAdmin can punch through the wall. When writing business code you barely notice it exists.
+3. **One main database for all hosts**. Repositories use `ConfigId=main`; login and business data have no tenant or application dimension. Soft deletion and creator data permissions remain.
 
 ---
 
@@ -131,10 +131,10 @@ GameFrameX.Admin.Unified.Api/
 ├── GameFrameX.Hub.Api/            # Hub API host (standalone WebApplication, traditional Controller routing)
 ├── GameFrameX.Web.Core/           # Admin startup logic, middleware, DI setup (important)
 ├── GameFrameX.Application/        # Application layer (config files, seed data)
-├── GameFrameX.Application.System/ # System management services (users/roles/menus/tenants/logs...)
+├── GameFrameX.Application.System/ # System management services (users/roles/menus/logs...)
 ├── GameFrameX.Application.Game/   # Game management services (zones/orders/mails/redeem codes...)
 ├── GameFrameX.Application.Client/ # Client management services (versions/channels/asset packages...)
-├── GameFrameX.Application.Tenant/ # Tenant-level services (devices / device groups)
+├── GameFrameX.Application.Tenant/ # Business services (devices / device groups; legacy project name)
 ├── GameFrameX.Entity/             # Entity layer (Base / System / Game / Client)
 ├── GameFrameX.Core/               # Core layer (repositories, service base classes, auth, SignalR)
 ├── GameFrameX.Core.Enum/          # Enum definitions
@@ -176,15 +176,13 @@ Note: SQLite is for local development/debugging only. SQLite is forbidden in liv
 **Production / containers (PostgreSQL, override env vars in pairs)**: when overriding the database, the type and the connection string must be set **as a pair**; a half override fails outright at startup. All three hosts (Web / Client / Hub) use **the same pair of variables**:
 
 - `GFX_MAIN_DB_TYPE=PostgreSQL` + `GFX_MAIN_DB_CONNECTION_STRING=Host=...`
-- Default tenant database needs no configuration: it is derived automatically from the main connection string (only the database name changes, see below)
+- All three hosts use only `ConfigId=main`. There is no automatic tenant database creation or derivation.
 - The legacy bare `DbType` / `ConnectionString` startup parameters still work (compatibility layer); startup prints a migration warning — switch soon
 - For other databases (MySQL / Oracle / DM… all 34 DbTypes), connection string syntax and examples: [`GameFrameX.Application/Configuration/Database-ConnectionStrings.md`](GameFrameX.Application/Configuration/Database-ConnectionStrings.md)
 
 A few more database conventions worth knowing:
 
-- **Tenant databases are created automatically**. When creating a normal tenant, the system automatically generates the `gameframex_admin_tenant_<TenantId>` database and the corresponding login role — **SuperAdmin does not need to fill in tenant connection strings by hand**.
-- **The default tenant database is also derived automatically (C269)**. Main connection string → default tenant connection string: for PostgreSQL / MySQL only the database name is replaced with `gameframex_admin_tenant_1300000000001` (same rule as normal tenant DBs; account/password inherited from the main DB; MySQL forces utf8mb4 on database creation); for SQLite it lands next to the main database file as `gameframex_admin_tenant_1300000000001.db`. Only PostgreSQL / MySQL / SQLite are supported; other types fail at startup. Explicit configuration wins: add back the `ConfigId=1300000000001` entry in `Database.json` or set `GFX_DEFAULT_TENANT_DB_TYPE` + `GFX_DEFAULT_TENANT_DB_CONNECTION_STRING` as a pair.
-- **Upgrading existing deployments (BREAKING)**: the default tenant database name changes from `gameframex_admin_tenant_default` to `gameframex_admin_tenant_1300000000001`. Pick one: a. rename online with `ALTER DATABASE gameframex_admin_tenant_default RENAME TO gameframex_admin_tenant_1300000000001` (the registry follows the derived value automatically); b. set `GFX_DEFAULT_TENANT_DB_*` as a pair pointing at the old database name and freeze it.
+- **Upgrade a default self-hosted instance**: stop writes and back up both databases, then run `db/single-main/migrate-default-instance.sh --dry-run` before `--execute`. Set `GFX_MIGRATION_DATABASE_TYPE`, `GFX_MIGRATION_SOURCE`, and `GFX_MIGRATION_TARGET`. The tool rejects multiple tenants/applications and conflicting data; dry-run rolls back, and repeated execution is idempotent.
 - **Compose ships PostgreSQL**. Running `docker compose up` from the repository root starts a `postgres:16-alpine` (first startup creates the databases automatically, see `docker/postgres/init.sql`; data lands in the repository root `postgres-data/` bind mount). To reuse an existing postgres container on the host, set `POSTGRES_HOST=host.docker.internal` etc. in the repository root `.env` and remove the api services' `depends_on` on `postgres`.
 - **All three hosts read the same default config**. Client / Hub automatically load `Database.json` at startup (same source as Admin; change it once and all three pick it up); environment variable overrides work the same way as compose.
 
@@ -226,8 +224,6 @@ The default config inside the image is SQLite (starts with zero env vars; data l
 docker run -p 20802:20802 \
   -e GFX_MAIN_DB_TYPE=PostgreSQL \
   -e GFX_MAIN_DB_CONNECTION_STRING="Host=your-pg;Port=5432;Database=gameframex_admin;Username=...;Password=..." \
-  -e GFX_DEFAULT_TENANT_DB_TYPE=PostgreSQL \
-  -e GFX_DEFAULT_TENANT_DB_CONNECTION_STRING="Host=your-pg;Port=5432;Database=gameframex_admin_tenant_1300000000001;Username=...;Password=..." \
   your-image
 ```
 
@@ -237,7 +233,6 @@ docker run -p 20802:20802 \
 |------|------------|
 | Startup reports database connection failure | Wrong connection string in `Database.json` (or the `GFX_MAIN_DB_*` env vars), or PG isn't running |
 | Startup reports "DbType is Sqlite/PostgreSQL but the connection string is not in … style" | Half-overridden env vars: `GFX_MAIN_DB_TYPE` and `GFX_MAIN_DB_CONNECTION_STRING` must be set as a pair |
-| Startup reports "default tenant database does not support auto-derivation" | The main database uses a DbType other than PostgreSQL / MySQL / SQLite; set `GFX_DEFAULT_TENANT_DB_TYPE` + `GFX_DEFAULT_TENANT_DB_CONNECTION_STRING` as a pair to specify explicitly |
 | SQLite database file in the wrong place | The connection string resolves relative to the process working directory — go back to the repository root and run `dotnet run`; just delete the stray `db/` that appeared in the project directory |
 | Tables not created | Code-First switches default to fully on in code (C278); if you explicitly configured them off, check `Database.json` or env vars |
 | Swagger won't open | Non-development environments don't mount Swagger by default; see [Exporting OpenAPI](#exporting-openapi-for-the-frontend) below |
@@ -291,18 +286,9 @@ No hand-written `services.AddScoped<>()`; registration happens automatically via
 
 Infrastructure components (SqlSugar, JWT, SignalR, EventBus and friends) are registered manually in `GameFrameX.Web.Core/Startup.cs` because they need configuration parameters.
 
-### Repositories and Multi-Database Routing
+### Repositories and the Main Database
 
-`SqlSugarRepository<T>` inherits from SqlSugar's `SimpleClient<T>`; its constructor decides which database the data goes to based on the attributes on the entity:
-
-| Entity Attribute | Routing Target |
-|----------|----------|
-| `[SystemTable]` | Main database |
-| `[LogTable]` | Log database |
-| `[Tenant]` | Tenant-specific database |
-| No attribute | Routed by the TenantId in the JWT Claim |
-
-You just write entities and tag them; the repository handles the rest of the routing.
+`SqlSugarRepository<T>` always uses the main connection (`ConfigId=main`). Entity attributes no longer select a tenant database.
 
 ### Authentication: Shared JWT, Plus Signatures
 
@@ -320,13 +306,10 @@ You just write entities and tag them; the repository handles the rest of the rou
 - Signature formula: `HMACSHA256(secret, "METHOD&URL&accessKey&timestamp&nonce")`
 - Anti-replay: nonce cache + timestamp skew check (5 minutes of skew allowed by default)
 
-### Multi-Tenancy and Soft Delete: Automatic Query Filtering
+### Soft Delete and Creator Data Permissions
 
-- `ITenantIdFilter`: queries automatically get a `TenantId` filter appended; tenant data is isolated by nature
-- `ISafeDeletedFilter`: queries automatically get `IsDeleted == false` appended; deletion is just a marker
-- SuperAdmin bypasses all filters, so the super admin can see everything (**but Hub API rejects SuperAdmin, see below**)
-
-These two are the kind of mechanisms you barely notice while writing business code, yet they keep covering your back.
+- Soft-delete filtering remains active.
+- `EntityBasicData` supports creator-based data permissions (`CreatedId`); organization-based scopes have been retired.
 
 ### Audit Fields: Auto-Filled, No Manual Work
 
@@ -334,7 +317,7 @@ SqlSugar AOP does this for you in `SqlSugarSetup.SetDbAop()`:
 
 | Operation | Fields Auto-Filled |
 |------|-------------|
-| Insert | `CreatedTime`, `CreatedId`, `CreatedName`, `TenantId` |
+| Insert | `CreatedTime`, `CreatedId`, `CreatedName` |
 | Update | `UpdateTime`, `UpdatedId`, `UpdatedName` |
 
 It also writes data changes into the audit log (`SystemLogDiff` / `TenantLogDiff`) along the way. So when you create entities you never assign audit fields yourself — the framework fills them in.
@@ -376,7 +359,7 @@ The frontend only recognizes this structure: `Code === 200` passes, everything e
 ### SignalR Real-Time Communication
 
 - Hub: `OnlineUserHub`, path `/hubs/onlineUser`
-- Grouped by tenant (`GROUP_ONLINE_{tenantId}`); tenant A's messages never drift into tenant B
+- Connections use authenticated user identities; there are no tenant message groups.
 - Capabilities: online user list, force logout, message sending (unicast / broadcast / exclude-self / target user)
 - For multi-instance deployment, optional Redis Backplane + Data Protection Key persistence lets messages fan out across instances
 
@@ -403,16 +386,16 @@ This is the iron law of Hub.Api. Controllers inject repositories in their constr
 
 **3. Three authentication scenarios, each with its own path.**
 
-| Scenario | How Auth Works | Where Tenant Comes From | Example |
+| Scenario | How Auth Works | User Identity | Example |
 |------|----------|-----------|------|
-| Logged-in user | JWT (`[Authorize]` declared on each controller) | Parsed from JWT | Container orchestration / asset-version writeback |
+| Logged-in user | JWT (`[Authorize]`) | Authenticated user | Container orchestration / asset-version writeback |
 | Anonymous WebHook | - | - | None compiled in this host |
-| Machine to machine | `[AllowAnonymous]` + `TenantGameAppOpenAccessAuthMiddleware` | The credential's bound App | `PackageBuildReportController` / `FeatureSwitchSyncController` |
+| Machine to machine | `[AllowAnonymous]` + `TenantGameAppOpenAccessAuthMiddleware` | Credential-bound user | `PackageBuildReportController` / `FeatureSwitchSyncController` |
 
 The machine-credential path validates AccessKey + signature + scope, **not JWT**, so the Controller is marked `[AllowAnonymous]` to skip JWT and a dedicated middleware takes over.
 
-**4. Tenant resolution is centralized in middleware, and the super admin is rejected.**
-`HubTenantMiddleware` (applied to everything except `/health`) writes the tenant Id uniformly into `HttpContext.Items`: authenticated requests take it from the JWT, anonymous WebHooks from request headers. Then `DelegateSqlSugarTenantIdResolver` feeds that Id into SqlSugar for tenant routing. **SuperAdmin is rejected outright** — Hub is a tenant-domain service, and a platform-level super admin shouldn't tunnel into some tenant's data through Hub.
+**4. Main database and credential-bound identity.**
+JWT requests use the authenticated user. Machine requests validate AccessKey, HMAC signature, scope, revocation and the bound user; credentials no longer select a tenant or application.
 
 **5. Ships its own optimistic-lock middleware and health checks.**
 `OptimisticConcurrencyMiddleware` sits at the very front of the pipeline, backstopping write operations that need concurrency control. There are three health check endpoints: `/health`, `/health/live`, `/health/ready` (compose uses them for liveness probes).
@@ -424,7 +407,6 @@ OptimisticConcurrencyMiddleware
   → Swagger (switch-controlled)
   → CORS
   → Authentication → Authorization
-  → HubTenantMiddleware (except /health; writes tenant Id; rejects super admin)
   → TenantGameAppOpenAccessAuthMiddleware (/api/PackageBuildReport / /api/FeatureSwitchSync)
   → HealthChecks / MapControllers
 ```
@@ -459,14 +441,10 @@ A complete back-office management module built on the in-house dynamic API routi
 | User management | `SystemUserService` | User CRUD, password reset, user-role binding (note: this service actually manages `TenantUser`; the naming is a bit misleading) |
 | Role management | `TenantRoleService` | Role CRUD, data-scope control, role-menu permission binding |
 | Menu permissions | `GlobalMenuService` | Tree menus, button-level permission resolution, route-to-API mapping |
-| Organizations | `TenantOrgService` | Tree-shaped org CRUD, role-org data scope |
-| Positions | `TenantPosService` | Position CRUD, ownership validation |
-| Tenant management | `SystemTenantService` | Multi-tenant CRUD, per-tenant database connection configuration |
 | Dictionary management | `GlobalDictTypeService` / `GlobalDictDataService` | Dictionary type and value CRUD, status toggling |
 | File management | `TenantFileService` | File upload/download, OSS object storage |
 | Scheduled jobs | `SystemJobService` | Job and trigger CRUD, pause / start / run now, cluster coordination |
 | Database management | `SystemDatabaseService` | Table / column CRUD, online schema management |
-| Notices | `TenantNoticeService` | Notice publishing, SignalR broadcast, read / unread tracking |
 | Online users | `TenantOnlineUserService` | Real-time online list, force logout, single sign-on |
 | Logging | `LogOperationService` / `LogExceptionService` / `LogVisitService` / `LogDiffService` | Operation, exception, visit logs and data-change audits, with Excel export |
 | Cache management | `SystemCacheService` | Unified cache abstraction (Memory / Redis), cache key management |
@@ -575,9 +553,9 @@ Pick an entity base class as needed:
 | Base Class | Characteristics | Use Case |
 |------|------|----------|
 | `EntityBaseId` | Only `Id` | Join tables, non-tenant entities |
-| `EntityTenantBase` | Id + tenant + audit + soft delete | System tables (externally referenced) |
-| `EntityBasic` | Inherits `EntityTenantBase` | General-purpose business entities (most common) |
-| `EntityBasicData` | Adds org data permissions | Data that must be filtered by organization |
+| `EntityBase` | Id + audit fields + soft delete | Main-database entities |
+| `EntityBasic` | Inherits `EntityBase` | General-purpose business entities (most common) |
+| `EntityBasicData` | Creator-based data permissions | Filter by `CreatedId` |
 | `EntityBasicSelect` | Adds Name + Description | Dropdown-picker entities |
 
 ### 2. Create Seed Data (Optional)
@@ -742,7 +720,7 @@ You probably forgot the "strip the Service suffix + lowercase first letter" rule
 Code-First by default only creates tables and adds columns. Destructive changes like dropping columns or changing column types may need manual handling or a careful restart. Back up before altering production tables.
 
 **SuperAdmin sees more data than everyone else — is that a bug?**
-No. SuperAdmin bypasses all tenant filters and soft-delete filters, so it sees everything. That's by design. **But Hub API rejects SuperAdmin access** — Hub only serves the tenant domain.
+SuperAdmin keeps its permission bypass. All hosts use the same main database; Hub machine channels retain their own credential checks.
 
 **Changed seed data but it's still old after restart?**
 Seeds upsert by primary key. If the key didn't change, existing rows aren't overwritten. Delete the row and restart, or use a different key.
@@ -751,12 +729,12 @@ Seeds upsert by primary key. If the key didn't change, existing rows aren't over
 Hub reuses Admin's JWT key but reads the `JWTSettings` node from its own `appsettings.json`. The key settings (`IssuerSigningKey` / `ValidIssuer` / `ValidAudience`) must match on both sides. If they don't, the tokens each side issues aren't accepted by the other.
 
 **Build reporting (PackageBuildReport) returns 401?**
-That's not JWT auth — it's machine credentials (AccessKey + signature + scope). It goes through `TenantGameAppOpenAccessAuthMiddleware`; the credential must be created in the Admin console's open-access management first and bound to the corresponding App.
+Machine channels use AccessKey, HMAC signature, scope and the bound user through `TenantGameAppOpenAccessAuthMiddleware`.
 
 ### Pitfalls
 
-**Multi-database routing not taking effect**
-Check that the attributes on the entity are correct: `[SystemTable]` / `[LogTable]` / `[Tenant]`. Unmarked entities route by the TenantId in the JWT Claim by default; without a login context they route to the main database.
+**Main-database data is missing**
+Repositories use `ConfigId=main`. Check the main connection configuration and host registration when data appears missing.
 
 **Audit fields are empty**
 Auditing relies on SqlSugar AOP auto-fill. If you bypass the repository and operate `SqlSugarClient` directly, the AOP may not run and the fields stay empty. Use `SqlSugarRepository<T>` properly. (Hub API uses repositories directly — that's fine.)
@@ -795,6 +773,8 @@ All three Dockerfiles are multi-stage builds (`sdk:10.0` for packaging → `aspn
 > Naming history: the compose service was once named `web-entry` (carried over from the old "Web.Entry"); renamed to `web-api` as of 2026-10-20 to align with GameFrameX.Web.Api.
 
 ### Pre-Release Checklist: Database Re-Seeding and Compact Short IDs
+
+This section describes only the historical long-ID to compact-ID upgrade (2026-09-15), which has no data conversion script. Instances already using compact IDs can use the default-instance single-main migration described above; it does not convert long IDs.
 
 The compact short ID layout ships with a **resettable, no-migration-script policy** (decision 2026-09-15): old and new ID layouts are incompatible; production PG main / tenant databases ship by "wipe and re-seed", and mixing old and new IDs is not allowed. Go through this before release:
 
@@ -871,7 +851,7 @@ Common addresses:
 
 The mantra:
 
-> **Three hosts, each on its own: in Admin, writing a Service is writing the API; Client handles login and payment; Hub is the outward-facing traditional Controller. Writing an entity creates the table, URLs never carry Service, multi-tenancy has your back automatically. Hub doesn't reuse Admin's layers — it writes its own validation. And when the OpenAPI changes, don't forget to tell the frontend to regenerate.**
+> **Three hosts, each on its own: in Admin, writing a Service is writing the API; Client handles login and payment; Hub is the outward-facing traditional Controller. Writing an entity creates the table, URLs never carry Service, all hosts use one main database. Hub doesn't reuse Admin's layers — it writes its own validation. And when the OpenAPI changes, don't forget to tell the frontend to regenerate.**
 
 When stuck, don't grind forever: check the pitfalls above first, then dig through `gfx-doc/` (the documentation system at the project root), then ask a colleague.
 
@@ -880,7 +860,7 @@ To read concrete code, jump to these places:
 - `GameFrameX.Web.Core/Startup.cs` —— Admin startup configuration, DI registration, middleware pipeline
 - `GameFrameX.Hub.Api/Program.cs` —— Hub startup configuration, middleware pipeline, JWT reuse
 - `GameFrameX.Hub.Api/Controllers/PackageBuildReportController.cs` —— the canonical example of Hub's "repository directly, no Application Service" style
-- `GameFrameX.Core.SqlSugar/` —— SqlSugar configuration, AOP, multi-database routing
+- `GameFrameX.Core.SqlSugar/` —— SqlSugar configuration, AOP, single-main-database access
 - `GameFrameX.Core/` —— repository base classes, `GenericCrudService`, auth, SignalR
 - `GameFrameX.Core.Extension/RepositoryExtension.cs` —— repository extension methods (common wheels)
 - `GameFrameX.Application/SeedData/` —— seed data

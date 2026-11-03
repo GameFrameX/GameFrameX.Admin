@@ -67,7 +67,7 @@ Client API と Hub API はどちらもより「スリム」です：Client API �
 
 1. **Service を書けば自動的に API が生える**（Admin API）。`IDynamicApiController` を実装すると、クラス内の public メソッドが自動的に REST エンドポイントになります。Controller を手書きしたり `[Route]` を手で貼ったりする必要はありません。これが Admin API の魂です。
 2. **エンティティを書けば自動的にテーブルができる**。SqlSugar Code-First：起動時にエンティティクラスをスキャン → テーブル生成 → シードデータ投入。CREATE TABLE の SQL を 1 行も書かなくてよく、フィールドを変えたら再起動するだけでテーブル構造が追従します。
-3. **マルチテナントは生まれつき組み込まれている**。エンティティに印を付けるだけで、クエリに `TenantId` フィルタが自動で付き、ソフトデリートも自動。SuperAdmin だけが壁をすり抜けられます。ビジネスロジックを書くとき、その存在はほとんど感じません。
+3. **3 ホストは単一のメイン DB を共有**。リポジトリは `ConfigId=main` を使用し、ログインと業務データからテナント・アプリの軸を廃止。ソフトデリートと作成者ベースの権限は維持します。
 
 ---
 
@@ -131,10 +131,10 @@ GameFrameX.Admin.Unified.Api/
 ├── GameFrameX.Hub.Api/            # Hub API ホスト（独立した WebApplication、従来型 Controller ルーティング）
 ├── GameFrameX.Web.Core/           # Admin の起動ロジック、ミドルウェア、DI 設定（要注目）
 ├── GameFrameX.Application/        # アプリケーション層（設定ファイル、シードデータ）
-├── GameFrameX.Application.System/ # システム管理サービス（ユーザー/ロール/メニュー/テナント/ログ…）
+├── GameFrameX.Application.System/ # システム管理サービス（ユーザー/ロール/メニュー/ログ…）
 ├── GameFrameX.Application.Game/   # ゲーム管理サービス（サーバー/注文/メール/引換コード…）
 ├── GameFrameX.Application.Client/ # クライアント管理サービス（バージョン/チャネル/リソースパッケージ…）
-├── GameFrameX.Application.Tenant/ # テナント級サービス（デバイス / デバイスグループ）
+├── GameFrameX.Application.Tenant/ # 業務サービス（デバイス / デバイスグループ、プロジェクト名は後続で変更予定）
 ├── GameFrameX.Entity/             # エンティティ層（Base / System / Game / Client）
 ├── GameFrameX.Core/               # コア層（リポジトリ、サービス基底クラス、認証、SignalR）
 ├── GameFrameX.Core.Enum/          # 列挙型定義
@@ -176,15 +176,13 @@ GameFrameX.Admin.Unified.Api/
 **本番 / コンテナ（PostgreSQL、環境変数でペア上書き）**：データベースを上書きする場合、タイプと接続文字列は必ず**ペアで**設定します。片方だけの上書きは起動時に即エラーになります。3 つの host（Web / Client / Hub）は**同じペアの変数**を使います：
 
 - `GFX_MAIN_DB_TYPE=PostgreSQL` + `GFX_MAIN_DB_CONNECTION_STRING=Host=...`
-- デフォルトテナント DB は設定不要：メイン DB の接続文字列から自動的に導出されます（DB 名を差し替えるだけ、詳細は下記）
+- 3 ホストは `ConfigId=main` のみを使用します。テナント DB の自動作成・導出は行いません。
 - 既存デプロイの素の `DbType` / `ConnectionString` 起動パラメータも引き続き使用可能（互換層）ですが、起動時に移行警告が出るので、早めに切り替えてください
 - 他のデータベース（MySQL / Oracle / 達夢……全 34 種の DbType）への切り替えの接続文字列の書き方と例：[`GameFrameX.Application/Configuration/Database-ConnectionStrings.md`](GameFrameX.Application/Configuration/Database-ConnectionStrings.md)
 
 データベースについて、他にも知っておくべき決まりがいくつかあります：
 
-- **テナント DB は自動作成される**。通常テナントを作成すると、システムがテナント ID に応じて `gameframex_admin_tenant_<TenantId>` データベースと対応するログインロールを自動生成します。**SuperAdmin がテナント DB の接続文字列を手入力する必要はありません**。
-- **デフォルトテナント DB も自動導出される（C269）**。メイン DB 接続文字列 → デフォルトテナント DB 接続文字列：PostgreSQL / MySQL は DB 名を `gameframex_admin_tenant_1300000000001` に差し替えるだけ（通常テナント DB と同じ規則、アカウント/パスワードはメイン DB を継承、MySQL の DB 作成は utf8mb4 強制）。SQLite はメイン DB と同じディレクトリに `gameframex_admin_tenant_1300000000001.db` が置かれます。対応するのは PostgreSQL / MySQL / SQLite のみで、他のタイプは起動時にエラーになります。明示的な設定が優先：`Database.json` に `ConfigId=1300000000001` の項目を戻すか、`GFX_DEFAULT_TENANT_DB_TYPE` + `GFX_DEFAULT_TENANT_DB_CONNECTION_STRING` をペアで設定してください。
-- **既存デプロイのアップグレード（BREAKING）**：デフォルトテナント DB 名が `gameframex_admin_tenant_default` から `gameframex_admin_tenant_1300000000001` に変わります。どちらかを選んでください：a. オンラインでリネーム `ALTER DATABASE gameframex_admin_tenant_default RENAME TO gameframex_admin_tenant_1300000000001`（レジストリは自動的に導出値へ追従）；b. `GFX_DEFAULT_TENANT_DB_*` をペアで設定し、旧 DB 名を指したまま固定。
+- **デフォルトのセルフホスト環境の移行**：書き込みを停止し両 DB をバックアップ後、`db/single-main/migrate-default-instance.sh --dry-run`、続いて `--execute` を実行します。`GFX_MIGRATION_DATABASE_TYPE`、`GFX_MIGRATION_SOURCE`、`GFX_MIGRATION_TARGET` を設定してください。複数テナント・複数アプリ・データ競合は拒否します。dry-run はロールバックされ、再実行は冪等です。
 - **Compose 内蔵 PostgreSQL**。リポジトリルートで `docker compose up` を実行すると `postgres:16-alpine` が一緒に起動します（初回起動時に自動構築、`docker/postgres/init.sql` 参照、データはリポジトリルートの `postgres-data/` bind mount に保存）。ホスト側の既存 postgres コンテナを再利用する場合は、リポジトリルートの `.env` に `POSTGRES_HOST=host.docker.internal` などの変数を設定し、api サービスの `postgres` への `depends_on` を外すだけです。
 - **3 つの host は同じデフォルト設定を共有**。Client / Hub は起動時に `Database.json` を自動ロードします（Admin と同一ソース、1 ヵ所変えれば 3 ヵ所に反映）。環境変数での上書き方法は compose と同一です。
 
@@ -226,8 +224,6 @@ Admin API の初回起動時、SqlSugar Code-First が自動で DB とテーブ�
 docker run -p 20802:20802 \
   -e GFX_MAIN_DB_TYPE=PostgreSQL \
   -e GFX_MAIN_DB_CONNECTION_STRING="Host=あなたのPG;Port=5432;Database=gameframex_admin;Username=...;Password=..." \
-  -e GFX_DEFAULT_TENANT_DB_TYPE=PostgreSQL \
-  -e GFX_DEFAULT_TENANT_DB_CONNECTION_STRING="Host=あなたのPG;Port=5432;Database=gameframex_admin_tenant_1300000000001;Username=...;Password=..." \
   あなたのイメージ
 ```
 
@@ -237,7 +233,6 @@ docker run -p 20802:20802 \
 |------|------------|
 | 起動時に DB 接続失敗のエラー | `Database.json`（または `GFX_MAIN_DB_*` 環境変数）の接続文字列が不正、もしくは PG が起動していない |
 | 起動時に「DbType が Sqlite/PostgreSQL だが、接続文字列が…の形式ではない」エラー | 環境変数が片方だけ上書きされている：`GFX_MAIN_DB_TYPE` と `GFX_MAIN_DB_CONNECTION_STRING` は必ずペアで設定すること |
-| 起動時に「デフォルトテナント DB は自動導出に未対応」エラー | メイン DB が PostgreSQL / MySQL / SQLite 以外の DbType を使用。`GFX_DEFAULT_TENANT_DB_TYPE` + `GFX_DEFAULT_TENANT_DB_CONNECTION_STRING` をペアで設定して明示指定する必要あり |
 | SQLite の DB ファイルが変な場所にできる | 接続文字列はプロセスの作業ディレクトリ基準で解決される——リポジトリルートに戻って `dotnet run` を実行。プロジェクトディレクトリにできた `db/` は削除すれば OK |
 | テーブルが作られない | Code-First スイッチはデフォルトでコード上すべて ON（C278）。明示的にオフに設定した覚えがあれば `Database.json` か環境変数を確認 |
 | Swagger が開かない | 開発環境以外ではデフォルトで Swagger をマウントしない。下の [OpenAPI のエクスポート](#openapi-をフロントエンドへエクスポート) を参照 |
@@ -291,18 +286,9 @@ public class MyService : ITransient, IDynamicApiController
 
 インフラコンポーネント（SqlSugar、JWT、SignalR、EventBus など）は `GameFrameX.Web.Core/Startup.cs` で手動登録します。設定パラメータが必要なためです。
 
-### リポジトリとマルチデータベースルーティング
+### リポジトリと単一メイン DB
 
-`SqlSugarRepository<T>` は SqlSugar の `SimpleClient<T>` を継承し、コンストラクタがエンティティの属性に基づいてデータの格納先 DB を決定します：
-
-| エンティティ属性 | ルーティング先 |
-|----------|----------|
-| `[SystemTable]` | メインデータベース |
-| `[LogTable]` | ログデータベース |
-| `[Tenant]` | テナント専用データベース |
-| 属性なし | JWT Claim 内の TenantId でルーティング |
-
-エンティティを書いて属性を付けるだけ。残りのルーティングはリポジトリが代行します。
+`SqlSugarRepository<T>` は常にメイン接続（`ConfigId=main`）を使用します。エンティティ属性によるテナント DB 選択は廃止しました。
 
 ### 認証体系：JWT 共通＋署名
 
@@ -320,13 +306,10 @@ public class MyService : ITransient, IDynamicApiController
 - 署名検証の式：`HMACSHA256(secret, "METHOD&URL&accessKey&timestamp&nonce")`
 - リプレイ防止：nonce キャッシュ＋時刻ずれチェック（デフォルトで 5 分のずれを許容）
 
-### マルチテナントとソフトデリート：クエリの自動フィルタリング
+### ソフトデリートと作成者ベースのデータ権限
 
-- `ITenantIdFilter`：クエリに `TenantId` フィルタを自動付与。テナント間のデータは自然に隔離
-- `ISafeDeletedFilter`：クエリに `IsDeleted == false` を自動付与。削除は印を付けるだけ
-- SuperAdmin はすべてのフィルタをスキップするので、超管理者には全データが見えます（**ただし Hub API は SuperAdmin を拒否します、後述**）
-
-この 2 つは「ビジネスを書いていてほとんど意識しないのに、常に下支えしてくれる」タイプの仕組みです。
+- ソフトデリートのクエリフィルタは維持します。
+- `EntityBasicData` は作成者 `CreatedId` による本人データ権限を扱います。組織ベースの範囲は廃止しました。
 
 ### 監査フィールド：自動挿入、手書き不要
 
@@ -334,7 +317,7 @@ SqlSugar AOP が `SqlSugarSetup.SetDbAop()` の中でこの仕事を代行しま
 
 | 操作 | 自動挿入されるフィールド |
 |------|-------------|
-| Insert | `CreatedTime`、`CreatedId`、`CreatedName`、`TenantId` |
+| Insert | `CreatedTime`、`CreatedId`、`CreatedName` |
 | Update | `UpdateTime`、`UpdatedId`、`UpdatedName` |
 
 同時に、データ変更を監査ログ（`SystemLogDiff` / `TenantLogDiff`）に書き込みます。エンティティを作るとき、監査フィールドの値は自分で入れなくてよく、フレームワークが埋めてくれます。
@@ -376,7 +359,7 @@ Admin API の `AdminResultProvider` がすべてのレスポンスに統一の�
 ### SignalR リアルタイム通信
 
 - Hub：`OnlineUserHub`、パス `/hubs/onlineUser`
-- テナント単位でグルーピング（`GROUP_ONLINE_{tenantId}`）。テナント A のメッセージがテナント B に流れることはない
+- 接続は認証済みユーザーを使用し、テナント別メッセージグループは作成しません。
 - できること：オンラインユーザー一覧、強制ログアウト、メッセージ送信（ユニキャスト / ブロードキャスト / 自分以外 / 特定ユーザー）
 - マルチインスタンスデプロイでは任意で Redis Backplane + Data Protection Key の永続化が可能で、メッセージをインスタンス横断でプッシュできる
 
@@ -403,16 +386,16 @@ Hub API（`GameFrameX.Hub.Api`、ポート `20806`）は**外部システム**�
 
 **3. 3 つの認証シーンがあり、それぞれ流れが異なる。**
 
-| シーン | 認証方法 | テナントの由来 | 例 |
+| シーン | 認証方法 | ユーザーの識別 | 例 |
 |------|----------|-----------|------|
-| ログインユーザー | JWT（各コントローラーが `[Authorize]` を明示） | JWT から解析 | コンテナ制御 / リソースバージョンの書き戻し |
+| ログインユーザー | JWT（各コントローラーが `[Authorize]` を明示） | 認証済みユーザー | コンテナ制御 / リソースバージョンの書き戻し |
 | 匿名 WebHook | - | - | このホストにコンパイル済み WebHook はありません |
-| マシン間 | `[AllowAnonymous]` + `TenantGameAppOpenAccessAuthMiddleware` | 証憑に紐づく App | `PackageBuildReportController` / `FeatureSwitchSyncController` |
+| マシン間 | `[AllowAnonymous]` + `TenantGameAppOpenAccessAuthMiddleware` | 紐付くユーザー | `PackageBuildReportController` / `FeatureSwitchSyncController` |
 
 マシン証憑の仕組みが検証するのは AccessKey + 署名 + scope で、**JWT ではありません**。だから Controller は `[AllowAnonymous]` で JWT をスキップし、専用ミドルウェアが引き受けます。
 
-**4. テナントはミドルウェアで一律解析し、SuperAdmin は拒否。**
-`HubTenantMiddleware`（`/health` 以外はすべて通る）がテナント Id を `HttpContext.Items` に一律書き込みます：認証リクエストは JWT から、匿名 WebHook はリクエストヘッダから取得。その Id を `DelegateSqlSugarTenantIdResolver` が SqlSugar へ渡してテナントルーティングを行います。**SuperAdmin は即座に拒否されます**——Hub はテナントドメインのサービスであり、プラットフォーム級の超管理者が Hub を経由して特定テナントのデータに入り込むべきではありません。
+**4. メイン DB と認証情報に紐付くユーザー。**
+JWT は認証済みユーザーを使用します。マシン経路は AccessKey、HMAC 署名、scope、失効状態、紐付くユーザーを検証し、テナントやアプリは選択しません。
 
 **5. 楽観ロックミドルウェアとヘルスチェックを内蔵。**
 `OptimisticConcurrencyMiddleware` はパイプラインの先頭にいて、並行制御が必要な書き込み操作を下支えします。ヘルスチェックのエンドポイントは 3 つ：`/health`、`/health/live`、`/health/ready`（compose の liveness probe に使用）。
@@ -424,7 +407,6 @@ OptimisticConcurrencyMiddleware
   → Swagger（スイッチ制御）
   → CORS
   → Authentication → Authorization
-  → HubTenantMiddleware（/health を除く；テナント Id を書き込み；SuperAdmin を拒否）
   → TenantGameAppOpenAccessAuthMiddleware（/api/PackageBuildReport / /api/FeatureSwitchSync）
   → HealthChecks / MapControllers
 ```
@@ -459,14 +441,10 @@ Admin API の独立した JSON 設定はすべて `GameFrameX.Application/Config
 | ユーザー管理 | `SystemUserService` | ユーザーの CRUD、パスワードリセット、ユーザー-ロール紐付け（注意：このサービスが実際に管理するのは `TenantUser`。命名は少しミスリード） |
 | ロール管理 | `TenantRoleService` | ロール CRUD、データ範囲制御、ロール-メニュー権限紐付け |
 | メニュー権限 | `GlobalMenuService` | ツリー形式メニュー、ボタン単位の権限解決、ルートと API のマッピング |
-| 組織機構 | `TenantOrgService` | ツリー形式組織 CRUD、ロール-組織のデータ範囲 |
-| 職位管理 | `TenantPosService` | 職位 CRUD、所属検証 |
-| テナント管理 | `SystemTenantService` | マルチテナント CRUD、独立 DB 接続設定 |
 | 辞書管理 | `GlobalDictTypeService` / `GlobalDictDataService` | 辞書タイプと辞書値の CRUD、状態切替 |
 | ファイル管理 | `TenantFileService` | ファイルのアップロード・ダウンロード、OSS オブジェクトストレージ |
 | 定期ジョブ | `SystemJobService` | ジョブとトリガーの CRUD、一時停止 / 開始 / 即時実行、クラスタ協調 |
 | データベース管理 | `SystemDatabaseService` | テーブル / 列 CRUD、DB・テーブル構造のオンライン管理 |
-| 通知公告 | `TenantNoticeService` | 公告の発行、SignalR ブロードキャスト、既読 / 未読トラッキング |
 | オンラインユーザー | `TenantOnlineUserService` | リアルタイムオンライン一覧、強制ログアウト、シングルサインオン |
 | ログシステム | `LogOperationService` / `LogExceptionService` / `LogVisitService` / `LogDiffService` | 操作ログ、例外ログ、アクセスログ、データ変更監査、Excel エクスポート対応 |
 | キャッシュ管理 | `SystemCacheService` | 統一キャッシュ抽象（Memory / Redis）、キャッシュキー管理 |
@@ -575,9 +553,9 @@ public class GameItemEntity : EntityBasic
 | 基底クラス | 特徴 | 適用シーン |
 |------|------|----------|
 | `EntityBaseId` | `Id` のみ | 紐付けテーブル、テナントなしエンティティ |
-| `EntityTenantBase` | Id + テナント + 監査 + ソフトデリート | システムテーブル（外部から参照） |
-| `EntityBasic` | `EntityTenantBase` を継承 | 汎用ビジネスエンティティ（最頻出） |
-| `EntityBasicData` | 組織データ権限を追加 | 組織単位でフィルタするデータ |
+| `EntityBase` | Id + 監査フィールド + ソフトデリート | メイン DB のエンティティ |
+| `EntityBasic` | `EntityBase` を継承 | 汎用ビジネスエンティティ（最頻出） |
+| `EntityBasicData` | 作成者ベースのデータ権限 | `CreatedId` でフィルタ |
 | `EntityBasicSelect` | Name + Description を追加 | ドロップダウンセレクター用エンティティ |
 
 ### 2. シードデータを作成（任意）
@@ -742,7 +720,7 @@ Hub API のパイプラインは異なります。[Hub API：第三の扉](#hub-
 Code-First はデフォルトではテーブル作成とカラム追加しか行いません。カラム削除や型変更のような破壊的変更は、手動対応か再起動時の注意が必要です。本番でテーブルを変える前に必ずバックアップを。
 
 **SuperAdmin の見えるデータが他の人より多いのはバグ？**
-違います。SuperAdmin はすべてのテナントフィルタとソフトデリートフィルタをスキップするため、全部が見えます。仕様です。**ただし Hub API は SuperAdmin のアクセスを拒否します**——Hub はテナントドメイン専用です。
+SuperAdmin の権限バイパスは維持します。全ホストがメイン DB を共有し、Hub のマシン経路は専用の認証検証を行います。
 
 **シードデータを変えたのに、再起動しても古いまま？**
 シードは主キー基準の Upsert です。主キーが同じなら既存レコードは上書きされません。該当行を削除して再起動するか、主キーを変えてください。
@@ -751,12 +729,12 @@ Code-First はデフォルトではテーブル作成とカラム追加しか行
 Hub は Admin の JWT 鍵を再利用しますが、読むのは自分の `appsettings.json` の `JWTSettings` ノードです。両側の鍵（`IssuerSigningKey` / `ValidIssuer` / `ValidAudience`）は一致が必須。不一致だと発行された token を互いに受理しません。
 
 **ビルド報告（PackageBuildReport）が 401？**
-あれは JWT 認証ではなくマシン証憑（AccessKey + 署名 + scope）です。`TenantGameAppOpenAccessAuthMiddleware` 経由で、証憑は先に Admin 管理画面のオープン API 管理で作成し、対応する App に紐付けておく必要があります。
+マシン経路は `TenantGameAppOpenAccessAuthMiddleware` で AccessKey、HMAC 署名、scope、紐付くユーザーを検証します。
 
 ### ハマりポイント
 
-**マルチデータベースルーティングが効かない**
-エンティティの属性が正しく付いているか確認：`[SystemTable]` / `[LogTable]` / `[Tenant]`。属性なしのエンティティはデフォルトで JWT Claim の TenantId でルーティングされ、ログインコンテキストがなければメイン DB に行きます。
+**メイン DB のデータが見つからない**
+リポジトリは `ConfigId=main` を使用します。データがない場合はメイン接続設定とホスト登録を確認してください。
 
 **監査フィールドが空になる**
 監査は SqlSugar AOP が自動挿入します。リポジトリを迂回して `SqlSugarClient` を直接操作すると AOP が走らず、フィールドが空になります。素直に `SqlSugarRepository<T>` を使ってください。（Hub API がリポジトリを直接使うのは OK です。）
@@ -795,6 +773,8 @@ cd .. && docker compose up --build   # 統一オーケストレーションは�
 > 命名の経緯：compose サービスはかつて `web-entry` という名前（旧 "Web.Entry" を踏襲）でしたが、2026-10-20 に `web-api` へ改名され、GameFrameX.Web.Api と揃えられました。
 
 ### リリース前チェックリスト：DB 再投入とコンパクト短 ID
+
+この節は 2026-09-15 の旧ロング ID から短い ID への移行のみを説明し、データ変換スクリプトはありません。短い ID を使用中のデフォルト環境は、前述の単一メイン DB 移行を利用できます。このツールは旧ロング ID を変換しません。
 
 コンパクト短 ID レイアウトのリリース方針は**リセット可能、移行スクリプトなし**（2026-09-15 決定）：新旧の ID レイアウトは非互換で、本番 PG のメイン DB / テナント DB は「全消し再投入」でリリースし、新旧 ID の混在は許されません。リリース前に以下を確認：
 
@@ -871,7 +851,7 @@ ls -lh ../GameFrameX.Admin.Unified.Vue/openapi.json   # だいたい 3 MB ある
 
 合言葉：
 
-> **3 つのホストはそれぞれ独立：Admin は Service を書くことがそのまま API、Client はログインと決済、Hub は外部向けの従来型 Controller。エンティティを書けばテーブルができ、URL に Service は付かず、マルチテナントは自動で下支え。Hub は Admin のレイヤーを再利用せず、バリデーションは自分で書く。OpenAPI を変えたらフロントエンドへの再生成依頼を忘れずに。**
+> **3 つのホストはそれぞれ独立：Admin は Service を書くことがそのまま API、Client はログインと決済、Hub は外部向けの従来型 Controller。エンティティを書けばテーブルができ、URL に Service は付かず、3 ホストは単一のメイン DB を共有。Hub は Admin のレイヤーを再利用せず、バリデーションは自分で書く。OpenAPI を変えたらフロントエンドへの再生成依頼を忘れずに。**
 
 詰まっても粘着しない：まず上のハマりポイントを見て、解決しなければ `gfx-doc/`（プロジェクトルートのドキュメントシステム一式）を漁り、それでもだめなら同僚に聞いてください。
 
@@ -880,7 +860,7 @@ ls -lh ../GameFrameX.Admin.Unified.Vue/openapi.json   # だいたい 3 MB ある
 - `GameFrameX.Web.Core/Startup.cs` —— Admin の起動設定、DI 登録、ミドルウェアパイプライン
 - `GameFrameX.Hub.Api/Program.cs` —— Hub の起動設定、ミドルウェアパイプライン、JWT 再利用
 - `GameFrameX.Hub.Api/Controllers/PackageBuildReportController.cs` —— Hub の「リポジトリ直接操作、Application Service は呼ばない」のお手本
-- `GameFrameX.Core.SqlSugar/` —— SqlSugar 設定、AOP、マルチデータベースルーティング
+- `GameFrameX.Core.SqlSugar/` —— SqlSugar 設定、AOP、単一メイン DB へのアクセス
 - `GameFrameX.Core/` —— リポジトリ基底クラス、`GenericCrudService`、認証、SignalR
 - `GameFrameX.Core.Extension/RepositoryExtension.cs` —— リポジトリ拡張メソッド（常用の車輪）
 - `GameFrameX.Application/SeedData/` —— シードデータ
