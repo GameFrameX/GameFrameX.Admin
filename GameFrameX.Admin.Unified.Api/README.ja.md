@@ -95,8 +95,8 @@ Client API と Hub API はどちらもより「スリム」です：Client API �
 Admin API（20802）              Client API（20808）            Hub API（20806）
     │                              │                              │
     │ 管理画面用                    │ ゲームクライアント用           │ 外部システム / ゲーム側 / CI 用
-    │ ログイン / ユーザー / メニュー / │ ログイン / 決済 / 設定取得      │ サーバー / リソースバージョン / アイテム /
-    │ 注文 / ログ / 定期ジョブ        │                              │ 引換コード / ビルド報告 / Tapd WebHook
+    │ ログイン / ユーザー / メニュー / │ ログイン / 決済 / 設定取得      │ サーバー / リソースバージョン /
+    │ 注文 / ログ / 定期ジョブ        │                              │ ビルド報告 / 機能スイッチ同期
     │                              │                              │
     └──────────── 共有 Entity ──────────────┬─────────────────────┘
                                            │
@@ -386,9 +386,9 @@ Hub API（`GameFrameX.Hub.Api`、ポート `20806`）は**外部システム**�
 
 | 呼び出し元 | 用途 | 対応 Controller |
 |--------|------|-----------------|
-| ゲーム側 / 運用ツール | サーバー一覧取得、リソースバージョン照会、アイテム照会、引換コード消し込み | `GameAreaController` / `GameAssetPackageVersionController` / `GameGoodsController` / `GameRedeemCodeController` |
+| ゲーム側 / 運用ツール | サーバー一覧取得、リソースバージョン照会 | `GameAreaController` / `GameAssetPackageVersionController` |
 | CI / ビルドマシン | ビルド完了後にリソースバージョン / パッケージ全体バージョンを書き戻す | `PackageBuildReportController` |
-| サードパーティプラットフォーム | Tapd の WebHook コールバックを受信 | `TapdWebHookController` |
+| サードパーティプラットフォーム | Hub にコンパイル済み WebHook はありません。退役した Tapd サンプルは `../samples/` にあります | - |
 
 他と違う点がいくつかあるので、コードを書く前に必ず把握してください：
 
@@ -404,8 +404,8 @@ Hub API（`GameFrameX.Hub.Api`、ポート `20806`）は**外部システム**�
 
 | シーン | 認証方法 | テナントの由来 | 例 |
 |------|----------|-----------|------|
-| ログインユーザー | JWT（`BaseController` のデフォルト `[Authorize]`） | JWT から解析 | サーバー / リソース / アイテム / 引換コードの照会 |
-| 匿名 WebHook | `[AllowAnonymous]` | リクエストヘッダから | `TapdWebHookController` |
+| ログインユーザー | JWT（`BaseController` のデフォルト `[Authorize]`） | JWT から解析 | サーバー / リソースの照会 |
+| 匿名 WebHook | - | - | このホストにコンパイル済み WebHook はありません |
 | マシン間 | `[AllowAnonymous]` + `TenantGameAppOpenAccessAuthMiddleware` | 証憑に紐づく App | `PackageBuildReportController`（ビルド報告） |
 
 マシン証憑の仕組みが検証するのは AccessKey + 署名 + scope で、**JWT ではありません**。だから Controller は `[AllowAnonymous]` で JWT をスキップし、専用ミドルウェアが引き受けます。
@@ -477,14 +477,7 @@ Admin API の独立した JSON 設定はすべて `GameFrameX.Application/Config
 | システム設定 | `SystemConfigService` | キー・バリュー設定の CRUD |
 | 列挙サービス | `SystemEnumService` | リフレクションでアセンブリ内の列挙型と値を取得 |
 | 定数サービス | `SystemConstService` | `[ConstAttribute]` 付きの定数値を取得 |
-| SMS サービス | `SystemSmsService` | Alibaba Cloud SMS 認証コード、60 秒 TTL |
-| 地域管理 | `SystemRegionService` | 行政区画 5 階層ツリー、統計局からの同期に対応 |
-| 印刷テンプレート | `TenantPrintService` | 印刷テンプレート CRUD |
 | オープン API | `SystemOpenAccessService` | AccessKey / Secret 管理、HMAC 署名認証 |
-| プラグイン管理 | `SystemPluginService` | 実行時に C# コードをコンパイルし、API エンドポイントとして動的登録 |
-| WeChat | `SystemWechatService` / `SystemWxOpenService` | 公式アカウント OAuth2、ミニプログラムログイン、テンプレートメッセージ、JS-SDK |
-| WeChat Pay | `SystemWechatPayService` | JSAPI オーダー（直結 / サービスプロバイダ）、支払いコールバック |
-| サーバー監視 | `SystemServerService` | ホスト情報、CPU / メモリ、ディスク、ロード済みアセンブリ |
 
 ### ゲーム管理
 
@@ -540,10 +533,7 @@ Admin API の独立した JSON 設定はすべて `GameFrameX.Application/Config
 |------|-----------|------|------|
 | サーバー照会 | `GameAreaController` | JWT | ゲーム側がサーバー一覧を取得 |
 | リソースパッケージバージョン | `GameAssetPackageVersionController` | JWT | リソースバージョンの照会、楽観ロック付き更新 |
-| アイテム照会 | `GameGoodsController` | JWT | ゲーム内アイテムの照会 |
-| 引換コード | `GameRedeemCodeController` | JWT | 引換コードの消し込み関連 |
 | ビルド報告 | `PackageBuildReportController` | マシン証憑 | CI / ビルドマシンがリソースバージョン / パッケージ全体バージョンを書き戻す（冪等 upsert） |
-| Tapd WebHook | `TapdWebHookController` | 匿名（リクエストヘッダからテナント取得） | Tapd コールバックの受信 |
 
 ### 決済連携
 

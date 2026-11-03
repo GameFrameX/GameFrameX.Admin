@@ -95,8 +95,8 @@ Client API와 Hub API는 더 "가볍습니다": Client API는 Entity + Payment�
 Admin API（20802）              Client API（20808）            Hub API（20806）
     │                              │                              │
     │ 관리 백오피스용                │ 게임 클라이언트용              │ 외부 시스템 / 게임 클라이언트 / CI용
-    │ 로그인 / 사용자 / 메뉴 /       │ 로그인 / 결제 / 설정 조회      │ 구역 서버 / 리소스 버전 / 아이템 /
-    │ 주문 / 로그 / 정기 작업        │                              │ 교환 코드 / 빌드 보고 / Tapd WebHook
+    │ 로그인 / 사용자 / 메뉴 /       │ 로그인 / 결제 / 설정 조회      │ 구역 서버 / 리소스 버전 /
+    │ 주문 / 로그 / 정기 작업        │                              │ 빌드 보고 / 기능 스위치 동기화
     │                              │                              │
     └──────────── Entity 공유 ──────────────┬─────────────────────┘
                                            │
@@ -386,9 +386,9 @@ Hub API(`GameFrameX.Hub.Api`, 포트 `20806`)는 **외부 시스템**을 위한 
 
 | 호출자 | 하는 일 | 해당 Controller |
 |--------|------|-----------------|
-| 게임 클라이언트 / 운영 도구 | 구역 서버 조회, 리소스 버전 조회, 아이템 조회, 교환 코드 검증 | `GameAreaController` / `GameAssetPackageVersionController` / `GameGoodsController` / `GameRedeemCodeController` |
+| 게임 클라이언트 / 운영 도구 | 구역 서버 조회, 리소스 버전 조회 | `GameAreaController` / `GameAssetPackageVersionController` |
 | CI / 빌드 머신 | 빌드 완료 후 리소스 버전 / 패키지 버전 기록 | `PackageBuildReportController` |
-| 서드파티 플랫폼 | Tapd WebHook 콜백 수신 | `TapdWebHookController` |
+| 서드파티 플랫폼 | Hub에 컴파일된 WebHook 없음. 종료된 Tapd 샘플은 `../samples/`에 있음 | - |
 
 코드를 작성하기 전에 반드시 알아야 할 남들과 다른 특징들:
 
@@ -404,8 +404,8 @@ Hub API(`GameFrameX.Hub.Api`, 포트 `20806`)는 **외부 시스템**을 위한 
 
 | 시나리오 | 인증 방식 | 테넌트 출처 | 예시 |
 |------|----------|-----------|------|
-| 로그인 사용자 | JWT(`BaseController` 기본 `[Authorize]`) | JWT에서 파싱 | 구역 서버 / 리소스 / 아이템 / 교환 코드 조회 |
-| 익명 WebHook | `[AllowAnonymous]` | 요청 헤더에서 | `TapdWebHookController` |
+| 로그인 사용자 | JWT(`BaseController` 기본 `[Authorize]`) | JWT에서 파싱 | 구역 서버 / 리소스 조회 |
+| 익명 WebHook | - | - | 이 호스트에 컴파일된 WebHook 없음 |
 | 머신 간 통신 | `[AllowAnonymous]` + `TenantGameAppOpenAccessAuthMiddleware` | 자격 증명에 바인딩된 App | `PackageBuildReportController`(빌드 보고) |
 
 머신 자격 증명 방식은 AccessKey + 서명 + scope를 검증하며 **JWT가 아닙니다**. 따라서 Controller에 `[AllowAnonymous]`를 표시해 JWT를 건너뛰고, 전용 미들웨어가 처리합니다.
@@ -477,14 +477,7 @@ Admin API의 독립 JSON 구성은 모두 `GameFrameX.Application/Configuration/
 | 시스템 구성 | `SystemConfigService` | 키-값 쌍 구성 CRUD |
 | 열거형 서비스 | `SystemEnumService` | 리플렉션으로 어셈블리의 열거형 타입과 값 조회 |
 | 상수 서비스 | `SystemConstService` | `[ConstAttribute]`로 표시된 상수 값 조회 |
-| SMS 서비스 | `SystemSmsService` | Alibaba Cloud SMS 인증 코드, 60초 TTL |
-| 지역 관리 | `SystemRegionService` | 행정구역 5단계 트리, 통계국 동기화 지원 |
-| 인쇄 템플릿 | `TenantPrintService` | 인쇄 템플릿 CRUD |
 | 개방형 인터페이스 | `SystemOpenAccessService` | AccessKey / Secret 관리, HMAC 서명 인증 |
-| 플러그인 관리 | `SystemPluginService` | 런타임에 C# 코드 컴파일, 동적으로 API 엔드포인트로 등록 |
-| WeChat | `SystemWechatService` / `SystemWxOpenService` | 공식 계정 OAuth2, 미니 프로그램 로그인, 템플릿 메시지, JS-SDK |
-| WeChat Pay | `SystemWechatPayService` | JSAPI 주문(직렬 / 파트너), 결제 콜백 |
-| 서버 모니터링 | `SystemServerService` | 호스트 정보, CPU / 메모리, 디스크, 로드된 어셈블리 |
 
 ### 게임 관리
 
@@ -540,10 +533,7 @@ Admin API의 독립 JSON 구성은 모두 `GameFrameX.Application/Configuration/
 |------|-----------|------|------|
 | 구역 서버 조회 | `GameAreaController` | JWT | 게임 클라이언트에 구역 서버 목록 제공 |
 | 리소스 패키지 버전 | `GameAssetPackageVersionController` | JWT | 리소스 버전 조회, 낙관적 잠금 업데이트 |
-| 아이템 조회 | `GameGoodsController` | JWT | 게임 내 아이템 조회 |
-| 교환 코드 | `GameRedeemCodeController` | JWT | 교환 코드 검증 관련 |
 | 빌드 보고 | `PackageBuildReportController` | 머신 자격 증명 | CI / 빌드 머신의 리소스 버전 / 패키지 버전 기록(멱등 upsert) |
-| Tapd WebHook | `TapdWebHookController` | 익명(요청 헤더에서 테넌트 추출) | Tapd 콜백 수신 |
 
 ### 결제 연동
 

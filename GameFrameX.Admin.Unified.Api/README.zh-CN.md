@@ -95,8 +95,8 @@ Client API 和 Hub API 都更"瘦"：Client API 只引用 Entity + Payment，不
 Admin API（20802）              Client API（20808）            Hub API（20806）
     │                              │                              │
     │ 管理后台用                    │ 游戏客户端用                  │ 外部系统 / 游戏端 / CI 用
-    │ 登录 / 用户 / 菜单 /          │ 登录 / 支付 / 拿配置          │ 区服 / 资源版本 / 道具 /
-    │ 订单 / 日志 / 定时任务         │                              │ 兑换码 / 打包上报 / Tapd WebHook
+    │ 登录 / 用户 / 菜单 /          │ 登录 / 支付 / 拿配置          │ 区服 / 资源版本 /
+    │ 订单 / 日志 / 定时任务         │                              │ 打包上报 / 功能开关同步
     │                              │                              │
     └──────────── 共享 Entity ──────────────┬─────────────────────┘
                                            │
@@ -386,9 +386,9 @@ Hub API（`GameFrameX.Hub.Api`，端口 `20806`）是给**外部系统**用的�
 
 | 调用方 | 干啥 | 对应 Controller |
 |--------|------|-----------------|
-| 游戏端 / 运营工具 | 拉区服、查资源版本、查道具、核销兑换码 | `GameAreaController` / `GameAssetPackageVersionController` / `GameGoodsController` / `GameRedeemCodeController` |
+| 游戏端 / 运营工具 | 拉区服、查资源版本 | `GameAreaController` / `GameAssetPackageVersionController` |
 | CI / 打包机 | 打包完成后回写资源版本 / 整包版本 | `PackageBuildReportController` |
-| 第三方平台 | 接收 Tapd 的 WebHook 回调 | `TapdWebHookController` |
+| 第三方平台 | Hub 当前无编译中的 WebHook；已退役的 Tapd 示例位于 `../samples/` | - |
 
 它有几个和别人不一样的地方，写代码前一定要知道：
 
@@ -404,8 +404,8 @@ Hub API（`GameFrameX.Hub.Api`，端口 `20806`）是给**外部系统**用的�
 
 | 场景 | 怎么鉴权 | 租户怎么来 | 示例 |
 |------|----------|-----------|------|
-| 登录用户 | JWT（`BaseController` 默认 `[Authorize]`） | 从 JWT 解析 | 区服 / 资源 / 道具 / 兑换码查询 |
-| 匿名 WebHook | `[AllowAnonymous]` | 从请求头来 | `TapdWebHookController` |
+| 登录用户 | JWT（`BaseController` 默认 `[Authorize]`） | 从 JWT 解析 | 区服 / 资源查询 |
+| 匿名 WebHook | - | - | 当前宿主无编译中的 WebHook |
 | 机器对机器 | `[AllowAnonymous]` + `TenantGameAppOpenAccessAuthMiddleware` | 凭证绑定的 App | `PackageBuildReportController`（打包上报） |
 
 机器凭证那套校验的是 AccessKey + 签名 + scope，**不是 JWT**，所以 Controller 标 `[AllowAnonymous]` 跳过 JWT，由专用中间件接管。
@@ -477,14 +477,7 @@ Admin API 的独立 JSON 配置都在 `GameFrameX.Application/Configuration/`，
 | 系统配置 | `SystemConfigService` | 键值对配置 CRUD |
 | 枚举服务 | `SystemEnumService` | 反射获取程序集里的枚举类型和值 |
 | 常量服务 | `SystemConstService` | 获取 `[ConstAttribute]` 标注的常量值 |
-| 短信服务 | `SystemSmsService` | 阿里云短信验证码，60 秒 TTL |
-| 地区管理 | `SystemRegionService` | 行政区划 5 级树，支持从统计局同步 |
-| 打印模板 | `TenantPrintService` | 打印模板 CRUD |
 | 开放接口 | `SystemOpenAccessService` | AccessKey / Secret 管理、HMAC 签名认证 |
-| 插件管理 | `SystemPluginService` | 运行时编译 C# 代码，动态注册成 API 端点 |
-| 微信 | `SystemWechatService` / `SystemWxOpenService` | 公众号 OAuth2、小程序登录、模板消息、JS-SDK |
-| 微信支付 | `SystemWechatPayService` | JSAPI 下单（直连 / 服务商）、支付回调 |
-| 服务器监控 | `SystemServerService` | 主机信息、CPU / 内存、磁盘、已加载程序集 |
 
 ### 游戏管理
 
@@ -540,10 +533,7 @@ Admin API 的独立 JSON 配置都在 `GameFrameX.Application/Configuration/`，
 |------|-----------|------|------|
 | 区服查询 | `GameAreaController` | JWT | 给游戏端拉区服列表 |
 | 资源包版本 | `GameAssetPackageVersionController` | JWT | 查资源版本、带乐观锁更新 |
-| 道具查询 | `GameGoodsController` | JWT | 查游戏内道具 |
-| 兑换码 | `GameRedeemCodeController` | JWT | 兑换码核销相关 |
 | 打包上报 | `PackageBuildReportController` | 机器凭证 | CI / 打包机回写资源版本 / 整包版本（幂等 upsert） |
-| Tapd WebHook | `TapdWebHookController` | 匿名（请求头取租户） | 接收 Tapd 回调 |
 
 ### 支付集成
 

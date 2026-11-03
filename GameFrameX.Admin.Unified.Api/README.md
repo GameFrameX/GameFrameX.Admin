@@ -95,8 +95,8 @@ Client API and Hub API are both "leaner": Client API only references Entity + Pa
 Admin API (20802)                Client API (20808)              Hub API (20806)
     │                              │                              │
     │ For the admin console        │ For game clients             │ For external systems / game servers / CI
-    │ Login / users / menus /      │ Login / payment / config     │ Zones / asset versions / goods /
-    │ orders / logs / jobs         │                              │ redeem codes / build reports / Tapd WebHook
+    │ Login / users / menus /      │ Login / payment / config     │ Zones / asset versions /
+    │ orders / logs / jobs         │                              │ build reports / feature switch sync
     │                              │                              │
     └──────────── Shared Entity ─────────────┬─────────────────────┘
                                            │
@@ -386,9 +386,9 @@ Hub API (`GameFrameX.Hub.Api`, port `20806`) is the aggregate API for **external
 
 | Caller | What They Do | Controller |
 |--------|------|-----------------|
-| Game servers / ops tools | Fetch zones, query asset versions, query goods, redeem codes | `GameAreaController` / `GameAssetPackageVersionController` / `GameGoodsController` / `GameRedeemCodeController` |
+| Game servers / ops tools | Fetch zones and query asset versions | `GameAreaController` / `GameAssetPackageVersionController` |
 | CI / build machines | Write back asset versions / full-package versions after a build | `PackageBuildReportController` |
-| Third-party platforms | Receive Tapd WebHook callbacks | `TapdWebHookController` |
+| Third-party platforms | No compiled Hub webhook endpoint; the retired Tapd sample is under `../samples/` | - |
 
 It has a few things that differ from the others — know these before writing code:
 
@@ -404,8 +404,8 @@ This is the iron law of Hub.Api. Controllers inject repositories in their constr
 
 | Scenario | How Auth Works | Where Tenant Comes From | Example |
 |------|----------|-----------|------|
-| Logged-in user | JWT (`BaseController` defaults to `[Authorize]`) | Parsed from JWT | Zone / asset / goods / redeem code queries |
-| Anonymous WebHook | `[AllowAnonymous]` | From request headers | `TapdWebHookController` |
+| Logged-in user | JWT (`BaseController` defaults to `[Authorize]`) | Parsed from JWT | Zone / asset queries |
+| Anonymous WebHook | - | - | None compiled in this host |
 | Machine to machine | `[AllowAnonymous]` + `TenantGameAppOpenAccessAuthMiddleware` | The credential's bound App | `PackageBuildReportController` (build reporting) |
 
 The machine-credential path validates AccessKey + signature + scope, **not JWT**, so the Controller is marked `[AllowAnonymous]` to skip JWT and a dedicated middleware takes over.
@@ -477,14 +477,7 @@ A complete back-office management module built on the in-house dynamic API routi
 | System config | `SystemConfigService` | Key-value config CRUD |
 | Enum service | `SystemEnumService` | Reflects enum types and values from assemblies |
 | Constant service | `SystemConstService` | Reads constants annotated with `[ConstAttribute]` |
-| SMS service | `SystemSmsService` | Aliyun SMS verification codes, 60-second TTL |
-| Region management | `SystemRegionService` | 5-level administrative division tree, syncs from the statistics bureau |
-| Print templates | `TenantPrintService` | Print template CRUD |
 | Open APIs | `SystemOpenAccessService` | AccessKey / Secret management, HMAC signature authentication |
-| Plugin management | `SystemPluginService` | Compiles C# code at runtime, dynamically registers it as API endpoints |
-| WeChat | `SystemWechatService` / `SystemWxOpenService` | Official account OAuth2, mini program login, template messages, JS-SDK |
-| WeChat Pay | `SystemWechatPayService` | JSAPI orders (direct / partner), payment callbacks |
-| Server monitoring | `SystemServerService` | Host info, CPU / memory, disk, loaded assemblies |
 
 ### Game Management
 
@@ -540,10 +533,7 @@ These are traditional Controllers running on Hub API (20806); they **do not use 
 |------|-----------|------|------|
 | Zone queries | `GameAreaController` | JWT | Lets game servers pull zone lists |
 | Asset package versions | `GameAssetPackageVersionController` | JWT | Query asset versions, update with optimistic lock |
-| Goods queries | `GameGoodsController` | JWT | Query in-game goods |
-| Redeem codes | `GameRedeemCodeController` | JWT | Redeem code verification and related operations |
 | Build reporting | `PackageBuildReportController` | Machine credentials | CI / build machines write back asset versions / full-package versions (idempotent upsert) |
-| Tapd WebHook | `TapdWebHookController` | Anonymous (tenant from headers) | Receives Tapd callbacks |
 
 ### Payment Integration
 
