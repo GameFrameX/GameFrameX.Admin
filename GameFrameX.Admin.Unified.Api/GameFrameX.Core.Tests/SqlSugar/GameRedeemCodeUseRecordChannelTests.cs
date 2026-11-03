@@ -129,41 +129,41 @@ public sealed class GameRedeemCodeUseRecordChannelTests : IDisposable
 
         await _db.Insertable(new TenantGameRedeemCodeChannelEntity
         {
-            Id = 10, Name = "渠道A", IsDeleted = false, TenantId = null, CreatedTime = now,
+            Id = 10, Name = "渠道A", IsDeleted = false, CreatedTime = now,
         }).ExecuteCommandAsync();
         await _db.Insertable(new TenantGameRedeemCodeChannelEntity
         {
-            Id = 11, Name = "渠道B", IsDeleted = false, TenantId = null, CreatedTime = now,
+            Id = 11, Name = "渠道B", IsDeleted = false, CreatedTime = now,
         }).ExecuteCommandAsync();
 
         await _db.Insertable(new TenantGameRedeemCodeEntity
         {
-            Id = 100, AreaId = 1, Code = "CODE1", ChannelId = 10, IsActive = true, UsageLimit = 100, UsedCount = 0, StartTime = nowDt, EndTime = nowDt, Description = "d1", Contents = "[]", IsDeleted = false, TenantId = null, CreatedTime = now,
+            Id = 100, AreaId = 1, Code = "CODE1", ChannelId = 10, IsActive = true, UsageLimit = 100, UsedCount = 0, StartTime = nowDt, EndTime = nowDt, Description = "d1", Contents = "[]", IsDeleted = false, CreatedTime = now,
         }).ExecuteCommandAsync();
         await _db.Insertable(new TenantGameRedeemCodeEntity
         {
-            Id = 101, AreaId = 1, Code = "CODE2", ChannelId = null, IsActive = true, UsageLimit = 100, UsedCount = 0, StartTime = nowDt, EndTime = nowDt, Description = "d2", Contents = "[]", IsDeleted = false, TenantId = null, CreatedTime = now,
+            Id = 101, AreaId = 1, Code = "CODE2", ChannelId = null, IsActive = true, UsageLimit = 100, UsedCount = 0, StartTime = nowDt, EndTime = nowDt, Description = "d2", Contents = "[]", IsDeleted = false, CreatedTime = now,
         }).ExecuteCommandAsync();
         await _db.Insertable(new TenantGameRedeemCodeEntity
         {
-            Id = 102, AreaId = 2, Code = "CODE3", ChannelId = 11, IsActive = true, UsageLimit = 100, UsedCount = 0, StartTime = nowDt, EndTime = nowDt, Description = "d3", Contents = "[]", IsDeleted = false, TenantId = null, CreatedTime = now,
+            Id = 102, AreaId = 2, Code = "CODE3", ChannelId = 11, IsActive = true, UsageLimit = 100, UsedCount = 0, StartTime = nowDt, EndTime = nowDt, Description = "d3", Contents = "[]", IsDeleted = false, CreatedTime = now,
         }).ExecuteCommandAsync();
 
         await _db.Insertable(new TenantGameRedeemCodeUseRecordEntity
         {
-            Id = 1, AreaId = 1, Code = "CODE1", PlayerId = 1, IsDeleted = false, TenantId = null, CreatedTime = now,
+            Id = 1, AreaId = 1, Code = "CODE1", PlayerId = 1, IsDeleted = false, CreatedTime = now,
         }).ExecuteCommandAsync();
         await _db.Insertable(new TenantGameRedeemCodeUseRecordEntity
         {
-            Id = 2, AreaId = 1, Code = "CODE2", PlayerId = 2, IsDeleted = false, TenantId = null, CreatedTime = now,
+            Id = 2, AreaId = 1, Code = "CODE2", PlayerId = 2, IsDeleted = false, CreatedTime = now,
         }).ExecuteCommandAsync();
         await _db.Insertable(new TenantGameRedeemCodeUseRecordEntity
         {
-            Id = 3, AreaId = 2, Code = "CODE3", PlayerId = 3, IsDeleted = false, TenantId = null, CreatedTime = now,
+            Id = 3, AreaId = 2, Code = "CODE3", PlayerId = 3, IsDeleted = false, CreatedTime = now,
         }).ExecuteCommandAsync();
         await _db.Insertable(new TenantGameRedeemCodeUseRecordEntity
         {
-            Id = 4, AreaId = 1, Code = "CODE1", PlayerId = 4, IsDeleted = false, TenantId = null, CreatedTime = now,
+            Id = 4, AreaId = 1, Code = "CODE1", PlayerId = 4, IsDeleted = false, CreatedTime = now,
         }).ExecuteCommandAsync();
     }
 

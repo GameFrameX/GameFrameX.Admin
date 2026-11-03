@@ -118,7 +118,6 @@ public class PlatformCaptchaConfigConcurrencyTests : IDisposable
             GroupCode = "Security",
             Remark = "平台私有登录图形验证码配置",
             CreatedTime = NowSeconds(),
-            TenantId = 0,
             CreatedId = 0,
             CreatedName = "test",
             UpdatedId = 0,

@@ -95,7 +95,6 @@ public sealed class ChannelDefinitionSoftDeleteVisibilityTests : IDisposable
             Name = code.ToLowerInvariant(),
             Description = code.ToLowerInvariant(),
             Scope = ChannelScopeEnum.Tenant,
-            TenantId = _db.TenantId,
             PlatformCode = "all",
             IsEnabled = isEnabled,
             IsDeleted = isDeleted,

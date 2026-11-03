@@ -15,17 +15,17 @@ namespace GameFrameX.Core.Tests.GameBusiness;
 public class RewardTemplateContractTests
 {
     [Fact]
-    public void RewardTemplateEntities_CarryRequiredAppScopedFields()
+    public void RewardTemplateEntities_CarryBusinessFieldsWithoutApplication()
     {
         var groupProps = PropNames<TenantGameRewardTemplateGroupEntity>();
         var templateProps = PropNames<TenantGameRewardTemplateEntity>();
 
-        Assert.Contains("AppId", groupProps);
+        Assert.DoesNotContain("AppId", groupProps);
         Assert.DoesNotContain("Code", groupProps);
         Assert.DoesNotContain("Icon", groupProps);
         Assert.Contains("Sort", groupProps);
 
-        Assert.Contains("AppId", templateProps);
+        Assert.DoesNotContain("AppId", templateProps);
         Assert.Contains("GroupId", templateProps);
         Assert.Contains("RewardItemsJson", templateProps);
         Assert.Contains("SnapshotSchemaVersion", templateProps);

@@ -5,15 +5,12 @@ namespace GameFrameX.Entity.Tenant.ClientApiConfig;
 /// <summary>
 /// 租户 Client API 运行策略合并配置（C378 四表合一：Token / 登录票据 / 区服输出 / 订单策略）。
 /// <para>节划分理由：令牌节是服务端内部签名密钥语义，天然租户级（不区分应用）；票据节与输出节均为应用作用域的运行窗口 / 开关，随行作用域回退。</para>
-/// <para>作用域：<see cref="EntityTenantBase.TenantId"/> + <see cref="AppId"/>，AppId=0 表示租户默认行，(TenantId, AppId) 唯一。</para>
-/// <para>消费规则：令牌节仅消费 AppId=0 行（维持原 Token 策略租户级语义不变）；票据节与输出节按「应用级行优先、AppId=0 行兜底」回退。</para>
 /// <para>存量数据由启动期迁移执行器从原四表幂等迁入（同键 Id 大者优先），迁移后原四表停写。</para>
 /// </summary>
 [SugarTable(null, "租户ClientAPI运行策略")]
 [TenantTable]
 [IncrementTable]
-[SugarIndex("ux_client_api_policy_tenant_app", "TenantId", OrderByType.Asc, nameof(AppId), OrderByType.Asc, true)]
-public class TenantClientApiPolicyEntity : EntityBasic, IAppScoped, ITenantAppConfigScope
+public class TenantClientApiPolicyEntity : EntityBasic
 {
     /// <summary>
     /// 是否要求请求签名。
@@ -32,12 +29,6 @@ public class TenantClientApiPolicyEntity : EntityBasic, IAppScoped, ITenantAppCo
     /// </summary>
     [SugarColumn(ColumnDescription = "风控策略", Length = EntityStringLength.Length512, IsNullable = true)]
     public string RiskPolicy { get; set; } = string.Empty;
-
-    /// <summary>
-    /// 应用 ID。0 表示租户默认行；大于 0 表示应用级覆盖。令牌节字段仅 AppId=0 行被消费。
-    /// </summary>
-    [SugarColumn(ColumnDescription = "应用ID", DefaultValue = "0")]
-    public long AppId { get; set; }
 
     /// <summary>
     /// 【令牌节】访问令牌签名密钥。服务端内部 HMAC 签发/校验使用，任何人都无需读取明文；

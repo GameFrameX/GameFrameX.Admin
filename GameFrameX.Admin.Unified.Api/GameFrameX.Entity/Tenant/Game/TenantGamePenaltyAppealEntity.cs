@@ -8,17 +8,11 @@ namespace GameFrameX.Entity.Tenant.Game;
 /// <para>审核通过（Approved）即同步撤销关联处罚（写 Revoke* + SourceAppealId 审计链）。</para>
 /// </summary>
 [SugarTable(null, "申诉事实源")]
-[SugarIndex("idx_appeal_tenant_app", "TenantId", OrderByType.Asc, "AppId", OrderByType.Asc)]
 [SugarIndex("idx_appeal_penalty", nameof(PenaltyId), OrderByType.Asc)]
 [TenantTable]
 [IncrementTable]
-public class TenantGamePenaltyAppealEntity : EntityBasic, IAppScoped
+public class TenantGamePenaltyAppealEntity : EntityBasic
 {
-    /// <summary>
-    /// 应用作用域，跟随关联处罚 AppId。
-    /// </summary>
-    [SugarColumn(ColumnDescription = "应用Id", DefaultValue = "0")]
-    public long AppId { get; set; }
 
     /// <summary>
     /// 关联处罚 Id（TenantGamePenaltyEntity.Id）。

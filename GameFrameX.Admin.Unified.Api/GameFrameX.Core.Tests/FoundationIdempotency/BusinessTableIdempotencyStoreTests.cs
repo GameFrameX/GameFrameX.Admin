@@ -182,7 +182,6 @@ public sealed class BusinessTableIdempotencyStoreTests : IDisposable
     {
         return new TenantGameAntiCheatEventEntity
         {
-            AppId = 1081001,
             Provider = AntiCheatProviderEnum.Custom,
             ProviderName = "test",
             ProviderEventId = "event-1",
@@ -204,7 +203,6 @@ public sealed class BusinessTableIdempotencyStoreTests : IDisposable
     {
         return new TenantGameAdvertisementRewardEntity
         {
-            AppId = 1081001,
             Provider = "TopOn",
             TransactionId = "tx-" + idempotencyKey,
             AdvertisementUnit = "unit-1",
@@ -228,8 +226,6 @@ public sealed class BusinessTableIdempotencyStoreTests : IDisposable
         var now = TimerHelper.UnixTimeSeconds();
         return new TenantGameOrderFulfillmentEntity
         {
-            TenantId = 1080001,
-            AppId = 1081001,
             OrderId = 9001,
             PayChannel = "google",
             ProviderTransactionId = "provider-tx-1",

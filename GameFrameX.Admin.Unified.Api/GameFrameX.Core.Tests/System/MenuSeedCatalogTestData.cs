@@ -60,7 +60,6 @@ internal static class MenuSeedCatalogTestData
             AllowTenantWhenSuperAdminOnly = menu.AllowTenantWhenSuperAdminOnly,
             IsEnabled = menu.IsEnabled,
             IsDeleted = false,
-            TenantId = 0,
             CreatedId = 0,
             CreatedName = "test",
             CreatedTime = menu.CreatedTime,

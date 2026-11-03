@@ -96,7 +96,6 @@ public class SystemUserSeedData : ISqlSugarEntitySeedData<SystemUserEntity>, ISe
                 AccountType = AccountTypeEnum.SuperAdmin,
                 Remark = "超级管理员",
                 CreatedTime = DateTimeOffset.Parse("2022-02-10 00:00:00").ToUnixTimeSeconds(),
-                TenantId = 0,
                 UpdateCount = 0,
                 Nation = "汉",
                 IdCardNum = "",

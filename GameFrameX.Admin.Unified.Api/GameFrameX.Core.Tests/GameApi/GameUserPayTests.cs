@@ -81,21 +81,20 @@ public sealed class GameUserPayTests
     }
 
     [Fact]
-    public async Task Create_AppLevelPolicy_OverridesTenantDefault()
+    public async Task Create_MainPolicyChange_ControlsSandboxRecharge()
     {
         using (var db = new ClientApiTestDb())
         {
             var policyRepository = CreatePolicyRepository(db);
-            await policyRepository.InsertAsync(MakePolicy(0, true));
             await policyRepository.InsertAsync(MakePolicy(db.AppId, false));
             var controller = CreateController(db, new FakePayReceiptVerifier(), true);
 
-            // 应用级（关）压过租户默认（开）——沙箱判定服务端权威按应用作用域
+            // 主库策略关闭沙箱直发。
             var first = ClientApiResultReader.Data(ClientApiResultReader.Read(await controller.Create(MakeCreate(7003, "sku.a"))));
             Assert.True(first.GetProperty("IsNeedPay").GetBoolean());
 
-            // 应用级打开后直发（provider 请求级缓存：配置变更加载后需新请求生效，重建 controller = 新 Scoped provider）
-            var appRow = db.TenantDb.Queryable<TenantClientApiPolicyEntity>().Single(x => x.AppId == db.AppId);
+            // 更新策略后重建请求级 provider，验证开启沙箱直发。
+            var appRow = db.TenantDb.Queryable<TenantClientApiPolicyEntity>().Single();
             appRow.EnableSandBoxRecharge = true;
             await policyRepository.UpdateAsync(appRow);
             var secondController = CreateController(db, new FakePayReceiptVerifier(), true);
@@ -506,7 +505,6 @@ public sealed class GameUserPayTests
     {
         return new TenantClientApiPolicyEntity
         {
-            AppId = appId,
             EnableSandBoxRecharge = enableSandbox,
             IsEnabled = true,
         };

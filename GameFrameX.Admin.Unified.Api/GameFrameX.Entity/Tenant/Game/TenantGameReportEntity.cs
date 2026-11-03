@@ -8,17 +8,11 @@ namespace GameFrameX.Entity.Tenant.Game;
 /// <para>本表是举报事实源；本期由 Admin 后台录入，玩家侧提交端点属后续 change。</para>
 /// </summary>
 [SugarTable(null, "举报事实源")]
-[SugarIndex("idx_report_tenant_app", "TenantId", OrderByType.Asc, "AppId", OrderByType.Asc)]
 [SugarIndex("idx_report_target", nameof(TargetType), OrderByType.Asc, nameof(TargetId), OrderByType.Asc)]
 [TenantTable]
 [IncrementTable]
-public class TenantGameReportEntity : EntityBasic, IAppScoped
+public class TenantGameReportEntity : EntityBasic
 {
-    /// <summary>
-    /// 应用作用域。举报是应用级事实数据，必须大于 0。
-    /// </summary>
-    [SugarColumn(ColumnDescription = "应用Id", DefaultValue = "0")]
-    public long AppId { get; set; }
 
     /// <summary>
     /// 举报人 UserId。

@@ -121,8 +121,6 @@ public sealed class ClientApiPenaltyEnforcementTests
         var entity = new TenantGamePenaltyEntity
         {
             Id = id,
-            TenantId = db.TenantId,
-            AppId = appId,
             AreaId = areaId,
             TargetType = areaId.HasValue ? PenaltyTargetTypeEnum.Role : PenaltyTargetTypeEnum.Account,
             TargetId = areaId.HasValue ? "role-3001" : "user-1001",

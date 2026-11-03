@@ -221,7 +221,6 @@ public class TenantGameHomeEntityServiceTests : IDisposable
         await _db.GetConnectionScope(TenantConfigId).Insertable(new TenantGameAreaEntity
         {
             Id = id,
-            TenantId = TenantId,
             CreatedId = 1,
             CreatedTime = now,
             CreatedName = "test",
@@ -262,7 +261,6 @@ public class TenantGameHomeEntityServiceTests : IDisposable
         await _db.GetConnectionScope(TenantConfigId).Insertable(new TenantGameOrderEntity
         {
             Id = id,
-            TenantId = TenantId,
             CreatedId = 1,
             CreatedTime = createdTime,
             CreatedName = "test",
@@ -276,7 +274,6 @@ public class TenantGameHomeEntityServiceTests : IDisposable
             DeletedId = 0,
             DeletedName = string.Empty,
             RowVersion = 0,
-            AppId = 100,
             Status = status,
             RoleId = "role-" + id,
             Amount = 100,
@@ -305,7 +302,6 @@ public class TenantGameHomeEntityServiceTests : IDisposable
         await _db.GetConnectionScope(TenantConfigId).Insertable(new TenantGameUserEntity
         {
             Id = id,
-            TenantId = TenantId,
             CreatedId = 1,
             CreatedTime = createdTime,
             CreatedName = "test",
@@ -344,7 +340,6 @@ public class TenantGameHomeEntityServiceTests : IDisposable
         await _db.GetConnectionScope(TenantConfigId).Insertable(new TenantGameHomeOnlineSampleEntity
         {
             Id = 40000L + sampleTime % 100000,
-            TenantId = TenantId,
             CreatedId = 0,
             CreatedTime = sampleTime,
             CreatedName = string.Empty,

@@ -72,7 +72,6 @@ public sealed class FeatureSwitchSyncControllerTests : IDisposable
         return new TenantGameAppFeatureSwitchEntity
         {
             Id = id,
-            AppId = appId,
             SwitchKey = switchKey,
             DisplayName = switchKey,
             Audience = audience,
@@ -85,7 +84,6 @@ public sealed class FeatureSwitchSyncControllerTests : IDisposable
             RolloutPercent = rolloutPercent,
             IsEnabled = true,
             IsDeleted = false,
-            TenantId = TenantId,
         };
     }
 

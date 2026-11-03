@@ -7,13 +7,12 @@ public static class DefaultTenantDatabaseSeeder
     /// <summary>
     /// 为新租户构建默认启用的本地对象存储配置，保证租户开箱即用、上传不报错。
     /// </summary>
-    public static TenantObjectStorageConfigEntity BuildDefaultObjectStorageConfig(long tenantId)
+    public static TenantObjectStorageConfigEntity BuildDefaultObjectStorageConfig()
     {
         var createdTime = DateTimeOffset.Parse("2022-02-10 00:00:00").ToUnixTimeSeconds();
         return new TenantObjectStorageConfigEntity
         {
             Id = SnowFlakeIdHelper.Instance.NextId(),
-            TenantId = tenantId,
             Provider = "local",
             PathTemplate = "Upload/{yyyy}/{MM}/{dd}",
             MaxFileSizeBytes = 20971520,
@@ -30,17 +29,17 @@ public static class DefaultTenantDatabaseSeeder
     /// <summary>
     /// 为新租户在对象存储配置为空时写入默认启用的本地配置，保证租户开箱即用、上传不报错。
     /// </summary>
-    public static void SeedDefaultObjectStorageConfigIfEmpty(SqlSugarScopeProvider tenantDb, long tenantId)
+    public static void SeedDefaultObjectStorageConfigIfEmpty(SqlSugarScopeProvider tenantDb)
     {
         var hasAny = tenantDb.Queryable<TenantObjectStorageConfigEntity>()
                              .Filter(null, true)
-                             .Any(u => u.TenantId == tenantId);
+                             .Any();
         if (hasAny)
         {
             return;
         }
 
-        tenantDb.Insertable(BuildDefaultObjectStorageConfig(tenantId)).ExecuteCommand();
+        tenantDb.Insertable(BuildDefaultObjectStorageConfig()).ExecuteCommand();
     }
 
     /// <summary>仅插入缺失的种子行，保留用户修改。</summary>

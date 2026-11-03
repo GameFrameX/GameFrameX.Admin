@@ -6,16 +6,10 @@ namespace GameFrameX.Entity.Tenant.Game;
 /// 邮件模板分类
 /// </summary>
 [SugarTable(null, "邮件模板分类")]
-[SugarIndex("idx_tenant_game_mail_template_category_tenant_app", "TenantId", OrderByType.Asc, nameof(AppId), OrderByType.Asc)]
 [TenantTable]
 [IncrementTable]
-public class TenantGameMailTemplateCategoryEntity : EntityBasicSelect, IAppScoped
+public class TenantGameMailTemplateCategoryEntity : EntityBasicSelect
 {
-    /// <summary>
-    /// 应用Id。应用内容作用域（TenantId + AppId），必须 &gt; 0。
-    /// </summary>
-    [SugarColumn(ColumnDescription = "应用Id", DefaultValue = "0")]
-    public long AppId { get; set; }
 
     /// <summary>
     /// 图标

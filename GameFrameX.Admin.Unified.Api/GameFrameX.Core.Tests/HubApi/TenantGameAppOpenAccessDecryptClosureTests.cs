@@ -150,13 +150,13 @@ public sealed class TenantGameAppOpenAccessDecryptClosureTests : IDisposable
     {
         var bindUser = new TenantUserEntity
         {
-            Id = 7801, TenantId = _db.TenantId, Account = "ci-user", RealName = "CI", Password = "not-a-real-password",
+            Id = 7801, Account = "ci-user", RealName = "CI", Password = "not-a-real-password",
         };
         TenantUserService.NormalizeNewUser(bindUser); // 补齐 NOT NULL 字符串列默认值
         _db.TenantDb.Insertable(bindUser).ExecuteCommand();
         _db.TenantDb.Insertable(new TenantGameAppOpenAccessEntity
         {
-            Id = 7802, TenantId = _db.TenantId, AppId = _db.AppId, BindUserId = 7801,
+            Id = 7802, BindUserId = 7801,
             Scenario = "ci", Purpose = "unit-test", SubjectName = "unit-test",
             ScopesJson = "[\"PackageBuildReport\"]",
             AccessKey = "ak-c372-vector", AccessSecret = storedAccessSecret,

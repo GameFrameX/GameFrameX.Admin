@@ -81,7 +81,6 @@ public sealed class OptimisticConcurrencyTests : IDisposable
         var entity = new TenantGameGoodsEntity
         {
             Id = 1,
-            TenantId = 1,
             Name = "initial",
             Description = "initial",
             CreatedTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),

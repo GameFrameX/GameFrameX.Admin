@@ -141,7 +141,6 @@ public sealed class OnlineScopeContextFactoryTests : IDisposable
             Id = id,
             Name = $"area-{id}",
             Description = string.Empty,
-            GameAppId = gameAppId,
             HttpManageUrl = "https://game-server.test",
             TcpSocketUrl = "tcp://game-server.test",
             WebSocketUrl = "wss://game-server.test",

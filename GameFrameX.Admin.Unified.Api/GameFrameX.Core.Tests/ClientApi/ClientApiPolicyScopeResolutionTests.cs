@@ -19,11 +19,11 @@ public sealed class ClientApiPolicyScopeResolutionTests : IDisposable
         var expireTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds() + 3600;
         _database.MainDb.Insertable(new[]
         {
-            new TenantClientApiPolicyEntity { Id = 1, AppId = 1, SigningKey = "old-key", IsEnabled = true, },
-            new TenantClientApiPolicyEntity { Id = 2, AppId = 2, SigningKey = "current-key", LifetimeMinutes = 60,
+            new TenantClientApiPolicyEntity { Id = 1, SigningKey = "old-key", IsEnabled = true, },
+            new TenantClientApiPolicyEntity { Id = 2, SigningKey = "current-key", LifetimeMinutes = 60,
                 TicketExpireTime = expireTime, EnableKeyAutoCreate = true, EnableSandBoxRecharge = true,
                 EnableReturnHttpManager = true, IsEnabled = true, },
-            new TenantClientApiPolicyEntity { Id = 3, AppId = 3, SigningKey = "disabled-key", IsEnabled = false, },
+            new TenantClientApiPolicyEntity { Id = 3, SigningKey = "disabled-key", IsEnabled = false, },
         }).ExecuteCommand();
         var provider = CreateProvider();
 
@@ -68,7 +68,7 @@ public sealed class ClientApiPolicyScopeResolutionTests : IDisposable
         Assert.Equal("cached-key", (await provider.GetTokenPolicyAsync()).SigningKey);
         _database.MainDb.Insertable(new TenantClientApiPolicyEntity
         {
-            Id = 2, AppId = 2, SigningKey = "new-key", IsEnabled = true, EnableSandBoxRecharge = true,
+            Id = 2, SigningKey = "new-key", IsEnabled = true, EnableSandBoxRecharge = true,
         }).ExecuteCommand();
 
         Assert.False((await provider.GetOrderPolicyAsync()).EnableSandBoxRecharge);

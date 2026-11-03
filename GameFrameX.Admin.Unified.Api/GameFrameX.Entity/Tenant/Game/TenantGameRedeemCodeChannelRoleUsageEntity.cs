@@ -17,13 +17,8 @@ namespace GameFrameX.Entity.Tenant.Game;
 [SugarIndex("ux_redeem_channel_role_usage", nameof(ChannelId), OrderByType.Asc, nameof(RoleId), OrderByType.Asc, true)]
 [TenantTable]
 [IncrementTable]
-public class TenantGameRedeemCodeChannelRoleUsageEntity : EntityBasic, IAppScoped
+public class TenantGameRedeemCodeChannelRoleUsageEntity : EntityBasic
 {
-    /// <summary>
-    /// 应用Id。事实数据应用作用域（TenantId + AppId），来自兑换码自身 AppId，必须 &gt; 0。
-    /// </summary>
-    [SugarColumn(ColumnDescription = "应用Id", DefaultValue = "0")]
-    public long AppId { get; set; }
 
     /// <summary>
     /// 兑换码渠道/分组 Id，来自兑换码 <c>ChannelId</c>（<see cref="TenantGameRedeemCodeEntity.ChannelId"/>）。

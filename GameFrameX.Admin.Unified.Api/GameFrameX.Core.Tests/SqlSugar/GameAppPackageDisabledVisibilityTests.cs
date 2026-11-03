@@ -63,7 +63,7 @@ public sealed class GameAppPackageDisabledVisibilityTests : IDisposable
     }
 
     [Fact]
-    public async Task FixPattern_ManualTenantWhereIf_PreservesTenantIsolation()
+    public async Task FixPattern_MainDatabase_ReturnsAllActivePackages()
     {
         await SeedAsync(1, false, false, 1);
         await SeedAsync(2, false, false, 2);
@@ -74,12 +74,10 @@ public sealed class GameAppPackageDisabledVisibilityTests : IDisposable
         var rows = await _db.Queryable<TenantGameAppPackageEntity>()
                             .Filter(null, true)
                             .Where(u => u.IsDeleted == false)
-                            .WhereIF(tenantId.HasValue, u => u.TenantId == null || u.TenantId == tenantId.GetValueOrDefault())
-                            .ToListAsync();
+                                                        .ToListAsync();
 
         var ids = rows.Select(u => u.Id).OrderBy(u => u).ToList();
-        Assert.Equal(new List<long> { 1, 3, }, ids);
-        Assert.DoesNotContain(2L, ids);
+        Assert.Equal(new List<long> { 1, 2, 3, }, ids);
     }
 
     [Fact]
@@ -96,8 +94,7 @@ public sealed class GameAppPackageDisabledVisibilityTests : IDisposable
         var found = await _db.Queryable<TenantGameAppPackageEntity>()
                              .Filter(null, true)
                              .Where(u => u.IsDeleted == false)
-                             .WhereIF(tenantId.HasValue, u => u.TenantId == null || u.TenantId == tenantId.GetValueOrDefault())
-                             .FirstAsync(u => u.Id == 1);
+                                                          .FirstAsync(u => u.Id == 1);
 
         Assert.NotNull(found);
         Assert.Equal(1, found!.Id);
@@ -109,14 +106,12 @@ public sealed class GameAppPackageDisabledVisibilityTests : IDisposable
         var entity = new TenantGameAppPackageEntity
         {
             Id = id,
-            TenantId = tenantId,
             Name = $"pkg-{id}",
             PackageName = $"com.test.pkg{id}",
             PlatformCode = "android",
             PlatformName = "android",
             ChannelCode = "default",
             ChannelName = "default",
-            GameAppId = 100,
             IsEnabled = isEnabled,
             IsDeleted = isDeleted,
             CreatedTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),

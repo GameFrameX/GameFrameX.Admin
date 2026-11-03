@@ -361,7 +361,6 @@ public sealed class TenantGameAppFeatureSwitchServiceTests : IDisposable
         await _db.Insertable(new TenantGameAppFeatureSwitchEntity
         {
             Id = _nextSeedId++,
-            AppId = appId,
             SwitchKey = switchKey,
             DisplayName = switchKey,
             Audience = FeatureSwitchAudienceValues.Both,
@@ -383,7 +382,6 @@ public sealed class TenantGameAppFeatureSwitchServiceTests : IDisposable
         {
             Id = _nextSeedId++,
             Name = packageName,
-            GameAppId = gameAppId,
             PackageName = packageName,
             PlatformCode = "android",
             PlatformName = "安卓",

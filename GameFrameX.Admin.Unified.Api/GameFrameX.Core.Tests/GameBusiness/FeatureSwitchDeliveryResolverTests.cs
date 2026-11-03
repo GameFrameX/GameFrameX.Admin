@@ -453,7 +453,6 @@ public sealed class FeatureSwitchDeliveryResolverTests : IDisposable
         return new TenantGameAppFeatureSwitchEntity
         {
             Id = id,
-            AppId = appId,
             SwitchKey = switchKey,
             DisplayName = switchKey,
             Audience = audience,

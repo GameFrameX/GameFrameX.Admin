@@ -40,7 +40,6 @@ public class GameAppPackageTests
     {
         var package = new TenantGameAppPackageEntity
         {
-            GameAppId = 100,
             Name = "iOS Global",
             PackageName = "com.demo.game",
             PlatformCode = "iOS",
@@ -51,7 +50,6 @@ public class GameAppPackageTests
             PackageVersion = "1.0.0",
         };
 
-        Assert.Equal(100, package.GameAppId);
         Assert.Equal("com.demo.game", package.PackageName);
         Assert.Equal("iOS", package.PlatformCode);
         Assert.Equal(31850206682437, package.ChannelId);

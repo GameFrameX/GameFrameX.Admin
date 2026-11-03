@@ -6,22 +6,15 @@ namespace GameFrameX.Entity.Tenant.Game;
 /// <summary>
 /// 权益发货账本（权益事实源）。记录每一笔权益发放的完整生命周期：
 /// 来源订单、Provider、商品、道具明细、角色/区服/账号、发放类型与状态、幂等键、失败原因、操作人审计。
-/// <para>应用作用域事实数据（TenantId + AppId），AppId 跟随订单。账本状态机独立于订单 OrderStatusEnum。</para>
 /// <para>幂等：ux_fulfillment_idempotency 在数据库层保证 IdempotencyKey 全局唯一，重复回调/重发不重复入账。</para>
 /// </summary>
 [SugarTable(null, "权益发货账本")]
 [SugarIndex("ux_fulfillment_idempotency", nameof(IdempotencyKey), OrderByType.Asc, true)]
-[SugarIndex("idx_fulfillment_tenant_app", "TenantId", OrderByType.Asc, nameof(AppId), OrderByType.Asc)]
 [SugarIndex("idx_fulfillment_order", nameof(OrderId), OrderByType.Asc)]
 [TenantTable]
 [IncrementTable]
-public class TenantGameOrderFulfillmentEntity : EntityBasic, IAppScoped
+public class TenantGameOrderFulfillmentEntity : EntityBasic
 {
-    /// <summary>
-    /// 应用Id。事实数据应用作用域（TenantId + AppId），跟随订单 AppId，必须 &gt; 0。
-    /// </summary>
-    [SugarColumn(ColumnDescription = "应用Id", DefaultValue = "0")]
-    public long AppId { get; set; }
 
     /// <summary>
     /// 来源订单 Id（TenantGameOrderEntity.Id）。

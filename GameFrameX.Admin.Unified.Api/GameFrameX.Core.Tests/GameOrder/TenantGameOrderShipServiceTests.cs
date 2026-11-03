@@ -201,7 +201,6 @@ public class TenantGameOrderShipServiceTests : IDisposable
         await _db.Insertable(new TenantGameAreaEntity
         {
             Id = areaId,
-            TenantId = 1,
             CreatedId = 1,
             CreatedTime = now,
             CreatedName = "test",
@@ -237,7 +236,6 @@ public class TenantGameOrderShipServiceTests : IDisposable
         await _db.Insertable(new TenantGameRoleEntity
         {
             Id = roleId,
-            TenantId = 1,
             CreatedId = 1,
             CreatedTime = now,
             CreatedName = "test",
@@ -271,7 +269,6 @@ public class TenantGameOrderShipServiceTests : IDisposable
         await _db.Insertable(new TenantGameOrderEntity
         {
             Id = orderId,
-            TenantId = 1,
             CreatedId = 1,
             CreatedTime = now,
             CreatedName = "test",

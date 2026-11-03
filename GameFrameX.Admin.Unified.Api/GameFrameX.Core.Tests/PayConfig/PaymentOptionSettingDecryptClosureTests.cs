@@ -38,7 +38,7 @@ public sealed class PaymentOptionSettingDecryptClosureTests
                 "{\"AliPayAppId\":\"2021001\",\"AliPayMerchantPrivateKey\":\"plain-merchant-key\",\"AliPayGatewayUrl\":\"https://openapi.alipay.com/gateway.do\"}");
             fixture.TenantDb.Insertable(new TenantGamePaymentConfigEntity
             {
-                Id = 1900000004201, TenantId = tenantId, AppId = appId, GameAppIdNormalized = appId, PayChannel = "alipay", ConfigJson = configJson,
+                Id = 1900000004201, PayChannel = "alipay", ConfigJson = configJson,
             }).ExecuteCommand();
 
             var httpContext = new DefaultHttpContext();

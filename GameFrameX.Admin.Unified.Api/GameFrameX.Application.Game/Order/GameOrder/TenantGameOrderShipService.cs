@@ -263,8 +263,6 @@ public class TenantGameOrderShipService
 
         return new TenantGameOrderFulfillmentEntity
         {
-            TenantId = order.TenantId,
-            AppId = order.AppId,
             OrderId = order.Id,
             PayChannel = order.PayChannel ?? string.Empty,
             ProviderTransactionId = order.ProviderTransactionId,

@@ -716,7 +716,6 @@ public sealed class SignatureValidationMiddlewareTests
             _keys.RemoveAll(x => x.Kid == kid);
             _keys.Add(new TenantAppSignatureKeyEntity
             {
-                AppId = appId,
                 Kid = kid,
                 Secret = secret,
                 IsEnabled = enabled,

@@ -26,7 +26,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "default",
                 Description = "默认缺省渠道",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "all",
                 ChannelType = ChannelTypeEnum.Official,
                 IsSystemLocked = true,
@@ -44,7 +44,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "官方主渠道",
                 Description = "平台官方主渠道",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "all",
                 ChannelType = ChannelTypeEnum.Official,
                 IsSystemLocked = true,
@@ -62,7 +62,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "官方网站",
                 Description = "官网下载入口",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "all",
                 ChannelType = ChannelTypeEnum.Official,
                 IsSystemLocked = true,
@@ -80,7 +80,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "官方启动器",
                 Description = "桌面端启动器",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "Windows",
                 ChannelType = ChannelTypeEnum.Official,
                 IsSystemLocked = true,
@@ -98,7 +98,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "官方PC客户端",
                 Description = "Windows 官方客户端分发",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "Windows",
                 ChannelType = ChannelTypeEnum.Official,
                 IsSystemLocked = true,
@@ -116,7 +116,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "官方Mac客户端",
                 Description = "macOS 官方客户端分发",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "MacOS",
                 ChannelType = ChannelTypeEnum.Official,
                 IsSystemLocked = true,
@@ -134,7 +134,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "Apple App Store",
                 Description = "苹果应用商店",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "iOS",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -152,7 +152,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "Google Play",
                 Description = "谷歌应用商店",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "Android",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -170,7 +170,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "Amazon Appstore",
                 Description = "亚马逊应用商店",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "Android",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -188,7 +188,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "Samsung Galaxy Store",
                 Description = "三星应用商店",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "Android",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -206,7 +206,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "华为应用市场",
                 Description = "华为安卓应用市场",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "Android",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -224,7 +224,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "小米应用商店",
                 Description = "小米应用商店",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "Android",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -242,7 +242,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "OPPO 软件商店",
                 Description = "OPPO 应用商店",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "Android",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -260,7 +260,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "vivo 应用商店",
                 Description = "vivo 应用商店",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "Android",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -278,7 +278,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "荣耀应用市场",
                 Description = "荣耀应用市场",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "Android",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -296,7 +296,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "魅族应用商店",
                 Description = "魅族应用商店",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "Android",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -314,7 +314,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "应用宝",
                 Description = "腾讯应用宝",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "Android",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -332,7 +332,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "360 手机助手",
                 Description = "360 应用商店",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "Android",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -350,7 +350,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "百度手机助手",
                 Description = "百度应用商店",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "Android",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -368,7 +368,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "酷安",
                 Description = "酷安应用市场",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "Android",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -386,7 +386,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "豌豆荚",
                 Description = "豌豆荚应用市场",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "Android",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -404,7 +404,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "搜狗应用市场",
                 Description = "搜狗应用市场",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "Android",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -422,7 +422,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "华为鸿蒙应用市场",
                 Description = "HarmonyOS 应用市场",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "HarmonyOS",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -440,7 +440,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "Microsoft Store",
                 Description = "微软商店",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "Windows",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -458,7 +458,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "Steam",
                 Description = "Steam 游戏平台",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "Windows",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -476,7 +476,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "Epic Games Store",
                 Description = "Epic 游戏商店",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "Windows",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -494,7 +494,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "GOG.com",
                 Description = "GOG 游戏 DRM-Free 商店",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "Windows",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -512,7 +512,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "Mac App Store",
                 Description = "macOS 应用商店",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "MacOS",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -530,7 +530,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "EA App",
                 Description = "EA 游戏平台",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "Windows",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -548,7 +548,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "Ubisoft Connect",
                 Description = "育碧游戏平台",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "Windows",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -566,7 +566,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "Battle.net",
                 Description = "暴雪战网",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "Windows",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -584,7 +584,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "Riot Client",
                 Description = "拳头游戏平台",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "Windows",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -602,7 +602,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "itch.io",
                 Description = "独立游戏分发平台",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "Windows",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -620,7 +620,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "PlayStation Store",
                 Description = "索尼 PlayStation 商店",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "PlayStation",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -638,7 +638,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "Xbox Store",
                 Description = "微软 Xbox 商店",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "Xbox",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -656,7 +656,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "Nintendo eShop",
                 Description = "任天堂 eShop 商店",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "NintendoSwitch",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -674,7 +674,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "TapTap",
                 Description = "TapTap 国内游戏社区",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "Android",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -692,7 +692,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "TapTap International",
                 Description = "TapTap 国际版",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "Android",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -710,7 +710,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "Bilibili 游戏中心",
                 Description = "哔哩哔哩游戏分发",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "Android",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -728,7 +728,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "37 手游",
                 Description = "37 互娱手游平台",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "Android",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -746,7 +746,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "4399 游戏盒",
                 Description = "4399 游戏平台",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "Android",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -764,7 +764,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "网易游戏官网",
                 Description = "网易游戏官网渠道",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "Android",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -782,7 +782,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "微信小游戏",
                 Description = "微信小游戏平台",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "WeChatMiniGame",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -800,7 +800,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "QQ 小游戏",
                 Description = "腾讯 QQ 小游戏平台",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "all",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -818,7 +818,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "支付宝小游戏",
                 Description = "支付宝小游戏平台",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "AlipayMiniGame",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -836,7 +836,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "抖音小游戏",
                 Description = "抖音小游戏平台",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "DouYinMiniGame",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -854,7 +854,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "快手小游戏",
                 Description = "快手小游戏平台",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "KuaiShouMiniGame",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -872,7 +872,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "百度小游戏",
                 Description = "百度小游戏平台",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "BaiduMiniGame",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -890,7 +890,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "B站小游戏",
                 Description = "哔哩哔哩小游戏平台",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "BilibiliMiniGame",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -908,7 +908,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "淘宝小游戏",
                 Description = "淘宝小游戏平台",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "TaobaoMiniGame",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -926,7 +926,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "京东小游戏",
                 Description = "京东小游戏平台",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "JingDongMiniGame",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -944,7 +944,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "美团小游戏",
                 Description = "美团小游戏平台",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "MeituanMiniGame",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -962,7 +962,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "华为快游戏",
                 Description = "华为快游戏平台",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "HuaweiMiniGame",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -980,7 +980,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "OPPO 小游戏",
                 Description = "OPPO 小游戏平台",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "OPPOMiniGame",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -998,7 +998,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "vivo 小游戏",
                 Description = "vivo 小游戏平台",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "VivoMiniGame",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -1016,7 +1016,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "小米快应用",
                 Description = "小米快游戏平台",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "XiaomiMiniGame",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -1034,7 +1034,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "TapTap 小游戏",
                 Description = "TapTap 小游戏平台",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "TapTapMiniGame",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -1052,7 +1052,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "Facebook Instant Games",
                 Description = "Meta 即时游戏平台",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "FacebookMiniGame",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -1070,7 +1070,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "TikTok Mini Games",
                 Description = "TikTok 小游戏平台",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "TikTokMiniGame",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -1088,7 +1088,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "YouTube Playables",
                 Description = "YouTube 即玩小游戏",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "YouTubeMiniGame",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -1106,7 +1106,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "CrazyGames",
                 Description = "CrazyGames 网页游戏平台",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "WebGL",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -1124,7 +1124,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "Poki",
                 Description = "Poki 网页游戏平台",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "WebGL",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -1142,7 +1142,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "Discord Activities",
                 Description = "Discord 活动小游戏",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "DiscordMiniGame",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -1160,7 +1160,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "Google Play Instant",
                 Description = "Google Play 即点即玩",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "Android",
                 ChannelType = ChannelTypeEnum.Store,
                 IsSystemLocked = true,
@@ -1178,7 +1178,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "巨量引擎",
                 Description = "字节巨量引擎广告（抖音/今日头条）",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "all",
                 ChannelType = ChannelTypeEnum.Ad,
                 IsSystemLocked = true,
@@ -1196,7 +1196,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "腾讯广告",
                 Description = "腾讯广告（广点通）",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "all",
                 ChannelType = ChannelTypeEnum.Ad,
                 IsSystemLocked = true,
@@ -1214,7 +1214,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "百度营销",
                 Description = "百度搜索/信息流广告",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "all",
                 ChannelType = ChannelTypeEnum.Ad,
                 IsSystemLocked = true,
@@ -1232,7 +1232,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "磁力引擎",
                 Description = "快手磁力引擎广告",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "all",
                 ChannelType = ChannelTypeEnum.Ad,
                 IsSystemLocked = true,
@@ -1250,7 +1250,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "UC 汇川",
                 Description = "阿里 UC 汇川广告",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "all",
                 ChannelType = ChannelTypeEnum.Ad,
                 IsSystemLocked = true,
@@ -1268,7 +1268,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "微博粉丝通",
                 Description = "微博粉丝通广告",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "all",
                 ChannelType = ChannelTypeEnum.Ad,
                 IsSystemLocked = true,
@@ -1286,7 +1286,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "小红书蒲公英",
                 Description = "小红书蒲公英广告",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "all",
                 ChannelType = ChannelTypeEnum.Ad,
                 IsSystemLocked = true,
@@ -1304,7 +1304,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "知乎广告",
                 Description = "知乎广告平台",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "all",
                 ChannelType = ChannelTypeEnum.Ad,
                 IsSystemLocked = true,
@@ -1322,7 +1322,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "Bilibili 起飞",
                 Description = "哔哩哔哩起飞广告",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "all",
                 ChannelType = ChannelTypeEnum.Ad,
                 IsSystemLocked = true,
@@ -1340,7 +1340,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "Meta Ads",
                 Description = "Meta 广告（Facebook/Instagram）",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "all",
                 ChannelType = ChannelTypeEnum.Ad,
                 IsSystemLocked = true,
@@ -1358,7 +1358,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "Google Ads",
                 Description = "Google 搜索/展示/UAC 广告",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "all",
                 ChannelType = ChannelTypeEnum.Ad,
                 IsSystemLocked = true,
@@ -1376,7 +1376,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "TikTok Ads",
                 Description = "TikTok 国际版广告平台",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "all",
                 ChannelType = ChannelTypeEnum.Ad,
                 IsSystemLocked = true,
@@ -1394,7 +1394,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "Apple Search Ads",
                 Description = "Apple App Store 搜索广告",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "iOS",
                 ChannelType = ChannelTypeEnum.Ad,
                 IsSystemLocked = true,
@@ -1412,7 +1412,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "X (Twitter) Ads",
                 Description = "X/Twitter 广告",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "all",
                 ChannelType = ChannelTypeEnum.Ad,
                 IsSystemLocked = true,
@@ -1430,7 +1430,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "Discord Ads",
                 Description = "Discord 广告平台",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "all",
                 ChannelType = ChannelTypeEnum.Ad,
                 IsSystemLocked = true,
@@ -1448,7 +1448,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "LinkedIn Ads",
                 Description = "LinkedIn 职场广告",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "all",
                 ChannelType = ChannelTypeEnum.Ad,
                 IsSystemLocked = true,
@@ -1466,7 +1466,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "Pinterest Ads",
                 Description = "Pinterest 广告平台",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "all",
                 ChannelType = ChannelTypeEnum.Ad,
                 IsSystemLocked = true,
@@ -1484,7 +1484,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "Reddit Ads",
                 Description = "Reddit 社区广告",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "all",
                 ChannelType = ChannelTypeEnum.Ad,
                 IsSystemLocked = true,
@@ -1502,7 +1502,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "Microsoft Ads",
                 Description = "微软 Bing/Windows 广告",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "Windows",
                 ChannelType = ChannelTypeEnum.Ad,
                 IsSystemLocked = true,
@@ -1520,7 +1520,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "Google AdMob",
                 Description = "Google 移动应用广告",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "Android",
                 ChannelType = ChannelTypeEnum.Ad,
                 IsSystemLocked = true,
@@ -1538,7 +1538,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "Unity Ads",
                 Description = "Unity 游戏内广告",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "all",
                 ChannelType = ChannelTypeEnum.Ad,
                 IsSystemLocked = true,
@@ -1556,7 +1556,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "AppLovin",
                 Description = "AppLovin 移动广告",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "all",
                 ChannelType = ChannelTypeEnum.Ad,
                 IsSystemLocked = true,
@@ -1574,7 +1574,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "ironSource",
                 Description = "ironSource 移动广告",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "all",
                 ChannelType = ChannelTypeEnum.Ad,
                 IsSystemLocked = true,
@@ -1592,7 +1592,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "ChartBoost",
                 Description = "ChartBoost 游戏内广告",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "all",
                 ChannelType = ChannelTypeEnum.Ad,
                 IsSystemLocked = true,
@@ -1610,7 +1610,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "Vungle",
                 Description = "Vungle 视频广告",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "all",
                 ChannelType = ChannelTypeEnum.Ad,
                 IsSystemLocked = true,
@@ -1628,7 +1628,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "AdColony",
                 Description = "AdColony 视频广告",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "all",
                 ChannelType = ChannelTypeEnum.Ad,
                 IsSystemLocked = true,
@@ -1646,7 +1646,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "Mintegral",
                 Description = "汇量科技 Mintegral 广告",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "all",
                 ChannelType = ChannelTypeEnum.Ad,
                 IsSystemLocked = true,
@@ -1664,7 +1664,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "Pangle",
                 Description = "字节海外 Pangle 广告",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "all",
                 ChannelType = ChannelTypeEnum.Ad,
                 IsSystemLocked = true,
@@ -1682,7 +1682,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "Meta Audience Network",
                 Description = "Meta Audience Network 广告",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "all",
                 ChannelType = ChannelTypeEnum.Ad,
                 IsSystemLocked = true,
@@ -1700,7 +1700,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "AppNext",
                 Description = "AppNext 推荐广告",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "all",
                 ChannelType = ChannelTypeEnum.Ad,
                 IsSystemLocked = true,
@@ -1718,7 +1718,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
                 Name = "Tapjoy",
                 Description = "Tapjoy 激励 Offerwall 广告",
                 Scope = ChannelScopeEnum.System,
-                TenantId = 0,
+
                 PlatformCode = "all",
                 ChannelType = ChannelTypeEnum.Ad,
                 IsSystemLocked = true,

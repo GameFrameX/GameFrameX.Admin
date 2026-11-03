@@ -7,17 +7,11 @@ namespace GameFrameX.Entity.Tenant.Game;
 /// <para>模板用于运营配置复用，业务使用时复制奖励快照；模板修改不影响已生成邮件、兑换码或活动。</para>
 /// </summary>
 [SugarTable(null, "奖励模板")]
-[SugarIndex("idx_tenant_game_reward_template_tenant_app", "TenantId", OrderByType.Asc, nameof(AppId), OrderByType.Asc)]
-[SugarIndex("idx_tenant_game_reward_template_group", "TenantId", OrderByType.Asc, nameof(AppId), OrderByType.Asc, nameof(GroupId), OrderByType.Asc)]
+[SugarIndex("idx_tenant_game_reward_template_group", nameof(GroupId), OrderByType.Asc)]
 [TenantTable]
 [IncrementTable]
-public class TenantGameRewardTemplateEntity : EntityBasicSelect, IAppScoped
+public class TenantGameRewardTemplateEntity : EntityBasicSelect
 {
-    /// <summary>
-    /// 应用Id。奖励模板属于应用内容作用域（TenantId + AppId），必须 &gt; 0。
-    /// </summary>
-    [SugarColumn(ColumnDescription = "应用Id", DefaultValue = "0")]
-    public long AppId { get; set; }
 
     /// <summary>
     /// 分组Id。必须属于同一应用下的奖励模板分组。

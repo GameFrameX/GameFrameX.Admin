@@ -5,10 +5,7 @@ using SqlSugar;
 namespace GameFrameX.Core.Tests.SqlSugar;
 
 /// <summary>
-/// GFX-84 / C80 回归测试：复刻 TenantGameAppAssetPackageVersionService.BuildPageQuery 的 GFX-84 增量部分
-/// （AppId 必填作用域过滤 + Package 精确筛选 <c>==</c>）。
-/// <para>用 Sqlite 内存文件库 + ConfigureBaseFilters 端到端验证查询形状，确保 Package 过滤从
-/// <c>Contains</c> 收紧为 <c>==</c>、AppId 过滤按作用域精确命中。</para>
+/// 验证主库的分包精确筛选与业务键唯一性。
 /// </summary>
 public sealed class GameAppAssetPackageVersionPackageFilterTests : IDisposable
 {
@@ -28,19 +25,6 @@ public sealed class GameAppAssetPackageVersionPackageFilterTests : IDisposable
         _db.CodeFirst.InitTables(typeof(TenantGameAppAssetPackageVersionEntity));
     }
 
-    /// <summary>
-    /// AppId 过滤：传 AppId=100 只返回应用 100 下的资源包版本，排除应用 200 与租户默认（AppId=0）。
-    /// </summary>
-    [Fact]
-    public async Task AppIdFilter_ReturnsOnlyGivenAppScope()
-    {
-        await SeedAsync();
-
-        var rows = await BuildQuery(100, null).ToListAsync();
-
-        Assert.Equal(2, rows.Count);
-        Assert.All(rows, r => Assert.Equal(100L, r.AppId));
-    }
 
     /// <summary>
     /// Package 精确筛选：传 Package="com.app.a" 只返回精确匹配，排除 "com.app.a.patch"（证明 == 而非 Contains）。
@@ -50,37 +34,13 @@ public sealed class GameAppAssetPackageVersionPackageFilterTests : IDisposable
     {
         await SeedAsync();
 
-        var rows = await BuildQuery(100, "com.app.a").ToListAsync();
+        var rows = await BuildQuery("com.app.a").ToListAsync();
 
         Assert.Single(rows);
         Assert.All(rows, r => Assert.Equal("com.app.a", r.Package));
     }
 
-    /// <summary>
-    /// AppId + Package 组合：双重精确过滤只命中唯一记录。
-    /// </summary>
-    [Fact]
-    public async Task AppIdAndPackage_Combined_ReturnsSingleMatch()
-    {
-        await SeedAsync();
 
-        var rows = await BuildQuery(100, "com.app.a").ToListAsync();
-
-        Assert.Single(rows);
-        Assert.Equal(100L, rows[0].AppId);
-        Assert.Equal("com.app.a", rows[0].Package);
-    }
-
-    /// <summary>
-    /// AppId 缺失：资源包版本是应用级数据，不能回退为全租户查询。
-    /// </summary>
-    [Fact]
-    public async Task MissingAppId_Throws()
-    {
-        await SeedAsync();
-
-        Assert.Throws<InvalidOperationException>(() => BuildQuery(null, null).ToList());
-    }
 
     /// <summary>
     /// 同应用同渠道/平台/应用版本/包名/语言/资源包名称应判定重复。
@@ -90,44 +50,35 @@ public sealed class GameAppAssetPackageVersionPackageFilterTests : IDisposable
     {
         await SeedAsync();
 
-        var exists = await CheckAssetPackageVersionDuplicate(100, "default", "android", "1.0.0", "com.app.a", "zh", "base");
+        var exists = await CheckAssetPackageVersionDuplicate("default", "android", "1.0.0", "com.app.a", "zh", "base");
 
         Assert.True(exists);
     }
 
     /// <summary>
-    /// 跨应用相同资源包版本键不应判定重复。
+    /// 不同渠道的资源包版本键不应判定重复。
     /// </summary>
     [Fact]
-    public async Task CrossAppSameAssetPackageVersionKey_NotDetectedAsDuplicate()
+    public async Task DifferentPackageKey_NotDetectedAsDuplicate()
     {
         await SeedAsync();
 
-        var exists = await CheckAssetPackageVersionDuplicate(300, "default", "android", "1.0.0", "com.app.a", "zh", "base");
+        var exists = await CheckAssetPackageVersionDuplicate("other", "android", "1.0.0", "com.app.a", "zh", "base");
 
         Assert.False(exists);
     }
 
-    private ISugarQueryable<TenantGameAppAssetPackageVersionEntity> BuildQuery(long? appId, string? package)
+    private ISugarQueryable<TenantGameAppAssetPackageVersionEntity> BuildQuery(string? package)
     {
-        // 复刻 TenantGameAppAssetPackageVersionService.BuildPageQuery 的应用级增量（AppId 必填 + Package ==）。
-        // 注：仅复刻过滤形状，省略 SelectAsync<Output>() 投影——投影不影响 WHERE 过滤断言。
-        if (appId is null or <= 0)
-        {
-            throw new InvalidOperationException("请选择应用后再维护资源包版本");
-        }
-
         var normalizedPackage = string.IsNullOrWhiteSpace(package) ? string.Empty : package.Trim();
         return _db.Queryable<TenantGameAppAssetPackageVersionEntity>()
-                  .WhereIF(!string.IsNullOrEmpty(normalizedPackage), u => u.Package == normalizedPackage)
-                  .Where(u => u.AppId == appId.Value);
+                  .WhereIF(!string.IsNullOrEmpty(normalizedPackage), u => u.Package == normalizedPackage);
     }
 
-    private async Task<bool> CheckAssetPackageVersionDuplicate(long appId, string channel, string platform, string appVersion, string package, string language, string assetPackageName)
+    private async Task<bool> CheckAssetPackageVersionDuplicate(string channel, string platform, string appVersion, string package, string language, string assetPackageName)
     {
         return await _db.Queryable<TenantGameAppAssetPackageVersionEntity>()
-                        .AnyAsync(u => u.AppId == appId
-                                       && u.Channel == channel
+                        .AnyAsync(u => u.Channel == channel
                                        && u.Platform == platform
                                        && u.AppVersion == appVersion
                                        && u.Package == package
@@ -139,18 +90,16 @@ public sealed class GameAppAssetPackageVersionPackageFilterTests : IDisposable
     {
         var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
-        await _db.Insertable(BuildAssetVersion(1, 100, "com.app.a", now)).ExecuteCommandAsync();
-        await _db.Insertable(BuildAssetVersion(2, 100, "com.app.a.patch", now)).ExecuteCommandAsync();
-        await _db.Insertable(BuildAssetVersion(3, 200, "com.app.a", now)).ExecuteCommandAsync();
-        await _db.Insertable(BuildAssetVersion(4, 0, "default", now)).ExecuteCommandAsync();
+        await _db.Insertable(BuildAssetVersion(1, "com.app.a", now)).ExecuteCommandAsync();
+        await _db.Insertable(BuildAssetVersion(2, "com.app.a.patch", now)).ExecuteCommandAsync();
+        await _db.Insertable(BuildAssetVersion(4, "default", now)).ExecuteCommandAsync();
     }
 
-    private static TenantGameAppAssetPackageVersionEntity BuildAssetVersion(long id, long appId, string package, long now)
+    private static TenantGameAppAssetPackageVersionEntity BuildAssetVersion(long id, string package, long now)
     {
         return new TenantGameAppAssetPackageVersionEntity
         {
             Id = id,
-            AppId = appId,
             Channel = "default",
             Platform = "android",
             AppVersion = "1.0.0",
@@ -160,7 +109,6 @@ public sealed class GameAppAssetPackageVersionPackageFilterTests : IDisposable
             RootPath = "/res/",
             ResourceVersion = "100",
             Description = "d",
-            TenantId = null,
             CreatedTime = now,
             IsDeleted = false,
         };

@@ -12,19 +12,12 @@ namespace GameFrameX.Entity.Tenant.Game;
 // 由 Provider 自身全局唯一，加入 AppId 反而会放宽约束导致跨应用潜在重复处理风险，故不引入 AppId 复合（详见 app-scope-backend-foundation.md 3.4 与本 change notes.md）。
 [SugarIndex("ux_game_order_provider_transaction", nameof(PayChannel), OrderByType.Asc, nameof(ProviderTransactionId), OrderByType.Asc, true)]
 [SugarIndex("idx_game_order_apple_original_transaction_id", nameof(AppleOriginalTransactionId), OrderByType.Asc)]
-[SugarIndex("idx_tenant_game_order_tenant_app", "TenantId", OrderByType.Asc, nameof(AppId), OrderByType.Asc)]
 // 首页聚合「今日订单」按 CreatedTime 过滤计数走索引（C321 / GFX-730）
 [SugarIndex("idx_tenant_game_order_created_time", nameof(CreatedTime), OrderByType.Asc)]
 [TenantTable]
 [IncrementTable]
-public class TenantGameOrderEntity : EntityBasic, IAppScoped
+public class TenantGameOrderEntity : EntityBasic
 {
-    /// <summary>
-    /// 应用Id。事实数据应用作用域（TenantId + AppId），必须 &gt; 0。
-    /// <para>来源：Client API 下单由 <c>AppResolutionMiddleware.AppIdKey</c> 写入；网页商城回调由路由 <c>{appId}</c> 写入。</para>
-    /// </summary>
-    [SugarColumn(ColumnDescription = "应用Id", DefaultValue = "0")]
-    public long AppId { get; set; }
 
     /// <summary>
     /// 订单状态
@@ -121,7 +114,6 @@ public class TenantGameOrderEntity : EntityBasic, IAppScoped
     /// </summary>
     [SugarColumn(ColumnDescription = "所属账号")]
     public string AccountId { get; set; } = null!;
-
 
     /// <summary>
     /// 角色注册时间

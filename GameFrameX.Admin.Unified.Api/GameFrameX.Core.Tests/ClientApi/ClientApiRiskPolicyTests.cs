@@ -25,9 +25,9 @@ public sealed class ClientApiRiskPolicyTests
             database.InitTenantTables(typeof(TenantClientApiPolicyEntity));
             database.MainDb.Insertable(new[]
             {
-                new TenantClientApiPolicyEntity { Id = 1, AppId = 1, IsEnabled = true, RiskPolicy = "FailOpen", },
-                new TenantClientApiPolicyEntity { Id = 2, AppId = 2, IsEnabled = true, SignatureRequired = true, RiskPolicy = "invalid", },
-                new TenantClientApiPolicyEntity { Id = 3, AppId = 3, IsEnabled = false, RiskPolicy = "FailOpen", },
+                new TenantClientApiPolicyEntity { Id = 1, IsEnabled = true, RiskPolicy = "FailOpen", },
+                new TenantClientApiPolicyEntity { Id = 2, IsEnabled = true, SignatureRequired = true, RiskPolicy = "invalid", },
+                new TenantClientApiPolicyEntity { Id = 3, IsEnabled = false, RiskPolicy = "FailOpen", },
             }).ExecuteCommand();
             var resolver = new GameAppRiskEnforcementModeResolver(database.MainDb);
             Assert.Equal(RiskEnforcementModeEnum.FailClosed, resolver.Resolve());

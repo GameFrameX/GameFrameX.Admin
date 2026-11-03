@@ -50,18 +50,17 @@ public sealed class AdvancedQueryAreaFilterTests : IDisposable
     public async Task NoAdvancedFilter_ReturnsAll()
     {
         await SeedAsync();
-        var all = await BuildQuery(null, null, null, null, null).ToListAsync();
+        var all = await BuildQuery(null, null, null, null).ToListAsync();
         Assert.Equal(3, all.Count);
     }
 
-    private ISugarQueryable<TenantGameAreaEntity> BuildQuery(bool? isDefault = null, bool? isRecommend = null, bool? isEnabled = null, GameLanguage? language = null, long? gameAppId = null)
+    private ISugarQueryable<TenantGameAreaEntity> BuildQuery(bool? isDefault = null, bool? isRecommend = null, bool? isEnabled = null, GameLanguage? language = null)
     {
         return _db.Queryable<TenantGameAreaEntity>()
                   .WhereIF(isDefault.HasValue, u => u.IsDefault == isDefault!.Value)
                   .WhereIF(isRecommend.HasValue, u => u.IsRecommend == isRecommend!.Value)
                   .WhereIF(isEnabled.HasValue, u => u.IsEnabled == isEnabled!.Value)
-                  .WhereIF(language.HasValue, u => u.Language == language!.Value)
-                  .WhereIF(gameAppId.HasValue, u => u.GameAppId == gameAppId!.Value);
+                  .WhereIF(language.HasValue, u => u.Language == language!.Value);
     }
 
     private async Task SeedAsync()
@@ -79,7 +78,7 @@ public sealed class AdvancedQueryAreaFilterTests : IDisposable
         return new TenantGameAreaEntity
         {
             Id = id, Name = name, Language = language,
-            TenantId = 1, CreatedId = 1, CreatedTime = now, CreatedName = "test",
+            CreatedId = 1, CreatedTime = now, CreatedName = "test",
             UpdateCount = 0, UpdateTime = now, UpdatedId = 1, UpdatedName = "test",
             IsDeleted = false, IsEnabled = isEnable, DeleteTime = 0, DeletedId = 0, DeletedName = string.Empty,
             RowVersion = 0, Description = "test",

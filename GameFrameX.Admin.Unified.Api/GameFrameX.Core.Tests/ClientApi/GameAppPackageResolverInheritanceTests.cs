@@ -229,9 +229,7 @@ public sealed class GameAppPackageResolverInheritanceTests : IDisposable
             return new TenantGameAppPackageEntity
             {
                 Id = id,
-                TenantId = _tenantId,
                 Name = $"pkg-{id}",
-                GameAppId = 1,
                 PackageName = packageName,
                 PlatformCode = "ios",
                 PlatformName = "iOS",

@@ -101,7 +101,6 @@ public sealed class TenantGameOnlinePlayerSegmentServiceTests : IDisposable
         var persisted = await _db.Queryable<TenantGameOnlinePlayerSegmentEntity>().FirstAsync(u => u.Id == response.Id);
         Assert.NotNull(persisted);
         Assert.Equal(OnlinePlayerSegmentSyncStatus.NotSynced, persisted.SyncStatus);
-        Assert.Equal(0, persisted.AppId);
     }
 
     /// <summary>
@@ -168,7 +167,6 @@ public sealed class TenantGameOnlinePlayerSegmentServiceTests : IDisposable
         await _db.Insertable(new TenantGameOnlineConfigRolloutEntity
         {
             Id = 6001,
-            AppId = App100,
             ServerId = 2001,
             ConfigKind = OnlineConfigRolloutKind.RemoteConfig,
             ConfigKey = "9001",

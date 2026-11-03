@@ -84,10 +84,8 @@ public sealed class AssetPackageScopeValidatorTests : IDisposable
         return new TenantGameAppAssetPackageEntity
         {
             Id = id,
-            GameAppId = gameAppId,
             Name = name,
             Description = "资源包定义",
-            TenantId = null,
             CreatedTime = now,
             IsDeleted = false,
         };

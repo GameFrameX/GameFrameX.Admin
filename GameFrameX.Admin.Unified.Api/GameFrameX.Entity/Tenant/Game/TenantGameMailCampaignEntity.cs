@@ -15,15 +15,9 @@ namespace GameFrameX.Entity.Tenant.Game;
 /// <para>与既有 <c>TenantGameMailEntity</c>（历史直发 <c>post_mail</c>）是两套独立邮件系统，不合并、字段不混用。</para>
 /// </summary>
 [SugarTable(null, "运营邮件Campaign")]
-[SugarIndex("idx_tenant_game_mail_campaign_tenant_app", "TenantId", OrderByType.Asc, nameof(AppId), OrderByType.Asc)]
 [TenantTable]
-public class TenantGameMailCampaignEntity : EntityBasic, IAppScoped
+public class TenantGameMailCampaignEntity : EntityBasic
 {
-    /// <summary>
-    /// 应用Id。事实数据应用作用域（TenantId + AppId），必须 &gt; 0；Campaign 面向特定应用玩家群体。
-    /// </summary>
-    [SugarColumn(ColumnDescription = "应用Id", DefaultValue = "0")]
-    public long AppId { get; set; }
 
     /// <summary>
     /// 区服Id。用于解析目标游戏服 <c>TenantGameAreaEntity.HttpManageUrl</c> 调用 Server 发布接口（与既有直发邮件同口径）。

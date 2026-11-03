@@ -29,7 +29,7 @@ public class ObjectStorageActiveConfigConcurrencyTests : IDisposable
         var db = OpenTenantDb(tenantId);
 
         // 预置 1 条启用配置
-        var seed = DefaultTenantDatabaseSeeder.BuildDefaultObjectStorageConfig(tenantId);
+        var seed = DefaultTenantDatabaseSeeder.BuildDefaultObjectStorageConfig();
         db.Insertable(seed).ExecuteCommand();
 
         // 复刻 service 的串行纪律：SemaphoreSlim(1,1) 包裹“停用其它 + 写当前启用”事务
@@ -37,7 +37,7 @@ public class ObjectStorageActiveConfigConcurrencyTests : IDisposable
         var tasks = Enumerable.Range(0, 8).Select(i => Task.Run(async () =>
         {
             var newId = 2000000000000L + i;
-            var entity = DefaultTenantDatabaseSeeder.BuildDefaultObjectStorageConfig(tenantId);
+            var entity = DefaultTenantDatabaseSeeder.BuildDefaultObjectStorageConfig();
             entity.Id = newId;
             entity.Remark = "concurrent-" + i;
 
@@ -70,7 +70,7 @@ public class ObjectStorageActiveConfigConcurrencyTests : IDisposable
         var tenantId = 1300000000002L;
         var db = OpenTenantDb(tenantId);
 
-        var first = DefaultTenantDatabaseSeeder.BuildDefaultObjectStorageConfig(tenantId);
+        var first = DefaultTenantDatabaseSeeder.BuildDefaultObjectStorageConfig();
         db.Insertable(first).ExecuteCommand();
 
         // 切换：停用其它 + 写当前启用
@@ -79,7 +79,7 @@ public class ObjectStorageActiveConfigConcurrencyTests : IDisposable
           .SetColumns(e => new TenantObjectStorageConfigEntity { IsEnabled = false, })
           .Where(e => e.IsEnabled == true && e.Id != newId)
           .ExecuteCommand();
-        var fresh = DefaultTenantDatabaseSeeder.BuildDefaultObjectStorageConfig(tenantId);
+        var fresh = DefaultTenantDatabaseSeeder.BuildDefaultObjectStorageConfig();
         fresh.Id = newId;
         db.Insertable(fresh).ExecuteCommand();
 

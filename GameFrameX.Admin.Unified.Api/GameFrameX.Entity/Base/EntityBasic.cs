@@ -3,8 +3,8 @@ using GameFrameX.Foundation.Orm.Entity;
 namespace GameFrameX.Entity.Base;
 
 /// <summary>
-/// 框架实体基类（含租户过滤）
+/// 主库业务实体基类
 /// </summary>
-public abstract class EntityBasic : EntityTenantBase
+public abstract class EntityBasic : EntityBase
 {
 }

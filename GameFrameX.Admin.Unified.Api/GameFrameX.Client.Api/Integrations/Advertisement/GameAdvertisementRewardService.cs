@@ -260,7 +260,6 @@ public sealed class GameAdvertisementRewardService
     {
         return new TenantGameAdvertisementRewardEntity
         {
-            AppId = resolution?.Role.AppId ?? 0,
             Provider = providerCanonical,
             TransactionId = payload.TransactionId,
             AdvertisementUnit = payload.AdvertisementUnit,

@@ -127,7 +127,6 @@ internal sealed class AuthTestHost : IDisposable
     public async Task SeedTenantUserAsync(long tenantId, string account, string password)
     {
         var user = BuildUser<TenantUserEntity>(TenantUserId, account, password, AccountTypeEnum.NormalUser);
-        user.TenantId = tenantId;
         user.IsEnabled = true;
 
         var tenantDb = _client.GetConnectionScope(MainConfigId);

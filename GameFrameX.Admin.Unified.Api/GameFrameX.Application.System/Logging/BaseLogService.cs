@@ -16,8 +16,8 @@ namespace GameFrameX.Application.System.Logging;
 /// <typeparam name="TTenantLog">租户日志实体（[TenantTable]，当前租户库）</typeparam>
 /// <typeparam name="TDto">日志投影 DTO，字段与实体共享基类一致</typeparam>
 public abstract class BaseLogService<TSystemLog, TTenantLog, TDto> : IAdminApiController
-    where TSystemLog : EntityTenantBase, new()
-    where TTenantLog : EntityTenantBase, new()
+    where TSystemLog : EntityBase, new()
+    where TTenantLog : EntityBase, new()
     where TDto : class, new()
 {
     /// <summary>
@@ -105,7 +105,7 @@ public abstract class BaseLogService<TSystemLog, TTenantLog, TDto> : IAdminApiCo
     /// <param name="input">导出参数</param>
     /// <returns>导出 DTO 列表</returns>
     protected async Task<List<ExportLogResponse>> QueryExportListAsync<TLog>(SqlSugarRepository<TLog> repo, LogRequest input)
-        where TLog : EntityTenantBase, new()
+        where TLog : EntityBase, new()
     {
         var timestampRange = ConvertToTimestampRange(input);
         return await repo.AsQueryable()
@@ -119,7 +119,7 @@ public abstract class BaseLogService<TSystemLog, TTenantLog, TDto> : IAdminApiCo
     /// 按时间范围与分页参数查询日志，返回 <typeparamref name="TDto"/> 投影分页。
     /// </summary>
     private async Task<SqlSugarPagedList<TDto>> QueryPagedAsync<TLog>(SqlSugarRepository<TLog> repo, PageLogRequest input, LogTimestampRange timestampRange)
-        where TLog : EntityTenantBase, new()
+        where TLog : EntityBase, new()
     {
         var searchKey = input.SearchKey?.Trim();
         return await repo.AsQueryable()
@@ -140,7 +140,7 @@ public abstract class BaseLogService<TSystemLog, TTenantLog, TDto> : IAdminApiCo
     /// lambda 内禁止 <c>?? new List</c> 等不可翻译的兜底写法）。
     /// </summary>
     /// <param name="searchKey">已 trim 的非空关键字</param>
-    private Expression<Func<TLog, bool>> BuildSearchKeyFilter<TLog>(string searchKey) where TLog : EntityTenantBase, new()
+    private Expression<Func<TLog, bool>> BuildSearchKeyFilter<TLog>(string searchKey) where TLog : EntityBase, new()
     {
         var parameter = Expression.Parameter(typeof(TLog), "u");
         Expression? body = null;

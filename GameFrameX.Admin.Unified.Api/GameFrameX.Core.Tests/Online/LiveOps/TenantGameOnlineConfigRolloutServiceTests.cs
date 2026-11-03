@@ -247,7 +247,6 @@ public sealed class TenantGameOnlineConfigRolloutServiceTests : IDisposable
         await _db.Insertable(new TenantGameOnlinePlayerSegmentEntity
         {
             Id = SegmentSynced,
-            AppId = App100,
             Name = "synced-segment",
             SyncStatus = OnlinePlayerSegmentSyncStatus.Synced,
             CreatedTime = now,
@@ -256,7 +255,6 @@ public sealed class TenantGameOnlineConfigRolloutServiceTests : IDisposable
         await _db.Insertable(new TenantGameOnlinePlayerSegmentEntity
         {
             Id = 7002,
-            AppId = App100,
             Name = "unsynced-segment",
             SyncStatus = OnlinePlayerSegmentSyncStatus.NotSynced,
             CreatedTime = now,

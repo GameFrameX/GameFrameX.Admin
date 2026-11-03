@@ -6,24 +6,18 @@ namespace GameFrameX.Entity.Tenant.Game;
 /// <summary>
 /// 反作弊事件账本（安全治理事件事实源）。记录反作弊 / 广告奖励 Provider 上报的每一笔风险事件：
 /// 来源 Provider、风险等级、指向对象、证据摘要、<strong>建议</strong>处置、人工复核状态。
-/// <para>应用作用域事实数据（TenantId + AppId），AppId 跟随上报来源应用。</para>
 /// <para>铁律：SuggestedAction 仅是 Provider 建议，<strong>永不自动落处罚</strong>；必须经人工复核（ManualReviewState Pending → Approved/Rejected/Escalated）。
 /// 本实体只承载事件与复核状态，不写处罚表——处罚创建/撤销属 C11-C（C115）职责。</para>
 /// <para>幂等：ux_anticheat_idempotency 在数据库层保证 IdempotencyKey 唯一，重复上报不重复入账。</para>
 /// </summary>
 [SugarTable(null, "反作弊事件账本")]
 [SugarIndex("ux_anticheat_idempotency", nameof(IdempotencyKey), OrderByType.Asc, true)]
-[SugarIndex("idx_anticheat_tenant_app_level", "TenantId", OrderByType.Asc, nameof(AppId), OrderByType.Asc, nameof(RiskLevel), OrderByType.Asc)]
-[SugarIndex("idx_anticheat_tenant_app_review", "TenantId", OrderByType.Asc, nameof(AppId), OrderByType.Asc, nameof(ManualReviewState), OrderByType.Asc)]
+[SugarIndex("idx_anticheat_tenant_app_level", nameof(RiskLevel), OrderByType.Asc)]
+[SugarIndex("idx_anticheat_tenant_app_review", nameof(ManualReviewState), OrderByType.Asc)]
 [TenantTable]
 [IncrementTable]
-public class TenantGameAntiCheatEventEntity : EntityBasic, IAppScoped
+public class TenantGameAntiCheatEventEntity : EntityBasic
 {
-    /// <summary>
-    /// 应用 Id。事实数据应用作用域（TenantId + AppId），跟随上报来源应用，必须大于 0。
-    /// </summary>
-    [SugarColumn(ColumnDescription = "应用Id", DefaultValue = "0")]
-    public long AppId { get; set; }
 
     /// <summary>
     /// 上报来源 Provider（TopOn/GoogleAdMob/UnityAds/Custom）。

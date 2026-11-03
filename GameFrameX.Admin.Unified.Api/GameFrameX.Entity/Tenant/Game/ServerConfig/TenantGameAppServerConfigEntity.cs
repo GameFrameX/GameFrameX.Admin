@@ -10,11 +10,6 @@ namespace GameFrameX.Entity.Tenant.Game.ServerConfig;
 [IncrementTable]
 public sealed class TenantGameAppServerConfigEntity : EntityBasic
 {
-    /// <summary>
-    /// 应用作用域，0 / null 表示租户默认配置（出厂基线行；应用行按 Key 覆盖基线行下发）
-    /// </summary>
-    [SugarColumn(ColumnDescription = "应用作用域", IsNullable = true)]
-    public long? AppId { get; set; }
 
     /// <summary>
     /// 配置键

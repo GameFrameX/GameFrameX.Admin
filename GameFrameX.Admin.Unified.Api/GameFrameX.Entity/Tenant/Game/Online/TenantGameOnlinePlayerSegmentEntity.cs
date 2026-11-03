@@ -15,15 +15,9 @@ namespace GameFrameX.Entity.Tenant.Game.Online;
 /// <c>OnlineRolloutSemanticMap</c>，本实体只承载 JSON 表达式不解释语义；同步状态反映最近一次 syncOnline 结果。</para>
 /// </summary>
 [SugarTable(null, "玩家分群定义")]
-[SugarIndex("idx_tenant_game_online_player_segment_tenant_app", "TenantId", OrderByType.Asc, nameof(AppId), OrderByType.Asc)]
 [TenantTable]
-public class TenantGameOnlinePlayerSegmentEntity : EntityBasic, IAppScoped
+public class TenantGameOnlinePlayerSegmentEntity : EntityBasic
 {
-    /// <summary>
-    /// 应用Id。事实数据应用作用域（TenantId + AppId），必须 &gt; 0；分群面向特定应用的玩家群体。
-    /// </summary>
-    [SugarColumn(ColumnDescription = "应用Id", DefaultValue = "0")]
-    public long AppId { get; set; }
 
     /// <summary>
     /// 分群名称（Admin 侧识别用；同应用内唯一性由 Service 校验）。

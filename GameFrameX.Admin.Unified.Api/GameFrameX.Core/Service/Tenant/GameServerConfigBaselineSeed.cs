@@ -18,7 +18,7 @@ public static class GameServerConfigBaselineSeed
     private const long SeedTime = 1745700000;
 
     /// <summary>
-    /// 构建全部出厂基线行（AppId=null 租户默认；登录下发时被应用行按 Key 覆盖）
+    /// 构建全部出厂基线行（主库默认配置）
     /// </summary>
     public static List<TenantGameAppServerConfigEntity> BuildRows()
     {
@@ -39,7 +39,6 @@ public static class GameServerConfigBaselineSeed
                     var entry = property.Value;
                     records.Add(new TenantGameAppServerConfigEntity
                     {
-                        AppId = null,
                         Key = property.Name,
                         Config = entry.GetProperty("config").GetRawText(),
                         Md5 = entry.GetProperty("md5").GetString() ?? string.Empty,

@@ -6,17 +6,10 @@ namespace GameFrameX.Entity.Tenant.Game;
 /// 用户邮件
 /// </summary>
 [SugarTable(null, "用户邮件")]
-[SugarIndex("idx_tenant_game_user_email_tenant_app", "TenantId", OrderByType.Asc, nameof(AppId), OrderByType.Asc)]
 [TenantTable]
 [IncrementTable]
-public class TenantGameUserEmailEntity : EntityBasic, IAppScoped
+public class TenantGameUserEmailEntity : EntityBasic
 {
-    /// <summary>
-    /// 应用Id。事实数据应用作用域（TenantId + AppId），必须 &gt; 0。
-    /// <para>来源：Client API 发邮件由 <c>AppResolutionMiddleware.AppIdKey</c> 写入。</para>
-    /// </summary>
-    [SugarColumn(ColumnDescription = "应用Id", DefaultValue = "0")]
-    public long AppId { get; set; }
 
     /// <summary>
     /// 邮件的接收者的电子邮件地址。

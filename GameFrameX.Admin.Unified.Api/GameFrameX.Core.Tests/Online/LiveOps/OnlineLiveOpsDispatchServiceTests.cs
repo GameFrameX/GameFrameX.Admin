@@ -200,7 +200,6 @@ public sealed class OnlineLiveOpsDispatchServiceTests : IDisposable
         var segment = new TenantGameOnlinePlayerSegmentEntity
         {
             Id = 7001,
-            AppId = App100,
             Name = "七日活跃",
             ConditionsJson = "[{\"Field\":\"activeDays\",\"Op\":\"gte\",\"Value\":\"7\"}]",
         };
@@ -263,17 +262,16 @@ public sealed class OnlineLiveOpsDispatchServiceTests : IDisposable
         await _db.Insertable(NewArea(Area1001, App100, now)).ExecuteCommandAsync();
 
         // 四类配置来源各一行（归属 App100）；公告 9005 归属 App200（构造跨应用场景）
-        await _db.Insertable(FillStrings(new TenantGameAppRemoteConfigEntity { Id = 9001, AppId = App100 })).ExecuteCommandAsync();
-        await _db.Insertable(FillStrings(new TenantGameAppDeviceGroupEntity { Id = 9002, AppId = App100 })).ExecuteCommandAsync();
-        await _db.Insertable(FillStrings(new TenantGameTimeJobEntity { Id = 9003, AppId = App100 })).ExecuteCommandAsync();
-        await _db.Insertable(FillStrings(new TenantGameAnnouncementEntity { Id = 9004, AppId = App100 })).ExecuteCommandAsync();
-        await _db.Insertable(FillStrings(new TenantGameAnnouncementEntity { Id = 9005, AppId = App200 })).ExecuteCommandAsync();
+        await _db.Insertable(FillStrings(new TenantGameAppRemoteConfigEntity { Id = 9001, })).ExecuteCommandAsync();
+        await _db.Insertable(FillStrings(new TenantGameAppDeviceGroupEntity { Id = 9002, })).ExecuteCommandAsync();
+        await _db.Insertable(FillStrings(new TenantGameTimeJobEntity { Id = 9003, })).ExecuteCommandAsync();
+        await _db.Insertable(FillStrings(new TenantGameAnnouncementEntity { Id = 9004, })).ExecuteCommandAsync();
+        await _db.Insertable(FillStrings(new TenantGameAnnouncementEntity { Id = 9005, })).ExecuteCommandAsync();
 
         // 邮件方案C 场景：9101 Published（Area1001 / v3 / CampaignId 77），9102 Draft
         await _db.Insertable(FillStrings(new TenantGameMailCampaignEntity
         {
             Id = 9101,
-            AppId = App100,
             AreaId = Area1001,
             Name = "campaign-published",
             PublishStatus = MailCampaignPublishStatus.Published,
@@ -285,7 +283,6 @@ public sealed class OnlineLiveOpsDispatchServiceTests : IDisposable
         await _db.Insertable(FillStrings(new TenantGameMailCampaignEntity
         {
             Id = 9102,
-            AppId = App100,
             AreaId = Area1001,
             Name = "campaign-draft",
             PublishStatus = MailCampaignPublishStatus.Draft,
@@ -299,7 +296,6 @@ public sealed class OnlineLiveOpsDispatchServiceTests : IDisposable
         return FillStrings(new TenantGameAreaEntity
         {
             Id = id,
-            GameAppId = gameAppId,
             CreatedTime = now,
             IsDeleted = false,
         });

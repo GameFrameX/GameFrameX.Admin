@@ -48,7 +48,6 @@ public class BackendDuplicationDtoContractTests
 
     private static readonly string[] MailTemplateSharedFields =
     {
-        "AppId",
         "BodyTemplate",
         "CategoryId",
         "DefaultAttachmentsJson",
@@ -64,7 +63,6 @@ public class BackendDuplicationDtoContractTests
 
     private static readonly string[] AnnouncementSharedFields =
     {
-        "AppId",
         "AreaId",
         "Content",
         "ContentLocalizationKey",

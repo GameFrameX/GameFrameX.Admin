@@ -97,7 +97,6 @@ internal sealed class ClientApiTestDb : IDisposable
         {
             Id = packageId,
             Name = "C108 Test Package",
-            GameAppId = AppId,
             PackageName = packageName,
             PlatformCode = "ios",
             PlatformName = "iOS",
@@ -117,7 +116,6 @@ internal sealed class ClientApiTestDb : IDisposable
         {
             Id = classifyId,
             Name = "Asia",
-            AppId = AppId,
             LocalizationKey = "area_asia",
             DockerRegister = "registry.test",
             ImageName = "game-server",
@@ -141,7 +139,6 @@ internal sealed class ClientApiTestDb : IDisposable
             Id = areaId,
             Name = $"Area-{areaId}",
             ClassifyId = classifyId,
-            GameAppId = AppId,
             IsEnabled = isEnabled,
             IsDeleted = false,
             ServerStatus = status,
@@ -182,7 +179,6 @@ internal sealed class ClientApiTestDb : IDisposable
         var entity = WithBasic(new TenantGameAppRemoteConfigEntity
         {
             Id = id,
-            AppId = AppId,
             Platform = "ios",
             Package = packageName,
             AppVersion = "1.0.0",
@@ -206,7 +202,6 @@ internal sealed class ClientApiTestDb : IDisposable
         var entity = WithBasic(new TenantGameAppReleaseVersionEntity
         {
             Id = id,
-            AppId = AppId,
             Platform = "ios",
             Package = packageName,
             OldVersion = "1.0.0",
@@ -229,7 +224,6 @@ internal sealed class ClientApiTestDb : IDisposable
         var entity = WithBasic(new TenantGameAppAssetPackageVersionEntity
         {
             Id = id,
-            AppId = AppId,
             Platform = "ios",
             Package = packageName,
             AppVersion = "1.0.0",
@@ -250,7 +244,6 @@ internal sealed class ClientApiTestDb : IDisposable
         var entity = WithBasic(new TenantGameAnnouncementEntity
         {
             Id = id,
-            AppId = AppId,
             AreaId = areaId,
             Language = language,
             Title = title,
@@ -307,7 +300,6 @@ internal sealed class ClientApiTestDb : IDisposable
         var entity = WithSelect(new TenantGameRoleEntity
         {
             Id = roleId,
-            AppId = appId > 0 ? appId : AppId,
             UserId = userId,
             AreaId = areaId,
             Name = name,
@@ -334,7 +326,6 @@ internal sealed class ClientApiTestDb : IDisposable
         var entity = WithSelect(new TenantGameGoodsEntity
         {
             Id = goodsId,
-            AppId = AppId,
             Name = $"Goods-{goodsId}",
             Description = "C108 goods",
             ClassifyId = classifyId,
@@ -353,7 +344,6 @@ internal sealed class ClientApiTestDb : IDisposable
         var entity = WithSelect(new TenantGameWebShopEntity
         {
             Id = shopId,
-            AppId = AppId,
             Name = $"Shop-{shopId}",
             Logo = "https://client.example.test/logo.png",
             Description = "C108 webshop",
@@ -375,7 +365,6 @@ internal sealed class ClientApiTestDb : IDisposable
         var entity = WithBasic(new TenantGameOrderEntity
         {
             Id = orderId,
-            AppId = AppId,
             Status = status,
             RoleId = roleId.ToString(),
             Amount = (uint)amount,
@@ -416,7 +405,6 @@ internal sealed class ClientApiTestDb : IDisposable
         var entity = WithBasic(new TenantGameRedeemCodeEntity
         {
             Id = codeId,
-            AppId = AppId,
             AreaId = areaId,
             ChannelId = channelId,
             Code = code,
@@ -438,7 +426,6 @@ internal sealed class ClientApiTestDb : IDisposable
         var entity = WithSelect(new TenantGameRedeemCodeChannelEntity
         {
             Id = channelId,
-            AppId = AppId,
             Name = name,
             RoleUsageLimit = roleUsageLimit,
         });
@@ -452,7 +439,6 @@ internal sealed class ClientApiTestDb : IDisposable
         var entity = WithSelect(new TenantGameWebShopOrderEntity
         {
             Id = orderId,
-            AppId = AppId,
             GameShopId = shopId,
             RoleId = roleId,
             AreaId = areaId,
@@ -488,7 +474,6 @@ internal sealed class ClientApiTestDb : IDisposable
         var entity = WithBasic(new TenantGameUserEmailEntity
         {
             Id = id,
-            AppId = AppId,
             Email = email,
             UserName = email,
             Language = "zh-CN",
@@ -544,7 +529,6 @@ internal sealed class ClientApiTestDb : IDisposable
     private T WithBasic<T>(T entity) where T : EntityBasic
     {
         var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-        entity.TenantId = TenantId;
         entity.CreatedId = 1;
         entity.CreatedName = "c108";
         entity.CreatedTime = now;

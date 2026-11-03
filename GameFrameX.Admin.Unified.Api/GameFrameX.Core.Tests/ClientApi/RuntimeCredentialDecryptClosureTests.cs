@@ -44,11 +44,11 @@ public sealed class RuntimeCredentialDecryptClosureTests : IDisposable
         _db.InitTenantTables(typeof(TenantAppSignatureKeyEntity));
         _db.TenantDb.Insertable(new TenantAppSignatureKeyEntity
         {
-            Id = 7101, TenantId = _db.TenantId, AppId = _db.AppId, Kid = "kid-plain", Secret = "sig-plain", IsEnabled = true,
+            Id = 7101, Kid = "kid-plain", Secret = "sig-plain", IsEnabled = true,
         }).ExecuteCommand();
         _db.TenantDb.Insertable(new TenantAppSignatureKeyEntity
         {
-            Id = 7102, TenantId = _db.TenantId, AppId = _db.AppId, Kid = "kid-cipher", Secret = TenantSecretCrypto.Encrypt("sig-cipher")!, IsEnabled = true,
+            Id = 7102, Kid = "kid-cipher", Secret = TenantSecretCrypto.Encrypt("sig-cipher")!, IsEnabled = true,
         }).ExecuteCommand();
 
         var resolver = new SignatureKeyResolver(_db.TenantDbProvider);
@@ -69,11 +69,11 @@ public sealed class RuntimeCredentialDecryptClosureTests : IDisposable
         _db.InitTenantTables(typeof(TenantSessionKeyEntity));
         _db.TenantDb.Insertable(new TenantSessionKeyEntity
         {
-            Id = 7201, TenantId = _db.TenantId, AppId = _db.AppId, Kid = "kid-plain", Secret = "session-plain", IsEnabled = true,
+            Id = 7201, Kid = "kid-plain", Secret = "session-plain", IsEnabled = true,
         }).ExecuteCommand();
         _db.TenantDb.Insertable(new TenantSessionKeyEntity
         {
-            Id = 7202, TenantId = _db.TenantId, AppId = _db.AppId, Kid = "kid-cipher", Secret = TenantSecretCrypto.Encrypt("session-cipher")!, IsEnabled = true,
+            Id = 7202, Kid = "kid-cipher", Secret = TenantSecretCrypto.Encrypt("session-cipher")!, IsEnabled = true,
         }).ExecuteCommand();
 
         var resolver = new SessionKeyResolver(_db.TenantDbProvider);
@@ -93,7 +93,7 @@ public sealed class RuntimeCredentialDecryptClosureTests : IDisposable
         {
             _db.TenantDb.Insertable(new TenantGameLoginTicketKeyEntity
             {
-                Id = 7301, TenantId = _db.TenantId, AppId = _db.AppId, Kid = "kid-ticket",
+                Id = 7301, Kid = "kid-ticket",
                 Algorithm = GameLoginTicketSigningKey.AlgorithmRs256,
                 PrivateKeyPem = TenantSecretCrypto.Encrypt(rsa.ExportPkcs8PrivateKeyPem())!,
                 PublicKeyPem = rsa.ExportSubjectPublicKeyInfoPem(),
@@ -116,7 +116,7 @@ public sealed class RuntimeCredentialDecryptClosureTests : IDisposable
         _db.InitTenantTables(typeof(TenantClientApiPolicyEntity));
         _db.TenantDb.Insertable(new TenantClientApiPolicyEntity
         {
-            Id = 7401, TenantId = _db.TenantId, AppId = 0, SigningKey = TenantSecretCrypto.Encrypt("policy-signing-key")!, IsEnabled = true,
+            Id = 7401, SigningKey = TenantSecretCrypto.Encrypt("policy-signing-key")!, IsEnabled = true,
         }).ExecuteCommand();
 
         var provider = new ClientApiTenantOptionsProvider(_db.TenantDbProvider, new HttpContextAccessor { HttpContext = _db.CreateHttpContext(), });
@@ -134,7 +134,7 @@ public sealed class RuntimeCredentialDecryptClosureTests : IDisposable
             "{\"callbackUrl\":\"https://cb.example.com/hook\",\"signingSecret\":\"ad-json-secret\"}");
         _db.TenantDb.Insertable(new TenantAdvertisementCallbackConfigEntity
         {
-            Id = 7501, TenantId = _db.TenantId, AppId = _db.AppId, Provider = "Pangle",
+            Id = 7501, Provider = "Pangle",
             SigningSecret = TenantSecretCrypto.Encrypt("ad-column-secret")!, VerificationKeys = string.Empty,
             ConfigJson = configJson, IsEnabled = true,
         }).ExecuteCommand();
@@ -157,7 +157,7 @@ public sealed class RuntimeCredentialDecryptClosureTests : IDisposable
         // ConfigJson 是验签材料唯一来源：Pangle 缺 signingSecret 直接 fail-closed，不再回落汇总列
         _db.TenantDb.Insertable(new TenantAdvertisementCallbackConfigEntity
         {
-            Id = 7511, TenantId = _db.TenantId, AppId = _db.AppId, Provider = "Pangle",
+            Id = 7511, Provider = "Pangle",
             SigningSecret = TenantSecretCrypto.Encrypt("ad-column-secret")!, VerificationKeys = string.Empty,
             ConfigJson = "{\"callbackUrl\":\"https://cb.example.com/hook\"}", IsEnabled = true,
         }).ExecuteCommand();
@@ -175,7 +175,7 @@ public sealed class RuntimeCredentialDecryptClosureTests : IDisposable
         // AdMob 行必填 verificationKeys；signingSecret 缺失不影响（AdMob 用 verificationKeys 验签）
         _db.TenantDb.Insertable(new TenantAdvertisementCallbackConfigEntity
         {
-            Id = 7512, TenantId = _db.TenantId, AppId = _db.AppId, Provider = "GoogleAdMob",
+            Id = 7512, Provider = "GoogleAdMob",
             ConfigJson = "{\"callbackUrl\":\"https://cb.example.com/admob\",\"verificationKeys\":\"k1=base64key\"}", IsEnabled = true,
         }).ExecuteCommand();
 
@@ -194,7 +194,7 @@ public sealed class RuntimeCredentialDecryptClosureTests : IDisposable
         _db.InitTenantTables(typeof(TenantEmailConfigEntity));
         _db.TenantDb.Insertable(new TenantEmailConfigEntity
         {
-            Id = 7601, TenantId = _db.TenantId, AppId = 0, FromEmailAddress = "noreply@example.com",
+            Id = 7601, FromEmailAddress = "noreply@example.com",
             FromEmailSecretId = TenantSecretCrypto.Encrypt("email-plain-id")!,
             FromEmailSecretKey = TenantSecretCrypto.Encrypt("email-plain-key")!,
             IsEnabled = true,

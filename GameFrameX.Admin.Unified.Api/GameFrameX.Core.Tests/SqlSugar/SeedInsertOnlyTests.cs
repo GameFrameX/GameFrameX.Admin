@@ -122,7 +122,7 @@ public class SeedInsertOnlyTests : IDisposable
             SqlSugarSetup.InitDatabase(scope, tenantConfig, new[] { typeof(TenantRoleEntity), });
 
             var tenantDb = scope.GetConnectionScope("tenant_2001");
-            var role = new TenantRoleEntity { Id = 99001, TenantId = 2001, Name = "初始角色", Code = "init_role", };
+            var role = new TenantRoleEntity { Id = 99001, Name = "初始角色", Code = "init_role", };
             DefaultTenantDatabaseSeeder.Upsert(tenantDb, new[] { role, });
 
             // 模拟用户在管理端改名
@@ -132,7 +132,7 @@ public class SeedInsertOnlyTests : IDisposable
                     .ExecuteCommand();
 
             // 二次 seed（如默认租户库重复初始化）：同名主键行不再覆盖
-            var seedAgain = new TenantRoleEntity { Id = 99001, TenantId = 2001, Name = "seed 新值", Code = "init_role", };
+            var seedAgain = new TenantRoleEntity { Id = 99001, Name = "seed 新值", Code = "init_role", };
             DefaultTenantDatabaseSeeder.Upsert(tenantDb, new[] { seedAgain, });
 
             var name = tenantDb.Queryable<TenantRoleEntity>().First(u => u.Id == 99001).Name;

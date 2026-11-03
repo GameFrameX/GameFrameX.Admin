@@ -5,18 +5,12 @@ namespace GameFrameX.Entity.Tenant.ClientApiConfig;
 /// <summary>
 /// 租户业务邮件配置。
 /// <para>承载玩家注册验证码、找回密码、玩家运营触达等租户品牌发信；与平台系统邮件（<c>SystemEmailProviderEntity</c>）完全独立，互不 fallback。</para>
-/// <para>作用域：<see cref="EntityTenantBase.TenantId"/> + <see cref="AppId"/>，AppId=0 表示租户默认配置；<see cref="Purpose"/>=0 表示通配租户业务邮件。</para>
 /// </summary>
 [SugarTable(null, "租户业务邮件配置")]
 [TenantTable]
 [IncrementTable]
-public class TenantEmailConfigEntity : EntityBasic, IAppScoped, ITenantAppConfigScope
+public class TenantEmailConfigEntity : EntityBasic
 {
-    /// <summary>
-    /// 应用 ID。0 表示租户默认邮件配置；大于 0 表示应用级覆盖。
-    /// </summary>
-    [SugarColumn(ColumnDescription = "应用ID", DefaultValue = "0")]
-    public long AppId { get; set; }
 
     /// <summary>
     /// 租户业务邮件用途（<c>TenantEmailPurpose</c>）。0 表示通配该租户 / 应用下所有租户业务邮件。
@@ -73,7 +67,6 @@ public class TenantEmailConfigEntity : EntityBasic, IAppScoped, ITenantAppConfig
     public string FromEmailSecretKey { get; set; } = string.Empty;
 
     /// <summary>
-    /// 配置选择优先级。同一匹配层（<c>TenantId+AppId+Purpose</c> 等）中按此值降序选择；数值越大越优先。
     /// <para>本字段仅用于配置选择，不代表邮件投递队列优先级。</para>
     /// </summary>
     [SugarColumn(ColumnDescription = "配置选择优先级", DefaultValue = "0")]

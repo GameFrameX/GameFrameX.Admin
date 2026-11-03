@@ -8,13 +8,8 @@ namespace GameFrameX.Entity.Tenant.Game;
 [SugarTable(null, "Game 登录票据签名 Key")]
 [TenantTable]
 [IncrementTable]
-public class TenantGameLoginTicketKeyEntity : EntityBasic, IAppScoped
+public class TenantGameLoginTicketKeyEntity : EntityBasic
 {
-    /// <summary>
-    /// 应用 ID。
-    /// </summary>
-    [SugarColumn(ColumnDescription = "应用 ID", DefaultValue = "0")]
-    public long AppId { get; set; }
 
     /// <summary>
     /// Key ID，写入 JWT header 的 kid。

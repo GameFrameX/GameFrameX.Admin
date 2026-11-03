@@ -4,8 +4,6 @@ namespace GameFrameX.Entity.Tenant.ObjectStorage;
 
 /// <summary>
 /// 租户对象存储配置。每个租户维护若干存储提供商配置，其中至多一条处于启用状态。
-/// 当前定位为租户默认资源能力（租户级共享），不补 AppId；若未来不同应用必须隔离桶 / 目录 / 凭证 / CDN 域名，
-/// 另立 change 评估升级为应用覆盖（仿 <c>ITenantAppConfigScope</c> 范式），不在当前作用域。
 /// </summary>
 [SugarTable(null, "租户对象存储配置")]
 [TenantTable]

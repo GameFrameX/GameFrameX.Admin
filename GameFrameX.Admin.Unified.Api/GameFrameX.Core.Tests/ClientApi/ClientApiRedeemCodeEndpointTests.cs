@@ -92,7 +92,6 @@ public sealed class ClientApiRedeemCodeEndpointTests
         await db.TenantDb.Insertable(new TenantGameRedeemCodeUseRecordEntity
         {
             Id = 9001,
-            AppId = db.AppId,
             AreaId = 2001,
             Code = "C108-REDEEM",
             PlayerId = 3001,
@@ -208,7 +207,6 @@ public sealed class ClientApiRedeemCodeEndpointTests
         await db.TenantDb.Insertable(new TenantGameRedeemCodeChannelRoleUsageEntity
         {
             Id = 9001,
-            AppId = db.AppId,
             ChannelId = 5001,
             RoleId = 3001,
             UsedCount = 1,
@@ -283,7 +281,6 @@ public sealed class ClientApiRedeemCodeEndpointTests
         await db.TenantDb.Insertable(new TenantGameRedeemCodeChannelRoleUsageEntity
         {
             Id = 9001,
-            AppId = db.AppId,
             ChannelId = 5001,
             RoleId = 3001,
             UsedCount = 1,

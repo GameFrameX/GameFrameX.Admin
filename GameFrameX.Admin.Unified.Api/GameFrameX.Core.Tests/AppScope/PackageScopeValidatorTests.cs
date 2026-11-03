@@ -123,7 +123,6 @@ public sealed class PackageScopeValidatorTests : IDisposable
         return new TenantGameAppPackageEntity
         {
             Id = id,
-            GameAppId = gameAppId,
             PackageName = packageName,
             IsEnabled = isEnabled,
             Name = packageName,
@@ -131,7 +130,6 @@ public sealed class PackageScopeValidatorTests : IDisposable
             PlatformName = "Android",
             ChannelCode = "default",
             ChannelName = "默认渠道",
-            TenantId = null,
             CreatedTime = now,
             IsDeleted = false,
         };

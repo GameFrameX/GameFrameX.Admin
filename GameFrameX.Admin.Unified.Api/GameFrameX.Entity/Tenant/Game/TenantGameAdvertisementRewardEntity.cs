@@ -6,21 +6,14 @@ namespace GameFrameX.Entity.Tenant.Game;
 /// <summary>
 /// 游戏广告奖励发放账本。
 /// <para>广告奖励发放权威事实源（C114 / GFX-110），覆盖 TopOn / GoogleAdMob / UnityAds 服务端回调。</para>
-/// <para>作用域：事实数据应用作用域 <see cref="EntityBasic"/> 的 <c>TenantId</c> + <see cref="AppId"/>；AppId 跟随角色 AppId，由 <c>原应用规则.EnsureFactAppId</c> 守卫。</para>
 /// <para>幂等：<see cref="IdempotencyKey"/> = <c>adreward:{NormalizedProvider}:{TransactionId}</c>，数据库唯一约束兜底，同一广告 transaction 重放不重复发奖。</para>
 /// </summary>
 [SugarTable(null, "游戏广告奖励发放账本")]
 [SugarIndex("ux_ad_reward_idempotency", nameof(IdempotencyKey), OrderByType.Asc, true)]
-[SugarIndex("idx_ad_reward_tenant_app", "TenantId", OrderByType.Asc, nameof(AppId), OrderByType.Asc)]
 [TenantTable]
 [IncrementTable]
-public class TenantGameAdvertisementRewardEntity : EntityBasic, IAppScoped
+public class TenantGameAdvertisementRewardEntity : EntityBasic
 {
-    /// <summary>
-    /// 应用 Id。事实数据应用作用域，跟随角色 <c>AppId</c>，必须 &gt; 0。
-    /// </summary>
-    [SugarColumn(ColumnDescription = "应用Id", DefaultValue = "0")]
-    public long AppId { get; set; }
 
     /// <summary>
     /// 广告平台 Provider。标准化值：<c>TopOn</c> / <c>GoogleAdMob</c> / <c>UnityAds</c>。

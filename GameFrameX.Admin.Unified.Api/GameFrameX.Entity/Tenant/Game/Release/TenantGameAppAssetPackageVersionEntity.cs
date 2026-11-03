@@ -7,11 +7,6 @@ namespace GameFrameX.Entity.Tenant.Game.Release;
 [IncrementTable]
 public sealed class TenantGameAppAssetPackageVersionEntity : EntityBasic
 {
-    /// <summary>
-    /// 应用作用域，0 / null 表示租户默认配置
-    /// </summary>
-    [SugarColumn(ColumnDescription = "应用作用域", IsNullable = true)]
-    public long? AppId { get; set; }
 
     /// <summary>
     /// 渠道
@@ -30,7 +25,6 @@ public sealed class TenantGameAppAssetPackageVersionEntity : EntityBasic
     /// </summary>
     [SugarColumn(ColumnDescription = "游戏版本", Length = EntityStringLength.Length256)]
     public string AppVersion { get; set; } = null!;
-
 
     /// <summary>
     /// 包名

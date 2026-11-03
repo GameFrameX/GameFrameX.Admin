@@ -19,12 +19,6 @@ public class TenantGameAppPackageEntity : EntityBasicSelect
     }
 
     /// <summary>
-    /// 游戏应用Id
-    /// </summary>
-    [SugarColumn(ColumnDescription = "游戏应用Id", DefaultValue = "0")]
-    public long GameAppId { get; set; }
-
-    /// <summary>
     /// 包名
     /// </summary>
     [SugarColumn(ColumnDescription = "包名", Length = EntityStringLength.Length512)]

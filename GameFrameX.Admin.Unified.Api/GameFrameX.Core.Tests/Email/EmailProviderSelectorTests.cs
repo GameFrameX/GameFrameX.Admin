@@ -114,7 +114,6 @@ public class EmailProviderSelectorTests : IDisposable
         await _db.Insertable(new SystemEmailProviderEntity
         {
             Id = id,
-            TenantId = 0,
             CreatedId = 1,
             CreatedTime = 1,
             CreatedName = "test",
@@ -143,7 +142,6 @@ public class EmailProviderSelectorTests : IDisposable
         await _db.Insertable(new TenantEmailConfigEntity
         {
             Id = id,
-            TenantId = tenantId,
             CreatedId = 1,
             CreatedTime = 1,
             CreatedName = "test",
@@ -157,7 +155,6 @@ public class EmailProviderSelectorTests : IDisposable
             DeletedId = 0,
             DeletedName = string.Empty,
             RowVersion = 0,
-            AppId = appId,
             Purpose = purpose,
             Provider = "TencentCloudSes",
             FromEmailAddress = "tenant@example.test",

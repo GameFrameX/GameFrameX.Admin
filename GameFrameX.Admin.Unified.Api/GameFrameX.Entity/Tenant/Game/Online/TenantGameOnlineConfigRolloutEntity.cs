@@ -11,20 +11,13 @@ namespace GameFrameX.Entity.Tenant.Game.Online;
 
 /// <summary>
 /// 配置灰度发布（Rollout）版本行。每次发布 / 回滚都追加新行（版本化），历史行不可修改不可删除（vault:C8 S7.8 / VC-7.12）。
-/// <para><c>ConfigVersion</c> 由 Admin 按 AppId + ConfigKind + ConfigKey 维度递增分配；
 /// 回滚行的 <c>TargetVersion</c> 指向目标历史版本（回滚 = 版本化新下发，不是恢复旧行）；
 /// 灰度语义（SegmentId + Percent 1-100 ↔ Online 侧解释 ↔ 既有 RolloutMatcher）三方对照见 <c>OnlineRolloutSemanticMap</c>。</para>
 /// </summary>
 [SugarTable(null, "配置灰度发布版本")]
-[SugarIndex("idx_tenant_game_online_config_rollout_tenant_app", "TenantId", OrderByType.Asc, nameof(AppId), OrderByType.Asc)]
 [TenantTable]
-public class TenantGameOnlineConfigRolloutEntity : EntityBasic, IAppScoped
+public class TenantGameOnlineConfigRolloutEntity : EntityBasic
 {
-    /// <summary>
-    /// 应用Id。事实数据应用作用域（TenantId + AppId），必须 &gt; 0。
-    /// </summary>
-    [SugarColumn(ColumnDescription = "应用Id", DefaultValue = "0")]
-    public long AppId { get; set; }
 
     /// <summary>
     /// 目标区服Id（Online 作用域三元组的 ServerId；灰度下发面向特定区服的 Online Runtime）。
@@ -44,10 +37,7 @@ public class TenantGameOnlineConfigRolloutEntity : EntityBasic, IAppScoped
     [SugarColumn(ColumnDescription = "配置业务键", Length = EntityStringLength.Length256)]
     public string ConfigKey { get; set; } = null!;
 
-    /// <summary>
-    /// Admin 侧分配的下发版本号（AppId + ConfigKind + ConfigKey 维度递增；发布与回滚共用同一序列）。
-    /// </summary>
-    [SugarColumn(ColumnDescription = "下发版本号", DefaultValue = "0")]
+        [SugarColumn(ColumnDescription = "下发版本号", DefaultValue = "0")]
     public int ConfigVersion { get; set; }
 
     /// <summary>

@@ -6,19 +6,13 @@ namespace GameFrameX.Entity.Tenant.Game;
 /// App 会话密钥（AES-256-GCM 加密信封对称密钥环，change C5 server-envelope-middleware）。
 /// <para>形状照 <see cref="TenantAppSignatureKeyEntity"/>（C2 密钥环先例）：Kid 版本化寻址、NotBefore/Expire 租约、
 /// Rotate 双活、禁删保护；区别在算法为 AES-GCM 信封密钥（会话层，双向 c2s/s2c HKDF 分钥）而非 HMAC 签名密钥。</para>
-/// <para><b>归属：</b>AppId 归属某个具体应用（IAppScoped），密钥域 = (租户, 应用, Kid)；同一应用可同时存在多把生效 key，
 /// 客户端信封自报 kid 定密钥（双活轮换窗口内新旧 key 共存）。</para>
 /// </summary>
 [SugarTable(null, "App 会话密钥")]
 [TenantTable]
 [IncrementTable]
-public class TenantSessionKeyEntity : EntityBasic, IAppScoped
+public class TenantSessionKeyEntity : EntityBasic
 {
-    /// <summary>
-    /// 应用 ID。密钥域归属：解密时按 (AppId, Kid) 定位会话密钥，防止跨应用挪用信封。
-    /// </summary>
-    [SugarColumn(ColumnDescription = "应用 ID", DefaultValue = "0")]
-    public long AppId { get; set; }
 
     /// <summary>
     /// Key ID（如 sess-app-1001-20260818120000-a1b2），进入信封 JSON 的 kid 字段。

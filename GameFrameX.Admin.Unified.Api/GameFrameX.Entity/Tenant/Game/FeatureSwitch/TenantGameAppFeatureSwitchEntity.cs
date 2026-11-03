@@ -8,16 +8,11 @@ namespace GameFrameX.Entity.Tenant.Game.FeatureSwitch;
 /// 按 <see cref="Audience"/> 过滤后拉取，玩法 gate 判定权在使用方业务端点，本表只承载配置分发。</para>
 /// </summary>
 [SugarTable(null, "活动/功能开关注册表")]
-[SugarIndex("idx_tenant_game_app_feature_switch_tenant_app_key", "TenantId", OrderByType.Asc, nameof(AppId), OrderByType.Asc, nameof(SwitchKey), OrderByType.Asc)]
+[SugarIndex("idx_tenant_game_app_feature_switch_tenant_app_key", nameof(SwitchKey), OrderByType.Asc)]
 [TenantTable]
 [IncrementTable]
 public sealed class TenantGameAppFeatureSwitchEntity : EntityBasic
 {
-    /// <summary>
-    /// 应用作用域，0 / null 表示租户默认层（未命中的应用行由该层按开关键兜底）
-    /// </summary>
-    [SugarColumn(ColumnDescription = "应用作用域", IsNullable = true)]
-    public long? AppId { get; set; }
 
     /// <summary>
     /// 开关键（同一应用作用域 + 相同作用域维度组合内唯一）
@@ -69,10 +64,7 @@ public sealed class TenantGameAppFeatureSwitchEntity : EntityBasic
     [SugarColumn(ColumnDescription = "平台", Length = EntityStringLength.Length256, DefaultValue = "default")]
     public string Platform { get; set; } = null!;
 
-    /// <summary>
-    /// 包名作用域，空 / default 表示不限；租户默认层（AppId &lt;= 0）不允许携带具体包名
-    /// </summary>
-    [SugarColumn(ColumnDescription = "包名", Length = EntityStringLength.Length256, DefaultValue = "default")]
+        [SugarColumn(ColumnDescription = "包名", Length = EntityStringLength.Length256, DefaultValue = "default")]
     public string Package { get; set; } = null!;
 
     /// <summary>

@@ -9,7 +9,7 @@ namespace GameFrameX.Entity.Tenant;
 [SugarTable(null, "租户库角色表")]
 [TenantTable]
 [IncrementTable]
-public class TenantRoleEntity : EntityTenantBase
+public class TenantRoleEntity : EntityBase
 {
     /// <summary>
     /// 名称

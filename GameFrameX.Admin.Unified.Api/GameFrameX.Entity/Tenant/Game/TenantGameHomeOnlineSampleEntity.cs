@@ -8,7 +8,7 @@ namespace GameFrameX.Entity.Tenant.Game;
 /// 首页趋势接口按整点桶回读，缺桶返回 null（前端降级画 —）。</para>
 /// </summary>
 [SugarTable(null, "首页在线人数时序采样")]
-[SugarIndex("ux_home_online_sample_tenant_time", nameof(TenantId), OrderByType.Asc, nameof(SampleTime), OrderByType.Asc, true)]
+[SugarIndex("ux_home_online_sample_tenant_time", nameof(SampleTime), OrderByType.Asc, true)]
 [TenantTable]
 [IncrementTable]
 public class TenantGameHomeOnlineSampleEntity : EntityBasic

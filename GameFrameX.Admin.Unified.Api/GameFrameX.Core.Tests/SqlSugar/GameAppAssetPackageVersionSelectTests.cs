@@ -89,7 +89,6 @@ public sealed class GameAppAssetPackageVersionSelectTests : IDisposable
         await _db.Insertable(new TenantGameAppPackageEntity
         {
             Id = 1,
-            GameAppId = 100,
             Name = "pkg-a",
             PackageName = "com.app.a",
             PlatformCode = "android",
@@ -104,7 +103,6 @@ public sealed class GameAppAssetPackageVersionSelectTests : IDisposable
         await _db.Insertable(new TenantGameAppPackageEntity
         {
             Id = 2,
-            GameAppId = 100,
             Name = "pkg-b",
             PackageName = "com.app.b",
             PlatformCode = "android",
@@ -119,7 +117,6 @@ public sealed class GameAppAssetPackageVersionSelectTests : IDisposable
         await _db.Insertable(new TenantGameAppPackageEntity
         {
             Id = 3,
-            GameAppId = 200,
             Name = "pkg-c",
             PackageName = "com.app.a",
             PlatformCode = "android",
@@ -134,7 +131,6 @@ public sealed class GameAppAssetPackageVersionSelectTests : IDisposable
         await _db.Insertable(new TenantGameAppAssetPackageVersionEntity
         {
             Id = 11,
-            AppId = 100,
             Channel = "default",
             Platform = "android",
             AppVersion = "1.0.0",
@@ -151,7 +147,6 @@ public sealed class GameAppAssetPackageVersionSelectTests : IDisposable
         await _db.Insertable(new TenantGameAppAssetPackageVersionEntity
         {
             Id = 12,
-            AppId = 100,
             Channel = "default",
             Platform = "android",
             AppVersion = "1.0.0",
@@ -168,7 +163,6 @@ public sealed class GameAppAssetPackageVersionSelectTests : IDisposable
         await _db.Insertable(new TenantGameAppAssetPackageVersionEntity
         {
             Id = 13,
-            AppId = 100,
             Channel = "default",
             Platform = "android",
             AppVersion = "1.0.0",
@@ -185,7 +179,6 @@ public sealed class GameAppAssetPackageVersionSelectTests : IDisposable
         await _db.Insertable(new TenantGameAppAssetPackageVersionEntity
         {
             Id = 21,
-            AppId = 100,
             Channel = "default",
             Platform = "android",
             AppVersion = "1.0.0",

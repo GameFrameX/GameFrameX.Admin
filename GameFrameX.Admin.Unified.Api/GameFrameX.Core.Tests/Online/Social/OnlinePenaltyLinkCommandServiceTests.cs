@@ -244,7 +244,6 @@ public sealed class OnlinePenaltyLinkCommandServiceTests : IDisposable
     {
         var penalty = new TenantGamePenaltyEntity
         {
-            AppId = App100,
             AreaId = areaId,
             TargetType = PenaltyTargetTypeEnum.Account,
             TargetId = targetId,
@@ -267,7 +266,6 @@ public sealed class OnlinePenaltyLinkCommandServiceTests : IDisposable
             Id = id,
             Name = $"area-{id}",
             Description = string.Empty,
-            GameAppId = App100,
             HttpManageUrl = "https://game-server.test",
             TcpSocketUrl = "tcp://game-server.test",
             WebSocketUrl = "wss://game-server.test",

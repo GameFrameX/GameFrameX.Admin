@@ -65,7 +65,6 @@ public sealed class ClientApiSessionKeyIssuerTests
     {
         return new TenantSessionKeyEntity
         {
-            AppId = appId,
             Kid = kid,
             Secret = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
             NotBeforeTime = 0,

@@ -79,7 +79,6 @@ internal static class OnlineAssetTestSupport
             Id = id,
             Name = $"area-{id}",
             Description = string.Empty,
-            GameAppId = appId,
             HttpManageUrl = "https://game-server.test",
             TcpSocketUrl = "tcp://game-server.test",
             WebSocketUrl = "wss://game-server.test",

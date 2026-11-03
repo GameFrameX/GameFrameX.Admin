@@ -45,7 +45,6 @@ public sealed class ClientApiFeatureSwitchEndpointTests
         return new TenantGameAppFeatureSwitchEntity
         {
             Id = id,
-            AppId = null,
             SwitchKey = switchKey,
             DisplayName = switchKey,
             Audience = audience,

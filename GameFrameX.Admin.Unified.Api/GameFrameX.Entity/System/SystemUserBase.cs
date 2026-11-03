@@ -6,7 +6,7 @@ namespace GameFrameX.Entity.System;
 /// <summary>
 /// 用户字段基类，仅提供 system_user 与 tenant_user 共享字段，不直接映射物理表。
 /// </summary>
-public abstract class SystemUserBase : EntityTenantBase
+public abstract class SystemUserBase : EntityBase
 {
     /// <summary>
     /// 账号
@@ -160,7 +160,6 @@ public abstract class SystemUserBase : EntityTenantBase
     public AccountTypeEnum AccountType { get; set; } = AccountTypeEnum.NormalUser;
 
 
-
     /// <summary>
     /// 直属主管Id
     /// </summary>
@@ -172,7 +171,6 @@ public abstract class SystemUserBase : EntityTenantBase
     /// </summary>
     [Navigate(NavigateType.OneToOne, nameof(ManagerUserId))]
     public TenantUserEntity ManagerUser { get; set; } = null!;
-
 
 
     /// <summary>

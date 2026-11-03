@@ -6,18 +6,12 @@ namespace GameFrameX.Entity.Tenant.ClientApiConfig;
 /// <summary>
 /// 租户广告回调配置。
 /// <para>承载广告服务端回调用于验签和参数识别的最小配置材料，Client API 公开回调入口按 Provider 读取该配置。</para>
-/// <para>作用域：<see cref="EntityTenantBase.TenantId"/> + <see cref="AppId"/>。</para>
 /// </summary>
 [SugarTable(null, "租户广告回调配置")]
 [TenantTable]
 [IncrementTable]
-public class TenantAdvertisementCallbackConfigEntity : EntityBasic, IAppScoped, ITenantAppConfigScope
+public class TenantAdvertisementCallbackConfigEntity : EntityBasic
 {
-    /// <summary>
-    /// 应用 ID。0 表示租户默认配置；大于 0 表示应用级覆盖。
-    /// </summary>
-    [SugarColumn(ColumnDescription = "应用ID", DefaultValue = "0")]
-    public long AppId { get; set; }
 
     /// <summary>
     /// 广告平台 Provider。当前首批配置支持 <c>TopOn</c>、<c>GoogleAdMob</c>、<c>Pangle</c>、<c>UnityAds</c>。

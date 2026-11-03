@@ -310,7 +310,6 @@ public sealed class OnlineServerClientTests : IDisposable
             Id = Area1001,
             Name = "area-1001",
             Description = string.Empty,
-            GameAppId = App100,
             HttpManageUrl = "https://game-server.test",
             TcpSocketUrl = "tcp://game-server.test",
             WebSocketUrl = "wss://game-server.test",

@@ -6,17 +6,10 @@ namespace GameFrameX.Entity.Tenant.Game.Announcement;
 /// 游戏横幅公告
 /// </summary>
 [SugarTable(null, "游戏横幅公告")]
-[SugarIndex("idx_tenant_game_banner_announcement_tenant_app", "TenantId", OrderByType.Asc, nameof(AppId), OrderByType.Asc)]
 [TenantTable]
 [IncrementTable]
-public class TenantGameBannerAnnouncementEntity : EntityBasic, IAppScoped
+public class TenantGameBannerAnnouncementEntity : EntityBasic
 {
-    /// <summary>
-    /// 应用Id。运营内容应用作用域（TenantId + AppId），必须 &gt; 0。
-    /// <para>来源：Admin 后台当前应用上下文写入。</para>
-    /// </summary>
-    [SugarColumn(ColumnDescription = "应用Id", DefaultValue = "0")]
-    public long AppId { get; set; }
 
     /// <summary>
     /// 区服ID

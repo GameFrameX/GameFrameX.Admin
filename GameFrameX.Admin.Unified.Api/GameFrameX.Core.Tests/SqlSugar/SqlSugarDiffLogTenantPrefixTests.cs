@@ -206,7 +206,6 @@ public class SqlSugarDiffLogTenantPrefixTests : IDisposable
         return new TenantGameAppRemoteConfigEntity
         {
             Id = id,
-            TenantId = 10001,
             Channel = channel,
             Platform = "test",
             AppVersion = "1.0.0",

@@ -696,7 +696,6 @@ public sealed class CryptoEnvelopeMiddlewareTests
             _keys.RemoveAll(x => x.Kid == kid);
             _keys.Add(new TenantSessionKeyEntity
             {
-                AppId = appId,
                 Kid = kid,
                 Secret = secret,
                 IsEnabled = enabled,

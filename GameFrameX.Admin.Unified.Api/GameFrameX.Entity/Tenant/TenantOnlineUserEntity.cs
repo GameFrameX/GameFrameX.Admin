@@ -8,7 +8,7 @@ namespace GameFrameX.Entity.Tenant;
 [SugarTable(null, "租户库在线用户表")]
 [TenantTable]
 [IncrementTable]
-public sealed class TenantOnlineUserEntity : EntityTenantBase
+public sealed class TenantOnlineUserEntity : EntityBase
 {
     /// <summary>
     /// 连接Id

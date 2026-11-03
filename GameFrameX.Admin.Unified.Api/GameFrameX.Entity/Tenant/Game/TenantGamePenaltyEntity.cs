@@ -6,21 +6,14 @@ namespace GameFrameX.Entity.Tenant.Game;
 /// <summary>
 /// 处罚事实源。记录账号 / 角色 / 设备 / IP 维度的封禁 / 限制登录 / 禁言 / 限制交易 / 限制匹配处罚生命周期：
 /// 对象、动作、状态、原因、有效期、来源（举报 / 申诉）、操作人与撤销审计。
-/// <para>应用 / 区服作为作用域字段（AppId / AreaId），不引入"封禁整个应用"对象类型。AppId 必须大于 0。</para>
 /// <para>登录阻断铁律：Enforcement 命中查询仅命中 ActionType ∈ {Ban, RestrictLogin}；Mute / RestrictTrade / RestrictMatch 永不阻断登录。</para>
 /// </summary>
 [SugarTable(null, "处罚事实源")]
-[SugarIndex("idx_penalty_tenant_app", "TenantId", OrderByType.Asc, "AppId", OrderByType.Asc)]
 [SugarIndex("idx_penalty_target", nameof(TargetType), OrderByType.Asc, nameof(TargetId), OrderByType.Asc, nameof(Status), OrderByType.Asc)]
 [TenantTable]
 [IncrementTable]
-public class TenantGamePenaltyEntity : EntityBasic, IAppScoped
+public class TenantGamePenaltyEntity : EntityBasic
 {
-    /// <summary>
-    /// 应用作用域。处罚是应用级事实数据，必须大于 0。
-    /// </summary>
-    [SugarColumn(ColumnDescription = "应用Id", DefaultValue = "0")]
-    public long AppId { get; set; }
 
     /// <summary>
     /// 区服作用域。null = 全区服生效。

@@ -275,7 +275,6 @@ public sealed class OnlineAuditSearchServiceTests : IDisposable
 
         await _db.Insertable(new TenantGamePenaltyEntity
         {
-            AppId = OnlineAssetTestSupport.App100,
             AreaId = OnlineAssetTestSupport.Area1001,
             TargetType = PenaltyTargetTypeEnum.Account,
             TargetId = "player-9",
@@ -288,7 +287,6 @@ public sealed class OnlineAuditSearchServiceTests : IDisposable
 
         await _db.Insertable(new TenantGameOnlineConfigRolloutEntity
         {
-            AppId = OnlineAssetTestSupport.App100,
             ServerId = OnlineAssetTestSupport.Area1001,
             ConfigKind = OnlineConfigRolloutKind.RemoteConfig,
             ConfigKey = "77",

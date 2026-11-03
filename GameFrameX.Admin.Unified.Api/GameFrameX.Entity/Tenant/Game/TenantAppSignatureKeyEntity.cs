@@ -6,19 +6,13 @@ namespace GameFrameX.Entity.Tenant.Game;
 /// App 传输签名密钥（HMAC-SHA256 对称密钥环，change C2 sig-keyring-server）。
 /// <para>形状照 <see cref="TenantGameLoginTicketKeyEntity"/> 体系：Kid 版本化寻址、NotBefore/Expire 租约、
 /// Rotate 双活、禁删保护；区别在算法为 HMAC 对称密钥（LoginTicket 为 RSA 非对称）。</para>
-/// <para><b>归属：</b>AppId 归属某个具体应用（IAppScoped），密钥域 = (租户, 应用)；同一应用可同时存在多把生效 key，
 /// 单 key 失效（禁用/到期）仅拒用该 key 签名的请求，不影响其余 key（多版本客户端共存的基础）。</para>
 /// </summary>
 [SugarTable(null, "App 传输签名密钥")]
 [TenantTable]
 [IncrementTable]
-public class TenantAppSignatureKeyEntity : EntityBasic, IAppScoped
+public class TenantAppSignatureKeyEntity : EntityBasic
 {
-    /// <summary>
-    /// 应用 ID。密钥域归属：验签时按 (AppId, Kid) 定位密钥，防止跨应用挪用签名。
-    /// </summary>
-    [SugarColumn(ColumnDescription = "应用 ID", DefaultValue = "0")]
-    public long AppId { get; set; }
 
     /// <summary>
     /// Key ID（如 sk-app-1001-20260817120000-a1b2），进入 v2 签名头与 message 串。

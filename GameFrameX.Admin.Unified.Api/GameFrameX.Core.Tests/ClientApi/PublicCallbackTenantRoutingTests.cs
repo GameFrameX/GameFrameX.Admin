@@ -119,8 +119,6 @@ public sealed class PublicCallbackTenantRoutingTests : IDisposable
             new TenantAdvertisementCallbackConfigEntity
             {
                 Id = 1900000004201,
-                TenantId = tenantId,
-                AppId = appId,
                 Provider = "TopOn",
                 ConfigJson = "{\"callbackUrl\":\"https://client.example.com/topon\",\"signingSecret\":\"topon-secret\"}",
                 IsEnabled = true,
@@ -129,8 +127,6 @@ public sealed class PublicCallbackTenantRoutingTests : IDisposable
             new TenantAdvertisementCallbackConfigEntity
             {
                 Id = 1900000004202,
-                TenantId = tenantId,
-                AppId = appId,
                 Provider = "Pangle",
                 ConfigJson = "{\"callbackUrl\":\"https://client.example.com/pangle\",\"signingSecret\":\"pangle-secret\"}",
                 IsEnabled = true,
@@ -182,8 +178,6 @@ public sealed class PublicCallbackTenantRoutingTests : IDisposable
             tenantDb.Insertable(new TenantGameAppPackageEntity
             {
                 Id = packageId.Value,
-                TenantId = tenantId,
-                GameAppId = appId,
                 Name = "C59 Test Package",
                 PackageName = "com.gameframex.c59",
                 PlatformCode = "ios",
@@ -220,10 +214,6 @@ public sealed class PublicCallbackTenantRoutingTests : IDisposable
         tenantDb.Insertable(new TenantGamePaymentConfigEntity
         {
             Id = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
-            TenantId = tenantId,
-            AppId = appId,
-            GameAppId = appId,
-            GameAppIdNormalized = appId,
             PackageIdNormalized = 0,
             PayChannel = "alipay",
             IsSandbox = isSandbox,

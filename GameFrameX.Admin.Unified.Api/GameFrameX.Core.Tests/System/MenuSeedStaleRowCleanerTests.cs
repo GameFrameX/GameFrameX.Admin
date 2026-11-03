@@ -317,7 +317,6 @@ public class MenuSeedStaleRowCleanerTests
             AllowTenantWhenSuperAdminOnly = source.AllowTenantWhenSuperAdminOnly,
             IsEnabled = source.IsEnabled ?? true,
             IsDeleted = false,
-            TenantId = 0,
             CreatedId = 0,
             CreatedName = "test",
             CreatedTime = source.CreatedTime,
