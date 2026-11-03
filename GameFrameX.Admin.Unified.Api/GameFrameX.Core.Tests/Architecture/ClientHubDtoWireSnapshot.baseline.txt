@@ -42,7 +42,6 @@ class|AppVersion,Channel,Language,PackageName,Platform
 class|AppleEmail,AppleId,AppleName
 class|AppleEmail,AppleId,AppleName,UserId
 class|AreaId,Avatar,HairstyleConfigId,HeroConfigId,Id,LastLoginTime,Level,Name,ServerName,UserId
-class|AreaId,ChannelId,Code,Description,EndTime,Items,StartTime,UsageLimit
 class|AreaId,Code,RoleId
 class|AreaId,HairstyleConfigId,HeroConfigId,Name,UserId
 class|AreaId,Id,Name,UserId
@@ -61,7 +60,6 @@ class|Channel,ClientVersion,DeviceId,ExtraFields,InstallId,Platform,VendorId
 class|Channel,Currency,Level,OrderId,PayChannel,ProductId,RealMoney,StrScene,UserId
 class|CheckExist,Key,Token,UserId
 class|City,Country,CountryLong,CountryShort,Currency,Ip,Region,TimeZone
-class|ClassifyId,ConfigId,Description,Name,Star
 class|ClassifyId,Description,HttpManageUrl,Id,IsEnabled,Name,ServerContainerId,ServerType,ServerVersion,TcpSocketUrl,WebSocketUrl
 class|Code,Email
 class|Code,Email,Password,UserId

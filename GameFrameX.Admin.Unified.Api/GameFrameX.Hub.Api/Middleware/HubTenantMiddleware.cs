@@ -10,7 +10,7 @@ namespace GameFrameX.Hub.Api.Middleware;
 /// 供 <c>ISqlSugarTenantIdResolver</c> 读取并路由租户库。
 /// <list type="bullet">
 /// <item>已鉴权请求：拒绝超级管理员；从 JWT 解析 <see cref="ClaimConst.TenantId"/>。</item>
-/// <item>匿名 WebHook 请求：从 <see cref="WebHookTenantIdHeader"/> 请求头解析租户 Id；WebHook 路由无租户头返回 401。</item>
+/// <item>匿名 WebHook 请求：从 <see cref="WebHookTenantIdHeader"/> 请求头解析租户 Id。</item>
 /// </list>
 /// 租户存在性 / 连接配置校验由 Repository 实时查库承担（已废弃 TenantDbResolver 内存缓存）。
 /// <para>拒绝响应统一走 <see cref="MiddlewareResponseWriter.WriteRejectedAsync"/>（C270 起纯文本改 JSON <c>{Code, Message}</c>；系统未上线，无存量消费者）。</para>
@@ -23,11 +23,6 @@ public class HubTenantMiddleware
     /// 匿名 WebHook 请求传递租户标识的请求头。
     /// </summary>
     public const string WebHookTenantIdHeader = "GameFrameX-Tenant-Id";
-
-    /// <summary>
-    /// 匿名 WebHook 路由前缀（无租户头时返回 401）。
-    /// </summary>
-    private const string WebHookPathPrefix = "/api/TapdWebHook";
 
     public HubTenantMiddleware(RequestDelegate next)
     {
@@ -60,18 +55,14 @@ public class HubTenantMiddleware
         }
         else
         {
-            // 匿名（WebHook）：从请求头解析租户 Id；WebHook 路由无租户头 → 401
+            // 匿名请求：有租户头时解析租户 Id，机器凭证中间件随后核对绑定。
             if (context.Request.Headers.TryGetValue(WebHookTenantIdHeader, out var headerValue)
                 && long.TryParse(headerValue, out var headerTenantId)
                 && headerTenantId > 0)
             {
                 context.Items[TenantContextAccessor.TenantIdKey] = headerTenantId;
             }
-            else if (context.Request.Path.StartsWithSegments(WebHookPathPrefix, StringComparison.OrdinalIgnoreCase))
-            {
-                await MiddlewareResponseWriter.WriteRejectedAsync(context, StatusCodes.Status401Unauthorized, "缺少租户标识");
-                return;
-            }
+
         }
 
         await _next(context);

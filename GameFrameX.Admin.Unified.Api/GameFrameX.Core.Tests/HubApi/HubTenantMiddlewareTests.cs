@@ -57,23 +57,6 @@ public sealed class HubTenantMiddlewareTests
     }
 
     [Fact]
-    public async Task AnonymousWebHookWithoutTenantHeader_RejectedWith401JsonBody()
-    {
-        var context = CreateContext();
-        context.Request.Path = "/api/TapdWebHook/notify";
-        var middleware = new HubTenantMiddleware(_ => throw new InvalidOperationException("不应进入下游"));
-
-        await middleware.InvokeAsync(context);
-
-        Assert.Equal(StatusCodes.Status401Unauthorized, context.Response.StatusCode);
-        using (var document = await ParseBodyAsync(context))
-        {
-            Assert.Equal(StatusCodes.Status401Unauthorized, document.RootElement.GetProperty("Code").GetInt32());
-            Assert.Equal("缺少租户标识", document.RootElement.GetProperty("Message").GetString());
-        }
-    }
-
-    [Fact]
     public async Task AnonymousNonWebHookWithoutTenantHeader_PassesThrough()
     {
         var context = CreateContext();
