@@ -9,7 +9,7 @@ namespace GameFrameX.Client.Api.Services.Auth;
 
 /// <summary>
 /// Client API 账号访问令牌签发服务。
-/// <para>签名密钥与有效期按当前请求租户从 <see cref="IClientApiTenantOptionsProvider"/> 读取；密钥按 TenantId 隔离，未配置时抛出异常。</para>
+/// <para>签名密钥与有效期从主库 <see cref="IClientApiTenantOptionsProvider"/> 读取；未配置密钥时抛出异常。</para>
 /// </summary>
 public sealed class ClientApiTokenIssuer
 {

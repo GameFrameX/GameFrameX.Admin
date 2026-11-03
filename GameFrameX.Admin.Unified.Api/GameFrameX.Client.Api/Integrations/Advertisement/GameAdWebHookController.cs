@@ -96,7 +96,7 @@ public class GameAdWebHookController : BaseController<TenantGameRoleAdvertisemen
             return Json(result.ToAnonymous());
         }
 
-        // 发放成功后补写 C75/C91 角色广告事实（应用作用域 AppId 取自已验签并通过 service 发放的角色实体）
+        // 发放成功后，依据已验签并完成奖励发放的角色补写广告事实。
         await WriteAdMobRoleAdvertisementFactAsync(input);
 
         return Json(result.ToAnonymous());
@@ -149,7 +149,6 @@ public class GameAdWebHookController : BaseController<TenantGameRoleAdvertisemen
                 UserId = userId,
                 RoleId = playerId.ToString(),
                 AreaId = gameRoleEntity.AreaId,
-                // 事实数据应用作用域：AppId 来自已通过签名验证并按 playerId 查到的角色实体（C75 落地），不接受请求体或路由参数覆盖。
                 IsSendSuccess = true,
                 CreatedTime = TimerHelper.UnixTimeSeconds(),
             };

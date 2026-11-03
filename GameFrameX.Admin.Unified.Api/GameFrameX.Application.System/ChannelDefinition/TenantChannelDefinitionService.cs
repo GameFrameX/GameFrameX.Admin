@@ -52,9 +52,9 @@ public class TenantChannelDefinitionService
     }
 
     /// <summary>
-    /// 导出当前租户渠道定义。复用既有 BuildPageQuery（强制 TenantId 过滤），
+    /// 导出主库渠道定义。复用既有 BuildPageQuery，
     /// 仅导出请求列白名单中、未标记 <see cref="ExportSensitiveAttribute"/> 的字段，
-    /// 租户账号不会跨租户泄露，超管不触发租户耦合导出。
+    /// 保留现有权限校验与导出行数限制。
     /// </summary>
     /// <param name="input">导出请求：查询条件 + 可见列白名单 + 范围（全量受 MaxExportRows 上限保护）。</param>
     /// <returns>.xlsx 文件流结果。</returns>

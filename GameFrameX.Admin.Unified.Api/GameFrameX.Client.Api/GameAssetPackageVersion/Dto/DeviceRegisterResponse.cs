@@ -6,7 +6,7 @@ namespace GameFrameX.Client.Api.GameAssetPackageVersion.Dto;
 public class DeviceRegisterResponse
 {
     /// <summary>
-    /// 设备 Id（AppId + DeviceUniqueIdentifier 已存在时返回既有行 Id）
+    /// 设备 Id（DeviceUniqueIdentifier 已存在时返回既有行 Id）
     /// </summary>
     public long DeviceId { get; set; }
 }

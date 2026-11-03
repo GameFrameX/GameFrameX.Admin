@@ -5,7 +5,4 @@ namespace GameFrameX.Application.Game.Reward.GameRewardTemplate.Dto;
 /// </summary>
 public class TenantGameRewardTemplateSnapshotRequest : BaseIdRequest
 {
-    /// <summary>
-    /// 当前应用Id。快照复制必须限定到当前应用，禁止 AppId=0。
-    /// </summary>
 }

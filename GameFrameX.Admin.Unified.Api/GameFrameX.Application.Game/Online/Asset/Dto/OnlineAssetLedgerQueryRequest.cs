@@ -2,7 +2,7 @@ namespace GameFrameX.Application.Game.Online.Asset.Dto;
 
 /// <summary>
 /// Online 资产流水查询请求体（Admin → Online 线缆契约；mock 先行，联调以 vault 详表回写）。
-/// <para>不含作用域字段——TenantId/ServerId 由 <c>OnlineServerClient</c> 按鉴权作用域注入，请求体不可覆盖。</para>
+/// <para>ServerId 由 <c>OnlineServerClient</c> 按已校验的区服上下文注入，请求体不可覆盖。</para>
 /// </summary>
 public class OnlineAssetLedgerQueryRequest
 {

@@ -9,7 +9,7 @@ namespace GameFrameX.Entity.Tenant.Game;
 [SugarTable(null, "游戏订单")]
 [SugarIndex("ux_game_order_apple_transaction_id", nameof(AppleTransactionId), OrderByType.Asc, true)]
 // ProviderTransactionId 唯一约束保持不变：第三方支付渠道（AliPay trade_no / Xsolla order.id / Google OrderId / Apple AppleTransactionId）
-// 由 Provider 自身全局唯一，加入 AppId 反而会放宽约束导致跨应用潜在重复处理风险，故不引入 AppId 复合（详见 app-scope-backend-foundation.md 3.4 与本 change notes.md）。
+// 由渠道自身保证全局唯一；按渠道和交易号共同约束，避免重复处理。
 [SugarIndex("ux_game_order_provider_transaction", nameof(PayChannel), OrderByType.Asc, nameof(ProviderTransactionId), OrderByType.Asc, true)]
 [SugarIndex("idx_game_order_apple_original_transaction_id", nameof(AppleOriginalTransactionId), OrderByType.Asc)]
 // 首页聚合「今日订单」按 CreatedTime 过滤计数走索引（C321 / GFX-730）
