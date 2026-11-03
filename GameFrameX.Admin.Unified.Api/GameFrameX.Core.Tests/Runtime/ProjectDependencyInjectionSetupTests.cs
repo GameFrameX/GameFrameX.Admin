@@ -1,3 +1,4 @@
+using GameFrameX.Application.System.GlobalPlatform;
 using GameFrameX.Core.Job;
 using GameFrameX.Application.System.Job;
 using GameFrameX.Core.Service.Tenant;
@@ -20,6 +21,7 @@ public class ProjectDependencyInjectionSetupTests
 
         services.AddProjectDependencyInjection();
 
+        AssertDescriptor(services, typeof(GlobalPlatformService), typeof(GlobalPlatformService), ServiceLifetime.Transient);
         AssertDescriptor(services, typeof(TenantUserService), typeof(TenantUserService), ServiceLifetime.Transient);
         AssertDescriptor(services, typeof(DynamicJobCompiler), typeof(DynamicJobCompiler), ServiceLifetime.Singleton);
         AssertDescriptor(services, typeof(IJobClusterServer), typeof(JobClusterServer), ServiceLifetime.Singleton);
