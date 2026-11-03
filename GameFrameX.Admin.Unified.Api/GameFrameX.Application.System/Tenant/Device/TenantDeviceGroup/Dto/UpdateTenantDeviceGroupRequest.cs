@@ -19,11 +19,6 @@ public class UpdateTenantDeviceGroupRequest : BaseNamedDescriptionRequest, ICrud
     public long? RowVersion { get; set; }
 
     /// <summary>
-    /// 应用 Id。不可变（服务端从既有实体回填）；声明于 DTO 仅为契约对称，前端无需传入。
-    /// </summary>
-    public long AppId { get; set; }
-
-    /// <summary>
     /// 设备id列表（必须与本分组同应用，跨应用设备由服务拒绝）
     /// </summary>
     public List<long>? DeviceIds { get; set; }

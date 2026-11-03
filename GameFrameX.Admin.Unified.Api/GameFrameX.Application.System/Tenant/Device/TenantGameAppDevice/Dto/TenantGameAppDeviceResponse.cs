@@ -13,11 +13,6 @@ public class TenantGameAppDeviceResponse : IBasePageResponse<global::GameFrameX.
     public long Id { get; set; }
 
     /// <summary>
-    /// 应用 ID。机器码归属具体应用，必须 &gt; 0；同一租户下不同应用的机器码彼此独立，禁止 AppId=0 的租户默认机器码。
-    /// </summary>
-    public long AppId { get; set; }
-
-    /// <summary>
     /// 机器码
     /// </summary>
     public string? DeviceUniqueIdentifier { get; set; }

@@ -13,11 +13,6 @@ public class TenantDeviceGroupResponse : IBasePageResponse<global::GameFrameX.En
     public long Id { get; set; }
 
     /// <summary>
-    /// 应用 ID。分组归属具体应用，必须 &gt; 0；同一租户下不同应用的分组彼此独立。
-    /// </summary>
-    public long AppId { get; set; }
-
-    /// <summary>
     /// 名称
     /// </summary>
     public string Name { get; set; } = null!;

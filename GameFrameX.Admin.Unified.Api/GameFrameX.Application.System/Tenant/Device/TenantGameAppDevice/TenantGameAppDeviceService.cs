@@ -1,43 +1,35 @@
-using GameFrameX.Application.System.Tenant.Device.AppScope;
 using GameFrameX.Application.System.Tenant.Device.TenantGameAppDevice.Dto;
 using GameFrameX.Entity.Tenant.Device;
-using GameFrameX.Entity.Tenant.Game;
 
 namespace GameFrameX.Application.System.Tenant.Device.TenantGameAppDevice;
 
 /// <summary>
-/// 设备码服务（应用级设备资源）。
-/// <para>设备码归属具体应用（AppId &gt; 0），同一租户下不同应用的机器码彼此独立；
-/// 机器码唯一性 = TenantId + AppId + DeviceUniqueIdentifier。</para>
+/// 设备码服务。
+/// <para>机器码 DeviceUniqueIdentifier 在主库内唯一。</para>
 /// </summary>
 [ApiDescriptionSettings(Order = 100)]
 public class TenantGameAppDeviceService : GenericCrudSelectService<TenantGameAppDeviceEntity, AddTenantGameAppDeviceRequest, UpdateTenantGameAppDeviceRequest, TenantGameAppDeviceResponse, TenantGameAppDeviceRequest>
 {
-    private readonly SqlSugarRepository<TenantGameAppEntity> _gameAppRepository;
 
     /// <summary>
     /// 设备码服务
     /// </summary>
     /// <param name="repository"></param>
-    /// <param name="gameAppRepository"></param>
-    public TenantGameAppDeviceService(SqlSugarRepository<TenantGameAppDeviceEntity> repository,
-        SqlSugarRepository<TenantGameAppEntity> gameAppRepository)
+    public TenantGameAppDeviceService(SqlSugarRepository<TenantGameAppDeviceEntity> repository)
         : base(repository)
     {
-        _gameAppRepository = gameAppRepository;
     }
 
     /// <summary>
-    /// 新增前校验：AppId 必填且应用属当前租户；机器码在同应用内唯一。
+    /// 新增前校验：机器码在主库内唯一。
     /// </summary>
     protected override async Task OnAddingAsync(AddTenantGameAppDeviceRequest input)
     {
-        await _gameAppRepository.ValidateGameAppBelongsToTenantAsync(input.AppId);
-        await EnsureDeviceUniqueIdentifierUniqueAsync(input.AppId, input.DeviceUniqueIdentifier, null);
+        await EnsureDeviceUniqueIdentifierUniqueAsync(input.DeviceUniqueIdentifier, null);
     }
 
     /// <summary>
-    /// 更新前：AppId 不可变（从既有实体回填）并校验应用归属；机器码唯一性排除自身。
+    /// 更新前：校验记录存在；机器码唯一性排除自身。
     /// </summary>
     protected override async Task OnUpdatingAsync(UpdateTenantGameAppDeviceRequest input)
     {
@@ -47,28 +39,19 @@ public class TenantGameAppDeviceService : GenericCrudSelectService<TenantGameApp
             throw BusinessError.Oh(CommonErrorCode.RecordNotFound);
         }
 
-        input.AppId = existing.AppId;
-        await _gameAppRepository.ValidateGameAppBelongsToTenantAsync(input.AppId);
-        await EnsureDeviceUniqueIdentifierUniqueAsync(input.AppId, input.DeviceUniqueIdentifier, input.Id);
+        await EnsureDeviceUniqueIdentifierUniqueAsync(input.DeviceUniqueIdentifier, input.Id);
     }
 
     /// <summary>
-    /// 分页查询按当前应用收口。
+    /// 分页查询主库设备。
     /// </summary>
     protected override ISugarQueryable<TenantGameAppDeviceResponse> BuildPageQuery(TenantGameAppDeviceRequest input)
     {
-        if (input.AppId == null || input.AppId <= 0)
-        {
-            throw BusinessError.Oh("应用Id不能为空");
-        }
-
-        var appId = input.AppId.Value;
         return Repository.AsQueryable()
                          .Where(u => u.IsDeleted == false)
-                         .Where(u => u.AppId == appId)
                          .WhereIF(input.GroupId > 0,
                                   u => SqlFunc.Subqueryable<TenantGameAppDeviceGroupRelationEntity>()
-                                            .Where(r => r.AppId == appId && r.DeviceId == u.Id && r.DeviceGroupId == input.GroupId.Value)
+                                            .Where(r => r.DeviceId == u.Id && r.DeviceGroupId == input.GroupId.Value)
                                             .Any())
                          .WhereIF(!string.IsNullOrWhiteSpace(input.SearchKey),
                                   u => (u.Name ?? string.Empty).Contains((input.SearchKey ?? string.Empty).Trim()))
@@ -76,22 +59,15 @@ public class TenantGameAppDeviceService : GenericCrudSelectService<TenantGameApp
     }
 
     /// <summary>
-    /// 获取选择器列表（按当前应用过滤）。
+    /// 获取主库选择器列表。
     /// </summary>
     [HttpPost(CrudActionRoutes.Select)]
     [ApiDescriptionSettings(Name = "Select")]
     public override async Task<List<BaseSelectPageResponse>> SelectAsync(BaseSelectPageRequest input)
     {
-        if (input.AppId == null || input.AppId <= 0)
-        {
-            throw BusinessError.Oh("应用Id不能为空");
-        }
-
-        var appId = input.AppId.Value;
         var searchKey = input.SearchKey?.Trim() ?? string.Empty;
         var query = await Repository.AsQueryable()
                                     .Where(u => u.IsDeleted == false)
-                                    .Where(u => u.AppId == appId)
                                     .WhereIF(!string.IsNullOrWhiteSpace(searchKey), u =>
                                                  (u.Name ?? string.Empty).Contains(searchKey))
                                     .Take(100)
@@ -102,9 +78,9 @@ public class TenantGameAppDeviceService : GenericCrudSelectService<TenantGameApp
     }
 
     /// <summary>
-    /// 校验机器码在同应用内唯一（TenantId 由租户仓储隔离保证）。
+    /// 校验机器码在主库内唯一。
     /// </summary>
-    private async Task EnsureDeviceUniqueIdentifierUniqueAsync(long appId, string? deviceUniqueIdentifier, long? excludeId)
+    private async Task EnsureDeviceUniqueIdentifierUniqueAsync(string? deviceUniqueIdentifier, long? excludeId)
     {
         if (string.IsNullOrWhiteSpace(deviceUniqueIdentifier))
         {
@@ -112,8 +88,8 @@ public class TenantGameAppDeviceService : GenericCrudSelectService<TenantGameApp
         }
 
         var exists = excludeId.HasValue
-                         ? await Repository.IsAnyAsync(u => u.AppId == appId && u.DeviceUniqueIdentifier == deviceUniqueIdentifier && u.Id != excludeId.Value)
-                         : await Repository.IsAnyAsync(u => u.AppId == appId && u.DeviceUniqueIdentifier == deviceUniqueIdentifier);
+                         ? await Repository.IsAnyAsync(u => u.DeviceUniqueIdentifier == deviceUniqueIdentifier && u.Id != excludeId.Value)
+                         : await Repository.IsAnyAsync(u => u.DeviceUniqueIdentifier == deviceUniqueIdentifier);
         if (exists)
         {
             throw BusinessError.Oh("机器码已存在");

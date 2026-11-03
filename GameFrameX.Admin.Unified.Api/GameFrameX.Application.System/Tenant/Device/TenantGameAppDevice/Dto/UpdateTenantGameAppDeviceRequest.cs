@@ -19,11 +19,6 @@ public class UpdateTenantGameAppDeviceRequest : BaseNamedDescriptionRequest, ICr
     public long? RowVersion { get; set; }
 
     /// <summary>
-    /// 应用 Id。不可变（服务端从既有实体回填）；声明于 DTO 仅为契约对称，前端无需传入。
-    /// </summary>
-    public long AppId { get; set; }
-
-    /// <summary>
     /// 设备唯一标识
     /// </summary>
     [Required(ErrorMessage = "机器码不能为空")]
