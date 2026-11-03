@@ -212,18 +212,20 @@ public sealed class ClientApiConfigEndpointTests
     }
 
     [Fact]
-    public async Task GameLoginTicketKey_PublicKeys_RejectsMissingAppContext()
+    public async Task GameLoginTicketKey_PublicKeys_WithoutRequestScope_ReturnsKeys()
     {
         var resolver = new StaticGameLoginTicketKeyResolver();
         var controller = new GameLoginTicketKeyController(resolver);
         using var db = new ClientApiTestDb(10, 20);
-        db.AttachContext(controller, includeApp: false);
+        db.AttachContext(controller, includeTenant: false, includeApp: false);
 
         var result = await controller.PublicKeys();
 
         var root = ClientApiResultReader.Read(result);
-        Assert.Equal((int)AuthErrorCode.AuthorizeInvalid, ClientApiResultReader.Code(root));
-        Assert.Equal("应用未认证", ClientApiResultReader.Message(root));
+        Assert.Equal(0, ClientApiResultReader.Code(root));
+        var key = ClientApiResultReader.Data(root)[0];
+        Assert.False(key.TryGetProperty("TenantId", out _));
+        Assert.False(key.TryGetProperty("AppId", out _));
     }
 
     [Fact]
@@ -233,31 +235,31 @@ public sealed class ClientApiConfigEndpointTests
         db.InitTenantTables(typeof(TenantGameLoginTicketKeyEntity));
         var resolver = new GameLoginTicketKeyResolver(db.TenantDbProvider, FakeOptionsProvider.WithTicketPolicy(DateTimeOffset.UtcNow.ToUnixTimeSeconds() + 60));
 
-        var publicKeys = await resolver.GetPublicKeysAsync(10, 20);
+        var publicKeys = await resolver.GetPublicKeysAsync();
 
         Assert.Empty(publicKeys);
         Assert.Equal(0, await db.TenantDb.Queryable<TenantGameLoginTicketKeyEntity>().CountAsync());
 
-        var signingKey = await resolver.ResolveSigningKeyAsync(10, 20);
+        var signingKey = await resolver.ResolveSigningKeyAsync();
 
         Assert.False(string.IsNullOrWhiteSpace(signingKey.Kid));
         Assert.Equal(1, await db.TenantDb.Queryable<TenantGameLoginTicketKeyEntity>().CountAsync());
-        Assert.Single(await resolver.GetPublicKeysAsync(10, 20));
+        Assert.Single(await resolver.GetPublicKeysAsync());
     }
 
     private sealed class StaticGameLoginTicketKeyResolver : IGameLoginTicketKeyResolver
     {
-        public Task<GameLoginTicketSigningKey> ResolveSigningKeyAsync(long tenantId, long appId)
+        public Task<GameLoginTicketSigningKey> ResolveSigningKeyAsync()
         {
             throw new NotSupportedException();
         }
 
-        public Task<IReadOnlyCollection<GameLoginTicketPublicKey>> GetPublicKeysAsync(long tenantId, long appId)
+        public Task<IReadOnlyCollection<GameLoginTicketPublicKey>> GetPublicKeysAsync()
         {
             IReadOnlyCollection<GameLoginTicketPublicKey> keys = new[]
             {
                 new GameLoginTicketPublicKey(
-                    $"tenant-{tenantId}-app-{appId}-test",
+                    "tenant-10-app-20-test",
                     GameLoginTicketSigningKey.AlgorithmRs256,
                     "public-key",
                     DateTimeOffset.UtcNow.AddMinutes(-5).ToUnixTimeSeconds(),

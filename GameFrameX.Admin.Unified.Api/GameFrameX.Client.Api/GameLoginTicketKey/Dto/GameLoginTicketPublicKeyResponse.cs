@@ -6,16 +6,6 @@ namespace GameFrameX.Client.Api.GameLoginTicketKey.Dto;
 public sealed class GameLoginTicketPublicKeyResponse
 {
     /// <summary>
-    /// 租户 ID。
-    /// </summary>
-    public long TenantId { get; set; }
-
-    /// <summary>
-    /// 应用 ID。
-    /// </summary>
-    public long AppId { get; set; }
-
-    /// <summary>
     /// Key ID。
     /// </summary>
     public string Kid { get; set; } = null!;

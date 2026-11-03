@@ -52,7 +52,7 @@ public class ClientApiTokenIssuerTests
         var keyResolver = TestGameLoginTicketKeyResolver.Create();
         var ticketIssuer = new GameLoginTicketIssuer(keyResolver, provider);
 
-        var ticket = await ticketIssuer.IssueAsync(new GameLoginTicketIssueContext(10, 20, 30, 40, 50, "wss://game.example.test:9443"));
+        var ticket = await ticketIssuer.IssueAsync(new GameLoginTicketIssueContext(30, 40, 50, "wss://game.example.test:9443"));
         var jwt = new JsonWebToken(ticket.Ticket);
 
         // issuer / audience 固定为平台默认，不读取租户配置
@@ -60,8 +60,8 @@ public class ClientApiTokenIssuerTests
         Assert.Equal(ClientApiPlatformDefaults.GameLoginTicketAudience, jwt.Audiences.Single());
         Assert.Equal(keyResolver.Kid, jwt.Kid);
         Assert.Equal(keyResolver.Kid, ticket.Kid);
-        Assert.Equal("10", jwt.Claims.Single(c => c.Type == "tenantId").Value);
-        Assert.Equal("20", jwt.Claims.Single(c => c.Type == "appId").Value);
+        Assert.DoesNotContain(jwt.Claims, claim => claim.Type == "tenantId");
+        Assert.DoesNotContain(jwt.Claims, claim => claim.Type == "appId");
         Assert.Equal("30", jwt.Claims.Single(c => c.Type == "userId").Value);
         Assert.Equal("40", jwt.Claims.Single(c => c.Type == "playerId").Value);
         Assert.Equal("50", jwt.Claims.Single(c => c.Type == "areaId").Value);
@@ -77,7 +77,7 @@ public class ClientApiTokenIssuerTests
         var keyResolver = TestGameLoginTicketKeyResolver.Create();
         var ticketIssuer = new GameLoginTicketIssuer(keyResolver, provider);
 
-        var ticket = await ticketIssuer.IssueAsync(new GameLoginTicketIssueContext(10, 20, 30, 40, 50, "wss://game.example.test:9443"));
+        var ticket = await ticketIssuer.IssueAsync(new GameLoginTicketIssueContext(30, 40, 50, "wss://game.example.test:9443"));
         var jwt = new JsonWebToken(ticket.Ticket);
 
         var exp = long.Parse(jwt.Claims.Single(c => c.Type == JwtRegisteredClaimNames.Exp).Value);
@@ -93,7 +93,7 @@ public class ClientApiTokenIssuerTests
         var keyResolver = TestGameLoginTicketKeyResolver.Create();
         var ticketIssuer = new GameLoginTicketIssuer(keyResolver, provider);
 
-        var ticket = await ticketIssuer.IssueAsync(new GameLoginTicketIssueContext(10, 20, 30, 40, 50, "wss://game.example.test:9443"));
+        var ticket = await ticketIssuer.IssueAsync(new GameLoginTicketIssueContext(30, 40, 50, "wss://game.example.test:9443"));
         var jwt = new JsonWebToken(ticket.Ticket);
 
         Assert.Null(ticket.ExpireTime);
@@ -109,7 +109,7 @@ public class ClientApiTokenIssuerTests
         var keyResolver = TestGameLoginTicketKeyResolver.Create();
         var ticketIssuer = new GameLoginTicketIssuer(keyResolver, provider);
 
-        var ticket = await ticketIssuer.IssueAsync(new GameLoginTicketIssueContext(10, 20, 30, 40, 50, "wss://game.example.test:9443"));
+        var ticket = await ticketIssuer.IssueAsync(new GameLoginTicketIssueContext(30, 40, 50, "wss://game.example.test:9443"));
         var after = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
         var jwt = new JsonWebToken(ticket.Ticket);
         var exp = long.Parse(jwt.Claims.Single(c => c.Type == JwtRegisteredClaimNames.Exp).Value);
@@ -185,14 +185,12 @@ public class ClientApiTokenIssuerTests
             }
         }
 
-        public Task<GameLoginTicketSigningKey> ResolveSigningKeyAsync(long tenantId, long appId)
+        public Task<GameLoginTicketSigningKey> ResolveSigningKeyAsync()
         {
-            Assert.Equal(10, tenantId);
-            Assert.Equal(20, appId);
             return Task.FromResult(_key);
         }
 
-        public Task<IReadOnlyCollection<GameLoginTicketPublicKey>> GetPublicKeysAsync(long tenantId, long appId)
+        public Task<IReadOnlyCollection<GameLoginTicketPublicKey>> GetPublicKeysAsync()
         {
             IReadOnlyCollection<GameLoginTicketPublicKey> keys = new[]
             {

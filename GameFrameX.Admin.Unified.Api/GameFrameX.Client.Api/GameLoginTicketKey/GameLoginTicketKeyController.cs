@@ -20,27 +20,15 @@ public class GameLoginTicketKeyController : BaseController
     }
 
     /// <summary>
-    /// 获取当前租户应用的 Game 登录票据公钥。
+    /// 获取当前主库的 Game 登录票据公钥。
     /// </summary>
     [HttpGet]
     [ProducesResponseType(200, Type = typeof(List<GameLoginTicketPublicKeyResponse>))]
     public async Task<HttpJsonResultData<List<GameLoginTicketPublicKeyResponse>>> PublicKeys()
     {
-        if (!TryGetContextLong(TenantContextAccessor.TenantIdKey, out var tenantId))
-        {
-            return GameApiResult.Error<List<GameLoginTicketPublicKeyResponse>>(AuthErrorCode.AuthorizeInvalid, "租户未解析");
-        }
-
-        if (!TryGetContextLong(AppResolutionMiddleware.AppIdKey, out var appId))
-        {
-            return GameApiResult.Error<List<GameLoginTicketPublicKeyResponse>>(AuthErrorCode.AuthorizeInvalid, "应用未认证");
-        }
-
-        var keys = await _keyResolver.GetPublicKeysAsync(tenantId, appId);
+        var keys = await _keyResolver.GetPublicKeysAsync();
         var output = keys.Select(key => new GameLoginTicketPublicKeyResponse
         {
-            TenantId = tenantId,
-            AppId = appId,
             Kid = key.Kid,
             Algorithm = key.Algorithm,
             PublicKeyPem = key.PublicKeyPem,
@@ -51,14 +39,4 @@ public class GameLoginTicketKeyController : BaseController
         return HttpJsonResultData<List<GameLoginTicketPublicKeyResponse>>.Success(output);
     }
 
-    private bool TryGetContextLong(string key, out long value)
-    {
-        value = 0;
-        if (!HttpContext.Items.TryGetValue(key, out var item) || item == null)
-        {
-            return false;
-        }
-
-        return long.TryParse(item.ToString(), out value);
-    }
 }

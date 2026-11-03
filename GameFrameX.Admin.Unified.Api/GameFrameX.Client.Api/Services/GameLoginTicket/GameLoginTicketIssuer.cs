@@ -7,7 +7,7 @@ namespace GameFrameX.Client.Api.Services.GameLoginTicket;
 
 /// <summary>
 /// Game 登录票据签发服务。
-/// <para>issuer 固定为 <c>gameframex-client-api</c>，audience 固定为 <c>game-server</c>；票据到期时间从租户票据策略读取，0 表示永不过期，非 0 值受平台 30 天上限保护；签名 key 由 <see cref="IGameLoginTicketKeyResolver"/> 管理。</para>
+/// <para>issuer 固定为 <c>gameframex-client-api</c>，audience 固定为 <c>game-server</c>；票据到期时间从运行票据策略读取，0 表示永不过期，非 0 值受平台 30 天上限保护；签名 key 由 <see cref="IGameLoginTicketKeyResolver"/> 管理。</para>
 /// </summary>
 public sealed class GameLoginTicketIssuer
 {
@@ -34,7 +34,7 @@ public sealed class GameLoginTicketIssuer
         var normalizedExpireTime = ClientApiPlatformDefaults.NormalizeGameLoginTicketExpireTime(policy.TicketExpireTime, nowUnix);
         long? expiresAt = normalizedExpireTime > 0 ? normalizedExpireTime : null;
         var jti = Guid.NewGuid().ToString("N");
-        var signingKey = await _keyResolver.ResolveSigningKeyAsync(context.TenantId, context.AppId);
+        var signingKey = await _keyResolver.ResolveSigningKeyAsync();
         var descriptor = new SecurityTokenDescriptor
         {
             Issuer = ClientApiPlatformDefaults.GameLoginTicketIssuer,
@@ -47,8 +47,6 @@ public sealed class GameLoginTicketIssuer
                 new Claim(JwtRegisteredClaimNames.Jti, jti),
                 new Claim(JwtRegisteredClaimNames.Iat, nowUnix.ToString(), ClaimValueTypes.Integer64),
                 new Claim("tokenUse", "game_login_ticket"),
-                new Claim("tenantId", context.TenantId.ToString()),
-                new Claim("appId", context.AppId.ToString()),
                 new Claim("userId", context.UserId.ToString()),
                 new Claim("playerId", context.PlayerId.ToString()),
                 new Claim("areaId", context.AreaId.ToString()),
@@ -59,17 +57,17 @@ public sealed class GameLoginTicketIssuer
         };
 
         var token = _handler.CreateToken(descriptor);
-        var audit = new GameLoginTicketAudit(context.TenantId, context.AppId, context.UserId, context.PlayerId, context.AreaId, context.RouteTarget, jti, true, string.Empty, nowUnix);
-        LogHelper.Info($"GameLoginTicketIssued tenantId={audit.TenantId} appId={audit.AppId} userId={audit.UserId} playerId={audit.PlayerId} areaId={audit.AreaId} kid={signingKey.Kid} jti={audit.Jti}");
+        var audit = new GameLoginTicketAudit(context.UserId, context.PlayerId, context.AreaId, context.RouteTarget, jti, true, string.Empty, nowUnix);
+        LogHelper.Info($"GameLoginTicketIssued userId={audit.UserId} playerId={audit.PlayerId} areaId={audit.AreaId} kid={signingKey.Kid} jti={audit.Jti}");
         return new GameLoginTicketIssueResponse(token, expiresAt, jti, signingKey.Kid);
     }
 
     /// <summary>
     /// 记录拒绝签发票据的审计事件。
     /// </summary>
-    public void AuditRejected(long tenantId, long appId, long userId, long playerId, long areaId, string reason)
+    public void AuditRejected(long userId, long playerId, long areaId, string reason)
     {
-        var audit = new GameLoginTicketAudit(tenantId, appId, userId, playerId, areaId, string.Empty, string.Empty, false, reason, TimerHelper.UnixTimeSeconds());
-        LogHelper.Warning($"GameLoginTicketRejected tenantId={audit.TenantId} appId={audit.AppId} userId={audit.UserId} playerId={audit.PlayerId} areaId={audit.AreaId} reason={audit.Reason}");
+        var audit = new GameLoginTicketAudit(userId, playerId, areaId, string.Empty, string.Empty, false, reason, TimerHelper.UnixTimeSeconds());
+        LogHelper.Warning($"GameLoginTicketRejected userId={audit.UserId} playerId={audit.PlayerId} areaId={audit.AreaId} reason={audit.Reason}");
     }
 }

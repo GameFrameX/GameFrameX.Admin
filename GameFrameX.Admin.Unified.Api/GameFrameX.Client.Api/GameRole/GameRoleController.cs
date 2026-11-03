@@ -243,11 +243,6 @@ public class GameRoleController : BaseController<TenantGameRoleEntity>
             return GameApiResult.Error<GameLoginTicketResponse>(AuthErrorCode.AuthorizeInvalid, "请求体不能包含租户、应用或账号上下文字段");
         }
 
-        if (!TryGetContextLong(TenantContextAccessor.TenantIdKey, out var tenantId))
-        {
-            return GameApiResult.Error<GameLoginTicketResponse>(AuthErrorCode.AuthorizeInvalid, "租户未解析");
-        }
-
         if (!TryGetContextLong(AppResolutionMiddleware.AppIdKey, out var appId))
         {
             return GameApiResult.Error<GameLoginTicketResponse>(AuthErrorCode.AuthorizeInvalid, "应用未认证");
@@ -262,19 +257,19 @@ public class GameRoleController : BaseController<TenantGameRoleEntity>
         var user = await PRepository.AsSugarClient().Queryable<TenantGameUserEntity>().Where(u => u.Id == tokenValidation.UserId).FirstAsync();
         if (user == null)
         {
-            _gameLoginTicketIssuer.AuditRejected(tenantId, appId, tokenValidation.UserId, input.PlayerId, input.AreaId, "account_not_found");
+            _gameLoginTicketIssuer.AuditRejected(tokenValidation.UserId, input.PlayerId, input.AreaId, "account_not_found");
             return GameApiResult.Error<GameLoginTicketResponse>(AccountErrorCode.AccountNotFound, "账号不存在");
         }
 
         if (user.Status == GameUserStatus.Deleted)
         {
-            _gameLoginTicketIssuer.AuditRejected(tenantId, appId, user.Id, input.PlayerId, input.AreaId, "account_deleted");
+            _gameLoginTicketIssuer.AuditRejected(user.Id, input.PlayerId, input.AreaId, "account_deleted");
             return GameApiResult.Error<GameLoginTicketResponse>(AccountErrorCode.AccountDeleting, "账号处于注销状态");
         }
 
         if (user.Status != GameUserStatus.Active)
         {
-            _gameLoginTicketIssuer.AuditRejected(tenantId, appId, user.Id, input.PlayerId, input.AreaId, "account_disabled");
+            _gameLoginTicketIssuer.AuditRejected(user.Id, input.PlayerId, input.AreaId, "account_disabled");
             return GameApiResult.Error<GameLoginTicketResponse>(AccountErrorCode.AccountDisabled, "账号已被禁用");
         }
 
@@ -282,7 +277,7 @@ public class GameRoleController : BaseController<TenantGameRoleEntity>
         var accountBlocking = await _tenantGamePenaltyEnforcementService.GetLoginBlockingPenaltyAsync(PenaltyTargetTypeEnum.Account, user.Id.ToString(), appId);
         if (accountBlocking != null)
         {
-            _gameLoginTicketIssuer.AuditRejected(tenantId, appId, user.Id, input.PlayerId, input.AreaId, "account_banned");
+            _gameLoginTicketIssuer.AuditRejected(user.Id, input.PlayerId, input.AreaId, "account_banned");
             return GameApiResult.Error<GameLoginTicketResponse>(AccountErrorCode.AccountBanned, $"账号已被封禁：{accountBlocking.Reason}");
         }
 
@@ -290,7 +285,7 @@ public class GameRoleController : BaseController<TenantGameRoleEntity>
         var gameAreaEntity = await PRepository.AsSugarClient().Queryable<TenantGameAreaEntity>().Filter(null, true).Where(u => u.IsDeleted == false).Where(u => u.Id == input.AreaId).FirstAsync();
         if (gameAreaEntity == null)
         {
-            _gameLoginTicketIssuer.AuditRejected(tenantId, appId, user.Id, input.PlayerId, input.AreaId, "area_not_found");
+            _gameLoginTicketIssuer.AuditRejected(user.Id, input.PlayerId, input.AreaId, "area_not_found");
             return GameApiResult.Error<GameLoginTicketResponse>(AreaErrorCode.AreaNotFound, "区服不存在");
         }
 
@@ -299,20 +294,20 @@ public class GameRoleController : BaseController<TenantGameRoleEntity>
             gameAreaEntity.ServerStatus == GameServerStatus.Offline ||
             gameAreaEntity.ServerStatus == GameServerStatus.Full)
         {
-            _gameLoginTicketIssuer.AuditRejected(tenantId, appId, user.Id, input.PlayerId, input.AreaId, "area_cannot_login");
+            _gameLoginTicketIssuer.AuditRejected(user.Id, input.PlayerId, input.AreaId, "area_cannot_login");
             return GameApiResult.Error<GameLoginTicketResponse>(AreaErrorCode.AreaCannotLogin, "当前区服不能登录");
         }
 
         var entity = await PRepository.GetSingleAsync(a => a.Id == input.PlayerId && a.AreaId == input.AreaId);
         if (entity == null)
         {
-            _gameLoginTicketIssuer.AuditRejected(tenantId, appId, user.Id, input.PlayerId, input.AreaId, "role_not_found");
+            _gameLoginTicketIssuer.AuditRejected(user.Id, input.PlayerId, input.AreaId, "role_not_found");
             return GameApiResult.Error<GameLoginTicketResponse>(GameRoleErrorCode.RoleNotFound, "角色不存在");
         }
 
         if (entity.UserId != user.Id)
         {
-            _gameLoginTicketIssuer.AuditRejected(tenantId, appId, user.Id, input.PlayerId, input.AreaId, "role_not_owned");
+            _gameLoginTicketIssuer.AuditRejected(user.Id, input.PlayerId, input.AreaId, "role_not_owned");
             return GameApiResult.Error<GameLoginTicketResponse>(AuthErrorCode.AuthorizeInvalid, "授权无效");
         }
 
@@ -320,7 +315,7 @@ public class GameRoleController : BaseController<TenantGameRoleEntity>
         var roleBlocking = await _tenantGamePenaltyEnforcementService.GetLoginBlockingPenaltyAsync(PenaltyTargetTypeEnum.Role, entity.Id.ToString(), appId, input.AreaId);
         if (roleBlocking != null)
         {
-            _gameLoginTicketIssuer.AuditRejected(tenantId, appId, user.Id, input.PlayerId, input.AreaId, "role_banned");
+            _gameLoginTicketIssuer.AuditRejected(user.Id, input.PlayerId, input.AreaId, "role_banned");
             return GameApiResult.Error<GameLoginTicketResponse>(GameRoleErrorCode.RoleBanned, $"角色已被封禁：{roleBlocking.Reason}");
         }
 
@@ -328,7 +323,7 @@ public class GameRoleController : BaseController<TenantGameRoleEntity>
         await TryRefreshPlayerInfo(entity, gameAreaEntity);
 
         var routeTarget = BuildRouteTarget(gameAreaEntity);
-        var ticket = await _gameLoginTicketIssuer.IssueAsync(new GameLoginTicketIssueContext(tenantId, appId, user.Id, entity.Id, input.AreaId, routeTarget));
+        var ticket = await _gameLoginTicketIssuer.IssueAsync(new GameLoginTicketIssueContext(user.Id, entity.Id, input.AreaId, routeTarget));
         var output = new GameLoginTicketResponse
         {
             Player = result,

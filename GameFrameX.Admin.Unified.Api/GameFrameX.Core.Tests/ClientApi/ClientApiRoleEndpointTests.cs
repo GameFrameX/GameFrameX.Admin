@@ -254,12 +254,12 @@ public sealed class ClientApiRoleEndpointTests
             return new TestGameLoginTicketKeyResolver(GameLoginTicketSigningKey.CreateRsa("tenant-10-app-20-role-test", privateKeyPem, publicKeyPem));
         }
 
-        public Task<GameLoginTicketSigningKey> ResolveSigningKeyAsync(long tenantId, long appId)
+        public Task<GameLoginTicketSigningKey> ResolveSigningKeyAsync()
         {
             return Task.FromResult(_key);
         }
 
-        public Task<IReadOnlyCollection<GameLoginTicketPublicKey>> GetPublicKeysAsync(long tenantId, long appId)
+        public Task<IReadOnlyCollection<GameLoginTicketPublicKey>> GetPublicKeysAsync()
         {
             IReadOnlyCollection<GameLoginTicketPublicKey> keys = new[]
             {

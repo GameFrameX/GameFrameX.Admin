@@ -104,7 +104,7 @@ public sealed class RuntimeCredentialDecryptClosureTests : IDisposable
         // 存在生效 key 时 optionsProvider（自动建 key 开关）不被触达，传 null 即可
         var resolver = new GameLoginTicketKeyResolver(_db.TenantDbProvider, null!);
 
-        var signingKey = await resolver.ResolveSigningKeyAsync(_db.TenantId, _db.AppId);
+        var signingKey = await resolver.ResolveSigningKeyAsync();
 
         // CreateRsa 内部 ImportFromPem——解密失败（密文当 PEM）必然抛错，返回即证明解密链路通
         Assert.Equal("kid-ticket", signingKey.Kid);
