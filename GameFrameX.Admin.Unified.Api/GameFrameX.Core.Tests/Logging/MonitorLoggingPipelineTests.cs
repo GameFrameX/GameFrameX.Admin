@@ -371,7 +371,6 @@ public sealed class MonitorLoggingPipelineTests : IAsyncLifetime
                     services.AddSingleton<SystemCacheService>();
                     services.AddScoped<SystemConfigService>();
                     services.AddSingleton<PlatformLoggingConfigProvider>();
-                    services.AddSingleton<ISqlSugarClient>();
                     services.AddSingleton<ISqlSugarTenantIdResolver>(new NullTenantIdResolver());
                     services.AddScoped(typeof(SqlSugarRepository<>));
                     services.AddSingleton<IEventPublisher, CaptureEventPublisher>();
