@@ -16,16 +16,12 @@ public static class StableDeviceRolloutMatcher
     /// <summary>
     /// 判断记录是否命中当前设备的灰度。
     /// </summary>
-    /// <param name="tenantId">当前租户 ID，参与稳定取模材料，避免跨租户同设备命中一致。</param>
-    /// <param name="appId">记录的应用作用域，参与稳定取模材料。</param>
     /// <param name="recordId">记录主键，参与稳定取模材料，使同一设备对不同记录独立判定。</param>
     /// <param name="deviceId">客户端稳定设备标识；缺失时只允许命中全量投放。</param>
     /// <param name="rolloutPercent">灰度比例 0-100，越界值按边界收敛。</param>
     /// <param name="deviceWhitelistJson">设备白名单 JSON 数组；命中白名单绕过灰度比例。</param>
     /// <returns>命中返回 true，否则返回 false。</returns>
     public static bool IsMatch(
-        long tenantId,
-        long? appId,
         long recordId,
         string? deviceId,
         int rolloutPercent,
@@ -48,7 +44,7 @@ public static class StableDeviceRolloutMatcher
             return false;
         }
 
-        var bucket = GetStableBucket(tenantId, appId, normalizedDeviceId, recordId);
+        var bucket = GetStableBucket(normalizedDeviceId, recordId);
         return bucket < percent;
     }
 
@@ -93,17 +89,15 @@ public static class StableDeviceRolloutMatcher
     }
 
     /// <summary>
-    /// 按「租户 + 应用 + 设备标识 + 记录主键」的 SHA-256 取前 4 字节生成 0-99 稳定桶号。
+    /// 按「设备标识 + 记录主键」的 SHA-256 取前 4 字节生成 0-99 稳定桶号。
     /// <para>同一组合恒定得同一桶号，故设备在同一记录上的灰度结论稳定，不随请求次数抖动。</para>
     /// </summary>
-    /// <param name="tenantId">当前租户 ID。</param>
-    /// <param name="appId">记录的应用作用域。</param>
     /// <param name="normalizedDeviceId">已归一化的设备标识。</param>
     /// <param name="recordId">记录主键。</param>
     /// <returns>0-99 的稳定桶号。</returns>
-    private static int GetStableBucket(long tenantId, long? appId, string normalizedDeviceId, long recordId)
+    private static int GetStableBucket(string normalizedDeviceId, long recordId)
     {
-        var material = $"{tenantId}:{appId.GetValueOrDefault()}:{normalizedDeviceId}:{recordId}";
+        var material = $"{normalizedDeviceId}:{recordId}";
         var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(material));
         var value = BitConverter.ToUInt32(bytes, 0);
         return (int)(value % 100);

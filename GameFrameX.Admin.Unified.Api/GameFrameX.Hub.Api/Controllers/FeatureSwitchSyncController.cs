@@ -1,5 +1,4 @@
 using GameFrameX.Application.Game.App.FeatureSwitch;
-using GameFrameX.Core.Middleware;
 using GameFrameX.Core.Service;
 using GameFrameX.Hub.Api.Const;
 using GameFrameX.Hub.Api.Dto.FeatureSwitchSync;
@@ -14,8 +13,7 @@ namespace GameFrameX.Hub.Api.Controllers;
 /// 鉴权（C267 HMAC v2 单头 + nonce 去重 + 时间窗，scope = <see cref="OpenAccessScopeConst.FeatureSwitchSync"/>），
 /// 非 JWT，故标记 <c>[AllowAnonymous]</c>（C236 起 JWT 默认鉴权由各控制器显式承担，本控制器不参与，
 /// 与 <c>PackageBuildReportController</c> 同模式）。</para>
-/// <para>应用作用域只取凭证绑定（<c>HttpContext.Items[TenantGameAppOpenAccessAuthMiddleware.AppIdItemsKey]</c>），
-/// 请求侧不可声明 AppId。服务器通道无 platform/package/language/channel 上下文，四维传 null →
+/// <para>服务器通道无 platform/package/language/channel 上下文，四维传 null →
 /// 仅命中 Default 哨兵行；服务器同步无设备身份，不做设备灰度（灰度是设备维度，语义如此设计）。</para>
 /// <para>判定权原则：下发 ≠ 授权。玩法/经济 gate 由 GameServer 业务端点依据开关值与时间窗实时校验，
 /// 本端点只负责配置分发；响应不携带任何机密（AppSecret / 签名密钥等）。</para>
@@ -46,18 +44,8 @@ public class FeatureSwitchSyncController : BaseController
     [HttpPost]
     public async Task<HttpJsonResultData<FeatureSwitchSyncResponse>> Sync([FromBody] FeatureSwitchSyncRequest request)
     {
-        // 租户由 HubTenantMiddleware 写入统一键；应用只取凭证绑定注入值，请求侧无可伪造面
-        var tenantId = HttpContext.Items[TenantContextAccessor.TenantIdKey] as long?;
-        var credentialAppId = HttpContext.Items[TenantGameAppOpenAccessAuthMiddleware.AppIdItemsKey] as long?;
-        if (!tenantId.HasValue || tenantId.Value <= 0 || !credentialAppId.HasValue || credentialAppId.Value <= 0)
-        {
-            return HttpJsonResultData<FeatureSwitchSyncResponse>.Fail("缺少凭证租户或应用上下文");
-        }
-
         var result = await _deliveryResolver.ResolveAsync(new FeatureSwitchDeliveryQuery
         {
-            TenantId = tenantId.Value,
-            AppId = credentialAppId.Value,
             Audience = FeatureSwitchAudience.Server,
             Platform = null,
             PackageCandidates = null,

@@ -8,7 +8,7 @@ namespace GameFrameX.Application.Game.App.FeatureSwitch;
 
 /// <summary>
 /// 活动/功能开关投放解析器（Client.Api 与 Hub.Api 共享的唯一实现，两通道不得各自实现解析）。
-/// <para>解析分三步：① 按租户 + 应用取候选行（应用行 + 租户默认层行）；② 在候选行上算投放版本号
+/// <para>解析分三步：① 从主库取候选行；② 在候选行上算投放版本号
 /// <c>Version</c>（Enabled 且在时间窗内的行集合，未做作用域匹配与设备灰度过滤）；③ 做作用域匹配 + 设备灰度
 /// 过滤后，每个开关键选出一个 winner。</para>
 /// <para>判定权原则：本解析器只负责「下发什么」，不承载授权语义。玩法/经济 gate 由消费方业务端点
@@ -16,11 +16,6 @@ namespace GameFrameX.Application.Game.App.FeatureSwitch;
 /// </summary>
 public sealed class FeatureSwitchDeliveryResolver
 {
-    /// <summary>
-    /// 应用作用域命中加分。应用行必须压过租户默认层行
-    /// </summary>
-    private const int AppScopeScore = 64;
-
     /// <summary>
     /// 平台作用域命中加分
     /// </summary>
@@ -46,7 +41,7 @@ public sealed class FeatureSwitchDeliveryResolver
     /// <summary>
     /// 初始化活动/功能开关投放解析器。
     /// </summary>
-    /// <param name="repository">开关注册表仓储（自带租户与软删除过滤）。</param>
+    /// <param name="repository">主库开关注册表仓储（自带软删除过滤）。</param>
     public FeatureSwitchDeliveryResolver(SqlSugarRepository<TenantGameAppFeatureSwitchEntity> repository)
     {
         _repository = repository;
@@ -59,12 +54,8 @@ public sealed class FeatureSwitchDeliveryResolver
     /// <returns>投放版本号与生效开关集合。</returns>
     public async Task<FeatureSwitchDeliveryResult> ResolveAsync(FeatureSwitchDeliveryQuery query)
     {
-        // 候选查询只按应用作用域收口：版本号定义为「（租户, 应用, Audience）视角」的配置指纹，
-        // 若在 SQL 层按调用方的平台/包名/语言/渠道裁剪，同一份配置会因调用方维度不同而得名多个版本号，
-        // 使差异协议在维度变化时误报 Unchanged。作用域匹配下移到 Resolve 的行过滤。
-        var candidates = await _repository.AsQueryable()
-                                          .Where(u => u.AppId == query.AppId || u.AppId == null || u.AppId == 0)
-                                          .ToListAsync();
+        // 版本指纹包含当前通道全部有效行，具体投放维度留给行匹配，防止维度变化时误报未变更。
+        var candidates = await _repository.AsQueryable().ToListAsync();
         return Resolve(candidates, query);
     }
 
@@ -213,8 +204,6 @@ public sealed class FeatureSwitchDeliveryResolver
         }
 
         return StableDeviceRolloutMatcher.IsMatch(
-            tenantId: query.TenantId,
-            appId: row.AppId,
             recordId: row.Id,
             deviceId: query.DeviceId,
             rolloutPercent: row.RolloutPercent,
@@ -237,9 +226,7 @@ public sealed class FeatureSwitchDeliveryResolver
     }
 
     /// <summary>
-    /// 作用域评分：App 64 / Platform 32 / Package 16 / Language 4 / Channel 2。
-    /// <para>租户默认层行（AppId 为 null / 0）不拿应用分，故应用覆盖行恒压过租户默认行；
-    /// 调用方未携带的维度（传 null）不参与计分，命中 Default 哨兵行因而恒得 0 分。</para>
+    /// 作用域评分：Platform 32 / Package 16 / Language 4 / Channel 2。
     /// </summary>
     /// <param name="row">候选行。</param>
     /// <param name="query">投放解析入参。</param>
@@ -247,11 +234,6 @@ public sealed class FeatureSwitchDeliveryResolver
     private static int CalculateScore(TenantGameAppFeatureSwitchEntity row, FeatureSwitchDeliveryQuery query)
     {
         var score = 0;
-
-        if (row.AppId.HasValue && row.AppId.Value > 0 && row.AppId.Value == query.AppId.GetValueOrDefault())
-        {
-            score += AppScopeScore;
-        }
 
         if (query.Platform != null && string.Equals(row.Platform, query.Platform, StringComparison.Ordinal))
         {
@@ -290,7 +272,6 @@ public sealed class FeatureSwitchDeliveryResolver
                                   .Select(row => new
                                   {
                                       row.Id,
-                                      row.AppId,
                                       row.SwitchKey,
                                       row.DisplayName,
                                       row.Description,

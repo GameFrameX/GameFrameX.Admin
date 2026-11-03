@@ -12,7 +12,7 @@ namespace GameFrameX.Hub.Api.Controllers;
 /// <summary>
 /// 打包上报控制器。
 /// <para>机器对机器调用（打包机 / CI / 流水线），由 <see cref="TenantGameAppOpenAccessAuthMiddleware"/> 鉴权（非 JWT），故标记 <c>[AllowAnonymous]</c>（C236 起 JWT 默认鉴权由各控制器显式 <c>[Authorize]</c> 承担，本控制器不参与）。</para>
-/// <para>分包 Id 驱动：查分包解析 <c>GameAppId / PackageName / PlatformCode / ChannelCode</c>，校验分包属凭证绑定 App（防跨 App），
+/// <para>分包 Id 驱动：查分包解析 <c>PackageName / PlatformCode / ChannelCode</c>，校验分包存在且启用，
 /// 资源包 → <see cref="TenantGameAppAssetPackageVersionEntity"/>，整包 → <see cref="TenantGameAppReleaseVersionEntity"/>，幂等 upsert（存在则更新，否则新增）。</para>
 /// <para>遵循 Hub.Api Controller 惯例（Repository 直接操作 Entity，不调 Application Service），故未提层 ScopeValidator / 未复用 Application.RemoteConfig 的 CheckXxxUnique —— Controller 自写归属与查重。</para>
 /// </summary>
@@ -47,24 +47,10 @@ public class PackageBuildReportController : BaseController
     [HttpPost]
     public async Task<HttpJsonResultData<BaseOperationAckResponse>> Report([FromBody] PackageBuildReportRequest input)
     {
-        // 凭证绑定 App（中间件已鉴权并注入）
-        var credentialAppId = HttpContext.Items[TenantGameAppOpenAccessAuthMiddleware.AppIdItemsKey] as long?;
-        if (!credentialAppId.HasValue || credentialAppId.Value <= 0)
-        {
-            return HttpJsonResultData<BaseOperationAckResponse>.Fail("缺少凭证应用上下文");
-        }
-
-        // 分包解析（仓储按当前租户路由）
-        var package = await _packageRepo.GetFirstAsync(p => p.Id == input.PackageId);
+        var package = await _packageRepo.GetFirstAsync(p => p.Id == input.PackageId && p.IsEnabled == true);
         if (package == null)
         {
-            return HttpJsonResultData<BaseOperationAckResponse>.Fail("分包不存在");
-        }
-
-        // 归属校验：分包必须属于凭证绑定 App（跨 App 即拒，凭证滥用防线）
-        if (package.GameAppId != credentialAppId.Value)
-        {
-            return HttpJsonResultData<BaseOperationAckResponse>.Fail("分包不属于凭证绑定应用");
+            return HttpJsonResultData<BaseOperationAckResponse>.Fail("分包不存在或已禁用");
         }
 
         var language = string.IsNullOrWhiteSpace(input.Language) ? GameDimensionConst.LanguageDefault : input.Language;
@@ -99,13 +85,12 @@ public class PackageBuildReportController : BaseController
     }
 
     /// <summary>
-    /// 资源包版本幂等 upsert（AppId + Package + AppVersion + AssetPackageName + Language 命中则更新，否则新增）。
+    /// 资源包版本幂等 upsert（Package + AppVersion + AssetPackageName + Language 命中则更新，否则新增）。
     /// </summary>
     private async Task UpsertAssetVersionAsync(TenantGameAppPackageEntity package, PackageBuildReportRequest input, string language)
     {
         var existing = await _assetVersionRepo.GetFirstAsync(v =>
-                                                                 v.AppId == package.GameAppId
-                                                                 && v.Package == package.PackageName
+                                                                 v.Package == package.PackageName
                                                                  && v.AppVersion == input.AppVersion
                                                                  && v.AssetPackageName == input.AssetPackageName
                                                                  && v.Language == language);
@@ -122,7 +107,6 @@ public class PackageBuildReportController : BaseController
 
         var entity = new TenantGameAppAssetPackageVersionEntity
         {
-            AppId = package.GameAppId,
             Package = package.PackageName,
             Platform = package.PlatformCode,
             Channel = package.ChannelCode,
@@ -136,13 +120,12 @@ public class PackageBuildReportController : BaseController
     }
 
     /// <summary>
-    /// 整包版本幂等 upsert（AppId + Package + AppVersion + Language 命中则更新，否则新增）。
+    /// 整包版本幂等 upsert（Package + AppVersion + Language 命中则更新，否则新增）。
     /// </summary>
     private async Task UpsertReleaseVersionAsync(TenantGameAppPackageEntity package, PackageBuildReportRequest input, string language)
     {
         var existing = await _releaseVersionRepo.GetFirstAsync(v =>
-                                                                   v.AppId == package.GameAppId
-                                                                   && v.Package == package.PackageName
+                                                                   v.Package == package.PackageName
                                                                    && v.AppVersion == input.AppVersion
                                                                    && v.Language == language);
 
@@ -157,7 +140,6 @@ public class PackageBuildReportController : BaseController
 
         var entity = new TenantGameAppReleaseVersionEntity
         {
-            AppId = package.GameAppId,
             Package = package.PackageName,
             Platform = package.PlatformCode,
             Channel = package.ChannelCode,

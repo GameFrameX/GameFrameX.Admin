@@ -13,31 +13,15 @@ using GameFrameX.Entity.Tenant.Game.App;
 namespace GameFrameX.Hub.Api.Middleware;
 
 /// <summary>
-/// 应用开放访问凭证鉴权中间件。
-/// <para>Hub.Api 机器对机器调用（打包上报、CI、流水线）鉴权，独立于 JWT。</para>
-/// <para>管线：<see cref="HubTenantMiddleware"/> 先从 <c>GameFrameX-Tenant-Id</c> 头声明租户写入
-/// <c>TenantContextAccessor.TenantIdKey</c>，本中间件按声明租户路由租户库查 <see cref="TenantGameAppOpenAccessEntity"/>，
-/// 校验 IsEnabled / 未过期 / 未撤销 / HMAC 签名（C267 起复用 <see cref="CanonicalRequestBuilder.BuildV2Message"/>，
-/// 与传输签名规范统一：v2 单头 + body 入签 + canonical query + 字节级 FixedTimeEquals 比较）/
-/// nonce 去重 / 时间窗 / 接口范围（Scopes），
-/// 校验通过后构造 <see cref="ClaimsPrincipal"/>（UserId/Name/TenantId）供审计列 AOP 写入操作人。</para>
-/// <para>C267 前为 4 个独立头（accessKey/timestamp/nonce/sign）+ <c>method&amp;path&amp;accessKey&amp;timestamp&amp;nonce</c>
-/// 消息串（body 不入签 + 字符串序数比较）；C267 起合并为单头 <c>Signature: v2;{accessKey};{ts};{nonce};{base64sig}</c>
-/// （accessKey 充当 keyId、nonce 充当 mid 段位），规范正文 gfx-doc/dev/signature/spec.md。</para>
-/// <para>401：缺租户 / 缺或非法签名头 / timestamp 非法或超窗 / 凭证无效 / 禁用 / 撤销 / 过期 / 签名错 / 重放 / 绑定用户不存在。
-/// 403：接口范围越权（Scopes 不含当前路由）/ 应用越权（声明 AppId ≠ 凭证.AppId）。</para>
+/// 主库开放访问凭证鉴权中间件。
+/// <para>机器通道独立于 JWT：校验凭证生命周期、HMAC v2、时间窗、nonce 与接口范围，
+/// 然后绑定主库操作人供审计使用。</para>
 /// </summary>
 public class TenantGameAppOpenAccessAuthMiddleware
 {
     private readonly RequestDelegate _next;
 
-    private const string DeclaredAppIdHeader = "x-app-id";
     private const string NonceCachePrefix = "gameAppOpenAccess:nonce:";
-
-    /// <summary>
-    /// HttpContext.Items 键：当前凭证绑定的 AppId（Controller 校验资源归属用，如 PackageId 必须属该 App）。
-    /// </summary>
-    public const string AppIdItemsKey = "__game_app_open_access_app_id";
 
     /// <summary>
     /// 时间戳允许偏差（±秒），与 C181 Signature 默认 ±5min 一致。
@@ -56,17 +40,6 @@ public class TenantGameAppOpenAccessAuthMiddleware
     /// <param name="cacheService">缓存服务（nonce 去重）。</param>
     public async Task InvokeAsync(HttpContext context, SystemCacheService cacheService)
     {
-        // 1. 声明租户（HubTenantMiddleware 已写入 Items）
-        var tenantId = context.Items[TenantContextAccessor.TenantIdKey] as long?;
-        if (!tenantId.HasValue || tenantId.Value <= 0)
-        {
-            await MiddlewareResponseWriter.WriteRejectedAsync(context, StatusCodes.Status401Unauthorized, "缺少租户标识");
-            return;
-        }
-
-        // 仓储依赖在租户校验通过后从请求管线解析（C347）：Repository<T> 构造在无租户上下文时即抛
-        // 「禁止回落主库」异常，若作为 InvokeAsync 方法参数由 DI 提前实例化，会在本方法体执行前
-        // 把「缺租户标识 401」劣化为 500。租户校验后解析即恢复 fail-fast 的 401 语义。
         var credentialRepo = context.RequestServices.GetRequiredService<Repository<TenantGameAppOpenAccessEntity>>();
         var userRepo = context.RequestServices.GetRequiredService<Repository<TenantUserEntity>>();
 
@@ -86,7 +59,7 @@ public class TenantGameAppOpenAccessAuthMiddleware
             return;
         }
 
-        // 4. 查凭证（仓储按声明租户路由租户库；声明假租户则查不到或 Secret 对不上）
+        // 主库按访问标识查凭证。
         var credential = await credentialRepo.AsQueryable().FirstAsync(c => c.AccessKey == accessKey);
         if (credential == null)
         {
@@ -155,16 +128,6 @@ public class TenantGameAppOpenAccessAuthMiddleware
             return;
         }
 
-        // 9. 应用越权校验：请求声明的 AppId（可选 header）必须等于凭证绑定 AppId
-        var declaredAppIdStr = context.Request.Headers[DeclaredAppIdHeader].FirstOrDefault();
-        if (!string.IsNullOrEmpty(declaredAppIdStr)
-            && long.TryParse(declaredAppIdStr, out var declaredAppId)
-            && declaredAppId != credential.AppId)
-        {
-            await MiddlewareResponseWriter.WriteRejectedAsync(context, StatusCodes.Status403Forbidden, "应用越权");
-            return;
-        }
-
         // 10. 查绑定用户（审计操作人）
         var user = await userRepo.AsQueryable().FirstAsync(u => u.Id == credential.BindUserId);
         if (user == null)
@@ -175,12 +138,10 @@ public class TenantGameAppOpenAccessAuthMiddleware
 
         // 11. 构造 ClaimsPrincipal，供审计列 AOP 与下游授权使用
         var identity = new ClaimsIdentity("TenantGameAppOpenAccess");
-        identity.AddClaim(new Claim(ClaimConst.TenantId, credential.TenantId + ""));
         identity.AddClaim(new Claim(ClaimConst.UserId, credential.BindUserId + ""));
         identity.AddClaim(new Claim(ClaimConst.Account, user.Account ?? string.Empty));
         identity.AddClaim(new Claim(ClaimConst.RealName, user.RealName ?? string.Empty));
         context.User = new ClaimsPrincipal(identity);
-        context.Items[AppIdItemsKey] = credential.AppId;
 
         await _next(context);
     }

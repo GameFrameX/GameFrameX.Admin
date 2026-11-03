@@ -74,6 +74,78 @@ public sealed class TenantGameAppOpenAccessDecryptClosureTests : IDisposable
         Assert.Contains(TenantSecretCrypto.KeyEnvironmentVariable, exception.Message, StringComparison.Ordinal);
     }
 
+    [Theory]
+    [InlineData("disabled", 401)]
+    [InlineData("revoked", 401)]
+    [InlineData("expired", 401)]
+    [InlineData("scope", 403)]
+    [InlineData("user", 401)]
+    [InlineData("tampered", 401)]
+    public async Task MainDatabaseCredential_InvalidStateOrRequest_IsRejected(string scenario, int expectedStatus)
+    {
+        SeedCredential(TenantSecretCrypto.Encrypt("hub-open-access-secret")!);
+        var credential = _db.MainDb.Queryable<TenantGameAppOpenAccessEntity>().First();
+        switch (scenario)
+        {
+            case "disabled":
+                credential.IsEnabled = false;
+                break;
+            case "revoked":
+                credential.RevokedTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+                break;
+            case "expired":
+                credential.ExpiresTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+                break;
+            case "scope":
+                credential.ScopesJson = "[\"FeatureSwitchSync\"]";
+                break;
+            case "user":
+                credential.BindUserId = 9999;
+                break;
+        }
+
+        _db.MainDb.Updateable(credential).ExecuteCommand();
+        var context = CreateSignedRequest("hub-open-access-secret");
+        if (scenario == "tampered")
+        {
+            context.Request.Body = new MemoryStream(Encoding.UTF8.GetBytes("{\"tampered\":true}"));
+        }
+
+        var nextCalled = false;
+        var middleware = new TenantGameAppOpenAccessAuthMiddleware(_ =>
+        {
+            nextCalled = true;
+            return Task.CompletedTask;
+        });
+        await middleware.InvokeAsync(context, CreateCacheService());
+
+        Assert.False(nextCalled);
+        Assert.Equal(expectedStatus, context.Response.StatusCode);
+    }
+
+    [Fact]
+    public async Task MainDatabaseCredential_ReplayIsRejectedAndOperatorHasNoTenantClaim()
+    {
+        SeedCredential(TenantSecretCrypto.Encrypt("hub-open-access-secret")!);
+        var first = CreateSignedRequest("hub-open-access-secret");
+        var cache = CreateCacheService();
+        var nextCount = 0;
+        var middleware = new TenantGameAppOpenAccessAuthMiddleware(context =>
+        {
+            nextCount++;
+            Assert.Equal("7801", context.User.FindFirst(GameFrameX.Core.Const.ClaimConst.UserId)?.Value);
+            Assert.Null(context.User.FindFirst(GameFrameX.Core.Const.ClaimConst.TenantId));
+            return Task.CompletedTask;
+        });
+        await middleware.InvokeAsync(first, cache);
+        var replay = CreateSignedRequest("hub-open-access-secret");
+        replay.Request.Headers["Signature"] = first.Request.Headers["Signature"];
+        await middleware.InvokeAsync(replay, cache);
+
+        Assert.Equal(1, nextCount);
+        Assert.Equal(StatusCodes.Status401Unauthorized, replay.Response.StatusCode);
+    }
+
     private void SeedCredential(string storedAccessSecret)
     {
         var bindUser = new TenantUserEntity
@@ -103,7 +175,8 @@ public sealed class TenantGameAppOpenAccessDecryptClosureTests : IDisposable
         var message = CanonicalRequestBuilder.BuildV2Message("POST", "/api/PackageBuildReport", string.Empty, "ak-c372-vector", timestamp, nonce, body);
         var signature = CanonicalRequestBuilder.HmacSha256(Encoding.UTF8.GetBytes(plaintextSecret), message);
 
-        var httpContext = _db.CreateHttpContext();
+        var httpContext = new DefaultHttpContext();
+        httpContext.Response.Body = new MemoryStream();
         httpContext.Request.Method = "POST";
         httpContext.Request.Path = "/api/PackageBuildReport";
         httpContext.Request.Body = new MemoryStream(body);

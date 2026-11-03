@@ -25,8 +25,6 @@ public static class RemoteConfigRolloutMatcher
         }
 
         return StableDeviceRolloutMatcher.IsMatch(
-            tenantId: tenantId,
-            appId: record.AppId,
             recordId: record.Id,
             deviceId: deviceId,
             rolloutPercent: record.RolloutPercent,

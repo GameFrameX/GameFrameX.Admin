@@ -38,10 +38,10 @@ public sealed class FeatureSwitchDeliveryResolverTests : IDisposable
     }
 
     /// <summary>
-    /// 应用覆盖行与租户默认行同键时，应用行胜出（作用域评分 App 分 64 压过默认层）。
+    /// 相同投放维度按优先级与主键决胜，遗留应用列不再影响投放。
     /// </summary>
     [Fact]
-    public void Resolve_AppRowOverridesTenantDefaultRowForSameSwitchKey()
+    public void Resolve_NewerRowWinsRegardlessOfLegacyApplication()
     {
         var tenantDefault = Row("login.banner", id: 1, appId: null, valueJson: "{\"v\":\"tenant\"}");
         var appRow = Row("login.banner", id: 2, appId: App100, valueJson: "{\"v\":\"app\"}");
@@ -363,10 +363,10 @@ public sealed class FeatureSwitchDeliveryResolverTests : IDisposable
     }
 
     /// <summary>
-    /// 候选查询收口在应用作用域：应用行与租户默认层行同时进入候选，其他应用的行被排除。
+    /// 候选查询从主库读取全部记录，不再按遗留应用列筛选。
     /// </summary>
     [Fact]
-    public async Task ResolveAsync_ScopesCandidatesToAppAndTenantDefaultLayer()
+    public async Task ResolveAsync_ReadsMainDatabaseCandidates()
     {
         await InsertAsync(Row("switch.app", id: 900001, appId: App100));
         await InsertAsync(Row("switch.default", id: 900002, appId: null));
@@ -375,7 +375,23 @@ public sealed class FeatureSwitchDeliveryResolverTests : IDisposable
         var result = await CreateResolver().ResolveAsync(Query());
 
         var keys = result.Switches.Select(item => item.SwitchKey).OrderBy(item => item, StringComparer.Ordinal).ToArray();
-        Assert.Equal(new[] { "switch.app", "switch.default", }, keys);
+        Assert.Equal(new[] { "switch.app", "switch.default", "switch.other", }, keys);
+    }
+
+    [Fact]
+    public void DeviceRollout_IsStableNormalizedAndRecordSpecific()
+    {
+        var first = Enumerable.Range(0, 200).Select(index =>
+            GameFrameX.Application.Game.App.Rollout.StableDeviceRolloutMatcher.IsMatch(1, $"device-{index}", 50, null)).ToArray();
+        var repeated = Enumerable.Range(0, 200).Select(index =>
+            GameFrameX.Application.Game.App.Rollout.StableDeviceRolloutMatcher.IsMatch(1, $" DEVICE-{index} ", 50, null)).ToArray();
+        var otherRecord = Enumerable.Range(0, 200).Select(index =>
+            GameFrameX.Application.Game.App.Rollout.StableDeviceRolloutMatcher.IsMatch(2, $"device-{index}", 50, null)).ToArray();
+
+        Assert.Equal(first, repeated);
+        Assert.Contains(true, first);
+        Assert.Contains(false, first);
+        Assert.False(first.SequenceEqual(otherRecord));
     }
 
     private FeatureSwitchDeliveryResolver CreateResolver()
@@ -407,8 +423,6 @@ public sealed class FeatureSwitchDeliveryResolverTests : IDisposable
     {
         return new FeatureSwitchDeliveryQuery
         {
-            TenantId = TenantId,
-            AppId = appId,
             Audience = audience,
             Platform = platform,
             PackageCandidates = packageCandidates,

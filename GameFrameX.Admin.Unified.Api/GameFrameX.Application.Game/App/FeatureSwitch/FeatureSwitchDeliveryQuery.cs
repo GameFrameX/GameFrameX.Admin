@@ -9,16 +9,6 @@ namespace GameFrameX.Application.Game.App.FeatureSwitch;
 public sealed record FeatureSwitchDeliveryQuery
 {
     /// <summary>
-    /// 当前租户 ID（必填，租户库路由）
-    /// </summary>
-    public long TenantId { get; init; }
-
-    /// <summary>
-    /// 应用作用域；null / 0 表示只取租户默认层
-    /// </summary>
-    public long? AppId { get; init; }
-
-    /// <summary>
     /// 下发通道视角，决定消费方标记过滤方向
     /// </summary>
     public FeatureSwitchAudience Audience { get; init; }

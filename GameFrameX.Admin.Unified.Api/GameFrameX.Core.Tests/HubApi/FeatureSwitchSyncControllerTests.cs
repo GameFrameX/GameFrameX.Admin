@@ -45,39 +45,17 @@ public sealed class FeatureSwitchSyncControllerTests : IDisposable
         };
         SqlSugarUnifiedConfig.ConfigureBaseSettings(config);
         _mainDb = new SqlSugarScope(config);
-        _mainDb.CodeFirst.InitTables(typeof(SystemTenantEntity));
-        _mainDb.Insertable(new SystemTenantEntity
-        {
-            Id = TenantId,
-            TenantType = TenantTypeEnum.Db,
-            DbType = DbType.Sqlite,
-            Connection = $"DataSource={_tenantDbPath}",
-            ConfigId = TenantId.ToString(),
-            IsEnabled = true,
-        }).ExecuteCommand();
-
         var provider = _mainDb;
         provider.CodeFirst.InitTables(typeof(TenantGameAppFeatureSwitchEntity));
     }
 
-    private FeatureSwitchSyncController CreateController(out ISqlSugarClient tenantDb, bool includeTenant = true, bool includeApp = true)
+    private FeatureSwitchSyncController CreateController(out ISqlSugarClient tenantDb, bool includeContext = true)
     {
         var provider = _mainDb;
-        var tenantIdResolver = new DelegateSqlSugarTenantIdResolver(() => TenantId);
         var repository = new Repository<TenantGameAppFeatureSwitchEntity>(_mainDb);
         tenantDb = provider;
         var controller = new FeatureSwitchSyncController(new FeatureSwitchDeliveryResolver(repository));
         var context = new DefaultHttpContext();
-        if (includeTenant)
-        {
-            context.Items[TenantContextAccessor.TenantIdKey] = TenantId;
-        }
-
-        if (includeApp)
-        {
-            context.Items[TenantGameAppOpenAccessAuthMiddleware.AppIdItemsKey] = CredentialAppId;
-        }
-
         controller.ControllerContext = new ControllerContext { HttpContext = context, };
         return controller;
     }
@@ -112,10 +90,10 @@ public sealed class FeatureSwitchSyncControllerTests : IDisposable
     }
 
     /// <summary>
-    /// 服务器通道消费方过滤：client 行不下发（server|both 命中），且 AppId 只取凭证绑定（他应用行不泄漏）。
+    /// 服务器通道仅过滤消费方，读取主库中 server|both 行。
     /// </summary>
     [Fact]
-    public async Task Sync_FiltersByAudienceAndCredentialBoundApp()
+    public async Task Sync_FiltersByAudienceFromMainDatabase()
     {
         var controller = CreateController(out var tenantDb);
         tenantDb.Insertable(new[]
@@ -131,7 +109,7 @@ public sealed class FeatureSwitchSyncControllerTests : IDisposable
         var data = ClientApiResultReader.Data(root);
 
         var switches = data.GetProperty("Switches");
-        Assert.Equal(2, switches.GetArrayLength());
+        Assert.Equal(3, switches.GetArrayLength());
         Assert.Equal("economy.drop_rate", switches[0].GetProperty("SwitchKey").GetString());
         Assert.Equal("login.banner", switches[1].GetProperty("SwitchKey").GetString());
         Assert.Matches("^[0-9a-f]{32}$", data.GetProperty("Version").GetString());
@@ -210,17 +188,17 @@ public sealed class FeatureSwitchSyncControllerTests : IDisposable
     }
 
     /// <summary>
-    /// 缺凭证租户 / 应用上下文（中间件未注入）→ 拒绝，不回落任何默认作用域。
+    /// 不需要遗留租户或应用上下文，机器身份由管线中的 HMAC 中间件验证。
     /// </summary>
     [Fact]
-    public async Task Sync_MissingCredentialContext_Rejected()
+    public async Task Sync_WithoutLegacyScopeContext_ReadsMainDatabase()
     {
-        var controller = CreateController(out _, includeApp: false);
+        var controller = CreateController(out _, includeContext: false);
 
         var result = await controller.Sync(new FeatureSwitchSyncRequest());
 
         var root = ClientApiResultReader.Read(result);
-        Assert.NotEqual(0, ClientApiResultReader.Code(root));
+        Assert.Equal(0, ClientApiResultReader.Code(root));
     }
 
     /// <summary>

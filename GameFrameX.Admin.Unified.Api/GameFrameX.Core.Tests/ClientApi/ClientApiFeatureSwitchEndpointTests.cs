@@ -1,7 +1,6 @@
 using GameFrameX.Application.Game.App.FeatureSwitch;
 using GameFrameX.Client.Api.GameFeatureSwitch;
 using GameFrameX.Client.Api.GameFeatureSwitch.Dto;
-using GameFrameX.Client.Api.Services.ClientApiTenantOptions;
 using GameFrameX.Client.Api.Services.PackageVersion;
 using GameFrameX.Core.Const;
 using GameFrameX.Entity.Tenant.Game.App;
@@ -13,7 +12,7 @@ namespace GameFrameX.Core.Tests.ClientApi;
 /// C347 活动/功能开关客户端通道（GameFeatureSwitchController）端点级测试。
 /// <para>覆盖：版本协议三态（首拉全量 / 同版本 Unchanged 短路 / 变更后全量）、消费方过滤（server 行不下发）、
 /// 时间窗外不下发、设备灰度三分支（未命中 / 白名单旁路 / 缺 DeviceId 仅全量命中）、
-/// 缺租户 / 缺应用上下文 fail-fast（C314 语义）与 PascalCase wire 契约。</para>
+/// 无租户 / 应用上下文时主库读取与 PascalCase wire 契约。</para>
 /// </summary>
 public sealed class ClientApiFeatureSwitchEndpointTests
 {
@@ -236,30 +235,36 @@ public sealed class ClientApiFeatureSwitchEndpointTests
     }
 
     /// <summary>
-    /// 缺租户上下文 fail-fast：抛 MissingTenantContextException（C314 语义，不回落默认租户）。
+    /// 无租户上下文仍从主库读取有效开关。
     /// </summary>
     [Fact]
-    public async Task GetInfo_MissingTenant_ThrowsMissingTenantContext()
+    public async Task GetInfo_WithoutTenantContext_ReadsMainDatabase()
     {
         using var db = new ClientApiTestDb();
         db.InitTenantTables(typeof(TenantGameAppFeatureSwitchEntity), typeof(TenantGameAppPackageEntity));
         var controller = CreateController(db);
         db.AttachContext(controller, includeTenant: false);
 
-        await Assert.ThrowsAsync<MissingTenantContextException>(() => controller.GetInfo(Request()));
+        db.SeedFeatureSwitch(Row(1, "activity.main"));
+        var result = ClientApiResultReader.Read(await controller.GetInfo(Request()));
+        Assert.Equal(0, ClientApiResultReader.Code(result));
+        Assert.Equal("activity.main", ClientApiResultReader.Data(result).GetProperty("Switches")[0].GetProperty("SwitchKey").GetString());
     }
 
     /// <summary>
-    /// 缺应用上下文 fail-fast：抛 UnauthorizedAccessException（ASP.NET 管道转换为 401）。
+    /// 无应用上下文仍从主库读取有效开关。
     /// </summary>
     [Fact]
-    public async Task GetInfo_MissingApp_ThrowsUnauthorized()
+    public async Task GetInfo_WithoutApplicationContext_ReadsMainDatabase()
     {
         using var db = new ClientApiTestDb();
         db.InitTenantTables(typeof(TenantGameAppFeatureSwitchEntity), typeof(TenantGameAppPackageEntity));
         var controller = CreateController(db);
         db.AttachContext(controller, includeApp: false);
 
-        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => controller.GetInfo(Request()));
+        db.SeedFeatureSwitch(Row(1, "activity.main"));
+        var result = ClientApiResultReader.Read(await controller.GetInfo(Request()));
+        Assert.Equal(0, ClientApiResultReader.Code(result));
+        Assert.Equal("activity.main", ClientApiResultReader.Data(result).GetProperty("Switches")[0].GetProperty("SwitchKey").GetString());
     }
 }

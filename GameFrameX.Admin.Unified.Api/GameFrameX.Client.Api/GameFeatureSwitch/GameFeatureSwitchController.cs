@@ -8,7 +8,7 @@ namespace GameFrameX.Client.Api.GameFeatureSwitch;
 
 /// <summary>
 /// 活动/功能开关聚合下发控制器（C347 客户端通道）。
-/// <para>客户端运行时拉取通道：按租户 + 应用聚合下发命中开关，支持版本化差异感知（游戏运行中动态生效）。
+/// <para>客户端运行时拉取通道：从主库聚合下发命中开关，支持版本化差异感知（游戏运行中动态生效）。
 /// 解析全部委托 <see cref="FeatureSwitchDeliveryResolver"/>（C345 唯一实现）：消费方过滤 client|both、
 /// 作用域评分 winner、时间窗（服务端 UTC 过滤）、设备灰度（稳定设备标识取模 + 白名单旁路，缺 DeviceId 仅全量命中）。</para>
 /// <para>判定权原则：下发 ≠ 授权。玩法/经济 gate 由 GameServer 业务端点依据开关值与时间窗实时校验，
@@ -42,15 +42,8 @@ public class GameFeatureSwitchController : BaseController
     [HttpPost]
     public async Task<HttpJsonResultData<FeatureSwitchResponse>> GetInfo([FromBody] FeatureSwitchRequest request)
     {
-        // 强制租户 + 应用上下文，缺失即拒绝（缺租户抛 MissingTenantContextException、缺应用 401，C314 语义）；
-        // 应用作用域只取上下文注入值，请求体声明不作为授权来源
-        var tenantAppContext = HttpContext.RequireTenantAppContext();
-        request.AppId = tenantAppContext.AppId;
-
         var result = await _deliveryResolver.ResolveAsync(new FeatureSwitchDeliveryQuery
         {
-            TenantId = tenantAppContext.TenantId,
-            AppId = tenantAppContext.AppId,
             Audience = FeatureSwitchAudience.Client,
             Platform = request.Platform,
             PackageCandidates = BuildPackageCandidates(request.PackageName),
