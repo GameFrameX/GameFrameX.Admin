@@ -1,7 +1,6 @@
 using GameFrameX.Application.Game.System.Email;
 using GameFrameX.Entity.Tenant.ClientApiConfig;
 using GameFrameX.Entity.System;
-using GameFrameX.Client.Api.Services.ClientApiTenantOptions;
 using GameFrameX.Client.Api.Services.Email;
 using SqlSugar;
 
@@ -63,51 +62,49 @@ public class EmailProviderSelectorTests : IDisposable
     }
 
     [Fact]
-    public async Task TenantSelector_ScopeLayerBeatsLowerScopePriority()
+    public async Task TenantSelector_ExactPurposeBeatsDefaultPriority()
     {
-        var context = new ClientApiTenantResolution { TenantId = 100, AppId = 200, };
         await InsertTenantAsync(1, 100, 0, 0, 999, 40, true);
-        await InsertTenantAsync(2, 100, 0, 7, 999, 30, true);
+        await InsertTenantAsync(2, 100, 0, 7, 1, 5, true);
         await InsertTenantAsync(3, 100, 200, 0, 999, 20, true);
         await InsertTenantAsync(4, 100, 200, 7, 1, 10, true);
 
-        var selected = await TenantEmailConfigSelector.SelectAsync(_db, context, 7);
+        var selected = await TenantEmailConfigSelector.SelectAsync(_db, 7);
 
         Assert.NotNull(selected);
         Assert.Equal(4, selected.Id);
     }
 
     [Fact]
-    public async Task TenantSelector_SameScopeUsesPriorityUpdateTimeAndIdTieBreakAndIgnoresDisabled()
+    public async Task TenantSelector_UsesPriorityUpdateTimeAndIdTieBreakAndIgnoresDisabled()
     {
-        var context = new ClientApiTenantResolution { TenantId = 100, AppId = 200, };
         await InsertTenantAsync(1, 100, 200, 7, 300, 30, false);
         await InsertTenantAsync(2, 100, 200, 7, 100, 10, true);
         await InsertTenantAsync(3, 100, 200, 7, 200, 20, true);
         await InsertTenantAsync(4, 100, 200, 7, 200, 20, true);
 
-        var selected = await TenantEmailConfigSelector.SelectAsync(_db, context, 7);
+        var selected = await TenantEmailConfigSelector.SelectAsync(_db, 7);
 
         Assert.NotNull(selected);
         Assert.Equal(4, selected.Id);
     }
 
     [Fact]
-    public async Task TenantSelector_ReturnsNullWithoutTenantContext()
+    public async Task TenantSelector_DefaultPurposeFallbackWorksWithoutRequestContext()
     {
-        var selected = await TenantEmailConfigSelector.SelectAsync(_db, new ClientApiTenantResolution { TenantId = 0, AppId = 200, }, 7);
+        await InsertTenantAsync(1, 100, 200, 0, 100, 10, true);
+        var selected = await TenantEmailConfigSelector.SelectAsync(_db, 7);
 
-        Assert.Null(selected);
+        Assert.Equal(1, selected?.Id);
     }
 
     [Fact]
-    public async Task TenantSelector_ReturnsNullWhenTenantHasNoEnabledProvider()
+    public async Task TenantSelector_ReturnsNullWhenNoEnabledProvider()
     {
-        var context = new ClientApiTenantResolution { TenantId = 100, AppId = 200, };
-        await InsertTenantAsync(1, 999, 200, 7, 100, 10, true);
+        await InsertTenantAsync(1, 999, 200, 7, 100, 10, false);
         await InsertTenantAsync(2, 100, 200, 7, 100, 10, false);
 
-        var selected = await TenantEmailConfigSelector.SelectAsync(_db, context, 7);
+        var selected = await TenantEmailConfigSelector.SelectAsync(_db, 7);
 
         Assert.Null(selected);
     }

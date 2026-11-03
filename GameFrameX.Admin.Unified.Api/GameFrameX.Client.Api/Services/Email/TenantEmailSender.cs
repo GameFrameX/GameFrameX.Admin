@@ -1,32 +1,21 @@
-using SqlSugar;
-using GameFrameX.Client.Api.Services.ClientApiTenantOptions;
-using GameFrameX.Core.Service.Message;
 using GameFrameX.Core.Service.Tenant;
+using SqlSugar;
+using GameFrameX.Core.Service.Message;
 using GameFrameX.Email.Abstract;
 using GameFrameX.Email.TencentSes;
 
 namespace GameFrameX.Client.Api.Services.Email;
 
 /// <summary>
-/// 租户业务邮件发送实现。
-/// <para>凭据（SecretId/SecretKey）与发件人地址均通过 <see cref="TenantEmailConfigSelector"/> 从租户库按 <c>TenantId + AppId + Purpose</c> 优先级读取。</para>
-/// <para>缺租户上下文或缺配置返回 <c>false</c> 并记录警告，禁止 fallback 到 <see cref="ISystemEmailSender"/>。</para>
+/// 从主库读取业务邮件配置并发送，未配置或凭据不完整时禁止回退系统邮件。
 /// </summary>
 public sealed class TenantEmailSender : ITenantEmailSender
 {
-    private readonly IClientApiTenantOptionsProvider _optionsProvider;
-    private readonly ISqlSugarClient _tenantDbProvider;
-    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly ISqlSugarClient _database;
 
-    /// <summary>
-    /// </summary>
-    public TenantEmailSender(IClientApiTenantOptionsProvider optionsProvider,
-        ISqlSugarClient tenantDbProvider,
-        IHttpContextAccessor httpContextAccessor)
+    public TenantEmailSender(ISqlSugarClient database)
     {
-        _optionsProvider = optionsProvider;
-        _tenantDbProvider = tenantDbProvider;
-        _httpContextAccessor = httpContextAccessor;
+        _database = database;
     }
 
     /// <inheritdoc />
@@ -72,22 +61,7 @@ public sealed class TenantEmailSender : ITenantEmailSender
     /// <inheritdoc />
     public async Task<TenantEmailOptionsSnapshot?> GetSnapshotAsync(TenantEmailPurpose purpose)
     {
-        var ctx = _httpContextAccessor.HttpContext;
-        var tenantIdObj = ctx?.Items[TenantContextAccessor.TenantIdKey] as long?;
-        if (!tenantIdObj.HasValue || tenantIdObj.Value <= 0)
-        {
-            return null;
-        }
-
-        var appIdObj = ctx?.Items[Middleware.AppResolutionMiddleware.AppIdKey] as long?;
-        var resolution = new ClientApiTenantResolution
-        {
-            TenantId = tenantIdObj.Value,
-            AppId = appIdObj,
-        };
-
-        var db = _tenantDbProvider;
-        var entity = await TenantEmailConfigSelector.SelectAsync(db, resolution, (int)purpose);
+        var entity = await TenantEmailConfigSelector.SelectAsync(_database, (int)purpose);
         if (entity == null)
         {
             return null;

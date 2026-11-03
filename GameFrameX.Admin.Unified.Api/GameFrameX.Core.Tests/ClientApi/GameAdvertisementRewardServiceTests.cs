@@ -395,11 +395,6 @@ public sealed class GameAdvertisementRewardServiceTests
             _adOptions = advertisementOptions;
         }
 
-        public ClientApiTenantResolution ResolveContext()
-        {
-            return new ClientApiTenantResolution();
-        }
-
         public Task<TenantEmailOptions> GetEmailOptionsAsync()
         {
 #pragma warning disable CS8625 // 测试桩：本场景只测广告回调，邮件策略返回 null 表示未配置

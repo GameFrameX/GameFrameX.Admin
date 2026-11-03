@@ -3,19 +3,10 @@ using GameFrameX.Advertisement.Abstract;
 namespace GameFrameX.Client.Api.Services.ClientApiTenantOptions;
 
 /// <summary>
-/// Client API 请求期租户配置 Provider。
-/// <para>按当前请求的 <c>TenantId</c>（来自 <c>TenantContextAccessor.TenantIdKey</c>）与 <c>AppId</c>（来自 <c>AppResolutionMiddleware.AppIdKey</c>）</para>
-/// <para>从租户库读取业务配置；作用域优先级：应用级（TenantId + AppId）&gt; 租户默认（TenantId, AppId=0）。</para>
-/// <para>缺少租户上下文时，对所有读取方法抛出 <see cref="InvalidOperationException"/>，禁止回落主库或进程级业务参数。</para>
+/// Client API 主库请求期业务配置 Provider。
 /// </summary>
 public interface IClientApiTenantOptionsProvider
 {
-    /// <summary>
-    /// 解析当前请求作用域的租户身份。
-    /// </summary>
-    /// <returns>租户上下文；缺少 TenantId 时抛出异常。</returns>
-    ClientApiTenantResolution ResolveContext();
-
     /// <summary>
     /// 读取租户业务邮件配置；未配置返回 null，调用方必须返回明确错误，不得 fallback 到系统邮件。
     /// </summary>

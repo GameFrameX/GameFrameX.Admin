@@ -1,76 +1,37 @@
+using GameFrameX.Core.Service.Tenant;
 using SqlSugar;
 using System.Text.Json;
 using GameFrameX.Advertisement.Abstract;
 using GameFrameX.Client.Api.Middleware;
 using GameFrameX.Client.Api.Services.Email;
-using GameFrameX.Core.Service.Tenant;
-using GameFrameX.Entity.Base;
 using GameFrameX.Entity.Tenant.ClientApiConfig;
 
 namespace GameFrameX.Client.Api.Services.ClientApiTenantOptions;
 
 /// <summary>
-/// 数据库驱动的 Client API 请求期租户配置 Provider。
-/// <para>作用域选择策略：应用级配置（TenantId + AppId）优先于租户默认配置（TenantId, AppId=0）。</para>
-/// <para>缺少租户上下文时抛出 <see cref="MissingTenantContextException"/>，禁止回落主库或进程级业务参数。</para>
+/// 从唯一主库读取 Client API 请求期业务配置。
+/// <para>所有策略节共享启用且 Id 最大的配置行，并在请求内缓存。</para>
 /// </summary>
 public sealed class ClientApiTenantOptionsProvider : IClientApiTenantOptionsProvider
 {
     private readonly ISqlSugarClient _tenantDbProvider;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
-    /// <summary>
-    /// 请求级缓存：租户默认行（AppId=0，令牌节唯一消费来源）。Scoped 生命周期内单次加载。
-    /// </summary>
-    private TenantClientApiPolicyEntity? _tenantDefaultPolicyRow;
-
-    /// <summary>
-    /// 请求级缓存：<see cref="_tenantDefaultPolicyRow"/> 是否已查过（区分「未查」与「查无行」）。
-    /// </summary>
-    private bool _tenantDefaultPolicyRowFetched;
-
-    /// <summary>
-    /// 请求级缓存：生效行（应用级行优先，AppId=0 兜底；票据节/输出节消费来源）。
-    /// </summary>
     private TenantClientApiPolicyEntity? _effectivePolicyRow;
-
-    /// <summary>
-    /// 请求级缓存：<see cref="_effectivePolicyRow"/> 是否已查过。
-    /// </summary>
     private bool _effectivePolicyRowFetched;
 
-    /// <summary>
-    /// </summary>
-    public ClientApiTenantOptionsProvider(ISqlSugarClient tenantDbProvider, IHttpContextAccessor httpContextAccessor)
+    public ClientApiTenantOptionsProvider(ISqlSugarClient database, IHttpContextAccessor httpContextAccessor)
     {
-        _tenantDbProvider = tenantDbProvider;
+        _tenantDbProvider = database;
         _httpContextAccessor = httpContextAccessor;
-    }
-
-    /// <inheritdoc />
-    public ClientApiTenantResolution ResolveContext()
-    {
-        var context = _httpContextAccessor.HttpContext;
-        var tenantId = ResolveTenantId(context);
-        if (!tenantId.HasValue)
-        {
-            throw new MissingTenantContextException("缺少租户上下文，Client API 请求期业务配置必须依赖当前 TenantId，禁止回落到主库或进程级业务参数。");
-        }
-
-        return new ClientApiTenantResolution
-        {
-            TenantId = tenantId.Value,
-            AppId = ResolveAppId(context),
-        };
     }
 
     /// <inheritdoc />
 #pragma warning disable CS8603 // 接口 IClientApiTenantOptionsProvider 签名非空（跨项目共享），但语义允许返回 null（未配置）；改返回类型会级联到测试 fake
     public async Task<TenantEmailOptions> GetEmailOptionsAsync()
     {
-        var ctx = ResolveContext();
         var db = _tenantDbProvider;
-        var entity = await TenantEmailConfigSelector.SelectAsync(db, ctx, 0);
+        var entity = await TenantEmailConfigSelector.SelectAsync(db, 0);
         return entity == null
                    ? null
                    : new TenantEmailOptions
@@ -123,14 +84,10 @@ public sealed class ClientApiTenantOptionsProvider : IClientApiTenantOptionsProv
 
     private async Task<TenantAdvertisementCallbackConfigEntity?> PickAdvertisementCallbackConfigAsync()
     {
-        var ctx = ResolveContext();
         var db = _tenantDbProvider;
-        var appId = ctx.AppId.GetValueOrDefault();
         var provider = ResolvePublicCallbackProvider(_httpContextAccessor.HttpContext);
         var query = db.Queryable<TenantAdvertisementCallbackConfigEntity>()
-                      .Where(c => c.TenantId == ctx.TenantId &&
-                                  c.IsEnabled == true &&
-                                  (c.AppId == appId || c.AppId == 0));
+                      .Where(c => c.IsEnabled == true);
         var candidates = await query.ToListAsync();
         if (!string.IsNullOrWhiteSpace(provider))
         {
@@ -140,15 +97,14 @@ public sealed class ClientApiTenantOptionsProvider : IClientApiTenantOptionsProv
         }
 
         return candidates
-               .OrderByDescending(c => appId > 0 && c.AppId == appId)
-               .ThenByDescending(c => c.Id)
+               .OrderByDescending(c => c.Id)
                .FirstOrDefault();
     }
 
     /// <inheritdoc />
     public async Task<TenantClientApiTokenPolicyOptions> GetTokenPolicyAsync()
     {
-        var entity = await GetTenantDefaultPolicyRowAsync();
+        var entity = await GetEffectivePolicyRowAsync();
         return new TenantClientApiTokenPolicyOptions
         {
             // C372（GFX-838）：令牌签名密钥读取边界解密（C371 起库内密文；无前缀明文直通）
@@ -191,97 +147,18 @@ public sealed class ClientApiTenantOptionsProvider : IClientApiTenantOptionsProv
         };
     }
 
-    /// <summary>
-    /// 读取租户默认策略行（AppId=0，启用态，Id 降序取首）。令牌节唯一消费来源（C378：维持原租户级语义）。
-    /// <para>请求级缓存：同一 Scoped 实例内四个策略 getter 只查一次租户默认行。</para>
-    /// </summary>
-    private async Task<TenantClientApiPolicyEntity?> GetTenantDefaultPolicyRowAsync()
-    {
-        if (_tenantDefaultPolicyRowFetched)
-        {
-            return _tenantDefaultPolicyRow;
-        }
-
-        var ctx = ResolveContext();
-        var db = _tenantDbProvider;
-        _tenantDefaultPolicyRow = await db.Queryable<TenantClientApiPolicyEntity>()
-                                          .Where(c => c.TenantId == ctx.TenantId && c.AppId == 0 && c.IsEnabled == true)
-                                          .OrderByDescending(c => c.Id)
-                                          .FirstAsync();
-        _tenantDefaultPolicyRowFetched = true;
-        return _tenantDefaultPolicyRow;
-    }
-
-    /// <summary>
-    /// 读取生效策略行：应用级（AppId &gt; 0 且匹配）优先，否则租户默认（AppId == 0）；票据节/输出节消费来源。
-    /// <para>请求级缓存：同一 Scoped 实例内只查一次生效行。</para>
-    /// </summary>
     private async Task<TenantClientApiPolicyEntity?> GetEffectivePolicyRowAsync()
     {
-        if (_effectivePolicyRowFetched)
+        if (!_effectivePolicyRowFetched)
         {
-            return _effectivePolicyRow;
+            _effectivePolicyRow = await _tenantDbProvider.Queryable<TenantClientApiPolicyEntity>()
+                .Where(c => c.IsEnabled == true)
+                .OrderByDescending(c => c.Id)
+                .FirstAsync();
+            _effectivePolicyRowFetched = true;
         }
 
-        var ctx = ResolveContext();
-        var db = _tenantDbProvider;
-        var appId = ctx.AppId.GetValueOrDefault();
-        if (appId > 0)
-        {
-            _effectivePolicyRow = await db.Queryable<TenantClientApiPolicyEntity>()
-                                          .Where(c => c.TenantId == ctx.TenantId && c.IsEnabled == true && c.AppId == appId)
-                                          .OrderByDescending(c => c.Id)
-                                          .FirstAsync();
-        }
-
-        if (_effectivePolicyRow == null)
-        {
-            _effectivePolicyRow = await db.Queryable<TenantClientApiPolicyEntity>()
-                                          .Where(c => c.TenantId == ctx.TenantId && c.IsEnabled == true && c.AppId == 0)
-                                          .OrderByDescending(c => c.Id)
-                                          .FirstAsync();
-        }
-
-        _effectivePolicyRowFetched = true;
         return _effectivePolicyRow;
-    }
-
-    /// <summary>
-    /// 解析当前请求的 TenantId；仅承认 <see cref="TenantContextAccessor.TenantIdKey"/>，不接受 query/header 绕过。
-    /// </summary>
-    private static long? ResolveTenantId(HttpContext? context)
-    {
-        if (context == null)
-        {
-            return null;
-        }
-
-        if (context.Items.TryGetValue(TenantContextAccessor.TenantIdKey, out var value) &&
-            long.TryParse(value?.ToString(), out var tenantId))
-        {
-            return tenantId;
-        }
-
-        return null;
-    }
-
-    /// <summary>
-    /// 解析当前请求的 AppId；仅承认 <see cref="AppResolutionMiddleware.AppIdKey"/>，无法取得时返回 null。
-    /// </summary>
-    private static long? ResolveAppId(HttpContext? context)
-    {
-        if (context == null)
-        {
-            return null;
-        }
-
-        if (context.Items.TryGetValue(AppResolutionMiddleware.AppIdKey, out var value) &&
-            long.TryParse(value?.ToString(), out var appId))
-        {
-            return appId;
-        }
-
-        return null;
     }
 
     private static string ResolvePublicCallbackProvider(HttpContext? context)
@@ -343,17 +220,19 @@ public sealed class ClientApiTenantOptionsProvider : IClientApiTenantOptionsProv
 
         try
         {
-            using var document = JsonDocument.Parse(raw);
-            if (document.RootElement.ValueKind != JsonValueKind.Object)
+            using (var document = JsonDocument.Parse(raw))
             {
-                return result;
-            }
+                if (document.RootElement.ValueKind != JsonValueKind.Object)
+                {
+                    return result;
+                }
 
-            foreach (var property in document.RootElement.EnumerateObject())
-            {
-                result[property.Name] = property.Value.ValueKind == JsonValueKind.String
-                                            ? property.Value.GetString() ?? string.Empty
-                                            : property.Value.ToString();
+                foreach (var property in document.RootElement.EnumerateObject())
+                {
+                    result[property.Name] = property.Value.ValueKind == JsonValueKind.String
+                                                ? property.Value.GetString() ?? string.Empty
+                                                : property.Value.ToString();
+                }
             }
         }
         catch (JsonException)

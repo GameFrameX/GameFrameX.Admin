@@ -1,35 +1,50 @@
 using GameFrameX.Client.Api.Services.Email;
-using Microsoft.AspNetCore.Http;
+using GameFrameX.Entity.Tenant.ClientApiConfig;
 
 namespace GameFrameX.Core.Tests.ClientApi;
 
 public class TenantEmailSenderTests
 {
     [Fact]
-    public async Task SendTemplate_ReturnsFalseWhenTenantEmailUnconfigured_NoSystemFallback()
+    public async Task SendTemplate_ReturnsFalseWhenUnconfigured_NoSystemFallback()
     {
-        // 租户业务邮件未配置时必须返回 false，禁止 fallback 到系统邮件
-        var provider = FakeOptionsProvider.WithoutEmailOptions();
-        // 缺 HttpContext 时 GetSnapshotAsync 提前返回 null，不需要真实 tenantDbProvider
-        var sender = new TenantEmailSender(provider, null!, new HttpContextAccessor());
-
-        var data = new Dictionary<string, string>
+        using (var database = new ClientApiTestDb())
         {
-            { "username", "player@example.test" },
-            { "verification_code", "123456" },
-        };
-
-        var ok = await sender.SendTemplateAsync(TenantEmailPurpose.PlayerRegisterCode, "player@example.test", 145225, "Subject", data);
-
-        Assert.False(ok);
+            database.InitTenantTables(typeof(TenantEmailConfigEntity));
+            var sender = new TenantEmailSender(database.MainDb);
+            var result = await sender.SendTemplateAsync(TenantEmailPurpose.PlayerRegisterCode,
+                "player@example.test", 145225, "Subject", new Dictionary<string, string>());
+            Assert.False(result);
+        }
     }
 
     [Fact]
     public async Task GetFromEmailAddress_ReturnsNullWhenUnconfigured()
     {
-        var provider = FakeOptionsProvider.WithoutEmailOptions();
-        var sender = new TenantEmailSender(provider, null!, new HttpContextAccessor());
+        using (var database = new ClientApiTestDb())
+        {
+            database.InitTenantTables(typeof(TenantEmailConfigEntity));
+            var sender = new TenantEmailSender(database.MainDb);
+            Assert.Null(await sender.GetFromEmailAddressAsync());
+        }
+    }
 
-        Assert.Null(await sender.GetFromEmailAddressAsync());
+    [Fact]
+    public async Task GetSnapshot_ReadsMainDatabaseWithoutRequestContext_RequiresCompleteCredentials()
+    {
+        using (var database = new ClientApiTestDb())
+        {
+            database.InitTenantTables(typeof(TenantEmailConfigEntity));
+            database.MainDb.Insertable(new TenantEmailConfigEntity
+            {
+                Id = 1, IsEnabled = true, FromEmailAddress = "sender@example.test",
+                FromEmailSecretId = "secret-id", FromEmailSecretKey = "secret-key",
+            }).ExecuteCommand();
+            var sender = new TenantEmailSender(database.MainDb);
+            Assert.Equal("sender@example.test", await sender.GetFromEmailAddressAsync());
+            database.MainDb.Updateable<TenantEmailConfigEntity>()
+                .SetColumns(row => row.FromEmailSecretKey == "").Where(row => row.Id == 1).ExecuteCommand();
+            Assert.Null(await sender.GetSnapshotAsync(TenantEmailPurpose.Default));
+        }
     }
 }

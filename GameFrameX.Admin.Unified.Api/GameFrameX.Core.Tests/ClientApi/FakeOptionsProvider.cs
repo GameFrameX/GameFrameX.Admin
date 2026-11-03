@@ -15,11 +15,6 @@ internal sealed class FakeOptionsProvider : IClientApiTenantOptionsProvider
     private TenantOrderPolicyOptions _orderPolicy = new();
     private TenantAreaPolicyOptions _areaPolicy = new();
 
-    public ClientApiTenantResolution ResolveContext()
-    {
-        return new ClientApiTenantResolution { TenantId = 10, AppId = 20, };
-    }
-
     public Task<TenantEmailOptions> GetEmailOptionsAsync()
     {
         return Task.FromResult(_emailOptions);
