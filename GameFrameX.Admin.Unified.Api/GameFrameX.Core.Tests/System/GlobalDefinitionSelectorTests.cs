@@ -22,6 +22,11 @@ public sealed class GlobalDefinitionSelectorTests : IDisposable
         SqlSugarUnifiedConfig.ConfigureBaseSettings(configuration);
         _database = new SqlSugarScope(configuration);
         _database.CodeFirst.InitTables(typeof(GlobalLanguageEntity), typeof(GlobalPlatformEntity));
+        // 仅重建测试库的平台表以允许描述为空，生产实体映射保持不变。
+        var platformTable = _database.EntityMaintenance.GetTableName<GlobalPlatformEntity>();
+        var tableDefinition = _database.Ado.GetString($"SELECT sql FROM sqlite_master WHERE name = '{platformTable}'");
+        _database.Ado.ExecuteCommand($"DROP TABLE {platformTable}");
+        _database.Ado.ExecuteCommand(tableDefinition.Replace("NOT NULL", string.Empty, StringComparison.OrdinalIgnoreCase));
     }
 
     [Fact]
@@ -72,19 +77,103 @@ public sealed class GlobalDefinitionSelectorTests : IDisposable
     }
 
     [Fact]
-    public async Task PlatformStringSelector_PreservesNameMappingAndPageSize()
+    public async Task PlatformStringSelector_PreservesNameMappingAndNullableDescription()
     {
-        await _database.Insertable(new GlobalPlatformEntity
+        await SeedPlatformsAsync();
+        var service = CreatePlatformService();
+
+        var result = await service.SelectStringAsync(new BaseSelectPageRequest { SearchKey = " Android ", });
+
+        Assert.Equal(new[] { "201", "202", }, result.Select(item => item.Id));
+        Assert.Equal(new[] { "Android", "Android alternative", }, result.Select(item => item.Value));
+        Assert.Null(result[0].Label);
+        Assert.Equal("Mobile", result[1].Label);
+        Assert.Empty(await service.SelectStringAsync(new BaseSelectPageRequest { SearchKey = "Mobile", }));
+        Assert.Single(await service.SelectStringAsync(new BaseSelectPageRequest { SearchKey = "Android", PageSize = 1, }));
+    }
+
+    [Fact]
+    public async Task PlatformNumericSelector_FiltersDeletedRowsAndKeepsNameMapping()
+    {
+        await SeedPlatformsAsync();
+        var service = CreatePlatformService();
+
+        var result = await service.SelectAsync(new BaseSelectPageRequest { SearchKey = " Android ", });
+
+        Assert.Equal(new long[] { 201, 202, }, result.Select(item => item.Id));
+        Assert.Equal(new[] { "Android", "Android alternative", }, result.Select(item => item.Value));
+        Assert.Equal(string.Empty, result[0].Label);
+        Assert.Equal("Mobile", result[1].Label);
+        Assert.Empty(await service.SelectAsync(new BaseSelectPageRequest { SearchKey = "Mobile", }));
+        Assert.Single(await service.SelectAsync(new BaseSelectPageRequest { SearchKey = "Android", PageSize = 1, }));
+    }
+
+    [Fact]
+    public async Task LanguageNumericSelector_PutsAllDefaultFormsFirstThenOrdersById()
+    {
+        await _database.Insertable(new[]
         {
-            Id = 201, Name = "Android", Description = "Mobile", IsDeleted = false,
+            new GlobalLanguageEntity { Id = 101, Name = "English", Code = "en", Description = "Latin", },
+            new GlobalLanguageEntity { Id = 104, Name = "Flagged", Code = "flag", Description = "Flag", IsDefault = true, },
+            new GlobalLanguageEntity { Id = 103, Name = "default", Code = "name-default", Description = "Name default", },
+            new GlobalLanguageEntity { Id = 102, Name = "Code default", Code = "default", Description = "Code default", },
         }).ExecuteCommandAsync();
-        var service = new GlobalPlatformService(new SqlSugarRepository<GlobalPlatformEntity> { Context = _database, });
 
-        var result = Assert.Single(await service.SelectStringAsync(new BaseSelectPageRequest { SearchKey = " Android ", PageSize = 1, }));
+        var result = await CreateLanguageService().SelectAsync(new BaseSelectPageRequest());
 
-        Assert.Equal("201", result.Id);
-        Assert.Equal("Android", result.Value);
-        Assert.Equal("Mobile", result.Label);
+        Assert.Equal(new long[] { 102, 103, 104, 101, }, result.Select(item => item.Id));
+    }
+
+    [Theory]
+    [InlineData(null, null)]
+    [InlineData("", "")]
+    [InlineData("  ", "  ")]
+    public async Task LanguageNumericSelector_FallsBackToName(string? code, string? description)
+    {
+        await _database.Insertable(new GlobalLanguageEntity
+        {
+            Id = 101, Name = "Fallback", Code = code, Description = description!,
+        }).ExecuteCommandAsync();
+
+        var result = Assert.Single(await CreateLanguageService().SelectAsync(new BaseSelectPageRequest()));
+
+        Assert.Equal("Fallback", result.Value);
+        Assert.Equal("Fallback", result.Label);
+    }
+
+    [Theory]
+    [InlineData(" English ")]
+    [InlineData(" Latin ")]
+    [InlineData(" en ")]
+    public async Task LanguageNumericSelector_SearchesNameDescriptionAndCode(string searchKey)
+    {
+        await _database.Insertable(new[]
+        {
+            new GlobalLanguageEntity { Id = 101, Name = "English", Code = " en ", Description = "Latin", },
+            new GlobalLanguageEntity { Id = 102, Name = "Other", Code = "other", Description = "Other", },
+        }).ExecuteCommandAsync();
+
+        var result = Assert.Single(await CreateLanguageService().SelectAsync(new BaseSelectPageRequest { SearchKey = searchKey, }));
+
+        Assert.Equal(101, result.Id);
+        Assert.Equal("en", result.Value);
+        Assert.Equal("Latin", result.Label);
+    }
+
+    private async Task SeedPlatformsAsync()
+    {
+        await _database.Insertable(new[]
+        {
+            new GlobalPlatformEntity { Id = 201, Name = "Android", Description = null!, IsDeleted = false, },
+            new GlobalPlatformEntity { Id = 202, Name = "Android alternative", Description = "Mobile", IsDeleted = false, },
+            new GlobalPlatformEntity { Id = 203, Name = "Deleted Android", Description = "Mobile", IsDeleted = true, },
+            new GlobalPlatformEntity { Id = 204, Name = "Other", Description = "Mobile", IsDeleted = false, },
+        }).ExecuteCommandAsync();
+    }
+
+    private GlobalPlatformService CreatePlatformService()
+    {
+        return new GlobalPlatformService(new SqlSugarRepository<GlobalPlatformEntity> { Context = _database, });
     }
 
     private GlobalLanguageService CreateLanguageService()
