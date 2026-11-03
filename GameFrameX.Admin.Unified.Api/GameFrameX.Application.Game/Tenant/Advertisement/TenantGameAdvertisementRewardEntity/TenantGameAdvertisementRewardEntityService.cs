@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using GameFrameX.Application.Game.App.AppScope;
 using GameFrameX.Application.Game.Tenant.Advertisement.TenantGameAdvertisementRewardEntity.Dto;
 
 #pragma warning disable CS8602, CS8604, CS8629 // SqlSugar WhereIF(condition, lambda)：lambda 仅在 condition=true 时执行；NRT 无法跨方法传播条件守卫，lambda 内 .Trim() 实际安全
@@ -45,9 +44,7 @@ public class TenantGameAdvertisementRewardEntityService
     /// </summary>
     protected override ISugarQueryable<TenantGameAdvertisementRewardEntityResponse> BuildPageQuery(PageTenantGameAdvertisementRewardEntityRequest input)
     {
-        var appId = AppScopeRules.EnsureFactAppId(input.AppId, "广告奖励账本");
         return Repository.AsQueryable()
-                         .Where(u => u.AppId == appId)
                          .WhereIF(!string.IsNullOrWhiteSpace(input.Provider), u => u.Provider == input.Provider)
                          .WhereIF(!string.IsNullOrWhiteSpace(input.TransactionId), u => u.TransactionId == input.TransactionId)
                          .WhereIF(!string.IsNullOrWhiteSpace(input.RoleId), u => u.RoleId == input.RoleId)

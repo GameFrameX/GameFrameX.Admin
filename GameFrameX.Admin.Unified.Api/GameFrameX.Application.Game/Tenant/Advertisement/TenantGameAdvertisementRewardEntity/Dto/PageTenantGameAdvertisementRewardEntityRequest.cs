@@ -9,11 +9,6 @@ namespace GameFrameX.Application.Game.Tenant.Advertisement.TenantGameAdvertiseme
 public class PageTenantGameAdvertisementRewardEntityRequest : BaseAreaPageRequest
 {
     /// <summary>
-    /// 应用Id。账本为事实数据应用作用域，分页必须显式传入当前应用，缺失或小于等于 0 会被服务层拒绝。
-    /// </summary>
-    public long? AppId { get; set; }
-
-    /// <summary>
     /// 广告平台 Provider（等值匹配，标准化值 TopOn / GoogleAdMob / UnityAds）。
     /// </summary>
     public string Provider { get; set; } = null!;

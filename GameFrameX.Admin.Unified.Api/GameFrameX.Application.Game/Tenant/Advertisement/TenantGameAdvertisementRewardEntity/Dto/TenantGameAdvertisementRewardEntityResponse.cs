@@ -14,11 +14,6 @@ public class TenantGameAdvertisementRewardEntityResponse : IBasePageResponse<Ent
     public long Id { get; set; }
 
     /// <summary>
-    /// 应用Id。事实数据应用作用域（TenantId + AppId），跟随角色 AppId。
-    /// </summary>
-    public long AppId { get; set; }
-
-    /// <summary>
     /// 广告平台 Provider（TopOn / GoogleAdMob / UnityAds）。
     /// </summary>
     public string Provider { get; set; } = null!;
