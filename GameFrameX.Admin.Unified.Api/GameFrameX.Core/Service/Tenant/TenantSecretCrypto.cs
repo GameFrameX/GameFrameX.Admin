@@ -9,7 +9,7 @@ namespace GameFrameX.Core.Service.Tenant;
 /// 对象存储 ConfigJson 敏感字段等）落库前加密、使用前解密都必须经过本类，禁止调用方自行判断密文形态。
 /// <para>密文格式为 <c>enc:sec:v1:&lt;Base64&gt;</c>，底层复用 Foundation.Encryption 的 <see cref="AesHelper"/>（AES-GCM + PBKDF2 600,000 迭代派生）；
 /// 密钥取环境变量 <see cref="KeyEnvironmentVariable"/>（GFX_TENANT_SECRET_ENC_KEY），与连接串密钥 <c>GFX_TENANT_CONN_ENC_KEY</c> 相互独立。</para>
-/// <para>前缀刻意区别于 <see cref="TenantConnectionCrypto"/> 的 <c>enc:v1:</c>：两类密文互不认领，防止连接串密文被凭证收口误当明文透传（反之亦然）。</para>
+/// <para>前缀刻意区别于 历史连接串的 <c>enc:v1:</c>：两类密文互不认领，防止连接串密文被凭证收口误当明文透传（反之亦然）。</para>
 /// <para>兼容语义：无 <c>enc:sec:v1:</c> 前缀的存量值视为明文直通；未配置密钥时写入侧保持明文直存（降级模式，首次打一条告警），
 /// 读取侧遇到带前缀密文则抛错提示补配密钥，绝不静默把密文当明文使用（fail-closed）。</para>
 /// <para>性能约束：PBKDF2 派生开销大（单次数百毫秒级），加解密只允许发生在「配置加载」边界（进程级缓存 / 单次加载语义），

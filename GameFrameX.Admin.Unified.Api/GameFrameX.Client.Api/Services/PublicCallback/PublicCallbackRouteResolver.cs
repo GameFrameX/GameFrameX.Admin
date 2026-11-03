@@ -10,10 +10,10 @@ namespace GameFrameX.Client.Api.Services.PublicCallback;
 public sealed class PublicCallbackRouteResolver
 {
     private readonly ISqlSugarClient _db;
-    private readonly ClientApiTenantDbProvider _tenantDbProvider;
+    private readonly ISqlSugarClient _tenantDbProvider;
     private readonly AppCacheService _appCacheService;
 
-    public PublicCallbackRouteResolver(ISqlSugarClient db, ClientApiTenantDbProvider tenantDbProvider, AppCacheService appCacheService)
+    public PublicCallbackRouteResolver(ISqlSugarClient db, ISqlSugarClient tenantDbProvider, AppCacheService appCacheService)
     {
         _db = db;
         _tenantDbProvider = tenantDbProvider;
@@ -117,7 +117,7 @@ public sealed class PublicCallbackRouteResolver
 
     private bool PackageMatches(long tenantId, long appId, long packageId)
     {
-        var tenantDb = _tenantDbProvider.GetTenantDb(tenantId);
+        var tenantDb = _tenantDbProvider;
         return tenantDb.Queryable<TenantGameAppPackageEntity>()
                        .Any(u => u.Id == packageId &&
                                  u.TenantId == tenantId &&

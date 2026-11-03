@@ -149,12 +149,13 @@ public sealed class TenantMenuSyncWorker : BackgroundService
         {
             using (var scope = _scopeFactory.CreateScope())
             {
-                var tenantService = scope.ServiceProvider.GetRequiredService<SystemTenantService>();
                 var mainDb = scope.ServiceProvider.GetRequiredService<ISqlSugarClient>()
                                   .AsTenant()
                                   .GetConnectionScope(SqlSugarConst.MainConfigId);
 
-                var tenants = await tenantService.GetTenantDbListAsync();
+                var tenants = await mainDb.Queryable<SystemTenantEntity>()
+                    .Where(u => u.TenantType == TenantTypeEnum.Db && u.IsEnabled == true && u.ConfigId != SqlSugarConst.MainConfigId)
+                    .ToListAsync(stoppingToken);
                 var stateEntities = await mainDb.Queryable<SystemTenantMenuSyncStateEntity>()
                                                 .Filter(null, true)
                                                 .ToListAsync(stoppingToken);

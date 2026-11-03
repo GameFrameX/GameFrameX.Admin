@@ -39,54 +39,7 @@ public class SqlSugarDatabaseInitializationTests : IDisposable
     private readonly List<string> _dbPaths = new();
 
     [Fact]
-    public void InitTenantDatabase_CreatesTenantTablesOnly()
-    {
-        using var scope = CreateScope("main");
-        var config = CreateConfig("tenant_1001");
-
-        SqlSugarSetup.InitTenantDatabase(scope.AsTenant(), config, InitializationTypes);
-
-        var tenantDb = scope.GetConnectionScope("tenant_1001");
-        Assert.True(TableExists(tenantDb, typeof(TenantGameAppEntity)));
-        Assert.True(TableExists(tenantDb, typeof(TenantUserEntity)));
-        Assert.True(TableExists(tenantDb, typeof(TenantChannelDefinitionEntity)));
-        Assert.False(TableExists(tenantDb, typeof(SystemTenantEntity)));
-        Assert.False(TableExists(tenantDb, typeof(SystemUserEntity)));
-        Assert.False(TableExists(tenantDb, typeof(GlobalMenuEntity)));
-        Assert.False(TableExists(tenantDb, typeof(SystemConfigEntity)));
-        Assert.False(TableExists(tenantDb, typeof(GlobalConfigEntity)));
-        Assert.False(TableExists(tenantDb, typeof(GlobalDictionaryTypeEntity)));
-        Assert.False(TableExists(tenantDb, typeof(GlobalDictionaryDataEntity)));
-        Assert.False(TableExists(tenantDb, typeof(GlobalChannelDefinitionEntity)));
-        Assert.True(TableExists(tenantDb, typeof(TenantLogVisitEntity)));
-        Assert.True(TableExists(tenantDb, typeof(TenantLogOperationEntity)));
-        Assert.True(TableExists(tenantDb, typeof(TenantLogDiffEntity)));
-        Assert.False(TableExists(tenantDb, typeof(SystemLogVisitEntity)));
-        Assert.False(TableExists(tenantDb, typeof(SystemLogOperationEntity)));
-        Assert.False(TableExists(tenantDb, typeof(SystemLogDiffEntity)));
-        Assert.Equal("tenant_game_app_entity", TableName(tenantDb, typeof(TenantGameAppEntity)));
-        Assert.Equal("tenant_user_entity", TableName(tenantDb, typeof(TenantUserEntity)));
-        Assert.Equal("tenant_channel_definition_entity", TableName(tenantDb, typeof(TenantChannelDefinitionEntity)));
-        Assert.Equal("tenant_log_operation_entity", TableName(tenantDb, typeof(TenantLogOperationEntity)));
-    }
-
-    [Fact]
-    public void InitTenantDatabase_WhenDatabaseInitializationDisabled_StillInitializesTenantTables()
-    {
-        using var scope = CreateScope("main");
-        var config = CreateConfig("tenant_1002");
-        config.DbSettings.EnableInitDb = false;
-
-        SqlSugarSetup.InitTenantDatabase(scope.AsTenant(), config, InitializationTypes);
-
-        var tenantDb = scope.GetConnectionScope("tenant_1002");
-        Assert.True(TableExists(tenantDb, typeof(TenantGameAppEntity)));
-        Assert.True(TableExists(tenantDb, typeof(TenantUserEntity)));
-        Assert.False(config.DbSettings.EnableInitDb);
-    }
-
-    [Fact]
-    public void InitDatabase_ForMainConfig_CreatesSystemAndGlobalTablesOnly()
+    public void InitDatabase_ForMainConfig_CreatesAllManagedTables()
     {
         using var scope = CreateScope("main");
         var config = CreateConfig("main");
@@ -102,15 +55,15 @@ public class SqlSugarDatabaseInitializationTests : IDisposable
         Assert.True(TableExists(mainDb, typeof(GlobalDictionaryTypeEntity)));
         Assert.True(TableExists(mainDb, typeof(GlobalDictionaryDataEntity)));
         Assert.True(TableExists(mainDb, typeof(GlobalChannelDefinitionEntity)));
-        Assert.False(TableExists(mainDb, typeof(TenantUserEntity)));
-        Assert.False(TableExists(mainDb, typeof(TenantChannelDefinitionEntity)));
-        Assert.False(TableExists(mainDb, typeof(TenantGameAppEntity)));
+        Assert.True(TableExists(mainDb, typeof(TenantUserEntity)));
+        Assert.True(TableExists(mainDb, typeof(TenantChannelDefinitionEntity)));
+        Assert.True(TableExists(mainDb, typeof(TenantGameAppEntity)));
         Assert.True(TableExists(mainDb, typeof(SystemLogVisitEntity)));
         Assert.True(TableExists(mainDb, typeof(SystemLogOperationEntity)));
         Assert.True(TableExists(mainDb, typeof(SystemLogDiffEntity)));
-        Assert.False(TableExists(mainDb, typeof(TenantLogVisitEntity)));
-        Assert.False(TableExists(mainDb, typeof(TenantLogOperationEntity)));
-        Assert.False(TableExists(mainDb, typeof(TenantLogDiffEntity)));
+        Assert.True(TableExists(mainDb, typeof(TenantLogVisitEntity)));
+        Assert.True(TableExists(mainDb, typeof(TenantLogOperationEntity)));
+        Assert.True(TableExists(mainDb, typeof(TenantLogDiffEntity)));
         Assert.Equal("system_log_operation_entity", TableName(mainDb, typeof(SystemLogOperationEntity)));
         Assert.Equal("system_user_entity", TableName(mainDb, typeof(SystemUserEntity)));
         Assert.Equal("system_tenant_entity", TableName(mainDb, typeof(SystemTenantEntity)));

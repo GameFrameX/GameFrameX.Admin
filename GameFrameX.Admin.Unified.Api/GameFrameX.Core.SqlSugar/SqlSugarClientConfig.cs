@@ -45,9 +45,9 @@ public static class SqlSugarClientConfig
                                                            entityInfo.PropertyName == nameof(EntityTenantBase.TenantId) &&
                                                            entityInfo.EntityValue is ITenantIdFilter)
                                                        {
-                                                           var currentTenantId = (long)entityInfo.EntityValue.GetType()
+                                                           var currentTenantId = (long?)entityInfo.EntityValue.GetType()
                                                                                                  .GetProperty(nameof(EntityTenantBase.TenantId))!
-                                                                                                 .GetValue(entityInfo.EntityValue)!;
+                                                                                                 .GetValue(entityInfo.EntityValue) ?? 0;
                                                            if (currentTenantId == 0)
                                                            {
                                                                var tenantId = tenantIdResolver.GetTenantId();

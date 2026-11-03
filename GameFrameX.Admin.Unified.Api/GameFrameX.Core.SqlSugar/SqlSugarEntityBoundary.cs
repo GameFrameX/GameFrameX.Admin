@@ -32,13 +32,13 @@ public static class SqlSugarEntityBoundary
 
     public static bool IsMainDatabaseTable(Type entityType)
     {
-        var ownership = GetOwnership(entityType);
-        return ownership == DatabaseOwnership.System || ownership == DatabaseOwnership.Global;
+        _ = GetOwnership(entityType);
+        return true;
     }
 
     public static bool RequiresTenantContext(Type entityType)
     {
-        return IsTenantTable(entityType);
+        return false;
     }
 
     /// <summary>

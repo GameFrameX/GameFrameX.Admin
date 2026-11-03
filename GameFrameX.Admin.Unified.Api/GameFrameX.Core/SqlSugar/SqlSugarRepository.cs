@@ -1,5 +1,4 @@
 using GameFrameX.Core.Extension.Const;
-using GameFrameX.Core.Service.Tenant;
 using GameFrameX.Foundation.Orm.Entity;
 
 namespace GameFrameX.Core.SqlSugar;
@@ -14,62 +13,10 @@ public class SqlSugarRepository<T> : SimpleClient<T> where T : EntityBase, new()
     {
     }
 
-    public SqlSugarRepository(ISqlSugarClient sqlSugarClient, TenantDbConnectionProvider tenantDbConnectionProvider)
+    public SqlSugarRepository(ISqlSugarClient sqlSugarClient)
     {
-        var tenant = sqlSugarClient.AsTenant();
-        base.Context = tenant.GetConnectionScope(SqlSugarConst.MainConfigId);
-
-        var entityType = typeof(T);
-        SqlSugarEntityBoundary.EnsureSingleBoundary(entityType);
-
-        // 若实体贴有多库特性，则返回指定库连接
-        if (SqlSugarEntityBoundary.IsExternalSpecificTable(entityType))
-        {
-            base.Context = tenant.GetConnectionScopeWithAttr<T>();
-            return;
-        }
-
-        // 平台主库表始终返回默认库连接
-        if (SqlSugarEntityBoundary.IsPlatformTable(entityType))
-        {
-            base.Context = tenant.GetConnectionScope(SqlSugarConst.MainConfigId);
-            return;
-        }
-
-        if (!SqlSugarEntityBoundary.IsTenantTable(entityType))
-        {
-            return;
-        }
-
-        var parsedTenantId = TenantOperationContext.GetEffectiveTenantId();
-        if (!parsedTenantId.HasValue)
-        {
-            throw BusinessError.Oh(SystemUserErrorCode.NoPermission);
-        }
-
-        // 根据租户Id切换库连接, 为空则返回默认库连接
-        var sqlSugarScopeProvider = tenantDbConnectionProvider.GetTenantDbConnectionScope(parsedTenantId.Value);
-        if (sqlSugarScopeProvider == null)
-        {
-            if (SqlSugarEntityBoundary.RequiresTenantContext(entityType))
-            {
-                throw BusinessError.Oh(SystemUserErrorCode.NoPermission);
-            }
-
-            return;
-        }
-
-        base.Context = sqlSugarScopeProvider;
-    }
-
-    /// <summary>
-    /// 供派生仓储使用的构造函数。派生类自行负责租户路由与 <see cref="SimpleClient{T}.Context"/> 绑定，
-    /// 跳过本类默认的实体边界校验与租户库路由。
-    /// </summary>
-    /// <param name="skipRouting">固定传 <c>true</c>，仅用于与公共无参构造函数区分签名。</param>
-    protected SqlSugarRepository(bool skipRouting)
-    {
-        // 派生仓储自行解析数据库连接，基类不做任何路由。
+        ArgumentNullException.ThrowIfNull(sqlSugarClient);
+        Context = sqlSugarClient.AsTenant().GetConnectionScope(SqlSugarConst.MainConfigId);
     }
 
     /// <summary>

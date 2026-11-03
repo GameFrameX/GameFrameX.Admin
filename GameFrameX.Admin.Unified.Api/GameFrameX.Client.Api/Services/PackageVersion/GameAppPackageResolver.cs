@@ -21,10 +21,10 @@ namespace GameFrameX.Client.Api.Services.PackageVersion;
 public class GameAppPackageResolver
 {
     private readonly ConcurrentDictionary<long, TenantPackageCache> _tenantCaches = new();
-    private readonly ClientApiTenantDbProvider _tenantDbProvider;
+    private readonly ISqlSugarClient _tenantDbProvider;
     private readonly ISqlSugarTenantIdResolver _tenantIdResolver;
 
-    public GameAppPackageResolver(ClientApiTenantDbProvider tenantDbProvider, ISqlSugarTenantIdResolver tenantIdResolver)
+    public GameAppPackageResolver(ISqlSugarClient tenantDbProvider, ISqlSugarTenantIdResolver tenantIdResolver)
     {
         _tenantDbProvider = tenantDbProvider;
         _tenantIdResolver = tenantIdResolver;
@@ -74,7 +74,7 @@ public class GameAppPackageResolver
     /// </summary>
     private TenantPackageCache RefreshCacheIfChanged(long tenantId)
     {
-        var db = _tenantDbProvider.GetTenantDb(tenantId);
+        var db = _tenantDbProvider;
         var signal = GetSignal(db);
         if (_tenantCaches.TryGetValue(tenantId, out var existing) && existing.Signal == signal)
         {

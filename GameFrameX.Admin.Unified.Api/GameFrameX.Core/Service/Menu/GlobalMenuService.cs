@@ -24,7 +24,7 @@ public class GlobalMenuService : IAdminApiController
     private readonly SqlSugarRepository<GlobalMenuEntity> _systemMenuRepository;
     private readonly SystemCacheService _systemCacheService;
     private readonly IServiceProvider _serviceProvider;
-    private readonly TenantDbConnectionProvider _tenantDbConnectionProvider;
+    private readonly ISqlSugarClient _tenantDbConnectionProvider;
     private readonly ISqlSugarClient _sqlSugarClient;
 
     static GlobalMenuService()
@@ -38,7 +38,7 @@ public class GlobalMenuService : IAdminApiController
         SqlSugarRepository<GlobalMenuEntity> systemMenuRepository,
         SystemCacheService systemCacheService,
         IServiceProvider serviceProvider,
-        TenantDbConnectionProvider tenantDbConnectionProvider,
+        ISqlSugarClient tenantDbConnectionProvider,
         ISqlSugarClient sqlSugarClient)
     {
         _currentUserContext = currentUserContext;
@@ -259,7 +259,7 @@ public class GlobalMenuService : IAdminApiController
                             .ToList();
         foreach (var tenantEntity in tenants)
         {
-            var tenantDb = _tenantDbConnectionProvider.GetTenantDbConnectionScope(tenantEntity.Id);
+            var tenantDb = _tenantDbConnectionProvider;
             if (tenantDb == null)
             {
                 continue;

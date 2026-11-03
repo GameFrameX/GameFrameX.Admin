@@ -15,7 +15,7 @@ public static class TenantEmailConfigSelector
     /// <summary>
     /// 按租户上下文 + 用途从租户库挑选最佳配置；未找到返回 null。
     /// </summary>
-    /// <param name="db">租户库 SqlSugar 客户端，由调用方通过 <c>ClientApiTenantDbProvider</c> 获取。</param>
+    /// <param name="db">租户库 SqlSugar 客户端，由调用方通过 <c>ISqlSugarClient</c> 获取。</param>
     /// <param name="context">当前请求的租户解析结果（<c>TenantId</c> + <c>AppId</c>）。</param>
     /// <param name="purpose">租户业务邮件用途。传 0 视为通配，匹配 <c>Purpose=0</c> 的配置。</param>
     /// <param name="cancellationToken">取消令牌。</param>

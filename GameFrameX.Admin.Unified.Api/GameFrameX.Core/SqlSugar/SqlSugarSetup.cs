@@ -46,7 +46,6 @@ public static class SqlSugarSetup
 
         var dbOptions = configuration.GetSection("DbConnection").Get<DbConnectionOptions>() ?? new DbConnectionOptions();
         dbOptions.PostConfigure(dbOptions, configuration);
-        ConfigureSystemTenantSeedData(dbOptions, effectiveTypes);
 
         dbOptions.ConnectionConfigs.ForEach(SetDbConfig);
 
@@ -70,26 +69,7 @@ public static class SqlSugarSetup
         {
             InitDatabase(sqlSugar, config, effectiveTypes);
 
-            // main 恒为 ConnectionConfigs 首项（DeriveDefaultTenantDatabase 只在尾部追加默认租户项）：
-            // 此处主库已就绪、默认租户项尚未初始化——注册租户 PG 角色自愈窗口（GFX-727 后遗留形态：
-            // 角色被清而注册表仍在，默认租户项 CreateDatabase 将以 28P01 裸栈崩溃，先按注册表重建缺失角色）。
-            // 口径与边界见 PostgreSqlTenantDatabaseProvisioner.EnsureRegisteredTenantRoles。
-            if (config.ConfigId?.ToString() == SqlSugarConst.MainConfigId)
-            {
-                var roleHealReport = PostgreSqlTenantDatabaseProvisioner.EnsureRegisteredTenantRoles(sqlSugar.GetConnectionScope(config.ConfigId), config, dbOptions);
-                if (roleHealReport.HealedRoles.Count > 0)
-                {
-                    // static Log 未接线（NullLogger 会吞警告），启动期运维可见输出走 Console（同菜单自愈清理先例）
-                    Console.WriteLine($"[Warning] 注册租户 PG 角色启动自愈：重建 {roleHealReport.HealedRoles.Count} 个缺失角色（密码取注册表连接串，权限矩阵已归位）：{string.Join(", ", roleHealReport.HealedRoles)}。");
-                }
-
-                foreach (var roleHealFailure in roleHealReport.Failures)
-                {
-                    Console.WriteLine($"[Error] 注册租户 PG 角色启动自愈失败：{roleHealFailure}");
-                }
-            }
         }
-        InitDefaultTenantDatabase(sqlSugar, dbOptions, effectiveTypes);
     }
 
     /// <summary>
@@ -465,15 +445,7 @@ public static class SqlSugarSetup
             var entityTypes = effectiveTypes.Where(u => !u.IsInterface && !u.IsAbstract && u.IsClass && u.IsDefined(typeof(SugarTable), false))
                                             .WhereIF(config.TableSettings.EnableIncreTable, u => u.IsDefined(typeof(IncrementTableAttribute), false)).ToList();
 
-            if (config.ConfigId.ToString() == SqlSugarConst.MainConfigId) // 默认库
-            {
-                entityTypes = entityTypes.Where(SqlSugarEntityBoundary.IsMainDatabaseTable).ToList();
-            }
-            else
-            {
-                entityTypes = entityTypes.Where(SqlSugarEntityBoundary.IsTenantTable).ToList();
-            }
-
+            entityTypes = entityTypes.Where(SqlSugarEntityBoundary.IsMainDatabaseTable).ToList();
 
             foreach (var entityType in entityTypes)
             {
@@ -511,20 +483,7 @@ public static class SqlSugarSetup
             foreach (var seedType in seedDataTypes)
             {
                 var entityType = seedType.GetInterfaces().First().GetGenericArguments().First();
-                if (config.ConfigId.ToString() == SqlSugarConst.MainConfigId) // 默认库
-                {
-                    if (!SqlSugarEntityBoundary.IsMainDatabaseTable(entityType))
-                    {
-                        continue;
-                    }
-                }
-                else
-                {
-                    if (!SqlSugarEntityBoundary.IsTenantTable(entityType))
-                    {
-                        continue;
-                    }
-                }
+                _ = SqlSugarEntityBoundary.GetOwnership(entityType);
 
                 var instance = Activator.CreateInstance(seedType);
                 var hasDataMethod = seedType.GetMethod("HasData");
@@ -650,209 +609,6 @@ public static class SqlSugarSetup
 
             return;
         }
-    }
-
-    /// <summary>
-    /// MySQL 建库后强制 utf8mb4 字符集：server 默认字符集不可控（MySQL 8 默认 utf8mb4，5.7/旧 MariaDB 默认 latin1），
-    /// CreateDatabase() 不带字符集子句，中文数据不允许落 latin1。幂等 ALTER 库默认字符集，
-    /// 调用点在 CodeFirst 建表之前，无存量表需要转换；MySql 与 MySqlConnector 两 DbType 共用（MySqlConnector builder 解析连接串取库名）。
-    /// </summary>
-    private static void EnsureMySqlDatabaseUtf8Mb4(SqlSugarScopeProvider db, DbConnectionConfig config)
-    {
-        var databaseName = new MySqlConnectionStringBuilder(config.ConnectionString).Database;
-        if (string.IsNullOrWhiteSpace(databaseName))
-        {
-            return;
-        }
-
-        db.Ado.ExecuteCommand(
-            $"ALTER DATABASE `{databaseName.Replace("`", "``")}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
-    }
-
-    private static void ConfigureSystemTenantSeedData(DbConnectionOptions dbOptions, IEnumerable<Type> effectiveTypes)
-    {
-        var seedType = effectiveTypes.FirstOrDefault(type => type.FullName == "GameFrameX.Application.SeedData.System.SystemTenantSeedData");
-        seedType?.GetMethod("Configure", BindingFlags.Public | BindingFlags.Static)?.Invoke(null, new object[] { dbOptions, });
-    }
-
-    /// <summary>
-    /// 初始化租户业务数据库
-    /// </summary>
-    /// <param name="iTenant"></param>
-    /// <param name="config"></param>
-    public static void InitTenantDatabase(ITenant iTenant, DbConnectionConfig config)
-    {
-        InitTenantDatabase(iTenant, config, ProjectTypeCatalog.EffectiveTypes);
-    }
-
-    internal static void InitTenantDatabase(ITenant iTenant, DbConnectionConfig config, IEnumerable<Type> effectiveTypes)
-    {
-        SetDbConfig(config);
-
-        if (!iTenant.IsAnyConnection(config.ConfigId.ToString()))
-        {
-            iTenant.AddConnection(config);
-        }
-
-        var db = iTenant.GetConnectionScope(config.ConfigId.ToString());
-        if (config.DbSettings?.EnableInitDb == true)
-        {
-            if (config.DbType == DbType.Sqlite)
-            {
-                // 同 InitDatabase：SqlSugar 的 SQLite CreateDatabase 会把 ./db/x.db 抠成 /db/ 根目录路径（macOS 只读根卷启动即崩），
-                // 改为自行确保 DataSource 父目录存在，库文件由后续首次打开连接时创建
-                EnsureSqliteDataDirectory(config.ConnectionString);
-            }
-            else
-            {
-                db.DbMaintenance.CreateDatabase();
-                if (config.DbType == DbType.MySql || config.DbType == DbType.MySqlConnector)
-                {
-                    EnsureMySqlDatabaseUtf8Mb4(db, config);
-                }
-            }
-        }
-
-        // 初始化租户库表结构。
-        var entityTypes = effectiveTypes.Where(u => !u.IsInterface && !u.IsAbstract && u.IsClass && u.IsDefined(typeof(SugarTable), false) &&
-                                                    SqlSugarEntityBoundary.IsTenantTable(u)).ToList();
-        if (!entityTypes.Any())
-        {
-            return;
-        }
-
-        EnsureLegacyColumnMigrations(db);
-
-        foreach (var entityType in entityTypes)
-        {
-            var splitTable = entityType.GetCustomAttribute<SplitTableAttribute>();
-            if (splitTable == null)
-            {
-                db.CodeFirst.InitTables(entityType);
-            }
-            else
-            {
-                db.CodeFirst.SplitTables().InitTables(entityType);
-            }
-        }
-    }
-
-    /// <summary>
-    /// 存量租户库的列类型演化自愈：CodeFirst 的 ALTER COLUMN TYPE DDL 不带 USING 子句，
-    /// PG 对无隐式 cast 的类型变更（如 varchar→bigint，42804）会直接启动崩溃。
-    /// 列存在且仍为字符串类型时先显式 USING 转换（非数字存量值归 0），再交给 InitTables 常规演化。
-    /// 幂等：列不存在（新建库）或已是目标类型时无操作。新增条目见各迁移私有方法注释。
-    /// </summary>
-    private static void EnsureLegacyColumnMigrations(ISqlSugarClient db)
-    {
-        // SQLite 测试库无 information_schema（其它无目录视图的 provider 同理），只在有目录视图的库上执行
-        var dbType = db.CurrentConnectionConfig.DbType;
-        if (dbType != DbType.PostgreSQL && dbType != DbType.MySql && dbType != DbType.MySqlConnector)
-        {
-            return;
-        }
-
-        MigrateCommodityCategoryIdColumnToBigInt(db);
-    }
-
-    /// <summary>
-    /// C391（GFX-923 / Api#291）：tenant_game_commodity_entity.category_id varchar→bigint。
-    /// 该表因新增接口自上线即 NRE 从未写入过业务行，列内容只可能是空/脏字符串，非数字值统一归 0。
-    /// ponytail: 一次性迁移残留，全量存量租户库演化完成后可删除本方法及其调用。
-    /// </summary>
-    private static void MigrateCommodityCategoryIdColumnToBigInt(ISqlSugarClient db)
-    {
-        var columnType = db.Ado.SqlQuery<string>(
-            "SELECT data_type FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'tenant_game_commodity_entity' AND column_name = 'category_id'");
-        if (columnType.Count == 0 || (columnType[0] != "character varying" && columnType[0] != "varchar"))
-        {
-            return;
-        }
-
-        db.Ado.ExecuteCommand(
-            "ALTER TABLE public.tenant_game_commodity_entity ALTER COLUMN category_id TYPE bigint " +
-            "USING CASE WHEN category_id ~ '^[0-9]+$' THEN category_id::bigint ELSE 0 END");
-    }
-
-    internal static void InitDefaultTenantDatabase(SqlSugarScope db, DbConnectionOptions dbOptions, IEnumerable<Type> effectiveTypes)
-    {
-        InitDefaultTenantDatabase(db, dbOptions, effectiveTypes, null);
-    }
-
-    internal static void InitDefaultTenantDatabase(SqlSugarScope db, DbConnectionOptions dbOptions, IEnumerable<Type> effectiveTypes, string? encryptedDefaultPassword)
-    {
-        var mainDb = db.GetConnectionScope(SqlSugarConst.MainConfigId);
-        var defaultTenantId = TenantDefaultDataTemplates.MainTenantId;
-        var defaultTenantConfigId = defaultTenantId.ToString();
-        var tenant = mainDb.Queryable<SystemTenantEntity>()
-                           .Filter(null, true)
-                           .First(u => u.Id == defaultTenantId);
-        if (tenant == null)
-        {
-            return;
-        }
-
-        if (tenant.ConfigId == SqlSugarConst.MainConfigId || tenant.ConfigId != defaultTenantConfigId)
-        {
-            throw new InvalidOperationException($"默认租户必须使用独立租户库，ConfigId 必须为 {defaultTenantConfigId}。");
-        }
-
-        if (tenant.TenantType != TenantTypeEnum.Db)
-        {
-            throw new InvalidOperationException("默认租户必须使用库隔离。");
-        }
-
-        var mainConfig = dbOptions.ConnectionConfigs.First(u => u.ConfigId.ToString() == SqlSugarConst.MainConfigId);
-        var tenantConfig = dbOptions.ConnectionConfigs.FirstOrDefault(u => u.ConfigId?.ToString() == defaultTenantConfigId);
-        if (tenantConfig == null || string.IsNullOrWhiteSpace(tenantConfig.ConnectionString))
-        {
-            throw new InvalidOperationException($"默认租户库连接配置缺失，请在 DbConnection.ConnectionConfigs 中配置 ConfigId={defaultTenantConfigId}，且连接串必须指向独立租户库。");
-        }
-
-        if (string.Equals(tenantConfig.ConnectionString, mainConfig.ConnectionString, StringComparison.OrdinalIgnoreCase))
-        {
-            throw new InvalidOperationException("默认租户库连接串不能复用平台主库连接串。");
-        }
-
-        tenantConfig.ConfigId = defaultTenantConfigId;
-        tenantConfig.DbSettings ??= new DbSettings();
-        tenantConfig.TableSettings ??= new TableSettings();
-        tenantConfig.SeedSettings ??= new SeedSettings();
-        tenantConfig.DbSettings.EnableDiffLog = false;
-
-        // GFX-727：connection 对账/落库必须走 TenantConnectionCrypto 收口——库内 enc:v1: 密文与 ConnectionConfigs
-        // 明文串直接比较永不相等，启动对账会把迁移回写的密文盖回明文；比较用解密后的明文，回写按密钥状态加密。
-        // 配钥环境下存量明文（历史版本未走收口写入的残留）一并收敛为密文形态
-        var storedConnection = TenantConnectionCrypto.Decrypt(tenant.Connection);
-        var hasEncryptionKey = !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable(TenantConnectionCrypto.KeyEnvironmentVariable));
-        if (tenant.DbType != tenantConfig.DbType
-            || storedConnection != tenantConfig.ConnectionString
-            || (hasEncryptionKey && !TenantConnectionCrypto.IsEncrypted(tenant.Connection))
-            || tenant.ConfigId != defaultTenantConfigId
-            || tenant.PackageId != TenantDefaultDataTemplates.EnterprisePackageId)
-        {
-            tenant.DbType = tenantConfig.DbType;
-            tenant.Connection = TenantConnectionCrypto.Encrypt(tenantConfig.ConnectionString);
-            tenant.ConfigId = defaultTenantConfigId;
-            tenant.PackageId = TenantDefaultDataTemplates.EnterprisePackageId;
-            mainDb.Updateable(tenant)
-                  .UpdateColumns(u => new { u.DbType, u.Connection, u.ConfigId, u.PackageId, })
-                  .ExecuteCommand();
-        }
-
-        // C354 T2：Enterprise 套餐菜单启动幂等补全（收敛 global_package_menu = 种子目录全集）。
-        // 必须先于 TenantMenuSyncWorker 首扫（HostedService 晚于 AddSqlSugar）——「补全先于纳入」，
-        // 默认租户纳入同步范围（C354 T6）后首扫拿到的闭包即 C189 全量，无振荡窗口。
-        EnterprisePackageMenuCompletion.EnsureCompleted(mainDb);
-
-        InitTenantDatabase(db.AsTenant(), tenantConfig, effectiveTypes);
-
-        var defaultPassword = mainDb.Queryable<SystemConfigEntity>()
-                                    .First(u => u.Code == CommonConst.SysPassword)
-                                    ?.Value ?? "123456";
-        var encryptedPassword = encryptedDefaultPassword ?? CryptogramUtility.HashPassword(defaultPassword);
-        var tenantDb = db.GetConnectionScope(defaultTenantConfigId);
-        DefaultTenantDatabaseSeeder.Seed(tenantDb, tenant, encryptedPassword);
     }
 
     private static string? GetCurrentUserDisplayName(IHttpContextAccessor httpContextAccessor)

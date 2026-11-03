@@ -428,7 +428,7 @@ public sealed class GameUserPayTests
     /// </summary>
     private static IClientApiTenantOptionsProvider CreateOptionsProvider(ClientApiTestDb db, bool withAppContext)
     {
-        var tenantDbProvider = new ClientApiTenantDbProvider(db.MainDb, db.TenantIdResolver);
+        var tenantDbProvider = db.MainDb;
         var accessor = new HttpContextAccessor { HttpContext = db.CreateHttpContext(true, withAppContext), };
         return new ClientApiTenantOptionsProvider(tenantDbProvider, accessor);
     }
@@ -436,15 +436,15 @@ public sealed class GameUserPayTests
     private static Repository<TenantGameOrderEntity> CreatePayRepository(ClientApiTestDb db)
     {
         db.InitTenantTables(typeof(TenantGameOrderEntity));
-        var tenantDbProvider = new ClientApiTenantDbProvider(db.MainDb, db.TenantIdResolver);
-        return new Repository<TenantGameOrderEntity>(db.MainDb, tenantDbProvider, db.TenantIdResolver);
+        var tenantDbProvider = db.MainDb;
+        return new Repository<TenantGameOrderEntity>(db.MainDb);
     }
 
     private static Repository<TenantClientApiPolicyEntity> CreatePolicyRepository(ClientApiTestDb db)
     {
         db.InitTenantTables(typeof(TenantClientApiPolicyEntity));
-        var tenantDbProvider = new ClientApiTenantDbProvider(db.MainDb, db.TenantIdResolver);
-        return new Repository<TenantClientApiPolicyEntity>(db.MainDb, tenantDbProvider, db.TenantIdResolver);
+        var tenantDbProvider = db.MainDb;
+        return new Repository<TenantClientApiPolicyEntity>(db.MainDb);
     }
 
     private static GameUserPayCreateRequest MakeCreate(long userId, string sku, int payChannel = 100)

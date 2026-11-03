@@ -119,7 +119,7 @@ public class SeedInsertOnlyTests : IDisposable
         using (var scope = CreateScope("tenant_2001"))
         {
             var tenantConfig = CreateConfig("tenant_2001");
-            SqlSugarSetup.InitTenantDatabase(scope.AsTenant(), tenantConfig, new[] { typeof(TenantRoleEntity), });
+            SqlSugarSetup.InitDatabase(scope, tenantConfig, new[] { typeof(TenantRoleEntity), });
 
             var tenantDb = scope.GetConnectionScope("tenant_2001");
             var role = new TenantRoleEntity { Id = 99001, TenantId = 2001, Name = "初始角色", Code = "init_role", };

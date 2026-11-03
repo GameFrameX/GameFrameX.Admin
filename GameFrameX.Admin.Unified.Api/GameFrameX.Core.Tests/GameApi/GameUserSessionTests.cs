@@ -268,8 +268,8 @@ public sealed class GameUserSessionTests
     private static Repository<T> CreateRepository<T>(ClientApiTestDb db) where T : GameFrameX.Foundation.Orm.Entity.EntityBase, new()
     {
         db.InitTenantTables(typeof(T));
-        var tenantDbProvider = new ClientApiTenantDbProvider(db.MainDb, db.TenantIdResolver);
-        return new Repository<T>(db.MainDb, tenantDbProvider, db.TenantIdResolver);
+        var tenantDbProvider = db.MainDb;
+        return new Repository<T>(db.MainDb);
     }
 
     private static GameUserSessionLoginRequest MakeLogin(long userId, string deviceModel = "SM-G991B")

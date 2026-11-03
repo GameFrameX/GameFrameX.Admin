@@ -18,52 +18,6 @@ public static class DefaultTenantDatabaseSeeder
     private const long DefaultCreatedTime = 1745836800;
     private const string DefaultCreatedName = "租管";
 
-    public static void Seed(SqlSugarScopeProvider tenantDb, SystemTenantEntity tenant, string encryptedPassword)
-    {
-        var orgs = BuildOrganizations(tenant.Id, tenant.OrganizationId);
-        var roles = BuildRoles(tenant.Id);
-        var positions = BuildPositions(tenant.Id);
-        var adminRole = roles.Single(u => u.Code == TenantDefaultDataTemplates.AdminRoleCode);
-        var adminPosition = positions.Single(u => u.Code == TenantDefaultDataTemplates.AdminPositionCode);
-        var adminUser = SystemTenantService.CreateTenantAdminUser(
-            new TenantResponse
-            {
-                Id = tenant.Id,
-                AdminAccount = "admin",
-                Email = TenantDefaultDataTemplates.DefaultAdminEmail,
-                Phone = TenantDefaultDataTemplates.DefaultAdminPhone,
-                Name = tenant.Remark ?? "默认租户",
-            },
-            encryptedPassword,
-            tenant.OrganizationId,
-            adminPosition.Id);
-        adminUser.Id = tenant.UserId;
-
-        var userRoles = new[]
-        {
-            new TenantUserRoleEntity
-            {
-                Id = StableSeedId.UserRole(tenant.Id, adminUser.Id, adminRole.Id),
-                UserId = adminUser.Id,
-                RoleId = adminRole.Id,
-            },
-        };
-
-        var roleMenus = MenuSeedCatalog.BuildRoleMenus(adminRole.Id, adminRole.Code ?? string.Empty);
-
-        Upsert(tenantDb, orgs);
-        Upsert(tenantDb, roles);
-        Upsert(tenantDb, positions);
-        Upsert(tenantDb, new[] { adminUser, });
-        Upsert(tenantDb, userRoles);
-        Upsert(tenantDb, roleMenus);
-        // C189：Upsert 只能补入/更新本次 BuildRoleMenus 产出的行，无法删除 SyncRoles 减少后残留的 role-menu。
-        // 以当前 SyncRoles 为权威删除多余授权，使默认租户管理员 role-menu 随 seed SyncRoles 变更幂等收敛。
-        ReconcileAdminRoleMenus(tenantDb, adminRole.Id, adminRole.Code ?? string.Empty);
-        SeedDefaultObjectStorageConfigIfEmpty(tenantDb, tenant.Id);
-        SeedDefaultTenantBusinessDataIfEmpty(tenantDb, tenant.Id, tenant.UserId);
-    }
-
     /// <summary>
     /// 为新租户构建默认启用的本地对象存储配置，保证租户开箱即用、上传不报错。
     /// </summary>

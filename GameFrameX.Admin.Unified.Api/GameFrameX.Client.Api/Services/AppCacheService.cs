@@ -11,11 +11,11 @@ namespace GameFrameX.Client.Api.Services;
 public class AppCacheService
 {
     private readonly ConcurrentDictionary<long, TenantAppCache> _tenantCaches = new();
-    private readonly ClientApiTenantDbProvider _tenantDbProvider;
+    private readonly ISqlSugarClient _tenantDbProvider;
     private readonly ISqlSugarTenantIdResolver _tenantIdResolver;
     private readonly object _refreshLock = new();
 
-    public AppCacheService(ClientApiTenantDbProvider tenantDbProvider, ISqlSugarTenantIdResolver tenantIdResolver)
+    public AppCacheService(ISqlSugarClient tenantDbProvider, ISqlSugarTenantIdResolver tenantIdResolver)
     {
         _tenantDbProvider = tenantDbProvider;
         _tenantIdResolver = tenantIdResolver;
@@ -94,7 +94,7 @@ public class AppCacheService
         // （C395 关联性实测间歇复现）。信号语义单调（轮换侧保证 UpdateTime 严格递增），可比较。
         lock (_refreshLock)
         {
-            var db = _tenantDbProvider.GetTenantDb(tenantId);
+            var db = _tenantDbProvider;
             db.QueryFilter.ClearAndBackup();
             try
             {

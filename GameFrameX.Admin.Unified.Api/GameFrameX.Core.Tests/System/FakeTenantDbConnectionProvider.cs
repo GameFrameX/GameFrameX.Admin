@@ -3,7 +3,7 @@ using SqlSugar;
 
 namespace GameFrameX.Core.Tests.System;
 
-internal sealed class FakeTenantDbConnectionProvider : ITenantDbConnectionProvider
+internal sealed class FakeTenantDbConnectionProvider
 {
     private readonly SqlSugarScope _client;
     private readonly string _tenantConfigId;
@@ -13,6 +13,8 @@ internal sealed class FakeTenantDbConnectionProvider : ITenantDbConnectionProvid
         _client = client;
         _tenantConfigId = tenantConfigId;
     }
+
+    public ISqlSugarClient Database => _client.GetConnectionScope(_tenantConfigId);
 
     public SqlSugarScopeProvider GetTenantDbConnectionScope(long tenantId)
     {

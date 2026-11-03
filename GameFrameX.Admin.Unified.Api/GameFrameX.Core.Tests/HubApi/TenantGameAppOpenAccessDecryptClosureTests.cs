@@ -117,7 +117,7 @@ public sealed class TenantGameAppOpenAccessDecryptClosureTests : IDisposable
     {
         var services = new ServiceCollection();
         services.AddSingleton<ISqlSugarClient>(_db.MainDb);
-        services.AddSingleton<ITenantDbProvider>(_db.TenantDbProvider);
+        services.AddSingleton<ISqlSugarClient>(_db.TenantDbProvider);
         services.AddSingleton<ISqlSugarTenantIdResolver>(_db.TenantIdResolver);
         services.AddScoped(typeof(Repository<>));
         return services.BuildServiceProvider();

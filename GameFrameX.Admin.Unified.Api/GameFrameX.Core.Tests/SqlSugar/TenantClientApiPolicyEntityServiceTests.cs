@@ -29,7 +29,7 @@ public sealed class TenantClientApiPolicyEntityServiceTests : IDisposable
     private TenantClientApiPolicyEntityService CreateService()
     {
         return new TenantClientApiPolicyEntityService(
-            new Repository<TenantClientApiPolicyEntity>(_db.MainDb, _db.TenantDbProvider, _db.TenantIdResolver),
+            new Repository<TenantClientApiPolicyEntity>(_db.MainDb),
             new GameFrameX.Core.Service.User.CurrentUserContext(new Microsoft.AspNetCore.Http.HttpContextAccessor()));
     }
 

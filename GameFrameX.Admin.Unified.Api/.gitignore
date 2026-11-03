@@ -19,6 +19,7 @@ error-codes.json
 # db/* 而非 db/：db/ 会整目录排除导致 !db/tenant-isolation/ 反排除失效（git 不进入被排除目录）
 db/*
 !db/tenant-isolation/
+!db/single-main/
 *.db
 .sonarqube
 postgres-data

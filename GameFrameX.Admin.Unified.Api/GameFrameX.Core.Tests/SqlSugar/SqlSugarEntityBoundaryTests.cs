@@ -34,22 +34,22 @@ public class SqlSugarEntityBoundaryTests
     {
         Assert.True(SqlSugarEntityBoundary.IsTenantTable(typeof(TenantGameAppDeviceEntity)));
         Assert.False(SqlSugarEntityBoundary.IsPlatformTable(typeof(TenantGameAppDeviceEntity)));
-        Assert.True(SqlSugarEntityBoundary.RequiresTenantContext(typeof(TenantGameAppDeviceEntity)));
+        Assert.False(SqlSugarEntityBoundary.RequiresTenantContext(typeof(TenantGameAppDeviceEntity)));
     }
 
     [Fact]
     public void TenantUser_IsTenantDatabase()
     {
-        Assert.False(SqlSugarEntityBoundary.IsMainDatabaseTable(typeof(TenantUserEntity)));
+        Assert.True(SqlSugarEntityBoundary.IsMainDatabaseTable(typeof(TenantUserEntity)));
         Assert.True(SqlSugarEntityBoundary.IsTenantTable(typeof(TenantUserEntity)));
-        Assert.True(SqlSugarEntityBoundary.RequiresTenantContext(typeof(TenantUserEntity)));
+        Assert.False(SqlSugarEntityBoundary.RequiresTenantContext(typeof(TenantUserEntity)));
         Assert.Equal("tenant_user_entity", SqlSugarEntityBoundary.GetPhysicalTableName(typeof(TenantUserEntity), nameof(TenantUserEntity)));
     }
 
     [Fact]
-    public void TenantGameEntity_IsNotInitializedInMainDatabase()
+    public void TenantGameEntity_IsInitializedInMainDatabase()
     {
-        Assert.False(SqlSugarEntityBoundary.IsMainDatabaseTable(typeof(TenantGameAppEntity)));
+        Assert.True(SqlSugarEntityBoundary.IsMainDatabaseTable(typeof(TenantGameAppEntity)));
     }
 
     [Fact]
@@ -82,15 +82,15 @@ public class SqlSugarEntityBoundaryTests
     [Fact]
     public void HostedSchedulerEntity_IsInitializedInMainDatabaseForCompatibility()
     {
-        Assert.False(SqlSugarEntityBoundary.IsMainDatabaseTable(typeof(TenantGameTimeJobEntity)));
+        Assert.True(SqlSugarEntityBoundary.IsMainDatabaseTable(typeof(TenantGameTimeJobEntity)));
         Assert.True(SqlSugarEntityBoundary.IsTenantTable(typeof(TenantGameTimeJobEntity)));
-        Assert.True(SqlSugarEntityBoundary.RequiresTenantContext(typeof(TenantGameTimeJobEntity)));
+        Assert.False(SqlSugarEntityBoundary.RequiresTenantContext(typeof(TenantGameTimeJobEntity)));
     }
 
     [Fact]
     public void OnlineUserEntity_IsInitializedInMainDatabaseForCompatibility()
     {
-        Assert.False(SqlSugarEntityBoundary.IsMainDatabaseTable(typeof(TenantOnlineUserEntity)));
+        Assert.True(SqlSugarEntityBoundary.IsMainDatabaseTable(typeof(TenantOnlineUserEntity)));
         Assert.True(SqlSugarEntityBoundary.IsTenantTable(typeof(TenantOnlineUserEntity)));
     }
 
@@ -109,7 +109,7 @@ public class SqlSugarEntityBoundaryTests
     {
         Assert.False(SqlSugarEntityBoundary.IsPlatformTable(typeof(TenantLogOperationEntity)));
         Assert.True(SqlSugarEntityBoundary.IsTenantTable(typeof(TenantLogOperationEntity)));
-        Assert.True(SqlSugarEntityBoundary.RequiresTenantContext(typeof(TenantLogOperationEntity)));
+        Assert.False(SqlSugarEntityBoundary.RequiresTenantContext(typeof(TenantLogOperationEntity)));
         Assert.Equal("tenant_log_operation_entity", SqlSugarEntityBoundary.GetPhysicalTableName(typeof(TenantLogOperationEntity), nameof(TenantLogOperationEntity)));
     }
 
@@ -167,9 +167,9 @@ public class SqlSugarEntityBoundaryTests
         Assert.False(SqlSugarEntityBoundary.IsTenantTable(typeof(SystemEmailProviderEntity)));
         Assert.Equal("system_email_provider_entity", SqlSugarEntityBoundary.GetPhysicalTableName(typeof(SystemEmailProviderEntity), nameof(SystemEmailProviderEntity)));
 
-        Assert.False(SqlSugarEntityBoundary.IsMainDatabaseTable(typeof(TenantEmailConfigEntity)));
+        Assert.True(SqlSugarEntityBoundary.IsMainDatabaseTable(typeof(TenantEmailConfigEntity)));
         Assert.True(SqlSugarEntityBoundary.IsTenantTable(typeof(TenantEmailConfigEntity)));
-        Assert.True(SqlSugarEntityBoundary.RequiresTenantContext(typeof(TenantEmailConfigEntity)));
+        Assert.False(SqlSugarEntityBoundary.RequiresTenantContext(typeof(TenantEmailConfigEntity)));
         Assert.Equal("tenant_email_config_entity", SqlSugarEntityBoundary.GetPhysicalTableName(typeof(TenantEmailConfigEntity), nameof(TenantEmailConfigEntity)));
     }
 
@@ -180,7 +180,7 @@ public class SqlSugarEntityBoundaryTests
         Assert.False(SqlSugarEntityBoundary.IsTenantTable(typeof(GlobalChannelDefinitionEntity)));
         Assert.Equal("global_channel_definition_entity", SqlSugarEntityBoundary.GetPhysicalTableName(typeof(GlobalChannelDefinitionEntity), nameof(GlobalChannelDefinitionEntity)));
 
-        Assert.False(SqlSugarEntityBoundary.IsMainDatabaseTable(typeof(TenantChannelDefinitionEntity)));
+        Assert.True(SqlSugarEntityBoundary.IsMainDatabaseTable(typeof(TenantChannelDefinitionEntity)));
         Assert.True(SqlSugarEntityBoundary.IsTenantTable(typeof(TenantChannelDefinitionEntity)));
         Assert.Equal("tenant_channel_definition_entity", SqlSugarEntityBoundary.GetPhysicalTableName(typeof(TenantChannelDefinitionEntity), nameof(TenantChannelDefinitionEntity)));
     }

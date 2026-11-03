@@ -1,8 +1,5 @@
 ﻿using GameFrameX.Core.Extension.Const;
 using GameFrameX.Core.Extension.Option;
-using GameFrameX.Core.Service.Tenant;
-using MySqlConnector;
-using Npgsql;
 
 namespace GameFrameX.Core.Option;
 
@@ -22,15 +19,13 @@ public sealed class DbConnectionOptions
     /// </summary>
     public List<DbConnectionConfig> ConnectionConfigs { get; set; } = new();
 
-    /// <summary>
-    /// 租户建库专用连接串（gfx_provisioner 账号，CREATEROLE+CREATEDB 非 superuser）。
-    /// <para>配置节 <c>DbConnection:ProvisioningConnectionString</c>；缺省回落主库连接并在开通租户时告警（降级模式），
-    /// 建库通道与业务主库凭据分离后，主库账号被拖库不再连带暴露建库权限。</para>
-    /// </summary>
-    public string? ProvisioningConnectionString { get; set; }
-
     public void PostConfigure(DbConnectionOptions options, IConfiguration configuration)
     {
+        if (HasEnvironmentVariable("GFX_MAIN_DB_TYPE") != HasEnvironmentVariable("GFX_MAIN_DB_CONNECTION_STRING"))
+        {
+            throw new InvalidOperationException("GFX_MAIN_DB_TYPE 与 GFX_MAIN_DB_CONNECTION_STRING 必须成对设置。");
+        }
+
         ApplyEnvironmentOverrides(options);
 
         foreach (var dbConfig in options.ConnectionConfigs)
@@ -41,7 +36,10 @@ public sealed class DbConnectionOptions
             }
         }
 
-        DeriveDefaultTenantDatabase(options);
+        if (options.ConnectionConfigs.Count != 1 || options.ConnectionConfigs[0].ConfigId?.ToString() != SqlSugarConst.MainConfigId)
+        {
+            throw new InvalidOperationException("仅允许配置一个 main 主库连接。");
+        }
 
         ValidateProviderConnectionStringConsistency(options);
     }
@@ -65,17 +63,10 @@ public sealed class DbConnectionOptions
         ApplyDatabaseType(options, SqlSugarConst.MainConfigId, 0,
                           "GFX_MAIN_DB_TYPE");
 
-        ApplyDatabaseType(options, TenantDefaultDataTemplates.MainTenantId.ToString(), 1,
-                          "GFX_DEFAULT_TENANT_DB_TYPE");
-
         ApplyConnectionString(options, SqlSugarConst.MainConfigId, 0,
                               "GFX_MAIN_DB_CONNECTION_STRING",
                               "MAIN_DB_CONNECTION_STRING",
                               "ConnectionString");
-
-        ApplyConnectionString(options, TenantDefaultDataTemplates.MainTenantId.ToString(), 1,
-                              "GFX_DEFAULT_TENANT_DB_CONNECTION_STRING",
-                              "DEFAULT_TENANT_DB_CONNECTION_STRING");
 
         for (var i = 0; i < options.ConnectionConfigs.Count; i++)
         {
@@ -125,7 +116,7 @@ public sealed class DbConnectionOptions
     }
 
     /// <summary>
-    /// 按 ConfigId 查找连接项；未命中时回落到指定下标（历史文件顺序约定：0=main、1=默认租户），越界返回 null。
+    /// 按 ConfigId 查找连接项；未命中时回落到指定下标（主库下标为 0），越界返回 null。
     /// </summary>
     private static DbConnectionConfig? FindConfig(DbConnectionOptions options, string configId, int fallbackIndex)
     {
@@ -150,156 +141,6 @@ public sealed class DbConnectionOptions
         }
 
         return dbType;
-    }
-
-    /// <summary>
-    /// 默认租户库自动推导：文件与环境变量均未显式配置默认租户库时，从主库连接串推导其连接。
-    /// <para>显式优先顺序：文件存在 ConfigId=<see cref="TenantDefaultDataTemplates.MainTenantId"/> 项（由覆盖逻辑改写文件项）、
-    /// 或 GFX_DEFAULT_TENANT_DB_TYPE / GFX_DEFAULT_TENANT_DB_CONNECTION_STRING 成对设置时，跳过推导——
-    /// 后者在文件省略该项时由环境变量对补建连接项（半套设置按「必须成对」fail-fast）。</para>
-    /// <para>仅支持 PostgreSQL、Sqlite、MySql 与 MySqlConnector：PostgreSQL / MySQL 复用普通租户建库的「前缀+租户ID」命名规律
-    ///（Server/Port/账号/密码等参数全继承主库），其余 DbType 无推导先例，启动抛错要求显式配置，
-    /// 对齐普通租户库 TenantDbTypeForbidden 的收紧精神；Odbc / Custom 连接串语义自定义，永不支持推导。</para>
-    /// </summary>
-    private static void DeriveDefaultTenantDatabase(DbConnectionOptions options)
-    {
-        var tenantConfigId = TenantDefaultDataTemplates.MainTenantId.ToString();
-        if (options.ConnectionConfigs.Any(item => item.ConfigId?.ToString() == tenantConfigId))
-        {
-            return;
-        }
-
-        var hasTenantDbType = HasEnvironmentVariable("GFX_DEFAULT_TENANT_DB_TYPE");
-        var hasTenantConnectionString = HasEnvironmentVariable("GFX_DEFAULT_TENANT_DB_CONNECTION_STRING");
-        if (hasTenantDbType || hasTenantConnectionString)
-        {
-            if (hasTenantDbType && hasTenantConnectionString)
-            {
-                // 成对显式变量按「文件可省略该项」口径补建：覆盖逻辑（ApplyDatabaseType / ApplyConnectionString）只改已有项，
-                // 文件缺项时静默落空，推导又在此被跳过，最终种子期报「默认租户库连接配置缺失」启动崩溃
-                options.ConnectionConfigs.Add(CreateDefaultTenantConfig(
-                                                 ParseDbType(Environment.GetEnvironmentVariable("GFX_DEFAULT_TENANT_DB_TYPE")!, "GFX_DEFAULT_TENANT_DB_TYPE"),
-                                                 Environment.GetEnvironmentVariable("GFX_DEFAULT_TENANT_DB_CONNECTION_STRING")!));
-                return;
-            }
-
-            // 半套显式变量（只设其一）跳过推导后，错误会后移到 InitDefaultTenantDatabase 的「配置缺失」文案，误导改文件而非补变量——
-            // 在此按成对口径直接 fail-fast，与 GFX_MAIN_DB_* 一致
-            throw new InvalidOperationException("GFX_DEFAULT_TENANT_DB_TYPE 与 GFX_DEFAULT_TENANT_DB_CONNECTION_STRING 必须成对设置。");
-        }
-
-        var mainConfig = options.ConnectionConfigs.FirstOrDefault(item => item.ConfigId?.ToString() == SqlSugarConst.MainConfigId);
-        if (mainConfig == null || string.IsNullOrWhiteSpace(mainConfig.ConnectionString))
-        {
-            return;
-        }
-
-        string tenantConnectionString;
-        if (mainConfig.DbType == DbType.PostgreSQL)
-        {
-            tenantConnectionString = DerivePostgreSqlTenantConnectionString(mainConfig.ConnectionString);
-        }
-        else if (mainConfig.DbType == DbType.Sqlite)
-        {
-            tenantConnectionString = DeriveSqliteTenantConnectionString(mainConfig.ConnectionString);
-        }
-        else if (mainConfig.DbType == DbType.MySql || mainConfig.DbType == DbType.MySqlConnector)
-        {
-            tenantConnectionString = DeriveMySqlTenantConnectionString(mainConfig.ConnectionString);
-        }
-        else
-        {
-            throw new InvalidOperationException(
-                $"主库 DbType 为 {mainConfig.DbType}，默认租户库不支持自动推导（仅支持 PostgreSQL / Sqlite / MySql / MySqlConnector）；" +
-                $"请显式配置 ConfigId={tenantConfigId} 的连接项，或成对设置 GFX_DEFAULT_TENANT_DB_TYPE / GFX_DEFAULT_TENANT_DB_CONNECTION_STRING。");
-        }
-
-        // 推导项开关与历史文件第二项等价：EnableInitDb=true 供专用管线幂等建库；
-        // 建表/种子开关全关（默认租户走 InitTenantDatabase + DefaultTenantDatabaseSeeder 专用管线，防通用管线重复建）；
-        // EnableDiffLog=false 与专用管线的强制值一致
-        options.ConnectionConfigs.Add(CreateDefaultTenantConfig(mainConfig.DbType, tenantConnectionString));
-    }
-
-    /// <summary>
-    /// 构建默认租户库连接项：推导项与成对环境变量补建项共用，开关与历史文件第二项等价——
-    /// EnableInitDb=true 供专用管线幂等建库；建表/种子开关全关（默认租户走 InitTenantDatabase + DefaultTenantDatabaseSeeder
-    /// 专用管线，防通用管线重复建）；EnableDiffLog=false 与专用管线的强制值一致。
-    /// </summary>
-    private static DbConnectionConfig CreateDefaultTenantConfig(DbType dbType, string connectionString)
-    {
-        return new DbConnectionConfig
-        {
-            ConfigId = TenantDefaultDataTemplates.MainTenantId.ToString(),
-            DbType = dbType,
-            ConnectionString = connectionString,
-            DbSettings = new DbSettings { EnableInitDb = true, EnableDiffLog = false, },
-            TableSettings = new TableSettings { EnableInitTable = false, EnableIncreTable = false, },
-            SeedSettings = new SeedSettings { EnableInitSeed = false, EnableIncreSeed = false, },
-        };
-    }
-
-    /// <summary>
-    /// PostgreSQL 推导：主库连接串仅替换库名为「租户库前缀+默认租户ID」（与普通租户库完全同规律），Host/Port/账号/密码全继承。
-    /// </summary>
-    private static string DerivePostgreSqlTenantConnectionString(string mainConnectionString)
-    {
-        var builder = new NpgsqlConnectionStringBuilder(mainConnectionString)
-        {
-            Database = PostgreSqlTenantDatabaseProvisioner.TenantDatabasePrefix + TenantDefaultDataTemplates.MainTenantId,
-        };
-        return builder.ConnectionString;
-    }
-
-    /// <summary>
-    /// MySQL 推导：主库连接串仅替换库名为「租户库前缀+默认租户ID」（与普通租户库完全同规律），Server/Port/账号/密码等其余参数全继承。
-    /// <para>MySql 与 MySqlConnector 两个 DbType 共用 MySqlConnector 的 builder 改写：两者连接串语法兼容（键大小写与 Server/Host、Uid/User ID 等
-    /// 别名均被 builder 识别），且 builder 仅做字符串解析不建立连接。注意 SqlSugarCore 5.1.4.216 在 .NET 上仅 DbType.MySql 可真实连接
-    ///（驱动即 MySqlConnector 包），DbType.MySqlConnector 的 provider 反射映射损坏，推导/改写层两值均支持但后者仅静态覆盖。</para>
-    /// </summary>
-    private static string DeriveMySqlTenantConnectionString(string mainConnectionString)
-    {
-        var builder = new MySqlConnectionStringBuilder(mainConnectionString)
-        {
-            Database = PostgreSqlTenantDatabaseProvisioner.TenantDatabasePrefix + TenantDefaultDataTemplates.MainTenantId,
-        };
-        return builder.ConnectionString;
-    }
-
-    /// <summary>
-    /// Sqlite 推导：主库文件同目录，文件名与 PostgreSQL 库名完全同名（前缀+默认租户ID，仅差扩展名），
-    /// 连接串中除 DataSource 外的其余参数原样保留。
-    /// </summary>
-    private static string DeriveSqliteTenantConnectionString(string mainConnectionString)
-    {
-        var segments = mainConnectionString.Split(';', StringSplitOptions.RemoveEmptyEntries).ToList();
-        for (var i = 0; i < segments.Count; i++)
-        {
-            var separatorIndex = segments[i].IndexOf('=');
-            if (separatorIndex <= 0)
-            {
-                continue;
-            }
-
-            var key = segments[i][..separatorIndex].Trim();
-            if (!string.Equals(key, "DataSource", StringComparison.OrdinalIgnoreCase)
-                && !string.Equals(key, "Data Source", StringComparison.OrdinalIgnoreCase))
-            {
-                continue;
-            }
-
-            segments[i] = key + "=" + DeriveSqliteTenantFileName(segments[i][(separatorIndex + 1)..].Trim());
-        }
-
-        return string.Join(";", segments) + ";";
-    }
-
-    private static string DeriveSqliteTenantFileName(string dataSource)
-    {
-        var directory = Path.GetDirectoryName(dataSource);
-        var tenantFileName = PostgreSqlTenantDatabaseProvisioner.TenantDatabasePrefix
-                             + TenantDefaultDataTemplates.MainTenantId
-                             + Path.GetExtension(dataSource);
-        return string.IsNullOrWhiteSpace(directory) ? tenantFileName : Path.Combine(directory, tenantFileName);
     }
 
     private static bool HasEnvironmentVariable(string name)

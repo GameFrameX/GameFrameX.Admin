@@ -78,7 +78,7 @@ public sealed class TenantNoticeEnabledVisibilityTests : IDisposable
     {
         // 复刻 Admin host DI 形态：GetTenantRepository 经 IServiceProvider 解析 SqlSugarRepository<T>，
         // Repository 构造按租户上下文路由到租户库连接（生产过滤器 + TenantId 填充 AOP 已装配）。
-        var repository = new Repository<TenantNoticeEntity>(_db.MainDb, _db.TenantDbProvider, _db.TenantIdResolver);
+        var repository = new Repository<TenantNoticeEntity>(_db.MainDb);
         var services = new ServiceCollection();
         services.AddSingleton<SqlSugarRepository<TenantNoticeEntity>>(repository);
         return new TenantNoticeService(

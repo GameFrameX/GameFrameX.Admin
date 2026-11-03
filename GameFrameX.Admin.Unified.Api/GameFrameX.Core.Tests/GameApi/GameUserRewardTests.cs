@@ -65,8 +65,8 @@ public sealed class GameUserRewardTests
     private static GameUserRewardController CreateController(ClientApiTestDb db)
     {
         db.InitTenantTables(typeof(TenantGameUserRewardEntity));
-        var tenantDbProvider = new ClientApiTenantDbProvider(db.MainDb, db.TenantIdResolver);
-        var repository = new Repository<TenantGameUserRewardEntity>(db.MainDb, tenantDbProvider, db.TenantIdResolver);
+        var tenantDbProvider = db.MainDb;
+        var repository = new Repository<TenantGameUserRewardEntity>(db.MainDb);
         return new GameUserRewardController(repository);
     }
 }

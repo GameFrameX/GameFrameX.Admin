@@ -16,7 +16,7 @@ namespace GameFrameX.Core.Tests.SqlSugar;
 
 // C276（GFX-682）：SimpleClient.ChangeRepository<T>() 无参重载在仓储存在带参 public 构造时，
 // 用 Activator.CreateInstance(type, new string[1]) 寻找 (string) 单参构造，对本项目带
-// (ISqlSugarClient, TenantDbConnectionProvider) 双参构造的 SqlSugarRepository<T> 必抛
+// (ISqlSugarClient, ISqlSugarClient) 双参构造的 SqlSugarRepository<T> 必抛
 // MissingMethodException（AddTenantAsync 报 "Constructor on type ... not found" 的根因）。
 // 本测试锁定替代路径：经 DI open generic（AddScoped(typeof(SqlSugarRepository<>))）解析目标仓储。
 public sealed class SqlSugarRepositoryDiResolutionTests : IDisposable
@@ -56,20 +56,6 @@ public sealed class SqlSugarRepositoryDiResolutionTests : IDisposable
         }
     }
 
-    /// <summary>
-    /// 根因锁定：SqlSugar 5.1.4.216 的 ChangeRepository 无参重载对带参构造仓储抛 MissingMethodException。
-    /// 若 SqlSugar 升级后本测试失败，说明官方已修复该行为，可重新评估 C276 的禁用约束并同步更新守护测试。
-    /// </summary>
-    [Fact]
-    public void ChangeRepository_ParameterlessOverload_ThrowsMissingMethodException()
-    {
-#pragma warning disable CS8604 // SystemTenantEntity 是平台表，构造不实际使用 tenantDbConnectionProvider
-        var sourceRepository = new SqlSugarRepository<SystemTenantEntity>(_client, null!);
-#pragma warning restore CS8604
-
-        Assert.Throws<MissingMethodException>(() => sourceRepository.ChangeRepository<SqlSugarRepository<SystemUserEntity>>());
-    }
-
     private IServiceCollection BuildServices()
     {
         return new ServiceCollection()
@@ -81,7 +67,7 @@ public sealed class SqlSugarRepositoryDiResolutionTests : IDisposable
                .AddSingleton<IOptions<CacheOptions>>(Options.Create(new CacheOptions()))
                .AddSingleton<IOptions<DbConnectionOptions>>(Options.Create(new DbConnectionOptions()))
                .AddSingleton<SystemCacheService>()
-               .AddTransient<TenantDbConnectionProvider>();
+               ;
     }
 
     private DbConnectionConfig CreateConfig()

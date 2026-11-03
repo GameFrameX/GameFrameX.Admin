@@ -1,3 +1,4 @@
+using SqlSugar;
 using System.Text.Json;
 using GameFrameX.Advertisement.Abstract;
 using GameFrameX.Client.Api.Middleware;
@@ -15,7 +16,7 @@ namespace GameFrameX.Client.Api.Services.ClientApiTenantOptions;
 /// </summary>
 public sealed class ClientApiTenantOptionsProvider : IClientApiTenantOptionsProvider
 {
-    private readonly ClientApiTenantDbProvider _tenantDbProvider;
+    private readonly ISqlSugarClient _tenantDbProvider;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
     /// <summary>
@@ -40,7 +41,7 @@ public sealed class ClientApiTenantOptionsProvider : IClientApiTenantOptionsProv
 
     /// <summary>
     /// </summary>
-    public ClientApiTenantOptionsProvider(ClientApiTenantDbProvider tenantDbProvider, IHttpContextAccessor httpContextAccessor)
+    public ClientApiTenantOptionsProvider(ISqlSugarClient tenantDbProvider, IHttpContextAccessor httpContextAccessor)
     {
         _tenantDbProvider = tenantDbProvider;
         _httpContextAccessor = httpContextAccessor;
@@ -68,7 +69,7 @@ public sealed class ClientApiTenantOptionsProvider : IClientApiTenantOptionsProv
     public async Task<TenantEmailOptions> GetEmailOptionsAsync()
     {
         var ctx = ResolveContext();
-        var db = _tenantDbProvider.GetTenantDb(ctx.TenantId);
+        var db = _tenantDbProvider;
         var entity = await TenantEmailConfigSelector.SelectAsync(db, ctx, 0);
         return entity == null
                    ? null
@@ -123,7 +124,7 @@ public sealed class ClientApiTenantOptionsProvider : IClientApiTenantOptionsProv
     private async Task<TenantAdvertisementCallbackConfigEntity?> PickAdvertisementCallbackConfigAsync()
     {
         var ctx = ResolveContext();
-        var db = _tenantDbProvider.GetTenantDb(ctx.TenantId);
+        var db = _tenantDbProvider;
         var appId = ctx.AppId.GetValueOrDefault();
         var provider = ResolvePublicCallbackProvider(_httpContextAccessor.HttpContext);
         var query = db.Queryable<TenantAdvertisementCallbackConfigEntity>()
@@ -202,7 +203,7 @@ public sealed class ClientApiTenantOptionsProvider : IClientApiTenantOptionsProv
         }
 
         var ctx = ResolveContext();
-        var db = _tenantDbProvider.GetTenantDb(ctx.TenantId);
+        var db = _tenantDbProvider;
         _tenantDefaultPolicyRow = await db.Queryable<TenantClientApiPolicyEntity>()
                                           .Where(c => c.TenantId == ctx.TenantId && c.AppId == 0 && c.IsEnabled == true)
                                           .OrderByDescending(c => c.Id)
@@ -223,7 +224,7 @@ public sealed class ClientApiTenantOptionsProvider : IClientApiTenantOptionsProv
         }
 
         var ctx = ResolveContext();
-        var db = _tenantDbProvider.GetTenantDb(ctx.TenantId);
+        var db = _tenantDbProvider;
         var appId = ctx.AppId.GetValueOrDefault();
         if (appId > 0)
         {

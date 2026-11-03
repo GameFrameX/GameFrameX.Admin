@@ -85,8 +85,8 @@ public sealed class PaymentOptionSettingDecryptClosureTests
             }).ExecuteCommand();
 
             TenantIdResolver = new DelegateSqlSugarTenantIdResolver(() => tenantId);
-            TenantDbProvider = new ClientApiTenantDbProvider(MainDb, TenantIdResolver);
-            TenantDb = TenantDbProvider.GetTenantDb(tenantId);
+            TenantDbProvider = MainDb;
+            TenantDb = TenantDbProvider;
             TenantDb.CodeFirst.InitTables(typeof(TenantGamePaymentConfigEntity));
             _ = appId;
         }
@@ -95,7 +95,7 @@ public sealed class PaymentOptionSettingDecryptClosureTests
 
         public ISqlSugarClient TenantDb { get; }
 
-        public ClientApiTenantDbProvider TenantDbProvider { get; }
+        public ISqlSugarClient TenantDbProvider { get; }
 
         public ISqlSugarTenantIdResolver TenantIdResolver { get; }
 

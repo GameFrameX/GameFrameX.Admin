@@ -37,13 +37,13 @@ public sealed class TenantMenuSyncApplier
     public const string DanglingPackageErrorPrefix = "dangling-package:";
 
     private readonly ISqlSugarClient _sqlSugarClient;
-    private readonly ITenantDbConnectionProvider _tenantDbConnectionProvider;
+    private readonly ISqlSugarClient _tenantDbConnectionProvider;
     private readonly SystemCacheService _systemCacheService;
     private readonly ILogger<TenantMenuSyncApplier> _logger;
 
     public TenantMenuSyncApplier(
         ISqlSugarClient sqlSugarClient,
-        ITenantDbConnectionProvider tenantDbConnectionProvider,
+        ISqlSugarClient tenantDbConnectionProvider,
         SystemCacheService systemCacheService,
         ILogger<TenantMenuSyncApplier> logger)
     {
@@ -75,7 +75,7 @@ public sealed class TenantMenuSyncApplier
             return new TenantMenuSyncResult(tenant.Id, Succeeded: false, SkippedDangling: true, InsertCount: 0, DeleteCount: 0);
         }
 
-        var tenantDb = _tenantDbConnectionProvider.GetTenantDbConnectionScope(tenant.Id);
+        var tenantDb = _tenantDbConnectionProvider;
         if (tenantDb == null)
         {
             throw new InvalidOperationException($"租户 {tenant.Id} 的租户库连接不可用。");

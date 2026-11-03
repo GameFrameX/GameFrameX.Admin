@@ -25,7 +25,6 @@ public class ProjectDependencyInjectionSetupTests
         AssertDescriptor(services, typeof(TenantUserService), typeof(TenantUserService), ServiceLifetime.Transient);
         AssertDescriptor(services, typeof(DynamicJobCompiler), typeof(DynamicJobCompiler), ServiceLifetime.Singleton);
         AssertDescriptor(services, typeof(IJobClusterServer), typeof(JobClusterServer), ServiceLifetime.Singleton);
-        AssertDescriptor(services, typeof(PostgreSqlTenantDatabaseProvisioner), typeof(PostgreSqlTenantDatabaseProvisioner), ServiceLifetime.Transient);
     }
 
     [Fact]

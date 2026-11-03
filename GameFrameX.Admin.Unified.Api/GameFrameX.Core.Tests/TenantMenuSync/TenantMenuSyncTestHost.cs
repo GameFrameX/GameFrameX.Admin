@@ -100,7 +100,7 @@ internal sealed class TenantMenuSyncTestHost : IDisposable
     {
         return new TenantMenuSyncApplier(
             _client,
-            new FakeTenantDbConnectionProvider(_client, TenantId.ToString()),
+            new FakeTenantDbConnectionProvider(_client, TenantId.ToString()).Database,
             new SystemCacheService(new FakeCache(), Options.Create(new CacheOptions())),
             NullLogger<TenantMenuSyncApplier>.Instance);
     }

@@ -12,10 +12,10 @@ namespace GameFrameX.Core.Middleware;
 public sealed class SignatureKeyResolver : ISignatureKeyResolver
 {
     private readonly ConcurrentDictionary<long, TenantSignatureKeyCache> _tenantCaches = new();
-    private readonly ITenantDbProvider _tenantDbProvider;
+    private readonly ISqlSugarClient _tenantDbProvider;
     private readonly ISqlSugarTenantIdResolver _tenantIdResolver;
 
-    public SignatureKeyResolver(ITenantDbProvider tenantDbProvider, ISqlSugarTenantIdResolver tenantIdResolver)
+    public SignatureKeyResolver(ISqlSugarClient tenantDbProvider, ISqlSugarTenantIdResolver tenantIdResolver)
     {
         _tenantDbProvider = tenantDbProvider;
         _tenantIdResolver = tenantIdResolver;
@@ -88,7 +88,7 @@ public sealed class SignatureKeyResolver : ISignatureKeyResolver
     /// </summary>
     private async Task<List<TenantAppSignatureKeyEntity>> GetTenantKeysAsync(long tenantId)
     {
-        var db = _tenantDbProvider.GetTenantDb(tenantId);
+        var db = _tenantDbProvider;
         db.QueryFilter.ClearAndBackup();
         try
         {

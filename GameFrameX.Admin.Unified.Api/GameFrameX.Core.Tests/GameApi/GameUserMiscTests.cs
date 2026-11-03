@@ -69,16 +69,16 @@ public sealed class GameUserMiscTests
     {
         db.InitTenantTables(typeof(TenantGameUserLogoutRecordEntity));
         db.InitTenantTables(typeof(TenantGameUserArchiveEntity));
-        var tenantDbProvider = new ClientApiTenantDbProvider(db.MainDb, db.TenantIdResolver);
-        var logoutRepository = new Repository<TenantGameUserLogoutRecordEntity>(db.MainDb, tenantDbProvider, db.TenantIdResolver);
-        var archiveRepository = new Repository<TenantGameUserArchiveEntity>(db.MainDb, tenantDbProvider, db.TenantIdResolver);
+        var tenantDbProvider = db.MainDb;
+        var logoutRepository = new Repository<TenantGameUserLogoutRecordEntity>(db.MainDb);
+        var archiveRepository = new Repository<TenantGameUserArchiveEntity>(db.MainDb);
         return new GameUserMiscController(logoutRepository, archiveRepository);
     }
 
     private static GameUserArchiveController CreateArchiveController(ClientApiTestDb db)
     {
-        var tenantDbProvider = new ClientApiTenantDbProvider(db.MainDb, db.TenantIdResolver);
-        var archiveRepository = new Repository<TenantGameUserArchiveEntity>(db.MainDb, tenantDbProvider, db.TenantIdResolver);
+        var tenantDbProvider = db.MainDb;
+        var archiveRepository = new Repository<TenantGameUserArchiveEntity>(db.MainDb);
         return new GameUserArchiveController(archiveRepository);
     }
 

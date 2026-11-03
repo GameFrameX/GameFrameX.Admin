@@ -26,13 +26,13 @@ public class PaymentOptionSettingProvider : IPaymentOptionSettingProvider
         PropertyNameCaseInsensitive = true,
     };
 
-    private readonly ClientApiTenantDbProvider _tenantDbProvider;
+    private readonly ISqlSugarClient _tenantDbProvider;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
     /// <summary>
     /// 支付配置提供器实现
     /// </summary>
-    public PaymentOptionSettingProvider(ClientApiTenantDbProvider tenantDbProvider, IHttpContextAccessor httpContextAccessor)
+    public PaymentOptionSettingProvider(ISqlSugarClient tenantDbProvider, IHttpContextAccessor httpContextAccessor)
     {
         _tenantDbProvider = tenantDbProvider;
         _httpContextAccessor = httpContextAccessor;
@@ -115,7 +115,7 @@ public class PaymentOptionSettingProvider : IPaymentOptionSettingProvider
         }
 
         var appId = GetCurrentAppId(context);
-        var db = _tenantDbProvider.GetTenantDb(tenantId.Value);
+        var db = _tenantDbProvider;
         var packageId = ResolveCurrentPackageId(context, tenantId.Value, appId, db);
         var environments = GetRequestedEnvironments(context);
 

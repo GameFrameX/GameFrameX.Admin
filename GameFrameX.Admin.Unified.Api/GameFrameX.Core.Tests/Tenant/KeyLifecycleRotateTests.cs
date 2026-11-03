@@ -40,14 +40,14 @@ public sealed class KeyLifecycleRotateTests : IDisposable
     private TenantGameLoginTicketKeyEntityService CreateTicketKeyService()
     {
         return new TenantGameLoginTicketKeyEntityService(
-            new Repository<TenantGameLoginTicketKeyEntity>(_db.MainDb, _db.TenantDbProvider, _db.TenantIdResolver),
+            new Repository<TenantGameLoginTicketKeyEntity>(_db.MainDb),
             new GameFrameX.Core.Service.User.CurrentUserContext(new Microsoft.AspNetCore.Http.HttpContextAccessor()));
     }
 
     private TenantClientApiPolicyEntityService CreatePolicyService()
     {
         return new TenantClientApiPolicyEntityService(
-            new Repository<TenantClientApiPolicyEntity>(_db.MainDb, _db.TenantDbProvider, _db.TenantIdResolver),
+            new Repository<TenantClientApiPolicyEntity>(_db.MainDb),
             new GameFrameX.Core.Service.User.CurrentUserContext(new Microsoft.AspNetCore.Http.HttpContextAccessor()));
     }
 

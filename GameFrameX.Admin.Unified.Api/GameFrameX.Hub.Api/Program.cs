@@ -50,8 +50,6 @@ internal static class Program
         var sqlSugar = SqlSugarClientConfig.AddSqlSugarClientService(mainDbConfig, tenantIdResolver, HubUserAuditHandler.Handle(httpContextAccessor));
 
         builder.Services.AddSingleton<ISqlSugarClient>(sqlSugar); // 主库（连 SystemTenantEntity 等平台表）
-        builder.Services.AddSingleton<HubTenantDbProvider>(); // 当前请求 TenantId -> 租户业务库连接（实时查库）
-        builder.Services.AddSingleton<ITenantDbProvider>(sp => sp.GetRequiredService<HubTenantDbProvider>()); // 共享层密钥环 Resolver / 统一仓储依赖接口
         builder.Services.AddScoped(typeof(Repository<>)); // 仓储（按租户路由数据库）
         // 基类服务面：FeatureSwitchDeliveryResolver 等共享实现以 SqlSugarRepository<T> 为构造参数（C345 冻结契约），
         // DI 不做基类向上匹配，须显式注册开放泛型基类 -> Repository<T> 实现（与上行为不同 descriptor，仓储无状态可各自实例化）

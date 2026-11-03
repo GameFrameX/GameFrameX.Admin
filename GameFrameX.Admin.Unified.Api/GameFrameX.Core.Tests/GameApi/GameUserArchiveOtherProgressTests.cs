@@ -70,8 +70,8 @@ public sealed class GameUserArchiveOtherProgressTests
     private static GameUserArchiveController CreateController(ClientApiTestDb db)
     {
         db.InitTenantTables(typeof(TenantGameUserArchiveEntity));
-        var tenantDbProvider = new ClientApiTenantDbProvider(db.MainDb, db.TenantIdResolver);
-        var repository = new Repository<TenantGameUserArchiveEntity>(db.MainDb, tenantDbProvider, db.TenantIdResolver);
+        var tenantDbProvider = db.MainDb;
+        var repository = new Repository<TenantGameUserArchiveEntity>(db.MainDb);
         return new GameUserArchiveController(repository);
     }
 }

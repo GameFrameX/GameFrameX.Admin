@@ -209,15 +209,15 @@ public sealed class GameUserRankTests
     private static Repository<TenantGameRankEntryEntity> CreateRankRepository(ClientApiTestDb db)
     {
         db.InitTenantTables(typeof(TenantGameRankEntryEntity));
-        var tenantDbProvider = new ClientApiTenantDbProvider(db.MainDb, db.TenantIdResolver);
-        return new Repository<TenantGameRankEntryEntity>(db.MainDb, tenantDbProvider, db.TenantIdResolver);
+        var tenantDbProvider = db.MainDb;
+        return new Repository<TenantGameRankEntryEntity>(db.MainDb);
     }
 
     private static Repository<TenantGameUserArchiveEntity> CreateArchiveRepository(ClientApiTestDb db)
     {
         db.InitTenantTables(typeof(TenantGameUserArchiveEntity));
-        var tenantDbProvider = new ClientApiTenantDbProvider(db.MainDb, db.TenantIdResolver);
-        return new Repository<TenantGameUserArchiveEntity>(db.MainDb, tenantDbProvider, db.TenantIdResolver);
+        var tenantDbProvider = db.MainDb;
+        return new Repository<TenantGameUserArchiveEntity>(db.MainDb);
     }
 
     private static GameUserRankJoinRequest MakeJoin(long userId, long token, int rankType = 1, string configKey = "bakeout", long configId = 101)

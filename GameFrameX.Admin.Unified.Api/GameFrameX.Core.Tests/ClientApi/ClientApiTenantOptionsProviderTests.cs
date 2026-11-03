@@ -101,8 +101,8 @@ public class ClientApiTenantOptionsProviderTests : IDisposable
             IsEnabled = true,
         }).ExecuteCommand();
 
-        var provider = new ClientApiTenantDbProvider(scope, new DelegateSqlSugarTenantIdResolver(() => tenantId));
-        var tenantDb = provider.GetTenantDb(tenantId);
+        var provider = scope;
+        var tenantDb = provider;
         tenantDb.CodeFirst.InitTables(typeof(TenantAdvertisementCallbackConfigEntity));
 
         Assert.True(TableExists(tenantDb, typeof(TenantAdvertisementCallbackConfigEntity)));
@@ -120,11 +120,11 @@ public class ClientApiTenantOptionsProviderTests : IDisposable
         scope.Insertable(CreateTenant(tenantId, tenantConfig.ConnectionString)).ExecuteCommand();
 
         var resolver = new DelegateSqlSugarTenantIdResolver(() => tenantId);
-        var provider = new ClientApiTenantDbProvider(scope, resolver);
-        var tenantDb = provider.GetTenantDb(tenantId);
+        var provider = scope;
+        var tenantDb = provider;
         tenantDb.CodeFirst.InitTables(typeof(TenantGameAppEntity));
 
-        var repository = new Repository<TenantGameAppEntity>(scope, provider, resolver);
+        var repository = new Repository<TenantGameAppEntity>(scope);
 
         Assert.True(TableExists(repository.AsSugarClient(), typeof(TenantGameAppEntity)));
         Assert.False(TableExists(scope, typeof(TenantGameAppEntity)));
@@ -141,8 +141,8 @@ public class ClientApiTenantOptionsProviderTests : IDisposable
         scope.Insertable(CreateTenant(tenantId, tenantConfig.ConnectionString)).ExecuteCommand();
 
         var resolver = new DelegateSqlSugarTenantIdResolver(() => tenantId);
-        var provider = new ClientApiTenantDbProvider(scope, resolver);
-        var tenantDb = provider.GetTenantDb(tenantId);
+        var provider = scope;
+        var tenantDb = provider;
         tenantDb.CodeFirst.InitTables(typeof(TenantGameAppEntity));
         tenantDb.Insertable(new TenantGameAppEntity
         {
@@ -175,8 +175,8 @@ public class ClientApiTenantOptionsProviderTests : IDisposable
         scope.Insertable(CreateTenant(tenantId, tenantConfig.ConnectionString)).ExecuteCommand();
 
         var resolver = new DelegateSqlSugarTenantIdResolver(() => tenantId);
-        var provider = new ClientApiTenantDbProvider(scope, resolver);
-        var tenantDb = provider.GetTenantDb(tenantId);
+        var provider = scope;
+        var tenantDb = provider;
         tenantDb.CodeFirst.InitTables(typeof(TenantGameAppPackageEntity));
         tenantDb.Insertable(new[]
         {

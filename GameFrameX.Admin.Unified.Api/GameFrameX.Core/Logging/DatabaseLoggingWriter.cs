@@ -14,7 +14,7 @@ namespace GameFrameX.Core.Logging;
 /// 平台上下文（SuperAdmin / 平台启动 / 无租户上下文）写 <see cref="SystemLogOperationEntity"/> 等平台日志到主库，
 /// 租户上下文（租户管理员 / 租户业务接口）写 <see cref="TenantLogOperationEntity"/> 等租户日志到当前租户库。
 /// 写入器运行在独立 <see cref="IServiceScope"/>，无 HTTP 租户上下文，因此租户库连接通过
-/// <see cref="TenantDbConnectionProvider.GetTenantDbConnectionScope"/> 显式按日志中解析到的租户 Id 解析。
+/// 所有日志均写入主库，历史实体分类保留供审计查询。
 /// </summary>
 public class DatabaseLoggingWriter : IDatabaseLoggingWriter, IDisposable
 {
@@ -233,15 +233,7 @@ public class DatabaseLoggingWriter : IDatabaseLoggingWriter, IDisposable
             return new LogWriteTarget { Db = mainDb, UsePlatformEntity = true, };
         }
 
-        var provider = _serviceScope.ServiceProvider.GetRequiredService<TenantDbConnectionProvider>();
-        var tenantDb = provider.GetTenantDbConnectionScope(tenantIdValue);
-        if (tenantDb != null)
-        {
-            return new LogWriteTarget { Db = tenantDb, UsePlatformEntity = false, };
-        }
-
-        // 租户库未就绪：归类为平台日志写入主库，不静默兜底到任意默认租户库（C156 边界要求）。
-        return new LogWriteTarget { Db = mainDb, UsePlatformEntity = true, };
+        return new LogWriteTarget { Db = mainDb, UsePlatformEntity = false, };
     }
 
     /// <summary>

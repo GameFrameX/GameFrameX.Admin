@@ -145,8 +145,8 @@ public sealed class GameUserRaceTests
         using (var db = new ClientApiTestDb())
         {
             db.InitTenantTables(typeof(TenantGameUserArchiveEntity));
-            var tenantDbProvider = new ClientApiTenantDbProvider(db.MainDb, db.TenantIdResolver);
-            var archiveRepository = new Repository<TenantGameUserArchiveEntity>(db.MainDb, tenantDbProvider, db.TenantIdResolver);
+            var tenantDbProvider = db.MainDb;
+            var archiveRepository = new Repository<TenantGameUserArchiveEntity>(db.MainDb);
             var archiveController = new GameUserArchiveController(archiveRepository);
             await archiveController.Upload(MakeUpload(9101, "real_a", "icon_a"));
             await archiveController.Upload(MakeUpload(9102, "real_b", "icon_b"));
@@ -183,8 +183,8 @@ public sealed class GameUserRaceTests
     private static GameUserRaceController CreateController(ClientApiTestDb db)
     {
         db.InitTenantTables(typeof(TenantGameUserArchiveEntity));
-        var tenantDbProvider = new ClientApiTenantDbProvider(db.MainDb, db.TenantIdResolver);
-        var archiveRepository = new Repository<TenantGameUserArchiveEntity>(db.MainDb, tenantDbProvider, db.TenantIdResolver);
+        var tenantDbProvider = db.MainDb;
+        var archiveRepository = new Repository<TenantGameUserArchiveEntity>(db.MainDb);
         return new GameUserRaceController(archiveRepository);
     }
 

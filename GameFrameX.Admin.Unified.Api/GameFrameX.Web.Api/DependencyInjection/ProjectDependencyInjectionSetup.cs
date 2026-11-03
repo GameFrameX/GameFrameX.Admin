@@ -43,7 +43,6 @@ public static class ProjectDependencyInjectionSetup
         }
 
         AddServiceDescriptor(services, typeof(IJobClusterServer), typeof(JobClusterServer), ServiceLifetime.Singleton);
-        AddServiceDescriptor(services, typeof(PostgreSqlTenantDatabaseProvisioner), typeof(PostgreSqlTenantDatabaseProvisioner), ServiceLifetime.Transient);
 
         return services;
     }

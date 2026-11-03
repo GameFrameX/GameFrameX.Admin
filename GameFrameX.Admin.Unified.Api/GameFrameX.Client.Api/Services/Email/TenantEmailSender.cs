@@ -1,3 +1,4 @@
+using SqlSugar;
 using GameFrameX.Client.Api.Services.ClientApiTenantOptions;
 using GameFrameX.Core.Service.Message;
 using GameFrameX.Core.Service.Tenant;
@@ -14,13 +15,13 @@ namespace GameFrameX.Client.Api.Services.Email;
 public sealed class TenantEmailSender : ITenantEmailSender
 {
     private readonly IClientApiTenantOptionsProvider _optionsProvider;
-    private readonly ClientApiTenantDbProvider _tenantDbProvider;
+    private readonly ISqlSugarClient _tenantDbProvider;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
     /// <summary>
     /// </summary>
     public TenantEmailSender(IClientApiTenantOptionsProvider optionsProvider,
-        ClientApiTenantDbProvider tenantDbProvider,
+        ISqlSugarClient tenantDbProvider,
         IHttpContextAccessor httpContextAccessor)
     {
         _optionsProvider = optionsProvider;
@@ -85,7 +86,7 @@ public sealed class TenantEmailSender : ITenantEmailSender
             AppId = appIdObj,
         };
 
-        var db = _tenantDbProvider.GetTenantDb(resolution.TenantId);
+        var db = _tenantDbProvider;
         var entity = await TenantEmailConfigSelector.SelectAsync(db, resolution, (int)purpose);
         if (entity == null)
         {

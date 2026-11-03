@@ -202,8 +202,8 @@ public sealed class ClientApiMiddlewareBoundaryTests : IDisposable
             IsEnabled = true,
         }).ExecuteCommand();
         var tenantResolver = new DelegateSqlSugarTenantIdResolver(() => tenantId);
-        var tenantDbProvider = new ClientApiTenantDbProvider(mainDb, tenantResolver);
-        var tenantDb = tenantDbProvider.GetTenantDb(tenantId);
+        var tenantDbProvider = mainDb;
+        var tenantDb = tenantDbProvider;
         tenantDb.CodeFirst.InitTables(typeof(TenantGameAppEntity));
         tenantDb.Insertable(new TenantGameAppEntity
         {

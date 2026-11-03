@@ -73,8 +73,8 @@ internal sealed class AuthTestHost : IDisposable
     {
         var httpContextAccessor = new HttpContextAccessor { HttpContext = HttpContext, };
 #pragma warning disable CS8604 // SystemUserEntity/SystemConfigEntity 是 platform table，构造不实际使用 tenantDbConnectionProvider；ICaptcha 在 captcha IsEnabled=false 路径不调用
-        var systemUserRepository = new SqlSugarRepository<SystemUserEntity>(_client, null!);
-        var systemConfigRepository = new SqlSugarRepository<SystemConfigEntity>(_client, null!);
+        var systemUserRepository = new SqlSugarRepository<SystemUserEntity>(_client);
+        var systemConfigRepository = new SqlSugarRepository<SystemConfigEntity>(_client);
         var captcha = (Lazy.Captcha.Core.ICaptcha)null!;
 #pragma warning restore CS8604
         var systemCacheService = new SystemCacheService(new FakeCache(), Options.Create(new CacheOptions()));

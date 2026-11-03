@@ -13,18 +13,15 @@ public sealed class TenantSecretCryptoTests : IDisposable
     private const string PlainSecret = "AKIDexample-secret-key-2026";
 
     private readonly string? _originalSecretKey;
-    private readonly string? _originalConnectionKey;
 
     public TenantSecretCryptoTests()
     {
         _originalSecretKey = Environment.GetEnvironmentVariable(TenantSecretCrypto.KeyEnvironmentVariable);
-        _originalConnectionKey = Environment.GetEnvironmentVariable(TenantConnectionCrypto.KeyEnvironmentVariable);
     }
 
     public void Dispose()
     {
         Restore(TenantSecretCrypto.KeyEnvironmentVariable, _originalSecretKey);
-        Restore(TenantConnectionCrypto.KeyEnvironmentVariable, _originalConnectionKey);
     }
 
     [Fact]
@@ -134,23 +131,10 @@ public sealed class TenantSecretCryptoTests : IDisposable
     {
         // 两域前缀互斥（enc:sec:v1: vs enc:v1:）：连接串密文对凭证收口是「无前缀值」，直通不认领、不误抛解密失败
         Environment.SetEnvironmentVariable(TenantSecretCrypto.KeyEnvironmentVariable, "unit-test-secret-key");
-        Environment.SetEnvironmentVariable(TenantConnectionCrypto.KeyEnvironmentVariable, "unit-test-connection-key");
-        var connectionCipher = TenantConnectionCrypto.Encrypt("Host=127.0.0.1;Password=conn-pwd");
+        const string connectionCipher = "enc:v1:legacy-connection-cipher";
 
         Assert.False(TenantSecretCrypto.IsEncrypted(connectionCipher));
         Assert.Equal(connectionCipher, TenantSecretCrypto.Decrypt(connectionCipher));
-    }
-
-    [Fact]
-    public void ConnectionCrypto_DoesNotClaimSecretCipherText()
-    {
-        // 反向互不认领：凭证密文对连接串收口同样是无前缀值——防止两类密文跨收口互解误用
-        Environment.SetEnvironmentVariable(TenantSecretCrypto.KeyEnvironmentVariable, "unit-test-secret-key");
-        Environment.SetEnvironmentVariable(TenantConnectionCrypto.KeyEnvironmentVariable, "unit-test-connection-key");
-        var secretCipher = TenantSecretCrypto.Encrypt(PlainSecret);
-
-        Assert.False(TenantConnectionCrypto.IsEncrypted(secretCipher));
-        Assert.Equal(secretCipher, TenantConnectionCrypto.Decrypt(secretCipher));
     }
 
     private static void Restore(string variable, string? value)

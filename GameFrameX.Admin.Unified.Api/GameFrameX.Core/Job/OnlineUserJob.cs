@@ -21,34 +21,12 @@ public class OnlineUserJob : IJob
 
     public async Task ExecuteAsync(JobExecutingContext context, CancellationToken stoppingToken)
     {
-        using var serviceScope = _scopeFactory.CreateScope();
-
-        var tenantRepository = serviceScope.ServiceProvider.GetRequiredService<SqlSugarRepository<SystemTenantEntity>>();
-        var tenantDbConnectionProvider = serviceScope.ServiceProvider.GetRequiredService<TenantDbConnectionProvider>();
-        var tenants = await tenantRepository.AsQueryable()
-                                     .Filter(null, true)
-                                     .Where(u => u.IsEnabled == true && u.TenantType == TenantTypeEnum.Db && !string.IsNullOrWhiteSpace(u.Connection))
-                                     .ToListAsync(stoppingToken);
-
-        foreach (var tenant in tenants)
+        using (var serviceScope = _scopeFactory.CreateScope())
         {
-            var tenantDb = tenantDbConnectionProvider.GetTenantDbConnectionScope(tenant.Id);
-            if (tenantDb == null)
-            {
-                continue;
-            }
-
-            await tenantDb.Deleteable<TenantOnlineUserEntity>()
-                          .Where(u => u.TenantId == tenant.Id)
-                          .ExecuteCommandAsync(stoppingToken);
+            var database = serviceScope.ServiceProvider.GetRequiredService<ISqlSugarClient>();
+            await database.Deleteable<TenantOnlineUserEntity>().ExecuteCommandAsync(stoppingToken);
         }
 
-        var originColor = Console.ForegroundColor;
-        Console.ForegroundColor = ConsoleColor.Red;
-        Console.WriteLine("【" + DateTime.Now + "】服务重启清空在线用户");
-        Console.ForegroundColor = originColor;
-
-        // 缓存租户列表；这里只依赖主库 system_tenant，避免构造带租户仓储的租户管理服务。
-        serviceScope.ServiceProvider.GetRequiredService<SystemCacheService>().Set(CacheConst.KeyTenant, tenants);
+        Console.WriteLine("服务重启清空在线用户");
     }
 }

@@ -28,7 +28,7 @@ public class TenantExpirationNotifyJob : IJob
         using var scope = _scopeFactory.CreateScope();
 
         var tenantRepository = scope.ServiceProvider.GetRequiredService<SqlSugarRepository<SystemTenantEntity>>();
-        var tenantDbConnectionProvider = scope.ServiceProvider.GetRequiredService<TenantDbConnectionProvider>();
+        var tenantDbConnectionProvider = scope.ServiceProvider.GetRequiredService<ISqlSugarClient>();
         var logger = scope.ServiceProvider.GetRequiredService<ILogger<TenantExpirationNotifyJob>>();
 
         var tenants = await tenantRepository.AsQueryable()
@@ -45,7 +45,7 @@ public class TenantExpirationNotifyJob : IJob
                 continue;
             }
 
-            var tenantDb = tenantDbConnectionProvider.GetTenantDbConnectionScope(tenant.Id);
+            var tenantDb = tenantDbConnectionProvider;
             if (tenantDb == null)
             {
                 continue;

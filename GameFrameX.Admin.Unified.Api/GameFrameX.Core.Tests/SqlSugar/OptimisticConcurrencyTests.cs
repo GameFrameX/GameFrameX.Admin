@@ -21,6 +21,7 @@ public sealed class OptimisticConcurrencyTests : IDisposable
     {
         var config = new ConnectionConfig
         {
+            ConfigId = "main",
             DbType = DbType.Sqlite,
             ConnectionString = $"DataSource={_dbPath}",
         };
@@ -108,10 +109,7 @@ public sealed class OptimisticConcurrencyTests : IDisposable
     public async Task ClientApiRepository_WhenSnapshotsConflict_RejectsSecondWrite()
     {
         await SeedTestEntityAsync(2);
-        var repository = new ClientRepository(
-            _db,
-            null!,
-            new DelegateSqlSugarTenantIdResolver(() => null));
+        var repository = new ClientRepository(_db);
         var firstSnapshot = await _db.Queryable<OptimisticTestEntity>().InSingleAsync(2);
         var secondSnapshot = await _db.Queryable<OptimisticTestEntity>().InSingleAsync(2);
         firstSnapshot.Value = "client-first";
@@ -127,10 +125,7 @@ public sealed class OptimisticConcurrencyTests : IDisposable
     public async Task HubApiRepository_WhenSnapshotsConflict_RejectsSecondWrite()
     {
         await SeedTestEntityAsync(3);
-        var repository = new HubRepository(
-            _db,
-            null!,
-            new DelegateSqlSugarTenantIdResolver(() => null));
+        var repository = new HubRepository(_db);
         var firstSnapshot = await _db.Queryable<OptimisticTestEntity>().InSingleAsync(3);
         var secondSnapshot = await _db.Queryable<OptimisticTestEntity>().InSingleAsync(3);
         firstSnapshot.Value = "hub-first";

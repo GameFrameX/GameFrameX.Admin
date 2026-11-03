@@ -15,9 +15,9 @@ namespace GameFrameX.Application.Game.Home.GameHome;
 public class TenantGameHomeEntityService : IAdminApiController
 {
     private readonly IHttpClientFactory _httpClientFactory;
-    private readonly ITenantDbConnectionProvider _tenantDbConnectionProvider;
+    private readonly ISqlSugarClient _tenantDbConnectionProvider;
 
-    public TenantGameHomeEntityService(IHttpClientFactory httpClientFactory, ITenantDbConnectionProvider tenantDbConnectionProvider)
+    public TenantGameHomeEntityService(IHttpClientFactory httpClientFactory, ISqlSugarClient tenantDbConnectionProvider)
     {
         _httpClientFactory = httpClientFactory;
         _tenantDbConnectionProvider = tenantDbConnectionProvider;
@@ -163,7 +163,7 @@ public class TenantGameHomeEntityService : IAdminApiController
             throw BusinessError.Oh(GameHomeErrorCode.TenantContextRequired);
         }
 
-        var tenantDb = _tenantDbConnectionProvider.GetTenantDbConnectionScope(tenantId.Value);
+        var tenantDb = _tenantDbConnectionProvider;
         if (tenantDb == null)
         {
             throw BusinessError.Oh(GameHomeErrorCode.TenantDbUnavailable);

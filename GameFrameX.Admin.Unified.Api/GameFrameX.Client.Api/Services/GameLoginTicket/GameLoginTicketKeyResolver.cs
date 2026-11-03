@@ -1,3 +1,4 @@
+using SqlSugar;
 using System.Security.Cryptography;
 using GameFrameX.Client.Api.Services.ClientApiTenantOptions;
 
@@ -11,10 +12,10 @@ namespace GameFrameX.Client.Api.Services.GameLoginTicket;
 /// </summary>
 public sealed class GameLoginTicketKeyResolver : IGameLoginTicketKeyResolver
 {
-    private readonly ClientApiTenantDbProvider _tenantDbProvider;
+    private readonly ISqlSugarClient _tenantDbProvider;
     private readonly IClientApiTenantOptionsProvider _optionsProvider;
 
-    public GameLoginTicketKeyResolver(ClientApiTenantDbProvider tenantDbProvider, IClientApiTenantOptionsProvider optionsProvider)
+    public GameLoginTicketKeyResolver(ISqlSugarClient tenantDbProvider, IClientApiTenantOptionsProvider optionsProvider)
     {
         _tenantDbProvider = tenantDbProvider;
         _optionsProvider = optionsProvider;
@@ -64,7 +65,7 @@ public sealed class GameLoginTicketKeyResolver : IGameLoginTicketKeyResolver
     /// </summary>
     private async Task<List<TenantGameLoginTicketKeyEntity>> GetActiveKeyEntitiesAsync(long tenantId, long appId, long now)
     {
-        var db = _tenantDbProvider.GetTenantDb(tenantId);
+        var db = _tenantDbProvider;
         return await db.Queryable<TenantGameLoginTicketKeyEntity>()
                        .Where(x => x.TenantId == tenantId &&
                                    x.AppId == appId &&
@@ -81,7 +82,7 @@ public sealed class GameLoginTicketKeyResolver : IGameLoginTicketKeyResolver
     /// </summary>
     private async Task CreateRsaKeyEntityAsync(long tenantId, long appId, long now)
     {
-        var db = _tenantDbProvider.GetTenantDb(tenantId);
+        var db = _tenantDbProvider;
         using (var rsa = RSA.Create(2048))
         {
             var entity = new TenantGameLoginTicketKeyEntity

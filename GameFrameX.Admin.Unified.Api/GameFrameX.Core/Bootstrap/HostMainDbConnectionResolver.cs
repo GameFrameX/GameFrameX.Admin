@@ -4,7 +4,7 @@ namespace GameFrameX.Core.Bootstrap;
 
 /// <summary>
 /// Client / Hub host 的主库连接解析入口（C269 单一入口装配）：
-/// 统一走「DbConnection 配置节 / 共享 Database.json 文件默认 + GFX_MAIN_DB_* 环境变量覆盖 + 默认租户库推导 + 错配校验」，
+/// 统一走「DbConnection 配置节 / 共享 Database.json 文件默认 + GFX_MAIN_DB_* 环境变量覆盖 + 错配校验」，
 /// 与 Web.Api 的 <c>SqlSugarSetup.AddSqlSugar</c> 共享同一套 <see cref="DbConnectionOptions.PostConfigure"/> 管线；
 /// <see cref="LauncherOptions"/> 裸启动参数降级为兼容兜底（无任何配置来源时才生效，并打迁移警告）。
 /// </summary>

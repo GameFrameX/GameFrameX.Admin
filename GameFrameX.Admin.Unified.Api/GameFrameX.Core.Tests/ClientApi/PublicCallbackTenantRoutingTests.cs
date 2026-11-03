@@ -226,7 +226,7 @@ public sealed class PublicCallbackTenantRoutingTests : IDisposable
                                                                 long.TryParse(value?.ToString(), out var parsed)
                                                                     ? parsed
                                                                     : null);
-        var tenantDbProvider = new ClientApiTenantDbProvider(mainDb, resolver);
+        var tenantDbProvider = mainDb;
         var appCacheService = new AppCacheService(tenantDbProvider, resolver);
         var routeResolver = new PublicCallbackRouteResolver(mainDb, tenantDbProvider, appCacheService);
         return new PostgresFixture(mainDb, tenantDb, tenantDbProvider, routeResolver, context => currentContext = context);
@@ -365,7 +365,7 @@ public sealed class PublicCallbackTenantRoutingTests : IDisposable
         public PostgresFixture(
             ISqlSugarClient mainDb,
             ISqlSugarClient tenantDb,
-            ClientApiTenantDbProvider tenantDbProvider,
+            ISqlSugarClient tenantDbProvider,
             PublicCallbackRouteResolver routeResolver,
             Action<DefaultHttpContext> setCurrentContext)
         {
@@ -380,7 +380,7 @@ public sealed class PublicCallbackTenantRoutingTests : IDisposable
 
         public ISqlSugarClient TenantDb { get; }
 
-        public ClientApiTenantDbProvider TenantDbProvider { get; }
+        public ISqlSugarClient TenantDbProvider { get; }
 
         public PublicCallbackRouteResolver RouteResolver { get; }
 

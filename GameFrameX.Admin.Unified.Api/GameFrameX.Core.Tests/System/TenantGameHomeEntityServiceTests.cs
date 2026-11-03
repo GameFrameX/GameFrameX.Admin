@@ -52,7 +52,7 @@ public class TenantGameHomeEntityServiceTests : IDisposable
     private TenantGameHomeEntityService CreateService(HttpClient? httpClient = null)
     {
         var client = httpClient ?? new HttpClient(new StubHandler(_ => throw new InvalidOperationException("should not call")));
-        return new TenantGameHomeEntityService(new StubHttpClientFactory(client), _tenantDbProvider);
+        return new TenantGameHomeEntityService(new StubHttpClientFactory(client), _tenantDbProvider.Database);
     }
 
 

@@ -96,7 +96,7 @@ internal static class Program
         // DI 不做基类向上匹配，须显式注册开放泛型基类 -> Repository<T> 实现（与上行为不同 descriptor，仓储无状态可各自实例化）
         builder.Services.AddScoped(typeof(SqlSugarRepository<>), typeof(Repository<>));
         // Core 服务（如 TenantAccessGate）按基类 SqlSugarRepository<T> 注入；映射到 Client.Api 的 Repository<T>，
-        // 其构造已用 ClientApiTenantDbProvider 正确接入主库 / 租户库 Context，避免基类回退无参构造导致 Context 为空、查询 NRE。
+        // 其构造已用 ISqlSugarClient 正确接入主库 / 租户库 Context，避免基类回退无参构造导致 Context 为空、查询 NRE。
         builder.Services.AddScoped(typeof(SqlSugarRepository<>), typeof(Repository<>));
         // 租户访问门禁依赖链：TenantExpirationMiddleware 解析 TenantAccessGate，进而依赖 ICache / SystemCacheService / TenantExpirationService。
         // 这组 Core 服务历史上未在 Client.Api 注册，导致中间件抛 InvalidOperationException、所有请求（含 /health 探针）返回 500。
@@ -116,8 +116,6 @@ internal static class Program
         builder.Services.AddSingleton<SystemCacheService>(); // 仅依赖 ICache + IOptions<CacheOptions>
         builder.Services.AddScoped<TenantExpirationService>(); // 依赖 SqlSugar 仓储
         builder.Services.AddTransient<TenantGameOrderShipService>(); // 订单发货/退款服务
-        builder.Services.AddSingleton<ClientApiTenantDbProvider>(); // 当前请求 TenantId -> 租户业务库连接
-        builder.Services.AddSingleton<ITenantDbProvider>(sp => sp.GetRequiredService<ClientApiTenantDbProvider>()); // 共享层密钥环 Resolver 依赖接口
         builder.Services.AddSingleton<GameAppPackageResolver>(); // 包名解析服务
         builder.Services.AddSingleton<AppCacheService>(); // 应用缓存服务
         builder.Services.AddSingleton<PublicCallbackRouteResolver>(); // 公开 provider 回调 URL -> 租户/应用上下文解析

@@ -13,10 +13,10 @@ namespace GameFrameX.Core.Middleware;
 public sealed class SessionKeyResolver : ISessionKeyResolver
 {
     private readonly ConcurrentDictionary<long, TenantSessionKeyCache> _tenantCaches = new();
-    private readonly ITenantDbProvider _tenantDbProvider;
+    private readonly ISqlSugarClient _tenantDbProvider;
     private readonly ISqlSugarTenantIdResolver _tenantIdResolver;
 
-    public SessionKeyResolver(ITenantDbProvider tenantDbProvider, ISqlSugarTenantIdResolver tenantIdResolver)
+    public SessionKeyResolver(ISqlSugarClient tenantDbProvider, ISqlSugarTenantIdResolver tenantIdResolver)
     {
         _tenantDbProvider = tenantDbProvider;
         _tenantIdResolver = tenantIdResolver;
@@ -72,7 +72,7 @@ public sealed class SessionKeyResolver : ISessionKeyResolver
     /// </summary>
     private async Task<List<TenantSessionKeyEntity>> GetTenantKeysAsync(long tenantId)
     {
-        var db = _tenantDbProvider.GetTenantDb(tenantId);
+        var db = _tenantDbProvider;
         db.QueryFilter.ClearAndBackup();
         try
         {

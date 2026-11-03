@@ -14,14 +14,14 @@ public class SystemOpenAccessService : IAdminApiController
 {
     private readonly SqlSugarRepository<SystemOpenAccessEntity> _systemOpenAccessRepository;
     private readonly SystemCacheService _systemCacheService;
-    private readonly TenantDbConnectionProvider _tenantDbConnectionProvider;
+    private readonly ISqlSugarClient _tenantDbConnectionProvider;
 
     /// <summary>
     /// 开放接口身份服务构造函数
     /// </summary>
     public SystemOpenAccessService(SqlSugarRepository<SystemOpenAccessEntity> systemOpenAccessRepository,
         SystemCacheService systemCacheService,
-        TenantDbConnectionProvider tenantDbConnectionProvider)
+        ISqlSugarClient tenantDbConnectionProvider)
     {
         _systemOpenAccessRepository = systemOpenAccessRepository;
         _systemCacheService = systemCacheService;
@@ -155,7 +155,7 @@ public class SystemOpenAccessService : IAdminApiController
     [NonAction]
     public BoundTenantUser GetBoundTenantUser(SystemOpenAccessEntity openAccess)
     {
-        var tenantDb = _tenantDbConnectionProvider.GetTenantDbConnectionScope(openAccess.BindTenantId);
+        var tenantDb = _tenantDbConnectionProvider;
         if (tenantDb == null)
         {
             throw BusinessError.Oh(TenantErrorCode.DefaultTenantStatusChangeForbidden);

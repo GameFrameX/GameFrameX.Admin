@@ -55,16 +55,16 @@ public sealed class FeatureSwitchSyncControllerTests : IDisposable
             IsEnabled = true,
         }).ExecuteCommand();
 
-        var provider = new HubTenantDbProvider(_mainDb);
-        provider.GetTenantDb(TenantId).CodeFirst.InitTables(typeof(TenantGameAppFeatureSwitchEntity));
+        var provider = _mainDb;
+        provider.CodeFirst.InitTables(typeof(TenantGameAppFeatureSwitchEntity));
     }
 
     private FeatureSwitchSyncController CreateController(out ISqlSugarClient tenantDb, bool includeTenant = true, bool includeApp = true)
     {
-        var provider = new HubTenantDbProvider(_mainDb);
+        var provider = _mainDb;
         var tenantIdResolver = new DelegateSqlSugarTenantIdResolver(() => TenantId);
-        var repository = new Repository<TenantGameAppFeatureSwitchEntity>(_mainDb, provider, tenantIdResolver);
-        tenantDb = provider.GetTenantDb(TenantId);
+        var repository = new Repository<TenantGameAppFeatureSwitchEntity>(_mainDb);
+        tenantDb = provider;
         var controller = new FeatureSwitchSyncController(new FeatureSwitchDeliveryResolver(repository));
         var context = new DefaultHttpContext();
         if (includeTenant)

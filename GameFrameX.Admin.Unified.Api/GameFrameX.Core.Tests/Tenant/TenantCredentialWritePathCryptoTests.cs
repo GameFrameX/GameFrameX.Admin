@@ -42,7 +42,7 @@ public sealed class TenantCredentialWritePathCryptoTests : IDisposable
     public async Task SignatureKey_AddAndRotate_RevealPlaintextOnce_StoreCipherOnly()
     {
         var service = new TenantAppSignatureKeyEntityService(
-            new Repository<TenantAppSignatureKeyEntity>(_db.MainDb, _db.TenantDbProvider, _db.TenantIdResolver));
+            new Repository<TenantAppSignatureKeyEntity>(_db.MainDb));
 
         var added = await service.AddAsync(new TenantAppSignatureKeyAddRequest { AppId = _db.AppId, Remark = "unit-add", });
         var storedAdded = _db.TenantDb.Queryable<TenantAppSignatureKeyEntity>().Filter(null, true).First(u => u.Id == added.Id);
@@ -61,7 +61,7 @@ public sealed class TenantCredentialWritePathCryptoTests : IDisposable
     public async Task AdvertisementConfig_AddEncryptsColumnsAndSensitiveJsonFields_MaskUpdatePreserves()
     {
         var service = new TenantAdvertisementCallbackConfigEntityService(
-            new Repository<TenantAdvertisementCallbackConfigEntity>(_db.MainDb, _db.TenantDbProvider, _db.TenantIdResolver),
+            new Repository<TenantAdvertisementCallbackConfigEntity>(_db.MainDb),
             new AdvertisementCallbackConfigSchemaProvider());
         var configJson = "{\"callbackUrl\":\"https://cb.example.com/hook\",\"signingSecret\":\"ad-plain-secret\"}";
 

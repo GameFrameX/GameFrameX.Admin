@@ -55,39 +55,13 @@ public class ScheduledTaskHostedService : BackgroundService
 
     private async Task LoadScheduledTasksAsync(CancellationToken cancellationToken)
     {
-        // 从每个启用租户库拿到定时任务配置，禁止在无租户上下文时回落主库查询 tenant_ 表。
-        // Output 已拆分为纯 POCO（不含 TenantId），用配对记录携带租户 Id 供 JobConfig 映射。
-        var jobEntityOutputs = new List<TenantJobEntry>();
+        List<TenantGameTimeJobEntityResponse> jobEntityOutputs;
         using (var scope = _serviceProvider.CreateScope())
         {
-            var tenantRepository = scope.ServiceProvider.GetRequiredService<SqlSugarRepository<SystemTenantEntity>>();
-            var tenantDbConnectionProvider = scope.ServiceProvider.GetRequiredService<TenantDbConnectionProvider>();
-            var tenants = await tenantRepository.AsQueryable()
-                                         .Filter(null, true)
-                                         .Where(u => u.IsEnabled == true && u.TenantType == TenantTypeEnum.Db && !string.IsNullOrWhiteSpace(u.Connection))
-                                         .ToListAsync(cancellationToken);
-
-            foreach (var tenant in tenants)
-            {
-                var tenantDb = tenantDbConnectionProvider.GetTenantDbConnectionScope(tenant.Id);
-                if (tenantDb == null)
-                {
-                    _logger.LogWarning("租户 {TenantId} 未取得租户库连接，已跳过定时任务加载。", tenant.Id);
-                    continue;
-                }
-
-                using (TenantOperationContext.UseTenant(tenant.Id))
-                {
-                    var tenantJobs = await tenantDb.Queryable<TenantGameTimeJobEntity>()
-                                                   .Where(u => u.TenantId == tenant.Id)
-                                                   .Select<TenantGameTimeJobEntityResponse>()
-                                                   .ToListAsync(cancellationToken);
-                    foreach (var job in tenantJobs)
-                    {
-                        jobEntityOutputs.Add(new TenantJobEntry { TenantId = tenant.Id, Job = job, });
-                    }
-                }
-            }
+            var database = scope.ServiceProvider.GetRequiredService<ISqlSugarClient>();
+            jobEntityOutputs = await database.Queryable<TenantGameTimeJobEntity>()
+                                             .Select<TenantGameTimeJobEntityResponse>()
+                                             .ToListAsync(cancellationToken);
         }
 
         var jobConfigs = new List<JobConfig>();
@@ -95,13 +69,12 @@ public class ScheduledTaskHostedService : BackgroundService
         {
             var config = new JobConfig
             {
-                TenantId = item.TenantId,
-                JobType = item.Job.Name,
-                CronExpression = item.Job.Cron,
-                Description = item.Job.Description,
-                IsOnce = item.Job.IsOnce,
-                MailId = item.Job.MailId > 0 ? item.Job.MailId : 0,
-                Id = item.Job.Id,
+                JobType = item.Name,
+                CronExpression = item.Cron,
+                Description = item.Description,
+                IsOnce = item.IsOnce,
+                MailId = item.MailId > 0 ? item.MailId : 0,
+                Id = item.Id,
             };
             jobConfigs.Add(config);
         });
@@ -129,13 +102,6 @@ public class ScheduledTaskHostedService : BackgroundService
 
     private async Task AddTaskAsync(JobConfig jobConfig, CancellationToken cancellationToken)
     {
-        var tenantId = jobConfig.TenantId > 0 ? jobConfig.TenantId : TenantOperationContext.GetEffectiveTenantId();
-        if (!tenantId.HasValue)
-        {
-            _logger.LogWarning("定时任务 {JobType} 缺少租户上下文，已跳过注册。", jobConfig.JobType);
-            return;
-        }
-
         // 确保 JobType 包含完整命名空间
         var jobType = Type.GetType($"GameFrameX.Application.Game.Job.{jobConfig.JobType}");
         if (jobType == null)
@@ -167,7 +133,6 @@ public class ScheduledTaskHostedService : BackgroundService
 
         var scheduledTask = new ScheduledTask
         {
-            TenantId = tenantId.Value,
             JobType = jobConfig.JobType,
             CronExpression = jobConfig.CronExpression,
             Description = jobConfig.Description,
@@ -290,59 +255,60 @@ public class ScheduledTaskHostedService : BackgroundService
         {
             _logger.LogInformation($"开始执行任务: {scheduledTask.Description}");
 
-            using var tenantContext = TenantOperationContext.UseTenant(scheduledTask.TenantId);
-            using var scope = _serviceProvider.CreateScope();
+            using (var scope = _serviceProvider.CreateScope())
+            {
 #pragma warning disable CS8604 // Type.GetType 未命中返回 null；GetService(Type) 接受 null 并返回 null（即未注册），符合 DI 容器语义
-            var job = scope.ServiceProvider.GetService(Type.GetType($"GameFrameX.Application.Game.Job.{scheduledTask.JobType}")) as IScheduleJob;
+                var job = scope.ServiceProvider.GetService(Type.GetType($"GameFrameX.Application.Game.Job.{scheduledTask.JobType}")) as IScheduleJob;
 #pragma warning restore CS8604
-            if (job == null)
-            {
-                _logger.LogWarning($"无法找到任务类型: {scheduledTask.JobType}");
-                return;
+                if (job == null)
+                {
+                    _logger.LogWarning($"无法找到任务类型: {scheduledTask.JobType}");
+                    return;
+                }
+
+                _systemCacheService.Set("MailId", scheduledTask.MailId);
+
+                var innerTask = await job.ExecuteAsync(cancellationToken);
+                if (innerTask != null)
+                {
+                    await innerTask;
+                }
+
+                // 计算下一个执行时间
+                if (!scheduledTask.IsOnce)
+                {
+                    var schedule = CrontabSchedule.Parse(scheduledTask.CronExpression, new CrontabSchedule.ParseOptions { IncludingSeconds = true, });
+                    await _tasksLock.WaitAsync(cancellationToken);
+                    try
+                    {
+                        scheduledTask.NextRun = schedule.GetNextOccurrence(DateTime.Now);
+                    }
+                    finally
+                    {
+                        _tasksLock.Release();
+                    }
+                }
+                else
+                {
+                    var repository = scope.ServiceProvider.GetRequiredService<SqlSugarRepository<TenantGameTimeJobEntity>>();
+                    if (scheduledTask.Id > 0)
+                    {
+                        await repository.DeleteByIdAsync(scheduledTask.Id);
+                    }
+
+                    await _tasksLock.WaitAsync(cancellationToken);
+                    try
+                    {
+                        _scheduledTasks.Remove(scheduledTask);
+                    }
+                    finally
+                    {
+                        _tasksLock.Release();
+                    }
+                }
+
+                _logger.LogInformation($"完成执行任务: {scheduledTask.Description}, 下一次执行时间: {scheduledTask.NextRun}");
             }
-
-            _systemCacheService.Set("MailId", scheduledTask.MailId);
-
-            var innerTask = await job.ExecuteAsync(cancellationToken);
-            if (innerTask != null)
-            {
-                await innerTask;
-            }
-
-            // 计算下一个执行时间
-            if (!scheduledTask.IsOnce)
-            {
-                var schedule = CrontabSchedule.Parse(scheduledTask.CronExpression, new CrontabSchedule.ParseOptions { IncludingSeconds = true, });
-                await _tasksLock.WaitAsync(cancellationToken);
-                try
-                {
-                    scheduledTask.NextRun = schedule.GetNextOccurrence(DateTime.Now);
-                }
-                finally
-                {
-                    _tasksLock.Release();
-                }
-            }
-            else
-            {
-                var repository = scope.ServiceProvider.GetRequiredService<SqlSugarRepository<TenantGameTimeJobEntity>>();
-                if (scheduledTask.Id > 0)
-                {
-                    await repository.DeleteByIdAsync(scheduledTask.Id);
-                }
-
-                await _tasksLock.WaitAsync(cancellationToken);
-                try
-                {
-                    _scheduledTasks.Remove(scheduledTask);
-                }
-                finally
-                {
-                    _tasksLock.Release();
-                }
-            }
-
-            _logger.LogInformation($"完成执行任务: {scheduledTask.Description}, 下一次执行时间: {scheduledTask.NextRun}");
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
@@ -371,16 +337,6 @@ public class ScheduledTaskHostedService : BackgroundService
         public bool IsOnce { get; set; }
         public long MailId { get; set; }
         public long Id { get; set; }
-        public long TenantId { get; set; }
     }
 
-    /// <summary>
-    /// 租户 Id 与其定时任务 Output 的配对记录（Output 纯 POCO 不含 TenantId，内部编排需要租户归属）。
-    /// </summary>
-    private sealed class TenantJobEntry
-    {
-        public long TenantId { get; set; }
-
-        public TenantGameTimeJobEntityResponse Job { get; set; } = null!;
-    }
 }
