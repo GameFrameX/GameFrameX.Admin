@@ -116,6 +116,7 @@ public class BackendDuplicationDtoContractTests
     public void SharedDtoFields_AreDeclaredOnceInTheirCommonBase()
     {
         AssertDeclaredOn<GameAppRemoteConfigEditRequest, UpdateGameAppRemoteConfigRequest>(RemoteConfigEditFields);
+        AssertDeclaredOn<GameAppReleaseVersionEditRequest, UpdateGameAppReleaseVersionRequest>(ReleaseVersionEditFields);
         AssertDeclaredOn<TenantGameMailTemplateEntityBaseRequest, UpdateTenantGameMailTemplateEntityRequest>(MailTemplateSharedFields);
         AssertDeclaredOn<TenantGameAnnouncementEntityBaseRequest, UpdateTenantGameAnnouncementEntityRequest>(AnnouncementSharedFields);
     }
