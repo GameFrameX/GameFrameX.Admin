@@ -11,7 +11,7 @@ namespace GameFrameX.Application.Game.Tenant.LoginTicket.TenantGameLoginTicketKe
 /// <summary>
 /// 租户 Game 登录票据签名密钥管理服务。
 /// <para>私钥永不回显：所有输出仅含公钥与元数据。密钥由系统签发或手动轮换生成，不支持手动新增 / 删除。</para>
-/// <para>作用域：租户 + 应用。</para>
+/// <para>作用域：主库。</para>
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 114)]
 public class TenantGameLoginTicketKeyEntityService : BaseService<TenantGameLoginTicketKeyEntity>
@@ -31,7 +31,6 @@ public class TenantGameLoginTicketKeyEntityService : BaseService<TenantGameLogin
     [ApiDescriptionSettings(Name = "Page")]
     public async Task<SqlSugarPagedList<TenantGameLoginTicketKeyResponse>> PageAsync(PageTenantGameLoginTicketKeyRequest input)
     {
-        var appId = input.AppId;
         return await Repository.AsQueryable()
                                .Where(u => u.IsDeleted == false)
                                .WhereIF(input.IsActive.HasValue, u => u.IsEnabled == input.IsActive.Value)
@@ -57,7 +56,7 @@ public class TenantGameLoginTicketKeyEntityService : BaseService<TenantGameLogin
     }
 
     /// <summary>
-    /// 手动轮换（C373）：立即为指定应用生成新 key（ExpireTime 为 null 则永不过期）；
+    /// 手动轮换（C373）：立即生成新 key（ExpireTime 为 null 则永不过期）；
     /// 旧 key 打 RotatedTime 标记并收窄到期时间到退场时刻（默认 now + 7 天、上限 now + 30 天），
     /// 到点被生效查询自然排除——轮换后旧公钥在退场窗口内仍可验签在途票据，窗口外自然退场。
     /// </summary>
@@ -81,8 +80,7 @@ public class TenantGameLoginTicketKeyEntityService : BaseService<TenantGameLogin
         {
             var entity = new TenantGameLoginTicketKeyEntity
             {
-                AppId = input.AppId,
-                Kid = $"admin-rotate-app-{input.AppId}-{TimerHelper.TimestampSecondsToDateTime(now, true):yyyyMMddHHmmss}",
+                Kid = $"admin-rotate-{TimerHelper.TimestampSecondsToDateTime(now, true):yyyyMMddHHmmss}-{Convert.ToHexString(RandomNumberGenerator.GetBytes(4)).ToLowerInvariant()}",
                 Algorithm = "RS256",
                 PrivateKeyPem = TenantSecretCrypto.Encrypt(rsa.ExportPkcs8PrivateKeyPem()) ?? string.Empty,
                 PublicKeyPem = rsa.ExportSubjectPublicKeyInfoPem(),
@@ -92,10 +90,10 @@ public class TenantGameLoginTicketKeyEntityService : BaseService<TenantGameLogin
                 Remark = "Admin 手动轮换生成",
             };
             await Repository.InsertAsync(entity);
-            await MarkOldKeyRotatedAsync(input.AppId, entity.Id, now, oldKeyExpireTime);
+            await MarkOldKeyRotatedAsync(entity.Id, now, oldKeyExpireTime);
 
             // 审计（C373）：密钥生命周期操作结构化审计行；DB 操作日志管线断链期先落应用日志，管线修复后统一接入
-            LogHelper.Info($"[KeyAudit] action=TicketKeyRotate tenant={_currentUserContext.TenantId} app={entity.AppId} newKid={entity.Kid} oldKeyExpireTime={oldKeyExpireTime} operator={_currentUserContext.Account}");
+            LogHelper.Info($"[KeyAudit] action=TicketKeyRotate newKid={entity.Kid} oldKeyExpireTime={oldKeyExpireTime} operator={_currentUserContext.Account}");
         }
     }
 
@@ -112,10 +110,10 @@ public class TenantGameLoginTicketKeyEntityService : BaseService<TenantGameLogin
     /// <summary>
     /// 标记旧钥退场：最新一把未标记的生效旧钥打 RotatedTime=now 并收窄 ExpireTime（与传输签名密钥环 MarkOldKeyRotatedAsync 同模型）。
     /// </summary>
-    private async Task MarkOldKeyRotatedAsync(long appId, long newKeyId, long now, long oldKeyExpireTime)
+    private async Task MarkOldKeyRotatedAsync(long newKeyId, long now, long oldKeyExpireTime)
     {
         var oldKey = await Repository.AsQueryable()
-                                     .Where(e => e.AppId == appId && e.Id != newKeyId && e.IsDeleted == false && e.IsEnabled == true && e.RotatedTime == null
+                                     .Where(e => e.Id != newKeyId && e.IsDeleted == false && e.IsEnabled == true && e.RotatedTime == null
                                                  && (e.ExpireTime == null || e.ExpireTime > now))
                                      .OrderByDescending(e => e.CreatedTime)
                                      .OrderByDescending(e => e.Id)

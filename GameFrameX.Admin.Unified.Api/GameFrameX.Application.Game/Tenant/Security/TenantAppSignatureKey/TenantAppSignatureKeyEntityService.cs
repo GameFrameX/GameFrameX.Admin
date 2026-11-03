@@ -11,7 +11,7 @@ namespace GameFrameX.Application.Game.Tenant.Security.TenantAppSignatureKey;
 /// App 传输签名密钥环管理服务（change C2 sig-keyring-server）。
 /// <para>密钥明文仅服务端随机生成（不接受外部提交，避免弱密钥入环），仅 AddAsync/RotateAsync 响应一次性回显；
 /// 列表/详情一律脱敏 ******；实体禁删（历史 key 是在途请求与多版本客户端的验签依据），退场走 DisableAsync 或租约到期。</para>
-/// <para>作用域：租户 + 应用。路由前缀 /api/tenantAppSignatureKeyEntity（动态路由规则：去 Service 后缀 + lowerCamelCase）。</para>
+/// <para>作用域：主库。路由前缀 /api/tenantAppSignatureKeyEntity（动态路由规则：去 Service 后缀 + lowerCamelCase）。</para>
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 114)]
 public class TenantAppSignatureKeyEntityService : BaseService<TenantAppSignatureKeyEntity>
@@ -28,7 +28,6 @@ public class TenantAppSignatureKeyEntityService : BaseService<TenantAppSignature
     [ApiDescriptionSettings(Name = "Page")]
     public async Task<SqlSugarPagedList<TenantAppSignatureKeyResponse>> PageAsync(PageTenantAppSignatureKeyRequest input)
     {
-        var appId = input.AppId;
         var page = await Repository.AsQueryable()
                                    .Where(u => u.IsDeleted == false)
                                    .WhereIF(input.IsActive.HasValue, u => u.IsEnabled == input.IsActive.Value)
@@ -46,7 +45,7 @@ public class TenantAppSignatureKeyEntityService : BaseService<TenantAppSignature
 
     /// <summary>
     /// 新增签名密钥：服务端随机生成 Kid + HMAC 密钥明文，响应一次性回显。
-    /// <para>适合为同一应用并行放置多把 key（多版本客户端各持一把互不影响）；密钥域归属 AppId。</para>
+    /// <para>适合为同一应用并行放置多把 key（多版本客户端各持一把互不影响）；多版本客户端共用主库密钥环。</para>
     /// </summary>
     [HttpPost("add")]
     [ApiDescriptionSettings(Name = "Add")]
@@ -59,8 +58,7 @@ public class TenantAppSignatureKeyEntityService : BaseService<TenantAppSignature
         var plainSecret = GenerateSecret();
         var entity = new TenantAppSignatureKeyEntity
         {
-            AppId = input.AppId,
-            Kid = GenerateKid(input.AppId, now),
+            Kid = GenerateKid(now),
             Secret = TenantSecretCrypto.Encrypt(plainSecret) ?? string.Empty,
             NotBeforeTime = notBefore,
             ExpireTime = input.ExpireTime,
@@ -91,8 +89,7 @@ public class TenantAppSignatureKeyEntityService : BaseService<TenantAppSignature
         var plainSecret = GenerateSecret();
         var entity = new TenantAppSignatureKeyEntity
         {
-            AppId = input.AppId,
-            Kid = GenerateKid(input.AppId, now),
+            Kid = GenerateKid(now),
             Secret = TenantSecretCrypto.Encrypt(plainSecret) ?? string.Empty,
             NotBeforeTime = now,
             ExpireTime = null,
@@ -101,7 +98,7 @@ public class TenantAppSignatureKeyEntityService : BaseService<TenantAppSignature
         };
         await Repository.InsertAsync(entity);
 
-        await MarkOldKeyRotatedAsync(input.AppId, entity.Id, now, input.OldKeyExpireTime);
+        await MarkOldKeyRotatedAsync(entity.Id, now, input.OldKeyExpireTime);
         return ToRevealOutput(entity, plainSecret);
     }
 
@@ -163,10 +160,10 @@ public class TenantAppSignatureKeyEntityService : BaseService<TenantAppSignature
     /// <para>只挑「启用 + 未被轮换过」的最新一把（排除本轮刚插入的新 key —— CreatedTime 为秒级，
     /// 同秒内排序无法区分新旧），不动已禁用/已过期的历史 key。</para>
     /// </summary>
-    private async Task MarkOldKeyRotatedAsync(long appId, long newKeyId, long now, long? oldKeyExpireTime)
+    private async Task MarkOldKeyRotatedAsync(long newKeyId, long now, long? oldKeyExpireTime)
     {
         var oldKey = await Repository.AsQueryable()
-                                     .Where(e => e.AppId == appId && e.Id != newKeyId && e.IsDeleted == false && e.IsEnabled == true && e.RotatedTime == null
+                                     .Where(e => e.Id != newKeyId && e.IsDeleted == false && e.IsEnabled == true && e.RotatedTime == null
                                                  && (e.ExpireTime == null || e.ExpireTime > now))
                                      .OrderByDescending(e => e.CreatedTime)
                                      .OrderByDescending(e => e.Id)
@@ -214,13 +211,13 @@ public class TenantAppSignatureKeyEntityService : BaseService<TenantAppSignature
     }
 
     /// <summary>
-    /// 生成 Key ID：sk-app-{appId}-{时间戳}-{随机后缀}。人可读、wire 稳定（对齐 LoginTicket Kid 风格），
+    /// 生成 Key ID：signature-{时间戳}-{随机后缀}。人可读、wire 稳定（对齐 LoginTicket Kid 风格），
     /// 随机后缀避免同秒并发新增/轮换撞名。
     /// </summary>
-    private static string GenerateKid(long appId, long now)
+    private static string GenerateKid(long now)
     {
         var suffix = Convert.ToHexString(RandomNumberGenerator.GetBytes(2)).ToLowerInvariant();
-        return $"sk-app-{appId}-{TimerHelper.TimestampSecondsToDateTime(now, true):yyyyMMddHHmmss}-{suffix}";
+        return $"signature-{TimerHelper.TimestampSecondsToDateTime(now, true):yyyyMMddHHmmss}-{suffix}";
     }
 
     /// <summary>
@@ -239,7 +236,6 @@ public class TenantAppSignatureKeyEntityService : BaseService<TenantAppSignature
         return new TenantAppSignatureKeyRevealResponse
         {
             Id = entity.Id,
-            AppId = entity.AppId,
             Kid = entity.Kid,
             Secret = plainSecret,
             NotBeforeTime = entity.NotBeforeTime,

@@ -7,11 +7,6 @@ namespace GameFrameX.Application.Game.Tenant.Integration.TenantAdvertisementCall
 public class UpdateTenantAdvertisementCallbackConfigRequest : BaseUpdateRequest
 {
     /// <summary>
-    /// 应用 ID。0 表示租户默认配置；大于 0 表示应用级覆盖。
-    /// </summary>
-    public long AppId { get; set; }
-
-    /// <summary>
     /// 广告平台 Provider。当前首批配置支持 <c>TopOn</c>、<c>GoogleAdMob</c>、<c>Pangle</c>、<c>UnityAds</c>。
     /// </summary>
     [Required(ErrorMessage = "广告平台不能为空")]

@@ -6,12 +6,6 @@ namespace GameFrameX.Application.Game.Tenant.Security.TenantAppSignatureKey.Dto;
 public class TenantAppSignatureKeyRotateRequest
 {
     /// <summary>
-    /// 应用 ID（密钥域归属）。
-    /// </summary>
-    [Required(ErrorMessage = "应用 ID 不能为空")]
-    public long AppId { get; set; }
-
-    /// <summary>
     /// 旧密钥的新到期时间（Unix 秒）：建议设为「双活窗口」结束时刻（客户端全量切换完成后）；
     /// null 表示不改动旧密钥租约（旧密钥按原到期时间或永久继续双活）。
     /// </summary>

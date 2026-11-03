@@ -15,16 +15,6 @@ public class TenantAppSignatureKeyResponse
     public long Id { get; set; }
 
     /// <summary>
-    /// 租户 ID。
-    /// </summary>
-    public long TenantId { get; set; }
-
-    /// <summary>
-    /// 应用 ID。
-    /// </summary>
-    public long AppId { get; set; }
-
-    /// <summary>
     /// Key ID，v2 签名头与 message 串中的 keyId。
     /// </summary>
     public string Kid { get; set; } = null!;

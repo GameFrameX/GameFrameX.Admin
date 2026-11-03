@@ -13,11 +13,6 @@ public class TenantSessionKeyRevealResponse
     public long Id { get; set; }
 
     /// <summary>
-    /// 应用 ID。
-    /// </summary>
-    public long AppId { get; set; }
-
-    /// <summary>
     /// Key ID，信封 JSON kid 字段。
     /// </summary>
     public string Kid { get; set; } = null!;

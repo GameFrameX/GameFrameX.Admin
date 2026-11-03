@@ -44,12 +44,12 @@ public sealed class TenantCredentialWritePathCryptoTests : IDisposable
         var service = new TenantAppSignatureKeyEntityService(
             new Repository<TenantAppSignatureKeyEntity>(_db.MainDb));
 
-        var added = await service.AddAsync(new TenantAppSignatureKeyAddRequest { AppId = _db.AppId, Remark = "unit-add", });
+        var added = await service.AddAsync(new TenantAppSignatureKeyAddRequest { Remark = "unit-add", });
         var storedAdded = _db.TenantDb.Queryable<TenantAppSignatureKeyEntity>().Filter(null, true).First(u => u.Id == added.Id);
         Assert.StartsWith(TenantSecretCrypto.EncryptedPrefix, storedAdded.Secret, StringComparison.Ordinal);
         Assert.Equal(added.Secret, TenantSecretCrypto.Decrypt(storedAdded.Secret));
 
-        var rotated = await service.RotateAsync(new TenantAppSignatureKeyRotateRequest { AppId = _db.AppId, });
+        var rotated = await service.RotateAsync(new TenantAppSignatureKeyRotateRequest { });
         var storedRotated = _db.TenantDb.Queryable<TenantAppSignatureKeyEntity>().Filter(null, true).First(u => u.Id == rotated.Id);
         Assert.StartsWith(TenantSecretCrypto.EncryptedPrefix, storedRotated.Secret, StringComparison.Ordinal);
         Assert.Equal(rotated.Secret, TenantSecretCrypto.Decrypt(storedRotated.Secret));
@@ -67,7 +67,7 @@ public sealed class TenantCredentialWritePathCryptoTests : IDisposable
 
         var added = await service.AddAsync(new AddTenantAdvertisementCallbackConfigRequest
         {
-            AppId = _db.AppId,
+           
             Provider = "Pangle",
             CallbackUrl = "https://cb.example.com/hook",
             SigningSecret = "ad-plain-secret",
@@ -90,7 +90,7 @@ public sealed class TenantCredentialWritePathCryptoTests : IDisposable
         await service.UpdateAsync(new UpdateTenantAdvertisementCallbackConfigRequest
         {
             Id = added.Id,
-            AppId = _db.AppId,
+           
             Provider = "Pangle",
             CallbackUrl = "https://cb.example.com/hook",
             SigningSecret = SensitiveFieldMask.MaskValue,

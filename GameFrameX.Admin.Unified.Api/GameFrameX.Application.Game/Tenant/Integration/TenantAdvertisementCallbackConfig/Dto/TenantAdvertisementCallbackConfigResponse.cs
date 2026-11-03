@@ -13,11 +13,6 @@ public class TenantAdvertisementCallbackConfigResponse : IBasePageResponse<Tenan
     public long Id { get; set; }
 
     /// <summary>
-    /// 应用 ID。0 表示租户默认配置；大于 0 表示应用级覆盖。
-    /// </summary>
-    public long AppId { get; set; }
-
-    /// <summary>
     /// 广告平台 Provider。当前首批配置支持 TopOn、GoogleAdMob、Pangle、UnityAds。
     /// </summary>
     public string Provider { get; set; } = "TopOn";

@@ -58,7 +58,7 @@ public sealed class BusinessPageSearchKeyRemovalGuardTests
     public void ServicesWithoutSelectAsyncKeep_FileContainsNoInputSearchKey()
     {
         var noKeepServices = CleanedServices.Where(u => !ServicesWithSelectAsyncKeep.Contains(u)).ToArray();
-        Assert.Equal(14, noKeepServices.Length);
+        Assert.Equal(13, noKeepServices.Length);
 
         foreach (var serviceName in noKeepServices)
         {

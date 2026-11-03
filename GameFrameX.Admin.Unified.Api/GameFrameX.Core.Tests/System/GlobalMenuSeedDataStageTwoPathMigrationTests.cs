@@ -65,7 +65,6 @@ public class GlobalMenuSeedDataStageTwoPathMigrationTests
         var menus = GlobalMenuSeedData.BuildData();
         var expectedParents = new Dictionary<string, string>(StringComparer.Ordinal)
         {
-            ["route:gameAppEntity"] = "route:app",
             ["route:gameAppPackage"] = "route:app",
             ["route:gameAppRelease"] = "route:app",
             ["route:gameAppResource"] = "route:app",

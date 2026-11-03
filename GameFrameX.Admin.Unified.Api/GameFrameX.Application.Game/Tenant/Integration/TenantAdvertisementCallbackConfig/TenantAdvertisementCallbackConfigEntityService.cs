@@ -41,16 +41,15 @@ public class TenantAdvertisementCallbackConfigEntityService
     }
 
     /// <summary>
-    /// 新增广告回调配置（同一租户下 Provider + AppId 作用域唯一）。
+    /// 新增广告回调配置（主库内 Provider 唯一）。
     /// </summary>
     public override async Task<TenantAdvertisementCallbackConfigResponse> AddAsync(AddTenantAdvertisementCallbackConfigRequest input)
     {
         var provider = NormalizeProvider(input.Provider, true);
         var configJson = NormalizeConfigJson(provider, input.ConfigJson, null);
-        await CheckUniqueScopeAsync(provider, input.AppId, null);
+        await CheckUniqueScopeAsync(provider, null);
 
         var entity = input.Adapt<Entity.Tenant.ClientApiConfig.TenantAdvertisementCallbackConfigEntity>();
-        entity.AppId = input.AppId;
         entity.Provider = provider;
         entity.ConfigJson = configJson;
         ApplyConfigSummary(entity, configJson);
@@ -77,9 +76,7 @@ public class TenantAdvertisementCallbackConfigEntityService
 
         var provider = NormalizeProvider(input.Provider, true);
         var configJson = NormalizeConfigJson(provider, input.ConfigJson, entity.ConfigJson);
-        await CheckUniqueScopeAsync(provider, input.AppId, input.Id);
-
-        entity.AppId = input.AppId;
+        await CheckUniqueScopeAsync(provider, input.Id);
         entity.Provider = provider;
         entity.ConfigJson = configJson;
         ApplyConfigSummary(entity, configJson);
@@ -95,7 +92,6 @@ public class TenantAdvertisementCallbackConfigEntityService
         await Repository.AsUpdateable(entity)
                         .UpdateColumns(e => new
                         {
-                            e.AppId,
                             e.Provider,
                             e.CallbackUrl,
                             e.SigningSecret,
@@ -163,14 +159,14 @@ public class TenantAdvertisementCallbackConfigEntityService
         return _schemaProvider.GetProviders();
     }
 
-    private async Task CheckUniqueScopeAsync(string provider, long appId, long? excludeId)
+    private async Task CheckUniqueScopeAsync(string provider, long? excludeId)
     {
         var exists = excludeId.HasValue
-                         ? await Repository.IsAnyAsync(x => x.Provider == provider && x.AppId == appId && x.Id != excludeId.Value)
-                         : await Repository.IsAnyAsync(x => x.Provider == provider && x.AppId == appId);
+                         ? await Repository.IsAnyAsync(x => x.Provider == provider && x.Id != excludeId.Value)
+                         : await Repository.IsAnyAsync(x => x.Provider == provider);
         if (exists)
         {
-            throw BusinessError.Oh("同一广告平台和应用的广告回调配置已存在");
+            throw BusinessError.Oh("同一广告平台的广告回调配置已存在");
         }
     }
 

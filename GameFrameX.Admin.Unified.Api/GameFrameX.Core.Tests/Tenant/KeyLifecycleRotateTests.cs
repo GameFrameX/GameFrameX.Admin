@@ -58,7 +58,7 @@ public sealed class KeyLifecycleRotateTests : IDisposable
     {
         var oldKey = new TenantGameLoginTicketKeyEntity
         {
-            AppId = _db.AppId,
+           
             Kid = "kid-old-active",
             Algorithm = "RS256",
             PrivateKeyPem = TenantSecretCrypto.Encrypt("old-private-pem") ?? string.Empty,
@@ -78,7 +78,7 @@ public sealed class KeyLifecycleRotateTests : IDisposable
         var oldKey = SeedActiveTicketKey();
         var before = TimerHelper.UnixTimeSeconds();
 
-        await CreateTicketKeyService().RotateAsync(new TenantGameLoginTicketKeyRotateRequest { AppId = _db.AppId, });
+        await CreateTicketKeyService().RotateAsync(new TenantGameLoginTicketKeyRotateRequest { });
 
         var after = TimerHelper.UnixTimeSeconds();
         var storedOld = _db.TenantDb.Queryable<TenantGameLoginTicketKeyEntity>().First(u => u.Id == oldKey.Id);
@@ -100,7 +100,7 @@ public sealed class KeyLifecycleRotateTests : IDisposable
         var now = TimerHelper.UnixTimeSeconds();
         var explicitExpire = now + 30 * 24 * 3600; // 上限边界（恰好 30 天）应放行
 
-        await CreateTicketKeyService().RotateAsync(new TenantGameLoginTicketKeyRotateRequest { AppId = _db.AppId, OldKeyExpireTime = explicitExpire, });
+        await CreateTicketKeyService().RotateAsync(new TenantGameLoginTicketKeyRotateRequest { OldKeyExpireTime = explicitExpire, });
 
         var storedOld = _db.TenantDb.Queryable<TenantGameLoginTicketKeyEntity>().First(u => u.Id == oldKey.Id);
         Assert.Equal(explicitExpire, storedOld.ExpireTime);
@@ -113,7 +113,7 @@ public sealed class KeyLifecycleRotateTests : IDisposable
         SeedActiveTicketKey();
         var request = new TenantGameLoginTicketKeyRotateRequest
         {
-            AppId = _db.AppId,
+           
             OldKeyExpireTime = TimerHelper.UnixTimeSeconds() + TenantGameLoginTicketKeyEntityService.OldKeyMaxExpireSeconds + 1,
         };
 
@@ -126,7 +126,7 @@ public sealed class KeyLifecycleRotateTests : IDisposable
         SeedActiveTicketKey();
         var request = new TenantGameLoginTicketKeyRotateRequest
         {
-            AppId = _db.AppId,
+           
             OldKeyExpireTime = TimerHelper.UnixTimeSeconds(),
         };
 
@@ -137,7 +137,7 @@ public sealed class KeyLifecycleRotateTests : IDisposable
     public async Task TicketKeyRotate_NoActiveOldKey_IsNoop()
     {
         // 无旧钥场景（首把密钥轮换）：仅生成新钥，不抛错
-        await CreateTicketKeyService().RotateAsync(new TenantGameLoginTicketKeyRotateRequest { AppId = _db.AppId, });
+        await CreateTicketKeyService().RotateAsync(new TenantGameLoginTicketKeyRotateRequest { });
 
         var count = _db.TenantDb.Queryable<TenantGameLoginTicketKeyEntity>().Count();
         Assert.Equal(1, count);

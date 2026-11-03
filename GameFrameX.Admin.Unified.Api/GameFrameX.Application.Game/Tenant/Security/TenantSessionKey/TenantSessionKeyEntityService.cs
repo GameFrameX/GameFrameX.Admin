@@ -11,7 +11,7 @@ namespace GameFrameX.Application.Game.Tenant.Security.TenantSessionKey;
 /// App 会话密钥环管理服务（change C5 server-envelope-middleware；C7 登录自动签发见 Client.Api 的 ClientApiSessionKeyIssuer）。
 /// <para>密钥明文仅服务端随机生成（不接受外部提交，避免弱密钥入环），仅 AddAsync/RotateAsync 响应一次性回显；
 /// 列表/详情一律脱敏 ******；实体禁删（历史 key 是在途加密信封的解密依据），退场走 DisableAsync 或租约到期。</para>
-/// <para>作用域：租户 + 应用。路由前缀 /api/tenantSessionKeyEntity。</para>
+/// <para>作用域：主库。路由前缀 /api/tenantSessionKeyEntity。</para>
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 114)]
 public class TenantSessionKeyEntityService : BaseService<TenantSessionKeyEntity>
@@ -28,7 +28,6 @@ public class TenantSessionKeyEntityService : BaseService<TenantSessionKeyEntity>
     [ApiDescriptionSettings(Name = "Page")]
     public async Task<SqlSugarPagedList<TenantSessionKeyResponse>> PageAsync(PageTenantSessionKeyRequest input)
     {
-        var appId = input.AppId;
         var page = await Repository.AsQueryable()
                                    .Where(u => u.IsDeleted == false)
                                    .WhereIF(input.IsActive.HasValue, u => u.IsEnabled == input.IsActive.Value)
@@ -46,7 +45,7 @@ public class TenantSessionKeyEntityService : BaseService<TenantSessionKeyEntity>
 
     /// <summary>
     /// 新增会话密钥：服务端随机生成 Kid + AES 密钥明文，响应一次性回显。
-    /// <para>适合为同一应用并行放置多把 key（多版本客户端各持一把互不影响）；密钥域归属 AppId。</para>
+    /// <para>适合为同一应用并行放置多把 key（多版本客户端各持一把互不影响）；多版本客户端共用主库密钥环。</para>
     /// </summary>
     [HttpPost(CrudActionRoutes.Add)]
     [ApiDescriptionSettings(Name = "Add")]
@@ -59,8 +58,7 @@ public class TenantSessionKeyEntityService : BaseService<TenantSessionKeyEntity>
         var plainSecret = GenerateSecret();
         var entity = new TenantSessionKeyEntity
         {
-            AppId = input.AppId,
-            Kid = GenerateKid(input.AppId, now),
+            Kid = GenerateKid(now),
             Secret = TenantSecretCrypto.Encrypt(plainSecret) ?? string.Empty,
             NotBeforeTime = notBefore,
             ExpireTime = input.ExpireTime,
@@ -112,8 +110,7 @@ public class TenantSessionKeyEntityService : BaseService<TenantSessionKeyEntity>
         var plainSecret = GenerateSecret();
         var entity = new TenantSessionKeyEntity
         {
-            AppId = input.AppId,
-            Kid = GenerateKid(input.AppId, now),
+            Kid = GenerateKid(now),
             Secret = TenantSecretCrypto.Encrypt(plainSecret) ?? string.Empty,
             NotBeforeTime = now,
             ExpireTime = null,
@@ -122,7 +119,7 @@ public class TenantSessionKeyEntityService : BaseService<TenantSessionKeyEntity>
         };
         await Repository.InsertAsync(entity);
 
-        await MarkOldKeyRotatedAsync(input.AppId, entity.Id, now, input.OldKeyExpireTime);
+        await MarkOldKeyRotatedAsync(entity.Id, now, input.OldKeyExpireTime);
         return ToRevealOutput(entity, plainSecret);
     }
 
@@ -184,10 +181,10 @@ public class TenantSessionKeyEntityService : BaseService<TenantSessionKeyEntity>
     /// <para>只挑「启用 + 未被轮换过」的最新一把（排除本轮刚插入的新 key —— CreatedTime 为秒级，
     /// 同秒内排序无法区分新旧），不动已禁用/已过期的历史 key。</para>
     /// </summary>
-    private async Task MarkOldKeyRotatedAsync(long appId, long newKeyId, long now, long? oldKeyExpireTime)
+    private async Task MarkOldKeyRotatedAsync(long newKeyId, long now, long? oldKeyExpireTime)
     {
         var oldKey = await Repository.AsQueryable()
-                                     .Where(e => e.AppId == appId && e.Id != newKeyId && e.IsDeleted == false && e.IsEnabled == true && e.RotatedTime == null
+                                     .Where(e => e.Id != newKeyId && e.IsDeleted == false && e.IsEnabled == true && e.RotatedTime == null
                                                  && (e.ExpireTime == null || e.ExpireTime > now))
                                      .OrderByDescending(e => e.CreatedTime)
                                      .OrderByDescending(e => e.Id)
@@ -235,14 +232,14 @@ public class TenantSessionKeyEntityService : BaseService<TenantSessionKeyEntity>
     }
 
     /// <summary>
-    /// 生成 Key ID：sess-app-{appId}-{时间戳}-{随机后缀}。人可读、wire 稳定（进入信封 JSON 的 kid 字段，
+    /// 生成 Key ID：session-{时间戳}-{随机后缀}。人可读、wire 稳定（进入信封 JSON 的 kid 字段，
     /// 字符白名单 [A-Za-z0-9._-]{1,64}），随机后缀避免同秒并发新增/轮换撞名。
     /// <para>public static：Client.Api 登录自动签发（C7 ClientApiSessionKeyIssuer）与本服务共用同一 Kid 形状。</para>
     /// </summary>
-    public static string GenerateKid(long appId, long now)
+    public static string GenerateKid(long now)
     {
         var suffix = Convert.ToHexString(RandomNumberGenerator.GetBytes(2)).ToLowerInvariant();
-        return $"sess-app-{appId}-{TimerHelper.TimestampSecondsToDateTime(now, true):yyyyMMddHHmmss}-{suffix}";
+        return $"session-{TimerHelper.TimestampSecondsToDateTime(now, true):yyyyMMddHHmmss}-{suffix}";
     }
 
     /// <summary>
@@ -262,7 +259,6 @@ public class TenantSessionKeyEntityService : BaseService<TenantSessionKeyEntity>
         return new TenantSessionKeyRevealResponse
         {
             Id = entity.Id,
-            AppId = entity.AppId,
             Kid = entity.Kid,
             Secret = plainSecret,
             NotBeforeTime = entity.NotBeforeTime,

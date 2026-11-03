@@ -6,11 +6,6 @@ namespace GameFrameX.Application.Game.Tenant.LoginTicket.TenantGameLoginTicketKe
 public class TenantGameLoginTicketKeyRotateRequest
 {
     /// <summary>
-    /// 应用 ID。
-    /// </summary>
-    public long AppId { get; set; }
-
-    /// <summary>
     /// 新密钥的到期时间；null 表示永不过期。
     /// </summary>
     public long? ExpireTime { get; set; }

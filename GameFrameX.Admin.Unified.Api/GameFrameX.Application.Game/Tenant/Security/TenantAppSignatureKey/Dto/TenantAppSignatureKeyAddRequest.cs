@@ -7,12 +7,6 @@ namespace GameFrameX.Application.Game.Tenant.Security.TenantAppSignatureKey.Dto;
 public class TenantAppSignatureKeyAddRequest
 {
     /// <summary>
-    /// 应用 ID（密钥域归属）。
-    /// </summary>
-    [Required(ErrorMessage = "应用 ID 不能为空")]
-    public long AppId { get; set; }
-
-    /// <summary>
     /// 生效时间（Unix 秒）；null 表示立即生效。
     /// </summary>
     public long? NotBeforeTime { get; set; }
