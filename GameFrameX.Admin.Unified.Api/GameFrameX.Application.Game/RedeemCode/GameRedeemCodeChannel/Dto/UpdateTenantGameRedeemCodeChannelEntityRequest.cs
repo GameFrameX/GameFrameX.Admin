@@ -5,12 +5,6 @@ namespace GameFrameX.Application.Game.RedeemCode.GameRedeemCodeChannel.Dto;
 /// </summary>
 public class UpdateTenantGameRedeemCodeChannelEntityRequest : BaseUpdateRequest
 {
-    /// <summary>
-    /// 应用Id。事实数据应用作用域，必须 &gt; 0。
-    /// <para>过渡期：后台运营当前应用上下文尚未建立，由前端手填。</para>
-    /// </summary>
-    [Required(ErrorMessage = "应用Id不能为空")]
-    public long AppId { get; set; }
 
     /// <summary>
     /// 名称。此前 UpdateRequest 缺此声明：编辑提交的 name 被绑定丢弃，Adapt 后实体 Name=null，

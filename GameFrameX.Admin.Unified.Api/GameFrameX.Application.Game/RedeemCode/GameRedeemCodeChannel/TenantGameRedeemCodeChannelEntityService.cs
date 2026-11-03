@@ -1,4 +1,3 @@
-using GameFrameX.Application.Game.App.AppScope;
 using GameFrameX.Application.Game.RedeemCode.GameRedeemCodeChannel.Dto;
 
 #pragma warning disable CS8602, CS8604, CS8629 // SqlSugar WhereIF(condition, lambda)：lambda 仅在 condition=true 时执行；NRT 无法跨方法传播条件守卫，lambda 内 .Trim()/.Value 实际安全
@@ -13,26 +12,22 @@ public class TenantGameRedeemCodeChannelEntityService
         AddTenantGameRedeemCodeChannelEntityRequest, UpdateTenantGameRedeemCodeChannelEntityRequest,
         TenantGameRedeemCodeChannelEntityResponse, PageTenantGameRedeemCodeChannelEntityRequest>
 {
-    private readonly SqlSugarRepository<Entity.Tenant.Game.TenantGameAppEntity> _gameAppRepository;
-
-    public TenantGameRedeemCodeChannelEntityService(SqlSugarRepository<Entity.Tenant.Game.TenantGameRedeemCodeChannelEntity> repository, SqlSugarRepository<Entity.Tenant.Game.TenantGameAppEntity> gameAppRepository)
+    public TenantGameRedeemCodeChannelEntityService(SqlSugarRepository<Entity.Tenant.Game.TenantGameRedeemCodeChannelEntity> repository)
         : base(repository)
     {
-        _gameAppRepository = gameAppRepository;
     }
 
     /// <summary>
-    /// 新增前校验：AppId 必填且必须属于当前租户（运营内容，禁止 AppId=0）；RoleUsageLimit 必须 &gt;= 0。
+    /// 新增前校验每角色可用次数。
     /// </summary>
-    protected override async Task OnAddingAsync(AddTenantGameRedeemCodeChannelEntityRequest input)
+    protected override Task OnAddingAsync(AddTenantGameRedeemCodeChannelEntityRequest input)
     {
-        AppScopeRules.EnsureFactAppId(input.AppId, "兑换码渠道");
         EnsureValidRoleUsageLimit(input.RoleUsageLimit);
-        await _gameAppRepository.ValidateGameAppBelongsToTenantAsync(input.AppId);
+        return Task.CompletedTask;
     }
 
     /// <summary>
-    /// 更新前：AppId 不可变（从既有实体回填）并校验应用归属；RoleUsageLimit 必须 &gt;= 0。
+    /// 更新前验证记录存在。
     /// </summary>
     protected override async Task OnUpdatingAsync(UpdateTenantGameRedeemCodeChannelEntityRequest input)
     {
@@ -42,10 +37,7 @@ public class TenantGameRedeemCodeChannelEntityService
             throw BusinessError.Oh(CommonErrorCode.RecordNotFound);
         }
 
-        input.AppId = existing.AppId;
-        AppScopeRules.EnsureFactAppId(input.AppId, "兑换码渠道");
         EnsureValidRoleUsageLimit(input.RoleUsageLimit);
-        await _gameAppRepository.ValidateGameAppBelongsToTenantAsync(input.AppId);
     }
 
     /// <summary>
@@ -61,10 +53,8 @@ public class TenantGameRedeemCodeChannelEntityService
 
     protected override ISugarQueryable<TenantGameRedeemCodeChannelEntityResponse> BuildPageQuery(PageTenantGameRedeemCodeChannelEntityRequest input)
     {
-        var appId = AppScopeRules.EnsureFactAppId(input.AppId, "兑换码渠道");
         return Repository.AsQueryable()
                          .WhereIF(!string.IsNullOrWhiteSpace(input.Name), u => u.Name.Contains(input.Name.Trim()))
-                         .Where(u => u.AppId == appId)
                          .Select<TenantGameRedeemCodeChannelEntityResponse>();
     }
 }

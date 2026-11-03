@@ -30,8 +30,4 @@ public class PageTenantGameRedeemCodeEntityRequest : BaseAreaPageRequest
     /// </summary>
     public long? ChannelId { get; set; }
 
-    /// <summary>
-    /// 应用Id（可选过滤，按当前应用筛选兑换码）
-    /// </summary>
-    public long? AppId { get; set; }
 }

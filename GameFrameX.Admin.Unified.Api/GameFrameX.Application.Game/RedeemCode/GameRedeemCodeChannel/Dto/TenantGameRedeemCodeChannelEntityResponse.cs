@@ -20,10 +20,6 @@ public class TenantGameRedeemCodeChannelEntityResponse : IBasePageResponse<Entit
     /// </summary>
     public string Description { get; set; } = null!;
 
-    /// <summary>
-    /// 应用Id。运营内容应用作用域（TenantId + AppId），必须 &gt; 0。
-    /// </summary>
-    public long AppId { get; set; }
 
     /// <summary>
     /// 每角色可用次数（兑换码分组角色限制）。0 = 不限制，1 = 每角色一次，N = 每角色最多 N 次。

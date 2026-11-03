@@ -1,4 +1,3 @@
-using GameFrameX.Application.Game.App.AppScope;
 using GameFrameX.Application.Game.RedeemCode.GameRedeemCodeUseRecord.Dto;
 
 namespace GameFrameX.Application.Game.RedeemCode.GameRedeemCodeUseRecord;
@@ -23,8 +22,8 @@ public class TenantGameRedeemCodeUseRecordEntityService
     }
 
     /// <summary>
-    /// 新增前：兑换码使用记录由客户端兑换链路产生，事实数据 AppId 必须来自可信写入链路；
-    /// 禁止管理后台直接创建使用记录，避免写入 AppId=0 违反事实数据应用作用域铁律。
+    /// 新增前解析并校验附件道具。
+    /// 新增前解析并校验附件道具。
     /// </summary>
     protected override Task OnAddingAsync(AddTenantGameRedeemCodeUseRecordEntityRequest input)
     {
@@ -33,10 +32,8 @@ public class TenantGameRedeemCodeUseRecordEntityService
 
     protected override ISugarQueryable<TenantGameRedeemCodeUseRecordEntityResponse> BuildPageQuery(PageTenantGameRedeemCodeUseRecordEntityRequest input)
     {
-        var appId = AppScopeRules.EnsureFactAppId(input.AppId, "兑换记录");
         return Repository.AsQueryable()
                          .WhereIF(input.AreaId > 0, u => u.AreaId == input.AreaId)
-                         .Where(u => u.AppId == appId)
                          .WhereIF(!string.IsNullOrWhiteSpace(input.Code), u => u.Code == input.Code)
                          .WhereIF(input.PlayerId > 0, u => u.PlayerId == input.PlayerId)
                          //处理外键和TreeSelector相关字段的连接
@@ -48,7 +45,6 @@ public class TenantGameRedeemCodeUseRecordEntityService
                          .Select((u, areaid, code, channel) => new TenantGameRedeemCodeUseRecordEntityResponse
                          {
                              Id = u.Id,
-                             AppId = u.AppId,
                              AreaId = u.AreaId,
                              Code = u.Code,
                              PlayerId = u.PlayerId,

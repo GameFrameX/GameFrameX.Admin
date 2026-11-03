@@ -1,4 +1,3 @@
-using GameFrameX.Application.Game.App.AppScope;
 using GameFrameX.Application.Game.RedeemCode.GameRedeemCode.Dto;
 using GameFrameX.Foundation.Json;
 
@@ -11,11 +10,8 @@ namespace GameFrameX.Application.Game.RedeemCode.GameRedeemCode;
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
 public class TenantGameRedeemCodeEntityService : GenericCrudService<Entity.Tenant.Game.TenantGameRedeemCodeEntity, AddTenantGameRedeemCodeEntityRequest, UpdateTenantGameRedeemCodeEntityRequest, TenantGameRedeemCodeEntityResponse, PageTenantGameRedeemCodeEntityRequest>
 {
-    private readonly SqlSugarRepository<Entity.Tenant.Game.TenantGameAppEntity> _gameAppRepository;
-
-    public TenantGameRedeemCodeEntityService(SqlSugarRepository<Entity.Tenant.Game.TenantGameRedeemCodeEntity> repository, SqlSugarRepository<Entity.Tenant.Game.TenantGameAppEntity> gameAppRepository) : base(repository)
+    public TenantGameRedeemCodeEntityService(SqlSugarRepository<Entity.Tenant.Game.TenantGameRedeemCodeEntity> repository) : base(repository)
     {
-        _gameAppRepository = gameAppRepository;
     }
 
     /// <summary>
@@ -23,13 +19,11 @@ public class TenantGameRedeemCodeEntityService : GenericCrudService<Entity.Tenan
     /// </summary>
     protected override ISugarQueryable<TenantGameRedeemCodeEntityResponse> BuildPageQuery(PageTenantGameRedeemCodeEntityRequest input)
     {
-        var appId = AppScopeRules.EnsureFactAppId(input.AppId, "游戏兑换码");
         return Repository.AsQueryable()
                          .WhereIF(!string.IsNullOrWhiteSpace(input.SearchKey), u =>
                                       u.Code.Contains(input.SearchKey.Trim())
                          )
                          .WhereIF(input.AreaId > 0, u => u.AreaId == input.AreaId)
-                         .Where(u => u.AppId == appId)
                          .WhereIF(!string.IsNullOrWhiteSpace(input.Code), u => u.Code.Contains(input.Code.Trim()))
                          .WhereIF(input.UsageLimit > 0, u => u.UsageLimit == input.UsageLimit)
                          .WhereIF(input.UsedCount > 0, u => u.UsedCount == input.UsedCount)
@@ -39,12 +33,10 @@ public class TenantGameRedeemCodeEntityService : GenericCrudService<Entity.Tenan
     }
 
     /// <summary>
-    /// 新增前的自定义处理：保留既有道具配置解析，并校验 AppId 必填且必须属于当前租户（事实数据，禁止 AppId=0）。
+    /// 新增前解析并校验附件道具。
     /// </summary>
     protected override async Task OnAddingAsync(AddTenantGameRedeemCodeEntityRequest input)
     {
-        AppScopeRules.EnsureFactAppId(input.AppId, "游戏兑换码");
-        await _gameAppRepository.ValidateGameAppBelongsToTenantAsync(input.AppId);
 
         var gamePropItemEntities = JsonHelper.Deserialize<List<GamePropItem>>(input.Contents);
         input.Contents = string.Empty;
@@ -71,7 +63,7 @@ public class TenantGameRedeemCodeEntityService : GenericCrudService<Entity.Tenan
     }
 
     /// <summary>
-    /// 更新前：AppId 不可变（从既有实体回填，禁止兑换码跨应用迁移）并校验应用归属。
+    /// 更新前验证记录存在。
     /// </summary>
     protected override async Task OnUpdatingAsync(UpdateTenantGameRedeemCodeEntityRequest input)
     {
@@ -80,9 +72,6 @@ public class TenantGameRedeemCodeEntityService : GenericCrudService<Entity.Tenan
         {
             throw BusinessError.Oh(CommonErrorCode.RecordNotFound);
         }
-
-        input.AppId = existing.AppId;
-        await _gameAppRepository.ValidateGameAppBelongsToTenantAsync(input.AppId);
     }
 }
 #pragma warning restore CS8602, CS8604, CS8629
