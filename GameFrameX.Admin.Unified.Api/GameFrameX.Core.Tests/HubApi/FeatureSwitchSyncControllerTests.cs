@@ -39,6 +39,7 @@ public sealed class FeatureSwitchSyncControllerTests : IDisposable
     {
         var config = new ConnectionConfig
         {
+            ConfigId = "main",
             DbType = DbType.Sqlite,
             ConnectionString = $"DataSource={_mainDbPath}",
         };

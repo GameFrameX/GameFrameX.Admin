@@ -28,16 +28,16 @@ public class LogTenantQueryIsolationTests
     }
 
     [Fact]
-    public void TenantLogEntities_RequireTenantDatabase()
+    public void TenantLogEntities_UseMainDatabase()
     {
-        // 租户日志归属当前租户库 tenant_log_*，必须随租户上下文路由；主库不承载租户日志。
+        // 历史日志表保留名称，读写统一归主库。
         Assert.True(SqlSugarEntityBoundary.IsTenantTable(typeof(TenantLogVisitEntity)));
         Assert.True(SqlSugarEntityBoundary.IsTenantTable(typeof(TenantLogOperationEntity)));
         Assert.True(SqlSugarEntityBoundary.IsTenantTable(typeof(TenantLogExceptionEntity)));
         Assert.True(SqlSugarEntityBoundary.IsTenantTable(typeof(TenantLogAuditEntity)));
         Assert.True(SqlSugarEntityBoundary.IsTenantTable(typeof(TenantLogDiffEntity)));
-        Assert.True(SqlSugarEntityBoundary.RequiresTenantContext(typeof(TenantLogOperationEntity)));
-        Assert.False(SqlSugarEntityBoundary.IsMainDatabaseTable(typeof(TenantLogOperationEntity)));
+        Assert.False(SqlSugarEntityBoundary.RequiresTenantContext(typeof(TenantLogOperationEntity)));
+        Assert.True(SqlSugarEntityBoundary.IsMainDatabaseTable(typeof(TenantLogOperationEntity)));
         Assert.Equal("tenant_log_operation_entity", SqlSugarEntityBoundary.GetPhysicalTableName(typeof(TenantLogOperationEntity), nameof(TenantLogOperationEntity)));
     }
 
