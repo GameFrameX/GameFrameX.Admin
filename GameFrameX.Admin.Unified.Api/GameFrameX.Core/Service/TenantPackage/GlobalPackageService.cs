@@ -237,7 +237,6 @@ public class GlobalPackageService : IAdminApiController
     /// 获取当前租户的到期状态（前端横幅用）
     /// </summary>
     [AuthenticatedOnly]
-    [BypassTenantExpiration]
     [DisplayName("获取租户到期状态")]
     [ApiDescriptionSettings(Name = "GetTenantExpirationStatus")]
     public async Task<HttpJsonResultData<TenantExpirationStatusResponse>> GetTenantExpirationStatusAsync()

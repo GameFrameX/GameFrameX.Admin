@@ -1,4 +1,4 @@
-﻿namespace GameFrameX.Core.Service.Auth.Dto;
+namespace GameFrameX.Core.Service.Auth.Dto;
 
 /// <summary>
 /// 用户登录参数
@@ -31,13 +31,4 @@ public class LoginRequest
     /// </summary>
     public string Code { get; set; } = null!;
 
-    /// <summary>
-    /// 租户Id。普通租户登录时使用，平台 SuperAdmin 可不传。
-    /// </summary>
-    public long? TenantId { get; set; }
-
-    /// <summary>
-    /// 租户主机名。普通租户登录时可用 Host 解析租户。
-    /// </summary>
-    public string TenantHost { get; set; } = null!;
 }

@@ -14,6 +14,22 @@ namespace GameFrameX.Core.Tests.System;
 public class SystemAuthServiceLoginTests
 {
     [Fact]
+    public void LoginRequest_ContainsOnlyAccountPasswordAndCaptchaFields()
+    {
+        Assert.Equal(new[] { "Account", "Code", "CodeId", "Password" }, typeof(LoginRequest).GetProperties().Select(property => property.Name).OrderBy(name => name));
+    }
+
+    [Fact]
+    public async Task Login_AccountWithNumericSuffix_IsMatchedLiterally()
+    {
+        using var host = new AuthTestHost();
+        await host.SeedSuperAdminAsync("operator@1001", "123456");
+        var response = await host.BuildService().LoginAsync(new LoginRequest { Account = "operator@1001", Password = "123456" });
+        Assert.Equal("fake-access-token", response.AccessToken);
+        Assert.Equal("operator@1001", host.Jwt.LastAccessTokenPayload![ClaimConst.Account]);
+    }
+
+    [Fact]
     public async Task Login_NonExistentAccount_ThrowsUnifiedAccountOrPasswordError()
     {
         using var host = new AuthTestHost();
@@ -82,6 +98,7 @@ public class SystemAuthServiceLoginTests
         Assert.Equal(1L, host.Jwt.LastAccessTokenPayload![ClaimConst.UserId]);
         Assert.Equal("superadmin", host.Jwt.LastAccessTokenPayload![ClaimConst.Account]);
         Assert.Equal(AccountTypeEnum.SuperAdmin, host.Jwt.LastAccessTokenPayload![ClaimConst.AccountType]);
+        Assert.Equal(new[] { "Account", "AccountType", "RealName", "UserId" }, host.Jwt.LastAccessTokenPayload.Keys.OrderBy(key => key));
     }
 
     [Fact]
@@ -99,25 +116,6 @@ public class SystemAuthServiceLoginTests
         }));
 
         Assert.Equal(SystemUserErrorCode.AccountFrozen, (SystemUserErrorCode)ex.ErrorCode!);
-    }
-
-    [Fact]
-    public async Task Login_TenantDisabled_ThrowsZ1003()
-    {
-        // 场景 ⑤租户禁用：租户库 seed TenantUser + 主库 seed SystemTenant(IsEnabled=false) → Z1003
-        using var host = new AuthTestHost();
-        var svc = host.BuildService();
-        await host.SeedTenantAsync(AuthTestHost.SeedTenantId, false);
-        await host.SeedTenantUserAsync(AuthTestHost.SeedTenantId, "tenantuser", "123456");
-
-        var ex = await Assert.ThrowsAsync<BusinessException>(() => svc.LoginAsync(new LoginRequest
-        {
-            Account = "tenantuser",
-            Password = "123456",
-            TenantId = AuthTestHost.SeedTenantId,
-        }));
-
-        Assert.Equal(TenantErrorCode.TenantDisabled, (TenantErrorCode)ex.ErrorCode!);
     }
 
     [Fact]

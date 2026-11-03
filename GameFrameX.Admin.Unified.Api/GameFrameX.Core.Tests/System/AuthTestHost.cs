@@ -47,8 +47,10 @@ internal sealed class AuthTestHost : IDisposable
         {
             typeof(SystemUserEntity),
             typeof(SystemConfigEntity),
-            typeof(SystemTenantEntity),
+            typeof(TenantUserEntity),
+            typeof(TenantOrganizationEntity),
         });
+        _client.GetConnectionScope(MainConfigId).CodeFirst.InitTables<TenantUserEntity>();
         SqlSugarSetup.InitDatabase(_client, tenantConfig, new[]
         {
             typeof(TenantUserEntity),
@@ -87,7 +89,6 @@ internal sealed class AuthTestHost : IDisposable
             serviceProvider,
             systemConfigService,
             captcha,
-            new FakeTenantDbConnectionProvider(_client, TenantConfigId),
             Jwt,
             new FakePlatformCaptchaConfigProvider());
     }
@@ -147,7 +148,7 @@ internal sealed class AuthTestHost : IDisposable
         user.TenantId = tenantId;
         user.IsEnabled = true;
 
-        var tenantDb = _client.GetConnectionScope(TenantConfigId);
+        var tenantDb = _client.GetConnectionScope(MainConfigId);
         await tenantDb.Insertable(user).ExecuteCommandAsync();
     }
 

@@ -115,7 +115,6 @@ internal static class Program
         builder.Services.Configure<ProtoVersionOptions>(builder.Configuration.GetSection("ProtoVersion"));
         builder.Services.AddSingleton<SystemCacheService>(); // 仅依赖 ICache + IOptions<CacheOptions>
         builder.Services.AddScoped<TenantExpirationService>(); // 依赖 SqlSugar 仓储
-        builder.Services.AddScoped<TenantAccessGate>(); // 依赖 SystemCacheService + 仓储 + TenantExpirationService
         builder.Services.AddTransient<TenantGameOrderShipService>(); // 订单发货/退款服务
         builder.Services.AddSingleton<ClientApiTenantDbProvider>(); // 当前请求 TenantId -> 租户业务库连接
         builder.Services.AddSingleton<ITenantDbProvider>(sp => sp.GetRequiredService<ClientApiTenantDbProvider>()); // 共享层密钥环 Resolver 依赖接口
@@ -204,7 +203,6 @@ internal static class Program
         app.UseMiddleware<CryptoEnvelopeMiddleware>();
 
         // 租户到期拦截中间件
-        app.UseMiddleware<TenantExpirationMiddleware>();
 
         // 应用验证中间件
         app.UseMiddleware<AppResolutionMiddleware>();

@@ -48,26 +48,6 @@ public class LoginUserResponse
     public string Signature { get; set; } = null!;
 
     /// <summary>
-    /// 机构Id
-    /// </summary>
-    public long OrganizationId { get; set; }
-
-    /// <summary>
-    /// 机构名称
-    /// </summary>
-    public string OrganizationName { get; set; } = null!;
-
-    /// <summary>
-    /// 机构类型
-    /// </summary>
-    public string OrganizationType { get; set; } = null!;
-
-    /// <summary>
-    /// 职位名称
-    /// </summary>
-    public string PosName { get; set; } = null!;
-
-    /// <summary>
     /// 按钮权限集合
     /// </summary>
     public List<string> Buttons { get; set; } = null!;

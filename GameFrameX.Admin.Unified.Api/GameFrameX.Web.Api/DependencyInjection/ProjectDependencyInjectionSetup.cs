@@ -21,7 +21,6 @@ public static class ProjectDependencyInjectionSetup
     private static readonly HashSet<string> ScopedTypes = new(StringComparer.Ordinal)
     {
         "GameFrameX.Core.Service.User.CurrentUserContext",
-        "GameFrameX.Core.Filter.TenantExpirationFilter",
         "GameFrameX.Application.Game.Tenant.ClientApiPolicy.RiskEnforcement.GameAppRiskEnforcementModeResolver",
         "GameFrameX.Application.Game.Penalty.GamePenalty.TenantGamePenaltyEnforcementService",
         "GameFrameX.Application.Game.User.GameUser.TenantGameUserPasswordService",
@@ -44,7 +43,6 @@ public static class ProjectDependencyInjectionSetup
         }
 
         AddServiceDescriptor(services, typeof(IJobClusterServer), typeof(JobClusterServer), ServiceLifetime.Singleton);
-        AddServiceDescriptor(services, typeof(TenantAccessGate), typeof(TenantAccessGate), ServiceLifetime.Transient);
         AddServiceDescriptor(services, typeof(PostgreSqlTenantDatabaseProvisioner), typeof(PostgreSqlTenantDatabaseProvisioner), ServiceLifetime.Transient);
 
         return services;

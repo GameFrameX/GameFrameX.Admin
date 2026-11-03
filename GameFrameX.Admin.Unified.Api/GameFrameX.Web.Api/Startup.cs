@@ -173,7 +173,6 @@ public class Startup
                     // 取代 FallbackPolicy —— FallbackPolicy 连 Swagger 中间件路径、404 路径都拦截，
                     // 是 Swagger 返回 401 的根因；AuthorizeFilter 只作用于 MVC action，文档中间件天然匿名。
                     options.Filters.Add(new AuthorizeFilter());
-                    options.Filters.AddService<TenantExpirationFilter>();
                     options.Filters.Add<AdminResultFilter>();
                 });
         services.Configure<ApiBehaviorOptions>(options =>

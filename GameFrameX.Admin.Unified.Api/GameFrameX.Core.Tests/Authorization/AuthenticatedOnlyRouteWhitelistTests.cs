@@ -39,9 +39,7 @@ public sealed class AuthenticatedOnlyRouteWhitelistTests
     {
         var method = serviceType.GetMethod(methodName, BindingFlags.Public | BindingFlags.Instance);
         Assert.NotNull(method);
-        Assert.True(method!.IsDefined(typeof(BypassTenantExpirationAttribute), false),
-                    $"{serviceType.Name}.{methodName} 必须标注 [BypassTenantExpiration]，否则禁用/过期租户用户无法使用该逃生通道端点");
-        Assert.True(method.IsDefined(typeof(AuthenticatedOnlyAttribute), false),
+        Assert.True(method!.IsDefined(typeof(AuthenticatedOnlyAttribute), false),
                     $"{serviceType.Name}.{methodName} 标注了 [BypassTenantExpiration] 却未标注 [AuthenticatedOnly]——tenant admin 会被自动隐藏按钮挡成 403（GFX-683 回潮）");
     }
 
