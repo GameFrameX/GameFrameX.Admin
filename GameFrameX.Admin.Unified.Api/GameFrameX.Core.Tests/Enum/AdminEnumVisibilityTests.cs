@@ -68,15 +68,12 @@ public class AdminEnumVisibilityTests
         "GameFrameX.Core.Enum.Errors.PlatformConfigErrorCode",
         "GameFrameX.Core.Enum.Errors.TenantErrorCode",
         "GameFrameX.Core.Enum.Errors.OrganizationErrorCode",
-        "GameFrameX.Core.Enum.Errors.RegionErrorCode",
         "GameFrameX.Core.Enum.Errors.PositionErrorCode",
         "GameFrameX.Core.Enum.Errors.FileErrorCode",
         "GameFrameX.Core.Enum.Errors.JobErrorCode",
         "GameFrameX.Core.Enum.Errors.DatabaseErrorCode",
         "GameFrameX.Core.Enum.Errors.OpenAccessErrorCode",
         "GameFrameX.Core.Enum.Errors.MailCampaignErrorCode",
-        "GameFrameX.Core.Enum.Errors.PrintErrorCode",
-        "GameFrameX.Core.Enum.Errors.PluginErrorCode",
         // C339（GFX-750）：Online 八段镜像错误码同规则豁免（服务端出站 + 码表由本地化 JSON 导出，不进前端枚举下拉）。
         "GameFrameX.Core.Enum.Errors.OnlineErrorCode",
         // C350（GFX-754）：Online 社交治理 317 段业务错误码同规则豁免（错误码枚举不进前端枚举下拉）。
