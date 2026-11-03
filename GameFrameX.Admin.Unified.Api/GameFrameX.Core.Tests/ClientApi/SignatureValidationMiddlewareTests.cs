@@ -761,7 +761,7 @@ public sealed class SignatureValidationMiddlewareTests
     {
         public RiskEnforcementModeEnum Mode { get; set; } = RiskEnforcementModeEnum.FailClosed;
 
-        public RiskEnforcementModeEnum Resolve(long appId)
+        public RiskEnforcementModeEnum Resolve()
         {
             return Mode;
         }

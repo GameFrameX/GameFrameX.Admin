@@ -16,6 +16,24 @@ namespace GameFrameX.Entity.Tenant.ClientApiConfig;
 public class TenantClientApiPolicyEntity : EntityBasic, IAppScoped, ITenantAppConfigScope
 {
     /// <summary>
+    /// 是否要求请求签名。
+    /// </summary>
+    [SugarColumn(ColumnDescription = "是否要求请求签名", DefaultValue = "false")]
+    public bool SignatureRequired { get; set; }
+
+    /// <summary>
+    /// 是否要求设备证明。
+    /// </summary>
+    [SugarColumn(ColumnDescription = "是否要求设备证明", DefaultValue = "false")]
+    public bool DeviceProofRequired { get; set; }
+
+    /// <summary>
+    /// 风险策略生效模式。
+    /// </summary>
+    [SugarColumn(ColumnDescription = "风控策略", Length = EntityStringLength.Length512, IsNullable = true)]
+    public string RiskPolicy { get; set; } = string.Empty;
+
+    /// <summary>
     /// 应用 ID。0 表示租户默认行；大于 0 表示应用级覆盖。令牌节字段仅 AppId=0 行被消费。
     /// </summary>
     [SugarColumn(ColumnDescription = "应用ID", DefaultValue = "0")]

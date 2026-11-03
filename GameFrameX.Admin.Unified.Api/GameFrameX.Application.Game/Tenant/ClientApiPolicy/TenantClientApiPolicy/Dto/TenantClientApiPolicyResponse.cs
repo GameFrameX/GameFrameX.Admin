@@ -6,6 +6,21 @@ namespace GameFrameX.Application.Game.Tenant.ClientApiPolicy.TenantClientApiPoli
 public class TenantClientApiPolicyResponse : IBasePageResponse<GameFrameX.Entity.Tenant.ClientApiConfig.TenantClientApiPolicyEntity>
 {
     /// <summary>
+    /// 是否要求请求签名。
+    /// </summary>
+    public bool SignatureRequired { get; set; }
+
+    /// <summary>
+    /// 是否要求设备证明。
+    /// </summary>
+    public bool DeviceProofRequired { get; set; }
+
+    /// <summary>
+    /// 风险策略生效模式。
+    /// </summary>
+    public string RiskPolicy { get; set; } = string.Empty;
+
+    /// <summary>
     /// Id
     /// </summary>
     public long Id { get; set; }

@@ -1,7 +1,7 @@
 namespace GameFrameX.Entity.Enum;
 
 /// <summary>
-/// 风险策略生效模式（解析 TenantGameAppEntity.RiskPolicy 字符串后的结构化决策）。
+/// 风险策略生效模式（解析 TenantClientApiPolicyEntity.RiskPolicy 字符串后的结构化决策）。
 /// <para>严格锁定 3 值：直接对齐 C11-D 验收"风险策略 fail closed / fail open 必须按应用配置明确"。
 /// 不引入 Disabled——AuditOnly 已表达"不阻断但记录"。</para>
 /// <para>解析默认安全：开启 SignatureRequired / DeviceProofRequired 且未显式配置时，回退 FailClosed（见 RiskEnforcementModeParser）。</para>

@@ -1,33 +1,32 @@
 using GameFrameX.Entity.Enum;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Tenant.ClientApiConfig;
 
 namespace GameFrameX.Core.Middleware;
 
 /// <summary>
-/// <see cref="IGameAppRiskEnforcementModeResolver"/> 默认实现。
-/// 读 <see cref="GameFrameX.Entity.Tenant.Game.TenantGameAppEntity"/> 的 RiskPolicy / SignatureRequired / DeviceProofRequired，
-/// 委托 <see cref="RiskEnforcementModeParser"/> 解析为 <see cref="RiskEnforcementModeEnum"/>。
-/// <para>本期不缓存（每次读应用行）；缓存优化属后续 change。</para>
+/// 从主库最新启用的 Client API 运行策略读取签名与设备证明风险模式。
 /// </summary>
 public class GameAppRiskEnforcementModeResolver : IGameAppRiskEnforcementModeResolver
 {
-    private readonly SqlSugarRepository<TenantGameAppEntity> _appRepository;
+    private readonly ISqlSugarClient _database;
 
-    public GameAppRiskEnforcementModeResolver(SqlSugarRepository<TenantGameAppEntity> appRepository)
+    public GameAppRiskEnforcementModeResolver(ISqlSugarClient database)
     {
-        _appRepository = appRepository;
+        _database = database;
     }
 
     /// <inheritdoc />
-    public RiskEnforcementModeEnum Resolve(long appId)
+    public RiskEnforcementModeEnum Resolve()
     {
-        var app = _appRepository.GetFirst(u => u.Id == appId);
-        if (app == null)
+        var policy = _database.Queryable<TenantClientApiPolicyEntity>()
+                              .Where(entity => entity.IsEnabled == true)
+                              .OrderByDescending(entity => entity.Id)
+                              .First();
+        if (policy == null)
         {
-            // 应用不存在按默认安全处理：未知应用视为 FailClosed，避免放行未注册应用。
             return RiskEnforcementModeEnum.FailClosed;
         }
 
-        return RiskEnforcementModeParser.Parse(app.RiskPolicy, app.SignatureRequired, app.DeviceProofRequired);
+        return RiskEnforcementModeParser.Parse(policy.RiskPolicy, policy.SignatureRequired, policy.DeviceProofRequired);
     }
 }

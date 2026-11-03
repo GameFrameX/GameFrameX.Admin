@@ -88,16 +88,14 @@ public sealed class SignatureValidationMiddleware
             return;
         }
 
-        var appId = TryResolveAppId(context);
-        // 风险模式分流器依赖租户实体仓储（TenantGameAppEntity，C259 起构造 fail-closed：无租户上下文禁止回落主库），
-        // 必须按需解析而不能走 InvokeAsync 参数注入——否则旁路请求（如 /health 探针）在无租户上下文时也会触发仓储构造而 500。
+        // 仅在验签失败后读取风险模式，公开端点和成功请求不需要访问策略表。
         var riskEnforcementModeResolver = context.RequestServices.GetRequiredService<IGameAppRiskEnforcementModeResolver>();
-        var mode = ResolveEnforcementMode(riskEnforcementModeResolver, appId);
+        var mode = ResolveEnforcementMode(riskEnforcementModeResolver);
         if (mode != RiskEnforcementModeEnum.FailClosed)
         {
             // AuditOnly / FailOpen：灰度观察期 —— 校验失败只记录不阻断，业务照常执行
-            logger.LogWarning("传输签名校验未通过，按 App 风险模式放行：mode={Mode} appId={AppId} code={Code} reason={Reason} path={Path}",
-                              mode, appId, rejection.Code, rejection.Message, context.Request.Path);
+            logger.LogWarning("传输签名校验未通过，按运行策略放行：mode={Mode} code={Code} reason={Reason} path={Path}",
+                              mode, rejection.Code, rejection.Message, context.Request.Path);
             await _next(context);
             return;
         }
@@ -249,12 +247,11 @@ public sealed class SignatureValidationMiddleware
     /// <summary>
     /// 解析 App 级风险生效模式；解析器异常（如租户库不可达）按默认安全 FailClosed 处理。
     /// </summary>
-    private static RiskEnforcementModeEnum ResolveEnforcementMode(IGameAppRiskEnforcementModeResolver resolver, long? appId)
+    private static RiskEnforcementModeEnum ResolveEnforcementMode(IGameAppRiskEnforcementModeResolver resolver)
     {
         try
         {
-            // appId 缺失传 0：与 resolver 内「应用不存在 → FailClosed」的默认安全口径一致
-            return resolver.Resolve(appId ?? 0);
+            return resolver.Resolve();
         }
         catch (Exception)
         {

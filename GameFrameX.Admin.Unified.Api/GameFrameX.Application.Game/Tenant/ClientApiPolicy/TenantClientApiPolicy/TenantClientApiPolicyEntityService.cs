@@ -117,6 +117,9 @@ public class TenantClientApiPolicyEntityService
         entity.EnableKeyAutoCreate = input.EnableKeyAutoCreate;
         entity.EnableReturnHttpManager = input.EnableReturnHttpManager;
         entity.EnableSandBoxRecharge = input.EnableSandBoxRecharge;
+        entity.SignatureRequired = input.SignatureRequired;
+        entity.DeviceProofRequired = input.DeviceProofRequired;
+        entity.RiskPolicy = input.RiskPolicy;
         entity.Remark = input.Remark;
         entity.RowVersion = input.RowVersion;
 
@@ -130,6 +133,9 @@ public class TenantClientApiPolicyEntityService
                             e.EnableKeyAutoCreate,
                             e.EnableReturnHttpManager,
                             e.EnableSandBoxRecharge,
+                            e.SignatureRequired,
+                            e.DeviceProofRequired,
+                            e.RiskPolicy,
                             e.Remark,
                         })
                         .ExecuteCommandWithOptLockAsync(true);

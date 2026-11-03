@@ -6,6 +6,21 @@ namespace GameFrameX.Application.Game.Tenant.ClientApiPolicy.TenantClientApiPoli
 public class UpdateTenantClientApiPolicyRequest : BaseUpdateRequest
 {
     /// <summary>
+    /// 是否要求请求签名。
+    /// </summary>
+    public bool SignatureRequired { get; set; }
+
+    /// <summary>
+    /// 是否要求设备证明。
+    /// </summary>
+    public bool DeviceProofRequired { get; set; }
+
+    /// <summary>
+    /// 风险策略生效模式。
+    /// </summary>
+    public string RiskPolicy { get; set; } = string.Empty;
+
+    /// <summary>
     /// 应用 ID。0 表示租户默认行；大于 0 表示应用级覆盖。令牌节字段仅 AppId=0 行被消费。
     /// </summary>
     public long AppId { get; set; }

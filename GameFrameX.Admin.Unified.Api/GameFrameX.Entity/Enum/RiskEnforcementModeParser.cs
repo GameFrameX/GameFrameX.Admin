@@ -2,7 +2,7 @@ namespace GameFrameX.Entity.Enum;
 
 /// <summary>
 /// 风险策略生效模式解析器（纯函数，无 IO，便于单元测试）。
-/// 把 <c>TenantGameAppEntity.RiskPolicy</c> 字符串解析为结构化 <see cref="RiskEnforcementModeEnum"/>。
+/// 把 <c>TenantClientApiPolicyEntity.RiskPolicy</c> 字符串解析为结构化 <see cref="RiskEnforcementModeEnum"/>。
 /// <para>解析优先级（默认安全）：</para>
 /// <list type="number">
 ///   <item>字符串非空且能 <c>Enum.TryParse</c>（忽略大小写）成功 → 返回解析值。</item>
