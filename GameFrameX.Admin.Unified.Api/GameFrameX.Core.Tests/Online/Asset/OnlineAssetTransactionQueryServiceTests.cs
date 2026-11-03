@@ -6,6 +6,7 @@ using GameFrameX.Core.SqlSugar;
 using GameFrameX.Entity.Tenant.Game;
 using SqlSugar;
 
+// S3/C401 断链修复点
 namespace GameFrameX.Core.Tests.Online.Asset;
 
 // C340 / GFX-752（vault:C4 S3.7、VC-3.14）：资产交易详情查询服务契约自检。
@@ -105,34 +106,29 @@ public sealed class OnlineAssetTransactionQueryServiceTests : IDisposable
     }
 
     /// <summary>
-    /// 区服不归属目标 App：scope factory 抛 ServerScopeDenied（32200004），Online 调用零次。
+    /// 区服不存在时拒绝，Online 调用零次。
     /// </summary>
     [Fact]
-    public async Task DetailAsync_RejectsServerNotInApp()
+    public async Task DetailAsync_RejectsNonexistentServer()
     {
-        // 建一个不归属 App100 的孤服（GameAppId=9999）。
         await OnlineAssetTestSupport.SeedScopeAsync(_db);
-        var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-        await _db.Insertable(new TenantGameAppEntity { Id = 9999, Name = "other-app", CreatedTime = now, IsDeleted = false, }).ExecuteCommandAsync();
-        await _db.Insertable(OnlineAssetTestSupport.NewArea(8888, 9999, now)).ExecuteCommandAsync();
-
         var fake = new OnlineAssetTestSupport.FakeOnlineServerClient();
         var service = CreateService(fake);
 
         var exception = await Assert.ThrowsAsync<BusinessException>(() => service.DetailAsync(new OnlineAssetTransactionDetailRequest
         {
             AppId = OnlineAssetTestSupport.App100,
-            ServerId = 8888,
+            ServerId = 9999,
             TransactionId = "tx-1",
         }));
 
-        Assert.Equal((int)OnlineErrorCode.ServerScopeDenied, exception.Code);
+        Assert.Equal((int)OnlineErrorCode.ScopeDenied, exception.Code);
         Assert.Empty(fake.Calls);
     }
 
     private OnlineAssetTransactionQueryService CreateService(IOnlineServerClient onlineServerClient)
     {
-        var factory = new OnlineScopeContextFactory(OnlineAssetTestSupport.CreateUserContext(), OnlineAssetTestSupport.Repository<TenantGameAppEntity>(_db), OnlineAssetTestSupport.Repository<TenantGameAreaEntity>(_db));
+        var factory = new OnlineScopeContextFactory(OnlineAssetTestSupport.Repository<TenantGameAreaEntity>(_db));
         return new OnlineAssetTransactionQueryService(onlineServerClient, factory);
     }
 

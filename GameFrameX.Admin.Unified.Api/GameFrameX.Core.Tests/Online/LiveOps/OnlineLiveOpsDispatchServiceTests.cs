@@ -19,6 +19,7 @@ using GameFrameX.Foundation.Orm.Entity;
 using Microsoft.AspNetCore.Http;
 using SqlSugar;
 
+// S3/C401 断链修复点
 namespace GameFrameX.Core.Tests.Online.LiveOps;
 
 // C343 / GFX-755（vault:C8 S7.7）：统一下发服务行为测试（mock-first：fake IOnlineServerClient，联调延后）。
@@ -233,7 +234,7 @@ public sealed class OnlineLiveOpsDispatchServiceTests : IDisposable
     {
         return new OnlineLiveOpsDispatchService(
             _client,
-            new OnlineScopeContextFactory(CreateUserContext(TenantA), Repository<TenantGameAppEntity>(), Repository<TenantGameAreaEntity>()),
+            new OnlineScopeContextFactory(Repository<TenantGameAreaEntity>()),
             Repository<TenantGameAppRemoteConfigEntity>(),
             Repository<TenantGameAppDeviceGroupEntity>(),
             Repository<TenantGameTimeJobEntity>(),

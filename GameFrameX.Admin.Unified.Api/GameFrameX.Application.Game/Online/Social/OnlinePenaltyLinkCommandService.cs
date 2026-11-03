@@ -3,6 +3,7 @@ using GameFrameX.Application.Game.Online.Social.Dto;
 using GameFrameX.Application.Game.ServerManager.Online;
 using GameFrameX.Entity.Enum;
 
+// S3/C401 断链修复点
 namespace GameFrameX.Application.Game.Online.Social;
 
 /// <summary>
@@ -148,7 +149,7 @@ public class OnlinePenaltyLinkCommandService : IAdminApiController
         var action = MapCommandToAction(command);
         try
         {
-            var scope = await _scopeContextFactory.CreateAsync(penalty.AppId, serverId, $"penalty-link:{penalty.Id}:{command}");
+            var scope = await _scopeContextFactory.CreateAsync(serverId, $"penalty-link:{penalty.Id}:{command}");
             var data = await _onlineServerClient.PostAsync<OnlineLinkCommandAckResponse>(action, new OnlineLinkCommandRequest
             {
                 PenaltyId = penalty.Id,

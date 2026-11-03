@@ -6,6 +6,7 @@ using GameFrameX.Core.SqlSugar;
 using GameFrameX.Entity.Tenant.Game;
 using SqlSugar;
 
+// S3/C401 断链修复点
 namespace GameFrameX.Core.Tests.Online.Asset;
 
 // C340 / GFX-752（vault:C4 S3.7、VC-3.11/3.13、VC-3.14）：人工发放/撤销命令服务契约自检。
@@ -266,10 +267,10 @@ public sealed class OnlineAssetGrantCommandServiceTests : IDisposable
     }
 
     /// <summary>
-    /// 越界前置拒绝：AppId 不归属当前租户 → ScopeDenied，Online 调用零次（任何 grant/revoke 调用前先卡）。
+    /// 区服不存在时拒绝，Online 调用零次。
     /// </summary>
     [Fact]
-    public async Task GrantAsync_RejectsCrossTenant_BeforeAnyOnlineCall()
+    public async Task GrantAsync_RejectsNonexistentServer_BeforeAnyOnlineCall()
     {
         await OnlineAssetTestSupport.SeedScopeAsync(_db);
         var fake = new OnlineAssetTestSupport.FakeOnlineServerClient();
@@ -277,8 +278,7 @@ public sealed class OnlineAssetGrantCommandServiceTests : IDisposable
 
         var exception = await Assert.ThrowsAsync<BusinessException>(() => service.GrantAsync(new OnlineAssetGrantRequest
         {
-            AppId = 9999,
-            ServerId = OnlineAssetTestSupport.Area1001,
+            ServerId = 9999,
             PlayerId = "player-1",
             Reason = "manual",
             GrantItems = new List<OnlineAssetGrantItemRequest>
@@ -293,7 +293,7 @@ public sealed class OnlineAssetGrantCommandServiceTests : IDisposable
 
     private OnlineAssetGrantCommandService CreateService(IOnlineServerClient onlineServerClient)
     {
-        var factory = new OnlineScopeContextFactory(OnlineAssetTestSupport.CreateUserContext(), OnlineAssetTestSupport.Repository<TenantGameAppEntity>(_db), OnlineAssetTestSupport.Repository<TenantGameAreaEntity>(_db));
+        var factory = new OnlineScopeContextFactory(OnlineAssetTestSupport.Repository<TenantGameAreaEntity>(_db));
         return new OnlineAssetGrantCommandService(onlineServerClient, factory);
     }
 

@@ -14,11 +14,12 @@ using GameFrameX.Foundation.Orm.Entity;
 using Microsoft.AspNetCore.Http;
 using SqlSugar;
 
+// S3/C401 断链修复点
 namespace GameFrameX.Core.Tests.ServerManager.Online;
 
 // C339 / GFX-750（vault:C2 S1.7）：Online 管理 API 客户端契约自检（typed client 基座）。
 // 覆盖：URL 形态（{HttpManageUrl}/{OnlineAdminApiPrefix}/{action}，默认 online/admin）、
-// 作用域三元组并入 POST 请求体顶层（业务体携带的伪作用域字段被鉴权值覆盖）与 GET 查询参数、
+// 区服标识并入 POST 请求体顶层（业务体携带的伪作用域字段被鉴权值覆盖）与 GET 查询参数、
 // Foundation 信封解包（失败 / 成功缺 Data 抛 InvalidOperationException）、
 // Online 协议码非 0 按协议段映射镜像段成员抛 BusinessError（协议段 Nxxx ↔ 镜像段 32(N-1)，
 // 段外未知码兜底系统段——VC-1.10 不崩溃、不误判成功）、原始协议码随 Message errors 透出、
@@ -51,7 +52,6 @@ public sealed class OnlineServerClientTests : IDisposable
         _db = _scopeOwner.GetConnectionScope("online-client");
         SqlSugarUnifiedConfig.ConfigureBaseFilters(_db);
         _db.CodeFirst.InitTables(
-            typeof(TenantGameAppEntity),
             typeof(TenantGameAreaEntity));
     }
 
@@ -93,7 +93,7 @@ public sealed class OnlineServerClientTests : IDisposable
     }
 
     /// <summary>
-    /// 作用域注入：POST 请求体顶层强制携带 TenantId/AppId/ServerId；业务体自带的伪作用域字段被鉴权值覆盖
+    /// 作用域注入：POST 请求体顶层强制携带 ServerId，丢弃旧租户与应用字段；业务体自带的伪作用域字段被鉴权值覆盖
     ///（「以鉴权与服务端路由为准，客户端字段不可直接覆盖」vault 契约）；业务字段原样保留。
     /// </summary>
     [Fact]
@@ -107,8 +107,8 @@ public sealed class OnlineServerClientTests : IDisposable
         await client.PostAsync<OnlineDemoData>("kick_player", new { TenantId = 999L, AppId = 888L, ServerId = 777L, Reason = 3, }, await CreateScopeAsync());
 
         var body = handler.LastRequestBodyJson;
-        Assert.Equal(TenantA, Convert.ToInt64(body["TenantId"]?.ToString()));
-        Assert.Equal(App100, Convert.ToInt64(body["AppId"]?.ToString()));
+        Assert.False(body.ContainsKey("TenantId"));
+        Assert.False(body.ContainsKey("AppId"));
         Assert.Equal(Area1001, Convert.ToInt64(body["ServerId"]?.ToString()));
         Assert.Equal(3, Convert.ToInt32(body["Reason"]?.ToString()));
     }
@@ -131,7 +131,7 @@ public sealed class OnlineServerClientTests : IDisposable
     }
 
     /// <summary>
-    /// GET：作用域三元组作为查询参数附加（POST 并体 / GET 并 query 的双形态契约）。
+    /// GET：区服标识作为查询参数附加（POST 并体 / GET 并 query 的双形态契约）。
     /// </summary>
     [Fact]
     public async Task GetAsync_AppendsScopeQueryParameters()
@@ -143,7 +143,7 @@ public sealed class OnlineServerClientTests : IDisposable
 
         await client.GetAsync<OnlineDemoData>("query_state", await CreateScopeAsync());
 
-        Assert.Equal($"https://game-server.test/online/admin/query_state?tenantId={TenantA}&appId={App100}&serverId={Area1001}", handler.LastRequestUrl);
+        Assert.Equal($"https://game-server.test/online/admin/query_state?serverId={Area1001}", handler.LastRequestUrl);
         Assert.Equal("GET", handler.LastRequestMethod);
     }
 
@@ -259,17 +259,8 @@ public sealed class OnlineServerClientTests : IDisposable
 
     private async Task<OnlineScopeContext> CreateScopeAsync()
     {
-        var factory = new OnlineScopeContextFactory(CreateUserContext(TenantA), Repository<TenantGameAppEntity>(), Repository<TenantGameAreaEntity>());
-        return await factory.CreateAsync(App100, Area1001, "unit-test");
-    }
-
-    private static CurrentUserContext CreateUserContext(long tenantId)
-    {
-        var identity = new ClaimsIdentity("TestAuth");
-        identity.AddClaim(new Claim(ClaimConst.TenantId, tenantId.ToString()));
-        var httpContext = new DefaultHttpContext { User = new ClaimsPrincipal(identity), };
-        var accessor = new HttpContextAccessor { HttpContext = httpContext, };
-        return new CurrentUserContext(accessor);
+        var factory = new OnlineScopeContextFactory(Repository<TenantGameAreaEntity>());
+        return await factory.CreateAsync(Area1001, "unit-test");
     }
 
     private SqlSugarRepository<T> Repository<T>() where T : EntityBase, new()
@@ -313,14 +304,6 @@ public sealed class OnlineServerClientTests : IDisposable
     private async Task SeedAsync()
     {
         var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-
-        await _db.Insertable(new TenantGameAppEntity
-        {
-            Id = App100,
-            Name = "app-100",
-            CreatedTime = now,
-            IsDeleted = false,
-        }).ExecuteCommandAsync();
 
         await _db.Insertable(new TenantGameAreaEntity
         {

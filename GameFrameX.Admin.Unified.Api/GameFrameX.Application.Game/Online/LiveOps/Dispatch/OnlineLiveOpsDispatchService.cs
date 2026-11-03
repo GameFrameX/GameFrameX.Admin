@@ -18,6 +18,7 @@ using GameFrameX.Entity.Tenant.Game.Announcement;
 using GameFrameX.Entity.Tenant.Game.Online;
 using GameFrameX.Entity.Tenant.Game.RemoteConfig;
 
+// S3/C401 断链修复点
 namespace GameFrameX.Application.Game.Online.LiveOps.Dispatch;
 
 /// <summary>
@@ -219,7 +220,7 @@ public class OnlineLiveOpsDispatchService : IOnlineLiveOpsDispatchService, IAdmi
     [NonAction]
     public async Task<OnlinePlayerSegmentSyncResponse> SyncSegmentToOnlineAsync(TenantGameOnlinePlayerSegmentEntity segment, long serverId, string reason)
     {
-        var scope = await _scopeFactory.CreateAsync(segment.AppId, serverId, ActionSyncPlayerSegment + ":" + segment.Id);
+        var scope = await _scopeFactory.CreateAsync(serverId, ActionSyncPlayerSegment + ":" + segment.Id);
         var ack = await _onlineServerClient.PostAsync<OnlineLiveOpsResponse>(ActionSyncPlayerSegment,
             new
             {
@@ -244,7 +245,7 @@ public class OnlineLiveOpsDispatchService : IOnlineLiveOpsDispatchService, IAdmi
     [NonAction]
     public async Task<OnlineConfigRolloutDispatchResponse> PublishRolloutToOnlineAsync(TenantGameOnlineConfigRolloutEntity rollout)
     {
-        var scope = await _scopeFactory.CreateAsync(rollout.AppId, rollout.ServerId, ActionPublishConfigRollout + ":" + rollout.ConfigKey + ":v" + rollout.ConfigVersion);
+        var scope = await _scopeFactory.CreateAsync(rollout.ServerId, ActionPublishConfigRollout + ":" + rollout.ConfigKey + ":v" + rollout.ConfigVersion);
         var ack = await _onlineServerClient.PostAsync<OnlineLiveOpsResponse>(ActionPublishConfigRollout,
             new
             {
@@ -265,7 +266,7 @@ public class OnlineLiveOpsDispatchService : IOnlineLiveOpsDispatchService, IAdmi
     public async Task<OnlineConfigRolloutDispatchResponse> RollbackRolloutToOnlineAsync(TenantGameOnlineConfigRolloutEntity rollout)
     {
         // 回滚 = 版本化新下发：以新 ConfigVersion 行下发 rollbackConfigRollout，TargetVersion 指向要恢复的历史版本（语义对照见 OnlineRolloutSemanticMap）。
-        var scope = await _scopeFactory.CreateAsync(rollout.AppId, rollout.ServerId, ActionRollbackConfigRollout + ":" + rollout.ConfigKey + ":v" + rollout.ConfigVersion + "->" + rollout.TargetVersion);
+        var scope = await _scopeFactory.CreateAsync(rollout.ServerId, ActionRollbackConfigRollout + ":" + rollout.ConfigKey + ":v" + rollout.ConfigVersion + "->" + rollout.TargetVersion);
         var ack = await _onlineServerClient.PostAsync<OnlineLiveOpsResponse>(ActionRollbackConfigRollout,
             new
             {
@@ -340,7 +341,7 @@ public class OnlineLiveOpsDispatchService : IOnlineLiveOpsDispatchService, IAdmi
     /// </summary>
     private async Task<OnlineLiveOpsResponse> PostOnlineAsync(string action, object payload, OnlineLiveOpsDispatchRequest input)
     {
-        var scope = await _scopeFactory.CreateAsync(input.AppId, input.ServerId, action + ":" + input.BusinessKey);
+        var scope = await _scopeFactory.CreateAsync(input.ServerId, action + ":" + input.BusinessKey);
         return await _onlineServerClient.PostAsync<OnlineLiveOpsResponse>(action, payload, scope);
     }
 

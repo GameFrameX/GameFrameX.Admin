@@ -5,20 +5,7 @@ using GameFrameX.Foundation.Http.Normalization;
 namespace GameFrameX.Application.Game.ServerManager.Online;
 
 /// <summary>
-/// <see cref="IOnlineServerClient"/> 默认实现（来源 change C339 / vault:C2 S1.7；typed client 注册见 Web.Api Startup）。
-/// <para>
-/// 作用域注入语义：每次调用的 URL 按 <c>scope.ServerId</c> 取区服经 <see cref="IOnlineServerEndpointResolver"/> 解析
-/// （作用域上下文已由 Factory 过租户归属校验，这里按 Id 取区服只是 URL 构造，不存在越界面）；
-/// 作用域三元组随请求携带（POST 并入请求体顶层字段、GET 作查询参数），
-/// TenantId 来自 Admin 鉴权上下文强制注入，请求参数在任何入口都不可覆盖它。
-/// </para>
-/// <para>
-/// 「Online 协议码 ↔ Admin 镜像码」映射（<see cref="MapToMirrorCode"/>）：协议段 Nxxx 一一对应镜像段 32(N-1)，
-/// 非段内已知详表的协议码按段级代表成员映射，原始协议码 / MessageKey 随异常 errors 透出；
-/// 映射关系以 vault 错误码表为唯一来源，不可手改镜像数值。协议段外未知码兜底映射系统段（VC-1.10：不崩溃、不误判成功）。
-/// </para>
-/// <para>传输层：Foundation <c>HttpJsonResultData</c> 信封（<c>PostJsonToStringAsync / GetToStringAsync</c> +
-/// <c>ToHttpJsonResult</c> 解包，同 MailCampaignServerClient 范式）；信封失败抛 <see cref="InvalidOperationException"/>（基础设施错误，非业务错误码）。</para>
+/// Online 管理客户端，按区服解析地址并注入区服标识，保留信封解包和协议错误映射。
 /// </summary>
 public sealed class OnlineServerClient : IOnlineServerClient
 {
@@ -49,8 +36,9 @@ public sealed class OnlineServerClient : IOnlineServerClient
     public async Task<TResponse> GetAsync<TResponse>(string action, OnlineScopeContext scope) where TResponse : class
     {
         var url = await ResolveUrlAsync(action, scope);
+        // S3/C401 断链修复点
         var urlWithScope = url + (url.Contains('?') ? "&" : "?")
-            + "tenantId=" + scope.TenantId + "&appId=" + scope.AppId + "&serverId=" + scope.ServerId;
+            + "serverId=" + scope.ServerId;
 
         var content = await _httpClient.GetToStringAsync(urlWithScope);
         return Unwrap<TResponse>(content, url);
@@ -104,10 +92,7 @@ public sealed class OnlineServerClient : IOnlineServerClient
         return response.Data;
     }
 
-    /// <summary>
-    /// 作用域三元组并入 POST 请求体顶层（业务字段保留原字段名，作用域字段同层级注入；请求体自身携带的任何作用域字段会被此处覆盖，
-    /// 与「作用域以鉴权与服务端路由为准，客户端字段不可直接覆盖」的 vault 契约一致）。
-    /// </summary>
+    /// <summary>区服标识并入请求体，业务载荷不能覆盖已验证的区服。</summary>
     private static Dictionary<string, object?> MergeScopeIntoPayload(object request, OnlineScopeContext scope)
     {
         var merged = new Dictionary<string, object?>(StringComparer.Ordinal);
@@ -116,12 +101,18 @@ public sealed class OnlineServerClient : IOnlineServerClient
         {
             foreach (var property in payload.EnumerateObject())
             {
+                if (string.Equals(property.Name, "TenantId", StringComparison.OrdinalIgnoreCase)
+                    || string.Equals(property.Name, "AppId", StringComparison.OrdinalIgnoreCase)
+                    || string.Equals(property.Name, "ServerId", StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
                 merged[property.Name] = property.Value;
             }
         }
 
-        merged["TenantId"] = scope.TenantId;
-        merged["AppId"] = scope.AppId;
+        // S3/C401 断链修复点
         merged["ServerId"] = scope.ServerId;
         return merged;
     }

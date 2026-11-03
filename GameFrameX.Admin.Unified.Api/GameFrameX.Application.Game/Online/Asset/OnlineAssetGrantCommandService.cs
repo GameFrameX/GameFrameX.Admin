@@ -2,6 +2,7 @@ using System.ComponentModel;
 using GameFrameX.Application.Game.Online.Asset.Dto;
 using GameFrameX.Application.Game.ServerManager.Online;
 
+// S3/C401 断链修复点
 namespace GameFrameX.Application.Game.Online.Asset;
 
 /// <summary>
@@ -75,7 +76,7 @@ public class OnlineAssetGrantCommandService : IAdminApiController
             }
         }
 
-        var scope = await _scopeContextFactory.CreateAsync(input.AppId, input.ServerId, $"asset-grant:{input.PlayerId}");
+        var scope = await _scopeContextFactory.CreateAsync(input.ServerId, $"asset-grant:{input.PlayerId}");
         var businessOrderNumber = ResolveBusinessOrderNumber(input.BusinessOrderNumber, GrantOrderNumberPrefix);
         return await _onlineServerClient.PostAsync<OnlineAssetGrantAckResponse>(GrantAssetAction, new OnlineAssetGrantCommandRequest
         {
@@ -104,7 +105,7 @@ public class OnlineAssetGrantCommandService : IAdminApiController
             throw BusinessError.Oh(CommonErrorCode.ParameterValidationFailed, new { field = "TransactionId", });
         }
 
-        var scope = await _scopeContextFactory.CreateAsync(input.AppId, input.ServerId, $"asset-revoke:{input.TransactionId}");
+        var scope = await _scopeContextFactory.CreateAsync(input.ServerId, $"asset-revoke:{input.TransactionId}");
         var businessOrderNumber = ResolveBusinessOrderNumber(input.BusinessOrderNumber, RevokeOrderNumberPrefix);
         return await _onlineServerClient.PostAsync<OnlineAssetGrantAckResponse>(RevokeAssetAction, new OnlineAssetRevokeCommandRequest
         {

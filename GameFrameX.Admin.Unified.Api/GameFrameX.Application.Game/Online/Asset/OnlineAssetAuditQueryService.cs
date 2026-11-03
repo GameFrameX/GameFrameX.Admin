@@ -2,6 +2,7 @@ using System.ComponentModel;
 using GameFrameX.Application.Game.Online.Asset.Dto;
 using GameFrameX.Application.Game.ServerManager.Online;
 
+// S3/C401 断链修复点
 namespace GameFrameX.Application.Game.Online.Asset;
 
 /// <summary>
@@ -41,7 +42,7 @@ public class OnlineAssetAuditQueryService : IAdminApiController
     [DisplayName("资产审计分页查询")]
     public async Task<OnlineAssetAuditPageResponse> PageAsync(PageOnlineAssetAuditRequest input)
     {
-        var scope = await _scopeContextFactory.CreateAsync(input.AppId, input.ServerId, "asset-audit-page");
+        var scope = await _scopeContextFactory.CreateAsync(input.ServerId, "asset-audit-page");
         var data = await _onlineServerClient.PostAsync<OnlineAssetAuditQueryResultResponse>(QueryAssetAuditAction, new OnlineAssetAuditQueryRequest
         {
             OperatorId = input.OperatorId,

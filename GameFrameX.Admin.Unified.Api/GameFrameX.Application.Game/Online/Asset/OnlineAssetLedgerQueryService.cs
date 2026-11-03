@@ -2,6 +2,7 @@ using System.ComponentModel;
 using GameFrameX.Application.Game.Online.Asset.Dto;
 using GameFrameX.Application.Game.ServerManager.Online;
 
+// S3/C401 断链修复点
 namespace GameFrameX.Application.Game.Online.Asset;
 
 /// <summary>
@@ -41,7 +42,7 @@ public class OnlineAssetLedgerQueryService : IAdminApiController
     [DisplayName("资产流水分页查询")]
     public async Task<OnlineAssetLedgerPageResponse> PageAsync(PageOnlineAssetLedgerRequest input)
     {
-        var scope = await _scopeContextFactory.CreateAsync(input.AppId, input.ServerId, "asset-ledger-page");
+        var scope = await _scopeContextFactory.CreateAsync(input.ServerId, "asset-ledger-page");
         var data = await _onlineServerClient.PostAsync<OnlineAssetLedgerQueryResultResponse>(QueryWalletLedgerAction, new OnlineAssetLedgerQueryRequest
         {
             PlayerId = input.PlayerId,

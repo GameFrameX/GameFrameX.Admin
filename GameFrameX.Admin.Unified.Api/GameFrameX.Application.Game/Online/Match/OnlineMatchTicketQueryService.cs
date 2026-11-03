@@ -2,6 +2,7 @@ using System.ComponentModel;
 using GameFrameX.Application.Game.Online.Match.Dto;
 using GameFrameX.Application.Game.ServerManager.Online;
 
+// S3/C401 断链修复点
 namespace GameFrameX.Application.Game.Online.Match;
 
 /// <summary>
@@ -46,7 +47,7 @@ public class OnlineMatchTicketQueryService : IAdminApiController
     [DisplayName("匹配失败原因分页查询")]
     public async Task<OnlineMatchFailurePageResponse> FailurePageAsync(PageOnlineMatchFailureRequest input)
     {
-        var scope = await _scopeContextFactory.CreateAsync(input.AppId, input.ServerId, "match-failure-page");
+        var scope = await _scopeContextFactory.CreateAsync(input.ServerId, "match-failure-page");
         var data = await _onlineServerClient.PostAsync<OnlineMatchFailureQueryResultResponse>(QueryMatchTicketFailuresAction, new OnlineMatchFailureQueryRequest
         {
             ReasonCode = input.ReasonCode,
@@ -84,7 +85,7 @@ public class OnlineMatchTicketQueryService : IAdminApiController
     [DisplayName("异常Ticket分页查询")]
     public async Task<OnlineMatchAbnormalTicketPageResponse> AbnormalPageAsync(PageOnlineMatchAbnormalTicketRequest input)
     {
-        var scope = await _scopeContextFactory.CreateAsync(input.AppId, input.ServerId, "match-abnormal-page");
+        var scope = await _scopeContextFactory.CreateAsync(input.ServerId, "match-abnormal-page");
         var data = await _onlineServerClient.PostAsync<OnlineMatchAbnormalTicketQueryResultResponse>(QueryMatchAbnormalTicketsAction, new OnlineMatchAbnormalTicketQueryRequest
         {
             AbnormalKind = input.AbnormalKind,

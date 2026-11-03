@@ -2,6 +2,7 @@ using System.ComponentModel;
 using GameFrameX.Application.Game.Online.Console.Dto;
 using GameFrameX.Application.Game.ServerManager.Online;
 
+// S3/C401 断链修复点
 namespace GameFrameX.Application.Game.Online.Console;
 
 /// <summary>
@@ -44,7 +45,7 @@ public class OnlinePlayerTimelineQueryService : IAdminApiController
     [DisplayName("玩家时间线查询")]
     public async Task<OnlinePlayerTimelineResponse> QueryAsync(OnlinePlayerTimelineRequest input)
     {
-        var scope = await _scopeContextFactory.CreateAsync(input.AppId, input.ServerId, $"player-timeline:{input.PlayerId}");
+        var scope = await _scopeContextFactory.CreateAsync(input.ServerId, $"player-timeline:{input.PlayerId}");
         var data = await _onlineServerClient.PostAsync<OnlinePlayerTimelineQueryResultResponse>(QueryPlayerTimelineAction, new OnlinePlayerTimelineQueryRequest
         {
             PlayerId = input.PlayerId,

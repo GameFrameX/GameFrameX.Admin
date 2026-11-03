@@ -6,6 +6,7 @@ using GameFrameX.Entity.Log;
 using GameFrameX.Entity.Tenant.Game;
 using GameFrameX.Entity.Tenant.Game.Online;
 
+// S3/C401 断链修复点
 namespace GameFrameX.Application.Game.Online.Console;
 
 /// <summary>
@@ -147,7 +148,7 @@ public class OnlineAuditSearchService : IAdminApiController
             return new List<OnlineAuditSearchEntryResponse>();
         }
 
-        var scope = await _scopeContextFactory.CreateAsync(input.AppId.Value, input.ServerId.Value, "audit-search");
+        var scope = await _scopeContextFactory.CreateAsync(input.ServerId.Value, "audit-search");
         var data = await _onlineServerClient.PostAsync<OnlineAuditEventQueryResultResponse>(QueryOnlineAuditEventsAction, new OnlineAuditEventQueryRequest
         {
             OperatorId = input.Operator,

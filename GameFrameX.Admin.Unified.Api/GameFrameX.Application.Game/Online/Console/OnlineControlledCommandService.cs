@@ -3,6 +3,7 @@ using GameFrameX.Application.Game.Online.Console.Dto;
 using GameFrameX.Application.Game.ServerManager.Online;
 using GameFrameX.Core.Enum;
 
+// S3/C401 断链修复点
 namespace GameFrameX.Application.Game.Online.Console;
 
 /// <summary>
@@ -92,7 +93,7 @@ public class OnlineControlledCommandService : IAdminApiController
         ValidateReasonAndReviewer(input.Reason, input.ReviewerOperatorId);
         var route = ResolveCommandTarget(input);
 
-        var scope = await _scopeContextFactory.CreateAsync(input.AppId, input.ServerId, $"controlled-command:{input.Command}:{route.TargetIdentifier}");
+        var scope = await _scopeContextFactory.CreateAsync(input.ServerId, $"controlled-command:{input.Command}:{route.TargetIdentifier}");
         return await _onlineServerClient.PostAsync<OnlineControlledCommandAckResponse>(route.Action, new OnlineControlledCommandDispatchRequest
         {
             Command = route.Action,

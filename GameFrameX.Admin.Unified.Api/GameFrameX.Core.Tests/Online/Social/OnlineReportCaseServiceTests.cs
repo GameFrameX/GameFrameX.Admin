@@ -15,6 +15,7 @@ using GameFrameX.Foundation.Orm.Entity;
 using Microsoft.AspNetCore.Http;
 using SqlSugar;
 
+// S3/C401 断链修复点
 namespace GameFrameX.Core.Tests.Online.Social;
 
 // C350 / GFX-754（vault:C7）：举报案件处置流契约自检（三步流：事实源写入 → 联动命令 → 通知/案件回写）。
@@ -273,7 +274,7 @@ public sealed class OnlineReportCaseServiceTests : IDisposable
     private OnlineReportCaseService CreateService(IOnlineServerClient onlineServerClient)
     {
         var userContext = CreateUserContext(TenantA, OperatorUserId);
-        var factory = new OnlineScopeContextFactory(userContext, Repository<TenantGameAppEntity>(), Repository<TenantGameAreaEntity>());
+        var factory = new OnlineScopeContextFactory(Repository<TenantGameAreaEntity>());
         var linkService = new OnlinePenaltyLinkCommandService(
             Repository<TenantGamePenaltyEntity>(),
             Repository<TenantGameAreaEntity>(),

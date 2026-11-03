@@ -2,6 +2,7 @@ using System.ComponentModel;
 using GameFrameX.Application.Game.Online.Social.Dto;
 using GameFrameX.Application.Game.ServerManager.Online;
 
+// S3/C401 断链修复点
 namespace GameFrameX.Application.Game.Online.Social;
 
 /// <summary>
@@ -41,7 +42,7 @@ public class OnlineMessageAuditQueryService : IAdminApiController
     [DisplayName("消息审计分页查询")]
     public async Task<OnlineMessageAuditPageResponse> PageAsync(PageOnlineMessageAuditRequest input)
     {
-        var scope = await _scopeContextFactory.CreateAsync(input.AppId, input.ServerId, "message-audit-page");
+        var scope = await _scopeContextFactory.CreateAsync(input.ServerId, "message-audit-page");
         var data = await _onlineServerClient.PostAsync<OnlineMessageAuditQueryResultResponse>(QueryChatMessagesAction, new OnlineMessageAuditQueryRequest
         {
             ChannelKind = input.ChannelKind,

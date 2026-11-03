@@ -5,6 +5,7 @@ using GameFrameX.Application.Game.Tenant.Penalty.TenantGamePenalty;
 using GameFrameX.Application.Game.Tenant.Penalty.TenantGamePenalty.Dto;
 using GameFrameX.Entity.Enum;
 
+// S3/C401 断链修复点
 namespace GameFrameX.Application.Game.Online.Social;
 
 /// <summary>
@@ -61,7 +62,7 @@ public class OnlineReportCaseService : IAdminApiController
     [DisplayName("举报案件分页查询")]
     public async Task<OnlineReportCasePageResponse> PageAsync(PageOnlineReportCaseRequest input)
     {
-        var scope = await _scopeContextFactory.CreateAsync(input.AppId, input.ServerId, "report-case-page");
+        var scope = await _scopeContextFactory.CreateAsync(input.ServerId, "report-case-page");
         var data = await _onlineServerClient.PostAsync<OnlineReportCaseQueryResultResponse>(QueryReportCasesAction, new OnlineReportCaseQueryRequest
         {
             Status = input.Status,
@@ -95,7 +96,7 @@ public class OnlineReportCaseService : IAdminApiController
     public async Task<OnlineReportHandleResponse> HandleAsync(OnlineReportHandleRequest input)
     {
         // 作用域前置校验：越界拒绝发生在任何写步骤之前（不产生半途事实）。
-        var scope = await _scopeContextFactory.CreateAsync(input.AppId, input.ServerId, $"report-handle:{input.CaseId}");
+        var scope = await _scopeContextFactory.CreateAsync(input.ServerId, $"report-handle:{input.CaseId}");
         var handledAt = TimerHelper.UnixTimeSeconds();
 
         // 第一步（仅 Mute/Ban）：处罚事实源写入。先落账后联动——事实源是 Admin 侧唯一处罚事实。

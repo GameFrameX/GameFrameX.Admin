@@ -11,6 +11,7 @@ using GameFrameX.Entity.Tenant.Game;
 using GameFrameX.Entity.Tenant.Game.Online;
 using SqlSugar;
 
+// S3/C401 断链修复点
 namespace GameFrameX.Core.Tests.Online.Console;
 
 // C344 / GFX-760（vault:C9 S8.2）：统一审计检索 Service 契约自检。
@@ -310,7 +311,7 @@ public sealed class OnlineAuditSearchServiceTests : IDisposable
 
     private OnlineAuditSearchService CreateService(IOnlineServerClient onlineServerClient)
     {
-        var factory = new OnlineScopeContextFactory(OnlineAssetTestSupport.CreateUserContext(), OnlineAssetTestSupport.Repository<TenantGameAppEntity>(_db), OnlineAssetTestSupport.Repository<TenantGameAreaEntity>(_db));
+        var factory = new OnlineScopeContextFactory(OnlineAssetTestSupport.Repository<TenantGameAreaEntity>(_db));
         return new OnlineAuditSearchService(
             new SqlSugarRepository<TenantLogOperationEntity> { Context = _db, },
             OnlineAssetTestSupport.Repository<TenantGamePenaltyEntity>(_db),

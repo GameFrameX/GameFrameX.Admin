@@ -7,6 +7,7 @@ using GameFrameX.Core.SqlSugar;
 using GameFrameX.Entity.Tenant.Game;
 using SqlSugar;
 
+// S3/C401 断链修复点
 namespace GameFrameX.Core.Tests.Online.Console;
 
 // C344 / GFX-760（vault:C9 S8.1 / VC-8.4）：受控操作命令 Service 契约自检。
@@ -292,7 +293,7 @@ public sealed class OnlineControlledCommandServiceTests : IDisposable
 
     private OnlineControlledCommandService CreateService(IOnlineServerClient onlineServerClient)
     {
-        var factory = new OnlineScopeContextFactory(OnlineAssetTestSupport.CreateUserContext(), OnlineAssetTestSupport.Repository<TenantGameAppEntity>(_db), OnlineAssetTestSupport.Repository<TenantGameAreaEntity>(_db));
+        var factory = new OnlineScopeContextFactory(OnlineAssetTestSupport.Repository<TenantGameAreaEntity>(_db));
         return new OnlineControlledCommandService(onlineServerClient, factory);
     }
 

@@ -2,6 +2,7 @@ using System.ComponentModel;
 using GameFrameX.Application.Game.Online.Asset.Dto;
 using GameFrameX.Application.Game.ServerManager.Online;
 
+// S3/C401 断链修复点
 namespace GameFrameX.Application.Game.Online.Asset;
 
 /// <summary>
@@ -47,7 +48,7 @@ public class OnlineAssetTransactionQueryService : IAdminApiController
             throw BusinessError.Oh(CommonErrorCode.ParameterValidationFailed, new { field = "TransactionId", });
         }
 
-        var scope = await _scopeContextFactory.CreateAsync(input.AppId, input.ServerId, "asset-transaction-detail");
+        var scope = await _scopeContextFactory.CreateAsync(input.ServerId, "asset-transaction-detail");
         return await _onlineServerClient.PostAsync<OnlineAssetTransactionDetailResponse>(QueryTransactionDetailAction, new OnlineAssetTransactionDetailQueryRequest
         {
             TransactionId = input.TransactionId,

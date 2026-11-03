@@ -6,6 +6,7 @@ using GameFrameX.Core.SqlSugar;
 using GameFrameX.Entity.Tenant.Game;
 using SqlSugar;
 
+// S3/C401 断链修复点
 namespace GameFrameX.Core.Tests.Online.Asset;
 
 // C340 / GFX-752（vault:C4 S3.7）：资产流水查询服务契约自检。
@@ -99,10 +100,10 @@ public sealed class OnlineAssetLedgerQueryServiceTests : IDisposable
     }
 
     /// <summary>
-    /// 越界拒绝：AppId 不归属当前租户，scope factory 抛 ScopeDenied，Online 调用零次。
+    /// 区服不存在时拒绝，Online 调用零次。
     /// </summary>
     [Fact]
-    public async Task PageAsync_RejectsCrossTenantApp_BeforeAnyOnlineCall()
+    public async Task PageAsync_RejectsNonexistentServer_BeforeAnyOnlineCall()
     {
         await OnlineAssetTestSupport.SeedScopeAsync(_db);
         var fake = new OnlineAssetTestSupport.FakeOnlineServerClient();
@@ -110,8 +111,7 @@ public sealed class OnlineAssetLedgerQueryServiceTests : IDisposable
 
         var exception = await Assert.ThrowsAsync<BusinessException>(() => service.PageAsync(new PageOnlineAssetLedgerRequest
         {
-            AppId = 9999,
-            ServerId = OnlineAssetTestSupport.Area1001,
+            ServerId = 9999,
             PlayerId = "player-1",
         }));
 
@@ -120,7 +120,7 @@ public sealed class OnlineAssetLedgerQueryServiceTests : IDisposable
     }
 
     /// <summary>
-    /// 作用域缺失：AppId=0 抛 ScopeMissing（32200005），Online 调用零次。
+    /// 作用域缺失：ServerId=0 抛 ScopeMissing（32200005），Online 调用零次。
     /// </summary>
     [Fact]
     public async Task PageAsync_RejectsMissingScope()
@@ -131,8 +131,7 @@ public sealed class OnlineAssetLedgerQueryServiceTests : IDisposable
 
         var exception = await Assert.ThrowsAsync<BusinessException>(() => service.PageAsync(new PageOnlineAssetLedgerRequest
         {
-            AppId = 0,
-            ServerId = OnlineAssetTestSupport.Area1001,
+            ServerId = 0,
             PlayerId = "player-1",
         }));
 
@@ -142,7 +141,7 @@ public sealed class OnlineAssetLedgerQueryServiceTests : IDisposable
 
     private OnlineAssetLedgerQueryService CreateService(IOnlineServerClient onlineServerClient)
     {
-        var factory = new OnlineScopeContextFactory(OnlineAssetTestSupport.CreateUserContext(), OnlineAssetTestSupport.Repository<TenantGameAppEntity>(_db), OnlineAssetTestSupport.Repository<TenantGameAreaEntity>(_db));
+        var factory = new OnlineScopeContextFactory(OnlineAssetTestSupport.Repository<TenantGameAreaEntity>(_db));
         return new OnlineAssetLedgerQueryService(onlineServerClient, factory);
     }
 

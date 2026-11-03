@@ -2,6 +2,7 @@ using System.ComponentModel;
 using GameFrameX.Application.Game.Online.Console.Dto;
 using GameFrameX.Application.Game.ServerManager.Online;
 
+// S3/C401 断链修复点
 namespace GameFrameX.Application.Game.Online.Console;
 
 /// <summary>
@@ -47,7 +48,7 @@ public class OnlineOverviewQueryService : IAdminApiController
     [DisplayName("在线总览快照查询")]
     public async Task<OnlineOverviewResponse> SnapshotAsync(OnlineOverviewRequest input)
     {
-        var scope = await _scopeContextFactory.CreateAsync(input.AppId, input.ServerId, "online-overview-snapshot");
+        var scope = await _scopeContextFactory.CreateAsync(input.ServerId, "online-overview-snapshot");
         var data = await _onlineServerClient.PostAsync<OnlineOverviewQueryResultResponse>(QueryOnlineOverviewAction, new OnlineOverviewQueryRequest(), scope);
 
         return new OnlineOverviewResponse

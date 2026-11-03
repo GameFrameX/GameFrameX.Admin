@@ -2,6 +2,7 @@ using System.ComponentModel;
 using GameFrameX.Application.Game.Online.Match.Dto;
 using GameFrameX.Application.Game.ServerManager.Online;
 
+// S3/C401 断链修复点
 namespace GameFrameX.Application.Game.Online.Match;
 
 /// <summary>
@@ -40,7 +41,7 @@ public class OnlineMatchQueueQueryService : IAdminApiController
     [DisplayName("匹配队列总览查询")]
     public async Task<OnlineMatchOverviewResponse> OverviewAsync(OnlineMatchOverviewRequest input)
     {
-        var scope = await _scopeContextFactory.CreateAsync(input.AppId, input.ServerId, "match-queue-overview");
+        var scope = await _scopeContextFactory.CreateAsync(input.ServerId, "match-queue-overview");
         var data = await _onlineServerClient.PostAsync<OnlineMatchOverviewQueryResultResponse>(QueryMatchQueueOverviewAction, new OnlineMatchOverviewQueryRequest
         {
             Mode = input.Mode,

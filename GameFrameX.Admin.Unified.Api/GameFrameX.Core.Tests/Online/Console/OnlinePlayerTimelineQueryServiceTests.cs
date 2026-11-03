@@ -7,6 +7,7 @@ using GameFrameX.Core.SqlSugar;
 using GameFrameX.Entity.Tenant.Game;
 using SqlSugar;
 
+// S3/C401 断链修复点
 namespace GameFrameX.Core.Tests.Online.Console;
 
 // C344 / GFX-760（vault:C9 S8.1）：玩家时间线查询 Service 契约自检。
@@ -122,10 +123,10 @@ public sealed class OnlinePlayerTimelineQueryServiceTests : IDisposable
     }
 
     /// <summary>
-    /// 越界前置拒绝：AppId 不归属当前租户 → ScopeDenied，Online 调用零次。
+    /// 区服不存在时拒绝，Online 调用零次。
     /// </summary>
     [Fact]
-    public async Task QueryAsync_RejectsCrossTenant_BeforeAnyOnlineCall()
+    public async Task QueryAsync_RejectsNonexistentServer_BeforeAnyOnlineCall()
     {
         await OnlineAssetTestSupport.SeedScopeAsync(_db);
         var fake = new OnlineAssetTestSupport.FakeOnlineServerClient();
@@ -133,8 +134,7 @@ public sealed class OnlinePlayerTimelineQueryServiceTests : IDisposable
 
         var exception = await Assert.ThrowsAsync<BusinessException>(() => service.QueryAsync(new OnlinePlayerTimelineRequest
         {
-            AppId = 9999,
-            ServerId = OnlineAssetTestSupport.Area1001,
+            ServerId = 9999,
             PlayerId = "player-9",
         }));
 
@@ -144,7 +144,7 @@ public sealed class OnlinePlayerTimelineQueryServiceTests : IDisposable
 
     private OnlinePlayerTimelineQueryService CreateService(IOnlineServerClient onlineServerClient)
     {
-        var factory = new OnlineScopeContextFactory(OnlineAssetTestSupport.CreateUserContext(), OnlineAssetTestSupport.Repository<TenantGameAppEntity>(_db), OnlineAssetTestSupport.Repository<TenantGameAreaEntity>(_db));
+        var factory = new OnlineScopeContextFactory(OnlineAssetTestSupport.Repository<TenantGameAreaEntity>(_db));
         return new OnlinePlayerTimelineQueryService(onlineServerClient, factory);
     }
 
