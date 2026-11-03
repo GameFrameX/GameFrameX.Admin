@@ -51,6 +51,8 @@ internal static class SingleMainMigration
             source.Ado.ExecuteCommand(source.CurrentConnectionConfig.DbType == DatabaseType.Sqlite
                 ? "PRAGMA query_only = ON" : "SET TRANSACTION READ ONLY");
             ValidateDefaultInstance(source, target);
+            ConfigurationCollisionGuard.Validate(source, true);
+            ConfigurationCollisionGuard.Validate(target, true);
             var currentTypes = entityTypes ?? typeof(TenantUserEntity).Assembly.GetTypes()
                 .Where(type => type.IsClass && !type.IsAbstract && type.IsDefined(typeof(SugarTable), false))
                 .OrderBy(type => type.FullName, StringComparer.Ordinal).ToArray();
@@ -72,6 +74,8 @@ internal static class SingleMainMigration
                 CopyTable(source, target, tableName);
                 copiedTables.Add(tableName);
             }
+
+            ConfigurationCollisionGuard.Validate(target, false);
 
             foreach (var ignored in sourceTables.Except(copiedTables).OrderBy(name => name, StringComparer.Ordinal))
             {

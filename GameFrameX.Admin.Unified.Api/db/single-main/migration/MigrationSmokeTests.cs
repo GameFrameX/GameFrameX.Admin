@@ -1,4 +1,5 @@
 using GameFrameX.Entity.System;
+using GameFrameX.Entity.Tenant.ClientApiConfig;
 using GameFrameX.Entity.Log;
 using GameFrameX.Entity.Global;
 using GameFrameX.Entity.Enum;
@@ -18,7 +19,7 @@ internal static class MigrationSmokeTests
             using (var source = SingleMainMigration.Connect(DbType.Sqlite, $"DataSource={Path.Combine(directory, "source.db")}"))
             using (var target = SingleMainMigration.Connect(DbType.Sqlite, $"DataSource={Path.Combine(directory, "target.db")}"))
             {
-                var types = new[] { typeof(TenantGameHomeOnlineSampleEntity), typeof(TenantGameGoodsEntity), typeof(SystemUserEntity), typeof(SystemLogVisitEntity) };
+                var types = new[] { typeof(TenantGameHomeOnlineSampleEntity), typeof(TenantGameGoodsEntity), typeof(SystemUserEntity), typeof(SystemLogVisitEntity), typeof(TenantClientApiPolicyEntity) };
                 target.Ado.ExecuteCommand("CREATE TABLE system_tenant_entity (id BIGINT PRIMARY KEY, is_deleted BOOLEAN)");
                 target.Ado.ExecuteCommand("INSERT INTO system_tenant_entity VALUES (1300000000001, 0)");
                 target.CodeFirst.InitTables<SystemUserEntity>();
@@ -37,6 +38,12 @@ internal static class MigrationSmokeTests
                 target.Ado.ExecuteCommand("ALTER TABLE tenant_game_home_online_sample_entity ADD COLUMN tenant_id BIGINT NOT NULL DEFAULT 1300000000001");
                 target.Ado.ExecuteCommand("ALTER TABLE tenant_game_home_online_sample_entity ADD COLUMN app_id BIGINT NOT NULL DEFAULT 100");
                 target.Ado.ExecuteCommand("CREATE UNIQUE INDEX ux_home_online_sample_tenant_time ON tenant_game_home_online_sample_entity (tenant_id, sample_time)");
+                source.CodeFirst.InitTables<TenantClientApiPolicyEntity>();
+                source.Insertable(new[] { new TenantClientApiPolicyEntity { Id = 9101 }, new TenantClientApiPolicyEntity { Id = 9102 } }).ExecuteCommand();
+                source.Ado.ExecuteCommand("ALTER TABLE tenant_client_api_policy_entity ADD COLUMN app_id BIGINT NOT NULL DEFAULT 0");
+                source.Ado.ExecuteCommand("UPDATE tenant_client_api_policy_entity SET app_id = 100 WHERE id = 9102");
+                Reject(() => SingleMainMigration.Run(source, target, true, types), "默认层与应用层策略碰撞必须拒绝", "配置作用域碰撞");
+                source.Deleteable<TenantClientApiPolicyEntity>().Where(row => row.Id == 9102).ExecuteCommand();
                 SingleMainMigration.Run(source, target, true, types);
                 Require(target.DbMaintenance.GetColumnInfosByTableName("tenant_game_home_online_sample_entity", false).Any(column => column.DbColumnName == "tenant_id"), "dry-run 删列必须回滚");
                 Require(target.Queryable<TenantGameHomeOnlineSampleEntity>().Count() == 0, "dry-run 数据复制必须回滚");
@@ -53,6 +60,10 @@ internal static class MigrationSmokeTests
                 Require(target.Queryable<GlobalMenuEntity>().Single().AppScope == MenuAppScopeEnum.Console, "手建菜单作用域必须塌缩");
                 Reject(() => target.Insertable(new TenantGameHomeOnlineSampleEntity { Id = 7002, SampleTime = 1000, OnlineCount = 1 }).ExecuteCommand(), "业务时间键仍应唯一", "UNIQUE");
                 Require(target.Queryable<TenantGameHomeOnlineSampleEntity>().Single().OnlineCount == 42, "业务字段必须保真");
+                target.Insertable(new TenantClientApiPolicyEntity { Id = 9103 }).ExecuteCommand();
+                Reject(() => SingleMainMigration.Run(source, target, false, types), "源目标不同主键的策略碰撞必须拒绝", "配置作用域碰撞");
+                Require(target.Queryable<TenantClientApiPolicyEntity>().Count() == 2, "拒绝迁移不能改写原目标配置");
+                target.Deleteable<TenantClientApiPolicyEntity>().Where(row => row.Id == 9103).ExecuteCommand();
                 target.Updateable<TenantGameHomeOnlineSampleEntity>().SetColumns(row => row.OnlineCount == 99).Where(row => row.Id == 7001).ExecuteCommand();
                 Reject(() => SingleMainMigration.Run(source, target, false, types), "冲突必须拒绝", "主键碰撞");
                 Require(target.Queryable<TenantGameHomeOnlineSampleEntity>().Single().OnlineCount == 99, "冲突不得覆盖目标");
