@@ -1,8 +1,6 @@
 using System.ComponentModel;
 using GameFrameX.Application.Game.ServerManager;
-using GameFrameX.Application.Game.App.AppScope;
 using GameFrameX.Application.Game.Area.GameArea.Dto;
-using GameFrameX.Core.Service.Tenant;
 using GameFrameX.Foundation.Http.Extension;
 using GameFrameX.Foundation.Json;
 
@@ -16,7 +14,6 @@ namespace GameFrameX.Application.Game.Area.GameArea;
 public class TenantGameAreaEntityService : GenericCrudSelectService<Entity.Tenant.Game.TenantGameAreaEntity, AddTenantGameAreaEntityRequest, UpdateTenantGameAreaEntityRequest, TenantGameAreaEntityResponse, PageTenantGameAreaEntityRequest>
 {
     private readonly SqlSugarRepository<Entity.Tenant.Game.TenantGameAreaClassifyEntity> _classifyRepository;
-    private readonly SqlSugarRepository<Entity.Tenant.Game.TenantGameAppEntity> _gameAppRepository;
     private readonly HttpClient _httpClient;
 
     /// <summary>
@@ -24,12 +21,10 @@ public class TenantGameAreaEntityService : GenericCrudSelectService<Entity.Tenan
     /// </summary>
     /// <param name="repository"></param>
     /// <param name="classifyRepository"></param>
-    /// <param name="gameAppRepository"></param>
     /// <param name="httpClient"></param>
-    public TenantGameAreaEntityService(SqlSugarRepository<Entity.Tenant.Game.TenantGameAreaEntity> repository, SqlSugarRepository<Entity.Tenant.Game.TenantGameAreaClassifyEntity> classifyRepository, SqlSugarRepository<Entity.Tenant.Game.TenantGameAppEntity> gameAppRepository, HttpClient httpClient) : base(repository)
+    public TenantGameAreaEntityService(SqlSugarRepository<Entity.Tenant.Game.TenantGameAreaEntity> repository, SqlSugarRepository<Entity.Tenant.Game.TenantGameAreaClassifyEntity> classifyRepository, HttpClient httpClient) : base(repository)
     {
         _classifyRepository = classifyRepository;
-        _gameAppRepository = gameAppRepository;
         _httpClient = httpClient;
     }
 
@@ -38,19 +33,15 @@ public class TenantGameAreaEntityService : GenericCrudSelectService<Entity.Tenan
     /// </summary>
     protected override ISugarQueryable<TenantGameAreaEntityResponse> BuildPageQuery(PageTenantGameAreaEntityRequest input)
     {
-        var gameAppId = AppScopeRules.EnsureFactAppId(input.AppId, "游戏区服");
-        var tenantId = TenantOperationContext.GetEffectiveTenantId();
         // 区服启用标记 C301 起归一基类 IsEnabled，会被全局 ISafeEnabledFilter 隐藏禁用行；
         // 管理列表必须能看到禁用区服（否则无法重新启用，参照 TenantGameAppPackageService 的 C67 FixPattern），
-        // 故绕过全部过滤器并手动补软删与租户条件。
+        // 故绕过全部过滤器并手动补软删条件。
         // 注意：Filter(null, true) 必须放在 LeftJoin 之后——SqlSugar 的 Filter 状态不随 join 链传递，
         // 放 join 前会被 join 重置（实测禁用行被 ISafeEnabledFilter 过滤），放 join 后才对整个查询生效。
         return Repository.AsQueryable()
                          .Filter(null, true)
                          .Where(u => u.IsDeleted == false)
-                         .WhereIF(tenantId.HasValue, u => u.TenantId == null || u.TenantId == tenantId.Value)
                          .WhereIF(!string.IsNullOrWhiteSpace(input.Name), u => u.Name.Contains(input.Name.Trim()))
-                         .Where(u => u.GameAppId == gameAppId)
                          .WhereIF(input.IsDefault.HasValue, u => u.IsDefault == input.IsDefault.Value)
                          .WhereIF(input.IsRecommend.HasValue, u => u.IsRecommend == input.IsRecommend.Value)
                          .WhereIF(input.IsEnabled.HasValue, u => u.IsEnabled == input.IsEnabled.Value)
@@ -69,7 +60,6 @@ public class TenantGameAreaEntityService : GenericCrudSelectService<Entity.Tenan
                              IsRecommend = u.IsRecommend,
                              ClassifyId = u.ClassifyId,
                              ClassifyIdName = SqlFunc.Subqueryable<Entity.Tenant.Game.TenantGameAreaClassifyEntity>().Where(classifyid => classifyid.Id == u.ClassifyId).Select(classifyid => classifyid.Name),
-                             GameAppId = u.GameAppId,
                              IsEnabled = u.IsEnabled,
                              ServerStatus = u.ServerStatus,
                              HttpManageUrl = u.HttpManageUrl,
@@ -107,15 +97,13 @@ public class TenantGameAreaEntityService : GenericCrudSelectService<Entity.Tenan
 
     /// <summary>
     /// 按 Id 取区服（含禁用行）。启用标记在基类 IsEnabled（C301 归一）后受全局 ISafeEnabledFilter 过滤，
-    /// 管理/转发操作必须触达禁用区服，故按 FixPattern 绕过全部过滤器并手动补软删与租户条件。
+    /// 管理/转发操作必须触达禁用区服，故按 FixPattern 绕过全部过滤器并手动补软删条件。
     /// </summary>
     private async Task<Entity.Tenant.Game.TenantGameAreaEntity> GetAreaForManagementAsync(long id)
     {
-        var tenantId = TenantOperationContext.GetEffectiveTenantId();
         return await Repository.AsQueryable()
                                .Filter(null, true)
                                .Where(u => u.IsDeleted == false)
-                               .WhereIF(tenantId.HasValue, u => u.TenantId == null || u.TenantId == tenantId.Value)
                                .FirstAsync(u => u.Id == id);
     }
 
@@ -131,16 +119,16 @@ public class TenantGameAreaEntityService : GenericCrudSelectService<Entity.Tenan
     }
 
     /// <summary>
-    /// 新增前校验：GameAppId 必填且必须属于当前租户（多租户过滤仓储，null 即抛错）。
+    /// 新增前归一化区服接口前缀。
     /// </summary>
-    protected override async Task OnAddingAsync(AddTenantGameAreaEntityRequest input)
+    protected override Task OnAddingAsync(AddTenantGameAreaEntityRequest input)
     {
         NormalizeEndpointPrefixes(input);
-        await _gameAppRepository.ValidateGameAppBelongsToTenantAsync(input.AppId);
+        return Task.CompletedTask;
     }
 
     /// <summary>
-    /// 更新前：GameAppId 不可变（从既有实体回填，禁止区服跨应用迁移）并校验应用归属。
+    /// 更新前归一化接口前缀并验证区服存在。
     /// </summary>
     protected override async Task OnUpdatingAsync(UpdateTenantGameAreaEntityRequest input)
     {
@@ -151,8 +139,6 @@ public class TenantGameAreaEntityService : GenericCrudSelectService<Entity.Tenan
             throw BusinessError.Oh(CommonErrorCode.RecordNotFound);
         }
 
-        input.AppId = existing.GameAppId;
-        await _gameAppRepository.ValidateGameAppBelongsToTenantAsync(input.AppId);
     }
 
     /// <summary>

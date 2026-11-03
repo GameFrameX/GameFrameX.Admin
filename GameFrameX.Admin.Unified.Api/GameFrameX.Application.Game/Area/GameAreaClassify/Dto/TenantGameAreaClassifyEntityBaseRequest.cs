@@ -5,11 +5,6 @@ namespace GameFrameX.Application.Game.Area.GameAreaClassify.Dto;
 /// </summary>
 public abstract class TenantGameAreaClassifyEntityBaseRequest : BaseUpdateRequest
 {
-    /// <summary>
-    /// 应用Id。运营内容应用作用域，必须 > 0。
-    /// </summary>
-    [Required(ErrorMessage = "应用Id不能为空")]
-    public long AppId { get; set; }
 
     /// <summary>
     /// 名称

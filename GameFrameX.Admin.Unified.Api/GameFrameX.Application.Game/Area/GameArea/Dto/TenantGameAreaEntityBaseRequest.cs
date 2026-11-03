@@ -42,13 +42,6 @@ public abstract class TenantGameAreaEntityBaseRequest : BaseUpdateRequest
     [Required(ErrorMessage = "大区分类Id不能为空")]
     public long ClassifyId { get; set; }
 
-    /// <summary>
-    /// 游戏应用Id。区服主归属，新增必填且必须属于当前租户；
-    /// 更新时由服务层从既有实体回填（不可变），防止区服跨应用迁移。
-    /// </summary>
-    [Required(ErrorMessage = "游戏应用Id不能为空")]
-    [AdaptMember("GameAppId")]
-    public long AppId { get; set; }
 
     /// <summary>
     /// Http 管理连接地址

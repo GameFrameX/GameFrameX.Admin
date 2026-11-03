@@ -8,11 +8,6 @@ namespace GameFrameX.Application.Game.Area.GameAreaClassify.Dto;
 // 导致新增报 {"Version":["版本号不能为空"]}。业务字段在此直接声明（与 TenantGameAreaClassifyEntityBaseRequest 镜像），与 AddGameAppRequest 约定一致。
 public class AddTenantGameAreaClassifyEntityRequest : BaseAddRequest
 {
-    /// <summary>
-    /// 应用Id。运营内容应用作用域，必须 > 0。
-    /// </summary>
-    [Required(ErrorMessage = "应用Id不能为空")]
-    public long AppId { get; set; }
 
     /// <summary>
     /// 名称

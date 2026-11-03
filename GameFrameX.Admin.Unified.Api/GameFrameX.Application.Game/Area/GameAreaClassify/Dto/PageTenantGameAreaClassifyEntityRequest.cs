@@ -5,10 +5,6 @@ namespace GameFrameX.Application.Game.Area.GameAreaClassify.Dto;
 /// </summary>
 public class PageTenantGameAreaClassifyEntityRequest : BasePageRequest
 {
-    /// <summary>
-    /// 应用Id
-    /// </summary>
-    public long? AppId { get; set; }
 
     /// <summary>
     /// 名称

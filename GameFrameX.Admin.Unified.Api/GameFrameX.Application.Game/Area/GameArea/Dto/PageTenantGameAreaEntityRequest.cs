@@ -12,10 +12,6 @@ public class PageTenantGameAreaEntityRequest : BasePageRequest
     /// </summary>
     public string Name { get; set; } = null!;
 
-    /// <summary>
-    /// 游戏应用Id（可选过滤）
-    /// </summary>
-    public long? AppId { get; set; }
 
     /// <summary>
     /// 是否是默认

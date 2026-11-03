@@ -118,10 +118,6 @@ public class TenantGameAreaEntityResponse : IBasePageResponse<Entity.Tenant.Game
     /// </summary>
     public string ServerContainerId { get; set; } = null!;
 
-    /// <summary>
-    /// 游戏应用Id。区服主归属 = TenantId + GameAppId，每条区服必属某个具体游戏应用。
-    /// </summary>
-    public long GameAppId { get; set; }
 
     /// <summary>
     /// 渠道id
