@@ -5,7 +5,6 @@ namespace GameFrameX.Application.System.OpenAccess.Dto;
 /// </summary>
 // 纯 POCO 投影（C228）：属性名与 GameFrameX.Entity.System.SystemOpenAccessEntity 保持一致。
 // 注意：AccessSecret 永不输出（明文仅创建/轮换时一次性返回，与 Game 侧 TenantGameAppOpenAccessResponse 对称）；
-// BindTenant 为导航属性，不在投影列内。
 public class OpenAccessResponse
 {
     /// <summary>
@@ -18,10 +17,6 @@ public class OpenAccessResponse
     /// </summary>
     public string AccessKey { get; set; } = string.Empty;
 
-    /// <summary>
-    /// 绑定租户Id
-    /// </summary>
-    public long BindTenantId { get; set; }
 
     /// <summary>
     /// 绑定用户Id
@@ -33,10 +28,6 @@ public class OpenAccessResponse
     /// </summary>
     public string BindUserAccount { get; set; } = string.Empty;
 
-    /// <summary>
-    /// 绑定租户名称
-    /// </summary>
-    public string BindTenantName { get; set; } = string.Empty;
 
     /// <summary>
     /// 是否启用

@@ -134,8 +134,6 @@ public sealed class GameAppPackageResolverInheritanceTests : IDisposable
         var mainConfig = CreateConfig("main");
         var tenantConfig = CreateConfig(tenantId.ToString());
         var scope = new SqlSugarScope(mainConfig);
-        scope.CodeFirst.InitTables(typeof(SystemTenantEntity));
-        scope.Insertable(CreateTenant(tenantId, tenantConfig.ConnectionString)).ExecuteCommand();
 
         var provider = scope;
         var tenantDb = provider;
@@ -159,18 +157,6 @@ public sealed class GameAppPackageResolverInheritanceTests : IDisposable
         return config;
     }
 
-    private static SystemTenantEntity CreateTenant(long tenantId, string connectionString)
-    {
-        return new SystemTenantEntity
-        {
-            Id = tenantId,
-            TenantType = TenantTypeEnum.Db,
-            DbType = DbType.Sqlite,
-            Connection = connectionString,
-            ConfigId = tenantId.ToString(),
-            IsEnabled = true,
-        };
-    }
 
     public void Dispose()
     {

@@ -24,7 +24,6 @@ public class GlobalMenuService : IAdminApiController
     private readonly SqlSugarRepository<GlobalMenuEntity> _systemMenuRepository;
     private readonly SystemCacheService _systemCacheService;
     private readonly IServiceProvider _serviceProvider;
-    private readonly ISqlSugarClient _tenantDbConnectionProvider;
     private readonly ISqlSugarClient _sqlSugarClient;
 
     static GlobalMenuService()
@@ -38,14 +37,12 @@ public class GlobalMenuService : IAdminApiController
         SqlSugarRepository<GlobalMenuEntity> systemMenuRepository,
         SystemCacheService systemCacheService,
         IServiceProvider serviceProvider,
-        ISqlSugarClient tenantDbConnectionProvider,
         ISqlSugarClient sqlSugarClient)
     {
         _currentUserContext = currentUserContext;
         _systemMenuRepository = systemMenuRepository;
         _systemCacheService = systemCacheService;
         _serviceProvider = serviceProvider;
-        _tenantDbConnectionProvider = tenantDbConnectionProvider;
         _sqlSugarClient = sqlSugarClient;
     }
 
@@ -239,8 +236,7 @@ public class GlobalMenuService : IAdminApiController
 
         await _systemMenuRepository.DeleteAsync(u => menuIdList.Contains(u.Id));
 
-        // 级联删除角色菜单数据：授权分散在各租户库，平台侧删除时无租户上下文，
-        // 经 TenantRoleMenuService 解析租户仓储会在构造期因缺 TenantId 抛 NoPermission；改为直接遍历租户库清理
+        // 角色授权与菜单同在主库，删除菜单时同步清理。
         await CascadeDeleteRoleMenusAsync(menuIdList);
 
         // 清除缓存
@@ -248,25 +244,12 @@ public class GlobalMenuService : IAdminApiController
     }
 
     /// <summary>
-    /// 遍历所有库隔离租户，删除指定菜单的角色授权（tenant_role_menu）。
+    /// 从主库删除指定菜单的角色授权（tenant_role_menu）。
     /// </summary>
     private async Task CascadeDeleteRoleMenusAsync(List<long> menuIdList)
     {
         var mainDb = _sqlSugarClient.AsTenant().GetConnectionScope(SqlSugarConst.MainConfigId);
-        var tenants = mainDb.Queryable<SystemTenantEntity>()
-                            .Filter(null, true)
-                            .Where(u => u.TenantType == TenantTypeEnum.Db)
-                            .ToList();
-        foreach (var tenantEntity in tenants)
-        {
-            var tenantDb = _tenantDbConnectionProvider;
-            if (tenantDb == null)
-            {
-                continue;
-            }
-
-            await tenantDb.Deleteable<TenantRoleMenuEntity>().Where(u => menuIdList.Contains(u.MenuId)).ExecuteCommandAsync();
-        }
+        await mainDb.Deleteable<TenantRoleMenuEntity>().Where(u => menuIdList.Contains(u.MenuId)).ExecuteCommandAsync();
     }
 
     /// <summary>

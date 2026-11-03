@@ -34,16 +34,7 @@ internal sealed class ClientApiTestDb : IDisposable
         AppId = appId;
         MainDb = CreateScope("main");
         TenantDbPath = CreateDatabasePath("tenant");
-        MainDb.CodeFirst.InitTables(typeof(SystemTenantEntity));
-        MainDb.Insertable(new SystemTenantEntity
-        {
-            Id = TenantId,
-            TenantType = TenantTypeEnum.Db,
-            DbType = DbType.Sqlite,
-            Connection = $"DataSource={TenantDbPath}",
-            ConfigId = TenantId.ToString(),
-            IsEnabled = true,
-        }).ExecuteCommand();
+
 
         TenantDbProvider = MainDb;
         TenantDb = TenantDbProvider;

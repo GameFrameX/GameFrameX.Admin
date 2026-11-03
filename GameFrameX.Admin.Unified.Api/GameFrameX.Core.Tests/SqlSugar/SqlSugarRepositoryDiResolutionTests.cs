@@ -32,7 +32,6 @@ public sealed class SqlSugarRepositoryDiResolutionTests : IDisposable
         SqlSugarSetup.InitDatabase(_client, mainConfig, new[]
         {
             typeof(SystemUserEntity),
-            typeof(SystemTenantEntity),
         });
     }
 

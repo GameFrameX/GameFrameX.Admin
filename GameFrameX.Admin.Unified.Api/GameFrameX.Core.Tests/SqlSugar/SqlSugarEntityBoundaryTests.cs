@@ -17,8 +17,6 @@ public class SqlSugarEntityBoundaryTests
     [Fact]
     public void PlatformEntity_IsPlatformDatabase()
     {
-        Assert.True(SqlSugarEntityBoundary.IsPlatformTable(typeof(SystemTenantEntity)));
-        Assert.False(SqlSugarEntityBoundary.IsTenantTable(typeof(SystemTenantEntity)));
     }
 
     [Fact]

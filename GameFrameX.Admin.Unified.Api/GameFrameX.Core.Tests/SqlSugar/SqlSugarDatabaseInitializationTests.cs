@@ -17,7 +17,6 @@ public class SqlSugarDatabaseInitializationTests : IDisposable
 {
     private static readonly Type[] InitializationTypes =
     {
-        typeof(SystemTenantEntity),
         typeof(SystemUserEntity),
         typeof(TenantUserEntity),
         typeof(GlobalMenuEntity),
@@ -48,7 +47,6 @@ public class SqlSugarDatabaseInitializationTests : IDisposable
 
         var mainDb = scope.GetConnectionScope("main");
         Assert.True(TableExists(mainDb, typeof(SystemUserEntity)));
-        Assert.True(TableExists(mainDb, typeof(SystemTenantEntity)));
         Assert.True(TableExists(mainDb, typeof(GlobalMenuEntity)));
         Assert.True(TableExists(mainDb, typeof(SystemConfigEntity)));
         Assert.True(TableExists(mainDb, typeof(GlobalConfigEntity)));
@@ -66,7 +64,6 @@ public class SqlSugarDatabaseInitializationTests : IDisposable
         Assert.True(TableExists(mainDb, typeof(TenantLogDiffEntity)));
         Assert.Equal("system_log_operation_entity", TableName(mainDb, typeof(SystemLogOperationEntity)));
         Assert.Equal("system_user_entity", TableName(mainDb, typeof(SystemUserEntity)));
-        Assert.Equal("system_tenant_entity", TableName(mainDb, typeof(SystemTenantEntity)));
         Assert.Equal("global_menu_entity", TableName(mainDb, typeof(GlobalMenuEntity)));
         Assert.Equal("system_config_entity", TableName(mainDb, typeof(SystemConfigEntity)));
         Assert.Equal("global_config_entity", TableName(mainDb, typeof(GlobalConfigEntity)));

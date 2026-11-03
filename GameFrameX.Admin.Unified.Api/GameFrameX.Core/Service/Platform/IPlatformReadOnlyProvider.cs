@@ -5,7 +5,7 @@ namespace GameFrameX.Core.Service.Platform;
 
 public interface IPlatformReadOnlyProvider
 {
-    Task<SystemTenantEntity> GetTenantAsync(long tenantId);
+
 
 
 

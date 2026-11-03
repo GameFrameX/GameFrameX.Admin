@@ -72,16 +72,7 @@ public sealed class PaymentOptionSettingDecryptClosureTests
 
             var mainConfig = CreateConfig("postgres", _databaseName);
             MainDb = new SqlSugarScope(mainConfig);
-            MainDb.CodeFirst.InitTables(typeof(SystemTenantEntity));
-            MainDb.Insertable(new SystemTenantEntity
-            {
-                Id = tenantId,
-                TenantType = TenantTypeEnum.Db,
-                DbType = DbType.PostgreSQL,
-                Connection = BuildConnectionString(_databaseName),
-                ConfigId = tenantId.ToString(),
-                IsEnabled = true,
-            }).ExecuteCommand();
+
 
             TenantDbProvider = MainDb;
             TenantDb = TenantDbProvider;

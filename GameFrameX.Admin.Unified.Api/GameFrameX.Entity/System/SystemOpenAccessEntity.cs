@@ -23,17 +23,7 @@ public class SystemOpenAccessEntity : EntityBasic
     [SugarColumn(ColumnDescription = "密钥", Length = EntityStringLength.Length512)]
     public virtual string AccessSecret { get; set; } = string.Empty;
 
-    /// <summary>
-    /// 绑定租户Id
-    /// </summary>
-    [SugarColumn(ColumnDescription = "绑定租户Id", DefaultValue = "0")]
-    public long BindTenantId { get; set; }
 
-    /// <summary>
-    /// 绑定租户
-    /// </summary>
-    [Navigate(NavigateType.OneToOne, nameof(BindTenantId))]
-    public SystemTenantEntity BindTenant { get; set; } = null!;
 
     /// <summary>
     /// 绑定用户Id

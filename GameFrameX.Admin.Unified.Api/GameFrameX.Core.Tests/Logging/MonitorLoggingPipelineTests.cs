@@ -69,7 +69,6 @@ public sealed class MonitorLoggingPipelineTests : IAsyncLifetime
             typeof(SystemLogOperationEntity),
             typeof(SystemLogVisitEntity),
             typeof(SystemLogExceptionEntity),
-            typeof(SystemTenantEntity),
             typeof(SystemConfigEntity),
         });
         SqlSugarSetup.InitDatabase(_db, tenantConfig, new[]

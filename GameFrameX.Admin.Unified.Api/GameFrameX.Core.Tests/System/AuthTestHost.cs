@@ -120,22 +120,6 @@ internal sealed class AuthTestHost : IDisposable
         return await mainDb.Queryable<SystemUserEntity>().FirstAsync(u => u.AccountType == AccountTypeEnum.SuperAdmin);
     }
 
-    /// <summary>
-    /// 在主库 seed 一条 <see cref="SystemTenantEntity"/>（场景 ⑤ 用 IsEnabled=false 触发 Z1003）。
-    /// </summary>
-    public async Task SeedTenantAsync(long tenantId, bool isEnabled)
-    {
-        var mainDb = _client.GetConnectionScope(MainConfigId);
-        await mainDb.Insertable(new SystemTenantEntity
-        {
-            Id = tenantId,
-            TenantType = TenantTypeEnum.Db,
-            DbType = DbType.Sqlite,
-            Connection = string.Empty,
-            ConfigId = tenantId.ToString(),
-            IsEnabled = isEnabled,
-        }).ExecuteCommandAsync();
-    }
 
     /// <summary>
     /// 在租户库 seed 一条 <see cref="TenantUserEntity"/>（AccountType=NormalUser，IsEnabled=true，以通过冻结检查进入租户禁用分支）。

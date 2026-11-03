@@ -174,18 +174,9 @@ public sealed class PublicCallbackTenantRoutingTests : IDisposable
         var tenantDb = CreateScope(_tenantDatabase);
         _scopes.Add(mainDb);
         _scopes.Add(tenantDb);
-        mainDb.CodeFirst.InitTables(typeof(SystemTenantEntity));
         tenantDb.CodeFirst.InitTables(typeof(TenantGameAppPackageEntity), typeof(TenantGamePaymentConfigEntity), typeof(TenantAdvertisementCallbackConfigEntity));
         var tenantConnection = BuildConnectionString(_tenantDatabase);
-        mainDb.Insertable(new SystemTenantEntity
-        {
-            Id = tenantId,
-            TenantType = TenantTypeEnum.Db,
-            DbType = DbType.PostgreSQL,
-            Connection = tenantConnection,
-            ConfigId = tenantId.ToString(),
-            IsEnabled = true,
-        }).ExecuteCommand();
+
         if (packageId.HasValue)
         {
             tenantDb.Insertable(new TenantGameAppPackageEntity

@@ -16,8 +16,8 @@ internal static class MigrationSmokeTests
             using (var target = SingleMainMigration.Connect(DbType.Sqlite, $"DataSource={Path.Combine(directory, "target.db")}"))
             {
                 var types = new[] { typeof(TenantGameHomeOnlineSampleEntity) };
-                target.CodeFirst.InitTables<SystemTenantEntity>();
-                target.Insertable(new SystemTenantEntity { Id = 1300000000001, IsDeleted = false }).ExecuteCommand();
+                target.Ado.ExecuteCommand("CREATE TABLE system_tenant_entity (id BIGINT PRIMARY KEY, is_deleted BOOLEAN)");
+                target.Ado.ExecuteCommand("INSERT INTO system_tenant_entity VALUES (1300000000001, 0)");
                 source.CodeFirst.InitTables<TenantGameHomeOnlineSampleEntity>();
                 source.Insertable(new TenantGameHomeOnlineSampleEntity { Id = 7001, TenantId = 1300000000001, SampleTime = 1000, OnlineCount = 42 }).ExecuteCommand();
                 SingleMainMigration.Run(source, target, true, types);
@@ -29,7 +29,7 @@ internal static class MigrationSmokeTests
                 target.Updateable<TenantGameHomeOnlineSampleEntity>().SetColumns(row => row.OnlineCount == 99).Where(row => row.Id == 7001).ExecuteCommand();
                 Reject(() => SingleMainMigration.Run(source, target, false, types), "冲突必须拒绝");
                 Require(target.Queryable<TenantGameHomeOnlineSampleEntity>().Single().OnlineCount == 99, "冲突不得覆盖目标");
-                target.Insertable(new SystemTenantEntity { Id = 9000, IsDeleted = false }).ExecuteCommand();
+                target.Ado.ExecuteCommand("INSERT INTO system_tenant_entity VALUES (9000, 0)");
                 Reject(() => SingleMainMigration.Run(source, target, true, types), "多租户必须拒绝");
                 Require(source.Queryable<TenantGameHomeOnlineSampleEntity>().Single().OnlineCount == 42, "源库必须不变");
             }

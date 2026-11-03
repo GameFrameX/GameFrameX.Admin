@@ -39,12 +39,10 @@ public class SystemOpenAccessService : IAdminApiController
     {
         var accessKey = input.AccessKey?.Trim() ?? string.Empty;
         return await _systemOpenAccessRepository.AsQueryable()
-                                         .LeftJoin<SystemTenantEntity>((u, a) => u.BindTenantId == a.Id)
-                                         .WhereIF(!string.IsNullOrWhiteSpace(accessKey), (u, a) => u.AccessKey.Contains(accessKey))
-                                         .Select((u, a) => new OpenAccessResponse
+                                         .WhereIF(!string.IsNullOrWhiteSpace(accessKey), u => u.AccessKey.Contains(accessKey))
+                                         .Select(u => new OpenAccessResponse
                                          {
                                              BindUserAccount = u.BindUserId.ToString(),
-                                             BindTenantName = a.Remark ?? string.Empty,
                                          }, true)
                                          .ToPagedListAsync(input.Page, input.PageSize);
     }
@@ -148,7 +146,7 @@ public class SystemOpenAccessService : IAdminApiController
     }
 
     /// <summary>
-    /// 从绑定租户库读取开放接口身份绑定的租户用户和组织。
+    /// 从主库读取开放接口身份绑定的用户。
     /// </summary>
     /// <param name="openAccess"></param>
     /// <returns></returns>
@@ -156,11 +154,6 @@ public class SystemOpenAccessService : IAdminApiController
     public BoundTenantUser GetBoundTenantUser(SystemOpenAccessEntity openAccess)
     {
         var tenantDb = _tenantDbConnectionProvider;
-        if (tenantDb == null)
-        {
-            throw BusinessError.Oh(TenantErrorCode.DefaultTenantStatusChangeForbidden);
-        }
-
         tenantDb.QueryFilter.ClearAndBackup();
         try
         {
