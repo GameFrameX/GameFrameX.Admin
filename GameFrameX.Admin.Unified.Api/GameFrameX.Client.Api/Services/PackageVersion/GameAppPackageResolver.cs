@@ -20,14 +20,12 @@ namespace GameFrameX.Client.Api.Services.PackageVersion;
 /// </remarks>
 public class GameAppPackageResolver
 {
-    private readonly ConcurrentDictionary<long, TenantPackageCache> _tenantCaches = new();
+    private PackageCache? _cache;
     private readonly ISqlSugarClient _tenantDbProvider;
-    private readonly ISqlSugarTenantIdResolver _tenantIdResolver;
 
-    public GameAppPackageResolver(ISqlSugarClient tenantDbProvider, ISqlSugarTenantIdResolver tenantIdResolver)
+    public GameAppPackageResolver(ISqlSugarClient tenantDbProvider)
     {
         _tenantDbProvider = tenantDbProvider;
-        _tenantIdResolver = tenantIdResolver;
     }
 
     /// <summary>
@@ -43,11 +41,7 @@ public class GameAppPackageResolver
     /// </summary>
     public async Task CheckAndRefreshAsync()
     {
-        var tenantId = _tenantIdResolver.GetTenantId();
-        if (tenantId.HasValue)
-        {
-            RefreshCacheIfChanged(tenantId.Value);
-        }
+        RefreshCacheIfChanged();
 
         await Task.CompletedTask;
     }
@@ -57,13 +51,7 @@ public class GameAppPackageResolver
     /// </summary>
     public string Resolve(string sourcePackageName)
     {
-        var tenantId = _tenantIdResolver.GetTenantId();
-        if (!tenantId.HasValue)
-        {
-            return sourcePackageName;
-        }
-
-        var cache = RefreshCacheIfChanged(tenantId.Value).Packages;
+        var cache = RefreshCacheIfChanged().Packages;
         return cache.TryGetValue(sourcePackageName, out var masterName)
                    ? masterName
                    : sourcePackageName;
@@ -72,21 +60,21 @@ public class GameAppPackageResolver
     /// <summary>
     /// 从数据库加载映射
     /// </summary>
-    private TenantPackageCache RefreshCacheIfChanged(long tenantId)
+    private PackageCache RefreshCacheIfChanged()
     {
         var db = _tenantDbProvider;
         var signal = GetSignal(db);
-        if (_tenantCaches.TryGetValue(tenantId, out var existing) && existing.Signal == signal)
+        if (_cache is { } existing && existing.Signal == signal)
         {
             return existing;
         }
 
         var refreshed = RefreshCache(db, signal);
-        _tenantCaches[tenantId] = refreshed;
+        _cache = refreshed;
         return refreshed;
     }
 
-    private static TenantPackageCache RefreshCache(ISqlSugarClient db, PackageCacheSignal signal)
+    private static PackageCache RefreshCache(ISqlSugarClient db, PackageCacheSignal signal)
     {
         // 仅"继承"模式的启用子包才允许母包回退；Override/DisableAsync 与禁用子包不进入映射。
         var children = db.Queryable<TenantGameAppPackageEntity>()
@@ -113,7 +101,7 @@ public class GameAppPackageResolver
             }
         }
 
-        return new TenantPackageCache(signal, cache);
+        return new PackageCache(signal, cache);
     }
 
     /// <summary>
@@ -168,9 +156,9 @@ public class GameAppPackageResolver
         }
     }
 
-    private sealed class TenantPackageCache
+    private sealed class PackageCache
     {
-        public TenantPackageCache(PackageCacheSignal signal, ConcurrentDictionary<string, string> packages)
+        public PackageCache(PackageCacheSignal signal, ConcurrentDictionary<string, string> packages)
         {
             Signal = signal;
             Packages = packages;

@@ -10,7 +10,6 @@ namespace GameFrameX.Client.Api.Services.PackageVersion;
 /// </summary>
 /// <remarks>
 /// 针对 TenantGameAppAssetPackageVersionEntity 实体的 Fallback 匹配实现，复用基类的 2 轮（原始包名 + 母包包名）与 6 级 Fallback 序列，
-/// 并叠加应用作用域（AppId）优先级。
 /// </remarks>
 public class AssetPackageVersionFallbackMatcher : GameAppPackageFallbackMatcher<AssetPackageVersionRequest, TenantGameAppAssetPackageVersionEntity>
 {
@@ -22,20 +21,6 @@ public class AssetPackageVersionFallbackMatcher : GameAppPackageFallbackMatcher<
         GameAppPackageResolver resolver)
         : base(repository, resolver)
     {
-    }
-
-    /// <summary>
-    /// 构建应用作用域过滤条件；appIdFilter 为正值时要求 App 精确匹配，为 null 时匹配租户默认（AppId 为 null 或 0）
-    /// </summary>
-    protected override Expression<Func<TenantGameAppAssetPackageVersionEntity, bool>> BuildAppScopePredicate(long? appIdFilter)
-    {
-        if (appIdFilter.HasValue && appIdFilter.Value > 0)
-        {
-            var appIdValue = appIdFilter.Value;
-            return m => m.AppId == appIdValue;
-        }
-
-        return m => m.AppId == null || m.AppId == 0;
     }
 
     /// <summary>
@@ -130,7 +115,6 @@ public class AssetPackageVersionFallbackMatcher : GameAppPackageFallbackMatcher<
             Language = request.Language,
             Channel = request.Channel,
             DeviceUniqueIdentifier = request.DeviceUniqueIdentifier,
-            AppId = request.AppId,
         };
     }
 }

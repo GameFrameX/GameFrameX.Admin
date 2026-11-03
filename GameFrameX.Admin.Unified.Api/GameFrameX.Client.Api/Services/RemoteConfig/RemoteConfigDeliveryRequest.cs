@@ -7,16 +7,6 @@ namespace GameFrameX.Client.Api.Services.RemoteConfig;
 public sealed class RemoteConfigDeliveryRequest : IPackageRequest
 {
     /// <summary>
-    /// 当前租户 ID，用于灰度稳定 hash。
-    /// </summary>
-    public long TenantId { get; set; }
-
-    /// <summary>
-    /// 应用作用域；正值表示应用级配置，空值或 0 表示租户默认配置。
-    /// </summary>
-    public long? AppId { get; set; }
-
-    /// <summary>
     /// 平台。
     /// </summary>
     public string Platform { get; set; } = null!;

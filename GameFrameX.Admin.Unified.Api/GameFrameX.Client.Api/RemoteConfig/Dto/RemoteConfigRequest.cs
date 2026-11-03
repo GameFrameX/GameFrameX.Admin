@@ -40,11 +40,6 @@ public class RemoteConfigRequest : IPackageRequest
     public string Channel { get; set; } = null!;
 
     /// <summary>
-    /// 应用作用域；null / 0 表示仅匹配租户默认配置，正值表示要求应用级覆盖（由服务端从应用上下文注入，客户端勿依赖）
-    /// </summary>
-    public long? AppId { get; set; }
-
-    /// <summary>
     /// 设备稳定标识，用于记录级灰度取模；大小写按服务端统一转小写处理。
     /// </summary>
     public string? DeviceId { get; set; }

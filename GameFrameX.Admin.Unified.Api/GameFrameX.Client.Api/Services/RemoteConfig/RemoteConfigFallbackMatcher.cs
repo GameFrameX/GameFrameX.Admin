@@ -26,20 +26,6 @@ public class RemoteConfigFallbackMatcher : GameAppPackageFallbackMatcher<RemoteC
     }
 
     /// <summary>
-    /// 构建应用作用域过滤条件；appIdFilter 为正值时要求 App 精确匹配，为 null 时匹配租户默认（AppId 为 null 或 0）
-    /// </summary>
-    protected override Expression<Func<TenantGameAppRemoteConfigEntity, bool>> BuildAppScopePredicate(long? appIdFilter)
-    {
-        if (appIdFilter.HasValue && appIdFilter.Value > 0)
-        {
-            var appIdValue = appIdFilter.Value;
-            return m => m.AppId == appIdValue;
-        }
-
-        return m => m.AppId == null || m.AppId == 0;
-    }
-
-    /// <summary>
     /// 构建完全匹配所有参数的查询条件
     /// </summary>
     protected override Expression<Func<TenantGameAppRemoteConfigEntity, bool>> BuildExactPredicates(RemoteConfigRequest request)
@@ -125,7 +111,6 @@ public class RemoteConfigFallbackMatcher : GameAppPackageFallbackMatcher<RemoteC
             AppVersion = request.AppVersion,
             Language = request.Language,
             Channel = request.Channel,
-            AppId = request.AppId,
             DeviceId = request.DeviceId,
         };
     }

@@ -33,16 +33,8 @@ public class GameRemoteConfigController : BaseController<TenantGameAppRemoteConf
     [HttpPost]
     public async Task<HttpJsonResultData<RemoteConfigResponse>> GetInfo([FromBody] RemoteConfigRequest remoteConfigRequest)
     {
-        // 强制租户 + 应用上下文，缺失即拒绝；并将应用作用域注入请求，供 matcher 走 App 精确 → 租户默认双层回退
-        var tenantAppContext = HttpContext.RequireTenantAppContext();
-        var tenantId = tenantAppContext.TenantId;
-        var appId = tenantAppContext.AppId;
-        remoteConfigRequest.AppId = appId;
-
         var gameRemoteConfig = await _deliveryService.MatchAsync(new RemoteConfigDeliveryRequest
         {
-            TenantId = tenantId,
-            AppId = appId,
             Platform = remoteConfigRequest.Platform,
             PackageName = remoteConfigRequest.PackageName,
             AppVersion = remoteConfigRequest.AppVersion,

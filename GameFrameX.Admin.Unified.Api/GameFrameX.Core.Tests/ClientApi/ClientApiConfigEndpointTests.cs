@@ -27,18 +27,17 @@ namespace GameFrameX.Core.Tests.ClientApi;
 public sealed class ClientApiConfigEndpointTests
 {
     [Fact]
-    public async Task GameAppVersion_GetInfo_UsesTrustedAppContextAndReturnsPascalCasePayload()
+    public async Task GameAppVersion_GetInfo_UsesMainDatabaseAndReturnsPascalCasePayload()
     {
         using var db = new ClientApiTestDb();
         db.SeedAppVersion(1, "com.gameframex.c108");
-        var resolver = new GameAppPackageResolver(db.TenantDbProvider, db.TenantIdResolver);
+        var resolver = new GameAppPackageResolver(db.TenantDbProvider);
         var matcher = new AppVersionFallbackMatcher(db.Repository<TenantGameAppReleaseVersionEntity>(), resolver);
         var controller = new GameAppVersionController(db.Repository<TenantGameAppReleaseVersionEntity>(), matcher);
-        db.AttachContext(controller);
+        db.AttachContext(controller, includeTenant: false, includeApp: false);
 
         var result = await controller.GetInfo(new GameAppVersionRequest
         {
-            AppId = 999999,
             Platform = "ios",
             PackageName = "com.gameframex.c108",
             AppVersion = "1.0.0",
@@ -59,13 +58,13 @@ public sealed class ClientApiConfigEndpointTests
     {
         using var db = new ClientApiTestDb();
         db.SeedAssetPackageVersion(1, "com.gameframex.c108");
-        var resolver = new GameAppPackageResolver(db.TenantDbProvider, db.TenantIdResolver);
+        var resolver = new GameAppPackageResolver(db.TenantDbProvider);
         var matcher = new AssetPackageVersionFallbackMatcher(db.Repository<TenantGameAppAssetPackageVersionEntity>(), resolver);
         var controller = new GameAssetPackageVersionController(
             db.Repository<TenantGameAppAssetPackageVersionEntity>(),
             db.Repository<TenantGameAppDeviceEntity>(),
             matcher);
-        db.AttachContext(controller);
+        db.AttachContext(controller, includeTenant: false, includeApp: false);
 
         var result = await controller.GetInfo(new AssetPackageVersionRequest
         {
@@ -89,17 +88,17 @@ public sealed class ClientApiConfigEndpointTests
     }
 
     [Fact]
-    public async Task GameAssetPackageVersion_RegisterDevice_IdempotentByAppAndIdentifier()
+    public async Task GameAssetPackageVersion_RegisterDevice_IdempotentByIdentifier()
     {
         using var db = new ClientApiTestDb();
         db.SeedAssetPackageVersion(1, "com.gameframex.c108");
-        var resolver = new GameAppPackageResolver(db.TenantDbProvider, db.TenantIdResolver);
+        var resolver = new GameAppPackageResolver(db.TenantDbProvider);
         var matcher = new AssetPackageVersionFallbackMatcher(db.Repository<TenantGameAppAssetPackageVersionEntity>(), resolver);
         var controller = new GameAssetPackageVersionController(
             db.Repository<TenantGameAppAssetPackageVersionEntity>(),
             db.Repository<TenantGameAppDeviceEntity>(),
             matcher);
-        db.AttachContext(controller);
+        db.AttachContext(controller, includeTenant: false, includeApp: false);
 
         var first = await controller.RegisterDevice(new DeviceRegisterRequest
         {
@@ -124,19 +123,18 @@ public sealed class ClientApiConfigEndpointTests
     }
 
     [Fact]
-    public async Task GameRemoteConfig_GetInfo_ReturnsAppScopedContentAndPascalCasePayload()
+    public async Task GameRemoteConfig_GetInfo_ReturnsMainDatabaseContentAndPascalCasePayload()
     {
         using var db = new ClientApiTestDb();
         db.InitTenantTables(typeof(TenantGameAppPackageEntity));
         db.SeedRemoteConfig(1, "com.gameframex.c108", "{\"feature\":\"on\"}");
-        var resolver = new GameAppPackageResolver(db.TenantDbProvider, db.TenantIdResolver);
+        var resolver = new GameAppPackageResolver(db.TenantDbProvider);
         var delivery = new RemoteConfigDeliveryService(db.Repository<TenantGameAppRemoteConfigEntity>(), resolver);
         var controller = new GameRemoteConfigController(db.Repository<TenantGameAppRemoteConfigEntity>(), delivery);
-        db.AttachContext(controller);
+        db.AttachContext(controller, includeTenant: false, includeApp: false);
 
         var result = await controller.GetInfo(new RemoteConfigRequest
         {
-            AppId = 999999,
             Platform = "ios",
             PackageName = "com.gameframex.c108",
             AppVersion = "1.0.0",
@@ -161,7 +159,7 @@ public sealed class ClientApiConfigEndpointTests
         db.SeedArea(100, 10);
         db.SeedArea(101, 10, false);
         var controller = new GameAreaController(db.Repository<TenantGameAreaEntity>(), FakeOptionsProvider.WithAreaPolicy(false));
-        db.AttachContext(controller);
+        db.AttachContext(controller, includeTenant: false, includeApp: false);
 
         var result = await controller.GetAreaList(new GameAreaGetAreaListRequest());
 
@@ -181,7 +179,7 @@ public sealed class ClientApiConfigEndpointTests
         db.SeedAnnouncement(2, 100, "fr-FR", "Inactive localized", false);
         db.SeedAnnouncement(3, null, "default", "Global default");
         var controller = new GameAnnouncementController(db.Repository<TenantGameAnnouncementEntity>());
-        db.AttachContext(controller);
+        db.AttachContext(controller, includeTenant: false, includeApp: false);
 
         var result = await controller.ListByAreaId(new GameAnnouncementListRequest { Id = 100, Language = "fr-FR", });
 
@@ -199,7 +197,7 @@ public sealed class ClientApiConfigEndpointTests
         var resolver = new StaticGameLoginTicketKeyResolver();
         var controller = new GameLoginTicketKeyController(resolver);
         using var db = new ClientApiTestDb(10, 20);
-        db.AttachContext(controller);
+        db.AttachContext(controller, includeTenant: false, includeApp: false);
 
         var result = await controller.PublicKeys();
 

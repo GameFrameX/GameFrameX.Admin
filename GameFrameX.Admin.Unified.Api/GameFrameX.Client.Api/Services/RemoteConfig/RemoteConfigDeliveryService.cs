@@ -34,8 +34,7 @@ public sealed class RemoteConfigDeliveryService
     {
         var packageNames = BuildPackageCandidates(request.PackageName);
         var candidates = await _repository.AsQueryable()
-                                          .Where(x => (x.AppId == request.AppId || x.AppId == null || x.AppId == 0)
-                                                      && (x.Platform == request.Platform || x.Platform == GameDimensionConst.PlatformDefault)
+                                          .Where(x => (x.Platform == request.Platform || x.Platform == GameDimensionConst.PlatformDefault)
                                                       && (packageNames.Contains(x.Package) || x.Package == GameDimensionConst.PackageNameDefault)
                                                       && (x.AppVersion == request.AppVersion || x.AppVersion == GameDimensionConst.AppVersionDefault)
                                                       && (x.Language == request.Language || x.Language == GameDimensionConst.LanguageDefault)
@@ -43,7 +42,7 @@ public sealed class RemoteConfigDeliveryService
                                           .ToListAsync();
 
         var scored = candidates.Select(item => new RemoteConfigScoredCandidate(item, CalculateScore(item, request, packageNames)));
-        return RemoteConfigRolloutMatcher.SelectWinner(scored, request.TenantId, request.DeviceId);
+        return RemoteConfigRolloutMatcher.SelectWinner(scored, request.DeviceId);
     }
 
     private string[] BuildPackageCandidates(string packageName)
@@ -61,11 +60,6 @@ public sealed class RemoteConfigDeliveryService
     private static int CalculateScore(TenantGameAppRemoteConfigEntity item, RemoteConfigDeliveryRequest request, string[] packageNames)
     {
         var score = 0;
-        if (item.AppId == request.AppId && request.AppId.GetValueOrDefault() > 0)
-        {
-            score += 64;
-        }
-
         if (item.Platform == request.Platform)
         {
             score += 32;

@@ -34,10 +34,6 @@ public class GameAppVersionController : BaseController<TenantGameAppReleaseVersi
     [HttpPost]
     public async Task<HttpJsonResultData<GameAppVersionResponse>> GetInfo([FromBody] GameAppVersionRequest gameAppVersionRequest)
     {
-        // 强制租户 + 应用上下文，缺失即拒绝；并将应用作用域注入请求，供 matcher 走 App 精确 → 租户默认双层回退
-        var appId = HttpContext.RequireTenantAppContext().AppId;
-        gameAppVersionRequest.AppId = appId;
-
         var gameAppVersion = await _matcher.MatchAsync(gameAppVersionRequest);
 
         if (gameAppVersion == null)

@@ -65,7 +65,7 @@ public sealed class ClientApiFeatureSwitchEndpointTests
     private static GameFeatureSwitchController CreateController(ClientApiTestDb db)
     {
         var resolver = new FeatureSwitchDeliveryResolver(db.Repository<TenantGameAppFeatureSwitchEntity>());
-        var packageResolver = new GameAppPackageResolver(db.TenantDbProvider, db.TenantIdResolver);
+        var packageResolver = new GameAppPackageResolver(db.TenantDbProvider);
         return new GameFeatureSwitchController(resolver, packageResolver);
     }
 

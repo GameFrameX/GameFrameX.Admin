@@ -195,7 +195,7 @@ public sealed class GameAppPackageResolverInheritanceTests : IDisposable
             _scope = scope;
             _tenantDb = tenantDb;
             _tenantId = tenantId;
-            Resolver = new GameAppPackageResolver(provider, tenantIdResolver);
+            Resolver = new GameAppPackageResolver(provider);
         }
 
         public GameAppPackageResolver Resolver { get; }

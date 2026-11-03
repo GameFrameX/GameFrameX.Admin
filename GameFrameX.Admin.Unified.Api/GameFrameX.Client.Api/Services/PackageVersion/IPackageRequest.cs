@@ -30,8 +30,4 @@ public interface IPackageRequest
     /// </summary>
     string Channel { get; set; }
 
-    /// <summary>
-    /// 应用作用域；null / 0 表示仅匹配租户默认配置，正值表示要求应用级覆盖
-    /// </summary>
-    long? AppId { get; set; }
 }

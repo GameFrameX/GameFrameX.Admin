@@ -14,10 +14,9 @@ public static class RemoteConfigRolloutMatcher
     /// 判断远程配置记录是否对当前设备生效。
     /// </summary>
     /// <param name="record">候选远程配置记录。</param>
-    /// <param name="tenantId">当前租户 ID。</param>
     /// <param name="deviceId">客户端稳定设备标识。</param>
     /// <returns>命中返回 true，否则返回 false。</returns>
-    public static bool IsMatch(TenantGameAppRemoteConfigEntity record, long tenantId, string? deviceId)
+    public static bool IsMatch(TenantGameAppRemoteConfigEntity record, string? deviceId)
     {
         if (record.IsEnabled == false)
         {
@@ -35,18 +34,15 @@ public static class RemoteConfigRolloutMatcher
     /// 从候选远程配置记录中选择最终投放记录。
     /// </summary>
     /// <param name="candidates">候选记录和作用域精确度。</param>
-    /// <param name="tenantId">当前租户 ID。</param>
     /// <param name="deviceId">客户端稳定设备标识。</param>
     /// <returns>命中的最高优先级记录；没有命中时返回 null。</returns>
     public static TenantGameAppRemoteConfigEntity? SelectWinner(
         IEnumerable<RemoteConfigScoredCandidate> candidates,
-        long tenantId,
         string? deviceId)
     {
-        return candidates.Where(item => IsMatch(item.Record, tenantId, deviceId))
+        return candidates.Where(item => IsMatch(item.Record, deviceId))
                          .OrderByDescending(item => item.Record.Priority)
                          .ThenByDescending(item => item.Score)
-                         .ThenByDescending(item => item.Record.AppId.HasValue && item.Record.AppId.Value > 0)
                          .ThenByDescending(item => item.Record.Id)
                          .Select(item => item.Record)
                          .FirstOrDefault();
