@@ -41,9 +41,15 @@ public class GlobalPlatformService : IAdminApiController
     [ApiDescriptionSettings(Name = "SelectString")]
     public async Task<List<BaseSelectPageStringResponse>> SelectStringAsync(BaseSelectPageRequest input)
     {
-        var result = await SelectAsync(input);
+        var searchKey = input.SearchKey?.Trim() ?? string.Empty;
+        var pageSize = Math.Min(input.PageSize > 0 ? input.PageSize : BaseSelectPageRequest.DefaultPageSize, BaseSelectPageRequest.MaxPageSize);
+        var query = await _repository.AsQueryable()
+                                     .Where(u => u.IsDeleted == false)
+                                     .WhereIF(!string.IsNullOrWhiteSpace(searchKey), u => (u.Name ?? string.Empty).Contains(searchKey))
+                                     .Take(pageSize)
+                                     .ToListAsync();
 
-        return result.Select(u => new BaseSelectPageStringResponse { Id = u.Id.ToString(), Value = u.Value, Label = u.Label, })
+        return query.Select(u => new BaseSelectPageStringResponse { Id = u.Id.ToString(), Value = u.Name ?? string.Empty, Label = u.Description, })
                      .ToList();
     }
 }
