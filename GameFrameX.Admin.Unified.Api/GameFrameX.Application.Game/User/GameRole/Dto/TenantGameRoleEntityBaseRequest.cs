@@ -6,13 +6,6 @@ namespace GameFrameX.Application.Game.User.GameRole.Dto;
 public class TenantGameRoleEntityBaseRequest : BaseAddRequest
 {
     /// <summary>
-    /// 应用Id。事实数据应用作用域，必须 &gt; 0。
-    /// <para>过渡期：后台运营当前应用上下文尚未建立（前端「当前应用」选择器待统一应用上下文 change 落地），由前端手填。</para>
-    /// </summary>
-    [Required(ErrorMessage = "应用Id不能为空")]
-    public virtual long AppId { get; set; }
-
-    /// <summary>
     /// 角色Id
     /// </summary>
     public string RoleId { get; set; } = null!;

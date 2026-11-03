@@ -8,11 +8,6 @@ namespace GameFrameX.Application.Game.User.GameUser.Dto;
 public class PageTenantGameUserEntityRequest : BasePageRequest
 {
     /// <summary>
-    /// 当前应用Id。游戏账号本身是租户级账号，后台应用工作台通过角色归属派生过滤账号。
-    /// </summary>
-    public long? AppId { get; set; }
-
-    /// <summary>
     /// Id
     /// </summary>
     public long? Id { get; set; }

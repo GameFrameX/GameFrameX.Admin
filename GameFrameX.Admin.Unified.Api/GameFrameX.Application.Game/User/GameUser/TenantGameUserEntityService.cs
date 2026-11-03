@@ -1,4 +1,3 @@
-using GameFrameX.Application.Game.App.AppScope;
 using GameFrameX.Application.Game.User.GameUser;
 using GameFrameX.Application.Game.User.GameUser.Dto;
 using GameFrameX.Entity.Enum;
@@ -26,15 +25,11 @@ public class TenantGameUserEntityService : GenericCrudSelectService<Entity.Tenan
     /// </summary>
     protected override ISugarQueryable<TenantGameUserEntityResponse> BuildPageQuery(PageTenantGameUserEntityRequest input)
     {
-        var appId = AppScopeRules.EnsureFactAppId(input.AppId, "游戏账号");
         return Repository.AsQueryable()
                          .WhereIF(input.Id > 0, u => u.Id == input.Id)
                          .WhereIF(!string.IsNullOrWhiteSpace(input.UserName), u => u.UserName.Contains(input.UserName.Trim()))
                          .WhereIF(!string.IsNullOrWhiteSpace(input.Name), u => u.Name.Contains(input.Name.Trim()))
                          .WhereIF(input.Status.HasValue, u => u.Status == input.Status.Value)
-                         .Where(u => SqlFunc.Subqueryable<Entity.Tenant.Game.TenantGameRoleEntity>()
-                                            .Where(r => r.AppId == appId && r.UserId == u.Id)
-                                            .Any())
                          .Select<TenantGameUserEntityResponse>();
     }
 
@@ -72,7 +67,6 @@ public class TenantGameUserEntityService : GenericCrudSelectService<Entity.Tenan
     [ApiDescriptionSettings(Name = "Ban")]
     public async Task BanAsync(DeleteTenantGameUserEntityRequest input)
     {
-        await EnsureUserBelongsToCurrentAppAsync(input);
         var entity = await Repository.GetFirstAsync(u => u.Id == input.Id) ?? throw BusinessError.Oh(CommonErrorCode.RecordNotFound);
         entity.Status = GameUserStatus.Banned;
         await Repository.AsUpdateable(entity).IgnoreColumns(true).ExecuteCommandWithOptLockAsync(true);
@@ -87,25 +81,10 @@ public class TenantGameUserEntityService : GenericCrudSelectService<Entity.Tenan
     [ApiDescriptionSettings(Name = "Unseal")]
     public async Task UnsealAsync(DeleteTenantGameUserEntityRequest input)
     {
-        await EnsureUserBelongsToCurrentAppAsync(input);
         var entity = await Repository.GetFirstAsync(u => u.Id == input.Id) ?? throw BusinessError.Oh(CommonErrorCode.RecordNotFound);
         entity.Status = GameUserStatus.Active;
         await Repository.AsUpdateable(entity).IgnoreColumns(true).ExecuteCommandWithOptLockAsync(true);
     }
 
-    /// <summary>
-    /// 游戏账号是租户级账号；应用工作台操作账号前，必须确认该账号在当前应用下至少存在一个角色。
-    /// </summary>
-    private async Task EnsureUserBelongsToCurrentAppAsync(DeleteTenantGameUserEntityRequest input)
-    {
-        var appId = AppScopeRules.EnsureFactAppId(input.AppId, "游戏账号");
-        var exists = await Repository.AsSugarClient()
-                                     .Queryable<Entity.Tenant.Game.TenantGameRoleEntity>()
-                                     .AnyAsync(u => u.AppId == appId && u.UserId == input.Id);
-        if (!exists)
-        {
-            throw BusinessError.Oh(CommonErrorCode.RecordNotFound);
-        }
-    }
 }
 #pragma warning restore CS8602, CS8604, CS8629

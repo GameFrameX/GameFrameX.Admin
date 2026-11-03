@@ -1,4 +1,4 @@
-﻿namespace GameFrameX.Application.Game.User.GameRole.Dto;
+namespace GameFrameX.Application.Game.User.GameRole.Dto;
 
 /// <summary>
 /// 游戏角色输出参数
@@ -14,11 +14,6 @@ public class TenantGameRoleEntityResponse
     /// 主键Id
     /// </summary>
     public long Id { get; set; }
-
-    /// <summary>
-    /// 应用Id
-    /// </summary>
-    public long AppId { get; set; }
 
     /// <summary>
     /// 用户ID

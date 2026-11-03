@@ -1,5 +1,4 @@
 using GameFrameX.Application.Game.ServerManager;
-using GameFrameX.Application.Game.App.AppScope;
 using GameFrameX.Application.Game.User.GameRole.Dto;
 using GameFrameX.Entity.Enum;
 using GameFrameX.Foundation.Http.Extension;
@@ -15,12 +14,10 @@ namespace GameFrameX.Application.Game.User.GameRole;
 public class TenantGameRoleEntityService : GenericCrudSelectService<Entity.Tenant.Game.TenantGameRoleEntity, AddTenantGameRoleEntityRequest, UpdateTenantGameRoleEntityRequest, TenantGameRoleEntityResponse, PageTenantGameRoleEntityRequest>
 {
     private readonly HttpClient _httpClient;
-    private readonly SqlSugarRepository<Entity.Tenant.Game.TenantGameAppEntity> _gameAppRepository;
 
-    public TenantGameRoleEntityService(SqlSugarRepository<Entity.Tenant.Game.TenantGameRoleEntity> repository, SqlSugarRepository<Entity.Tenant.Game.TenantGameAppEntity> gameAppRepository, HttpClient httpClient) : base(repository)
+    public TenantGameRoleEntityService(SqlSugarRepository<Entity.Tenant.Game.TenantGameRoleEntity> repository, HttpClient httpClient) : base(repository)
     {
         _httpClient = httpClient;
-        _gameAppRepository = gameAppRepository;
     }
 
     /// <summary>
@@ -28,12 +25,10 @@ public class TenantGameRoleEntityService : GenericCrudSelectService<Entity.Tenan
     /// </summary>
     protected override ISugarQueryable<TenantGameRoleEntityResponse> BuildPageQuery(PageTenantGameRoleEntityRequest input)
     {
-        var appId = AppScopeRules.EnsureFactAppId(input.AppId, "游戏角色");
         return Repository.AsQueryable()
                          .WhereIF(input.Id > 0, u => u.Id == input.Id)
                          .WhereIF(input.UserId > 0, u => u.UserId == input.UserId)
                          .WhereIF(input.AreaId > 0, u => u.AreaId == input.AreaId)
-                         .Where(u => u.AppId == appId)
                          .WhereIF(input.IsSandbox == true, u => u.IsSandbox == true)
                          .WhereIF(input.IsSandbox == false, u => u.IsSandbox == false || u.IsSandbox == null)
                          .WhereIF(!string.IsNullOrWhiteSpace(input.Name), u => u.Name.Contains(input.Name.Trim()))
@@ -47,30 +42,6 @@ public class TenantGameRoleEntityService : GenericCrudSelectService<Entity.Tenan
                                   u => u.AllRecharge >= input.RechargeMin
                                        && u.AllRecharge <= input.RechargeMax)
                          .Select<TenantGameRoleEntityResponse>();
-    }
-
-    /// <summary>
-    /// 新增前校验：AppId 必填且必须属于当前租户（事实数据，禁止 AppId=0）。
-    /// </summary>
-    protected override async Task OnAddingAsync(AddTenantGameRoleEntityRequest input)
-    {
-        AppScopeRules.EnsureFactAppId(input.AppId, "游戏角色");
-        await _gameAppRepository.ValidateGameAppBelongsToTenantAsync(input.AppId);
-    }
-
-    /// <summary>
-    /// 更新前：AppId 不可变（从既有实体回填，禁止角色跨应用迁移）并校验应用归属。
-    /// </summary>
-    protected override async Task OnUpdatingAsync(UpdateTenantGameRoleEntityRequest input)
-    {
-        var existing = await Repository.GetFirstAsync(u => u.Id == long.Parse(input.RoleId));
-        if (existing == null)
-        {
-            throw BusinessError.Oh(CommonErrorCode.RecordNotFound);
-        }
-
-        input.AppId = existing.AppId;
-        await _gameAppRepository.ValidateGameAppBelongsToTenantAsync(input.AppId);
     }
 
     /// <summary>
@@ -92,7 +63,7 @@ public class TenantGameRoleEntityService : GenericCrudSelectService<Entity.Tenan
     }
 
     /// <summary>
-    /// 更新游戏角色（AppId 不可变，从既有实体回填，禁止跨应用迁移）
+    /// 更新游戏角色
     /// </summary>
     /// <param name="input"></param>
     /// <returns></returns>
@@ -105,15 +76,11 @@ public class TenantGameRoleEntityService : GenericCrudSelectService<Entity.Tenan
             throw BusinessError.Oh(CommonErrorCode.RecordNotFound);
         }
 
-        // 应用归属不可变：从既有实体回填 AppId，禁止角色跨应用迁移
         var existing = await Repository.GetFirstAsync(u => u.Id == long.Parse(input.RoleId));
         if (existing == null)
         {
             throw BusinessError.Oh(CommonErrorCode.RecordNotFound);
         }
-
-        input.AppId = existing.AppId;
-        await _gameAppRepository.ValidateGameAppBelongsToTenantAsync(input.AppId);
 
         var entity = input.Adapt<Entity.Tenant.Game.TenantGameRoleEntity>();
         entity.Id = long.Parse(input.RoleId);
