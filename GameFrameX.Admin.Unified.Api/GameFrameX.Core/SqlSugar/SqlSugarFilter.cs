@@ -1,7 +1,6 @@
 using GameFrameX.Core.Extension.Cache;
 using GameFrameX.Core.Extension.Const;
 using GameFrameX.Core.Service.Cache;
-using GameFrameX.Core.Service.Organization;
 using GameFrameX.Entity.Base;
 using GameFrameX.Entity.Enum;
 
@@ -24,101 +23,24 @@ public static class SqlSugarFilter
     }
 
     /// <summary>
-    /// 删除用户机构缓存
+    /// 清除用户数据权限缓存
     /// </summary>
     /// <param name="userId"></param>
     /// <param name="dbConfigId"></param>
-    public static void DeleteUserOrganizationCache(long userId, string dbConfigId)
+    public static void ClearUserDataScopeCache(long userId, string dbConfigId)
     {
         var cache = GetCache();
         var systemCacheService = HttpContextAccessor?.HttpContext?.RequestServices.GetService<SystemCacheService>();
 
-        // 删除用户机构集合缓存
-        systemCacheService?.Remove($"{CacheConst.KeyUserOrganization}{userId}");
+        cache.Remove($"db:{dbConfigId}:dataScope:{userId}");
         // 删除最大数据权限缓存
         systemCacheService?.Remove($"{CacheConst.KeyRoleMaxDataScope}{userId}");
-        // 删除用户机构（数据范围）缓存——过滤器
-        cache.Remove($"db:{dbConfigId}:orgList:{userId}");
-    }
-
-    /// <summary>
-    /// 配置用户机构集合过滤器
-    /// </summary>
-    public static void SetOrganizationEntityFilter(SqlSugarScopeProvider db)
-    {
-        var dataScope = SetDataScopeFilter(db);
-        // 全部数据无需机构过滤；仅本人数据已由 SetDataScopeFilter 配置 CreatedId 过滤。
-        if (dataScope == (int)DataScopeEnum.All || dataScope == (int)DataScopeEnum.Self)
-        {
-            return;
-        }
-
-        var userId = HttpContextAccessor?.HttpContext?.User.FindFirst(ClaimConst.UserId)?.Value;
-        if (string.IsNullOrWhiteSpace(userId))
-        {
-            return;
-        }
-
-        // 配置用户机构集合缓存
-        var cacheKey = $"db:{db.CurrentConnectionConfig.ConfigId}:orgList:{userId}";
-        var cache = GetCache();
-        var orgFilter = cache.Get<ConcurrentDictionary<Type, LambdaExpression>>(cacheKey);
-        if (orgFilter == null)
-        {
-            // 获取用户所属机构
-            var tenantOrganizationService = HttpContextAccessor?.HttpContext?.RequestServices.GetService<TenantOrganizationService>();
-            if (tenantOrganizationService == null)
-            {
-                return;
-            }
-
-            var orgIds = Task.Run(tenantOrganizationService.GetUserOrganizationIdListAsync).GetAwaiter().GetResult();
-            if (orgIds == null || orgIds.Count == 0)
-            {
-                return;
-            }
-
-            // 获取业务实体数据表
-            var entityTypes = EffectiveTypes.Where(u => !u.IsInterface && !u.IsAbstract && u.IsClass
-                                                        && u.IsSubclassOf(typeof(EntityBasicData)));
-            if (!entityTypes.Any())
-            {
-                return;
-            }
-
-            orgFilter = new ConcurrentDictionary<Type, LambdaExpression>();
-            foreach (var entityType in entityTypes)
-            {
-                // 排除非当前数据库实体
-                var tAtt = entityType.GetCustomAttribute<TenantAttribute>();
-                if (tAtt != null && db.CurrentConnectionConfig.ConfigId.ToString() != tAtt.configId.ToString())
-                {
-                    continue;
-                }
-
-                var lambda = DynamicExpressionParser.ParseLambda(new[]
-                                                                 {
-                                                                     Expression.Parameter(entityType, "u"),
-                                                                 }, typeof(bool), $"@0.Contains(u.{nameof(EntityBasicData.CreateOrganizationId)}??{default(long)})", orgIds);
-                db.QueryFilter.AddTableFilter(entityType, lambda);
-                orgFilter.TryAdd(entityType, lambda);
-            }
-
-            cache.Add(cacheKey, orgFilter);
-        }
-        else
-        {
-            foreach (var filter in orgFilter)
-            {
-                db.QueryFilter.AddTableFilter(filter.Key, filter.Value);
-            }
-        }
     }
 
     /// <summary>
     /// 配置用户仅本人数据过滤器
     /// </summary>
-    private static int SetDataScopeFilter(SqlSugarScopeProvider db)
+    public static int SetDataScopeFilter(SqlSugarScopeProvider db)
     {
         var maxDataScope = (int)DataScopeEnum.All;
 

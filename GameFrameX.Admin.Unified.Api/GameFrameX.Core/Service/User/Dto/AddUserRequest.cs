@@ -1,4 +1,4 @@
-﻿using GameFrameX.Entity.Enum;
+using GameFrameX.Entity.Enum;
 using GameFrameX.Entity.System;
 
 namespace GameFrameX.Core.Service.User.Dto;
@@ -136,15 +136,7 @@ public class AddUserRequest
     /// </summary>
     public AccountTypeEnum AccountType { get; set; } = AccountTypeEnum.NormalUser;
 
-    /// <summary>
-    /// 直属机构Id
-    /// </summary>
-    public long OrganizationId { get; set; }
 
-    /// <summary>
-    /// 职位Id
-    /// </summary>
-    public long PosId { get; set; }
 
     /// <summary>
     /// 工号
@@ -161,8 +153,4 @@ public class AddUserRequest
     /// </summary>
     public List<long> RoleIdList { get; set; } = null!;
 
-    /// <summary>
-    /// 扩展机构集合
-    /// </summary>
-    public List<TenantUserExtensionOrganizationEntity> ExtOrganizationIdList { get; set; } = null!;
 }

@@ -57,7 +57,6 @@ internal static class MenuSeedCatalogTestData
             OrderNo = menu.OrderNo,
             Remark = menu.Remark ?? string.Empty,
             SuperAdminOnly = menu.SuperAdminOnly,
-            SyncRoles = menu.SyncRoles,
             AllowTenantWhenSuperAdminOnly = menu.AllowTenantWhenSuperAdminOnly,
             IsEnabled = menu.IsEnabled,
             IsDeleted = false,

@@ -25,7 +25,6 @@ public sealed class OnlineAssetMenuSeedTests
         Assert.Equal("在线平台", container.Title);
         Assert.Equal(550, container.OrderNo);
         // C366：容器受众 = 13 个叶子受众并集（playerSegment/configRollout 为 ServerOps，运营/观测页为 OpsManager/GmSupport/DataAnalyst）。
-        Assert.Equal((int)(TenantMenuSyncRole.TenantAdmin | TenantMenuSyncRole.ServerOps | TenantMenuSyncRole.OpsManager | TenantMenuSyncRole.GmSupport | TenantMenuSyncRole.DataAnalyst), container.SyncRoles);
     }
 
     [Theory]
@@ -47,7 +46,6 @@ public sealed class OnlineAssetMenuSeedTests
         // C324：叶子页面带 /app 受众段；Dir 不带。
         Assert.Equal(path, page.Path);
         Assert.Equal(component, page.Component);
-        Assert.Equal((int)(TenantMenuSyncRole.TenantAdmin | TenantMenuSyncRole.OpsManager), page.SyncRoles);
     }
 
     [Fact]
@@ -63,14 +61,12 @@ public sealed class OnlineAssetMenuSeedTests
         Assert.Equal("人工发放", grant.Title);
         Assert.Equal(200, grant.OrderNo);
         // 高危：仅 TenantAdmin 可见可执行；OpsManager 排除。
-        Assert.Equal((int)TenantMenuSyncRole.TenantAdmin, grant.SyncRoles);
 
         Assert.Equal(MenuTypeEnum.Button, revoke.Type);
         Assert.Equal(StableSeedId.Menu("route:onlineWalletLedger"), revoke.Pid);
         Assert.Equal("onlineAssetGrantCommand:revoke", revoke.Permission);
         Assert.Equal("人工撤销", revoke.Title);
         Assert.Equal(300, revoke.OrderNo);
-        Assert.Equal((int)TenantMenuSyncRole.TenantAdmin, revoke.SyncRoles);
     }
 
     [Fact]
@@ -84,17 +80,14 @@ public sealed class OnlineAssetMenuSeedTests
         Assert.Equal(MenuTypeEnum.Button, ledgerPage.Type);
         Assert.Equal("onlineAssetLedgerQuery:page", ledgerPage.Permission);
         Assert.Equal(StableSeedId.Menu("route:onlineWalletLedger"), ledgerPage.Pid);
-        Assert.Equal((int)(TenantMenuSyncRole.TenantAdmin | TenantMenuSyncRole.OpsManager), ledgerPage.SyncRoles);
 
         Assert.Equal(MenuTypeEnum.Button, detail.Type);
         Assert.Equal("onlineAssetTransactionQuery:detail", detail.Permission);
         Assert.Equal(StableSeedId.Menu("route:onlineTransactionDetail"), detail.Pid);
-        Assert.Equal((int)(TenantMenuSyncRole.TenantAdmin | TenantMenuSyncRole.OpsManager), detail.SyncRoles);
 
         Assert.Equal(MenuTypeEnum.Button, auditPage.Type);
         Assert.Equal("onlineAssetAuditQuery:page", auditPage.Permission);
         Assert.Equal(StableSeedId.Menu("route:onlineAssetAudit"), auditPage.Pid);
-        Assert.Equal((int)(TenantMenuSyncRole.TenantAdmin | TenantMenuSyncRole.OpsManager), auditPage.SyncRoles);
     }
 
     [Fact]

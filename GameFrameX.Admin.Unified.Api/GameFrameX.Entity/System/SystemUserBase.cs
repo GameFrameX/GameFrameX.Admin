@@ -159,17 +159,7 @@ public abstract class SystemUserBase : EntityTenantBase
     [SugarColumn(ColumnDescription = "账号类型", DefaultValue = "0")]
     public AccountTypeEnum AccountType { get; set; } = AccountTypeEnum.NormalUser;
 
-    /// <summary>
-    /// 直属机构Id
-    /// </summary>
-    [SugarColumn(ColumnDescription = "直属机构Id", DefaultValue = "0")]
-    public long OrganizationId { get; set; }
 
-    /// <summary>
-    /// 直属机构
-    /// </summary>
-    [Navigate(NavigateType.OneToOne, nameof(OrganizationId))]
-    public TenantOrganizationEntity TenantOrganizationEntity { get; set; } = null!;
 
     /// <summary>
     /// 直属主管Id
@@ -183,17 +173,7 @@ public abstract class SystemUserBase : EntityTenantBase
     [Navigate(NavigateType.OneToOne, nameof(ManagerUserId))]
     public TenantUserEntity ManagerUser { get; set; } = null!;
 
-    /// <summary>
-    /// 职位Id
-    /// </summary>
-    [SugarColumn(ColumnDescription = "职位Id", DefaultValue = "0")]
-    public long PosId { get; set; }
 
-    /// <summary>
-    /// 职位
-    /// </summary>
-    [Navigate(NavigateType.OneToOne, nameof(PosId))]
-    public TenantPositionEntity TenantPositionEntity { get; set; } = null!;
 
     /// <summary>
     /// 工号

@@ -2,7 +2,6 @@ using System.Reflection;
 using GameFrameX.Core.Authorization;
 using GameFrameX.Core.Filter;
 using GameFrameX.Core.Service.Auth;
-using GameFrameX.Core.Service.TenantPackage;
 
 namespace GameFrameX.Core.Tests.Authorization;
 
@@ -24,7 +23,6 @@ public sealed class AuthenticatedOnlyRouteWhitelistTests
             {
                 { typeof(SystemAuthService), nameof(SystemAuthService.Logout) },
                 { typeof(SystemAuthService), nameof(SystemAuthService.GetRefreshTokenAsync) },
-                { typeof(GlobalPackageService), nameof(GlobalPackageService.GetTenantExpirationStatusAsync) },
             };
         }
     }

@@ -107,10 +107,6 @@ public class GlobalMenuResponse
     /// </summary>
     public bool SuperAdminOnly { get; set; }
 
-    /// <summary>
-    /// 租户默认角色同步标志（TenantMenuSyncRole 位枚举整数值）
-    /// </summary>
-    public int SyncRoles { get; set; }
 
     /// <summary>
     /// 超管专属菜单下允许租户只读访问

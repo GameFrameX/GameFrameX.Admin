@@ -98,7 +98,6 @@ public class SqlSugarDatabaseInitializationTests : IDisposable
         var isAffixColumn = ColumnName(mainDb, typeof(GlobalMenuEntity), nameof(GlobalMenuEntity.IsAffix));
         var orderNoColumn = ColumnName(mainDb, typeof(GlobalMenuEntity), nameof(GlobalMenuEntity.OrderNo));
         var superAdminOnlyColumn = ColumnName(mainDb, typeof(GlobalMenuEntity), nameof(GlobalMenuEntity.SuperAdminOnly));
-        var syncRolesColumn = ColumnName(mainDb, typeof(GlobalMenuEntity), nameof(GlobalMenuEntity.SyncRoles));
         var allowTenantColumn = ColumnName(mainDb, typeof(GlobalMenuEntity), nameof(GlobalMenuEntity.AllowTenantWhenSuperAdminOnly));
         var isEnabledColumn = ColumnName(mainDb, typeof(GlobalMenuEntity), nameof(GlobalMenuEntity.IsEnabled));
         var isDeletedColumn = ColumnName(mainDb, typeof(GlobalMenuEntity), nameof(GlobalMenuEntity.IsDeleted));
@@ -109,9 +108,9 @@ public class SqlSugarDatabaseInitializationTests : IDisposable
         var tenantIdColumn = ColumnName(mainDb, typeof(GlobalMenuEntity), nameof(GlobalMenuEntity.TenantId));
         var appScopeColumn = ColumnName(mainDb, typeof(GlobalMenuEntity), nameof(GlobalMenuEntity.AppScope));
         mainDb.Ado.ExecuteCommand(
-            $"INSERT INTO {tableName} ({idColumn}, {pidColumn}, {keyColumn}, {titleColumn}, {typeColumn}, {isHideColumn}, {isIframeColumn}, {isKeepAliveColumn}, {isAffixColumn}, {orderNoColumn}, {superAdminOnlyColumn}, {syncRolesColumn}, {allowTenantColumn}, {isEnabledColumn}, {isDeletedColumn}, {createdIdColumn}, {createdTimeColumn}, {createdNameColumn}, {updateCountColumn}, {tenantIdColumn}, {appScopeColumn}) " +
-            "VALUES (@legacyId, @pid, @legacyKey, @legacyTitle, @type, @falseValue, @falseValue, @trueValue, @falseValue, @orderNo, @falseValue, @syncRoles, @falseValue, @trueValue, @falseValue, @createdId, @createdTime, @createdName, @updateCount, @tenantId, @appScope), " +
-            "(@autoId, @pid, @autoKey, @autoTitle, @type, @trueValue, @falseValue, @trueValue, @falseValue, @orderNo, @falseValue, @syncRoles, @falseValue, @trueValue, @falseValue, @createdId, @createdTime, @createdName, @updateCount, @tenantId, @appScope)",
+            $"INSERT INTO {tableName} ({idColumn}, {pidColumn}, {keyColumn}, {titleColumn}, {typeColumn}, {isHideColumn}, {isIframeColumn}, {isKeepAliveColumn}, {isAffixColumn}, {orderNoColumn}, {superAdminOnlyColumn}, {allowTenantColumn}, {isEnabledColumn}, {isDeletedColumn}, {createdIdColumn}, {createdTimeColumn}, {createdNameColumn}, {updateCountColumn}, {tenantIdColumn}, {appScopeColumn}) " +
+            "VALUES (@legacyId, @pid, @legacyKey, @legacyTitle, @type, @falseValue, @falseValue, @trueValue, @falseValue, @orderNo, @falseValue, @falseValue, @trueValue, @falseValue, @createdId, @createdTime, @createdName, @updateCount, @tenantId, @appScope), " +
+            "(@autoId, @pid, @autoKey, @autoTitle, @type, @trueValue, @falseValue, @trueValue, @falseValue, @orderNo, @falseValue, @falseValue, @trueValue, @falseValue, @createdId, @createdTime, @createdName, @updateCount, @tenantId, @appScope)",
             new SugarParameter("@legacyId", legacyId),
             new SugarParameter("@pid", 0),
             new SugarParameter("@legacyKey", "legacy:menu"),
@@ -121,7 +120,6 @@ public class SqlSugarDatabaseInitializationTests : IDisposable
             new SugarParameter("@autoTitle", "auto"),
             new SugarParameter("@type", (int)MenuTypeEnum.Button),
             new SugarParameter("@orderNo", 9999),
-            new SugarParameter("@syncRoles", 0),
             new SugarParameter("@createdId", 0),
             new SugarParameter("@createdTime", DateTimeOffset.UtcNow.ToUnixTimeSeconds()),
             new SugarParameter("@createdName", "test"),

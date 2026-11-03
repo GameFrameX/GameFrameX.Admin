@@ -23,7 +23,6 @@ using GameFrameX.Core.Bootstrap;
 using GameFrameX.Core.Cache;
 using GameFrameX.Core.Service.Cache;
 using GameFrameX.Core.Service.Tenant;
-using GameFrameX.Core.Service.TenantPackage;
 using GameFrameX.Foundation.Extensions;
 using GameFrameX.Foundation.Options;
 using Serilog;
@@ -114,7 +113,6 @@ internal static class Program
         // C5 协议版本白名单配置（缺头拒绝；未知版本 AuditOnly 仅告警放行）
         builder.Services.Configure<ProtoVersionOptions>(builder.Configuration.GetSection("ProtoVersion"));
         builder.Services.AddSingleton<SystemCacheService>(); // 仅依赖 ICache + IOptions<CacheOptions>
-        builder.Services.AddScoped<TenantExpirationService>(); // 依赖 SqlSugar 仓储
         builder.Services.AddTransient<TenantGameOrderShipService>(); // 订单发货/退款服务
         builder.Services.AddSingleton<GameAppPackageResolver>(); // 包名解析服务
         builder.Services.AddSingleton<AppCacheService>(); // 应用缓存服务

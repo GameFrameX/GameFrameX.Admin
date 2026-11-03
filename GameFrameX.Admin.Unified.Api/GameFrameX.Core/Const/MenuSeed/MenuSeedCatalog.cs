@@ -1,5 +1,3 @@
-using System.Security.Cryptography;
-using System.Text;
 using GameFrameX.Entity.Enum;
 using GameFrameX.Entity.Global;
 
@@ -104,45 +102,6 @@ public static class MenuSeedCatalog
     }
 
     /// <summary>
-    /// 获取租户管理员默认菜单和按钮权限。
-    /// </summary>
-    public static IReadOnlyList<long> TenantAdminMenuIds
-    {
-        get { return GetMenuIdsForRoleCode(TenantDefaultDataTemplates.AdminRoleCode); }
-    }
-
-    /// <summary>
-    /// 当前菜单目录版本号：definitions 引擎消费字段（Key / ParentKey / Type / SyncRoles / SuperAdminOnly /
-    /// AllowTenantWhenSuperAdminOnly / AppScope）的确定性 SHA-256 哈希。
-    /// <para>Title / Icon / OrderNo / 时间戳等展示字段不入哈希——防止 cosmetic 编辑触发全租户无差异重同步；
-    /// SyncRoles / SuperAdminOnly 漂移必检。同内容多次计算结果不变（C353 状态表比对口径）。</para>
-    /// </summary>
-    public static string CatalogVersion
-    {
-        get { return ComputeCatalogVersion(Definitions); }
-    }
-
-    /// <summary>
-    /// 计算给定菜单定义集合的目录版本号。纯函数，供单测注入自定义 definitions 验证字段口径。
-    /// </summary>
-    public static string ComputeCatalogVersion(IReadOnlyList<MenuSeedDefinition> definitions)
-    {
-        var lines = definitions
-                    .Select(u => string.Join('|',
-                        u.Key,
-                        u.ParentKey ?? string.Empty,
-                        ((int)u.Type).ToString(System.Globalization.CultureInfo.InvariantCulture),
-                        ((int)u.SyncRoles).ToString(System.Globalization.CultureInfo.InvariantCulture),
-                        u.SuperAdminOnly ? "1" : "0",
-                        u.AllowTenantWhenSuperAdminOnly ? "1" : "0",
-                        ((int)u.AppScope).ToString(System.Globalization.CultureInfo.InvariantCulture)))
-                    .OrderBy(u => u, StringComparer.Ordinal)
-                    .ToArray();
-
-        return Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(string.Join('\n', lines))));
-    }
-
-    /// <summary>
     /// 获取 SuperAdmin-only 整棵子树的菜单 ID（根 + 所有后代）。纯函数重载，供闭包计算器 / 同步引擎注入 definitions 复用。
     /// </summary>
     public static IReadOnlySet<long> GetSuperAdminOnlySubtreeMenuIds(IReadOnlyList<MenuSeedDefinition> definitions)
@@ -156,98 +115,6 @@ public static class MenuSeedCatalog
                .Where(u => BelongsToSuperAdminOnlySubtree(u.Key, superAdminOnlyKeys, definitionsByKey))
                .Select(u => StableSeedId.Menu(u.Key))
                .ToHashSet();
-    }
-
-    /// <summary>
-    /// 按当前 SyncRoles 选出应同步给指定角色的菜单 ID 集合（含按钮父回退）。纯函数重载，供同步引擎注入 definitions 复用。
-    /// </summary>
-    public static IReadOnlyList<long> GetSyncedMenuIds(IReadOnlyList<MenuSeedDefinition> definitions, TenantMenuSyncRole role)
-    {
-        return SelectSyncedDefinitions(definitions, role)
-               .Select(u => StableSeedId.Menu(u.Key))
-               .Distinct()
-               .ToArray();
-    }
-
-    /// <summary>
-    /// 根据默认角色编码获取菜单 ID。
-    /// </summary>
-    public static IReadOnlyList<long> GetMenuIdsForRoleCode(string roleCode)
-    {
-        return SelectSyncedDefinitions(Definitions, ResolveRole(roleCode))
-               .Select(u => StableSeedId.Menu(u.Key))
-               .Distinct()
-               .ToArray();
-    }
-
-    /// <summary>
-    /// 根据默认角色编码生成角色菜单授权。
-    /// </summary>
-    public static IReadOnlyList<TenantRoleMenuEntity> BuildRoleMenus(long roleId, string roleCode)
-    {
-        return SelectSyncedDefinitions(Definitions, ResolveRole(roleCode))
-               .Select(u => new TenantRoleMenuEntity
-               {
-                   Id = StableSeedId.RoleMenu(roleCode, u.Key),
-                   RoleId = roleId,
-                   MenuId = StableSeedId.Menu(u.Key),
-               })
-               .GroupBy(u => u.MenuId)
-               .Select(u => u.First())
-               .ToArray();
-    }
-
-    /// <summary>
-    /// 计算种子菜单范围内、不应同步给指定角色的菜单 Id 集合（C189 role-menu 幂等收敛的删除候选）。
-    /// <para>以当前 SyncRoles 为权威：期望集 = <see cref="SelectSyncedDefinitions"/>；surplus = 全部种子菜单 Id − 期望集。
-    /// 仅限种子菜单范围（global_menu 定义），保护租户手动授权的非种子菜单不被收敛误删。
-    /// 与 <see cref="BuildRoleMenus"/> 共用同一份期望集计算，保证"补入"与"删除"对同一 SyncRoles 收敛一致。</para>
-    /// </summary>
-    public static IReadOnlyList<long> GetSurplusSeedMenuIds(string roleCode)
-    {
-        return GetSurplusSeedMenuIds(Definitions, ResolveRole(roleCode));
-    }
-
-    /// <summary>
-    /// 计算给定菜单定义集合中、不应同步给指定角色的菜单 Id 集合。纯函数重载，供单测注入自定义 SyncRoles 验证增/减/改。
-    /// </summary>
-    public static IReadOnlyList<long> GetSurplusSeedMenuIds(IReadOnlyList<MenuSeedDefinition> definitions, TenantMenuSyncRole role)
-    {
-        if (role == TenantMenuSyncRole.None)
-        {
-            return Array.Empty<long>();
-        }
-
-        var expectedMenuIds = SelectSyncedDefinitions(definitions, role)
-                              .Select(u => StableSeedId.Menu(u.Key))
-                              .ToHashSet();
-
-        return definitions
-               .Select(u => StableSeedId.Menu(u.Key))
-               .Where(u => !expectedMenuIds.Contains(u))
-               .ToList();
-    }
-
-    /// <summary>
-    /// 按当前 SyncRoles 选出应同步给指定角色的菜单/按钮定义。
-    /// <see cref="GetMenuIdsForRoleCode"/> / <see cref="BuildRoleMenus"/> / <see cref="GetSurplusSeedMenuIds"/> 的共享期望集计算，
-    /// 确保"补入授权"与"删除多余"基于完全一致的期望集，幂等收敛。
-    /// </summary>
-    private static IReadOnlyList<MenuSeedDefinition> SelectSyncedDefinitions(IReadOnlyList<MenuSeedDefinition> definitions, TenantMenuSyncRole role)
-    {
-        if (role == TenantMenuSyncRole.None)
-        {
-            return Array.Empty<MenuSeedDefinition>();
-        }
-
-        var syncedMenuKeys = definitions
-                             .Where(u => u.Type != MenuTypeEnum.Button && u.SyncRoles.HasFlag(role))
-                             .Select(u => u.Key)
-                             .ToHashSet(StringComparer.Ordinal);
-
-        return definitions
-               .Where(u => ShouldSyncToRole(u, role, syncedMenuKeys))
-               .ToList();
     }
 
     /// <summary>
@@ -295,7 +162,6 @@ public static class MenuSeedCatalog
                 dbMenu.Remark,
                 dbMenu.CreatedTime,
                 dbMenu.UpdateTime ?? dbMenu.CreatedTime,
-                (TenantMenuSyncRole)dbMenu.SyncRoles,
                 dbMenu.SuperAdminOnly,
                 dbMenu.AllowTenantWhenSuperAdminOnly,
                 dbMenu.AppScope);
@@ -349,12 +215,7 @@ public static class MenuSeedCatalog
             throw new InvalidOperationException($"global_menu 父级不存在: Key={missingParent.Key}, Pid={missingParent.Pid}。");
         }
 
-        var allowedRoles = global::System.Enum.GetValues<TenantMenuSyncRole>().Aggregate(TenantMenuSyncRole.None, (current, value) => current | value);
-        var invalidRole = dbMenus.FirstOrDefault(u => ((TenantMenuSyncRole)u.SyncRoles & ~allowedRoles) != 0);
-        if (invalidRole != null)
-        {
-            throw new InvalidOperationException($"global_menu.SyncRoles 包含未知位: Key={invalidRole.Key}, SyncRoles={invalidRole.SyncRoles}。");
-        }
+
 
         var invalidAppScope = dbMenus.FirstOrDefault(u => !global::System.Enum.IsDefined(typeof(MenuAppScopeEnum), u.AppScope));
         if (invalidAppScope != null)
@@ -415,25 +276,6 @@ public static class MenuSeedCatalog
         }
 
         return false;
-    }
-
-    private static bool ShouldSyncToRole(MenuSeedDefinition definition, TenantMenuSyncRole role, IReadOnlySet<string> syncedMenuKeys)
-    {
-        if (definition.SyncRoles.HasFlag(role))
-        {
-            return true;
-        }
-
-        return role == TenantMenuSyncRole.TenantAdmin
-               && definition.Type == MenuTypeEnum.Button
-               && definition.ParentKey != null
-               && !definition.SuperAdminOnly
-               && syncedMenuKeys.Contains(definition.ParentKey);
-    }
-
-    private static TenantMenuSyncRole ResolveRole(string roleCode)
-    {
-        return TenantDefaultDataTemplates.ResolveMenuSyncRole(roleCode);
     }
 
     private static InvalidOperationException NotLoaded()

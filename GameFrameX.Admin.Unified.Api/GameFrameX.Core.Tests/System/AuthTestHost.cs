@@ -48,13 +48,11 @@ internal sealed class AuthTestHost : IDisposable
             typeof(SystemUserEntity),
             typeof(SystemConfigEntity),
             typeof(TenantUserEntity),
-            typeof(TenantOrganizationEntity),
         });
         _client.GetConnectionScope(MainConfigId).CodeFirst.InitTables<TenantUserEntity>();
         SqlSugarSetup.InitDatabase(_client, tenantConfig, new[]
         {
             typeof(TenantUserEntity),
-            typeof(TenantOrganizationEntity),
         });
     }
 

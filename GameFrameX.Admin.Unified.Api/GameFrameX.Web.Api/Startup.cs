@@ -22,7 +22,6 @@ using GameFrameX.Core.Service.Message;
 using GameFrameX.Core.Service.PlatformRateLimit;
 using GameFrameX.Core.Service.PlatformLogging;
 using GameFrameX.Core.Service.PlatformPasswordPolicy;
-using GameFrameX.Core.Service.TenantMenuSync;
 using GameFrameX.Core.SignalR;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Core.Utility;
@@ -109,9 +108,6 @@ public class Startup
         services.AddHostedService<ApiEndpointCatalogSync>();
         // C353 / GFX-773：套餐驱动的存量租户菜单权限自动同步（队列单例 + Applier 作用域 + 后台工作器）。
         // 注册顺序在 ApiEndpointCatalogSync 之后：Worker 启动扫描有目录就绪等待兜底，不依赖严格启动序。
-        services.AddSingleton<TenantMenuSyncQueue>();
-        services.AddScoped<TenantMenuSyncApplier>();
-        services.AddHostedService<TenantMenuSyncWorker>();
         services.AddPlatformJwt();
         // 允许跨域（支持通过 CORS_ORIGINS 环境变量配置允许的域名列表，逗号分隔；未配置则允许所有来源）
         var corsOrigins = Environment.GetEnvironmentVariable("CORS_ORIGINS");

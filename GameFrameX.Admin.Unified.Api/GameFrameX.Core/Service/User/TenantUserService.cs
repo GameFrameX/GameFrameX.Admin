@@ -1,6 +1,4 @@
 using GameFrameX.Core.Service.Base;
-using GameFrameX.Core.Service.Organization;
-using GameFrameX.Core.Service.TenantPackage;
 using GameFrameX.Core.Service.User.Dto;
 using GameFrameX.Entity.Enum;
 using GameFrameX.Foundation.Http.Normalization;
@@ -14,24 +12,17 @@ namespace GameFrameX.Core.Service.User;
 public class TenantUserService : BaseSystemService
 {
     private readonly SqlSugarRepository<TenantUserEntity> _tenantUserRepository;
-    private readonly TenantOrganizationService _tenantOrganizationService;
-    private readonly TenantUserExtensionOrganizationService _tenantUserExtOrganizationService;
     private readonly TenantUserRoleService _tenantUserRoleService;
     private readonly SystemConfigService _systemConfigService;
 
     public TenantUserService(
         CurrentUserContext currentUserContext,
-        TenantQuotaHelper tenantQuotaHelper,
         SqlSugarRepository<TenantUserEntity> tenantUserRepository,
-        TenantOrganizationService tenantOrganizationService,
-        TenantUserExtensionOrganizationService tenantUserExtOrganizationService,
         TenantUserRoleService tenantUserRoleService,
         SystemConfigService systemConfigService)
-        : base(currentUserContext, tenantQuotaHelper)
+        : base(currentUserContext)
     {
         _tenantUserRepository = tenantUserRepository;
-        _tenantOrganizationService = tenantOrganizationService;
-        _tenantUserExtOrganizationService = tenantUserExtOrganizationService;
         _tenantUserRoleService = tenantUserRoleService;
         _systemConfigService = systemConfigService;
     }
@@ -56,22 +47,8 @@ public class TenantUserService : BaseSystemService
     [ApiDescriptionSettings(Name = "Page")]
     public async Task<SqlSugarPagedList<TenantUserResponse>> PageAsync(PageUserRequest input)
     {
-        // 获取用户拥有的机构集合
-        var userOrganizationIdList = await _tenantOrganizationService.GetUserOrganizationIdListAsync();
-        List<long>? orgList = null;
-        if (input.OrganizationId > 0) // 指定机构查询时
-        {
-            orgList = await _tenantOrganizationService.GetChildIdListWithSelfByIdAsync(input.OrganizationId);
-            orgList = CurrentUserContext.SuperAdmin ? orgList : orgList.Where(u => userOrganizationIdList.Contains(u)).ToList();
-        }
-        else // 各管理员只能看到自己机构下的用户列表
-        {
-            orgList = CurrentUserContext.SuperAdmin ? null : userOrganizationIdList;
-        }
-
         return await _tenantUserRepository.AsQueryable()
                                    .Where(u => u.AccountType != AccountTypeEnum.SuperAdmin)
-                                   .WhereIF(orgList != null, u => orgList!.Contains(u.OrganizationId))
                                    .WhereIF(!string.IsNullOrWhiteSpace(input.Account), u => u.Account.Contains(input.Account))
                                    .WhereIF(!string.IsNullOrWhiteSpace(input.RealName), u => u.RealName.Contains(input.RealName))
                                    .WhereIF(!string.IsNullOrWhiteSpace(input.Phone), u => u.Phone.Contains(input.Phone))
@@ -97,20 +74,6 @@ public class TenantUserService : BaseSystemService
             throw BusinessError.Oh(SystemUserErrorCode.AccountAlreadyExists);
         }
 
-        // 用户数量限额检查
-        if (!CurrentUserContext.SuperAdmin)
-        {
-            var package = await TenantQuotaHelper.GetPackageAsync(CurrentUserContext.TenantId);
-            if (package != null)
-            {
-                var currentUserCount = await _tenantUserRepository.AsQueryable().CountAsync();
-                if (currentUserCount >= package.MaxUserCount)
-                {
-                    throw BusinessError.Oh($"用户数已达上限（{package.MaxUserCount}），无法新增");
-                }
-            }
-        }
-
         var password = await _systemConfigService.GetConfigValueAsync<string>(CommonConst.SysPassword);
 
         var user = input.Adapt<TenantUserEntity>();
@@ -118,7 +81,7 @@ public class TenantUserService : BaseSystemService
         user.Password = CryptogramUtility.HashPassword(password);
         var newUser = await _tenantUserRepository.AsInsertable(user).ExecuteReturnEntityAsync();
         input.Id = newUser.Id;
-        await UpdateRoleAndExtOrganizationAsync(input);
+        await UpdateUserRolesAsync(input);
 
         return newUser.Id;
     }
@@ -142,22 +105,19 @@ public class TenantUserService : BaseSystemService
         await _tenantUserRepository.AsUpdateable(input.Adapt<TenantUserEntity>()).IgnoreColumns(true)
                             .IgnoreColumns(u => new { u.Password, u.IsEnabled, }).ExecuteCommandAsync();
 
-        await UpdateRoleAndExtOrganizationAsync(input);
+        await UpdateUserRolesAsync(input);
 
-        // 删除用户机构缓存
-        SqlSugarFilter.DeleteUserOrganizationCache(input.Id, _tenantUserRepository.Context.CurrentConnectionConfig.ConfigId?.ToString() ?? string.Empty);
     }
 
     /// <summary>
-    /// 更新角色和扩展机构
+    /// 更新用户角色
     /// </summary>
     /// <param name="input"></param>
     /// <returns></returns>
-    private async Task UpdateRoleAndExtOrganizationAsync(AddUserRequest input)
+    private async Task UpdateUserRolesAsync(AddUserRequest input)
     {
         await GrantRoleAsync(new UserRoleRequest { UserId = input.Id, RoleIdList = input.RoleIdList, });
 
-        await _tenantUserExtOrganizationService.UpdateUserExtOrganizationAsync(input.Id, input.ExtOrganizationIdList);
     }
 
     /// <summary>
@@ -187,8 +147,6 @@ public class TenantUserService : BaseSystemService
         // 删除用户角色
         await _tenantUserRoleService.DeleteUserRoleByUserIdAsync(input.Id);
 
-        // 删除用户扩展机构
-        await _tenantUserExtOrganizationService.DeleteUserExtOrganizationByUserIdAsync(input.Id);
     }
 
     /// <summary>
@@ -215,7 +173,7 @@ public class TenantUserService : BaseSystemService
     public async Task<int> UpdateBaseInfoAsync(TenantUserEntity user)
     {
         return await _tenantUserRepository.AsUpdateable(user)
-                                   .IgnoreColumns(u => new { u.CreatedTime, u.Account, u.Password, u.AccountType, u.OrganizationId, u.PosId, }).ExecuteCommandAsync();
+                                   .IgnoreColumns(u => new { u.CreatedTime, u.Account, u.Password, u.AccountType, }).ExecuteCommandAsync();
     }
 
     /// <summary>
@@ -251,6 +209,7 @@ public class TenantUserService : BaseSystemService
         //    throw BusinessError.Oh(SystemUserErrorCode.AssignRoleToSuperAdminForbidden);
 
         await _tenantUserRoleService.GrantUserRoleAsync(input);
+        SqlSugarFilter.ClearUserDataScopeCache(input.UserId, _tenantUserRepository.Context.CurrentConnectionConfig.ConfigId?.ToString() ?? string.Empty);
     }
 
     /// <summary>
@@ -314,16 +273,4 @@ public class TenantUserService : BaseSystemService
         return await _tenantUserRoleService.GetUserRoleIdListAsync(userId);
     }
 
-    /// <summary>
-    /// 获取用户扩展机构集合
-    /// </summary>
-    /// <param name="userId"></param>
-    /// <returns></returns>
-    [DisplayName("获取用户扩展机构集合")]
-    // Org 为路由锁定字符串（前端 /api/tenantUser/ownExtOrgList 实际调用），GFX-710 禁简写豁免
-    [ApiDescriptionSettings(Name = "GetOwnExtOrgList")]
-    public async Task<List<TenantUserExtensionOrganizationResponse>> GetOwnExtOrganizationListAsync(long userId)
-    {
-        return await _tenantUserExtOrganizationService.GetUserExtOrganizationListAsync(userId);
-    }
 }

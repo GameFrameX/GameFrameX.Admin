@@ -170,8 +170,7 @@ public class SystemOpenAccessService : IAdminApiController
                 throw BusinessError.Oh(SystemUserErrorCode.AccountNotFound);
             }
 
-            var org = tenantDb.Queryable<TenantOrganizationEntity>().First(u => u.Id == user.OrganizationId);
-            return new BoundTenantUser(user, org);
+            return new BoundTenantUser(user);
         }
         finally
         {

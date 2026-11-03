@@ -1,4 +1,4 @@
-﻿using GameFrameX.Core.Hub;
+using GameFrameX.Core.Hub;
 using GameFrameX.Core.Service.OnlineUser.Dto;
 using Microsoft.AspNetCore.SignalR;
 
@@ -55,32 +55,6 @@ public class TenantOnlineUserService : IAdminApiController
 
         await _onlineUserHubContext.Clients.Client(user.ConnectionId).ForceOfflineAsync("强制下线");
         await _systemOnlineUerRepository.DeleteAsync(user);
-    }
-
-    /// <summary>
-    /// 发布站内消息
-    /// </summary>
-    /// <param name="notice"></param>
-    /// <param name="userIds"></param>
-    /// <returns></returns>
-    [NonAction]
-    public async Task PublicNoticeAsync(TenantNoticeEntity notice, List<long> userIds)
-    {
-        var userList = await _systemOnlineUerRepository.GetListAsync(u => userIds.Contains(u.UserId));
-        if (!userList.Any())
-        {
-            return;
-        }
-
-        foreach (var item in userList)
-        {
-            if (string.IsNullOrEmpty(item.ConnectionId))
-            {
-                continue;
-            }
-
-            await _onlineUserHubContext.Clients.Client(item.ConnectionId).PublicNoticeAsync(notice);
-        }
     }
 
     /// <summary>

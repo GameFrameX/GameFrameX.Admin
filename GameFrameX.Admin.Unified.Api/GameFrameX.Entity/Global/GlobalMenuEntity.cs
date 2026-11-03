@@ -126,11 +126,6 @@ public sealed class GlobalMenuEntity : EntityBasic
     [SugarColumn(ColumnDescription = "是否仅超管可见", DefaultValue = "false")]
     public bool SuperAdminOnly { get; set; }
 
-    /// <summary>
-    /// 租户默认角色同步标志（TenantMenuSyncRole 位枚举整数值）
-    /// </summary>
-    [SugarColumn(ColumnDescription = "租户角色同步标志", DefaultValue = "0")]
-    public int SyncRoles { get; set; }
 
     /// <summary>
     /// 超管专属菜单下允许租户只读访问

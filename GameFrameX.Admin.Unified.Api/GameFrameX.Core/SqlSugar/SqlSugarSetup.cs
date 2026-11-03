@@ -4,7 +4,6 @@ using GameFrameX.Core.Extension.Cache;
 using GameFrameX.Core.Extension.Const;
 using GameFrameX.Core.Extension.Option;
 using GameFrameX.Core.Service.Tenant;
-using GameFrameX.Core.Service.TenantMenuSync;
 using GameFrameX.Entity.Base;
 using GameFrameX.Entity.Enum;
 using GameFrameX.Entity.System;
@@ -185,22 +184,7 @@ public static class SqlSugarSetup
                             entityInfo.SetValue(GetCurrentUserDisplayName(httpContextAccessor));
                         }
                     }
-                    else if (entityInfo.PropertyName == nameof(EntityBasicData.CreateOrganizationId))
-                    {
-                        var createOrganizationId = ((dynamic)entityInfo.EntityValue).CreateOrganizationId;
-                        if (createOrganizationId == 0 || createOrganizationId == null)
-                        {
-                            entityInfo.SetValue(user.FindFirst(ClaimConst.OrganizationId)?.Value);
-                        }
-                    }
-                    else if (entityInfo.PropertyName == nameof(EntityBasicData.CreateOrganizationName))
-                    {
-                        var createOrganizationName = ((dynamic)entityInfo.EntityValue).CreateOrganizationName;
-                        if (string.IsNullOrEmpty(createOrganizationName))
-                        {
-                            entityInfo.SetValue(user.FindFirst(ClaimConst.OrganizationName)?.Value);
-                        }
-                    }
+
                 }
             }
 
@@ -238,7 +222,7 @@ public static class SqlSugarSetup
         // 主库或其它租户库在 AOP 初始化阶段安装该过滤器会错误访问不存在或不属于当前用户的租户表。
         if (currentTenantId > 0 && db.CurrentConnectionConfig.ConfigId.ToString() == currentTenantId.ToString())
         {
-            SqlSugarFilter.SetOrganizationEntityFilter(db);
+            SqlSugarFilter.SetDataScopeFilter(db);
         }
 
     }

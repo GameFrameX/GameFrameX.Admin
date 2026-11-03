@@ -1,7 +1,5 @@
 using GameFrameX.Core.Service.Base;
-using GameFrameX.Core.Service.Organization;
 using GameFrameX.Core.Service.Role.Dto;
-using GameFrameX.Core.Service.TenantPackage;
 using GameFrameX.Core.Service.User;
 using GameFrameX.Entity.Enum;
 using GameFrameX.Entity.Global;
@@ -15,27 +13,20 @@ namespace GameFrameX.Core.Service.Role;
 public class TenantRoleService : BaseSystemService
 {
     private readonly SqlSugarRepository<TenantRoleEntity> _systemRoleRepository;
-    private readonly TenantRoleOrganizationService _systemRoleOrganizationService;
     private readonly TenantRoleMenuService _systemRoleMenuService;
-    private readonly TenantOrganizationService _systemOrganizationService;
     private readonly TenantUserRoleService _systemUserRoleService;
     private readonly IServiceProvider _serviceProvider;
 
     public TenantRoleService(
         CurrentUserContext currentUserContext,
-        TenantQuotaHelper tenantQuotaHelper,
         SqlSugarRepository<TenantRoleEntity> systemRoleRepository,
-        TenantRoleOrganizationService systemRoleOrganizationService,
         TenantRoleMenuService systemRoleMenuService,
-        TenantOrganizationService systemOrganizationService,
         TenantUserRoleService systemUserRoleService,
         IServiceProvider serviceProvider)
-        : base(currentUserContext, tenantQuotaHelper)
+        : base(currentUserContext)
     {
         _systemRoleRepository = systemRoleRepository;
-        _systemRoleOrganizationService = systemRoleOrganizationService;
         _systemRoleMenuService = systemRoleMenuService;
-        _systemOrganizationService = systemOrganizationService;
         _systemUserRoleService = systemUserRoleService;
         _serviceProvider = serviceProvider;
     }
@@ -87,20 +78,6 @@ public class TenantRoleService : BaseSystemService
         if (await _systemRoleRepository.IsAnyAsync(u => u.Name == input.Name && u.Code == input.Code))
         {
             throw BusinessError.Oh(CommonErrorCode.RecordAlreadyExists);
-        }
-
-        // 角色数量限额检查
-        if (!CurrentUserContext.SuperAdmin)
-        {
-            var package = await TenantQuotaHelper.GetPackageAsync(CurrentUserContext.TenantId);
-            if (package != null)
-            {
-                var currentRoleCount = await _systemRoleRepository.AsQueryable().CountAsync();
-                if (currentRoleCount >= package.MaxRoleCount)
-                {
-                    throw BusinessError.Oh($"角色数已达上限（{package.MaxRoleCount}），无法新增");
-                }
-            }
         }
 
         var newRole = await _systemRoleRepository.AsInsertable(input.Adapt<TenantRoleEntity>()).ExecuteReturnEntityAsync();
@@ -170,8 +147,6 @@ public class TenantRoleService : BaseSystemService
 
         await _systemRoleRepository.DeleteAsync(systemRole);
 
-        // 级联删除角色机构数据
-        await _systemRoleOrganizationService.DeleteRoleOrganizationByRoleIdAsync(systemRole.Id);
 
         // 级联删除用户角色数据
         await _systemUserRoleService.DeleteUserRoleByRoleIdAsync(systemRole.Id);
@@ -193,56 +168,6 @@ public class TenantRoleService : BaseSystemService
     }
 
     /// <summary>
-    /// 授权角色数据范围
-    /// </summary>
-    /// <param name="input"></param>
-    /// <returns></returns>
-    [DisplayName("授权角色数据范围")]
-    [ApiDescriptionSettings(Name = "GrantDataScope")]
-    public async Task GrantDataScopeAsync(RoleOrganizationRequest input)
-    {
-        // 删除与该角色相关的用户机构缓存
-        var userIdList = await _systemUserRoleService.GetUserIdListAsync(input.Id);
-        foreach (var userId in userIdList)
-        {
-            SqlSugarFilter.DeleteUserOrganizationCache(userId, _systemRoleRepository.Context.CurrentConnectionConfig.ConfigId?.ToString() ?? string.Empty);
-        }
-
-        var role = await _systemRoleRepository.GetFirstAsync(u => u.Id == input.Id);
-        var dataScope = input.DataScope;
-        if (!CurrentUserContext.SuperAdmin)
-        {
-            // 非超级管理员没有全部数据范围权限
-            if (dataScope == (int)DataScopeEnum.All)
-            {
-                throw BusinessError.Oh(SystemUserErrorCode.NoPermission);
-            }
-
-            // 若数据范围自定义，则判断授权数据范围是否有权限
-            if (dataScope == (int)DataScopeEnum.Define)
-            {
-                var grantOrganizationIdList = input.OrganizationIdList ?? new List<long>();
-                if (grantOrganizationIdList.Count > 0)
-                {
-                    var orgIdList = await _systemOrganizationService.GetUserOrganizationIdListAsync();
-                    if (orgIdList.Count < 1)
-                    {
-                        throw BusinessError.Oh(SystemUserErrorCode.NoPermission);
-                    }
-                    else if (!grantOrganizationIdList.All(u => orgIdList.Any(c => c == u)))
-                    {
-                        throw BusinessError.Oh(SystemUserErrorCode.NoPermission);
-                    }
-                }
-            }
-        }
-
-        role.DataScope = (DataScopeEnum)dataScope;
-        await _systemRoleRepository.AsUpdateable(role).UpdateColumns(u => new { u.DataScope, }).ExecuteCommandWithOptLockAsync(true);
-        await _systemRoleOrganizationService.GrantRoleOrganizationAsync(input);
-    }
-
-    /// <summary>
     /// 根据角色Id获取菜单Id集合
     /// </summary>
     /// <param name="input"></param>
@@ -252,19 +177,6 @@ public class TenantRoleService : BaseSystemService
     public async Task<List<long>> GetOwnMenuListAsync([FromQuery] RoleRequest input)
     {
         return await _systemRoleMenuService.GetRoleMenuIdListAsync(new List<long> { input.Id, });
-    }
-
-    /// <summary>
-    /// 根据角色Id获取机构Id集合
-    /// </summary>
-    /// <param name="input"></param>
-    /// <returns></returns>
-    [DisplayName("根据角色Id获取机构Id集合")]
-    // Org 为路由锁定字符串（前端 /api/tenantRole/ownOrgList 实际调用），GFX-710 禁简写豁免
-    [ApiDescriptionSettings(Name = "GetOwnOrgList")]
-    public async Task<List<long>> GetOwnOrganizationListAsync([FromQuery] RoleRequest input)
-    {
-        return await _systemRoleOrganizationService.GetRoleOrganizationIdListAsync(new List<long> { input.Id, });
     }
 
     /// <summary>

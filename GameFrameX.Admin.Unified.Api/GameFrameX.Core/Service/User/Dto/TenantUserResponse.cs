@@ -132,20 +132,12 @@ public class TenantUserResponse
     /// </summary>
     public AccountTypeEnum AccountType { get; set; } = AccountTypeEnum.NormalUser;
 
-    /// <summary>
-    /// 直属机构Id
-    /// </summary>
-    public long OrganizationId { get; set; }
 
     /// <summary>
     /// 直属主管Id
     /// </summary>
     public long? ManagerUserId { get; set; }
 
-    /// <summary>
-    /// 职位Id
-    /// </summary>
-    public long PosId { get; set; }
 
     /// <summary>
     /// 工号

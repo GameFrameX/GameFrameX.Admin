@@ -6,7 +6,7 @@ namespace GameFrameX.Core.Tests.System;
 /// <summary>
 /// C112 (GFX-104 阶段4) 配套回归测试：验证区服运维 / 任务与自动化两棵菜单的
 /// Path / Component 已由 /game/&lt;子域&gt;/... 切到 /&lt;子域&gt;Center/...；
-/// 菜单 Key / Id / Pid / SyncRoles 与改动前一致（spec 系统管理 §86 禁止运行时写 tenant_role_menu）。
+/// 菜单 Key / Id / Pid 与改动前一致（spec 系统管理 §86 禁止运行时写 tenant_role_menu）。
 /// </summary>
 [Collection("MenuSeedCatalog")]
 public class GlobalMenuSeedDataStageFourPathMigrationTests

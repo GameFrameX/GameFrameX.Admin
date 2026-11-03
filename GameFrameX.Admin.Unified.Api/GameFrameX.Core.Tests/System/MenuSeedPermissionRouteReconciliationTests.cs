@@ -3,8 +3,6 @@ using GameFrameX.Application.Game.Tenant.Penalty.TenantGamePenalty;
 using GameFrameX.Application.SeedData.System;
 using GameFrameX.Core.Api;
 using GameFrameX.Core.Authorization;
-using GameFrameX.Core.Service.Organization;
-using GameFrameX.Core.Service.TenantPackage;
 using GameFrameX.Core.Service.User;
 using GameFrameX.Entity.Enum;
 using Microsoft.AspNetCore.Mvc.Routing;
@@ -78,9 +76,7 @@ public class MenuSeedPermissionRouteReconciliationTests
     [Fact]
     public void MenuSeedRouteNameOfProducesCanonicalRouteNames()
     {
-        Assert.Equal("tenantOrganization:delete", MenuSeedRouteName.Of<TenantOrganizationService>(nameof(TenantOrganizationService.DeleteOrganizationAsync)));
         Assert.Equal("tenantGamePenaltyEntity:detail", MenuSeedRouteName.Of<TenantGamePenaltyEntityService>(nameof(TenantGamePenaltyEntityService.GetAsync)));
-        Assert.Equal("globalPackage:detail:{id}", MenuSeedRouteName.Of<GlobalPackageService>(nameof(GlobalPackageService.GetDetailAsync)));
         Assert.Equal("tenantUser:ownRoleList:{userId}", MenuSeedRouteName.Of<TenantUserService>(nameof(TenantUserService.GetOwnRoleListAsync)));
     }
 

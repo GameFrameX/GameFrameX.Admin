@@ -13,7 +13,7 @@ namespace GameFrameX.Application.SeedData.System;
 /// <para>
 /// 容器 route:onlineCenter 由 C340 的 <see cref="GlobalMenuSeedData.OnlineMenus"/>（GlobalMenuSeedData.Online.cs）提供；
 /// 本文件只落匹配观测三页（队列总览/失败原因/异常 Ticket）+ 三查询按钮，不动既有行（并行 change 泳道纪律）。
-/// 纯只读观测页（vault S4.9），SyncRoles 取运维观测受众：TenantAdmin / OpsManager / GmSupport / DataAnalyst。
+/// 区服运行状态只读观测菜单。
 /// </para>
 /// </summary>
 public partial class GlobalMenuSeedData
@@ -47,7 +47,6 @@ public partial class GlobalMenuSeedData
                 Remark = null,
                 CreatedTime = 1789344000,
                 UpdateTime = 1789344000,
-                SyncRoles = (int)(TenantMenuSyncRole.TenantAdmin | TenantMenuSyncRole.OpsManager | TenantMenuSyncRole.GmSupport | TenantMenuSyncRole.DataAnalyst),
                 SuperAdminOnly = false,
                 AllowTenantWhenSuperAdminOnly = false,
                 IsDeleted = false,
@@ -77,7 +76,6 @@ public partial class GlobalMenuSeedData
                 Remark = null,
                 CreatedTime = 1789344000,
                 UpdateTime = 1789344000,
-                SyncRoles = (int)(TenantMenuSyncRole.TenantAdmin | TenantMenuSyncRole.OpsManager | TenantMenuSyncRole.GmSupport | TenantMenuSyncRole.DataAnalyst),
                 SuperAdminOnly = false,
                 AllowTenantWhenSuperAdminOnly = false,
                 IsDeleted = false,
@@ -107,7 +105,6 @@ public partial class GlobalMenuSeedData
                 Remark = null,
                 CreatedTime = 1789344000,
                 UpdateTime = 1789344000,
-                SyncRoles = (int)(TenantMenuSyncRole.TenantAdmin | TenantMenuSyncRole.OpsManager | TenantMenuSyncRole.GmSupport | TenantMenuSyncRole.DataAnalyst),
                 SuperAdminOnly = false,
                 AllowTenantWhenSuperAdminOnly = false,
                 IsDeleted = false,
@@ -136,7 +133,6 @@ public partial class GlobalMenuSeedData
                 Remark = null,
                 CreatedTime = 1789344000,
                 UpdateTime = 1789344000,
-                SyncRoles = (int)(TenantMenuSyncRole.TenantAdmin | TenantMenuSyncRole.OpsManager | TenantMenuSyncRole.GmSupport | TenantMenuSyncRole.DataAnalyst),
                 SuperAdminOnly = false,
                 AllowTenantWhenSuperAdminOnly = false,
                 IsDeleted = false,
@@ -165,7 +161,6 @@ public partial class GlobalMenuSeedData
                 Remark = null,
                 CreatedTime = 1789344000,
                 UpdateTime = 1789344000,
-                SyncRoles = (int)(TenantMenuSyncRole.TenantAdmin | TenantMenuSyncRole.OpsManager | TenantMenuSyncRole.GmSupport | TenantMenuSyncRole.DataAnalyst),
                 SuperAdminOnly = false,
                 AllowTenantWhenSuperAdminOnly = false,
                 IsDeleted = false,
@@ -194,7 +189,6 @@ public partial class GlobalMenuSeedData
                 Remark = null,
                 CreatedTime = 1789344000,
                 UpdateTime = 1789344000,
-                SyncRoles = (int)(TenantMenuSyncRole.TenantAdmin | TenantMenuSyncRole.OpsManager | TenantMenuSyncRole.GmSupport | TenantMenuSyncRole.DataAnalyst),
                 SuperAdminOnly = false,
                 AllowTenantWhenSuperAdminOnly = false,
                 IsDeleted = false,

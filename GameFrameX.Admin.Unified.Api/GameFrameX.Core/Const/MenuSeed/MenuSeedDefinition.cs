@@ -27,7 +27,6 @@ public sealed record MenuSeedDefinition(
     string? Remark,
     long CreatedTime,
     long UpdateTime,
-    TenantMenuSyncRole SyncRoles,
     bool SuperAdminOnly,
     bool AllowTenantWhenSuperAdminOnly,
     MenuAppScopeEnum AppScope);

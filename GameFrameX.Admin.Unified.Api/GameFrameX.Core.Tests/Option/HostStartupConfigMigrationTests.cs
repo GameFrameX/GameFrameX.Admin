@@ -37,24 +37,6 @@ public sealed class HostStartupConfigMigrationTests
     }
 
     [Fact]
-    public void TenantMenuSyncOptions_BindsToAppSettingsSection()
-    {
-        // OptionsSettings 特性缺失时 AddConfigurableOptions 会按类名绑定 "TenantMenuSyncOptions" 节（不存在），
-        // appsettings.json 的 TenantMenuSync 节被静默丢弃——默认值恰好与文件值相同掩盖过失效；特性与节名必须对齐。
-        var attribute = typeof(TenantMenuSyncOptions).GetCustomAttributes(typeof(OptionsSettingsAttribute), false)
-                                                     .OfType<OptionsSettingsAttribute>()
-                                                     .FirstOrDefault();
-        Assert.NotNull(attribute);
-        Assert.Equal("TenantMenuSync", attribute!.Path);
-
-        var config = BuildConfig(Path.Combine(FindRepoRoot(), "GameFrameX.Web.Api", "appsettings.json"));
-        var options = config.GetSection("TenantMenuSync").Get<TenantMenuSyncOptions>();
-        Assert.NotNull(options);
-        Assert.Equal(config.GetValue<int>("TenantMenuSync:WorkerConcurrency"), options!.WorkerConcurrency);
-        Assert.Equal(config.GetValue<int>("TenantMenuSync:ScanIntervalSeconds"), options.ScanIntervalSeconds);
-    }
-
-    [Fact]
     public void AppJson_HasBeenRemoved()
     {
         // C177（GFX-176）：Configuration/App.json 已最终删除。

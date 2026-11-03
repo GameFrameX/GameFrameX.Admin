@@ -14,7 +14,7 @@ namespace GameFrameX.Core.Api;
 public static class AdminApiRouteNaming
 {
     /// <summary>
-    /// 控制器路由段：类名去 <c>Service</c> 后缀后转 lowerCamelCase（如 <c>TenantOrganizationService</c> → <c>tenantOrganization</c>）。
+    /// 控制器路由段：类名去 <c>Service</c> 后缀后转 lowerCamelCase（如 <c>TenantUserService</c> → <c>tenantUser</c>）。
     /// </summary>
     public static string ControllerRouteSegment(Type controllerType)
     {

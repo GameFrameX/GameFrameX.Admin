@@ -1,7 +1,6 @@
 using GameFrameX.Entity.Tenant.Game.App;
 using GameFrameX.Application.Game.App.GameAppPackage.Dto;
 using GameFrameX.Application.Game.App.AppScope;
-using GameFrameX.Core.Service.TenantPackage;
 using GameFrameX.Core.Service.Tenant;
 using GameFrameX.Core.Service.User;
 using GameFrameX.Entity.Enum;
@@ -24,7 +23,6 @@ public class TenantGameAppPackageService
     private readonly SqlSugarRepository<GlobalPlatformEntity> _globalPlatformRepository;
     private readonly SqlSugarRepository<GlobalChannelDefinitionEntity> _globalChannelDefinitionRepository;
     private readonly SqlSugarRepository<TenantChannelDefinitionEntity> _tenantChannelDefinitionRepository;
-    private readonly TenantQuotaService _tenantQuotaService;
     private readonly CurrentUserContext _currentUserContext;
 
     public TenantGameAppPackageService(
@@ -33,7 +31,6 @@ public class TenantGameAppPackageService
         SqlSugarRepository<GlobalPlatformEntity> globalPlatformRepository,
         SqlSugarRepository<GlobalChannelDefinitionEntity> globalChannelDefinitionRepository,
         SqlSugarRepository<TenantChannelDefinitionEntity> tenantChannelDefinitionRepository,
-        TenantQuotaService tenantQuotaService,
         CurrentUserContext currentUserContext)
         : base(repository)
     {
@@ -41,7 +38,6 @@ public class TenantGameAppPackageService
         _globalPlatformRepository = globalPlatformRepository;
         _globalChannelDefinitionRepository = globalChannelDefinitionRepository;
         _tenantChannelDefinitionRepository = tenantChannelDefinitionRepository;
-        _tenantQuotaService = tenantQuotaService;
         _currentUserContext = currentUserContext;
     }
 
@@ -133,7 +129,6 @@ public class TenantGameAppPackageService
     {
         await ValidateParentPackageAsync(input.AppId, input.ParentPackageId, input.PackageKind);
         var channel = await ValidatePackageAsync(input.AppId, input.PackageName, input.PlatformCode, input.ChannelId);
-        await CheckPackageQuotaAsync(input.AppId);
 
         var entity = input.Adapt<TenantGameAppPackageEntity>();
         NormalizePackageKind(entity);
@@ -181,7 +176,6 @@ public class TenantGameAppPackageService
     {
         await ValidateParentPackageAsync(input.AppId, input.ParentPackageId, input.PackageKind);
         await ValidatePackageAsync(input.AppId, input.PackageName, input.PlatformCode, input.ChannelId);
-        await CheckPackageQuotaAsync(input.AppId);
     }
 
     protected override async Task OnAddedAsync(AddGameAppPackageRequest input, TenantGameAppPackageEntity entity)
@@ -396,21 +390,6 @@ public class TenantGameAppPackageService
         if (entity.ParentPackageId.HasValue)
         {
             entity.PackageKind = PackageKindEnum.Derived;
-        }
-    }
-
-    private async Task CheckPackageQuotaAsync(long gameAppId)
-    {
-        if (_currentUserContext.SuperAdmin)
-        {
-            return;
-        }
-
-        var quota = await _tenantQuotaService.GetEffectiveQuotaAsync(_currentUserContext.TenantId);
-        var currentCount = await Repository.AsQueryable().Where(u => u.GameAppId == gameAppId).CountAsync();
-        if (currentCount >= quota.MaxPackageCountPerApp)
-        {
-            throw BusinessError.Oh($"分包数已达上限（{quota.MaxPackageCountPerApp}），无法新增");
         }
     }
 

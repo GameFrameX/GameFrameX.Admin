@@ -2,8 +2,6 @@ using System.Security.Cryptography;
 using GameFrameX.Application.Game.App.GameApp.Dto;
 using GameFrameX.Core.Security;
 using GameFrameX.Core.Service;
-using GameFrameX.Core.Service.TenantPackage;
-using GameFrameX.Core.Service.TenantPackage.Dto;
 using GameFrameX.Core.Service.User;
 
 #pragma warning disable CS8602, CS8629 // SqlSugar WhereIF(condition, lambda)：lambda 仅在 condition=true 时执行；NRT 无法跨方法传播条件守卫，lambda 内 .Trim()/.Value 实际安全
@@ -18,16 +16,13 @@ public class TenantGameAppEntityService
         AddGameAppRequest, UpdateGameAppRequest,
         GameAppResponse, PageGameAppRequest>
 {
-    private readonly TenantQuotaService _tenantQuotaService;
     private readonly CurrentUserContext _currentUserContext;
 
     public TenantGameAppEntityService(
         SqlSugarRepository<Entity.Tenant.Game.TenantGameAppEntity> repository,
-        TenantQuotaService tenantQuotaService,
         CurrentUserContext currentUserContext)
         : base(repository)
     {
-        _tenantQuotaService = tenantQuotaService;
         _currentUserContext = currentUserContext;
     }
 
@@ -45,7 +40,6 @@ public class TenantGameAppEntityService
     /// </summary>
     public override async Task<GameAppResponse> AddAsync(AddGameAppRequest input)
     {
-        await CheckGameAppQuotaAsync();
         return (await CreateEntityAsync(input)).Adapt<GameAppResponse>();
     }
 
@@ -156,39 +150,6 @@ public class TenantGameAppEntityService
         entity.AppSecretHash = null;
 #pragma warning restore CS8625
         return entity;
-    }
-
-    private async Task CheckGameAppQuotaAsync()
-    {
-        if (_currentUserContext.SuperAdmin)
-        {
-            return;
-        }
-
-        var quota = await _tenantQuotaService.GetEffectiveQuotaAsync(_currentUserContext.TenantId);
-        var currentCount = await Repository.AsQueryable().CountAsync();
-        var error = GetCreateAppQuotaError(currentCount, quota);
-        if (!string.IsNullOrWhiteSpace(error))
-        {
-            throw BusinessError.Oh(error);
-        }
-    }
-
-    /// <summary>
-    /// 校验租户应用数量是否超出配额；超限返回错误消息，否则返回 null。
-    /// <para>超级管理员跳过配额限制（<see cref="CheckGameAppQuotaAsync"/>）。</para>
-    /// </summary>
-    /// <param name="currentCount">当前租户已有应用数</param>
-    /// <param name="quota">租户生效配额</param>
-    /// <returns>超限错误消息；未超限返回 null</returns>
-    public static string? GetCreateAppQuotaError(int currentCount, EffectiveQuotaResponse quota)
-    {
-        if (currentCount >= quota.MaxGameAppCount)
-        {
-            return $"应用数已达上限（{quota.MaxGameAppCount}），无法新增";
-        }
-
-        return null;
     }
 
     private static string GenerateAppSecret()

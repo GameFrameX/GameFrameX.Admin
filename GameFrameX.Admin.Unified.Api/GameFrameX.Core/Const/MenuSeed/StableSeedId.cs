@@ -31,46 +31,6 @@ public static class StableSeedId
         return PositiveHash("role-menu", roleCode + "|" + menuKey);
     }
 
-    /// <summary>
-    /// 派生默认租户管理员用户角色主键。
-    /// </summary>
-    public static long UserRole(long tenantId, long userId, long roleId)
-    {
-        return PositiveHash("user-role", tenantId + "|" + userId + "|" + roleId);
-    }
-
-    /// <summary>
-    /// 派生租户套餐种子主键。
-    /// </summary>
-    public static long TenantPackage(string code)
-    {
-        return PositiveHash("tenant-package", code);
-    }
-
-    /// <summary>
-    /// 派生租户组织种子主键。
-    /// </summary>
-    public static long TenantOrganizationEntity(string key)
-    {
-        return PositiveHash("tenant-org", key);
-    }
-
-    /// <summary>
-    /// 派生租户角色种子主键。
-    /// </summary>
-    public static long TenantRoleEntity(string code)
-    {
-        return PositiveHash("tenant-role", code);
-    }
-
-    /// <summary>
-    /// 派生租户职位种子主键。
-    /// </summary>
-    public static long TenantPosition(string code)
-    {
-        return PositiveHash("tenant-position", code);
-    }
-
     private static long PositiveHash(string scope, string key)
     {
         var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(scope + ":" + key));

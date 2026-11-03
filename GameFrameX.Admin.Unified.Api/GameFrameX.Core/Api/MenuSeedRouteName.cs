@@ -7,7 +7,7 @@ namespace GameFrameX.Core.Api;
 /// <summary>
 /// 菜单种子按钮 Permission（routeName，<c>controller:action</c> 形态）的类型安全拼接入口（C368）。
 /// <para>
-/// 种子写法：<c>Permission = MenuSeedRouteName.Of&lt;TenantOrganizationService&gt;(nameof(TenantOrganizationService.DeleteAsync))</c>。
+/// 种子写法：<c>Permission = MenuSeedRouteName.Of&lt;TenantUserService&gt;(nameof(TenantUserService.DeleteUserAsync))</c>。
 /// 控制器段与动作段均按 <see cref="AdminApiRouteNaming"/> 唯一事实源推导——服务改名/删除后种子随编译自动跟随或报错，
 /// 不再出现手写字符串停留在旧路由名的漂移。仅推导 Permission 绑定链；按钮 Key 是前端权限码契约
 /// （StableSeedId 由 Key 派生 Id，牵动 role-menu），必须保持字面量。
@@ -16,9 +16,9 @@ namespace GameFrameX.Core.Api;
 public static class MenuSeedRouteName
 {
     /// <summary>
-    /// 由服务类型与方法名推导 routeName（<c>tenantOrganization:delete</c> 形态）。
+    /// 由服务类型与方法名推导 routeName（<c>tenantUser:delete</c> 形态）。
     /// </summary>
-    /// <typeparam name="TService">Admin 动态 API 服务类型（如 <c>TenantOrganizationService</c>）。</typeparam>
+    /// <typeparam name="TService">Admin 动态 API 服务类型（如 <c>TenantUserService</c>）。</typeparam>
     /// <param name="methodName">方法名（建议 <c>nameof(TService.XxxAsync)</c> 传入，保编译期存在性检查）。</param>
     public static string Of<TService>(string methodName) where TService : class
     {
@@ -44,7 +44,7 @@ public static class MenuSeedRouteName
 
         var routePath = routePaths[0];
 
-        // routePath 形如 api/tenantOrganization/delete → routeName（tenantOrganization:delete）。
+        // routePath 形如 api/tenantUser/delete → routeName（tenantUser:delete）。
         // 多段模板（如 dbtypelist/{configid}）与无特性 GET 动作参数段（如 ownRoleList/{userId}）
         // 统一转冒号形态，与存量字面量及 RouteNameToRoutePath 反向变换兼容。
         const string apiPrefix = "api/";

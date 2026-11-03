@@ -1,7 +1,5 @@
 using System.Reflection;
-using GameFrameX.Application.System.Tenant.Notice;
 using GameFrameX.Core.Service.Menu;
-using GameFrameX.Core.Service.Organization;
 using GameFrameX.Core.Service.PlatformCaptcha;
 using GameFrameX.Core.Service.PlatformJwt;
 using GameFrameX.Core.Service.Role;
@@ -26,7 +24,7 @@ public sealed class SqlSugarTransactionBoundaryTests
         var assemblies = new[]
         {
             typeof(TenantUserService).Assembly,
-            typeof(TenantNoticeService).Assembly,
+            typeof(GameFrameX.Application.System.OpenAccess.SystemOpenAccessService).Assembly,
         };
 
         var localTransactionMethods = assemblies
@@ -35,21 +33,17 @@ public sealed class SqlSugarTransactionBoundaryTests
                                       .Where(u => u.GetCustomAttributes<SqlSugarTransactionAttribute>(true).Any())
                                       .ToList();
         Assert.Contains(localTransactionMethods, u => u.DeclaringType == typeof(TenantUserService) && u.Name == nameof(TenantUserService.AddUserAsync));
-        Assert.Contains(localTransactionMethods, u => u.DeclaringType == typeof(TenantOrganizationService) && u.Name == nameof(TenantOrganizationService.UpdateOrganizationAsync));
         Assert.Contains(localTransactionMethods, u => u.DeclaringType == typeof(TenantRoleService) && u.Name == nameof(TenantRoleService.DeleteRoleAsync));
         Assert.Contains(localTransactionMethods, u => u.DeclaringType == typeof(GlobalMenuService) && u.Name == nameof(GlobalMenuService.DeleteMenuAsync));
         Assert.Contains(localTransactionMethods, u => u.DeclaringType == typeof(PlatformCaptchaConfigService) && u.Name == nameof(PlatformCaptchaConfigService.UpdateAsync));
         Assert.Contains(localTransactionMethods, u => u.DeclaringType == typeof(PlatformJwtConfigService) && u.Name == nameof(PlatformJwtConfigService.UpdateAsync));
-        Assert.Contains(localTransactionMethods, u => u.DeclaringType == typeof(TenantNoticeService) && u.Name == nameof(TenantNoticeService.UpdateNoticeAsync));
     }
 
     [Fact]
     public void InternalTransactionalServices_UseExplicitTransactionRunner()
     {
         AssertUsesTransactionRunner(typeof(TenantRoleMenuService), nameof(TenantRoleMenuService.GrantRoleMenuAsync));
-        AssertUsesTransactionRunner(typeof(TenantRoleOrganizationService), nameof(TenantRoleOrganizationService.GrantRoleOrganizationAsync));
         AssertUsesTransactionRunner(typeof(TenantUserRoleService), nameof(TenantUserRoleService.GrantUserRoleAsync));
-        AssertUsesTransactionRunner(typeof(TenantUserExtensionOrganizationService), nameof(TenantUserExtensionOrganizationService.UpdateUserExtOrganizationAsync));
     }
 
     private static void AssertUsesTransactionRunner(Type type, string methodName)

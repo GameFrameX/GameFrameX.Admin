@@ -1,11 +1,11 @@
-﻿using GameFrameX.Entity.Enum;
+using GameFrameX.Entity.Enum;
 using GameFrameX.Entity.Global;
 
 namespace GameFrameX.Core.Service.Menu.Dto;
 
 /// <summary>
 /// 新增/编辑菜单输入参数。
-/// 显式声明前端表单可填字段，不再继承 <see cref="GlobalMenuEntity"/>，避免种子安全元数据（SuperAdminOnly、SyncRoles、AllowTenantWhenSuperAdminOnly、Key）与子节点导航属性被前端批量赋值。
+/// 显式声明前端表单可填字段，不再继承 <see cref="GlobalMenuEntity"/>，避免种子安全元数据（SuperAdminOnly、AllowTenantWhenSuperAdminOnly、Key）与子节点导航属性被前端批量赋值。
 /// </summary>
 public class AddMenuRequest
 {

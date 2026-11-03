@@ -314,7 +314,6 @@ public class MenuSeedStaleRowCleanerTests
             OrderNo = source.OrderNo,
             Remark = source.Remark ?? string.Empty,
             SuperAdminOnly = source.SuperAdminOnly,
-            SyncRoles = source.SyncRoles,
             AllowTenantWhenSuperAdminOnly = source.AllowTenantWhenSuperAdminOnly,
             IsEnabled = source.IsEnabled ?? true,
             IsDeleted = false,

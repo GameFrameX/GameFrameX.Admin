@@ -8,7 +8,6 @@ public sealed class DbJobPersistenceTests
     [Theory]
     [InlineData(typeof(LogJob))]
     [InlineData(typeof(OnlineUserJob))]
-    [InlineData(typeof(TenantExpirationNotifyJob))]
     public void DisableAnnotationTriggerRescan_KeepsScannedTriggersButDisablesSecondScan(Type jobType)
     {
         var schedulerBuilder = jobType.ScanToBuilder();

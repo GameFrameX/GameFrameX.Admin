@@ -17,7 +17,6 @@ public static class ProjectOptions
         services.AddConfigurableOptions<SnowFlakeIdOptions>();
         services.AddConfigurableOptions<CacheOptions>();
         services.AddConfigurableOptions<WechatPayOptions>();
-        services.AddConfigurableOptions<TenantMenuSyncOptions>();
 
         // Options 管线实例补跑 DbConnectionOptions.PostConfigure（GFX-682）：
         // 环境变量覆盖（GFX_MAIN_DB_*）与默认租户库推导只存在于 SqlSugarSetup 手工实例；

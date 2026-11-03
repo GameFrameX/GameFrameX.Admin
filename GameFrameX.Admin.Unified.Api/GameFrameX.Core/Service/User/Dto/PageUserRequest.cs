@@ -1,4 +1,4 @@
-﻿namespace GameFrameX.Core.Service.User.Dto;
+namespace GameFrameX.Core.Service.User.Dto;
 
 public class PageUserRequest : BasePageRequest
 {
@@ -17,8 +17,4 @@ public class PageUserRequest : BasePageRequest
     /// </summary>
     public string Phone { get; set; } = null!;
 
-    /// <summary>
-    /// 查询时所选机构Id
-    /// </summary>
-    public long OrganizationId { get; set; }
 }

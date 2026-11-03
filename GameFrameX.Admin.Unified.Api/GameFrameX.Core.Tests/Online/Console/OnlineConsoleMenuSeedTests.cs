@@ -40,7 +40,6 @@ public sealed class OnlineConsoleMenuSeedTests
         Assert.Equal(path, page.Path);
         Assert.Equal(component, page.Component);
         // 控制台查询受众：租户管理员 + 运营负责人 + 客服 GM + 数据分析。
-        Assert.Equal((int)(TenantMenuSyncRole.TenantAdmin | TenantMenuSyncRole.OpsManager | TenantMenuSyncRole.GmSupport | TenantMenuSyncRole.DataAnalyst), page.SyncRoles);
     }
 
     [Fact]
@@ -63,10 +62,6 @@ public sealed class OnlineConsoleMenuSeedTests
         Assert.Equal(StableSeedId.Menu("route:onlineAuditSearch"), auditPage.Pid);
         Assert.Equal("onlineAuditSearch:page", auditPage.Permission);
 
-        var queryRoles = (int)(TenantMenuSyncRole.TenantAdmin | TenantMenuSyncRole.OpsManager | TenantMenuSyncRole.GmSupport | TenantMenuSyncRole.DataAnalyst);
-        Assert.Equal(queryRoles, snapshot.SyncRoles);
-        Assert.Equal(queryRoles, timelineQuery.SyncRoles);
-        Assert.Equal(queryRoles, auditPage.SyncRoles);
     }
 
     [Fact]
@@ -80,6 +75,5 @@ public sealed class OnlineConsoleMenuSeedTests
         Assert.Equal("onlineControlledCommand:execute", execute.Permission);
         Assert.Equal("受控操作", execute.Title);
         // 高危：仅租户管理员可见可执行（与资产人工发放/撤销按钮口径一致）。
-        Assert.Equal((int)TenantMenuSyncRole.TenantAdmin, execute.SyncRoles);
     }
 }
