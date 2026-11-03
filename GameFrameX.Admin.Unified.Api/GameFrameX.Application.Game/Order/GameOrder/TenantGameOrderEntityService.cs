@@ -1,4 +1,3 @@
-using GameFrameX.Application.Game.App.AppScope;
 using GameFrameX.Application.Game.Order.GameOrder.Dto;
 using GameFrameX.Core.Service.User;
 using GameFrameX.Entity.Enum;
@@ -22,8 +21,7 @@ public class TenantGameOrderEntityService : GenericCrudService<Entity.Tenant.Gam
     }
 
     /// <summary>
-    /// 新增前：游戏订单由客户端下单 / 支付回调链路产生，事实数据 AppId 必须来自可信写入链路；
-    /// 禁止管理后台直接创建订单，避免写入 AppId=0 违反事实数据应用作用域铁律。
+    /// 订单由可信客户端下单和支付回调链路产生，禁止管理后台直接创建。
     /// </summary>
     protected override Task OnAddingAsync(AddTenantGameOrderEntityRequest input)
     {
@@ -32,13 +30,11 @@ public class TenantGameOrderEntityService : GenericCrudService<Entity.Tenant.Gam
 
     protected override ISugarQueryable<TenantGameOrderEntityResponse> BuildPageQuery(PageTenantGameOrderEntityRequest input)
     {
-        var appId = AppScopeRules.EnsureFactAppId(input.AppId, "游戏订单");
         return Repository.AsQueryable()
                          .WhereIF(input.Status.HasValue, u => u.Status == input.Status)
                          .WhereIF(!string.IsNullOrWhiteSpace(input.RoleId), u => u.RoleId == input.RoleId)
                          .WhereIF(input.Amount > 0, u => u.Amount == input.Amount)
                          .WhereIF(input.AreaId > 0, u => u.AreaId == input.AreaId)
-                         .Where(u => u.AppId == appId)
                          .WhereIF(!string.IsNullOrWhiteSpace(input.OrderId), u => u.OrderId == input.OrderId)
                          .WhereIF(input.Sku > 0, u => u.Sku == input.Sku)
                          .WhereIF(!string.IsNullOrWhiteSpace(input.PayChannel), u => u.PayChannel.Contains(input.PayChannel.Trim()))
@@ -59,13 +55,11 @@ public class TenantGameOrderEntityService : GenericCrudService<Entity.Tenant.Gam
     [ApiDescriptionSettings(Name = "Summary")]
     public async Task<GameOrderSummaryResponse> SummaryAsync(PageTenantGameOrderEntityRequest input)
     {
-        var appId = AppScopeRules.EnsureFactAppId(input.AppId, "游戏订单");
         var baseQuery = Repository.AsQueryable()
                                   .WhereIF(input.Status.HasValue, u => u.Status == input.Status)
                                   .WhereIF(!string.IsNullOrWhiteSpace(input.RoleId), u => u.RoleId == input.RoleId)
                                   .WhereIF(input.Amount > 0, u => u.Amount == input.Amount)
                                   .WhereIF(input.AreaId > 0, u => u.AreaId == input.AreaId)
-                                  .Where(u => u.AppId == appId)
                                   .WhereIF(!string.IsNullOrWhiteSpace(input.OrderId), u => u.OrderId == input.OrderId)
                                   .WhereIF(input.Sku > 0, u => u.Sku == input.Sku)
                                   .WhereIF(!string.IsNullOrWhiteSpace(input.PayChannel), u => u.PayChannel.Contains(input.PayChannel.Trim()))

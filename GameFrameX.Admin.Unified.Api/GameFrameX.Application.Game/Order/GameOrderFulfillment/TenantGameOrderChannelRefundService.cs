@@ -9,10 +9,10 @@ using GameFrameX.Payment.Abstract.Models;
 namespace GameFrameX.Application.Game.Order.GameOrderFulfillment;
 
 /// <summary>
-/// 渠道退款路由服务（C310 / GFX-718）：按订单支付渠道解析 <see cref="IRefundManager"/> 与租户支付配置，执行渠道侧退款。
+/// 渠道退款路由服务：按订单支付渠道解析 <see cref="IRefundManager"/> 与主库支付配置，执行渠道侧退款。
 /// <para>渠道退款必须先于本地账本扣除（<c>TenantGameOrderShipService.RefundAsync</c>）成功执行：
 /// 渠道失败 / 渠道不支持主动退款 / 渠道配置缺失时抛 <see cref="BusinessError"/>（错误码进 PaymentErrorCode 段 704），本地账本不动。</para>
-/// <para>渠道配置来源：租户库 TenantGamePaymentConfigEntity（PayChannel + GameAppIdNormalized 作用域，与 TenantGamePaymentConfigEntityService 同口径），
+/// <para>渠道配置来源：主库 TenantGamePaymentConfigEntity 中对应支付渠道的基础分包配置，
 /// IsSandbox 与订单匹配者优先；ConfigJson 经 <see cref="PaymentChannelRegistry"/> 反序列化为渠道 Option 类型。</para>
 /// </summary>
 public class TenantGameOrderChannelRefundService
@@ -50,7 +50,7 @@ public class TenantGameOrderChannelRefundService
         var optionSetting = ResolveOptionSetting(channel, order);
         if (optionSetting == null)
         {
-            throw BusinessError.Oh(PaymentErrorCode.RefundConfigMissing, $"channel={channel}, appId={order.AppId}, isSandbox={order.IsSandbox ?? false}");
+            throw BusinessError.Oh(PaymentErrorCode.RefundConfigMissing, $"channel={channel}, isSandbox={order.IsSandbox ?? false}");
         }
 
         if (!refundManager.SupportsProactiveRefund)
@@ -80,7 +80,7 @@ public class TenantGameOrderChannelRefundService
         var optionSetting = ResolveOptionSetting(channel, order);
         if (optionSetting == null)
         {
-            throw BusinessError.Oh(PaymentErrorCode.RefundConfigMissing, $"channel={channel}, appId={order.AppId}, isSandbox={order.IsSandbox ?? false}");
+            throw BusinessError.Oh(PaymentErrorCode.RefundConfigMissing, $"channel={channel}, isSandbox={order.IsSandbox ?? false}");
         }
 
         var context = BuildContext(channel, order, string.Empty);
@@ -88,15 +88,15 @@ public class TenantGameOrderChannelRefundService
     }
 
     /// <summary>
-    /// 从租户库解析渠道支付配置：PayChannel + GameAppIdNormalized 作用域（应用级精确优先，回落平台级），IsSandbox 与订单匹配者优先。
+    /// 从主库解析渠道基础分包支付配置，IsSandbox 与订单匹配者优先。
     /// </summary>
     private IPaymentOptionSetting? ResolveOptionSetting(string channel, Entity.Tenant.Game.TenantGameOrderEntity order)
     {
         var isSandbox = order.IsSandbox ?? false;
         var configs = _db.Queryable<TenantGamePaymentConfigEntity>()
                          .Where(u => u.PayChannel == channel && u.IsEnabled == true)
-                         .Where(u => u.GameAppIdNormalized == order.AppId ||
-                                     (u.GameAppIdNormalized == 0 && u.PackageIdNormalized == 0))
+                         .Where(u => u.PackageIdNormalized == 0)
+                         .OrderByDescending(u => u.Id)
                          .ToList();
 
         TenantGamePaymentConfigEntity? sandboxMatched = null;

@@ -8,11 +8,6 @@ namespace GameFrameX.Application.Game.Order.GameOrderFulfillment.Dto;
 public class PageTenantGameOrderFulfillmentEntityRequest : BaseAreaPageRequest
 {
     /// <summary>
-    /// 应用Id。应用级发货账本分页必须显式传入当前应用，缺失或小于等于 0 会被服务层拒绝。
-    /// </summary>
-    public long? AppId { get; set; }
-
-    /// <summary>
     /// 来源订单 Id（账本 OrderId 为 long，非订单表的字符串 OrderId）。
     /// </summary>
     public long? OrderId { get; set; }

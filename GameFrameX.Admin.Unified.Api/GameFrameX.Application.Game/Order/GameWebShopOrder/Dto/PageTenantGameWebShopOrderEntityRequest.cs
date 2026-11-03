@@ -27,8 +27,4 @@ public class PageTenantGameWebShopOrderEntityRequest : BaseAreaPageRequest
     /// </summary>
     public GameMailType? MailType { get; set; }
 
-    /// <summary>
-    /// 应用Id（可选过滤，按当前应用筛选网页商城订单）
-    /// </summary>
-    public long? AppId { get; set; }
 }

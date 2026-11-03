@@ -1,4 +1,3 @@
-using GameFrameX.Application.Game.App.AppScope;
 using GameFrameX.Application.Game.Order.GameOrder;
 using GameFrameX.Application.Game.Order.GameOrderFulfillment.Dto;
 using GameFrameX.Core.Service.User;
@@ -62,9 +61,7 @@ public class TenantGameOrderFulfillmentEntityService
     /// </summary>
     protected override ISugarQueryable<TenantGameOrderFulfillmentEntityResponse> BuildPageQuery(PageTenantGameOrderFulfillmentEntityRequest input)
     {
-        var appId = AppScopeRules.EnsureFactAppId(input.AppId, "权益发货账本");
         return Repository.AsQueryable()
-                         .Where(u => u.AppId == appId)
                          .WhereIF(input.OrderId.HasValue, u => u.OrderId == input.OrderId.Value)
                          .WhereIF(!string.IsNullOrWhiteSpace(input.RoleId), u => u.RoleId == input.RoleId)
                          .WhereIF(input.AreaId.HasValue, u => u.AreaId == input.AreaId.Value)

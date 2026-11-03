@@ -1,5 +1,4 @@
 using GameFrameX.Application.Game.ServerManager;
-using GameFrameX.Application.Game.App.AppScope;
 using GameFrameX.Application.Game.Mail.GameMail.Dto;
 using GameFrameX.Application.Game.Order.GameWebShopOrder.Dto;
 using GameFrameX.Entity.Enum;
@@ -45,8 +44,7 @@ public class TenantGameWebShopOrderEntityService : GenericCrudSelectService<Enti
     }
 
     /// <summary>
-    /// 新增前：商城订单由客户端商城下单 / 支付回调链路产生，事实数据 AppId 必须来自可信写入链路；
-    /// 禁止管理后台直接创建商城订单，避免写入 AppId=0 违反事实数据应用作用域铁律。
+    /// 商城订单由可信客户端下单和支付回调链路产生，禁止管理后台直接创建。
     /// </summary>
     protected override Task OnAddingAsync(AddTenantGameWebShopOrderEntityRequest input)
     {
@@ -58,12 +56,10 @@ public class TenantGameWebShopOrderEntityService : GenericCrudSelectService<Enti
     /// </summary>
     protected override ISugarQueryable<TenantGameWebShopOrderEntityResponse> BuildPageQuery(PageTenantGameWebShopOrderEntityRequest input)
     {
-        var appId = AppScopeRules.EnsureFactAppId(input.AppId, "网页商城订单");
         return Repository.AsQueryable()
                          .WhereIF(!string.IsNullOrWhiteSpace(input.SearchKey), u =>
                                       u.Name.Contains(input.SearchKey.Trim())
                          )
-                         .Where(u => u.AppId == appId)
                          .WhereIF(!string.IsNullOrWhiteSpace(input.Title), u => u.Name.Contains(input.Title.Trim()))
                          .Select<TenantGameWebShopOrderEntityResponse>();
     }

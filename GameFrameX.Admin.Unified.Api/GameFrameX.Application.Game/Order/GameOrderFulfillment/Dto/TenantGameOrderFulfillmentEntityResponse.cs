@@ -14,11 +14,6 @@ public class TenantGameOrderFulfillmentEntityResponse : IBasePageResponse<Entity
     public long Id { get; set; }
 
     /// <summary>
-    /// 应用Id。事实数据应用作用域（TenantId + AppId），跟随订单 AppId，必须 &gt; 0。
-    /// </summary>
-    public long AppId { get; set; }
-
-    /// <summary>
     /// 来源订单 Id（TenantGameOrderEntity.Id）。
     /// </summary>
     public long OrderId { get; set; }

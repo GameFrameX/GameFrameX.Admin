@@ -38,7 +38,7 @@ public class TenantGameOrderFulfillmentEntityServiceContractTests
                     .Select(p => p.Name)
                     .ToHashSet();
 
-        Assert.Contains("AppId", props);
+        Assert.DoesNotContain("AppId", props);
         Assert.Contains("OrderId", props);
         Assert.Contains("RoleId", props);
         Assert.Contains("AreaId", props);
