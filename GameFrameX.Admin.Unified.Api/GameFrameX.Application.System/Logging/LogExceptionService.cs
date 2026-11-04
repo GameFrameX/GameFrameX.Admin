@@ -5,7 +5,7 @@ using GameFrameX.Entity.Log;
 namespace GameFrameX.Application.System.Logging;
 
 /// <summary>
-/// 系统异常日志服务。C156 起：SuperAdmin 查询主库 system_log_exception，普通租户查询当前租户库 tenant_log_exception。
+/// 系统异常日志服务。统一查询主库新日志与历史日志。
 /// </summary>
 [ApiDescriptionSettings(Order = 350)]
 public class LogExceptionService : BaseLogService<SystemLogExceptionEntity, TenantLogExceptionEntity, LogOperationFields>
@@ -57,9 +57,7 @@ public class LogExceptionService : BaseLogService<SystemLogExceptionEntity, Tena
     [DisplayName("导出异常日志")]
     public async Task<IActionResult> ExportLogExAsync(LogRequest input)
     {
-        var list = IsPlatformContext
-                       ? await QueryExportListAsync(SystemLogRepository, input)
-                       : await QueryExportListAsync(TenantLogRepository, input);
+        var list = await QueryExportListAsync(input);
         return await ExportLogResponse.ExportAsExcelAsync(list, LogDisplayName);
     }
 }

@@ -2,6 +2,9 @@ using System.Net;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json.Nodes;
+using GameFrameX.Application.System.Logging;
+using GameFrameX.Application.System.Logging.Dto;
+using GameFrameX.Core.Service.User;
 using GameFrameX.Core.Cache;
 using GameFrameX.Core.Const;
 using GameFrameX.Core.EventBus;
@@ -70,6 +73,7 @@ public sealed class MonitorLoggingPipelineTests : IAsyncLifetime
             typeof(SystemLogVisitEntity),
             typeof(SystemLogExceptionEntity),
             typeof(SystemConfigEntity),
+            typeof(TenantLogOperationEntity),
         });
         SqlSugarSetup.InitDatabase(_db, tenantConfig, new[]
         {
@@ -173,6 +177,13 @@ public sealed class MonitorLoggingPipelineTests : IAsyncLifetime
         Assert.Equal("tenant-admin", row.Account);
         Assert.Equal("GetPage", row.ActionName);
         Assert.Contains("tenant-query", row.RequestParam);
+        var context = new CurrentUserContext(new HttpContextAccessor
+        {
+            HttpContext = new DefaultHttpContext { User = BuildTestPrincipal(TenantIdentity) },
+        });
+        var service = new LogOperationService(new() { Context = tenantDb }, new() { Context = tenantDb }, context);
+        var page = await service.PageAsync(new PageLogRequest { Page = 1, PageSize = 20, SearchKey = "tenant-admin" });
+        Assert.Equal(row.Id, Assert.Single(page.Items).Id);
 
         var mainDb = _db.GetConnectionScope(MainConfigId);
         Assert.Single(await mainDb.Queryable<SystemLogOperationEntity>().Where(u => u.RequestUrl.Contains("/api/monitorPipeline/page")).ToListAsync());

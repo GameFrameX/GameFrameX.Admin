@@ -5,7 +5,7 @@ using GameFrameX.Entity.Log;
 namespace GameFrameX.Application.System.Logging;
 
 /// <summary>
-/// 系统操作日志服务。C156 起：SuperAdmin 查询主库 system_log_operation，普通租户查询当前租户库 tenant_log_operation。
+/// 系统操作日志服务。统一查询主库新日志与历史日志。
 /// </summary>
 [ApiDescriptionSettings(Order = 360)]
 public class LogOperationService : BaseLogService<SystemLogOperationEntity, TenantLogOperationEntity, LogOperationFields>
@@ -57,9 +57,7 @@ public class LogOperationService : BaseLogService<SystemLogOperationEntity, Tena
     [DisplayName("导出操作日志")]
     public async Task<IActionResult> ExportLogOpAsync(LogRequest input)
     {
-        var list = IsPlatformContext
-                       ? await QueryExportListAsync(SystemLogRepository, input)
-                       : await QueryExportListAsync(TenantLogRepository, input);
+        var list = await QueryExportListAsync(input);
         return await ExportLogResponse.ExportAsExcelAsync(list, LogDisplayName);
     }
 }

@@ -197,6 +197,46 @@ public sealed class LogPageSearchKeyFilterTests : IDisposable
         Assert.Equal("Y", page.Items.First().ActionName);
     }
 
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task EveryAccount_SeesCurrentAndHistoricalLogs_AndClearsBoth(bool superAdmin)
+    {
+        await SeedVisitAsync("current", "operator", "127.0.0.1", "local");
+        await SeedOperationAsync("POST", "/current", "current operation", "200");
+        await SeedExceptionAsync("POST", "/current", "current exception");
+        await SeedDiffAsync("Insert", "current SQL", "before");
+        await _db.Insertable(new TenantLogVisitEntity { Id = 100, Account = "historical", CreatedTime = 1 }).ExecuteCommandAsync();
+        await _db.Insertable(new TenantLogOperationEntity { Id = 100, Message = "historical", CreatedTime = 1 }).ExecuteCommandAsync();
+        await _db.Insertable(new TenantLogExceptionEntity { Id = 100, Message = "historical", CreatedTime = 1 }).ExecuteCommandAsync();
+        await _db.Insertable(new TenantLogDiffEntity { Id = 100, DiffType = "historical", CreatedTime = 1 }).ExecuteCommandAsync();
+        var context = BuildContext(superAdmin);
+        var visits = new LogVisitService(new() { Context = _db }, new() { Context = _db }, context);
+        var operations = new LogOperationService(new() { Context = _db }, new() { Context = _db }, context);
+        var exceptions = new LogExceptionService(new() { Context = _db }, new() { Context = _db }, context);
+        var differences = new LogDiffService(new() { Context = _db }, new() { Context = _db }, context);
+        var input = new PageLogRequest { Page = 1, PageSize = 20 };
+        Assert.Equal(2, (await visits.PageAsync(input)).Total);
+        Assert.Equal(2, (await operations.PageAsync(input)).Total);
+        Assert.Equal(2, (await exceptions.PageAsync(input)).Total);
+        Assert.Equal(2, (await differences.PageAsync(input)).Total);
+        var historical = await visits.PageAsync(new PageLogRequest { Page = 1, PageSize = 1, SearchKey = "historical" });
+        Assert.Equal("historical", Assert.Single(historical.Items).Account);
+        var operationExport = (Microsoft.AspNetCore.Mvc.FileStreamResult)await operations.ExportLogOpAsync(new LogRequest());
+        using (operationExport.FileStream)
+        {
+            Assert.True(operationExport.FileStream.Length > 0);
+        }
+        Assert.True(await visits.ClearAsync());
+        Assert.True(await operations.ClearAsync());
+        Assert.True(await exceptions.ClearAsync());
+        Assert.True(await differences.ClearAsync());
+        Assert.Equal(0, (await visits.PageAsync(input)).Total);
+        Assert.Equal(0, (await operations.PageAsync(input)).Total);
+        Assert.Equal(0, (await exceptions.PageAsync(input)).Total);
+        Assert.Equal(0, (await differences.PageAsync(input)).Total);
+    }
+
     // ---------- helpers ----------
 
     private async Task SeedVisitAsync(string displayTitle, string account, string remoteIp, string location)
@@ -267,38 +307,38 @@ public sealed class LogPageSearchKeyFilterTests : IDisposable
     {
         var systemRepo = new SqlSugarRepository<SystemLogVisitEntity> { Context = _db };
         var tenantRepo = new SqlSugarRepository<TenantLogVisitEntity> { Context = _db };
-        return new LogVisitService(systemRepo, tenantRepo, BuildSuperAdminContext());
+        return new LogVisitService(systemRepo, tenantRepo, BuildContext());
     }
 
     private LogOperationService BuildOperationService()
     {
         var systemRepo = new SqlSugarRepository<SystemLogOperationEntity> { Context = _db };
         var tenantRepo = new SqlSugarRepository<TenantLogOperationEntity> { Context = _db };
-        return new LogOperationService(systemRepo, tenantRepo, BuildSuperAdminContext());
+        return new LogOperationService(systemRepo, tenantRepo, BuildContext());
     }
 
     private LogExceptionService BuildExceptionService()
     {
         var systemRepo = new SqlSugarRepository<SystemLogExceptionEntity> { Context = _db };
         var tenantRepo = new SqlSugarRepository<TenantLogExceptionEntity> { Context = _db };
-        return new LogExceptionService(systemRepo, tenantRepo, BuildSuperAdminContext());
+        return new LogExceptionService(systemRepo, tenantRepo, BuildContext());
     }
 
     private LogDiffService BuildDiffService()
     {
         var systemRepo = new SqlSugarRepository<SystemLogDiffEntity> { Context = _db };
         var tenantRepo = new SqlSugarRepository<TenantLogDiffEntity> { Context = _db };
-        return new LogDiffService(systemRepo, tenantRepo, BuildSuperAdminContext());
+        return new LogDiffService(systemRepo, tenantRepo, BuildContext());
     }
 
     /// <summary>
     /// 构造 SuperAdmin CurrentUserContext，让 BaseLogService 走系统日志（system_log_*）主库路径。
     /// </summary>
-    private static CurrentUserContext BuildSuperAdminContext()
+    private static CurrentUserContext BuildContext(bool superAdmin = true)
     {
         var claims = new[]
         {
-            new Claim(ClaimConst.AccountType, ((int)AccountTypeEnum.SuperAdmin).ToString()),
+            new Claim(ClaimConst.AccountType, ((int)(superAdmin ? AccountTypeEnum.SuperAdmin : AccountTypeEnum.NormalUser)).ToString()),
         };
         var identity = new ClaimsIdentity(claims, "Test");
         var principal = new ClaimsPrincipal(identity);

@@ -8,12 +8,11 @@ namespace GameFrameX.Application.System.Logging;
 
 /// <summary>
 /// 系统日志服务基类，提供统一的日志查询、清空和导出功能。
-/// C156 起：每种日志拆为平台 <typeparamref name="TSystemLog"/>（主库 system_log_*）与租户 <typeparamref name="TTenantLog"/>（租户库 tenant_log_*）两套实体，
-/// 查询/清空/导出按当前登录身份分流——SuperAdmin 访问平台日志主库，普通租户访问当前租户库的租户日志。
+/// 查询、清空和导出统一覆盖主库新日志与迁入主库的历史日志。
 /// <typeparamref name="TDto"/> 为统一投影目标（共享字段基类），保证前端字段形状不随实体拆分而变化。
 /// </summary>
-/// <typeparam name="TSystemLog">平台日志实体（[PlatformTable]，主库）</typeparam>
-/// <typeparam name="TTenantLog">租户日志实体（[TenantTable]，当前租户库）</typeparam>
+/// <typeparam name="TSystemLog">主库新日志实体</typeparam>
+/// <typeparam name="TTenantLog">主库历史日志实体</typeparam>
 /// <typeparam name="TDto">日志投影 DTO，字段与实体共享基类一致</typeparam>
 public abstract class BaseLogService<TSystemLog, TTenantLog, TDto> : IAdminApiController
     where TSystemLog : EntityBase, new()
@@ -26,12 +25,12 @@ public abstract class BaseLogService<TSystemLog, TTenantLog, TDto> : IAdminApiCo
     protected readonly SqlSugarRepository<TSystemLog> SystemLogRepository;
 
     /// <summary>
-    /// 租户日志仓储（当前租户库 tenant_log_*）
+    /// 租户日志仓储（主库 tenant_log_* 历史表）
     /// </summary>
     protected readonly SqlSugarRepository<TTenantLog> TenantLogRepository;
 
     /// <summary>
-    /// 当前登录用户，用于判定 SuperAdmin 平台上下文。
+    /// 当前登录用户。
     /// </summary>
     protected readonly CurrentUserContext CurrentUserContext;
 
@@ -61,14 +60,6 @@ public abstract class BaseLogService<TSystemLog, TTenantLog, TDto> : IAdminApiCo
     protected virtual IReadOnlyCollection<string> SearchableTextColumns { get; } = Array.Empty<string>();
 
     /// <summary>
-    /// 当前是否为平台上下文（SuperAdmin 访问主库平台日志）。普通租户上下文访问当前租户库的租户日志。
-    /// </summary>
-    protected bool IsPlatformContext
-    {
-        get { return CurrentUserContext.SuperAdmin; }
-    }
-
-    /// <summary>
     /// 获取日志分页列表
     /// </summary>
     /// <param name="input">分页查询参数</param>
@@ -79,13 +70,15 @@ public abstract class BaseLogService<TSystemLog, TTenantLog, TDto> : IAdminApiCo
     public virtual async Task<SqlSugarPagedList<TDto>> PageAsync(PageLogRequest input)
     {
         var timestampRange = ConvertToTimestampRange(input);
-        return IsPlatformContext
-                   ? await QueryPagedAsync(SystemLogRepository, input, timestampRange)
-                   : await QueryPagedAsync(TenantLogRepository, input, timestampRange);
+        var current = QueryFiltered(SystemLogRepository, input, timestampRange).Select<TDto>();
+        var historical = QueryFiltered(TenantLogRepository, input, timestampRange).Select<TDto>();
+        return await SystemLogRepository.Context.UnionAll(current, historical)
+                                        .OrderBuilder(input)
+                                        .ToPagedListAsync(input.Page, input.PageSize);
     }
 
     /// <summary>
-    /// 清空日志。平台上下文清空主库平台日志，租户上下文清空当前租户库的租户日志。
+    /// 清空主库新日志和历史日志。
     /// </summary>
     /// <returns>清空结果</returns>
     [ApiDescriptionSettings(Name = "Clear")]
@@ -93,9 +86,8 @@ public abstract class BaseLogService<TSystemLog, TTenantLog, TDto> : IAdminApiCo
     [DisplayName("清空日志")]
     public virtual async Task<bool> ClearAsync()
     {
-        var count = IsPlatformContext
-                        ? await SystemLogRepository.AsDeleteable().Where(u => u.Id > 0).ExecuteCommandAsync()
-                        : await TenantLogRepository.AsDeleteable().Where(u => u.Id > 0).ExecuteCommandAsync();
+        var count = await SystemLogRepository.AsDeleteable().Where(u => u.Id > 0).ExecuteCommandAsync();
+        count += await TenantLogRepository.AsDeleteable().Where(u => u.Id > 0).ExecuteCommandAsync();
         return count > 0;
     }
 
@@ -104,32 +96,29 @@ public abstract class BaseLogService<TSystemLog, TTenantLog, TDto> : IAdminApiCo
     /// </summary>
     /// <param name="input">导出参数</param>
     /// <returns>导出 DTO 列表</returns>
-    protected async Task<List<ExportLogResponse>> QueryExportListAsync<TLog>(SqlSugarRepository<TLog> repo, LogRequest input)
-        where TLog : EntityBase, new()
+    protected async Task<List<ExportLogResponse>> QueryExportListAsync(LogRequest input)
     {
         var timestampRange = ConvertToTimestampRange(input);
-        return await repo.AsQueryable()
-                         .WhereIF(input.StartTime.HasValue && input.EndTime.HasValue,
-                                  u => u.CreatedTime >= timestampRange.StartTimestamp && u.CreatedTime <= timestampRange.EndTimestamp)
-                         .OrderBy(u => u.CreatedTime, OrderByType.Desc)
-                         .Select<ExportLogResponse>().ToListAsync();
+        var pageInput = new PageLogRequest { StartTime = input.StartTime, EndTime = input.EndTime };
+        var current = QueryFiltered(SystemLogRepository, pageInput, timestampRange).Select<ExportLogResponse>();
+        var historical = QueryFiltered(TenantLogRepository, pageInput, timestampRange).Select<ExportLogResponse>();
+        return await SystemLogRepository.Context.UnionAll(current, historical)
+                                        .OrderBy(u => u.LogDateTime, OrderByType.Desc)
+                                        .ToListAsync();
     }
 
     /// <summary>
     /// 按时间范围与分页参数查询日志，返回 <typeparamref name="TDto"/> 投影分页。
     /// </summary>
-    private async Task<SqlSugarPagedList<TDto>> QueryPagedAsync<TLog>(SqlSugarRepository<TLog> repo, PageLogRequest input, LogTimestampRange timestampRange)
+    private ISugarQueryable<TLog> QueryFiltered<TLog>(SqlSugarRepository<TLog> repo, PageLogRequest input, LogTimestampRange timestampRange)
         where TLog : EntityBase, new()
     {
         var searchKey = input.SearchKey?.Trim();
-        return await repo.AsQueryable()
+        return repo.AsQueryable()
                          .WhereIF(input.StartTime.HasValue, u => u.CreatedTime >= timestampRange.StartTimestamp)
                          .WhereIF(input.EndTime.HasValue, u => u.CreatedTime <= timestampRange.EndTimestamp)
                          .WhereIF(!string.IsNullOrWhiteSpace(searchKey) && SearchableTextColumns.Count > 0,
-                                  BuildSearchKeyFilter<TLog>(searchKey!))
-                         .OrderBuilder(input)
-                         .Select<TDto>()
-                         .ToPagedListAsync(input.Page, input.PageSize);
+                                  BuildSearchKeyFilter<TLog>(searchKey!));
     }
 
     /// <summary>
