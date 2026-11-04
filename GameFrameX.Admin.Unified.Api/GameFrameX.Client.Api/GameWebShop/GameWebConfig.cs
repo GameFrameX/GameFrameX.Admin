@@ -1,7 +1,7 @@
-﻿namespace GameFrameX.Client.Api.GameWebShop;
+﻿﻿namespace GameFrameX.Client.Api.GameWebShop;
 
 /// <summary>
-/// 游戏角色输出参数
+/// 网页商城支付配置（系统配置 code=web_shop_params）
 /// </summary>
 public sealed class GameWebConfig
 {
@@ -41,14 +41,8 @@ public sealed class GameWebConfig
     public string Pid { get; set; } = null!;
 
     /// <summary>
-    /// 回调地址
+    /// 回调地址（站点根地址或完整回调路由地址，下单前由 PublicCallbackNotifyUrlBuilder 规范化为
+    /// 能命中 api/GameWebShop/NotifyWebShop/{packageId} 路由的完整地址，无法识别的地址拒绝下单）
     /// </summary>
     public string NotifyUrl { get; set; } = null!;
-
-    /// <summary>
-    /// 支付回调验签模式：log / enforce。
-    /// <para>log（缺省）：重算 MD5 并记录 expected/received 签名但不拒绝，用于灰度观测 zlpay notify 签名口径；非白名单取值一律按 log 处理（灰度安全侧）。</para>
-    /// <para>enforce：验签失败直接拒绝发货。切换前置条件：log 模式下观察到一次真实合法回调验签通过（口径确认）后再切 enforce，否则口径不符会打断真实收款。</para>
-    /// </summary>
-    public string VerifySignMode { get; set; } = "log";
 }

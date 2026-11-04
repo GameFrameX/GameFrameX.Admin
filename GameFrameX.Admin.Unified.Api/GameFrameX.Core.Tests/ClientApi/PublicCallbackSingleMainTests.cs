@@ -1,6 +1,9 @@
+using System.Text.Json;
+using GameFrameX.Client.Api.Integrations.Payment;
 using GameFrameX.Client.Api.Middleware;
 using GameFrameX.Client.Api.Services.PublicCallback;
 using GameFrameX.Core.Middleware;
+using GameFrameX.Entity.Tenant.Game;
 using GameFrameX.Payment.AliPay;
 using GameFrameX.Payment.Wechat;
 using Microsoft.AspNetCore.Http;
@@ -12,17 +15,36 @@ public sealed class PublicCallbackSingleMainTests
     [Theory]
     [InlineData("alipay")]
     [InlineData("wechat")]
-    public void OutboundPayment_UsesConfiguredNotifyUrlWithoutTenantScope(string channel)
+    public void OutboundPayment_BuildsNotifyUrlFromSiteRootThroughProvider(string channel)
     {
-        var context = new DefaultHttpContext();
-        context.Request.QueryString = new QueryString("?tenantId=123&appId=456");
-        var setting = channel == "alipay"
-            ? (GameFrameX.Payment.Abstract.IPaymentOptionSetting)new AliPayOptionSetting { AliPayNotifyUrl = "https://example.test/notify", }
-            : new WechatPayOptionSetting { WechatPayNotifyUrl = "https://example.test/notify", };
+        // 出站下单通知地址经 PaymentOptionSettingProvider 真实构造：站点根地址自动补全新回调路由段
+        //（旧 tenantId/appId 查询作用域不参与），生成的 notify_url 能命中公开回调端点。
+        using (var database = new ClientApiTestDb())
+        {
+            database.InitTenantTables(typeof(TenantGamePaymentConfigEntity));
+            var configJson = channel == "alipay"
+                ? JsonSerializer.Serialize(new AliPayOptionSetting { AliPayNotifyUrl = "https://example.test", })
+                : JsonSerializer.Serialize(new WechatPayOptionSetting { WechatPayNotifyUrl = "https://example.test", });
+            database.TenantDb.Insertable(new TenantGamePaymentConfigEntity
+            {
+                Id = 1900000005101,
+                PackageIdNormalized = 0,
+                PayChannel = channel,
+                IsSandbox = false,
+                IsEnabled = true,
+                ConfigJson = configJson,
+            }).ExecuteCommand();
 
-        Assert.Equal("https://example.test/notify", channel == "alipay"
-            ? ((AliPayOptionSetting)setting).AliPayNotifyUrl
-            : ((WechatPayOptionSetting)setting).WechatPayNotifyUrl);
+            var context = new DefaultHttpContext();
+            context.Request.QueryString = new QueryString("?tenantId=123&appId=456");
+            var provider = new PaymentOptionSettingProvider(database.TenantDbProvider, new HttpContextAccessor { HttpContext = context });
+
+            var expectedRoute = channel == "alipay" ? "api/GameOrder/NotifyAliPay" : "api/GameOrder/NotifyWeChatPay";
+            var notifyUrl = channel == "alipay"
+                ? provider.GetOptionSetting<AliPayOptionSetting>("alipay")?.AliPayNotifyUrl
+                : provider.GetOptionSetting<WechatPayOptionSetting>("wechat")?.WechatPayNotifyUrl;
+            Assert.Equal("https://example.test/" + expectedRoute, notifyUrl);
+        }
     }
 
     [Fact]

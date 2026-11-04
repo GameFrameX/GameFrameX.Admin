@@ -74,7 +74,7 @@ public sealed class PublicCallbackTenantRoutingTests
     }
 
     [Fact]
-    public void PaymentProvider_UsesConfiguredAliPayCallbackUrlWithoutTenantScope()
+    public void PaymentProvider_AppendsPackageRouteSegmentToConfiguredCallbackUrl()
     {
         const long packageId = 1900000003201;
         using (var fixture = CreateFixture(packageId))
@@ -85,7 +85,54 @@ public sealed class PublicCallbackTenantRoutingTests
             context.Items[PaymentOptionSettingProvider.PaymentIsSandboxKey] = true;
             var provider = new PaymentOptionSettingProvider(fixture.MainDb, new HttpContextAccessor { HttpContext = context });
             var setting = provider.GetOptionSetting<AliPayOptionSetting>("alipay");
+            // 完整新路由地址 + 当前分包上下文：回调地址带上分包段，网关回调按分包解析回同一租户
+            Assert.NotNull(setting);
+            Assert.Equal("https://client.example.com/api/GameOrder/NotifyAliPay/1900000003201", setting.AliPayNotifyUrl);
+        }
+    }
+
+    [Fact]
+    public void PaymentProvider_BuildsCallbackUrlFromSiteRootWithoutPackageContext()
+    {
+        using (var fixture = CreateFixture())
+        {
+            InsertAliPayConfig(fixture.MainDb, false, "https://client.example.com");
+            var context = new DefaultHttpContext();
+            var provider = new PaymentOptionSettingProvider(fixture.MainDb, new HttpContextAccessor { HttpContext = context });
+            var setting = provider.GetOptionSetting<AliPayOptionSetting>("alipay");
+            // 站点根地址自动补全路由段；无分包上下文时不带分包段（主库配置）
+            Assert.NotNull(setting);
             Assert.Equal("https://client.example.com/api/GameOrder/NotifyAliPay", setting.AliPayNotifyUrl);
+        }
+    }
+
+    [Fact]
+    public void PaymentProvider_NormalizesLegacyThreeSegmentCallbackUrl()
+    {
+        using (var fixture = CreateFixture())
+        {
+            InsertAliPayConfig(fixture.MainDb, false, "https://client.example.com/api/GameOrder/NotifyAliPay/999/888/777");
+            var context = new DefaultHttpContext();
+            var provider = new PaymentOptionSettingProvider(fixture.MainDb, new HttpContextAccessor { HttpContext = context });
+            var setting = provider.GetOptionSetting<AliPayOptionSetting>("alipay");
+            // 旧「租户/应用/分包」三段地址去段重建为新路由（无分包上下文时不带分包段）
+            Assert.NotNull(setting);
+            Assert.Equal("https://client.example.com/api/GameOrder/NotifyAliPay", setting.AliPayNotifyUrl);
+        }
+    }
+
+    [Fact]
+    public void PaymentProvider_RejectsUnmappableCallbackUrl()
+    {
+        using (var fixture = CreateFixture())
+        {
+            InsertAliPayConfig(fixture.MainDb, false, "https://client.example.com/pay/notify");
+            var context = new DefaultHttpContext();
+            var provider = new PaymentOptionSettingProvider(fixture.MainDb, new HttpContextAccessor { HttpContext = context });
+            var setting = provider.GetOptionSetting<AliPayOptionSetting>("alipay");
+            // 无法识别的地址置空：处理器按「通知地址未配置」拒绝下单
+            Assert.NotNull(setting);
+            Assert.Equal(string.Empty, setting.AliPayNotifyUrl);
         }
     }
 
@@ -140,7 +187,7 @@ public sealed class PublicCallbackTenantRoutingTests
         context.SetEndpoint(new Endpoint(_ => Task.CompletedTask, new EndpointMetadataCollection(new PublicCallbackEndpointAttribute(provider, callbackKind)), provider + "-" + callbackKind));
     }
 
-    private static void InsertAliPayConfig(ISqlSugarClient database, bool isSandbox)
+    private static void InsertAliPayConfig(ISqlSugarClient database, bool isSandbox, string notifyUrl = "https://client.example.com/api/GameOrder/NotifyAliPay")
     {
         database.Insertable(new TenantGamePaymentConfigEntity
         {
@@ -154,7 +201,7 @@ public sealed class PublicCallbackTenantRoutingTests
                 AliPayAppId = "2026000000000000",
                 AliPayMerchantPrivateKey = "private-key",
                 AliPayPublicKey = "public-key",
-                AliPayNotifyUrl = "https://client.example.com/api/GameOrder/NotifyAliPay",
+                AliPayNotifyUrl = notifyUrl,
                 AliPayReturnUrl = "https://client.example.com/pay/return",
             }),
         }).ExecuteCommand();
