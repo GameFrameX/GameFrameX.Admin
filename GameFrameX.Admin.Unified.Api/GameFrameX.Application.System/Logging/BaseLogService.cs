@@ -1,3 +1,6 @@
+using GameFrameX.Core.Logging;
+using GameFrameX.Entity.System;
+using GameFrameX.Entity.Enum;
 using System.Linq.Expressions;
 using System.Reflection;
 using GameFrameX.Application.System.Logging.Dto;
@@ -72,9 +75,15 @@ public abstract class BaseLogService<TSystemLog, TTenantLog, TDto> : IAdminApiCo
         var timestampRange = ConvertToTimestampRange(input);
         var current = QueryFiltered(SystemLogRepository, input, timestampRange).Select<TDto>();
         var historical = QueryFiltered(TenantLogRepository, input, timestampRange).Select<TDto>();
-        return await SystemLogRepository.Context.UnionAll(current, historical)
+        var page = await SystemLogRepository.Context.UnionAll(current, historical)
                                         .OrderBy(BuildProjectionOrder(input))
                                         .ToPagedListAsync(input.Page, input.PageSize);
+        foreach (var item in page.Items)
+        {
+            RedactSnapshot(item);
+        }
+
+        return page;
     }
 
     private string BuildProjectionOrder(PageLogRequest input)
@@ -120,9 +129,15 @@ public abstract class BaseLogService<TSystemLog, TTenantLog, TDto> : IAdminApiCo
         var pageInput = new PageLogRequest { StartTime = input.StartTime, EndTime = input.EndTime };
         var current = QueryFiltered(SystemLogRepository, pageInput, timestampRange).Select<ExportLogResponse>();
         var historical = QueryFiltered(TenantLogRepository, pageInput, timestampRange).Select<ExportLogResponse>();
-        return await SystemLogRepository.Context.UnionAll(current, historical)
+        var rows = await SystemLogRepository.Context.UnionAll(current, historical)
                                         .OrderBy(u => u.LogDateTime, OrderByType.Desc)
                                         .ToListAsync();
+        foreach (var row in rows)
+        {
+            RedactSnapshot(row);
+        }
+
+        return rows;
     }
 
     /// <summary>
@@ -133,10 +148,49 @@ public abstract class BaseLogService<TSystemLog, TTenantLog, TDto> : IAdminApiCo
     {
         var searchKey = input.SearchKey?.Trim();
         return repo.AsQueryable()
+                         .Where(BuildVisibilityFilter<TLog>())
                          .WhereIF(input.StartTime.HasValue, u => u.CreatedTime >= timestampRange.StartTimestamp)
                          .WhereIF(input.EndTime.HasValue, u => u.CreatedTime <= timestampRange.EndTimestamp)
                          .WhereIF(!string.IsNullOrWhiteSpace(searchKey) && SearchableTextColumns.Count > 0,
                                   BuildSearchKeyFilter<TLog>(searchKey!));
+    }
+
+    private Expression<Func<TLog, bool>> BuildVisibilityFilter<TLog>() where TLog : EntityBase, new()
+    {
+        if (CurrentUserContext.SuperAdmin)
+        {
+            return row => true;
+        }
+
+        // 包含软删账号，防止账号退场后旧日志重新对普通运营可见。
+        var administrators = SystemLogRepository.Context.Queryable<SystemUserEntity>()
+            .ClearFilter().Where(user => user.AccountType == AccountTypeEnum.SuperAdmin)
+            .Select(user => new { user.Id, user.Account }).ToList();
+        var identities = administrators.Select(user => (long?)user.Id).ToArray();
+        var accounts = administrators.Select(user => user.Account).Append("superadmin").Distinct().ToArray();
+        var parameter = Expression.Parameter(typeof(TLog), "row");
+        var createdId = Expression.Convert(Expression.Property(parameter, nameof(EntityBase.CreatedId)), typeof(long?));
+        var containsIdentity = Expression.Call(typeof(Enumerable), nameof(Enumerable.Contains), new[] { typeof(long?) }, Expression.Constant(identities), createdId);
+        Expression body = Expression.OrElse(Expression.Equal(createdId, Expression.Constant(null, typeof(long?))), Expression.Not(containsIdentity));
+        var accountProperty = typeof(TLog).GetProperty("Account");
+        if (accountProperty != null)
+        {
+            var account = Expression.Property(parameter, accountProperty);
+            var containsAccount = Expression.Call(typeof(Enumerable), nameof(Enumerable.Contains), new[] { typeof(string) }, Expression.Constant(accounts), account);
+            body = Expression.AndAlso(body, Expression.OrElse(Expression.Equal(account, Expression.Constant(null, typeof(string))), Expression.Not(containsAccount)));
+        }
+
+        return Expression.Lambda<Func<TLog, bool>>(body, parameter);
+    }
+
+    private static void RedactSnapshot(object item)
+    {
+        var snapshot = global::System.Text.Json.Nodes.JsonNode.Parse(SensitiveLogRedactor.Redact(global::System.Text.Json.JsonSerializer.Serialize(item))!)!;
+        foreach (var property in item.GetType().GetProperties().Where(property => property.CanWrite && property.PropertyType == typeof(string)))
+        {
+            property.SetValue(item, item is GameFrameX.Entity.Log.LogDiffFields && property.Name is "Sql" or "Parameters"
+                ? SensitiveLogRedactor.Mask : snapshot[property.Name]?.GetValue<string>());
+        }
     }
 
     /// <summary>

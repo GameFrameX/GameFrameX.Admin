@@ -36,6 +36,7 @@ public sealed class LogPageSearchKeyFilterTests : IDisposable
         _db = new SqlSugarScope(config);
         SqlSugarUnifiedConfig.ConfigureBaseFilters(_db);
         _db.CodeFirst.InitTables(
+            typeof(GameFrameX.Entity.System.SystemUserEntity),
             typeof(SystemLogVisitEntity),
             typeof(TenantLogVisitEntity),
             typeof(SystemLogOperationEntity),
@@ -303,6 +304,52 @@ public sealed class LogPageSearchKeyFilterTests : IDisposable
             AfterData = "after",
             CreatedTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
         }).ExecuteCommandAsync();
+    }
+
+    [Fact]
+    public async Task OperatorPageAndDetailPayloadAndExport_ExcludeSuperAdminIncludingLogin_AndRedactLegacyCredentials()
+    {
+        const string plain = "historical-credential-23456";
+        var root = new GameFrameX.Entity.System.SystemUserEntity { Id = 999, Account = "renamed-root", AccountType = AccountTypeEnum.SuperAdmin, IsDeleted = true };
+        foreach (var property in root.GetType().GetProperties().Where(property => property.PropertyType == typeof(string) && property.CanWrite && property.GetValue(root) == null))
+        {
+            property.SetValue(root, string.Empty);
+        }
+
+        await _db.Insertable(root).ExecuteCommandAsync();
+        await _db.Insertable(new[]
+        {
+            new SystemLogOperationEntity { Id = 501, Account = "renamed-root", CreatedId = 999, Message = "root-record" },
+            new SystemLogOperationEntity { Id = 502, Account = "superadmin", CreatedId = 0, Message = "root-login-record" },
+            new SystemLogOperationEntity { Id = 503, Account = "operator", CreatedId = 2001, Message = "{\"Password\":\"" + plain + "\",\"AccessToken\":\"" + plain + "\"}" },
+            new SystemLogOperationEntity { Id = 504, Account = "renamed-account", CreatedId = 999, Message = "root-id-record" },
+        }).ExecuteCommandAsync();
+        await _db.Insertable(new TenantLogOperationEntity { Id = 601, Account = "renamed-root", CreatedId = 0, Message = "historical-root-login-record" }).ExecuteCommandAsync();
+        var service = new LogOperationService(new() { Context = _db }, new() { Context = _db }, BuildContext(false));
+        var page = await service.PageAsync(new PageLogRequest { Page = 1, PageSize = 20 });
+        var own = Assert.Single(page.Items);
+        Assert.Equal(503, own.Id);
+        // 页面详情直接展示分页行 Message，没有独立 detail HTTP 入口。
+        Assert.DoesNotContain(plain, own.Message);
+        var file = (Microsoft.AspNetCore.Mvc.FileStreamResult)await service.ExportLogOpAsync(new LogRequest());
+        using (file.FileStream)
+        using (var archive = new global::System.IO.Compression.ZipArchive(file.FileStream))
+        {
+            var content = string.Join("", archive.Entries.Where(entry => entry.FullName.EndsWith(".xml")).Select(entry =>
+            {
+                using (var reader = new StreamReader(entry.Open()))
+                {
+                    return reader.ReadToEnd();
+                }
+            }));
+            Assert.DoesNotContain("root-record", content);
+            Assert.DoesNotContain("root-login-record", content);
+            Assert.DoesNotContain("root-id-record", content);
+            Assert.DoesNotContain(plain, content);
+            Assert.Contains("******", content);
+        }
+
+        Assert.Equal(5, (await BuildOperationService().PageAsync(new PageLogRequest { Page = 1, PageSize = 20 })).Total);
     }
 
     private LogVisitService BuildVisitService()
