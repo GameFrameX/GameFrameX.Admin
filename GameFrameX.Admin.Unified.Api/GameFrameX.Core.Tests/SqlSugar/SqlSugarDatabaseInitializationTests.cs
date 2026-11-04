@@ -1,4 +1,7 @@
 using GameFrameX.Core.Option;
+using GameFrameX.Application.SeedData.Client;
+using GameFrameX.Entity.Tenant.Device;
+using GameFrameX.Entity.Tenant.Game.Release;
 using GameFrameX.Application.SeedData.System;
 using GameFrameX.Core.Cache;
 using GameFrameX.Core.Tests.System;
@@ -40,6 +43,35 @@ public class SqlSugarDatabaseInitializationTests : IDisposable
     };
 
     private readonly List<string> _dbPaths = new();
+
+    [Fact]
+    public void InitDatabase_SeedsBusinessDefaultsOnce_AndKeepsOperatorChanges()
+    {
+        SqlSugarCache.Configure(new FakeCache());
+        using (var scope = CreateScope("main"))
+        {
+            var config = CreateConfig("main");
+            config.SeedSettings.EnableInitSeed = true;
+            var types = new[] { typeof(GlobalMenuEntity), typeof(GlobalMenuSeedData), typeof(TenantChannelDefinitionEntity),
+                typeof(BusinessChannelSeedData), typeof(TenantGameAppDeviceGroupEntity), typeof(GameAppDeviceGroupSeedData),
+                typeof(TenantGameAppVersionDefinitionEntity), typeof(GameAppVersionDefinitionSeedData) };
+            SqlSugarSetup.InitDatabase(scope, config, types);
+            var database = scope.GetConnectionScope("main");
+            var channel = Assert.Single(database.Queryable<TenantChannelDefinitionEntity>().ToList());
+            Assert.Equal("business-default", channel.Code);
+            Assert.True(channel.IsDefault);
+            Assert.True(channel.IsEnabled);
+            Assert.Single(database.Queryable<TenantGameAppDeviceGroupEntity>().ToList());
+            Assert.Equal(new[] { "1.0.0", "default" }, database.Queryable<TenantGameAppVersionDefinitionEntity>().OrderBy(row => row.Name).Select(row => row.Name).ToArray());
+            database.Updateable<TenantChannelDefinitionEntity>().SetColumns(row => new TenantChannelDefinitionEntity
+                { Name = "运维修改", IsEnabled = false, IsDeleted = true }).Where(row => row.Id == channel.Id).ExecuteCommand();
+            SqlSugarSetup.InitDatabase(scope, config, types);
+            var actual = Assert.Single(database.Queryable<TenantChannelDefinitionEntity>().Filter(null, true).ToList());
+            Assert.Equal("运维修改", actual.Name);
+            Assert.False(actual.IsEnabled);
+            Assert.True(actual.IsDeleted);
+        }
+    }
 
     [Fact]
     public void InitDatabase_OnlySeedsSuperAdmin_AndPreservesExistingOperationsUsers()
