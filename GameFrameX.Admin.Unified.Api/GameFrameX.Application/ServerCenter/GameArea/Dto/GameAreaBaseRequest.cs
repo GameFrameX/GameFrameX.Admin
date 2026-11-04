@@ -5,7 +5,7 @@ namespace GameFrameX.Application.ServerCenter.GameArea.Dto;
 /// <summary>
 /// 游戏区服实体基类 - 包含 AddInput 和 UpdateInput 的公共字段
 /// </summary>
-public abstract class TenantGameAreaEntityBaseRequest : BaseUpdateRequest
+public abstract class GameAreaBaseRequest : BaseUpdateRequest
 {
     /// <summary>
     /// 名称

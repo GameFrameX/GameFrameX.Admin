@@ -3,7 +3,7 @@ namespace GameFrameX.Client.Api.GameRole.Dto;
 /// <summary>
 /// 游戏角色输出参数
 /// </summary>
-public sealed class TenantGameRoleEntityResponse : EntityBaseId
+public sealed class GameRoleResponse : EntityBaseId
 {
     /// <summary>
     /// 用户ID

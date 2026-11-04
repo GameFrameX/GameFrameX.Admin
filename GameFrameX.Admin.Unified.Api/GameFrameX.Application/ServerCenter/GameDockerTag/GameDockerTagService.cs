@@ -7,13 +7,13 @@ namespace GameFrameX.Application.ServerCenter.GameDockerTag;
 /// 游戏镜像服务
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
-public class TenantGameDockerTagEntityService
+public class GameDockerTagService
     : GenericCrudSelectService<Entity.Tenant.Game.TenantGameDockerTagEntity,
         AddTenantGameDockerTagEntityRequest, UpdateTenantGameDockerTagEntityRequest,
-        TenantGameDockerTagEntityResponse, PageTenantGameDockerTagEntityRequest>
+        GameDockerTagResponse, PageTenantGameDockerTagEntityRequest>
 {
 
-    public TenantGameDockerTagEntityService(SqlSugarRepository<Entity.Tenant.Game.TenantGameDockerTagEntity> repository)
+    public GameDockerTagService(SqlSugarRepository<Entity.Tenant.Game.TenantGameDockerTagEntity> repository)
         : base(repository)
     {
     }
@@ -31,11 +31,11 @@ public class TenantGameDockerTagEntityService
 
     }
 
-    protected override ISugarQueryable<TenantGameDockerTagEntityResponse> BuildPageQuery(PageTenantGameDockerTagEntityRequest input)
+    protected override ISugarQueryable<GameDockerTagResponse> BuildPageQuery(PageTenantGameDockerTagEntityRequest input)
     {
         return Repository.AsQueryable()
                          .WhereIF(!string.IsNullOrWhiteSpace(input.Name), u => u.Name.Contains(input.Name.Trim()))
-                         .Select<TenantGameDockerTagEntityResponse>();
+                         .Select<GameDockerTagResponse>();
     }
 }
 #pragma warning restore CS8602, CS8604, CS8629

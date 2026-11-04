@@ -11,13 +11,13 @@ namespace GameFrameX.Application.ClientDelivery.GameAppAssetPackageVersion;
 /// 资源包版本服务
 /// </summary>
 [ApiDescriptionSettings(ClientConst.GroupName, Order = 100)]
-public class TenantGameAppAssetPackageVersionService : GenericCrudService<Entity.Tenant.Game.Release.TenantGameAppAssetPackageVersionEntity, AddGameAppAssetPackageVersionRequest, UpdateGameAppAssetPackageVersionRequest, GameAppAssetPackageVersionResponse, PageGameAppAssetPackageVersionRequest>
+public class GameAppAssetPackageVersionService : GenericCrudService<Entity.Tenant.Game.Release.TenantGameAppAssetPackageVersionEntity, AddGameAppAssetPackageVersionRequest, UpdateGameAppAssetPackageVersionRequest, GameAppAssetPackageVersionResponse, PageGameAppAssetPackageVersionRequest>
 {
     protected readonly SqlSugarRepository<Entity.Tenant.Game.Release.TenantGameAppAssetPackageVersionHistoryEntity> RepositoryAssetPackageVersionHistory;
     private readonly SqlSugarRepository<TenantGameAppPackageEntity> _packageRepository;
     private readonly SqlSugarRepository<TenantGameAppAssetPackageEntity> _assetPackageRepository;
 
-    public TenantGameAppAssetPackageVersionService(
+    public GameAppAssetPackageVersionService(
         SqlSugarRepository<Entity.Tenant.Game.Release.TenantGameAppAssetPackageVersionEntity> service,
         SqlSugarRepository<Entity.Tenant.Game.Release.TenantGameAppAssetPackageVersionHistoryEntity> rep2,
         SqlSugarRepository<TenantGameAppPackageEntity> packageRepository,

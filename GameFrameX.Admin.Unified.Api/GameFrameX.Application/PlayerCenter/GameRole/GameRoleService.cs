@@ -11,11 +11,11 @@ namespace GameFrameX.Application.PlayerCenter.GameRole;
 /// 游戏角色服务
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
-public class TenantGameRoleEntityService : GenericCrudSelectService<Entity.Tenant.Game.TenantGameRoleEntity, AddTenantGameRoleEntityRequest, UpdateTenantGameRoleEntityRequest, TenantGameRoleEntityResponse, PageTenantGameRoleEntityRequest>
+public class GameRoleService : GenericCrudSelectService<Entity.Tenant.Game.TenantGameRoleEntity, AddTenantGameRoleEntityRequest, UpdateTenantGameRoleEntityRequest, GameRoleResponse, PageTenantGameRoleEntityRequest>
 {
     private readonly HttpClient _httpClient;
 
-    public TenantGameRoleEntityService(SqlSugarRepository<Entity.Tenant.Game.TenantGameRoleEntity> repository, HttpClient httpClient) : base(repository)
+    public GameRoleService(SqlSugarRepository<Entity.Tenant.Game.TenantGameRoleEntity> repository, HttpClient httpClient) : base(repository)
     {
         _httpClient = httpClient;
     }
@@ -23,7 +23,7 @@ public class TenantGameRoleEntityService : GenericCrudSelectService<Entity.Tenan
     /// <summary>
     /// 构建分页查询条件
     /// </summary>
-    protected override ISugarQueryable<TenantGameRoleEntityResponse> BuildPageQuery(PageTenantGameRoleEntityRequest input)
+    protected override ISugarQueryable<GameRoleResponse> BuildPageQuery(PageTenantGameRoleEntityRequest input)
     {
         return Repository.AsQueryable()
                          .WhereIF(input.Id > 0, u => u.Id == input.Id)
@@ -41,7 +41,7 @@ public class TenantGameRoleEntityService : GenericCrudSelectService<Entity.Tenan
                          .WhereIF(input.RechargeMin != null && input.RechargeMax != null && input.RechargeMin <= input.RechargeMax,
                                   u => u.AllRecharge >= input.RechargeMin
                                        && u.AllRecharge <= input.RechargeMax)
-                         .Select<TenantGameRoleEntityResponse>();
+                         .Select<GameRoleResponse>();
     }
 
     /// <summary>
@@ -49,7 +49,7 @@ public class TenantGameRoleEntityService : GenericCrudSelectService<Entity.Tenan
     /// </summary>
     [HttpPost(CrudActionRoutes.Page)]
     [ApiDescriptionSettings(Name = "Page")]
-    public override async Task<SqlSugarPagedList<TenantGameRoleEntityResponse>> PageAsync(PageTenantGameRoleEntityRequest input)
+    public override async Task<SqlSugarPagedList<GameRoleResponse>> PageAsync(PageTenantGameRoleEntityRequest input)
     {
         var query = BuildPageQuery(input);
         query = ApplyOrdering(query, input);
@@ -230,9 +230,9 @@ public class TenantGameRoleEntityService : GenericCrudSelectService<Entity.Tenan
     /// <returns></returns>
     [HttpGet(CrudActionRoutes.Detail)]
     [ApiDescriptionSettings(Name = "Detail")]
-    public override async Task<TenantGameRoleEntityResponse> GetAsync([FromQuery] BaseIdRequest input)
+    public override async Task<GameRoleResponse> GetAsync([FromQuery] BaseIdRequest input)
     {
         var entity = await Repository.GetFirstAsync(u => u.Id == input.Id);
-        return entity == null ? default : entity.Adapt<TenantGameRoleEntityResponse>();
+        return entity == null ? default : entity.Adapt<GameRoleResponse>();
     }
 }

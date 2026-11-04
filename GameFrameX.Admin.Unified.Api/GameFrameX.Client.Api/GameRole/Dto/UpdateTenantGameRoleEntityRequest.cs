@@ -5,7 +5,7 @@ namespace GameFrameX.Client.Api.GameRole.Dto;
 /// <summary>
 /// 游戏角色更新输入参数
 /// </summary>
-public class UpdateTenantGameRoleEntityRequest : TenantGameRoleEntityBaseRequest
+public class UpdateTenantGameRoleEntityRequest : GameRoleBaseRequest
 {
     /// <summary>
     /// 主键Id

@@ -58,9 +58,9 @@ public class UpdateTenantGameWebShopOrderEntityRequest : BaseUpdateRequest
     /// <summary>
     /// 转换为共享数据类
     /// </summary>
-    public TenantGameWebShopOrderEntityDataRequest ToData()
+    public GameWebShopOrderDataRequest ToData()
     {
-        return new TenantGameWebShopOrderEntityDataRequest
+        return new GameWebShopOrderDataRequest
         {
             Name = Name,
             Logo = Logo,

@@ -3,7 +3,7 @@ namespace GameFrameX.Application.NoticeCenter.GameAnnouncement.Dto;
 /// <summary>
 /// 游戏公告更新输入参数
 /// </summary>
-public class UpdateTenantGameAnnouncementEntityRequest : TenantGameAnnouncementEntityBaseRequest, ICrudUpdateRequest
+public class UpdateTenantGameAnnouncementEntityRequest : GameAnnouncementBaseRequest, ICrudUpdateRequest
 {
     /// <summary>
     /// 主键Id

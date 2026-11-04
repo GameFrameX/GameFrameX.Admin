@@ -37,7 +37,7 @@ public sealed class ThreeHostApiRoutingContractTests
     [InlineData(typeof(GlobalDictionaryTypeService), nameof(GlobalDictionaryTypeService.GetListAsync), "api/globalDictionaryType/list", "GET")]
     [InlineData(typeof(SystemCacheService), nameof(SystemCacheService.GetKeysByPrefixKey), "api/systemCache/keysByPrefixKey/{prefixKey}", "GET")]
     [InlineData(typeof(GlobalDictionaryTypeService), nameof(GlobalDictionaryTypeService.AddDictionaryTypeAsync), "api/globalDictionaryType/add", "POST")]
-    [InlineData(typeof(TenantGamePenaltyEntityService), nameof(TenantGamePenaltyEntityService.RevokeAsync), "api/tenantGamePenaltyEntity/revoke", "POST")]
+    [InlineData(typeof(GamePenaltyService), nameof(GamePenaltyService.RevokeAsync), "api/gamePenalty/revoke", "POST")]
     public void AdminDynamicConvention_SampleEndpoints_MatchContractedRouteAndVerb(Type controllerType, string methodName, string expectedTemplate, string expectedVerb)
     {
         var applicationModel = BuildApplicationModel(controllerType, methodName);
@@ -74,7 +74,7 @@ public sealed class ThreeHostApiRoutingContractTests
                      .Select(route => route.Template)
                      .ToArray();
 
-        Assert.Equal(new[] { "api/TenantGameAnnouncementEntityService/[action]" }, routes);
+        Assert.Equal(new[] { "api/GameAnnouncementService/[action]" }, routes);
     }
 
     [Fact]

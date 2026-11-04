@@ -7,7 +7,7 @@ namespace GameFrameX.Application.GmCenter.LiveOps.PlayerSegment.Dto;
 /// <summary>
 /// 更新玩家分群输入（编辑定义后须重新 syncOnline 生效）。
 /// </summary>
-public sealed class UpdateTenantGameOnlinePlayerSegmentRequest : TenantGameOnlinePlayerSegmentBaseRequest
+public sealed class UpdateTenantGameOnlinePlayerSegmentRequest : GameOnlinePlayerSegmentBaseRequest
 {
     // 同步状态机字段不在 BaseRequest：Adapt 后 enum/long 默认 0 穿透 IgnoreColumns 写库，
     // 会把同步回执清零（见 OnUpdatingAsync 回填），与 MailCampaign Update 同范式。

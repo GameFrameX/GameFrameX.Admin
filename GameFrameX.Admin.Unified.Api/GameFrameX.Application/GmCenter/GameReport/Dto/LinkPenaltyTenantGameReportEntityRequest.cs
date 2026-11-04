@@ -1,7 +1,7 @@
 namespace GameFrameX.Application.GmCenter.GameReport.Dto;
 
 /// <summary>
-/// 举报关联处罚输入参数。仅 Confirmed 举报可关联；不自动创建处罚（创建走 TenantGamePenaltyEntityService.AddAsync）。
+/// 举报关联处罚输入参数。仅 Confirmed 举报可关联；不自动创建处罚（创建走 GamePenaltyService.AddAsync）。
 /// </summary>
 public class LinkPenaltyTenantGameReportEntityRequest
 {

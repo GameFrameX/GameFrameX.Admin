@@ -107,7 +107,7 @@ internal static class Program
         // C5 协议版本白名单配置（缺头拒绝；未知版本 AuditOnly 仅告警放行）
         builder.Services.Configure<ProtoVersionOptions>(builder.Configuration.GetSection("ProtoVersion"));
         builder.Services.AddSingleton<SystemCacheService>(); // 仅依赖 ICache + IOptions<CacheOptions>
-        builder.Services.AddTransient<TenantGameOrderShipService>(); // 订单发货/退款服务
+        builder.Services.AddTransient<GameOrderShipService>(); // 订单发货/退款服务
         builder.Services.AddSingleton<GameAppPackageResolver>(); // 包名解析服务
         builder.Services.AddSingleton<PublicCallbackRouteResolver>(); // 公开 provider 回调 URL -> 租户/应用上下文解析
         // Client API 请求期租户配置 Provider：依赖 IHttpContextAccessor + ISqlSugarClient，按请求作用域读取租户库配置
@@ -129,9 +129,9 @@ internal static class Program
         builder.Services.AddScoped<IGameLoginTicketKeyResolver, GameLoginTicketKeyResolver>();
         builder.Services.AddScoped<GameLoginTicketIssuer>();
         // 处罚事实源登录阻断查询（BanAsync / RestrictLogin 命中即拦截登录漏斗）
-        builder.Services.AddScoped<ITenantGamePenaltyEnforcementService, TenantGamePenaltyEnforcementService>();
+        builder.Services.AddScoped<IGamePenaltyEnforcementService, GamePenaltyEnforcementService>();
         // 玩家账号密码哈希服务（PBKDF2，change C198 / GFX-627）：供 GameUserController 写入 / 校验玩家密码
-        builder.Services.AddScoped<TenantGameUserPasswordService>();
+        builder.Services.AddScoped<GameUserPasswordService>();
 
         // 注册 Fallback 匹配器
         builder.Services.AddScoped<IFallbackMatcher<GameAppVersionRequest, TenantGameAppReleaseVersionEntity>, AppVersionFallbackMatcher>();

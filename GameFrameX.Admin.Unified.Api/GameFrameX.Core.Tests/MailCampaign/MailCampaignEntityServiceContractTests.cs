@@ -16,7 +16,7 @@ public class MailCampaignEntityServiceContractTests
     [Fact]
     public void Service_Exposes_Required_Crud_And_Campaign_Actions()
     {
-        var methodNames = typeof(TenantGameMailCampaignEntityService)
+        var methodNames = typeof(GameMailCampaignService)
                           .GetMethods(BindingFlags.Public | BindingFlags.Instance)
                           .Select(m => m.Name)
                           .ToHashSet();
@@ -72,7 +72,7 @@ public class MailCampaignEntityServiceContractTests
     [Fact]
     public void Output_Carries_Server_Writeback_Fields()
     {
-        var props = PropNames<TenantGameMailCampaignEntityResponse>();
+        var props = PropNames<GameMailCampaignResponse>();
 
         Assert.Contains("PublishStatus", props);
         Assert.Contains("ServerCampaignId", props);
@@ -83,7 +83,7 @@ public class MailCampaignEntityServiceContractTests
         Assert.Contains("RevokeOperator", props);
         Assert.Contains("LastServerCode", props);
         Assert.Contains("LastServerMessage", props);
-        Assert.Equal(typeof(long?), typeof(TenantGameMailCampaignEntityResponse).GetProperty("RowVersion")?.PropertyType);
+        Assert.Equal(typeof(long?), typeof(GameMailCampaignResponse).GetProperty("RowVersion")?.PropertyType);
     }
 
     [Fact]

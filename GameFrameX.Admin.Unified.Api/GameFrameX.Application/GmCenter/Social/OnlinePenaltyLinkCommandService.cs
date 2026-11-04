@@ -11,7 +11,7 @@ namespace GameFrameX.Application.GmCenter.Social;
 /// <para>
 /// 路由前缀 /api/onlinePenaltyLinkCommand（change C350 / vault:C7、vault:C2 S1.4）。
 /// 经 <see cref="IOnlineServerClient"/> 调 Online 显式命令接口（踢下线 / 吊销 Token / 禁言，三命令硬白名单，X3 红线）；
-/// 联动命令调用点唯一——处置流（OnlineReportCaseService）与既有页面增量（TenantGamePenaltyEntityService.SyncOnlineRuntimeAsync）
+/// 联动命令调用点唯一——处置流（OnlineReportCaseService）与既有页面增量（GamePenaltyService.SyncOnlineRuntimeAsync）
 /// 一律经 <see cref="ExecuteLinkAsync"/>，不得绕过本服务直调 Online 命令接口（守护测试 OnlineSocialCommandWhitelistTests）。
 /// </para>
 /// <para>

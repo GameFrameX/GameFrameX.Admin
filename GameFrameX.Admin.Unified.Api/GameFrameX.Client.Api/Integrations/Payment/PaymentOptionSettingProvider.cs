@@ -136,7 +136,7 @@ public class PaymentOptionSettingProvider : IPaymentOptionSettingProvider
 
         return query.ToList()
                     .GroupBy(u => u.IsSandbox)
-                    .Select(group => TenantGamePaymentConfigEntityService.PickBestConfig(group, packageId))
+                    .Select(group => GamePaymentConfigService.PickBestConfig(group, packageId))
                     .OfType<TenantGamePaymentConfigEntity>()
                     .OrderBy(u => u.IsSandbox)
                     .ToList();

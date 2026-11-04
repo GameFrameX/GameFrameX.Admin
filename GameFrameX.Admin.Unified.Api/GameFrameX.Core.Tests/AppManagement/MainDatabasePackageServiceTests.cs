@@ -59,7 +59,7 @@ public sealed class MainDatabasePackageServiceTests
         };
     }
 
-    private static TenantGameAppPackageService CreateService(ClientApiTestDb database)
+    private static GameAppPackageService CreateService(ClientApiTestDb database)
     {
         database.InitTenantTables(typeof(TenantGameAppPackageEntity), typeof(GlobalPlatformEntity),
             typeof(GlobalChannelDefinitionEntity), typeof(TenantChannelDefinitionEntity));
@@ -72,7 +72,7 @@ public sealed class MainDatabasePackageServiceTests
             Id = 10, Name = "official", Description = "Official", Scope = ChannelScopeEnum.System,
             IsEnabled = true, IsDeleted = false,
         }).ExecuteCommand();
-        return new TenantGameAppPackageService(
+        return new GameAppPackageService(
             new SqlSugarRepository<TenantGameAppPackageEntity> { Context = database.MainDb },
             new SqlSugarRepository<GlobalPlatformEntity> { Context = database.MainDb },
             new SqlSugarRepository<GlobalChannelDefinitionEntity> { Context = database.MainDb },

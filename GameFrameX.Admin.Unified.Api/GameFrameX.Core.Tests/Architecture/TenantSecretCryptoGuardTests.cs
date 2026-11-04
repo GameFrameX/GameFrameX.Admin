@@ -12,8 +12,8 @@ public sealed class TenantSecretCryptoGuardTests
     [InlineData("GameFrameX.Application/Platform/Email/SystemEmailProviderService.cs", "TenantSecretCrypto.Encrypt")]
     [InlineData("GameFrameX.Application/Platform/OpenAccess/SystemOpenAccessService.cs", "TenantSecretCrypto.Encrypt")]
     [InlineData("GameFrameX.Application/Platform/OpenAccess/SystemOpenAccessService.cs", "TenantSecretCrypto.Decrypt")]
-    [InlineData("GameFrameX.Application/ClientDelivery/ObjectStorageConfig/TenantObjectStorageConfigEntityService.cs", "TenantObjectStorageConfigCrypto.EncryptConfigJson")]
-    [InlineData("GameFrameX.Application/ClientDelivery/ObjectStorageConfig/TenantObjectStorageConfigEntityService.cs", "TenantObjectStorageConfigCrypto.DecryptConfigJson")]
+    [InlineData("GameFrameX.Application/ClientDelivery/ObjectStorageConfig/ObjectStorageConfigService.cs", "TenantObjectStorageConfigCrypto.EncryptConfigJson")]
+    [InlineData("GameFrameX.Application/ClientDelivery/ObjectStorageConfig/ObjectStorageConfigService.cs", "TenantObjectStorageConfigCrypto.DecryptConfigJson")]
     [InlineData("GameFrameX.Application/Platform/Email/SystemEmailDispatcher.cs", "TenantSecretCrypto.Decrypt")]
     [InlineData("GameFrameX.Core/Service/File/TenantFileService.cs", "TenantObjectStorageConfigCrypto.DecryptConfigJson")]
     public void CredentialPath_MustRouteThroughSecretCrypto(string relativePath, string requiredCall)

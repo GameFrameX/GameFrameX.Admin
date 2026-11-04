@@ -5,6 +5,6 @@ namespace GameFrameX.Application.GmCenter.LiveOps.PlayerSegment.Dto;
 /// <summary>
 /// 新增玩家分群输入。
 /// </summary>
-public sealed class AddTenantGameOnlinePlayerSegmentRequest : TenantGameOnlinePlayerSegmentBaseRequest
+public sealed class AddTenantGameOnlinePlayerSegmentRequest : GameOnlinePlayerSegmentBaseRequest
 {
 }

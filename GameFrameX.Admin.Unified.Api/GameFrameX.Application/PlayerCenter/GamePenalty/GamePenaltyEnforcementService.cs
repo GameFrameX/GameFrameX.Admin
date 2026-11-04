@@ -10,11 +10,11 @@ namespace GameFrameX.Application.PlayerCenter.GamePenalty;
 /// <para>AND (AreaId IS NULL OR AreaId = @areaId)</para>
 /// <para>ORDER BY Id，取第一条。</para>
 /// </summary>
-public class TenantGamePenaltyEnforcementService : ITenantGamePenaltyEnforcementService
+public class GamePenaltyEnforcementService : IGamePenaltyEnforcementService
 {
     private readonly SqlSugarRepository<Entity.Tenant.Game.TenantGamePenaltyEntity> _penaltyRepository;
 
-    public TenantGamePenaltyEnforcementService(SqlSugarRepository<Entity.Tenant.Game.TenantGamePenaltyEntity> penaltyRepository)
+    public GamePenaltyEnforcementService(SqlSugarRepository<Entity.Tenant.Game.TenantGamePenaltyEntity> penaltyRepository)
     {
         _penaltyRepository = penaltyRepository;
     }

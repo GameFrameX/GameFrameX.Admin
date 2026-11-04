@@ -8,14 +8,14 @@ namespace GameFrameX.Application.NoticeCenter.GameRewardTemplate;
 /// 奖励模板服务。
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
-public class TenantGameRewardTemplateEntityService
+public class GameRewardTemplateService
     : GenericCrudSelectService<Entity.Tenant.Game.TenantGameRewardTemplateEntity,
         AddTenantGameRewardTemplateEntityRequest, UpdateTenantGameRewardTemplateEntityRequest,
-        TenantGameRewardTemplateEntityResponse, PageTenantGameRewardTemplateEntityRequest>
+        GameRewardTemplateResponse, PageTenantGameRewardTemplateEntityRequest>
 {
     private readonly SqlSugarRepository<Entity.Tenant.Game.TenantGameRewardTemplateGroupEntity> _groupRepository;
 
-    public TenantGameRewardTemplateEntityService(
+    public GameRewardTemplateService(
         SqlSugarRepository<Entity.Tenant.Game.TenantGameRewardTemplateEntity> repository,
         SqlSugarRepository<Entity.Tenant.Game.TenantGameRewardTemplateGroupEntity> groupRepository)
         : base(repository)
@@ -23,7 +23,7 @@ public class TenantGameRewardTemplateEntityService
         _groupRepository = groupRepository;
     }
 
-    protected override ISugarQueryable<TenantGameRewardTemplateEntityResponse> BuildPageQuery(PageTenantGameRewardTemplateEntityRequest input)
+    protected override ISugarQueryable<GameRewardTemplateResponse> BuildPageQuery(PageTenantGameRewardTemplateEntityRequest input)
     {
         return Repository.AsQueryable()
                          .WhereIF(!string.IsNullOrWhiteSpace(input.SearchKey), u => u.Name.Contains(input.SearchKey.Trim()))
@@ -31,7 +31,7 @@ public class TenantGameRewardTemplateEntityService
                          .WhereIF(input.GroupId.HasValue, u => u.GroupId == input.GroupId.Value)
                          .WhereIF(input.IsEnabled.HasValue, u => u.IsEnabled == input.IsEnabled.Value)
                          .LeftJoin<Entity.Tenant.Game.TenantGameRewardTemplateGroupEntity>((t, g) => t.GroupId == g.Id)
-                         .Select((t, g) => new TenantGameRewardTemplateEntityResponse
+                         .Select((t, g) => new GameRewardTemplateResponse
                          {
                              Id = t.Id,
                              Name = t.Name,
@@ -76,7 +76,7 @@ public class TenantGameRewardTemplateEntityService
     /// </summary>
     [HttpPost("copySnapshot")]
     [ApiDescriptionSettings(Name = "CopySnapshot")]
-    public async Task<TenantGameRewardTemplateSnapshotResponse> CopySnapshotAsync(TenantGameRewardTemplateSnapshotRequest input)
+    public async Task<GameRewardTemplateSnapshotResponse> CopySnapshotAsync(GameRewardTemplateSnapshotRequest input)
     {
         var entity = await Repository.GetFirstAsync(u => u.Id == input.Id && u.IsDeleted == false);
         if (entity == null)
@@ -90,7 +90,7 @@ public class TenantGameRewardTemplateEntityService
         }
 
         ValidateRewardItemsJson(entity.RewardItemsJson);
-        return new TenantGameRewardTemplateSnapshotResponse
+        return new GameRewardTemplateSnapshotResponse
         {
             Id = entity.Id,
             Name = entity.Name,

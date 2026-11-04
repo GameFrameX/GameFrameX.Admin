@@ -17,10 +17,10 @@ public sealed class MainDatabasePlayerServiceTests
         using (var database = new ClientApiTestDb())
         {
             var user = database.SeedUser(100, userName: "player");
-            var service = new TenantGameUserEntityService(new SqlSugarRepository<TenantGameUserEntity>
+            var service = new GameUserService(new SqlSugarRepository<TenantGameUserEntity>
             {
                 Context = database.MainDb,
-            }, new TenantGameUserPasswordService());
+            }, new GameUserPasswordService());
             Assert.Equal(user.Id, Assert.Single((await service.PageAsync(new() { UserName = "player" })).Items).Id);
             await service.BanAsync(new() { Id = user.Id });
             Assert.Equal(GameUserStatus.Banned, (await database.MainDb.Queryable<TenantGameUserEntity>().InSingleAsync(user.Id)).Status);
@@ -38,7 +38,7 @@ public sealed class MainDatabasePlayerServiceTests
         {
             var role = database.SeedRole(201, 100, 10, name: "one");
             database.SeedRole(202, 100, 11, name: "two");
-            var service = new TenantGameRoleEntityService(new SqlSugarRepository<TenantGameRoleEntity>
+            var service = new GameRoleService(new SqlSugarRepository<TenantGameRoleEntity>
             {
                 Context = database.MainDb,
             }, client);

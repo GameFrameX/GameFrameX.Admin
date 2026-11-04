@@ -5,7 +5,7 @@ namespace GameFrameX.Client.Api.GameArea.Dto;
 /// <summary>
 /// 游戏区服
 /// </summary>
-public sealed class TenantGameAreaEntityResponse
+public sealed class GameAreaResponse
 {
     /// <summary>
     /// 区服Id

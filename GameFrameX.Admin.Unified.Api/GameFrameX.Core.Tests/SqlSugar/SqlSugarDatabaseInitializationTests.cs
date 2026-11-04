@@ -271,7 +271,7 @@ public class SqlSugarDatabaseInitializationTests : IDisposable
         var tenantDb = scope.GetConnectionScope("tenant_1003");
 
         var sql = tenantDb.Queryable<TenantGameTimeJobEntity>()
-                          .Select<TenantGameTimeJobEntityResponse>()
+                          .Select<GameTimeJobResponse>()
                           .ToSql();
 
         Assert.Contains("tenant_game_time_job_entity", sql.Key, StringComparison.Ordinal);

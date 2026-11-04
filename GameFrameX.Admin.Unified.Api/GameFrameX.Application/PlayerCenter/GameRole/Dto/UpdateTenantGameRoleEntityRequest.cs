@@ -3,7 +3,7 @@ namespace GameFrameX.Application.PlayerCenter.GameRole.Dto;
 /// <summary>
 /// 游戏角色更新输入参数
 /// </summary>
-public class UpdateTenantGameRoleEntityRequest : TenantGameRoleEntityBaseRequest, ICrudUpdateRequest
+public class UpdateTenantGameRoleEntityRequest : GameRoleBaseRequest, ICrudUpdateRequest
 {
     /// <summary>
     /// 主键Id

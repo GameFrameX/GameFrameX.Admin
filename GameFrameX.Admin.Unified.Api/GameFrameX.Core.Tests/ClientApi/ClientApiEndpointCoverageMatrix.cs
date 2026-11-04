@@ -11,8 +11,8 @@ internal static class ClientApiEndpointCoverageMatrix
         Endpoint("GameAdWebHook.AdMobNotify", "GET", "api/GameAdWebHook/AdMobNotify/{tenantId:long}/{appId:long}/{packageId:long?}", "ad-callback", true, true, false, true, "valid AdMob callback grants reward once", "invalid-route", "signature-failed", "duplicate-callback", "cross-tenant"),
         Endpoint("GameAdWebHook.UnityAdsNotify", "GET", "api/GameAdWebHook/UnityAdsNotify/{tenantId:long}/{appId:long}/{packageId:long?}", "ad-callback", true, true, false, true, "valid UnityAds callback grants reward once", "invalid-route", "signature-failed", "duplicate-callback"),
 
-        Endpoint("GameAnnouncement.List", "GET", "api/TenantGameAnnouncementEntityService/List", "announcement", true, true, false, false, "lists enabled announcements by language", "missing-tenant", "disabled-record-hidden"),
-        Endpoint("GameAnnouncement.ListByAreaId", "POST", "api/TenantGameAnnouncementEntityService/ListByAreaId", "announcement", true, true, false, false, "lists enabled area announcements", "missing-tenant", "area-not-found"),
+        Endpoint("GameAnnouncement.List", "GET", "api/GameAnnouncementService/List", "announcement", true, true, false, false, "lists enabled announcements by language", "missing-tenant", "disabled-record-hidden"),
+        Endpoint("GameAnnouncement.ListByAreaId", "POST", "api/GameAnnouncementService/ListByAreaId", "announcement", true, true, false, false, "lists enabled area announcements", "missing-tenant", "area-not-found"),
 
         Endpoint("GameAppVersion.GetInfo", "POST", "api/GameAppVersion/GetInfo", "client-config", true, true, false, false, "matches release version by app/package/platform/channel", "missing-app", "not-found", "disabled-record-hidden", "fallback-boundary"),
         Endpoint("GameArea.GetAreaList", "POST", "api/GameArea/GetAreaList", "area", true, true, false, false, "returns visible area tree", "missing-app", "closed-area-filter", "package-fallback"),

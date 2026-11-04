@@ -11,7 +11,7 @@ namespace GameFrameX.Application.ClientDelivery.GameAppPackage;
 /// 游戏应用分包管理服务
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 101)]
-public class TenantGameAppPackageService
+public class GameAppPackageService
     : GenericCrudSelectService<TenantGameAppPackageEntity,
         AddGameAppPackageRequest, UpdateGameAppPackageRequest,
         GameAppPackageResponse, PageGameAppPackageRequest>
@@ -20,7 +20,7 @@ public class TenantGameAppPackageService
     private readonly SqlSugarRepository<GlobalChannelDefinitionEntity> _globalChannelDefinitionRepository;
     private readonly SqlSugarRepository<TenantChannelDefinitionEntity> _tenantChannelDefinitionRepository;
 
-    public TenantGameAppPackageService(
+    public GameAppPackageService(
         SqlSugarRepository<TenantGameAppPackageEntity> repository,
         SqlSugarRepository<GlobalPlatformEntity> globalPlatformRepository,
         SqlSugarRepository<GlobalChannelDefinitionEntity> globalChannelDefinitionRepository,

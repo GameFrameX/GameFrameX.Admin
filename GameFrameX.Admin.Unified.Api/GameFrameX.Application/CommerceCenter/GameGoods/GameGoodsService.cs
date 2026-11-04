@@ -7,12 +7,12 @@ namespace GameFrameX.Application.CommerceCenter.GameGoods;
 /// 游戏资源服务
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
-public class TenantGameGoodsEntityService
+public class GameGoodsService
     : GenericCrudSelectService<Entity.Tenant.Game.TenantGameGoodsEntity,
         AddTenantGameGoodsEntityRequest, UpdateTenantGameGoodsEntityRequest,
-        TenantGameGoodsEntityResponse, PageTenantGameGoodsEntityRequest>
+        GameGoodsResponse, PageTenantGameGoodsEntityRequest>
 {
-    public TenantGameGoodsEntityService(SqlSugarRepository<Entity.Tenant.Game.TenantGameGoodsEntity> repository)
+    public GameGoodsService(SqlSugarRepository<Entity.Tenant.Game.TenantGameGoodsEntity> repository)
         : base(repository)
     {
     }
@@ -38,14 +38,14 @@ public class TenantGameGoodsEntityService
         }
     }
 
-    protected override ISugarQueryable<TenantGameGoodsEntityResponse> BuildPageQuery(PageTenantGameGoodsEntityRequest input)
+    protected override ISugarQueryable<GameGoodsResponse> BuildPageQuery(PageTenantGameGoodsEntityRequest input)
     {
         return Repository.AsQueryable()
                          .WhereIF(!string.IsNullOrWhiteSpace(input.SearchKey), u =>
                                       u.Name.Contains(input.SearchKey.Trim()))
                          .WhereIF(input.ConfigId > 0, u => u.ConfigId == input.ConfigId)
                          .WhereIF(!string.IsNullOrWhiteSpace(input.Name), u => u.Name.Contains(input.Name.Trim()))
-                         .Select<TenantGameGoodsEntityResponse>();
+                         .Select<GameGoodsResponse>();
     }
 
     /// <summary>
@@ -59,7 +59,7 @@ public class TenantGameGoodsEntityService
                                     .WhereIF(!string.IsNullOrWhiteSpace(input.SearchKey), u =>
                                                  u.Name.Contains(input.SearchKey.Trim()))
                                     .LeftJoin<Entity.Tenant.Game.TenantGameGoodsCatalogueEntity>((g, c) => g.ClassifyId == c.Id)
-                                    .Select((g, c) => new TenantGameGoodsEntitySelectPageStringResponse
+                                    .Select((g, c) => new GameGoodsSelectPageStringResponse
                                     {
                                         Id = g.Id.ToString(),
                                         Value = g.Name,

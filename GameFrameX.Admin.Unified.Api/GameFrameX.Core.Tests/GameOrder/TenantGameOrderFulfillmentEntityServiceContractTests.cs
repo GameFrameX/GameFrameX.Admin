@@ -15,7 +15,7 @@ public class TenantGameOrderFulfillmentEntityServiceContractTests
     [Fact]
     public void Service_Exposes_Required_Read_And_Management_Actions()
     {
-        var methodNames = typeof(TenantGameOrderFulfillmentEntityService)
+        var methodNames = typeof(GameOrderFulfillmentService)
                           .GetMethods(BindingFlags.Public | BindingFlags.Instance)
                           .Select(m => m.Name)
                           .ToHashSet();
@@ -80,7 +80,7 @@ public class TenantGameOrderFulfillmentEntityServiceContractTests
         var expected = typeof(Task<FulfillmentActionResponse>);
         foreach (var methodName in new[] { "RefundAsync", "CompensateAsync", "ResendAsync", })
         {
-            var method = typeof(TenantGameOrderFulfillmentEntityService)
+            var method = typeof(GameOrderFulfillmentService)
                 .GetMethod(methodName, BindingFlags.Public | BindingFlags.Instance);
             Assert.NotNull(method);
             Assert.Equal(expected, method!.ReturnType);
@@ -90,10 +90,10 @@ public class TenantGameOrderFulfillmentEntityServiceContractTests
     [Fact]
     public void Service_Exposes_No_HttpJsonResultData_Endpoints()
     {
-        // C223：Admin 服务边界内不再有 HttpJsonResultData 返回签名（对外 string 生态收敛在 Client.Api / TenantGameOrderShipService）。
-        var offender = typeof(TenantGameOrderFulfillmentEntityService)
+        // C223：Admin 服务边界内不再有 HttpJsonResultData 返回签名（对外 string 生态收敛在 Client.Api / GameOrderShipService）。
+        var offender = typeof(GameOrderFulfillmentService)
                        .GetMethods(BindingFlags.Public | BindingFlags.Instance)
-                       .Where(m => m.DeclaringType == typeof(TenantGameOrderFulfillmentEntityService))
+                       .Where(m => m.DeclaringType == typeof(GameOrderFulfillmentService))
                        .FirstOrDefault(m => m.ReturnType.IsGenericType
                                             && m.ReturnType.GetGenericArguments()[0].Name.StartsWith("HttpJsonResultData"));
         Assert.Null(offender);

@@ -15,7 +15,7 @@ public sealed class MainDatabaseWebShopServiceTests
         using (var client = new HttpClient())
         {
             database.InitTenantTables(typeof(TenantGameWebShopEntity));
-            var service = new TenantGameWebShopEntityService(new SqlSugarRepository<TenantGameWebShopEntity>
+            var service = new GameWebShopService(new SqlSugarRepository<TenantGameWebShopEntity>
             {
                 Context = database.MainDb,
             }, client);

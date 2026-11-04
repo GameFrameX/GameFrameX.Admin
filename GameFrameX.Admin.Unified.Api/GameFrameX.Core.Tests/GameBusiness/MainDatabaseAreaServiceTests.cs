@@ -18,7 +18,7 @@ public sealed class MainDatabaseAreaServiceTests
             database.SeedAreaClassify(100);
             var area = database.SeedArea(101, 100, isEnabled: false);
             database.MainDb.QueryFilter.AddTableFilter<TenantGameAreaEntity>(x => x.IsEnabled == true);
-            var service = new TenantGameAreaEntityService(new SqlSugarRepository<TenantGameAreaEntity>
+            var service = new GameAreaService(new SqlSugarRepository<TenantGameAreaEntity>
             {
                 Context = database.MainDb,
             }, new SqlSugarRepository<TenantGameAreaClassifyEntity> { Context = database.MainDb }, client);
@@ -36,7 +36,7 @@ public sealed class MainDatabaseAreaServiceTests
         using (var database = new ClientApiTestDb())
         {
             var existing = database.SeedAreaClassify(100);
-            var service = new TenantGameAreaClassifyEntityService(new SqlSugarRepository<TenantGameAreaClassifyEntity>
+            var service = new GameAreaClassifyService(new SqlSugarRepository<TenantGameAreaClassifyEntity>
             {
                 Context = database.MainDb,
             });

@@ -7,14 +7,14 @@ namespace GameFrameX.Application.NoticeCenter.GameMailTemplate;
 /// 邮件模板服务
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
-public class TenantGameMailTemplateEntityService
+public class GameMailTemplateService
     : GenericCrudSelectService<Entity.Tenant.Game.TenantGameMailTemplateEntity,
         AddTenantGameMailTemplateEntityRequest, UpdateTenantGameMailTemplateEntityRequest,
-        TenantGameMailTemplateEntityResponse, PageTenantGameMailTemplateEntityRequest>
+        GameMailTemplateResponse, PageTenantGameMailTemplateEntityRequest>
 {
     private readonly SqlSugarRepository<Entity.Tenant.Game.TenantGameMailTemplateCategoryEntity> _categoryRepository;
 
-    public TenantGameMailTemplateEntityService(
+    public GameMailTemplateService(
         SqlSugarRepository<Entity.Tenant.Game.TenantGameMailTemplateEntity> repository,
         SqlSugarRepository<Entity.Tenant.Game.TenantGameMailTemplateCategoryEntity> categoryRepository)
         : base(repository)
@@ -22,7 +22,7 @@ public class TenantGameMailTemplateEntityService
         _categoryRepository = categoryRepository;
     }
 
-    protected override ISugarQueryable<TenantGameMailTemplateEntityResponse> BuildPageQuery(PageTenantGameMailTemplateEntityRequest input)
+    protected override ISugarQueryable<GameMailTemplateResponse> BuildPageQuery(PageTenantGameMailTemplateEntityRequest input)
     {
         return Repository.AsQueryable()
                          .WhereIF(!string.IsNullOrWhiteSpace(input.SearchKey), u => u.Name.Contains(input.SearchKey.Trim()))
@@ -30,7 +30,7 @@ public class TenantGameMailTemplateEntityService
                          .WhereIF(input.CategoryId.HasValue, u => u.CategoryId == input.CategoryId.Value)
                          .WhereIF(input.IsEnabled.HasValue, u => u.IsEnabled == input.IsEnabled.Value)
                          .LeftJoin<Entity.Tenant.Game.TenantGameMailTemplateCategoryEntity>((t, c) => t.CategoryId == c.Id)
-                         .Select((t, c) => new TenantGameMailTemplateEntityResponse
+                         .Select((t, c) => new GameMailTemplateResponse
                          {
                              Id = t.Id,
                              Name = t.Name,

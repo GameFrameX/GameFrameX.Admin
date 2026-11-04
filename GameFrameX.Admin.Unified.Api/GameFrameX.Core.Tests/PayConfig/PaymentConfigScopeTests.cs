@@ -12,14 +12,14 @@ public class PaymentConfigScopeTests
     [InlineData(200L, 200)]
     public void BuildScope_NormalizesPackage(long? packageId, long expectedPackageId)
     {
-        var scope = TenantGamePaymentConfigEntityService.BuildScope(packageId);
+        var scope = GamePaymentConfigService.BuildScope(packageId);
         Assert.Equal(expectedPackageId, scope.PackageIdNormalized);
     }
 
     [Fact]
     public void BuildScope_PackageRequiresNoApplication()
     {
-        var scope = TenantGamePaymentConfigEntityService.BuildScope(200);
+        var scope = GamePaymentConfigService.BuildScope(200);
         Assert.Equal(200, scope.PackageId);
     }
 
@@ -31,7 +31,7 @@ public class PaymentConfigScopeTests
             new TenantGamePaymentConfigEntity { Id = 1, PayChannel = "apple", PackageIdNormalized = 0 },
             new TenantGamePaymentConfigEntity { Id = 2, PayChannel = "apple", PackageId = 200, PackageIdNormalized = 200 },
         };
-        Assert.Equal(2, TenantGamePaymentConfigEntityService.PickBestConfig(configs, 200)?.Id);
+        Assert.Equal(2, GamePaymentConfigService.PickBestConfig(configs, 200)?.Id);
     }
 
     [Fact]
@@ -42,7 +42,7 @@ public class PaymentConfigScopeTests
             new TenantGamePaymentConfigEntity { Id = 1, PayChannel = "apple", PackageIdNormalized = 0 },
             new TenantGamePaymentConfigEntity { Id = 2, PayChannel = "apple", PackageId = 300, PackageIdNormalized = 300 },
         };
-        Assert.Equal(1, TenantGamePaymentConfigEntityService.PickBestConfig(configs, 200)?.Id);
+        Assert.Equal(1, GamePaymentConfigService.PickBestConfig(configs, 200)?.Id);
     }
 
     [Fact]

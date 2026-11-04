@@ -140,7 +140,7 @@ public sealed class ClientApiWeChatPayCallbackTests
             FakeOptionsProvider.WithAreaPolicy(false),
             db.Repository<TenantGameRoleEntity>(),
             new HttpClient(handler, false),
-            new TenantGameOrderShipService(db.TenantDb, new ClientApiTestHttpClientFactory(handler)),
+            new GameOrderShipService(db.TenantDb, new ClientApiTestHttpClientFactory(handler)),
             new WechatCallbackPaymentFactory(setting),
             new TestGooglePubSubPushAuthenticator(false),
             new TestGooglePlayPurchaseService(null));

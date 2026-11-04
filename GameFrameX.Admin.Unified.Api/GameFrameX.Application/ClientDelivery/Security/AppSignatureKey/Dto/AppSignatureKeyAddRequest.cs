@@ -4,7 +4,7 @@ namespace GameFrameX.Application.ClientDelivery.Security.AppSignatureKey.Dto;
 /// 新增 App 传输签名密钥输入参数。
 /// <para>密钥明文由服务端随机生成（不允许外部提交，避免弱密钥入环），响应中一次性回显。</para>
 /// </summary>
-public class TenantAppSignatureKeyAddRequest
+public class AppSignatureKeyAddRequest
 {
     /// <summary>
     /// 生效时间（Unix 秒）；null 表示立即生效。

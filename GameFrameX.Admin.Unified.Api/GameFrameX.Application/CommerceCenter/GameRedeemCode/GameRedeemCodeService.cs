@@ -8,16 +8,16 @@ namespace GameFrameX.Application.CommerceCenter.GameRedeemCode;
 /// 兑换码服务
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
-public class TenantGameRedeemCodeEntityService : GenericCrudService<Entity.Tenant.Game.TenantGameRedeemCodeEntity, AddTenantGameRedeemCodeEntityRequest, UpdateTenantGameRedeemCodeEntityRequest, TenantGameRedeemCodeEntityResponse, PageTenantGameRedeemCodeEntityRequest>
+public class GameRedeemCodeService : GenericCrudService<Entity.Tenant.Game.TenantGameRedeemCodeEntity, AddTenantGameRedeemCodeEntityRequest, UpdateTenantGameRedeemCodeEntityRequest, GameRedeemCodeResponse, PageTenantGameRedeemCodeEntityRequest>
 {
-    public TenantGameRedeemCodeEntityService(SqlSugarRepository<Entity.Tenant.Game.TenantGameRedeemCodeEntity> repository) : base(repository)
+    public GameRedeemCodeService(SqlSugarRepository<Entity.Tenant.Game.TenantGameRedeemCodeEntity> repository) : base(repository)
     {
     }
 
     /// <summary>
     /// 构建分页查询条件
     /// </summary>
-    protected override ISugarQueryable<TenantGameRedeemCodeEntityResponse> BuildPageQuery(PageTenantGameRedeemCodeEntityRequest input)
+    protected override ISugarQueryable<GameRedeemCodeResponse> BuildPageQuery(PageTenantGameRedeemCodeEntityRequest input)
     {
         return Repository.AsQueryable()
                          .WhereIF(!string.IsNullOrWhiteSpace(input.SearchKey), u =>
@@ -29,7 +29,7 @@ public class TenantGameRedeemCodeEntityService : GenericCrudService<Entity.Tenan
                          .WhereIF(input.UsedCount > 0, u => u.UsedCount == input.UsedCount)
                          .WhereIF(input.ChannelId > 0, u => u.ChannelId == input.ChannelId)
                          .WhereIF(input.IsActive.HasValue, u => u.IsActive == input.IsActive.Value)
-                         .Select<TenantGameRedeemCodeEntityResponse>();
+                         .Select<GameRedeemCodeResponse>();
     }
 
     /// <summary>

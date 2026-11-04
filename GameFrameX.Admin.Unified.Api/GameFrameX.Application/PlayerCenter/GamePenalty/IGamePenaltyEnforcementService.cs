@@ -6,7 +6,7 @@ namespace GameFrameX.Application.PlayerCenter.GamePenalty;
 /// 处罚事实源登录阻断查询服务。Client API 登录鉴权的唯一封禁判定入口。
 /// <para>铁律：仅命中 ActionType ∈ {BanAsync, RestrictLogin} 的 Active + 未过期处罚；Mute / RestrictTrade / RestrictMatch 永不命中。</para>
 /// </summary>
-public interface ITenantGamePenaltyEnforcementService
+public interface IGamePenaltyEnforcementService
 {
     /// <summary>
     /// 判断指定对象在当前区服下是否存在生效中的登录阻断处罚（ActionType ∈ {BanAsync, RestrictLogin}）。

@@ -3,7 +3,7 @@ namespace GameFrameX.Application.NoticeCenter.GameMailTemplate.Dto;
 /// <summary>
 /// 邮件模板更新输入参数
 /// </summary>
-public class UpdateTenantGameMailTemplateEntityRequest : TenantGameMailTemplateEntityBaseRequest, ICrudUpdateRequest
+public class UpdateTenantGameMailTemplateEntityRequest : GameMailTemplateBaseRequest, ICrudUpdateRequest
 {
     /// <summary>
     /// 主键Id

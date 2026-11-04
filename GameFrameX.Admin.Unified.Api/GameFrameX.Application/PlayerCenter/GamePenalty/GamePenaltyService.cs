@@ -15,15 +15,15 @@ namespace GameFrameX.Application.PlayerCenter.GamePenalty;
 /// <para>SyncOnlineRuntimeAsync：把生效中处罚同步到 Online 运行时（经 OnlinePenaltyLinkCommandService 唯一联动入口，change C350）。</para>
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
-public class TenantGamePenaltyEntityService
+public class GamePenaltyService
     : GenericCrudService<Entity.Tenant.Game.TenantGamePenaltyEntity,
         AddTenantGamePenaltyEntityRequest, UpdateTenantGamePenaltyEntityRequest,
-        TenantGamePenaltyEntityResponse, PageTenantGamePenaltyEntityRequest>
+        GamePenaltyResponse, PageTenantGamePenaltyEntityRequest>
 {
     private readonly CurrentUserContext _currentUserContext;
     private readonly OnlinePenaltyLinkCommandService _penaltyLinkCommandService;
 
-    public TenantGamePenaltyEntityService(SqlSugarRepository<Entity.Tenant.Game.TenantGamePenaltyEntity> repository,
+    public GamePenaltyService(SqlSugarRepository<Entity.Tenant.Game.TenantGamePenaltyEntity> repository,
         CurrentUserContext currentUserContext,
         OnlinePenaltyLinkCommandService penaltyLinkCommandService)
         : base(repository)
@@ -35,7 +35,7 @@ public class TenantGamePenaltyEntityService
     /// <summary>
     /// 新增处罚。审计字段服务端强制。
     /// </summary>
-    public override async Task<TenantGamePenaltyEntityResponse> AddAsync(AddTenantGamePenaltyEntityRequest input)
+    public override async Task<GamePenaltyResponse> AddAsync(AddTenantGamePenaltyEntityRequest input)
     {
         if (string.IsNullOrWhiteSpace(input.TargetId))
         {
@@ -51,13 +51,13 @@ public class TenantGamePenaltyEntityService
         entity.Status = PenaltyStatusEnum.Active;
         entity.OperatorId = _currentUserContext.UserId;
         await Repository.InsertWithDiffLogAsync(entity);
-        return entity.Adapt<TenantGamePenaltyEntityResponse>();
+        return entity.Adapt<GamePenaltyResponse>();
     }
 
     /// <summary>
     /// 分页查询：按 TargetType / TargetId / Status / ActionType 过滤。
     /// </summary>
-    protected override ISugarQueryable<TenantGamePenaltyEntityResponse> BuildPageQuery(PageTenantGamePenaltyEntityRequest input)
+    protected override ISugarQueryable<GamePenaltyResponse> BuildPageQuery(PageTenantGamePenaltyEntityRequest input)
     {
         return Repository.AsQueryable()
 
@@ -65,7 +65,7 @@ public class TenantGamePenaltyEntityService
                          .WhereIF(!string.IsNullOrWhiteSpace(input.TargetId), p => p.TargetId == input.TargetId)
                          .WhereIF(input.Status.HasValue, p => p.Status == input.Status.Value)
                          .WhereIF(input.ActionType.HasValue, p => p.ActionType == input.ActionType.Value)
-                         .Select<TenantGamePenaltyEntityResponse>();
+                         .Select<GamePenaltyResponse>();
     }
 
     /// <summary>

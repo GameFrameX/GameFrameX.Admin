@@ -3,7 +3,7 @@ namespace GameFrameX.Application.ServerCenter.GameDockerTag.Dto;
 /// <summary>
 /// 游戏Docker标签实体基类 - 包含 AddInput 和 UpdateInput 的公共字段
 /// </summary>
-public abstract class TenantGameDockerTagEntityBaseRequest : BaseUpdateRequest
+public abstract class GameDockerTagBaseRequest : BaseUpdateRequest
 {
     /// <summary>
     /// 名称

@@ -7,7 +7,7 @@ namespace GameFrameX.Application.GmCenter.LiveOps.ConfigRollout.Dto;
 /// <summary>
 /// 配置灰度版本行输出（Publish / Rollback 动作回显的公共基类）。
 /// </summary>
-public class TenantGameOnlineConfigRolloutResponse
+public class GameOnlineConfigRolloutResponse
 {
     /// <summary>
     /// 版本行Id。

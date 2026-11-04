@@ -7,12 +7,12 @@ namespace GameFrameX.Application.CommerceCenter.GameCommodity;
 /// 游戏商品交易服务
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
-public class TenantGameCommodityEntityService
+public class GameCommodityService
     : GenericCrudService<Entity.Tenant.Game.TenantGameCommodityEntity,
         AddTenantGameCommodityEntityRequest, UpdateTenantGameCommodityEntityRequest,
-        TenantGameCommodityEntityResponse, PageTenantGameCommodityEntityRequest>
+        GameCommodityResponse, PageTenantGameCommodityEntityRequest>
 {
-    public TenantGameCommodityEntityService(SqlSugarRepository<Entity.Tenant.Game.TenantGameCommodityEntity> repository)
+    public GameCommodityService(SqlSugarRepository<Entity.Tenant.Game.TenantGameCommodityEntity> repository)
         : base(repository)
     {
     }
@@ -29,7 +29,7 @@ public class TenantGameCommodityEntityService
         }
     }
 
-    protected override ISugarQueryable<TenantGameCommodityEntityResponse> BuildPageQuery(PageTenantGameCommodityEntityRequest input)
+    protected override ISugarQueryable<GameCommodityResponse> BuildPageQuery(PageTenantGameCommodityEntityRequest input)
     {
         return Repository.AsQueryable()
                          .WhereIF(!string.IsNullOrWhiteSpace(input.SearchKey), u =>
@@ -41,7 +41,7 @@ public class TenantGameCommodityEntityService
                          .WhereIF(input.Number > 0, u => u.Number == input.Number)
                          .WhereIF(!string.IsNullOrWhiteSpace(input.CreatedName), u => u.CreatedName.Contains(input.CreatedName.Trim()))
                          .WhereIF(!string.IsNullOrWhiteSpace(input.UpdatedName), u => u.UpdatedName.Contains(input.UpdatedName.Trim()))
-                         .Select<TenantGameCommodityEntityResponse>();
+                         .Select<GameCommodityResponse>();
     }
 }
 #pragma warning restore CS8602, CS8604, CS8629

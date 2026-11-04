@@ -5,6 +5,6 @@ namespace GameFrameX.Application.GmCenter.LiveOps.ConfigRollout.Dto;
 /// <summary>
 /// 灰度发布输出（发布成功的版本行回显）。
 /// </summary>
-public sealed class PublishConfigRolloutResponse : TenantGameOnlineConfigRolloutResponse
+public sealed class PublishConfigRolloutResponse : GameOnlineConfigRolloutResponse
 {
 }

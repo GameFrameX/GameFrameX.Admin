@@ -3,7 +3,7 @@ namespace GameFrameX.Application.ClientDelivery.LoginTicket.GameLoginTicketKey.D
 /// <summary>
 /// 签名密钥手动轮换输入参数。
 /// </summary>
-public class TenantGameLoginTicketKeyRotateRequest
+public class GameLoginTicketKeyRotateRequest
 {
     /// <summary>
     /// 新密钥的到期时间；null 表示永不过期。

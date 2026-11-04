@@ -9,7 +9,7 @@ public sealed class GameLoginTicketResponse
     /// <summary>
     /// 角色基础信息。
     /// </summary>
-    public TenantGameRoleEntityResponse Player { get; set; } = null!;
+    public GameRoleResponse Player { get; set; } = null!;
 
     /// <summary>
     /// 短时 Game Server 准入票据。

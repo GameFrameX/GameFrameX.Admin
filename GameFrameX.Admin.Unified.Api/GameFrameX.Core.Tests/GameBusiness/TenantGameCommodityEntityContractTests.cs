@@ -69,7 +69,7 @@ public class TenantGameCommodityEntityContractTests
         // 前端 getCategoryName 的 item.id === categoryId 严格相等匹配不受影响
         var options = CreateOptions();
 
-        var json = JsonSerializer.Serialize(new TenantGameCommodityEntityResponse
+        var json = JsonSerializer.Serialize(new GameCommodityResponse
         {
             Id = 4664278385747429000,
             CategoryId = 7451234567890123,

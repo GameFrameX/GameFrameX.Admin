@@ -3,7 +3,7 @@ namespace GameFrameX.Application.CommerceCenter.GameGoods.Dto;
 /// <summary>
 /// 游戏资源输出参数
 /// </summary>
-public class TenantGameGoodsEntityResponse : IBasePageResponse<Entity.Tenant.Game.TenantGameGoodsEntity>
+public class GameGoodsResponse : IBasePageResponse<Entity.Tenant.Game.TenantGameGoodsEntity>
 {
     /// <summary>
     /// Id

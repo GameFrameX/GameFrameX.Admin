@@ -34,7 +34,7 @@ public class OnlineReportCaseService : IAdminApiController
 
     private readonly IOnlineServerClient _onlineServerClient;
     private readonly OnlineScopeContextFactory _scopeContextFactory;
-    private readonly TenantGamePenaltyEntityService _penaltyEntityService;
+    private readonly GamePenaltyService _penaltyEntityService;
     private readonly OnlinePenaltyLinkCommandService _penaltyLinkCommandService;
 
     /// <summary>
@@ -43,7 +43,7 @@ public class OnlineReportCaseService : IAdminApiController
     public OnlineReportCaseService(
         IOnlineServerClient onlineServerClient,
         OnlineScopeContextFactory scopeContextFactory,
-        TenantGamePenaltyEntityService penaltyEntityService,
+        GamePenaltyService penaltyEntityService,
         OnlinePenaltyLinkCommandService penaltyLinkCommandService)
     {
         _onlineServerClient = onlineServerClient;
@@ -167,10 +167,10 @@ public class OnlineReportCaseService : IAdminApiController
     }
 
     /// <summary>
-    /// 写处罚事实源（复用 TenantGamePenaltyEntityService.AddAsync 语义：服务端强制 Status=Active、OperatorId=当前操作人）。
+    /// 写处罚事实源（复用 GamePenaltyService.AddAsync 语义：服务端强制 Status=Active、OperatorId=当前操作人）。
     /// <para>SourceReportId 为 long? 而案件 Id 为 Online 侧字符串，类型不匹配不写入——案件回链经 Reason 摘要与审计日志保留。</para>
     /// </summary>
-    private async Task<TenantGamePenaltyEntityResponse> WritePenaltyFactAsync(OnlineReportHandleRequest input, long handledAt)
+    private async Task<GamePenaltyResponse> WritePenaltyFactAsync(OnlineReportHandleRequest input, long handledAt)
     {
         if (!input.DurationMinutes.HasValue)
         {

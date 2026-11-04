@@ -24,8 +24,8 @@ public class GameUserController : BaseController<TenantGameUserEntity>
     private readonly ClientApiTokenIssuer _clientApiTokenIssuer;
     private readonly ClientApiSessionKeyIssuer _clientApiSessionKeyIssuer;
     private readonly Repository<TenantGameUserEmailEntity> _gameUserEmailService;
-    private readonly ITenantGamePenaltyEnforcementService _tenantGamePenaltyEnforcementService;
-    private readonly TenantGameUserPasswordService _tenantGameUserPasswordService;
+    private readonly IGamePenaltyEnforcementService _tenantGamePenaltyEnforcementService;
+    private readonly GameUserPasswordService _tenantGameUserPasswordService;
 
     /*private readonly GoogleOAuth2Service _googleOAuth2Service;*/
 
@@ -42,8 +42,8 @@ public class GameUserController : BaseController<TenantGameUserEntity>
     public GameUserController(SqlSugarRepository<TenantGameUserEntity> service, ClientApiTokenIssuer clientApiTokenIssuer,
         ClientApiSessionKeyIssuer clientApiSessionKeyIssuer,
         Repository<TenantGameUserEmailEntity> gameUserEmailService,
-        ITenantGamePenaltyEnforcementService tenantGamePenaltyEnforcementService,
-        TenantGameUserPasswordService tenantGameUserPasswordService
+        IGamePenaltyEnforcementService tenantGamePenaltyEnforcementService,
+        GameUserPasswordService tenantGameUserPasswordService
         /*, GoogleOAuth2Service googleOAuth2Service*/
     ) : base(service)
     {
@@ -539,7 +539,7 @@ public class GameUserController : BaseController<TenantGameUserEntity>
         if (entity == null)
         {
             // 账号不存在：执行一次假 Verify 抵御账号枚举（耗时与密码错误路径一致），统一返回账号或密码错误，不泄露账号是否存在
-            _tenantGameUserPasswordService.Verify(input.Password, TenantGameUserPasswordService.EnumerationDecoyHash);
+            _tenantGameUserPasswordService.Verify(input.Password, GameUserPasswordService.EnumerationDecoyHash);
             return GameApiResult.Error<GetTenantGameUserEntityResponse>(AccountErrorCode.AccountOrPasswordByEmailError, "账号或密码错误");
         }
 
@@ -704,7 +704,7 @@ public class GameUserController : BaseController<TenantGameUserEntity>
         if (entity == null)
         {
             // 账号不存在：执行一次假 Verify 抵御账号枚举（耗时与密码错误路径一致），统一返回账号或密码错误，不泄露账号是否存在
-            _tenantGameUserPasswordService.Verify(input.Password, TenantGameUserPasswordService.EnumerationDecoyHash);
+            _tenantGameUserPasswordService.Verify(input.Password, GameUserPasswordService.EnumerationDecoyHash);
             return GameApiResult.Error<GetTenantGameUserEntityResponse>(AccountErrorCode.AccountOrPasswordError, "账号或密码错误");
         }
 

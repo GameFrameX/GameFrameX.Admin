@@ -165,7 +165,7 @@ public sealed class ClientApiAccountEndpointTests
     public async Task GameUser_EmailLogin_AcceptsCorrectPassword_RejectsWrongAndMissingAccount()
     {
         using var db = new ClientApiTestDb();
-        // SeedUser 用 Argon2id 写入 EmailPassword，与生产 TenantGameUserPasswordService 一致（C215）
+        // SeedUser 用 Argon2id 写入 EmailPassword，与生产 GameUserPasswordService 一致（C215）
         db.SeedUser(2001, "player@example.test", "right-password", email: "player@example.test");
         var controller = CreateController(db);
         db.AttachContext(controller);
@@ -204,7 +204,7 @@ public sealed class ClientApiAccountEndpointTests
             new ClientApiSessionKeyIssuer(db.Repository<TenantSessionKeyEntity>()),
             db.Repository<TenantGameUserEmailEntity>(),
             new FakeTenantGamePenaltyEnforcementService(),
-            new TenantGameUserPasswordService());
+            new GameUserPasswordService());
     }
 
     private static ClientApiTokenIssuer CreateTokenIssuer()

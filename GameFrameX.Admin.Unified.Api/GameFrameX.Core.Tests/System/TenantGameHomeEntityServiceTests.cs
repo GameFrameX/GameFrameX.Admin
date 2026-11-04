@@ -49,10 +49,10 @@ public class TenantGameHomeEntityServiceTests : IDisposable
         _tenantDbProvider = new FakeTenantDbConnectionProvider(_db, TenantConfigId);
     }
 
-    private TenantGameHomeEntityService CreateService(HttpClient? httpClient = null)
+    private GameHomeService CreateService(HttpClient? httpClient = null)
     {
         var client = httpClient ?? new HttpClient(new StubHandler(_ => throw new InvalidOperationException("should not call")));
-        return new TenantGameHomeEntityService(new StubHttpClientFactory(client), _tenantDbProvider.Database);
+        return new GameHomeService(new StubHttpClientFactory(client), _tenantDbProvider.Database);
     }
 
 

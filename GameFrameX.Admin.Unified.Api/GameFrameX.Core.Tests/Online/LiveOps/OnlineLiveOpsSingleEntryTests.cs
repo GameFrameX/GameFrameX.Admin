@@ -80,11 +80,11 @@ public sealed class OnlineLiveOpsSingleEntryTests
     {
         var siblings = new[]
         {
-            typeof(GameFrameX.Application.GmCenter.LiveOps.PlayerSegment.TenantGameOnlinePlayerSegmentService),
-            typeof(TenantGameOnlineConfigRolloutService),
-            typeof(TenantGameAppRemoteConfigService),
-            typeof(TenantGameAnnouncementEntityService),
-            typeof(TenantGameMailCampaignEntityService),
+            typeof(GameFrameX.Application.GmCenter.LiveOps.PlayerSegment.GameOnlinePlayerSegmentService),
+            typeof(GameOnlineConfigRolloutService),
+            typeof(GameAppRemoteConfigService),
+            typeof(GameAnnouncementService),
+            typeof(GameMailCampaignService),
         };
 
         foreach (var sibling in siblings)
@@ -127,7 +127,7 @@ public sealed class OnlineLiveOpsSingleEntryTests
     public void NewServices_AreAdminApiControllers()
     {
         Assert.Contains(typeof(IAdminApiController), typeof(OnlineLiveOpsDispatchService).GetInterfaces());
-        Assert.Contains(typeof(IAdminApiController), typeof(TenantGameOnlineConfigRolloutService).GetInterfaces());
+        Assert.Contains(typeof(IAdminApiController), typeof(GameOnlineConfigRolloutService).GetInterfaces());
     }
 
     /// <summary>

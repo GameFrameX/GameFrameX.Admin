@@ -8,14 +8,14 @@ namespace GameFrameX.Application.ClientDelivery.Device.GameAppDevice;
 /// <para>机器码 DeviceUniqueIdentifier 在主库内唯一。</para>
 /// </summary>
 [ApiDescriptionSettings(Order = 100)]
-public class TenantGameAppDeviceService : GenericCrudSelectService<TenantGameAppDeviceEntity, AddTenantGameAppDeviceRequest, UpdateTenantGameAppDeviceRequest, TenantGameAppDeviceResponse, TenantGameAppDeviceRequest>
+public class GameAppDeviceService : GenericCrudSelectService<TenantGameAppDeviceEntity, AddTenantGameAppDeviceRequest, UpdateTenantGameAppDeviceRequest, GameAppDeviceResponse, GameAppDeviceRequest>
 {
 
     /// <summary>
     /// 设备码服务
     /// </summary>
     /// <param name="repository"></param>
-    public TenantGameAppDeviceService(SqlSugarRepository<TenantGameAppDeviceEntity> repository)
+    public GameAppDeviceService(SqlSugarRepository<TenantGameAppDeviceEntity> repository)
         : base(repository)
     {
     }
@@ -45,7 +45,7 @@ public class TenantGameAppDeviceService : GenericCrudSelectService<TenantGameApp
     /// <summary>
     /// 分页查询主库设备。
     /// </summary>
-    protected override ISugarQueryable<TenantGameAppDeviceResponse> BuildPageQuery(TenantGameAppDeviceRequest input)
+    protected override ISugarQueryable<GameAppDeviceResponse> BuildPageQuery(GameAppDeviceRequest input)
     {
         return Repository.AsQueryable()
                          .Where(u => u.IsDeleted == false)
@@ -55,7 +55,7 @@ public class TenantGameAppDeviceService : GenericCrudSelectService<TenantGameApp
                                             .Any())
                          .WhereIF(!string.IsNullOrWhiteSpace(input.SearchKey),
                                   u => (u.Name ?? string.Empty).Contains((input.SearchKey ?? string.Empty).Trim()))
-                         .Select<TenantGameAppDeviceResponse>();
+                         .Select<GameAppDeviceResponse>();
     }
 
     /// <summary>

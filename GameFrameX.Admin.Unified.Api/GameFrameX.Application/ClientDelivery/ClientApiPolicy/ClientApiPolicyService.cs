@@ -18,10 +18,10 @@ namespace GameFrameX.Application.ClientDelivery.ClientApiPolicy;
 /// Encrypt 幂等跳过已密文值，新明文在落库前加密。</para>
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 112)]
-public class TenantClientApiPolicyEntityService
+public class ClientApiPolicyService
     : GenericCrudService<GameFrameX.Entity.Tenant.ClientApiConfig.TenantClientApiPolicyEntity,
         AddTenantClientApiPolicyRequest, UpdateTenantClientApiPolicyRequest,
-        TenantClientApiPolicyResponse, PageTenantClientApiPolicyRequest>
+        ClientApiPolicyResponse, PageTenantClientApiPolicyRequest>
 {
     /// <summary>
     /// 票据固定到期时间上限（秒）：30 天（C142 决策口径）。
@@ -30,7 +30,7 @@ public class TenantClientApiPolicyEntityService
 
     private readonly GameFrameX.Core.Service.User.CurrentUserContext _currentUserContext;
 
-    public TenantClientApiPolicyEntityService(SqlSugarRepository<GameFrameX.Entity.Tenant.ClientApiConfig.TenantClientApiPolicyEntity> repository,
+    public ClientApiPolicyService(SqlSugarRepository<GameFrameX.Entity.Tenant.ClientApiConfig.TenantClientApiPolicyEntity> repository,
                                               GameFrameX.Core.Service.User.CurrentUserContext currentUserContext)
         : base(repository)
     {
@@ -64,20 +64,20 @@ public class TenantClientApiPolicyEntityService
         LogHelper.Info($"[KeyAudit] action=PolicySigningKeyRotate policyId={entity.Id} oldKeyRevoked=immediately operator={_currentUserContext.Account}");
     }
 
-    protected override ISugarQueryable<TenantClientApiPolicyResponse> BuildPageQuery(PageTenantClientApiPolicyRequest input)
+    protected override ISugarQueryable<ClientApiPolicyResponse> BuildPageQuery(PageTenantClientApiPolicyRequest input)
     {
         var searchKey = input.SearchKey?.Trim();
         return Repository.AsQueryable()
                          .WhereIF(!string.IsNullOrWhiteSpace(searchKey), u => u.Remark.Contains(searchKey))
                          .WhereIF(input.IsActive.HasValue, u => u.IsEnabled == input.IsActive.Value)
-                         .Select<TenantClientApiPolicyResponse>();
+                         .Select<ClientApiPolicyResponse>();
     }
 
     /// <summary>
     /// 新增主库唯一运行策略。SigningKey 空白时服务端生成 64 位十六进制密钥。
     /// </summary>
     [DisplayName("新增 Client API 运行策略")]
-    public override async Task<TenantClientApiPolicyResponse> AddAsync(AddTenantClientApiPolicyRequest input)
+    public override async Task<ClientApiPolicyResponse> AddAsync(AddTenantClientApiPolicyRequest input)
     {
         await CheckUniqueScopeAsync(null);
         ValidateTicketExpireTime(input.TicketExpireTime);
@@ -86,7 +86,7 @@ public class TenantClientApiPolicyEntityService
         entity.SigningKey = ResolveSigningKeyForStorage(input.SigningKey, null);
         entity.IsEnabled = true;
         await Repository.InsertAsync(entity);
-        var response = entity.Adapt<TenantClientApiPolicyResponse>();
+        var response = entity.Adapt<ClientApiPolicyResponse>();
         // 与 Page/Detail 同口径：SigningKey 不出 wire（库内密文形态也不回显，掩码替代）
         response.SigningKey = SensitiveFieldMask.MaskValue;
         return response;
@@ -144,7 +144,7 @@ public class TenantClientApiPolicyEntityService
     [HttpPost(CrudActionRoutes.Page)]
     [ApiDescriptionSettings(Name = "Page")]
     [DisplayName("分页查询 Client API 运行策略")]
-    public override async Task<SqlSugarPagedList<TenantClientApiPolicyResponse>> PageAsync(PageTenantClientApiPolicyRequest input)
+    public override async Task<SqlSugarPagedList<ClientApiPolicyResponse>> PageAsync(PageTenantClientApiPolicyRequest input)
     {
         var result = await base.PageAsync(input);
         foreach (var item in result.Items)
@@ -161,7 +161,7 @@ public class TenantClientApiPolicyEntityService
     [HttpGet(CrudActionRoutes.Detail)]
     [ApiDescriptionSettings(Name = "Detail")]
     [DisplayName("Client API 运行策略详情")]
-    public override async Task<TenantClientApiPolicyResponse> GetAsync([FromQuery] BaseIdRequest input)
+    public override async Task<ClientApiPolicyResponse> GetAsync([FromQuery] BaseIdRequest input)
     {
         var entity = await InnerGetAsync(input);
         if (entity == null)
@@ -170,7 +170,7 @@ public class TenantClientApiPolicyEntityService
         }
 
         entity.SigningKey = SensitiveFieldMask.MaskValue;
-        return entity.Adapt<TenantClientApiPolicyResponse>();
+        return entity.Adapt<ClientApiPolicyResponse>();
     }
 
     /// <summary>

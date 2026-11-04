@@ -14,9 +14,9 @@ namespace GameFrameX.Application.ClientDelivery.Security.SessionKey;
 /// <para>作用域：主库。路由前缀 /api/tenantSessionKeyEntity。</para>
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 114)]
-public class TenantSessionKeyEntityService : BaseService<TenantSessionKeyEntity>
+public class SessionKeyService : BaseService<TenantSessionKeyEntity>
 {
-    public TenantSessionKeyEntityService(SqlSugarRepository<TenantSessionKeyEntity> repository)
+    public SessionKeyService(SqlSugarRepository<TenantSessionKeyEntity> repository)
         : base(repository)
     {
     }
@@ -26,13 +26,13 @@ public class TenantSessionKeyEntityService : BaseService<TenantSessionKeyEntity>
     /// </summary>
     [HttpPost(CrudActionRoutes.Page)]
     [ApiDescriptionSettings(Name = "Page")]
-    public async Task<SqlSugarPagedList<TenantSessionKeyResponse>> PageAsync(PageTenantSessionKeyRequest input)
+    public async Task<SqlSugarPagedList<SessionKeyResponse>> PageAsync(PageTenantSessionKeyRequest input)
     {
         var page = await Repository.AsQueryable()
                                    .Where(u => u.IsDeleted == false)
                                    .WhereIF(input.IsActive.HasValue, u => u.IsEnabled == input.IsActive.Value)
                                    .OrderBy(u => u.CreatedTime, OrderByType.Desc)
-                                   .Select<TenantSessionKeyResponse>()
+                                   .Select<SessionKeyResponse>()
                                    .ToPagedListAsync(input.Page, input.PageSize);
         foreach (var item in page.Items)
         {
@@ -49,7 +49,7 @@ public class TenantSessionKeyEntityService : BaseService<TenantSessionKeyEntity>
     /// </summary>
     [HttpPost(CrudActionRoutes.Add)]
     [ApiDescriptionSettings(Name = "Add")]
-    public async Task<TenantSessionKeyRevealResponse> AddAsync(TenantSessionKeyAddRequest input)
+    public async Task<SessionKeyRevealResponse> AddAsync(SessionKeyAddRequest input)
     {
         var now = TimerHelper.UnixTimeSeconds();
         var notBefore = input.NotBeforeTime ?? now;
@@ -75,11 +75,11 @@ public class TenantSessionKeyEntityService : BaseService<TenantSessionKeyEntity>
     /// </summary>
     [HttpGet(CrudActionRoutes.Detail)]
     [ApiDescriptionSettings(Name = "Detail")]
-    public async Task<TenantSessionKeyResponse> DetailAsync(BaseIdRequest input)
+    public async Task<SessionKeyResponse> DetailAsync(BaseIdRequest input)
     {
         var item = await Repository.AsQueryable()
                                    .Where(u => u.IsDeleted == false && u.Id == input.Id)
-                                   .Select<TenantSessionKeyResponse>()
+                                   .Select<SessionKeyResponse>()
                                    .FirstAsync();
         if (item == null)
         {
@@ -99,7 +99,7 @@ public class TenantSessionKeyEntityService : BaseService<TenantSessionKeyEntity>
     /// </summary>
     [HttpPost("rotate")]
     [ApiDescriptionSettings(Name = "Rotate")]
-    public async Task<TenantSessionKeyRevealResponse> RotateAsync(TenantSessionKeyRotateRequest input)
+    public async Task<SessionKeyRevealResponse> RotateAsync(SessionKeyRotateRequest input)
     {
         var now = TimerHelper.UnixTimeSeconds();
         if (input.OldKeyExpireTime.HasValue && input.OldKeyExpireTime.Value <= now)
@@ -149,7 +149,7 @@ public class TenantSessionKeyEntityService : BaseService<TenantSessionKeyEntity>
     /// </summary>
     [HttpPost("renew")]
     [ApiDescriptionSettings(Name = "Renew")]
-    public async Task RenewAsync(TenantSessionKeyRenewRequest input)
+    public async Task RenewAsync(SessionKeyRenewRequest input)
     {
         var now = TimerHelper.UnixTimeSeconds();
         if (input.ExpireTime.HasValue && input.ExpireTime.Value <= now)
@@ -254,9 +254,9 @@ public class TenantSessionKeyEntityService : BaseService<TenantSessionKeyEntity>
     /// <summary>
     /// 一次性回显输出：库内密文（C371），响应携带生成时明文。
     /// </summary>
-    private static TenantSessionKeyRevealResponse ToRevealOutput(TenantSessionKeyEntity entity, string plainSecret)
+    private static SessionKeyRevealResponse ToRevealOutput(TenantSessionKeyEntity entity, string plainSecret)
     {
-        return new TenantSessionKeyRevealResponse
+        return new SessionKeyRevealResponse
         {
             Id = entity.Id,
             Kid = entity.Kid,

@@ -14,11 +14,11 @@ public sealed class HostApplicationGameReferenceGuardTests
     private static readonly HashSet<string> ClientApiAllowedReferences = new(StringComparer.Ordinal)
     {
         // GameUserController 封禁/踢下线联动处罚执行（DI 注入接口）
-        "GameFrameX.Application.PlayerCenter.GamePenalty.ITenantGamePenaltyEnforcementService",
+        "GameFrameX.Application.PlayerCenter.GamePenalty.IGamePenaltyEnforcementService",
         // GameUserController 用户密码校验（C214 Argon2id 路径）
-        "GameFrameX.Application.PlayerCenter.GameUser.TenantGameUserPasswordService",
+        "GameFrameX.Application.PlayerCenter.GameUser.GameUserPasswordService",
         // GameOrderController 订单发货（Client.Api 支付回调后履约）
-        "GameFrameX.Application.CommerceCenter.GameOrder.TenantGameOrderShipService",
+        "GameFrameX.Application.CommerceCenter.GameOrder.GameOrderShipService",
         // C345 灰度判定原语唯一化：RemoteConfigRolloutMatcher 委托 Application 层共享实现，
         // 与活动/功能开关投放共用同一套取模 + 白名单旁路语义（原 Client.Api 私有副本已收敛）。
         "GameFrameX.Application.ClientDelivery.Rollout.StableDeviceRolloutMatcher",

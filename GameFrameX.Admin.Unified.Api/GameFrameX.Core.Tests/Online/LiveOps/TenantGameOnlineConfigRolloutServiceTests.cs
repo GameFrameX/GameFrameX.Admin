@@ -214,9 +214,9 @@ public sealed class TenantGameOnlineConfigRolloutServiceTests : IDisposable
         };
     }
 
-    private TenantGameOnlineConfigRolloutService CreateService()
+    private GameOnlineConfigRolloutService CreateService()
     {
-        return new TenantGameOnlineConfigRolloutService(
+        return new GameOnlineConfigRolloutService(
             Repository<TenantGameOnlineConfigRolloutEntity>(),
             Repository<TenantGameOnlinePlayerSegmentEntity>(),
             _dispatch,

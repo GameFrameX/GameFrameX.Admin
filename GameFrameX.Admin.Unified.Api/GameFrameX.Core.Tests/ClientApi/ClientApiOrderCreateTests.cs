@@ -107,7 +107,7 @@ public sealed class ClientApiOrderCreateTests
             FakeOptionsProvider.WithAreaPolicy(false),
             db.Repository<TenantGameRoleEntity>(),
             new HttpClient(ClientApiRecordingHttpHandler.WithGameServerDefaults(), false),
-            new TenantGameOrderShipService(db.TenantDb, new ClientApiTestHttpClientFactory(ClientApiRecordingHttpHandler.WithGameServerDefaults())),
+            new GameOrderShipService(db.TenantDb, new ClientApiTestHttpClientFactory(ClientApiRecordingHttpHandler.WithGameServerDefaults())),
             factory,
             new TestGooglePubSubPushAuthenticator(),
             new TestGooglePlayPurchaseService());

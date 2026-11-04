@@ -3,7 +3,7 @@ namespace GameFrameX.Application.NoticeCenter.GameMailTemplateCategory.Dto;
 /// <summary>
 /// 邮件模板分类输出参数
 /// </summary>
-public class TenantGameMailTemplateCategoryEntityResponse : IBasePageResponse<Entity.Tenant.Game.TenantGameMailTemplateCategoryEntity>
+public class GameMailTemplateCategoryResponse : IBasePageResponse<Entity.Tenant.Game.TenantGameMailTemplateCategoryEntity>
 {
     /// <summary>
     /// Id

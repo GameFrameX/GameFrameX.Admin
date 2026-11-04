@@ -7,7 +7,7 @@ namespace GameFrameX.Application.CommerceCenter.GameWebShop;
 /// 游戏角色服务
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
-public class TenantGameWebShopEntityService : GenericCrudSelectService<Entity.Tenant.Game.TenantGameWebShopEntity, AddTenantGameWebShopEntityRequest, UpdateTenantGameWebShopEntityRequest, TenantGameWebShopEntityResponse, PageTenantGameWebShopEntityRequest>
+public class GameWebShopService : GenericCrudSelectService<Entity.Tenant.Game.TenantGameWebShopEntity, AddTenantGameWebShopEntityRequest, UpdateTenantGameWebShopEntityRequest, GameWebShopResponse, PageTenantGameWebShopEntityRequest>
 {
     private readonly HttpClient _httpClient;
 
@@ -17,7 +17,7 @@ public class TenantGameWebShopEntityService : GenericCrudSelectService<Entity.Te
     /// <param name="repository"></param>
     /// <param name="httpClient"></param>
     /// <returns></returns>
-    public TenantGameWebShopEntityService(SqlSugarRepository<Entity.Tenant.Game.TenantGameWebShopEntity> repository, HttpClient httpClient) : base(repository)
+    public GameWebShopService(SqlSugarRepository<Entity.Tenant.Game.TenantGameWebShopEntity> repository, HttpClient httpClient) : base(repository)
     {
         _httpClient = httpClient;
     }
@@ -25,14 +25,14 @@ public class TenantGameWebShopEntityService : GenericCrudSelectService<Entity.Te
     /// <summary>
     /// 构建分页查询条件
     /// </summary>
-    protected override ISugarQueryable<TenantGameWebShopEntityResponse> BuildPageQuery(PageTenantGameWebShopEntityRequest input)
+    protected override ISugarQueryable<GameWebShopResponse> BuildPageQuery(PageTenantGameWebShopEntityRequest input)
     {
         return Repository.AsQueryable()
                          .WhereIF(!string.IsNullOrWhiteSpace(input.SearchKey), u =>
                                       u.Name.Contains(input.SearchKey.Trim())
                          )
                          .WhereIF(!string.IsNullOrWhiteSpace(input.Title), u => u.Name.Contains(input.Title.Trim()))
-                         .Select<TenantGameWebShopEntityResponse>();
+                         .Select<GameWebShopResponse>();
     }
 
     /// <summary>

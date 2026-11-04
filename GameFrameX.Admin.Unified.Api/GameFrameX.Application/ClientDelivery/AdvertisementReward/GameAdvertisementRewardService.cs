@@ -12,12 +12,12 @@ namespace GameFrameX.Application.ClientDelivery.AdvertisementReward;
 /// 留待单独 change 落地；前端对应按钮已由 tenantGameAdRewardEntity:retry / :markProcessed 权限码门控，未种码即隐藏。</para>
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
-public class TenantGameAdvertisementRewardEntityService
+public class GameAdvertisementRewardService
     : GenericCrudService<Entity.Tenant.Game.TenantGameAdvertisementRewardEntity,
         AddTenantGameAdvertisementRewardEntityRequest, UpdateTenantGameAdvertisementRewardEntityRequest,
-        TenantGameAdvertisementRewardEntityResponse, PageTenantGameAdvertisementRewardEntityRequest>
+        GameAdvertisementRewardResponse, PageTenantGameAdvertisementRewardEntityRequest>
 {
-    public TenantGameAdvertisementRewardEntityService(
+    public GameAdvertisementRewardService(
         SqlSugarRepository<Entity.Tenant.Game.TenantGameAdvertisementRewardEntity> repository)
         : base(repository)
     {
@@ -42,7 +42,7 @@ public class TenantGameAdvertisementRewardEntityService
     /// <summary>
     /// 账本分页查询过滤。
     /// </summary>
-    protected override ISugarQueryable<TenantGameAdvertisementRewardEntityResponse> BuildPageQuery(PageTenantGameAdvertisementRewardEntityRequest input)
+    protected override ISugarQueryable<GameAdvertisementRewardResponse> BuildPageQuery(PageTenantGameAdvertisementRewardEntityRequest input)
     {
         return Repository.AsQueryable()
                          .WhereIF(!string.IsNullOrWhiteSpace(input.Provider), u => u.Provider == input.Provider)
@@ -57,7 +57,7 @@ public class TenantGameAdvertisementRewardEntityService
                          .WhereIF(input.CreateTimeRange != null && input.CreateTimeRange.Count == 2 && input.CreateTimeRange[0] < input.CreateTimeRange[1],
                                   u => u.CreatedTime >= input.CreateTimeRange[0]
                                        && u.CreatedTime <= input.CreateTimeRange[1])
-                         .Select<TenantGameAdvertisementRewardEntityResponse>();
+                         .Select<GameAdvertisementRewardResponse>();
     }
 
     /// <summary>
@@ -66,7 +66,7 @@ public class TenantGameAdvertisementRewardEntityService
     [HttpPost(CrudActionRoutes.Export)]
     [ApiDescriptionSettings(Name = "Export")]
     [DisplayName("导出广告奖励账本")]
-    public async Task<List<TenantGameAdvertisementRewardEntityResponse>> ExportAsync(PageTenantGameAdvertisementRewardEntityRequest input)
+    public async Task<List<GameAdvertisementRewardResponse>> ExportAsync(PageTenantGameAdvertisementRewardEntityRequest input)
     {
         return await BuildPageQuery(input).Take(1000).ToListAsync();
     }

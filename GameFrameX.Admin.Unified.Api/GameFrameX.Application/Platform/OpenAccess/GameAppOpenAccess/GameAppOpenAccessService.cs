@@ -13,7 +13,7 @@ namespace GameFrameX.Application.Platform.OpenAccess.GameAppOpenAccess;
 /// <para>签发和更新均校验绑定用户存在，AccessSecret 仅签发 / 轮换时一次性返回。</para>
 /// </summary>
 [ApiDescriptionSettings(Order = 185)]
-public class TenantGameAppOpenAccessService : IAdminApiController
+public class GameAppOpenAccessService : IAdminApiController
 {
     private readonly SqlSugarRepository<TenantGameAppOpenAccessEntity> _repository;
     private readonly SqlSugarRepository<TenantUserEntity> _userRepository;
@@ -21,7 +21,7 @@ public class TenantGameAppOpenAccessService : IAdminApiController
     /// <summary>
     /// 应用开放访问凭证管理服务构造函数。
     /// </summary>
-    public TenantGameAppOpenAccessService(
+    public GameAppOpenAccessService(
         SqlSugarRepository<TenantGameAppOpenAccessEntity> repository,
         SqlSugarRepository<TenantUserEntity> userRepository)
     {
@@ -36,7 +36,7 @@ public class TenantGameAppOpenAccessService : IAdminApiController
     /// <returns>凭证分页（含绑定用户账号 / 姓名回显）。</returns>
     [DisplayName("获取应用开放访问凭证分页列表")]
     [ApiDescriptionSettings(Name = "Page")]
-    public async Task<SqlSugarPagedList<TenantGameAppOpenAccessResponse>> PageAsync(PageTenantGameAppOpenAccessRequest input)
+    public async Task<SqlSugarPagedList<GameAppOpenAccessResponse>> PageAsync(PageTenantGameAppOpenAccessRequest input)
     {
         var accessKey = input.AccessKey?.Trim() ?? string.Empty;
         var scenario = input.Scenario?.Trim() ?? string.Empty;
@@ -48,7 +48,7 @@ public class TenantGameAppOpenAccessService : IAdminApiController
                          .WhereIF(!string.IsNullOrWhiteSpace(scenario), (u, t) => u.Scenario == scenario)
                          .WhereIF(!string.IsNullOrWhiteSpace(subjectName), (u, t) => u.SubjectName.Contains(subjectName))
                          .WhereIF(input.IsEnabled.HasValue, (u, t) => u.IsEnabled == input.IsEnabled)
-                         .Select((u, t) => new TenantGameAppOpenAccessResponse
+                         .Select((u, t) => new GameAppOpenAccessResponse
                          {
                              Id = u.Id,
                              BindUserId = u.BindUserId,
@@ -81,7 +81,7 @@ public class TenantGameAppOpenAccessService : IAdminApiController
     [ApiDescriptionSettings(Name = "Add")]
     [HttpPost]
     [DisplayName("签发应用开放访问凭证")]
-    public async Task<TenantGameAppOpenAccessSecretResponse> AddAsync(AddTenantGameAppOpenAccessRequest input)
+    public async Task<GameAppOpenAccessSecretResponse> AddAsync(AddTenantGameAppOpenAccessRequest input)
     {
         await EnsureBindUserExistsAsync(input.BindUserId);
         var scopes = EnsureValidScopes(input.ScopesJson);
@@ -107,7 +107,7 @@ public class TenantGameAppOpenAccessService : IAdminApiController
         };
         await _repository.InsertAsync(entity);
 
-        return new TenantGameAppOpenAccessSecretResponse
+        return new GameAppOpenAccessSecretResponse
         {
             Id = entity.Id,
             AccessKey = accessKey,
@@ -147,7 +147,7 @@ public class TenantGameAppOpenAccessService : IAdminApiController
     [ApiDescriptionSettings(Name = "Delete")]
     [HttpPost]
     [DisplayName("删除应用开放访问凭证")]
-    public async Task DeleteAsync(TenantGameAppOpenAccessActionRequest input)
+    public async Task DeleteAsync(GameAppOpenAccessActionRequest input)
     {
         var existing = await GetCredentialAsync(input.Id);
         await _repository.DeleteAsync(existing);
@@ -160,7 +160,7 @@ public class TenantGameAppOpenAccessService : IAdminApiController
     [ApiDescriptionSettings(Name = "Revoke")]
     [HttpPost]
     [DisplayName("吊销应用开放访问凭证")]
-    public async Task RevokeAsync(TenantGameAppOpenAccessActionRequest input)
+    public async Task RevokeAsync(GameAppOpenAccessActionRequest input)
     {
         var existing = await GetCredentialAsync(input.Id);
 
@@ -181,7 +181,7 @@ public class TenantGameAppOpenAccessService : IAdminApiController
     [ApiDescriptionSettings(Name = "Enable")]
     [HttpPost]
     [DisplayName("启用应用开放访问凭证")]
-    public async Task EnableAsync(TenantGameAppOpenAccessActionRequest input)
+    public async Task EnableAsync(GameAppOpenAccessActionRequest input)
     {
         var existing = await GetCredentialAsync(input.Id);
 
@@ -203,7 +203,7 @@ public class TenantGameAppOpenAccessService : IAdminApiController
     [ApiDescriptionSettings(Name = "Disable")]
     [HttpPost]
     [DisplayName("禁用应用开放访问凭证")]
-    public async Task DisableAsync(TenantGameAppOpenAccessActionRequest input)
+    public async Task DisableAsync(GameAppOpenAccessActionRequest input)
     {
         var existing = await GetCredentialAsync(input.Id);
 
@@ -221,7 +221,7 @@ public class TenantGameAppOpenAccessService : IAdminApiController
     [ApiDescriptionSettings(Name = "Refresh")]
     [HttpPost]
     [DisplayName("轮换应用开放访问凭证密钥")]
-    public async Task<TenantGameAppOpenAccessSecretResponse> RefreshAsync(TenantGameAppOpenAccessActionRequest input)
+    public async Task<GameAppOpenAccessSecretResponse> RefreshAsync(GameAppOpenAccessActionRequest input)
     {
         var existing = await GetCredentialAsync(input.Id);
 
@@ -231,7 +231,7 @@ public class TenantGameAppOpenAccessService : IAdminApiController
 
         await _repository.Context.UpdateWithOptimisticLockAsync(existing);
 
-        return new TenantGameAppOpenAccessSecretResponse
+        return new GameAppOpenAccessSecretResponse
         {
             Id = existing.Id,
             AccessKey = existing.AccessKey,

@@ -5,9 +5,9 @@ namespace GameFrameX.Application.ClientDelivery.Security.AppSignatureKey.Dto;
 /// <summary>
 /// App 传输签名密钥输出参数（列表/详情，密钥脱敏）。
 /// <para><see cref="Secret"/> 为固定脱敏占位值 ******：HMAC 对称密钥验签必需明文落库（见实体注释），
-/// 但任何列表/详情查询都不得回显明文；明文仅在 AddAsync/RotateAsync 响应（<see cref="TenantAppSignatureKeyRevealResponse"/>）一次性回显。</para>
+/// 但任何列表/详情查询都不得回显明文；明文仅在 AddAsync/RotateAsync 响应（<see cref="AppSignatureKeyRevealResponse"/>）一次性回显。</para>
 /// </summary>
-public class TenantAppSignatureKeyResponse
+public class AppSignatureKeyResponse
 {
     /// <summary>
     /// 主键 ID。

@@ -11,7 +11,7 @@ namespace GameFrameX.Client.Api.GameUser.Dto;
 /// <summary>
 /// 游戏账号重置密码输入参数
 /// </summary>
-public class GameUserResetEntityRequest : TenantGameUserEntityBaseRequest
+public class GameUserResetEntityRequest : GameUserBaseRequest
 {
     /// <summary>
     /// 账号

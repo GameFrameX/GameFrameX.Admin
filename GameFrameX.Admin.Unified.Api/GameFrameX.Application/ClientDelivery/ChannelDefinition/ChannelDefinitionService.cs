@@ -11,7 +11,7 @@ namespace GameFrameX.Application.ClientDelivery.ChannelDefinition;
 /// 租户渠道定义服务，仅管理当前租户渠道
 /// </summary>
 [ApiDescriptionSettings(Order = 101)]
-public class TenantChannelDefinitionService
+public class ChannelDefinitionService
     : ChannelDefinitionManagementServiceBase<TenantChannelDefinitionEntity>
 {
     private readonly SqlSugarRepository<TenantGameAppPackageEntity> _packageRepository;
@@ -19,7 +19,7 @@ public class TenantChannelDefinitionService
     /// <summary>
     /// 租户渠道定义服务
     /// </summary>
-    public TenantChannelDefinitionService(
+    public ChannelDefinitionService(
         SqlSugarRepository<TenantChannelDefinitionEntity> repository,
         SqlSugarRepository<GlobalChannelDefinitionEntity> globalChannelRepository,
         SqlSugarRepository<TenantGameAppPackageEntity> packageRepository,

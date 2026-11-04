@@ -14,11 +14,11 @@ namespace GameFrameX.Application.ClientDelivery.LoginTicket.GameLoginTicketKey;
 /// <para>作用域：主库。</para>
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 114)]
-public class TenantGameLoginTicketKeyEntityService : BaseService<TenantGameLoginTicketKeyEntity>
+public class GameLoginTicketKeyService : BaseService<TenantGameLoginTicketKeyEntity>
 {
     private readonly CurrentUserContext _currentUserContext;
 
-    public TenantGameLoginTicketKeyEntityService(SqlSugarRepository<TenantGameLoginTicketKeyEntity> repository, CurrentUserContext currentUserContext)
+    public GameLoginTicketKeyService(SqlSugarRepository<TenantGameLoginTicketKeyEntity> repository, CurrentUserContext currentUserContext)
         : base(repository)
     {
         _currentUserContext = currentUserContext;
@@ -29,13 +29,13 @@ public class TenantGameLoginTicketKeyEntityService : BaseService<TenantGameLogin
     /// </summary>
     [HttpPost("page")]
     [ApiDescriptionSettings(Name = "Page")]
-    public async Task<SqlSugarPagedList<TenantGameLoginTicketKeyResponse>> PageAsync(PageTenantGameLoginTicketKeyRequest input)
+    public async Task<SqlSugarPagedList<GameLoginTicketKeyResponse>> PageAsync(PageTenantGameLoginTicketKeyRequest input)
     {
         return await Repository.AsQueryable()
                                .Where(u => u.IsDeleted == false)
                                .WhereIF(input.IsActive.HasValue, u => u.IsEnabled == input.IsActive.Value)
                                .OrderBy(u => u.CreatedTime, OrderByType.Desc)
-                               .Select<TenantGameLoginTicketKeyResponse>()
+                               .Select<GameLoginTicketKeyResponse>()
                                .ToPagedListAsync(input.Page, input.PageSize);
     }
 
@@ -44,7 +44,7 @@ public class TenantGameLoginTicketKeyEntityService : BaseService<TenantGameLogin
     /// </summary>
     [HttpGet("detail")]
     [ApiDescriptionSettings(Name = "Detail")]
-    public async Task<TenantGameLoginTicketKeyResponse> DetailAsync([FromQuery] BaseIdRequest input)
+    public async Task<GameLoginTicketKeyResponse> DetailAsync([FromQuery] BaseIdRequest input)
     {
         var entity = await Repository.GetFirstAsync(u => u.Id == input.Id);
         if (entity == null)
@@ -52,7 +52,7 @@ public class TenantGameLoginTicketKeyEntityService : BaseService<TenantGameLogin
             throw BusinessError.Oh(CommonErrorCode.RecordNotFound);
         }
 
-        return entity.Adapt<TenantGameLoginTicketKeyResponse>();
+        return entity.Adapt<GameLoginTicketKeyResponse>();
     }
 
     /// <summary>
@@ -62,7 +62,7 @@ public class TenantGameLoginTicketKeyEntityService : BaseService<TenantGameLogin
     /// </summary>
     [HttpPost("rotate")]
     [ApiDescriptionSettings(Name = "Rotate")]
-    public async Task RotateAsync(TenantGameLoginTicketKeyRotateRequest input)
+    public async Task RotateAsync(GameLoginTicketKeyRotateRequest input)
     {
         var now = TimerHelper.UnixTimeSeconds();
         var oldKeyExpireTime = input.OldKeyExpireTime ?? now + OldKeyDefaultExpireSeconds;

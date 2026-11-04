@@ -41,8 +41,8 @@ GameFrameX.Advertisement.TopOn|GameFrameX.Advertisement.TopOn.TopOnAdvertisement
 GameFrameX.Advertisement.UnityAds|GameFrameX.Advertisement.UnityAds.UnityAdsAdvertisementCallbackOption|Property|hmacParam # Param
 GameFrameX.Advertisement.UnityAds|GameFrameX.Advertisement.UnityAds.UnityAdsAdvertisementCallbackOption|Property|orderIdParam # Param
 GameFrameX.Advertisement.UnityAds|GameFrameX.Advertisement.UnityAds.UnityAdsAdvertisementCallbackOption|Property|sidParam # Param
-GameFrameX.Application|GameFrameX.Application.ServerCenter.GameArea.Dto.TenantGameAreaEntityBaseRequest|Property|ServerParams # Params
-GameFrameX.Application|GameFrameX.Application.ServerCenter.GameArea.Dto.TenantGameAreaEntityResponse|Property|ServerParams # Params
+GameFrameX.Application|GameFrameX.Application.ServerCenter.GameArea.Dto.GameAreaBaseRequest|Property|ServerParams # Params
+GameFrameX.Application|GameFrameX.Application.ServerCenter.GameArea.Dto.GameAreaResponse|Property|ServerParams # Params
 GameFrameX.Client.Api|GameFrameX.Client.Api.GameUserArchive.Dto.GameUserArchiveDownloadResponse|Property|AdStatus # Ad
 GameFrameX.Client.Api|GameFrameX.Client.Api.GameUserArchive.Dto.GameUserArchiveUploadRequest|Property|AdStatus # Ad
 GameFrameX.Client.Api|GameFrameX.Client.Api.GameUserSession.Dto.GameUserSessionLoginRequest|Property|AdGroup # Ad

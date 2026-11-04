@@ -37,16 +37,16 @@ public sealed class KeyLifecycleRotateTests : IDisposable
         _db.Dispose();
     }
 
-    private TenantGameLoginTicketKeyEntityService CreateTicketKeyService()
+    private GameLoginTicketKeyService CreateTicketKeyService()
     {
-        return new TenantGameLoginTicketKeyEntityService(
+        return new GameLoginTicketKeyService(
             new Repository<TenantGameLoginTicketKeyEntity>(_db.MainDb),
             new GameFrameX.Core.Service.User.CurrentUserContext(new Microsoft.AspNetCore.Http.HttpContextAccessor()));
     }
 
-    private TenantClientApiPolicyEntityService CreatePolicyService()
+    private ClientApiPolicyService CreatePolicyService()
     {
-        return new TenantClientApiPolicyEntityService(
+        return new ClientApiPolicyService(
             new Repository<TenantClientApiPolicyEntity>(_db.MainDb),
             new GameFrameX.Core.Service.User.CurrentUserContext(new Microsoft.AspNetCore.Http.HttpContextAccessor()));
     }
@@ -78,14 +78,14 @@ public sealed class KeyLifecycleRotateTests : IDisposable
         var oldKey = SeedActiveTicketKey();
         var before = TimerHelper.UnixTimeSeconds();
 
-        await CreateTicketKeyService().RotateAsync(new TenantGameLoginTicketKeyRotateRequest { });
+        await CreateTicketKeyService().RotateAsync(new GameLoginTicketKeyRotateRequest { });
 
         var after = TimerHelper.UnixTimeSeconds();
         var storedOld = _db.TenantDb.Queryable<TenantGameLoginTicketKeyEntity>().First(u => u.Id == oldKey.Id);
         Assert.NotNull(storedOld.RotatedTime);
         Assert.InRange(storedOld.RotatedTime.Value, before, after);
-        Assert.InRange(storedOld.ExpireTime!.Value, before + TenantGameLoginTicketKeyEntityService.OldKeyDefaultExpireSeconds,
-                       after + TenantGameLoginTicketKeyEntityService.OldKeyDefaultExpireSeconds);
+        Assert.InRange(storedOld.ExpireTime!.Value, before + GameLoginTicketKeyService.OldKeyDefaultExpireSeconds,
+                       after + GameLoginTicketKeyService.OldKeyDefaultExpireSeconds);
 
         // 新钥立即生效（NotBefore ∈ [before, after]），且未被标记轮换
         var newKey = _db.TenantDb.Queryable<TenantGameLoginTicketKeyEntity>().First(u => u.Kid != "kid-old-active");
@@ -100,7 +100,7 @@ public sealed class KeyLifecycleRotateTests : IDisposable
         var now = TimerHelper.UnixTimeSeconds();
         var explicitExpire = now + 30 * 24 * 3600; // 上限边界（恰好 30 天）应放行
 
-        await CreateTicketKeyService().RotateAsync(new TenantGameLoginTicketKeyRotateRequest { OldKeyExpireTime = explicitExpire, });
+        await CreateTicketKeyService().RotateAsync(new GameLoginTicketKeyRotateRequest { OldKeyExpireTime = explicitExpire, });
 
         var storedOld = _db.TenantDb.Queryable<TenantGameLoginTicketKeyEntity>().First(u => u.Id == oldKey.Id);
         Assert.Equal(explicitExpire, storedOld.ExpireTime);
@@ -111,10 +111,10 @@ public sealed class KeyLifecycleRotateTests : IDisposable
     public async Task TicketKeyRotate_OldKeyExpireBeyond30Days_Rejected()
     {
         SeedActiveTicketKey();
-        var request = new TenantGameLoginTicketKeyRotateRequest
+        var request = new GameLoginTicketKeyRotateRequest
         {
            
-            OldKeyExpireTime = TimerHelper.UnixTimeSeconds() + TenantGameLoginTicketKeyEntityService.OldKeyMaxExpireSeconds + 1,
+            OldKeyExpireTime = TimerHelper.UnixTimeSeconds() + GameLoginTicketKeyService.OldKeyMaxExpireSeconds + 1,
         };
 
         await Assert.ThrowsAsync<BusinessException>(() => CreateTicketKeyService().RotateAsync(request));
@@ -124,7 +124,7 @@ public sealed class KeyLifecycleRotateTests : IDisposable
     public async Task TicketKeyRotate_OldKeyExpireNotAfterNow_Rejected()
     {
         SeedActiveTicketKey();
-        var request = new TenantGameLoginTicketKeyRotateRequest
+        var request = new GameLoginTicketKeyRotateRequest
         {
            
             OldKeyExpireTime = TimerHelper.UnixTimeSeconds(),
@@ -137,7 +137,7 @@ public sealed class KeyLifecycleRotateTests : IDisposable
     public async Task TicketKeyRotate_NoActiveOldKey_IsNoop()
     {
         // 无旧钥场景（首把密钥轮换）：仅生成新钥，不抛错
-        await CreateTicketKeyService().RotateAsync(new TenantGameLoginTicketKeyRotateRequest { });
+        await CreateTicketKeyService().RotateAsync(new GameLoginTicketKeyRotateRequest { });
 
         var count = _db.TenantDb.Queryable<TenantGameLoginTicketKeyEntity>().Count();
         Assert.Equal(1, count);
@@ -187,9 +187,9 @@ public sealed class KeyLifecycleRotateTests : IDisposable
     {
         var repositoryRoot = GetRepositoryRoot();
         var ticketKeySource = File.ReadAllText(Path.Combine(repositoryRoot,
-            "GameFrameX.Application/ClientDelivery/LoginTicket/GameLoginTicketKey/TenantGameLoginTicketKeyEntityService.cs"));
+            "GameFrameX.Application/ClientDelivery/LoginTicket/GameLoginTicketKey/GameLoginTicketKeyService.cs"));
         var policySource = File.ReadAllText(Path.Combine(repositoryRoot,
-            "GameFrameX.Application/ClientDelivery/ClientApiPolicy/TenantClientApiPolicyEntityService.cs"));
+            "GameFrameX.Application/ClientDelivery/ClientApiPolicy/ClientApiPolicyService.cs"));
 
         Assert.Contains("[KeyAudit] action=TicketKeyRotate", ticketKeySource, StringComparison.Ordinal);
         Assert.Contains("operator={_currentUserContext.Account}", ticketKeySource, StringComparison.Ordinal);

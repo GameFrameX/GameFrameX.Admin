@@ -11,7 +11,7 @@ namespace GameFrameX.Application.ClientDelivery.GamePaymentConfig;
 /// 游戏支付配置管理服务
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
-public class TenantGamePaymentConfigEntityService
+public class GamePaymentConfigService
     : GenericCrudService<Entity.Tenant.Game.TenantGamePaymentConfigEntity,
         AddGamePaymentConfigRequest, UpdateGamePaymentConfigRequest,
         GamePaymentConfigResponse, PageGamePaymentConfigRequest>
@@ -19,7 +19,7 @@ public class TenantGamePaymentConfigEntityService
     private readonly SqlSugarRepository<TenantGameAppPackageEntity> _packageRepository;
     private readonly IPaymentConfigSchemaProvider _schemaProvider;
 
-    public TenantGamePaymentConfigEntityService(
+    public GamePaymentConfigService(
         SqlSugarRepository<Entity.Tenant.Game.TenantGamePaymentConfigEntity> repository,
         SqlSugarRepository<TenantGameAppPackageEntity> packageRepository,
         IPaymentConfigSchemaProvider schemaProvider)

@@ -3,7 +3,7 @@ namespace GameFrameX.Application.NoticeCenter.GameBannerAnnouncement.Dto;
 /// <summary>
 /// 游戏内横幅公告实体基类 - 包含 AddInput 和 UpdateInput 的公共字段
 /// </summary>
-public abstract class TenantGameBannerAnnouncementEntityBaseRequest : BaseUpdateRequest
+public abstract class GameBannerAnnouncementBaseRequest : BaseUpdateRequest
 {
     /// <summary>
     /// 区服ID

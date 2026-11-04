@@ -8,7 +8,7 @@ namespace GameFrameX.Application.GmCenter.LiveOps.PlayerSegment.Dto;
 /// <summary>
 /// 玩家分群输出。
 /// </summary>
-public sealed class TenantGameOnlinePlayerSegmentResponse
+public sealed class GameOnlinePlayerSegmentResponse
 {
     /// <summary>
     /// 分群Id。

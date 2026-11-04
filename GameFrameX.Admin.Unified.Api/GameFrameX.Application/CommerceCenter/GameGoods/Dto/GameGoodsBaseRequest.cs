@@ -3,7 +3,7 @@ namespace GameFrameX.Application.CommerceCenter.GameGoods.Dto;
 /// <summary>
 /// 游戏资源实体基类 - 包含 AddInput 和 UpdateInput 的公共字段
 /// </summary>
-public abstract class TenantGameGoodsEntityBaseRequest : BaseUpdateRequest
+public abstract class GameGoodsBaseRequest : BaseUpdateRequest
 {
     /// <summary>
     /// 配置ID

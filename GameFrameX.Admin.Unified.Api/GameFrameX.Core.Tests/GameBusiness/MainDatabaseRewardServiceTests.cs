@@ -18,12 +18,12 @@ public sealed class MainDatabaseRewardServiceTests
         {
             database.InitTenantTables(typeof(TenantGameRewardTemplateEntity), typeof(TenantGameRewardTemplateGroupEntity));
             var groups = new SqlSugarRepository<TenantGameRewardTemplateGroupEntity> { Context = database.MainDb };
-            var groupService = new TenantGameRewardTemplateGroupEntityService(groups);
+            var groupService = new GameRewardTemplateGroupService(groups);
             var group = await groupService.AddAsync(new AddTenantGameRewardTemplateGroupEntityRequest
             {
                 Name = "rewards", Description = "rewards", IsEnabled = true,
             });
-            var service = new TenantGameRewardTemplateEntityService(new SqlSugarRepository<TenantGameRewardTemplateEntity>
+            var service = new GameRewardTemplateService(new SqlSugarRepository<TenantGameRewardTemplateEntity>
             {
                 Context = database.MainDb,
             }, groups);
@@ -32,7 +32,7 @@ public sealed class MainDatabaseRewardServiceTests
                 Name = "gift", Description = "gift", GroupId = group.Id,
                 RewardItemsJson = "[{\"id\":1,\"itemId\":10,\"count\":2}]", IsEnabled = true,
             });
-            var snapshot = await service.CopySnapshotAsync(new TenantGameRewardTemplateSnapshotRequest { Id = created.Id });
+            var snapshot = await service.CopySnapshotAsync(new GameRewardTemplateSnapshotRequest { Id = created.Id });
             Assert.Equal(group.Id, snapshot.GroupId);
             Assert.Equal(1, snapshot.SnapshotSchemaVersion);
             Assert.Equal(created.Id, Assert.Single(await service.SelectAsync(new() { SearchKey = "gift" })).Id);

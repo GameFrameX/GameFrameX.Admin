@@ -7,12 +7,12 @@ namespace GameFrameX.Application.CommerceCenter.GameGoodsCatalogue;
 /// 游戏道具分类服务
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
-public class TenantGameGoodsCatalogueEntityService
+public class GameGoodsCatalogueService
     : GenericCrudSelectService<Entity.Tenant.Game.TenantGameGoodsCatalogueEntity,
         AddTenantGameGoodsCatalogueEntityRequest, UpdateTenantGameGoodsCatalogueEntityRequest,
-        TenantGameGoodsCatalogueEntityResponse, PageTenantGameGoodsCatalogueEntityRequest>
+        GameGoodsCatalogueResponse, PageTenantGameGoodsCatalogueEntityRequest>
 {
-    public TenantGameGoodsCatalogueEntityService(SqlSugarRepository<Entity.Tenant.Game.TenantGameGoodsCatalogueEntity> repository)
+    public GameGoodsCatalogueService(SqlSugarRepository<Entity.Tenant.Game.TenantGameGoodsCatalogueEntity> repository)
         : base(repository)
     {
     }
@@ -33,12 +33,12 @@ public class TenantGameGoodsCatalogueEntityService
         await CheckNameUniqueAsync(input.Name, input.Id);
     }
 
-    protected override ISugarQueryable<TenantGameGoodsCatalogueEntityResponse> BuildPageQuery(PageTenantGameGoodsCatalogueEntityRequest input)
+    protected override ISugarQueryable<GameGoodsCatalogueResponse> BuildPageQuery(PageTenantGameGoodsCatalogueEntityRequest input)
     {
         return Repository.AsQueryable()
                          .WhereIF(!string.IsNullOrWhiteSpace(input.Name), u => u.Name.Contains(input.Name.Trim()))
                          .WhereIF(!string.IsNullOrWhiteSpace(input.Description), u => u.Description.Contains(input.Description.Trim()))
-                         .Select<TenantGameGoodsCatalogueEntityResponse>();
+                         .Select<GameGoodsCatalogueResponse>();
     }
 }
 #pragma warning restore CS8602, CS8604, CS8629

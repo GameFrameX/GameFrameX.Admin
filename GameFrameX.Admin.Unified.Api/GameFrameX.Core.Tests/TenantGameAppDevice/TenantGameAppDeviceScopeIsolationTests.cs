@@ -40,7 +40,7 @@ public sealed class TenantGameAppDeviceScopeIsolationTests : IDisposable
     public async Task AddGroup_RejectsMissingDevice()
     {
         await SeedAsync();
-        var service = new TenantDeviceGroupService(
+        var service = new DeviceGroupService(
             Repository<TenantGameAppDeviceGroupEntity>());
 
         await Assert.ThrowsAsync<BusinessException>(() => service.AddAsync(new AddTenantDeviceGroupRequest
@@ -55,7 +55,7 @@ public sealed class TenantGameAppDeviceScopeIsolationTests : IDisposable
     public async Task AddGroup_AcceptsExistingDevices()
     {
         await SeedAsync();
-        var service = new TenantDeviceGroupService(
+        var service = new DeviceGroupService(
             Repository<TenantGameAppDeviceGroupEntity>());
 
         var group = await service.AddAsync(new AddTenantDeviceGroupRequest
@@ -77,10 +77,10 @@ public sealed class TenantGameAppDeviceScopeIsolationTests : IDisposable
     public async Task DevicePage_ReturnsMainDatabaseDevices()
     {
         await SeedAsync();
-        var service = new TenantGameAppDeviceService(
+        var service = new GameAppDeviceService(
             Repository<TenantGameAppDeviceEntity>());
 
-        var page = await service.PageAsync(new TenantGameAppDeviceRequest());
+        var page = await service.PageAsync(new GameAppDeviceRequest());
 
         var ids = page.Items.Select(u => u.Id).OrderBy(i => i).ToArray();
         Assert.Equal(new[] { DeviceA1, DeviceA2, DeviceB1, }, ids);
@@ -90,7 +90,7 @@ public sealed class TenantGameAppDeviceScopeIsolationTests : IDisposable
     public async Task DeviceAdd_RejectsDuplicateIdentifier()
     {
         await SeedAsync();
-        var service = new TenantGameAppDeviceService(
+        var service = new GameAppDeviceService(
             Repository<TenantGameAppDeviceEntity>());
 
         await Assert.ThrowsAsync<BusinessException>(() => service.AddAsync(new AddTenantGameAppDeviceRequest
@@ -105,7 +105,7 @@ public sealed class TenantGameAppDeviceScopeIsolationTests : IDisposable
     public async Task DeviceAdd_AcceptsUniqueIdentifier()
     {
         await SeedAsync();
-        var service = new TenantGameAppDeviceService(
+        var service = new GameAppDeviceService(
             Repository<TenantGameAppDeviceEntity>());
 
         var device = await service.AddAsync(new AddTenantGameAppDeviceRequest

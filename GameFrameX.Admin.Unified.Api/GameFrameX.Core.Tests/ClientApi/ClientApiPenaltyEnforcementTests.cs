@@ -19,7 +19,7 @@ public sealed class ClientApiPenaltyEnforcementTests
         db.InitTenantTables(typeof(TenantGamePenaltyEntity));
         SeedPenalty(db, 1, PenaltyActionTypeEnum.Ban, PenaltyStatusEnum.Active, null, db.AppId);
 
-        var service = new TenantGamePenaltyEnforcementService(db.Repository<TenantGamePenaltyEntity>());
+        var service = new GamePenaltyEnforcementService(db.Repository<TenantGamePenaltyEntity>());
         var hit = await service.GetLoginBlockingPenaltyAsync(PenaltyTargetTypeEnum.Account, "user-1001");
 
         Assert.NotNull(hit);
@@ -33,7 +33,7 @@ public sealed class ClientApiPenaltyEnforcementTests
         db.InitTenantTables(typeof(TenantGamePenaltyEntity));
         SeedPenalty(db, 2, PenaltyActionTypeEnum.RestrictLogin, PenaltyStatusEnum.Active, null, db.AppId);
 
-        var service = new TenantGamePenaltyEnforcementService(db.Repository<TenantGamePenaltyEntity>());
+        var service = new GamePenaltyEnforcementService(db.Repository<TenantGamePenaltyEntity>());
         var hit = await service.GetLoginBlockingPenaltyAsync(PenaltyTargetTypeEnum.Account, "user-1001");
 
         Assert.NotNull(hit);
@@ -46,7 +46,7 @@ public sealed class ClientApiPenaltyEnforcementTests
         db.InitTenantTables(typeof(TenantGamePenaltyEntity));
         SeedPenalty(db, 3, PenaltyActionTypeEnum.Mute, PenaltyStatusEnum.Active, null, db.AppId);
 
-        var service = new TenantGamePenaltyEnforcementService(db.Repository<TenantGamePenaltyEntity>());
+        var service = new GamePenaltyEnforcementService(db.Repository<TenantGamePenaltyEntity>());
         var hit = await service.GetLoginBlockingPenaltyAsync(PenaltyTargetTypeEnum.Account, "user-1001");
 
         Assert.Null(hit);
@@ -59,7 +59,7 @@ public sealed class ClientApiPenaltyEnforcementTests
         db.InitTenantTables(typeof(TenantGamePenaltyEntity));
         SeedPenalty(db, 4, PenaltyActionTypeEnum.Ban, PenaltyStatusEnum.Revoked, null, db.AppId);
 
-        var service = new TenantGamePenaltyEnforcementService(db.Repository<TenantGamePenaltyEntity>());
+        var service = new GamePenaltyEnforcementService(db.Repository<TenantGamePenaltyEntity>());
         var hit = await service.GetLoginBlockingPenaltyAsync(PenaltyTargetTypeEnum.Account, "user-1001");
 
         Assert.Null(hit);
@@ -72,7 +72,7 @@ public sealed class ClientApiPenaltyEnforcementTests
         db.InitTenantTables(typeof(TenantGamePenaltyEntity));
         SeedPenalty(db, 5, PenaltyActionTypeEnum.Ban, PenaltyStatusEnum.Active, DateTimeOffset.UtcNow.AddMinutes(-1), db.AppId);
 
-        var service = new TenantGamePenaltyEnforcementService(db.Repository<TenantGamePenaltyEntity>());
+        var service = new GamePenaltyEnforcementService(db.Repository<TenantGamePenaltyEntity>());
         var hit = await service.GetLoginBlockingPenaltyAsync(PenaltyTargetTypeEnum.Account, "user-1001");
 
         Assert.Null(hit);
@@ -85,7 +85,7 @@ public sealed class ClientApiPenaltyEnforcementTests
         db.InitTenantTables(typeof(TenantGamePenaltyEntity));
         SeedPenalty(db, 6, PenaltyActionTypeEnum.Ban, PenaltyStatusEnum.Active, null, 0);
 
-        var service = new TenantGamePenaltyEnforcementService(db.Repository<TenantGamePenaltyEntity>());
+        var service = new GamePenaltyEnforcementService(db.Repository<TenantGamePenaltyEntity>());
         var hit = await service.GetLoginBlockingPenaltyAsync(PenaltyTargetTypeEnum.Account, "user-1001");
 
         Assert.NotNull(hit);
@@ -98,7 +98,7 @@ public sealed class ClientApiPenaltyEnforcementTests
         db.InitTenantTables(typeof(TenantGamePenaltyEntity));
         SeedPenalty(db, 7, PenaltyActionTypeEnum.Ban, PenaltyStatusEnum.Active, null, db.AppId, 2001);
 
-        var service = new TenantGamePenaltyEnforcementService(db.Repository<TenantGamePenaltyEntity>());
+        var service = new GamePenaltyEnforcementService(db.Repository<TenantGamePenaltyEntity>());
 
         // 同区服命中
         var hitSame = await service.GetLoginBlockingPenaltyAsync(PenaltyTargetTypeEnum.Role, "role-3001", 2001);

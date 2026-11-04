@@ -134,14 +134,14 @@ public class MenuSeedStaleRowCleanerTests
                 Key = "tenantAdCallbackConfigEntity:page",
                 Pid = legacyRoute.Id,
                 Type = MenuTypeEnum.Button,
-                Permission = "tenantAdvertisementCallbackConfigEntity:page",
+                Permission = "advertisementCallbackConfig:page",
                 Title = "查询(旧)",
             });
             db.Insertable(new List<GlobalMenuEntity> { legacyRoute, legacyPage, }).ExecuteCommand();
 
             // 修复前：ValidateDbMenus 因 Permission 重复拒绝加载
             var before = Assert.Throws<InvalidOperationException>(() => MenuSeedCatalog.LoadFromDb(db));
-            Assert.Contains("global_menu.Permission 重复: tenantAdvertisementCallbackConfigEntity:page", before.Message);
+            Assert.Contains("global_menu.Permission 重复: advertisementCallbackConfig:page", before.Message);
 
             var removedKeys = MenuSeedStaleRowCleaner.RemoveStaleRows(db, seedIdsByKey);
             Assert.Equal(new[] { "route:tenantAdCallbackConfigEntity", "tenantAdCallbackConfigEntity:page", }, removedKeys.OrderBy(u => u, StringComparer.Ordinal).ToArray());
@@ -149,10 +149,10 @@ public class MenuSeedStaleRowCleanerTests
             // 清理后加载通过，且该 Permission 只剩一条有效定义（种子全称 Key 行）
             MenuSeedCatalog.LoadFromDb(db);
             var permissionRows = MenuSeedCatalog.AllDefinitions
-                                                .Where(u => u.Permission == "tenantAdvertisementCallbackConfigEntity:page")
+                                                .Where(u => u.Permission == "advertisementCallbackConfig:page")
                                                 .ToList();
             var row = Assert.Single(permissionRows);
-            Assert.Equal("tenantAdvertisementCallbackConfigEntity:page", row.Key);
+            Assert.Equal("advertisementCallbackConfig:page", row.Key);
         }
         finally
         {

@@ -13,7 +13,7 @@ namespace GameFrameX.Application.GmCenter.GameAntiCheatEvent;
 /// <para>非通用 CRUD：上报（SubmitAsync）幂等且一律落 Pending；变更（ReviewAsync）走人工复核状态机，不暴露通用 UpdateAsync。</para>
 /// </summary>
 [ApiDescriptionSettings(Order = 100)]
-public sealed class TenantGameAntiCheatEventEntityService
+public sealed class GameAntiCheatEventService
     : BaseService<TenantGameAntiCheatEventEntity>
 {
     /// <summary>
@@ -27,7 +27,7 @@ public sealed class TenantGameAntiCheatEventEntityService
             ManualReviewStateEnum.Escalated,
         };
 
-    public TenantGameAntiCheatEventEntityService(SqlSugarRepository<TenantGameAntiCheatEventEntity> repository)
+    public GameAntiCheatEventService(SqlSugarRepository<TenantGameAntiCheatEventEntity> repository)
         : base(repository)
     {
     }
@@ -37,7 +37,7 @@ public sealed class TenantGameAntiCheatEventEntityService
     /// </summary>
     [HttpPost(CrudActionRoutes.Page)]
     [ApiDescriptionSettings(Name = "Page")]
-    public async Task<SqlSugarPagedList<TenantGameAntiCheatEventResponse>> PageAsync(
+    public async Task<SqlSugarPagedList<GameAntiCheatEventResponse>> PageAsync(
         PageTenantGameAntiCheatEventRequest input)
     {
         var targetId = string.IsNullOrWhiteSpace(input.TargetId) ? null : input.TargetId.Trim();
@@ -50,7 +50,7 @@ public sealed class TenantGameAntiCheatEventEntityService
                                        u => u.ManualReviewState == input.ManualReviewState.Value)
                               .WhereIF(input.TargetType.HasValue, u => u.TargetType == input.TargetType.Value)
                               .WhereIF(targetId != null, u => u.TargetId == targetId)
-                              .Select<TenantGameAntiCheatEventResponse>()
+                              .Select<GameAntiCheatEventResponse>()
                               .OrderBy(u => u.CreatedTime, OrderByType.Desc);
         return await query.ToPagedListAsync(input.Page, input.PageSize);
     }
@@ -60,10 +60,10 @@ public sealed class TenantGameAntiCheatEventEntityService
     /// </summary>
     [HttpGet(CrudActionRoutes.Detail)]
     [ApiDescriptionSettings(Name = "Detail")]
-    public async Task<TenantGameAntiCheatEventResponse> DetailAsync([FromQuery] BaseIdRequest input)
+    public async Task<GameAntiCheatEventResponse> DetailAsync([FromQuery] BaseIdRequest input)
     {
         var entity = await InnerGetAsync(input);
-        return entity == null ? default : entity.Adapt<TenantGameAntiCheatEventResponse>();
+        return entity == null ? default : entity.Adapt<GameAntiCheatEventResponse>();
     }
 
     /// <summary>
@@ -76,7 +76,7 @@ public sealed class TenantGameAntiCheatEventEntityService
     /// </summary>
     [HttpPost("submit")]
     [ApiDescriptionSettings(Name = "Submit")]
-    public async Task<TenantGameAntiCheatEventResponse> SubmitAsync(AddTenantGameAntiCheatEventRequest input)
+    public async Task<GameAntiCheatEventResponse> SubmitAsync(AddTenantGameAntiCheatEventRequest input)
     {
         var idempotencyKey = input.IdempotencyKey?.Trim() ?? string.Empty;
         if (idempotencyKey.Length == 0)
@@ -102,12 +102,12 @@ public sealed class TenantGameAntiCheatEventEntityService
         {
             // 同键重放：返回既有事件（不重复入账、不抛错）
             var existing = await Repository.GetFirstAsync(u => u.IdempotencyKey == idempotencyKey);
-            return existing!.Adapt<TenantGameAntiCheatEventResponse>();
+            return existing!.Adapt<GameAntiCheatEventResponse>();
         }
 
         // Execute 分支：占位即入账（Conflict / Busy 不可达：常量摘要无内容冲突，占位原子无 Processing 中间态）
         await coordinator.CompleteAsync(new IdempotencyCompletionRequest(identifier, ReadOnlyMemory<byte>.Empty, 0));
-        return entity.Adapt<TenantGameAntiCheatEventResponse>();
+        return entity.Adapt<GameAntiCheatEventResponse>();
     }
 
     /// <summary>

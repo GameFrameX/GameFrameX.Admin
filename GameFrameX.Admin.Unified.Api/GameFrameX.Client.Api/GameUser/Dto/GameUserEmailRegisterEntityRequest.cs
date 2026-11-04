@@ -11,7 +11,7 @@ namespace GameFrameX.Client.Api.GameUser.Dto;
 /// <summary>
 /// 游戏账号增加输入参数
 /// </summary>
-public class GameUserEmailRegisterEntityRequest : TenantGameUserEntityBaseRequest
+public class GameUserEmailRegisterEntityRequest : GameUserBaseRequest
 {
     /// <summary>
     /// 账号

@@ -177,7 +177,7 @@ public sealed class AdminEndpointParameterShapeContractTests
         var assemblies = new[]
         {
             typeof(GlobalDictionaryTypeService).Assembly, // GameFrameX.Application.Platform
-            typeof(TenantGamePenaltyEntityService).Assembly, // GameFrameX.Application.Platform
+            typeof(GamePenaltyService).Assembly, // GameFrameX.Application.Platform
             typeof(BaseService<>).Assembly, // GameFrameX.Core
         };
         foreach (var assembly in assemblies.Distinct())

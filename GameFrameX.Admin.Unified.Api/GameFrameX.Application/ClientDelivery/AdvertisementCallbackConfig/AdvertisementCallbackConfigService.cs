@@ -13,15 +13,15 @@ namespace GameFrameX.Application.ClientDelivery.AdvertisementCallbackConfig;
 /// <para>敏感字段（SigningSecret / VerificationKeys）输出脱敏，更新回传 <c>******</c> 保留原值。</para>
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 111)]
-public class TenantAdvertisementCallbackConfigEntityService
+public class AdvertisementCallbackConfigService
     : GenericCrudService<Entity.Tenant.ClientApiConfig.TenantAdvertisementCallbackConfigEntity,
         AddTenantAdvertisementCallbackConfigRequest, UpdateTenantAdvertisementCallbackConfigRequest,
-        TenantAdvertisementCallbackConfigResponse, PageTenantAdvertisementCallbackConfigRequest>
+        AdvertisementCallbackConfigResponse, PageTenantAdvertisementCallbackConfigRequest>
 {
     private readonly IAdvertisementCallbackConfigSchemaProvider _schemaProvider;
     private const string SupportedProviderMessage = "广告平台只支持 TopOn、GoogleAdMob、Pangle、UnityAds";
 
-    public TenantAdvertisementCallbackConfigEntityService(
+    public AdvertisementCallbackConfigService(
         SqlSugarRepository<Entity.Tenant.ClientApiConfig.TenantAdvertisementCallbackConfigEntity> repository,
         IAdvertisementCallbackConfigSchemaProvider schemaProvider)
         : base(repository)
@@ -29,7 +29,7 @@ public class TenantAdvertisementCallbackConfigEntityService
         _schemaProvider = schemaProvider;
     }
 
-    protected override ISugarQueryable<TenantAdvertisementCallbackConfigResponse> BuildPageQuery(PageTenantAdvertisementCallbackConfigRequest input)
+    protected override ISugarQueryable<AdvertisementCallbackConfigResponse> BuildPageQuery(PageTenantAdvertisementCallbackConfigRequest input)
     {
         var searchKey = input.SearchKey?.Trim();
         var provider = NormalizeProvider(input.Provider, false);
@@ -37,13 +37,13 @@ public class TenantAdvertisementCallbackConfigEntityService
                          .WhereIF(!string.IsNullOrWhiteSpace(searchKey), u => u.Remark.Contains(searchKey) || u.CallbackUrl.Contains(searchKey))
                          .WhereIF(!string.IsNullOrWhiteSpace(provider), u => u.Provider == provider)
                          .WhereIF(input.IsActive.HasValue, u => u.IsEnabled == input.IsActive.Value)
-                         .Select<TenantAdvertisementCallbackConfigResponse>();
+                         .Select<AdvertisementCallbackConfigResponse>();
     }
 
     /// <summary>
     /// 新增广告回调配置（主库内 Provider 唯一）。
     /// </summary>
-    public override async Task<TenantAdvertisementCallbackConfigResponse> AddAsync(AddTenantAdvertisementCallbackConfigRequest input)
+    public override async Task<AdvertisementCallbackConfigResponse> AddAsync(AddTenantAdvertisementCallbackConfigRequest input)
     {
         var provider = NormalizeProvider(input.Provider, true);
         var configJson = NormalizeConfigJson(provider, input.ConfigJson, null);
@@ -60,7 +60,7 @@ public class TenantAdvertisementCallbackConfigEntityService
         entity.ParameterPurposeJson = BuildParameterPurposeJson(provider);
         entity.IsEnabled = input.IsEnabled;
         await Repository.InsertAsync(entity);
-        return entity.Adapt<TenantAdvertisementCallbackConfigResponse>();
+        return entity.Adapt<AdvertisementCallbackConfigResponse>();
     }
 
     /// <summary>
@@ -109,7 +109,7 @@ public class TenantAdvertisementCallbackConfigEntityService
     /// </summary>
     [HttpPost(CrudActionRoutes.Page)]
     [ApiDescriptionSettings(Name = "Page")]
-    public override async Task<SqlSugarPagedList<TenantAdvertisementCallbackConfigResponse>> PageAsync(PageTenantAdvertisementCallbackConfigRequest input)
+    public override async Task<SqlSugarPagedList<AdvertisementCallbackConfigResponse>> PageAsync(PageTenantAdvertisementCallbackConfigRequest input)
     {
         var result = await base.PageAsync(input);
         foreach (var item in result.Items)
@@ -125,7 +125,7 @@ public class TenantAdvertisementCallbackConfigEntityService
     /// </summary>
     [HttpGet(CrudActionRoutes.Detail)]
     [ApiDescriptionSettings(Name = "Detail")]
-    public override async Task<TenantAdvertisementCallbackConfigResponse> GetAsync([FromQuery] BaseIdRequest input)
+    public override async Task<AdvertisementCallbackConfigResponse> GetAsync([FromQuery] BaseIdRequest input)
     {
         var entity = await InnerGetAsync(input);
         if (entity == null)
@@ -133,7 +133,7 @@ public class TenantAdvertisementCallbackConfigEntityService
             throw BusinessError.Oh("广告回调配置不存在");
         }
 
-        var output = entity.Adapt<TenantAdvertisementCallbackConfigResponse>();
+        var output = entity.Adapt<AdvertisementCallbackConfigResponse>();
         MaskSecrets(output, false);
         return output;
     }
@@ -304,7 +304,7 @@ public class TenantAdvertisementCallbackConfigEntityService
         }
     }
 
-    private void MaskSecrets(TenantAdvertisementCallbackConfigResponse output, bool maskWholeConfig)
+    private void MaskSecrets(AdvertisementCallbackConfigResponse output, bool maskWholeConfig)
     {
         output.SigningSecret = string.IsNullOrWhiteSpace(output.SigningSecret) ? string.Empty : SensitiveFieldMask.MaskValue;
         output.VerificationKeys = string.IsNullOrWhiteSpace(output.VerificationKeys) ? string.Empty : SensitiveFieldMask.MaskValue;

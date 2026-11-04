@@ -5,7 +5,7 @@ namespace GameFrameX.Application.NoticeCenter.GameMail.Dto;
 /// <summary>
 /// 游戏邮件实体基类 - 包含 AddInput 和 UpdateInput 的公共字段
 /// </summary>
-public abstract class TenantGameMailEntityBaseRequest : BaseUpdateRequest
+public abstract class GameMailBaseRequest : BaseUpdateRequest
 {
     /// <summary>
     /// 标题

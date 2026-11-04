@@ -3,7 +3,7 @@ namespace GameFrameX.Client.Api.GameArea.Dto;
 /// <summary>
 /// 游戏大区
 /// </summary>
-public sealed class TenantGameAreaClassifyEntityResponse
+public sealed class GameAreaClassifyResponse
 {
     /// <summary>
     /// 大区Name
@@ -23,5 +23,5 @@ public sealed class TenantGameAreaClassifyEntityResponse
     /// <summary>
     /// 大区Id
     /// </summary>
-    public List<TenantGameAreaEntityResponse> GameAreaList { get; set; } = null!;
+    public List<GameAreaResponse> GameAreaList { get; set; } = null!;
 }

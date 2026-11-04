@@ -5,7 +5,7 @@ namespace GameFrameX.Application.PlayerCenter.GamePenaltyAppeal.Dto;
 /// <summary>
 /// 申诉输出参数（含审核审计字段，供后台只读展示）。
 /// </summary>
-public class TenantGamePenaltyAppealEntityResponse : IBasePageResponse<Entity.Tenant.Game.TenantGamePenaltyAppealEntity>
+public class GamePenaltyAppealResponse : IBasePageResponse<Entity.Tenant.Game.TenantGamePenaltyAppealEntity>
 {
     /// <summary>
     /// Id

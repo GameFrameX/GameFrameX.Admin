@@ -11,15 +11,15 @@ namespace GameFrameX.Application.GmCenter.GameReport;
 /// <para>LinkPenaltyAsync：仅 Confirmed 举报可关联已存在处罚；写 ResultPenaltyId + HandlerId，不自动创建处罚。</para>
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
-public class TenantGameReportEntityService
+public class GameReportService
     : GenericCrudService<Entity.Tenant.Game.TenantGameReportEntity,
         AddTenantGameReportEntityRequest, UpdateTenantGameReportEntityRequest,
-        TenantGameReportEntityResponse, PageTenantGameReportEntityRequest>
+        GameReportResponse, PageTenantGameReportEntityRequest>
 {
     private readonly CurrentUserContext _currentUserContext;
     private readonly SqlSugarRepository<Entity.Tenant.Game.TenantGamePenaltyEntity> _penaltyRepository;
 
-    public TenantGameReportEntityService(SqlSugarRepository<Entity.Tenant.Game.TenantGameReportEntity> repository,
+    public GameReportService(SqlSugarRepository<Entity.Tenant.Game.TenantGameReportEntity> repository,
         SqlSugarRepository<Entity.Tenant.Game.TenantGamePenaltyEntity> penaltyRepository,
         CurrentUserContext currentUserContext)
         : base(repository)
@@ -31,7 +31,7 @@ public class TenantGameReportEntityService
     /// <summary>
     /// 录入举报：Status/HandlerId 服务端强制。
     /// </summary>
-    public override async Task<TenantGameReportEntityResponse> AddAsync(AddTenantGameReportEntityRequest input)
+    public override async Task<GameReportResponse> AddAsync(AddTenantGameReportEntityRequest input)
     {
         if (string.IsNullOrWhiteSpace(input.TargetId))
         {
@@ -47,13 +47,13 @@ public class TenantGameReportEntityService
         entity.Status = ReportStatusEnum.Pending;
         entity.HandlerId = null;
         await Repository.InsertWithDiffLogAsync(entity);
-        return entity.Adapt<TenantGameReportEntityResponse>();
+        return entity.Adapt<GameReportResponse>();
     }
 
     /// <summary>
     /// 分页查询：按 TargetType / TargetId / ReportType / Status 过滤。
     /// </summary>
-    protected override ISugarQueryable<TenantGameReportEntityResponse> BuildPageQuery(PageTenantGameReportEntityRequest input)
+    protected override ISugarQueryable<GameReportResponse> BuildPageQuery(PageTenantGameReportEntityRequest input)
     {
         return Repository.AsQueryable()
 
@@ -61,7 +61,7 @@ public class TenantGameReportEntityService
                          .WhereIF(!string.IsNullOrWhiteSpace(input.TargetId), r => r.TargetId == input.TargetId)
                          .WhereIF(input.ReportType.HasValue, r => r.ReportType == input.ReportType.Value)
                          .WhereIF(input.Status.HasValue, r => r.Status == input.Status.Value)
-                         .Select<TenantGameReportEntityResponse>();
+                         .Select<GameReportResponse>();
     }
 
     /// <summary>

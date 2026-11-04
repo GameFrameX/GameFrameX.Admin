@@ -6,7 +6,7 @@ namespace GameFrameX.Application.ClientDelivery.AdvertisementReward.Dto;
 /// 广告奖励发放账本输出参数（C114 / GFX-111 后端跟进）。投影暴露实体全字段：
 /// Provider/TransactionId/AdvertisementUnit/RoleId/UserId/AreaId/RewardItem/RewardAmount/Status/IdempotencyKey/FailureReason/IsSandbox + 审计列。
 /// </summary>
-public class TenantGameAdvertisementRewardEntityResponse : IBasePageResponse<Entity.Tenant.Game.TenantGameAdvertisementRewardEntity>
+public class GameAdvertisementRewardResponse : IBasePageResponse<Entity.Tenant.Game.TenantGameAdvertisementRewardEntity>
 {
     /// <summary>
     /// Id

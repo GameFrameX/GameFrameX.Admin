@@ -5,7 +5,7 @@ namespace GameFrameX.Application.GmCenter.GameAntiCheatEvent.Dto;
 /// <summary>
 /// 反作弊事件输出投影。
 /// </summary>
-public class TenantGameAntiCheatEventResponse
+public class GameAntiCheatEventResponse
 {
     public long Id { get; set; }
 

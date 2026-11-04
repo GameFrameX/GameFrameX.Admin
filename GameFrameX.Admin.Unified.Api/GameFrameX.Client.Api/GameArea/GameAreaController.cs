@@ -25,16 +25,16 @@ public class GameAreaController : BaseController<TenantGameAreaEntity>
     /// </summary>
     /// <returns></returns>
     [HttpPost]
-    [ProducesResponseType(200, Type = typeof(List<TenantGameAreaClassifyEntityResponse>))]
-    public async Task<HttpJsonResultData<List<TenantGameAreaClassifyEntityResponse>>> GetAreaList([FromBody] GameAreaGetAreaListRequest gameAreaGetAreaListRequest)
+    [ProducesResponseType(200, Type = typeof(List<GameAreaClassifyResponse>))]
+    public async Task<HttpJsonResultData<List<GameAreaClassifyResponse>>> GetAreaList([FromBody] GameAreaGetAreaListRequest gameAreaGetAreaListRequest)
     {
         var catList = await PRepository.AsSugarClient().Queryable<TenantGameAreaClassifyEntity>().ToListAsync();
-        var gameAreaCatEntityList = new List<TenantGameAreaClassifyEntityResponse>(catList.Count);
+        var gameAreaCatEntityList = new List<GameAreaClassifyResponse>(catList.Count);
         var gameAreaEntities = await PRepository.GetListAsync();
         var areaPolicy = await _optionsProvider.GetAreaPolicyAsync();
         foreach (var gameAreaCatEntity in catList)
         {
-            var gameAreaCatEntityDto = gameAreaCatEntity.Adapt<TenantGameAreaClassifyEntityResponse>();
+            var gameAreaCatEntityDto = gameAreaCatEntity.Adapt<GameAreaClassifyResponse>();
             // var gameAreaList = gameAreaEntities
             //     .Where(m => m.ClassifyId == gameAreaCatEntity.Id && m.IsEnabled.GetValueOrDefault())
             //     .WhereIf(!string.IsNullOrWhiteSpace(gameAreaGetAreaListRequest.PackageName),
@@ -50,10 +50,10 @@ public class GameAreaController : BaseController<TenantGameAreaEntity>
             //     .ToList();
             var gameAreaList = gameAreaEntities.Where(m => m.ClassifyId == gameAreaCatEntity.Id && m.IsEnabled.GetValueOrDefault()).OrderByDescending(m => m.CreatedTime).ThenBy(m => m.IsRecommend).ToList();
 
-            gameAreaCatEntityDto.GameAreaList = new List<TenantGameAreaEntityResponse>(gameAreaList.Count);
+            gameAreaCatEntityDto.GameAreaList = new List<GameAreaResponse>(gameAreaList.Count);
             foreach (var gameAreaEntity in gameAreaList)
             {
-                var gameAreaEntityDto = gameAreaEntity.Adapt<TenantGameAreaEntityResponse>();
+                var gameAreaEntityDto = gameAreaEntity.Adapt<GameAreaResponse>();
                 if (areaPolicy.EnableReturnHttpManager)
                 {
                     gameAreaEntityDto.HttpManageUrl = gameAreaEntity.HttpManageUrl;
@@ -69,6 +69,6 @@ public class GameAreaController : BaseController<TenantGameAreaEntity>
             gameAreaCatEntityList.Add(gameAreaCatEntityDto);
         }
 
-        return HttpJsonResultData<List<TenantGameAreaClassifyEntityResponse>>.Success(gameAreaCatEntityList);
+        return HttpJsonResultData<List<GameAreaClassifyResponse>>.Success(gameAreaCatEntityList);
     }
 }

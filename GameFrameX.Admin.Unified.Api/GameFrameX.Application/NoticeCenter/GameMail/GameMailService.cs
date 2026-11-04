@@ -13,10 +13,10 @@ namespace GameFrameX.Application.NoticeCenter.GameMail;
 /// 游戏邮件服务
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
-public class TenantGameMailEntityService
+public class GameMailService
     : GenericCrudService<Entity.Tenant.Game.TenantGameMailEntity,
         AddTenantGameMailEntityRequest, UpdateTenantGameMailEntityRequest,
-        TenantGameMailEntityResponse, PageTenantGameMailEntityRequest>
+        GameMailResponse, PageTenantGameMailEntityRequest>
 {
     private ScheduledTaskHostedService SendEmailJob { get; }
     private readonly SqlSugarRepository<Entity.Tenant.Game.TenantGameAreaEntity> _gameAreaEntityRepository;
@@ -29,7 +29,7 @@ public class TenantGameMailEntityService
     /// <param name="systemTenantGameAreaEntity"></param>
     /// <param name="httpClientFactory"></param>
     /// <param name="sendEmailJob"></param>
-    public TenantGameMailEntityService(SqlSugarRepository<Entity.Tenant.Game.TenantGameMailEntity> repository, SqlSugarRepository<Entity.Tenant.Game.TenantGameAreaEntity> systemTenantGameAreaEntity, HttpClient httpClientFactory, ScheduledTaskHostedService sendEmailJob)
+    public GameMailService(SqlSugarRepository<Entity.Tenant.Game.TenantGameMailEntity> repository, SqlSugarRepository<Entity.Tenant.Game.TenantGameAreaEntity> systemTenantGameAreaEntity, HttpClient httpClientFactory, ScheduledTaskHostedService sendEmailJob)
         : base(repository)
     {
         _httpClientFactory = httpClientFactory;
@@ -37,7 +37,7 @@ public class TenantGameMailEntityService
         SendEmailJob = sendEmailJob;
     }
 
-    protected override ISugarQueryable<TenantGameMailEntityResponse> BuildPageQuery(PageTenantGameMailEntityRequest input)
+    protected override ISugarQueryable<GameMailResponse> BuildPageQuery(PageTenantGameMailEntityRequest input)
     {
         return Repository.AsQueryable()
                          .WhereIF(!string.IsNullOrWhiteSpace(input.SearchKey), u =>
@@ -46,7 +46,7 @@ public class TenantGameMailEntityService
                          .WhereIF(input.IsAllPost.HasValue, u => u.IsAllPost == input.IsAllPost.Value)
                          .WhereIF(input.Status.HasValue, u => u.Status == input.Status.Value)
                          .WhereIF(input.MailType.HasValue, u => u.MailType == input.MailType.Value)
-                         .Select<TenantGameMailEntityResponse>();
+                         .Select<GameMailResponse>();
     }
 
     /// <summary>

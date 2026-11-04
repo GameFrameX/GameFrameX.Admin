@@ -22,7 +22,7 @@ public partial class GameOrderController : BaseController<TenantGameOrderEntity>
     private readonly IClientApiTenantOptionsProvider _optionsProvider;
     private readonly Repository<TenantGameRoleEntity> _gameRoleService;
     private readonly HttpClient _httpClient;
-    private readonly TenantGameOrderShipService _shipService;
+    private readonly GameOrderShipService _shipService;
     private readonly IPaymentChannelFactory _paymentChannelFactory;
     private readonly IGooglePubSubPushAuthenticator _googlePubSubPushAuthenticator;
     private readonly IGooglePlayPurchaseService _googlePlayPurchaseService;
@@ -41,7 +41,7 @@ public partial class GameOrderController : BaseController<TenantGameOrderEntity>
         IClientApiTenantOptionsProvider optionsProvider,
         Repository<TenantGameRoleEntity> gameRoleService,
         HttpClient httpClient,
-        TenantGameOrderShipService shipService,
+        GameOrderShipService shipService,
         IPaymentChannelFactory paymentChannelFactory,
         IGooglePubSubPushAuthenticator googlePubSubPushAuthenticator,
         IGooglePlayPurchaseService googlePlayPurchaseService
@@ -165,7 +165,7 @@ public partial class GameOrderController : BaseController<TenantGameOrderEntity>
         entity.OrderId = orderEntity.OrderId;
         // 保存订单到数据库
         var updatedEntity = await PRepository.InsertReturnEntityAsync(entity);
-        // 注意：累充(AllRecharge)不在下单时递增，改为在发货确认支付成功后递增（见 TenantGameOrderShipService.ShipAsync），避免下单刷 VIP 等级
+        // 注意：累充(AllRecharge)不在下单时递增，改为在发货确认支付成功后递增（见 GameOrderShipService.ShipAsync），避免下单刷 VIP 等级
         // 创建输出对象
         var output = updatedEntity.Adapt<AddTenantGameOrderEntityResponse>();
 

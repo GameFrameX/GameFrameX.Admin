@@ -14,7 +14,7 @@ public class TenantGameOrderShipServiceTests : IDisposable
     private readonly string _dbPath = Path.Combine(Path.GetTempPath(), $"game_order_ship_{Guid.NewGuid():N}.db");
     private readonly SqlSugarScope _db;
     private readonly RecordingHttpMessageHandler _handler = new();
-    private readonly TenantGameOrderShipService _service;
+    private readonly GameOrderShipService _service;
 
     public TenantGameOrderShipServiceTests()
     {
@@ -26,7 +26,7 @@ public class TenantGameOrderShipServiceTests : IDisposable
             IsAutoCloseConnection = true,
         });
         _db.CodeFirst.InitTables<TenantGameAreaEntity, TenantGameRoleEntity, TenantGameOrderEntity, TenantGameOrderFulfillmentEntity>();
-        _service = new TenantGameOrderShipService(_db, new TestHttpClientFactory(_handler));
+        _service = new GameOrderShipService(_db, new TestHttpClientFactory(_handler));
     }
 
     [Fact]

@@ -11,7 +11,7 @@ namespace GameFrameX.Application.ServerCenter.GameArea;
 /// 游戏区服服务
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
-public class TenantGameAreaEntityService : GenericCrudSelectService<Entity.Tenant.Game.TenantGameAreaEntity, AddTenantGameAreaEntityRequest, UpdateTenantGameAreaEntityRequest, TenantGameAreaEntityResponse, PageTenantGameAreaEntityRequest>
+public class GameAreaService : GenericCrudSelectService<Entity.Tenant.Game.TenantGameAreaEntity, AddTenantGameAreaEntityRequest, UpdateTenantGameAreaEntityRequest, GameAreaResponse, PageTenantGameAreaEntityRequest>
 {
     private readonly SqlSugarRepository<Entity.Tenant.Game.TenantGameAreaClassifyEntity> _classifyRepository;
     private readonly HttpClient _httpClient;
@@ -22,7 +22,7 @@ public class TenantGameAreaEntityService : GenericCrudSelectService<Entity.Tenan
     /// <param name="repository"></param>
     /// <param name="classifyRepository"></param>
     /// <param name="httpClient"></param>
-    public TenantGameAreaEntityService(SqlSugarRepository<Entity.Tenant.Game.TenantGameAreaEntity> repository, SqlSugarRepository<Entity.Tenant.Game.TenantGameAreaClassifyEntity> classifyRepository, HttpClient httpClient) : base(repository)
+    public GameAreaService(SqlSugarRepository<Entity.Tenant.Game.TenantGameAreaEntity> repository, SqlSugarRepository<Entity.Tenant.Game.TenantGameAreaClassifyEntity> classifyRepository, HttpClient httpClient) : base(repository)
     {
         _classifyRepository = classifyRepository;
         _httpClient = httpClient;
@@ -31,10 +31,10 @@ public class TenantGameAreaEntityService : GenericCrudSelectService<Entity.Tenan
     /// <summary>
     /// 构建分页查询条件（含外键关联）
     /// </summary>
-    protected override ISugarQueryable<TenantGameAreaEntityResponse> BuildPageQuery(PageTenantGameAreaEntityRequest input)
+    protected override ISugarQueryable<GameAreaResponse> BuildPageQuery(PageTenantGameAreaEntityRequest input)
     {
         // 区服启用标记 C301 起归一基类 IsEnabled，会被全局 ISafeEnabledFilter 隐藏禁用行；
-        // 管理列表必须能看到禁用区服（否则无法重新启用，参照 TenantGameAppPackageService 的 C67 FixPattern），
+        // 管理列表必须能看到禁用区服（否则无法重新启用，参照 GameAppPackageService 的 C67 FixPattern），
         // 故绕过全部过滤器并手动补软删条件。
         // 注意：Filter(null, true) 必须放在 LeftJoin 之后——SqlSugar 的 Filter 状态不随 join 链传递，
         // 放 join 前会被 join 重置（实测禁用行被 ISafeEnabledFilter 过滤），放 join 后才对整个查询生效。
@@ -49,7 +49,7 @@ public class TenantGameAreaEntityService : GenericCrudSelectService<Entity.Tenan
                          // C301：分類名改用子查询取值。原 LeftJoin 形态下 SqlSugar 的 Filter/ClearFilter 均不生效
                          //（join 查询不吃 queryable 级过滤器开关，实测禁用行被 ISafeEnabledFilter 隐藏），
                          // 改单表 + SqlFunc.Subqueryable 后 Filter(null, true) 才能对主查询生效。
-                         .Select(u => new TenantGameAreaEntityResponse
+                         .Select(u => new GameAreaResponse
                          {
                              Id = u.Id,
                              // 乐观锁版本必须下发：编辑回传缺 RowVersion 会让乐观锁以 null 参数比较（Postgres bigint = text）500
@@ -112,10 +112,10 @@ public class TenantGameAreaEntityService : GenericCrudSelectService<Entity.Tenan
     /// </summary>
     [HttpGet(CrudActionRoutes.Detail)]
     [DisplayName("区服详情")]
-    public override async Task<TenantGameAreaEntityResponse> GetAsync([FromQuery] BaseIdRequest input)
+    public override async Task<GameAreaResponse> GetAsync([FromQuery] BaseIdRequest input)
     {
         var entity = await GetAreaForManagementAsync(input.Id);
-        return entity == null ? default : entity.Adapt<TenantGameAreaEntityResponse>();
+        return entity == null ? default : entity.Adapt<GameAreaResponse>();
     }
 
     /// <summary>
@@ -145,7 +145,7 @@ public class TenantGameAreaEntityService : GenericCrudSelectService<Entity.Tenan
     /// 归一化区服 Server HTTP 接口前缀（来源 change C175）：Trim 空白与首尾斜杠；
     /// <para>ClientDispatch/Fulfillment 空值回填默认 <c>game/api</c>（保证历史路径不回归）；Gm/Control 允许空（空表示不构造对应能力 URL）。</para>
     /// </summary>
-    private static void NormalizeEndpointPrefixes(TenantGameAreaEntityBaseRequest input)
+    private static void NormalizeEndpointPrefixes(GameAreaBaseRequest input)
     {
         input.ClientDispatchApiPrefix = NormalizeApiPrefix(input.ClientDispatchApiPrefix, GameServerEndpointUrlBuilder.DefaultApiPrefix);
         input.FulfillmentApiPrefix = NormalizeApiPrefix(input.FulfillmentApiPrefix, GameServerEndpointUrlBuilder.DefaultApiPrefix);

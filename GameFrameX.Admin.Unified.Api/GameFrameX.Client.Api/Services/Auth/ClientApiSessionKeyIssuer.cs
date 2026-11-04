@@ -7,7 +7,7 @@ namespace GameFrameX.Client.Api.Services.Auth;
 /// 登录期会话密钥签发服务。
 /// <para>每次登录生成一把 Kid 会话密钥写入会话密钥环（<see cref="TenantSessionKeyEntity"/>，AES-256-GCM 信封对称密钥），
 /// NotBefore=now、Expire 与 AccessToken 到期时间对齐，随登录响应一次性回显 Kid/Secret。</para>
-/// <para>Kid 使用随机标识；Secret 复用管理面 <see cref="TenantSessionKeyEntityService"/> 的安全随机源。</para>
+/// <para>Kid 使用随机标识；Secret 复用管理面 <see cref="SessionKeyService"/> 的安全随机源。</para>
 /// </summary>
 public sealed class ClientApiSessionKeyIssuer
 {
@@ -36,7 +36,7 @@ public sealed class ClientApiSessionKeyIssuer
                          .Where(e => e.ExpireTime != null && e.ExpireTime < now)
                          .ExecuteCommandAsync();
 
-        var plainSecret = TenantSessionKeyEntityService.GenerateSecret();
+        var plainSecret = SessionKeyService.GenerateSecret();
         var entity = new TenantSessionKeyEntity
         {
             Kid = Guid.NewGuid().ToString("N"),

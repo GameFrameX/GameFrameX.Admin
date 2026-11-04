@@ -333,9 +333,9 @@ public sealed class TenantGameAppFeatureSwitchServiceTests : IDisposable
         Assert.Equal("switch.default", Assert.Single(filtered.Items).SwitchKey);
     }
 
-    private TenantGameAppFeatureSwitchService CreateService()
+    private GameAppFeatureSwitchService CreateService()
     {
-        return new TenantGameAppFeatureSwitchService(
+        return new GameAppFeatureSwitchService(
             new SqlSugarRepository<TenantGameAppFeatureSwitchEntity> { Context = _db, },
             new SqlSugarRepository<TenantGameAppPackageEntity> { Context = _db, });
     }

@@ -87,24 +87,24 @@ public sealed class TenantGameAppDeviceContractTests
     [Fact]
     public void TenantGameAppDeviceService_UpdateUsesGenericCrudPath()
     {
-        var updateMethod = typeof(TenantGameAppDeviceService).GetMethod(
+        var updateMethod = typeof(GameAppDeviceService).GetMethod(
             "UpdateAsync",
             BindingFlags.Instance | BindingFlags.Public);
 
         Assert.NotNull(updateMethod);
-        Assert.NotEqual(typeof(TenantGameAppDeviceService), updateMethod!.DeclaringType);
+        Assert.NotEqual(typeof(GameAppDeviceService), updateMethod!.DeclaringType);
         Assert.Contains("GenericCrudService", updateMethod.DeclaringType!.Name);
     }
 
     [Fact]
     public void TenantDeviceGroupService_UpdateUsesGenericCrudPath()
     {
-        var updateMethod = typeof(TenantDeviceGroupService).GetMethod(
+        var updateMethod = typeof(DeviceGroupService).GetMethod(
             "UpdateAsync",
             BindingFlags.Instance | BindingFlags.Public);
 
         Assert.NotNull(updateMethod);
-        Assert.NotEqual(typeof(TenantDeviceGroupService), updateMethod!.DeclaringType);
+        Assert.NotEqual(typeof(DeviceGroupService), updateMethod!.DeclaringType);
         Assert.Contains("GenericCrudService", updateMethod.DeclaringType!.Name);
     }
 

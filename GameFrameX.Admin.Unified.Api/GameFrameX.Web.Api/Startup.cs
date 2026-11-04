@@ -68,18 +68,18 @@ public class Startup
         // SqlSugar
         services.AddSqlSugar(configuration, webHostEnvironment, cache, httpContextAccessor);
         // Admin 侧租户库连接提供器：Core 收敛层（Repository 租户表路由 / 签名密钥环 Resolver）依赖，与 Client.Api / Game.Api 的注册同口径
-        // 支付配置 schema 提供器（供 TenantGamePaymentConfigEntityService 在 admin 主机解析）
+        // 支付配置 schema 提供器（供 GamePaymentConfigService 在 admin 主机解析）
         services.AddScoped<IPaymentConfigSchemaProvider, PaymentConfigSchemaProvider>();
         // 渠道退款管理器（C310 / GFX-718）：四渠道统一 IRefundManager 契约；Payment.* 工程不在自动扫描范围，须显式注册
         services.AddScoped<IRefundManager, GameFrameX.Payment.Xsolla.Refund.XsollaRefundManager>();
         services.AddScoped<IRefundManager, GameFrameX.Payment.Apple.Refund.AppleRefundManager>();
         services.AddScoped<IRefundManager, GameFrameX.Payment.Google.Refund.GoogleRefundManager>();
         services.AddScoped<IRefundManager, GameFrameX.Payment.AliPay.Refund.AliPayRefundManager>();
-        // 广告回调配置 schema 提供器（供 TenantAdvertisementCallbackConfigEntityService 动态渲染和校验）
+        // 广告回调配置 schema 提供器（供 AdvertisementCallbackConfigService 动态渲染和校验）
         services.AddScoped<IAdvertisementCallbackConfigSchemaProvider, AdvertisementCallbackConfigSchemaProvider>();
         // 平台系统邮件发送器（ISystemEmailSender 实现位于 Application.Platform；从主库 SystemEmailProviderEntity 读取）
         services.AddSingleton<ISystemEmailSender, GameFrameX.Application.Platform.Email.SystemEmailSender>();
-        // 对象存储配置 schema 提供器（供 TenantObjectStorageConfigEntityService 动态渲染和校验）
+        // 对象存储配置 schema 提供器（供 ObjectStorageConfigService 动态渲染和校验）
         services.AddScoped<IObjectStorageConfigSchemaProvider, ObjectStorageConfigSchemaProvider>();
         // 对象存储 Adapter 工厂（单例；供 TenantFileService 与 TestConnectionAsync 端点解析租户存储配置）
         services.AddSingleton<IObjectStorageAdapterFactory, ObjectStorage.Abstract.DefaultObjectStorageAdapterFactory>();
