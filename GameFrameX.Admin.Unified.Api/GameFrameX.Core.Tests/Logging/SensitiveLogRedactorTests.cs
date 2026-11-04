@@ -32,6 +32,29 @@ public sealed class SensitiveLogRedactorTests
         Assert.Contains(plain, payload);
     }
 
+    [Theory]
+    [InlineData("quote\"and\\slash")]
+    [InlineData("short")]
+    public void SecretsEchoedAcrossSerializedColumns_RemainValidJsonAndAreMasked(string plain)
+    {
+        var payload = JsonSerializer.Serialize(new { Exception = "failed with " + plain, RequestParam = JsonSerializer.Serialize(new { Password = plain }) });
+        var result = SensitiveLogRedactor.Redact(payload);
+        using (var document = JsonDocument.Parse(result!))
+        {
+            Assert.DoesNotContain(plain, document.RootElement.GetProperty("Exception").GetString());
+            Assert.DoesNotContain(plain, document.RootElement.GetProperty("RequestParam").GetString());
+        }
+
+        Assert.Equal(result, SensitiveLogRedactor.Redact(result));
+    }
+
+    [Fact]
+    public void EndpointMetadataAndOrdinaryParameters_RemainReadable()
+    {
+        const string value = "{\"ControllerName\":\"TenantSessionKeyEntity\",\"ActionName\":\"SetupSuperAdminPassword\",\"Keyword\":\"ordinary\"}";
+        Assert.Equal(value, SensitiveLogRedactor.Redact(value));
+    }
+
     [Fact]
     public void RepeatedJsonStringEncoding_CannotHideCredentials()
     {

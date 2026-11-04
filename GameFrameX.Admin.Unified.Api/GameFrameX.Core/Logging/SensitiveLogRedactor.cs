@@ -26,10 +26,10 @@ public static class SensitiveLogRedactor
             return text;
         }
 
-        return RedactText(text, 0);
+        return RedactText(text, 0, new HashSet<string>(StringComparer.Ordinal));
     }
 
-    private static string RedactText(string text, int depth)
+    private static string RedactText(string text, int depth, HashSet<string> secrets)
     {
         if (depth >= 32)
         {
@@ -46,29 +46,76 @@ public static class SensitiveLogRedactor
 
             if (node is JsonValue scalar && scalar.TryGetValue<string>(out var nested))
             {
-                var redacted = RedactText(nested, depth + 1);
+                var redacted = RedactText(nested, depth + 1, secrets);
                 return nested == redacted ? text : JsonSerializer.Serialize(redacted);
             }
 
-            var secrets = new HashSet<string>(StringComparer.Ordinal);
             var changed = RedactNode(node, secrets, depth + 1);
-            var result = changed ? node.ToJsonString() : text;
-            // 同一凭据也可能被异常或 URL 作为无字段名文本回显。
-            foreach (var secret in secrets.Where(value => value.Length > 0 && value != Mask).OrderByDescending(value => value.Length))
-            {
-                result = result.Replace(JsonEncodedText.Encode(secret).ToString(), Mask, StringComparison.Ordinal);
-                result = result.Replace(secret, Mask, StringComparison.Ordinal);
-            }
-
-            return result;
+            changed |= ReplaceSecretValues(node, secrets);
+            return changed ? node.ToJsonString() : text;
         }
         catch (JsonException)
         {
             // 不把残缺 JSON、URL 查询或未结构化凭据文本原样持久化。
             return text.TrimStart().StartsWith('{') || text.TrimStart().StartsWith('[')
-                || Regex.IsMatch(text, "password|secret|token|private.?key|signing.?key|session.?key|authorization|credential", RegexOptions.IgnoreCase)
+                || Regex.IsMatch(text, "(password|secret|token|private.?key|signing.?key|session.?key|authorization|credential)[a-z0-9_]*[^a-z0-9_]*[:=]", RegexOptions.IgnoreCase)
                 ? Mask : text;
         }
+    }
+
+    private static bool ReplaceSecretValues(JsonNode node, HashSet<string> secrets)
+    {
+        var changed = false;
+        if (node is JsonObject dictionary)
+        {
+            foreach (var pair in dictionary.ToArray())
+            {
+                if (pair.Value is JsonValue value && value.TryGetValue<string>(out var text))
+                {
+                    var redacted = ReplaceSecrets(text, secrets);
+                    if (redacted != text)
+                    {
+                        dictionary[pair.Key] = redacted;
+                        changed = true;
+                    }
+                }
+                else if (pair.Value != null)
+                {
+                    changed |= ReplaceSecretValues(pair.Value, secrets);
+                }
+            }
+        }
+        else if (node is JsonArray array)
+        {
+            for (var index = 0; index < array.Count; index++)
+            {
+                if (array[index] is JsonValue value && value.TryGetValue<string>(out var text))
+                {
+                    var redacted = ReplaceSecrets(text, secrets);
+                    if (redacted != text)
+                    {
+                        array[index] = redacted;
+                        changed = true;
+                    }
+                }
+                else if (array[index] != null)
+                {
+                    changed |= ReplaceSecretValues(array[index]!, secrets);
+                }
+            }
+        }
+
+        return changed;
+    }
+
+    private static string ReplaceSecrets(string text, HashSet<string> secrets)
+    {
+        foreach (var secret in secrets.Where(value => value.Length > 0 && value != Mask).OrderByDescending(value => value.Length))
+        {
+            text = text.Replace(secret, Mask, StringComparison.Ordinal);
+        }
+
+        return text;
     }
 
     private static bool RedactNode(JsonNode node, HashSet<string> secrets, int depth)
@@ -96,7 +143,7 @@ public static class SensitiveLogRedactor
                 }
                 else if (pair.Value is JsonValue scalar && scalar.TryGetValue<string>(out var text))
                 {
-                    var redacted = RedactText(text, depth);
+                    var redacted = RedactText(text, depth, secrets);
                     if (redacted != text)
                     {
                         dictionary[pair.Key] = redacted;
@@ -115,7 +162,7 @@ public static class SensitiveLogRedactor
             {
                 if (array[index] is JsonValue value && value.TryGetValue<string>(out var text))
                 {
-                    var redacted = RedactText(text, depth);
+                    var redacted = RedactText(text, depth, secrets);
                     if (redacted != text)
                     {
                         array[index] = redacted;
