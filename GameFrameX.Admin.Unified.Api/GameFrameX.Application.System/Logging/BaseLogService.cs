@@ -73,8 +73,20 @@ public abstract class BaseLogService<TSystemLog, TTenantLog, TDto> : IAdminApiCo
         var current = QueryFiltered(SystemLogRepository, input, timestampRange).Select<TDto>();
         var historical = QueryFiltered(TenantLogRepository, input, timestampRange).Select<TDto>();
         return await SystemLogRepository.Context.UnionAll(current, historical)
-                                        .OrderBuilder(input)
+                                        .OrderBy(BuildProjectionOrder(input))
                                         .ToPagedListAsync(input.Page, input.PageSize);
+    }
+
+    private string BuildProjectionOrder(PageLogRequest input)
+    {
+        // UNION 结果列使用投影属性别名，不能再映射成原表的下划线列名。
+        var property = typeof(TDto).GetProperties().FirstOrDefault(candidate =>
+            candidate.Name.Equals(input.OrderBy, StringComparison.OrdinalIgnoreCase));
+        var propertyName = property?.Name ?? "Id";
+        var descending = property == null || input.IsDescending;
+        var quotedName = SystemLogRepository.Context.CurrentConnectionConfig.DbType == DbType.MySql
+            ? $"`{propertyName}`" : $"\"{propertyName}\"";
+        return $"{quotedName} {(descending ? "DESC" : "ASC")}";
     }
 
     /// <summary>

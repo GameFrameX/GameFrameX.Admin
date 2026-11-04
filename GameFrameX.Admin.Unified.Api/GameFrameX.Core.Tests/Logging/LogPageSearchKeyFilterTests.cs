@@ -215,9 +215,11 @@ public sealed class LogPageSearchKeyFilterTests : IDisposable
         var operations = new LogOperationService(new() { Context = _db }, new() { Context = _db }, context);
         var exceptions = new LogExceptionService(new() { Context = _db }, new() { Context = _db }, context);
         var differences = new LogDiffService(new() { Context = _db }, new() { Context = _db }, context);
-        var input = new PageLogRequest { Page = 1, PageSize = 20 };
+        var input = new PageLogRequest { Page = 1, PageSize = 20, OrderBy = "createdTime", IsDescending = true };
         Assert.Equal(2, (await visits.PageAsync(input)).Total);
-        Assert.Equal(2, (await operations.PageAsync(input)).Total);
+        var operationPage = await operations.PageAsync(input);
+        Assert.Equal(2, operationPage.Total);
+        Assert.Equal("current operation", operationPage.Items.First().Message);
         Assert.Equal(2, (await exceptions.PageAsync(input)).Total);
         Assert.Equal(2, (await differences.PageAsync(input)).Total);
         var historical = await visits.PageAsync(new PageLogRequest { Page = 1, PageSize = 1, SearchKey = "historical" });
