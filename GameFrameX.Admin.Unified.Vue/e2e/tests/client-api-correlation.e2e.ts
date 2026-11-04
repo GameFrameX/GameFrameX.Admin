@@ -153,10 +153,10 @@ const FIXTURE_PACKAGE = 'com.gameframex.e2e.correlation';
 // 分包是包级端点的前置（区服/版本/开关按包解析）；无包时自举持久 fixture 包（幂等：已存在则复用）
 async function ensureFixturePackage(ctx: AdminContext, packageName: string): Promise<string> {
   if (packageName) return packageName;
-  const channels = await adminPost(ctx, 'tenantChannelDefinition/selectString', { pageSize: 5 });
+  const channels = await adminPost(ctx, 'channelDefinition/selectString', { pageSize: 5 });
   const channelRows = readObjects(channels, []) === undefined ? [] : (Array.isArray(channels) ? channels.map(asRecord) : []);
   const channelId = channelRows.length > 0 ? Number(readString(channelRows[0], ['Id']) || readNumber(channelRows[0], ['Id']) || 0) : 0;
-  const created = await adminPost(ctx, 'tenantGameAppPackage/add', {
+  const created = await adminPost(ctx, 'gameAppPackage/add', {
     appId: ctx.appId,
     name: 'E2E关联分包',
     packageName: FIXTURE_PACKAGE,
@@ -217,7 +217,7 @@ test.describe('Client.Api 与后台关联性', () => {
     const { ctx, packageName, secret } = await setupContext(request);
     const marker = `E2E_FS_${Date.now().toString(36)}`;
 
-    const created = await adminPost(ctx, 'tenantGameAppFeatureSwitch/add', {
+    const created = await adminPost(ctx, 'gameAppFeatureSwitch/add', {
       appId: ctx.appId,
       switchKey: marker,
       displayName: marker,
@@ -232,7 +232,7 @@ test.describe('Client.Api 与后台关联性', () => {
     const call = await clientCall(ctx, 'post', 'GameFeatureSwitch/GetInfo', secret, featureSwitchRequestBody(ctx.appId, packageName));
     expect(readEnvelopeCode(call.payload), `开关查询 code（packageName=${packageName || '空'}）`).toBe(0);
     expect(readSwitchKeys(call.payload), 'Client.Api 必须下发后台刚创建的开关').toContain(marker);
-    await adminPost(ctx, 'tenantGameAppFeatureSwitch/delete', {
+    await adminPost(ctx, 'gameAppFeatureSwitch/delete', {
       id: readString(created, ['Id']),
       rowVersion: readNumber(created, ['RowVersion']) ?? 0,
     });
@@ -245,12 +245,12 @@ test.describe('Client.Api 与后台关联性', () => {
 
     // 区服（写读关联）：Client.Api 区服按「分类 → 区服」两级下发——后台 seed 分类+区服 → Client.Api 可见 → 清理后消失
     {
-      const classify = await adminPost(ctx, 'tenantGameAreaClassifyEntity/add', {
+      const classify = await adminPost(ctx, 'gameAreaClassify/add', {
         appId: ctx.appId,
         name: `E2E分类${Date.now() % 1000}`,
         description: 'e2e correlation',
       });
-      const area = await adminPost(ctx, 'tenantGameAreaEntity/add', {
+      const area = await adminPost(ctx, 'gameArea/add', {
         appId: ctx.appId,
         name: `E2E区服${Date.now() % 1000}`,
         description: 'e2e correlation',
@@ -277,11 +277,11 @@ test.describe('Client.Api 与后台关联性', () => {
       const allAreas = classifyRows.flatMap((row) => readObjects(row, ['GameAreaList']));
       const clientIds = allAreas.map((row) => readString(row, ['Id'])).filter((id) => id !== '');
       expect(clientIds, 'Client.Api 区服列表应包含后台刚 seed 的区服').toContain(readString(area, ['Id']));
-      await adminPost(ctx, 'tenantGameAreaEntity/delete', {
+      await adminPost(ctx, 'gameArea/delete', {
         id: readString(area, ['Id']),
         rowVersion: readNumber(area, ['RowVersion']) ?? 0,
       }).catch(() => undefined);
-      await adminPost(ctx, 'tenantGameAreaClassifyEntity/delete', {
+      await adminPost(ctx, 'gameAreaClassify/delete', {
         id: readString(classify, ['Id']),
         rowVersion: readNumber(classify, ['RowVersion']) ?? 0,
       }).catch(() => undefined);
@@ -291,7 +291,7 @@ test.describe('Client.Api 与后台关联性', () => {
     if (packageName) {
       const versionMarker = `9.9.9.${Date.now() % 1000}`;
       // 精确匹配契约：OldVersion == 客户端当前版本(0.0.1)、Platform/Language/Channel/Package 与请求全等
-      const createdVersion = await adminPost(ctx, 'tenantGameAppReleaseVersion/add', {
+      const createdVersion = await adminPost(ctx, 'gameAppReleaseVersion/add', {
         appId: ctx.appId,
         appVersion: versionMarker,
         platform: 'android',
@@ -316,7 +316,7 @@ test.describe('Client.Api 与后台关联性', () => {
       const versionData = pick(call.payload, ['Data']) ?? pick(call.payload, ['data']);
       const downloadUrl = readString(versionData, ['AppDownloadUrl']) || readString(versionData, ['appDownloadUrl']);
       expect(downloadUrl, '下发 URL 与后台写入一致').toContain('e2e.apk');
-      await adminPost(ctx, 'tenantGameAppReleaseVersion/delete', {
+      await adminPost(ctx, 'gameAppReleaseVersion/delete', {
         id: readString(createdVersion, ['Id']),
         rowVersion: readNumber(createdVersion, ['RowVersion']) ?? 0,
       });
@@ -334,7 +334,7 @@ test.describe('Client.Api 与后台关联性', () => {
     {
       const configKey = `e2e_corr_${Date.now() % 100000}`;
       const markerValue = Date.now().toString(36);
-      const key = await adminPost(ctx, 'tenantGameAppRemoteConfigKey/add', {
+      const key = await adminPost(ctx, 'gameAppRemoteConfigKey/add', {
         keyName: configKey,
         displayName: 'E2E Corr Key',
         valueType: 'string',
@@ -342,7 +342,7 @@ test.describe('Client.Api 与后台关联性', () => {
       });
       // 远程配置单行：作用域五元组 + ModeContents（modeCode → 内容键值）与 ActiveModeCode 激活
       const modeCode = `e2e_mode_${Date.now() % 100000}`;
-      const config = await adminPost(ctx, 'tenantGameAppRemoteConfig/add', {
+      const config = await adminPost(ctx, 'gameAppRemoteConfig/add', {
         appId: ctx.appId,
         platform: 'android',
         package: packageName,
@@ -370,8 +370,8 @@ test.describe('Client.Api 与后台关联性', () => {
       const configData = pick(configCall.payload, ['Data']) ?? pick(configCall.payload, ['data']);
       const content = readString(configData, ['Content']) || readString(configData, ['content']);
       expect(content, '远程配置 Content 必须与后台写入的 ModeContents 一致').toContain(markerValue);
-      await adminPost(ctx, 'tenantGameAppRemoteConfig/delete', { id: readString(config, ['Id']), rowVersion: readNumber(config, ['RowVersion']) ?? 0 }).catch(() => undefined);
-      await adminPost(ctx, 'tenantGameAppRemoteConfigKey/delete', { id: readString(key, ['Id']), rowVersion: readNumber(key, ['RowVersion']) ?? 0 }).catch(() => undefined);
+      await adminPost(ctx, 'gameAppRemoteConfig/delete', { id: readString(config, ['Id']), rowVersion: readNumber(config, ['RowVersion']) ?? 0 }).catch(() => undefined);
+      await adminPost(ctx, 'gameAppRemoteConfigKey/delete', { id: readString(key, ['Id']), rowVersion: readNumber(key, ['RowVersion']) ?? 0 }).catch(() => undefined);
     }
   });
 });
