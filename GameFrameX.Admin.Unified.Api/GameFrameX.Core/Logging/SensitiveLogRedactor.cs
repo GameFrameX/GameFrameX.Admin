@@ -11,12 +11,17 @@ public static class SensitiveLogRedactor
 
     public static bool IsSensitiveName(string name)
     {
-        var normalized = new string(name.Where(char.IsLetterOrDigit).ToArray()).ToLowerInvariant();
+        var normalized = NormalizeFieldName(name);
         return normalized.Contains("password") || normalized.Contains("secret") || normalized.Contains("token")
             || normalized.Contains("privatekey") || normalized.Contains("signingkey") || normalized.Contains("sessionkey")
             || normalized.Contains("encryptionkey") || normalized.Contains("credential") || normalized.Contains("connectionstring")
             || normalized.Contains("apikey") || normalized.Contains("signkey") || normalized.Contains("verificationkey") || normalized.Contains("keymaterial")
             || normalized is "key" or "keyvalue" or "authorization" or "accesskey";
+    }
+
+    private static string NormalizeFieldName(string name)
+    {
+        return new string(name.Where(char.IsLetterOrDigit).ToArray()).ToLowerInvariant();
     }
 
     public static string? Redact(string? text)
@@ -124,11 +129,11 @@ public static class SensitiveLogRedactor
         if (node is JsonObject dictionary)
         {
             // Monitor 参数/claims 和 SqlSugar 差异列以 name/type/ColumnName + value 成对存储。
-            var sensitiveValue = dictionary.Any(pair => pair.Key.ToLowerInvariant() is "name" or "type" or "columnname" or "dbcolumnname" or "parametername" or "code"
+            var sensitiveValue = dictionary.Any(pair => NormalizeFieldName(pair.Key) is "name" or "type" or "columnname" or "dbcolumnname" or "parametername" or "code"
                 && pair.Value is JsonValue value && value.TryGetValue<string>(out var descriptor) && IsSensitiveName(descriptor));
             foreach (var pair in dictionary.ToArray())
             {
-                if (IsSensitiveName(pair.Key) || (sensitiveValue && pair.Key.Equals("value", StringComparison.OrdinalIgnoreCase)))
+                if (IsSensitiveName(pair.Key) || (sensitiveValue && NormalizeFieldName(pair.Key) is "value" or "oldvalue" or "newvalue"))
                 {
                     if (pair.Value is JsonValue value && value.TryGetValue<string>(out var secret))
                     {

@@ -52,6 +52,21 @@ public sealed class SensitiveLogRedactorTests
         Assert.Equal(result, SensitiveLogRedactor.Redact(result));
     }
 
+    [Theory]
+    [InlineData("ColumnName", "OldValue", "NewValue")]
+    [InlineData("column_name", "old_value", "new_value")]
+    public void HistoricalAuditColumnDescriptor_MasksOldAndNewValues(string descriptor, string before, string after)
+    {
+        var result = SensitiveLogRedactor.Redact(JsonSerializer.Serialize(new Dictionary<string, string> { [descriptor] = "Password", [before] = "old-credential", [after] = "new-credential" }));
+        using (var document = JsonDocument.Parse(result!))
+        {
+            Assert.Equal(SensitiveLogRedactor.Mask, document.RootElement.GetProperty(before).GetString());
+            Assert.Equal(SensitiveLogRedactor.Mask, document.RootElement.GetProperty(after).GetString());
+        }
+
+        Assert.Equal(result, SensitiveLogRedactor.Redact(result));
+    }
+
     [Fact]
     public void EndpointMetadataAndOrdinaryParameters_RemainReadable()
     {

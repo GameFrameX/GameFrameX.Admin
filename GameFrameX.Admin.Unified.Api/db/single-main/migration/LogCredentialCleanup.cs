@@ -9,7 +9,7 @@ internal static class LogCredentialCleanup
 {
     internal static bool IsLogTable(string tableName)
     {
-        return new[] { "system", "tenant" }.Any(prefix => new[] { "operation", "exception", "visit", "diff" }
+        return new[] { "system", "tenant" }.Any(prefix => new[] { "operation", "exception", "visit", "diff", "audit" }
             .Any(kind => tableName.Equals($"{prefix}_log_{kind}_entity", StringComparison.OrdinalIgnoreCase)));
     }
 
