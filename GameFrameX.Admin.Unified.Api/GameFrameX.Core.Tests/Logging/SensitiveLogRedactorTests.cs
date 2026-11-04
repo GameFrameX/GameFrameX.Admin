@@ -113,7 +113,8 @@ public sealed class SensitiveLogRedactorTests
     [InlineData("https://localhost/api/auth?pass___word=secret-value&keyword=plain-value", "secret-value", "keyword=plain-value")]
     [InlineData("https://localhost/api/auth?pass%77ord=secret-value&keyword=plain-value", "secret-value", "keyword=plain-value")]
     [InlineData("https://localhost/api/auth?CliEnT_SecReT=secret-value&keyword=plain-value", "secret-value", "keyword=plain-value")]
-    [InlineData("log line Password: \"quoted-secret-value\" keyword=plain-value", "quoted-secret-value", "keyword=plain-value")]
+    [InlineData("https://localhost/api/auth?pass+word=secret-value&keyword=plain-value", "secret-value", "keyword=plain-value")]
+    [InlineData("https://localhost/api/auth?pass%2Bword=secret-value&keyword=plain-value", "secret-value", "keyword=plain-value")]
     public void UnstructuredQueryCredentials_MaskValueButKeepNonSensitiveParameters(string value, string credential, string kept)
     {
         var redacted = SensitiveLogRedactor.Redact(value);
@@ -160,6 +161,20 @@ public sealed class SensitiveLogRedactorTests
         var redacted = SensitiveLogRedactor.Redact(payload);
 
         Assert.DoesNotContain("123456", redacted);
+        Assert.Contains(SensitiveLogRedactor.Mask, redacted);
+        Assert.Equal(redacted, SensitiveLogRedactor.Redact(redacted));
+    }
+
+    [Fact]
+    public void SecretValueContainingMaskSubstring_IsMaskedAcrossEchoFields()
+    {
+        const string plain = "mask-spanning-credential-99012";
+        var payload = JsonSerializer.Serialize(new { Password = "a******b" + plain, Echo = "a******b" + plain });
+
+        var redacted = SensitiveLogRedactor.Redact(payload);
+
+        Assert.DoesNotContain(plain, redacted);
+        Assert.DoesNotContain("a******b", redacted);
         Assert.Contains(SensitiveLogRedactor.Mask, redacted);
         Assert.Equal(redacted, SensitiveLogRedactor.Redact(redacted));
     }

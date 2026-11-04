@@ -172,7 +172,7 @@ public static class SensitiveLogRedactor
 
     private static bool IsNameCharacter(char character)
     {
-        return char.IsLetterOrDigit(character) || character == '_' || character == '%' || character == '-' || character == '.';
+        return char.IsLetterOrDigit(character) || character == '_' || character == '%' || character == '-' || character == '.' || character == '+';
     }
 
     private static bool IsSensitiveUnstructuredName(string name)
@@ -246,8 +246,15 @@ public static class SensitiveLogRedactor
     {
         foreach (var secret in secrets.Where(value => value.Length > 0 && value != Mask).OrderByDescending(value => value.Length))
         {
-            // 既有掩码内的字符不得再被逐字替换（如单字符密钥会把 ****** 逐字展开），按掩码切段后只在段内替换。
-            if (text.Contains(Mask))
+            if (secret.Contains(Mask, StringComparison.Ordinal))
+            {
+                // 密钥值自身含掩码子串时，按掩码切段永远匹配不到横跨边界的整串，必须整串字面量替换。
+                text = text.Replace(secret, Mask, StringComparison.Ordinal);
+                continue;
+            }
+
+            // 既有掩码内的字符不得再被逐字替换（如单字符密钥会把 ****** 逐星展开），按掩码切段后只在段内替换。
+            if (text.Contains(Mask, StringComparison.Ordinal))
             {
                 var segments = text.Split(Mask);
                 for (var index = 0; index < segments.Length; index++)
