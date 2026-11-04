@@ -4,7 +4,7 @@ using GameFrameX.Entity.Tenant.Game;
 namespace GameFrameX.Core.Middleware;
 
 /// <summary>
-/// 主库驱动的签名密钥环。每次读取当前启用状态与租约，密文解密使用进程缓存。
+/// 主库驱动的签名密钥环。每次读取当前启用状态与租约，密文解密使用有界进程缓存。
 /// </summary>
 public sealed class SignatureKeyResolver : ISignatureKeyResolver
 {
@@ -18,26 +18,28 @@ public sealed class SignatureKeyResolver : ISignatureKeyResolver
     /// <inheritdoc />
     public async Task<SignatureKeyLookup> ResolveAsync(string kid)
     {
-        var keys = await GetKeysAsync();
-        var entity = keys.FirstOrDefault(x => x.Kid == kid);
+        var entity = await GetKeyAsync(kid);
         if (entity == null)
         {
             return new SignatureKeyLookup(SignatureKeyLookupResult.NotFound, kid, null);
         }
 
         var result = Judge(entity, TimerHelper.UnixTimeSeconds());
-        return new SignatureKeyLookup(result, kid, result == SignatureKeyLookupResult.Active ? entity.Secret : null);
+        return new SignatureKeyLookup(result, kid, result == SignatureKeyLookupResult.Active ? RuntimeKeyMaterialCache.Decrypt(entity.Secret) : null);
     }
 
     /// <inheritdoc />
     public async Task<IReadOnlyList<SignatureKeyMaterial>> GetActiveKeysAsync()
     {
         var now = TimerHelper.UnixTimeSeconds();
-        var keys = await GetKeysAsync();
+        var keys = await _tenantDbProvider.Queryable<TenantAppSignatureKeyEntity>().ClearFilter()
+            .Where(key => key.IsDeleted == false && key.IsEnabled == true
+                && (key.NotBeforeTime == null || key.NotBeforeTime <= now)
+                && (key.ExpireTime == null || key.ExpireTime > now)).ToListAsync();
         return keys.Where(x => Judge(x, now) == SignatureKeyLookupResult.Active)
                    .OrderByDescending(x => x.CreatedTime)
                    .ThenByDescending(x => x.Id)
-                   .Select(x => new SignatureKeyMaterial(x.Kid, x.Secret))
+                   .Select(x => new SignatureKeyMaterial(x.Kid, RuntimeKeyMaterialCache.Decrypt(x.Secret)))
                    .ToList();
     }
 
@@ -66,28 +68,11 @@ public sealed class SignatureKeyResolver : ISignatureKeyResolver
         return SignatureKeyLookupResult.Active;
     }
 
-    /// <summary>
-    /// 取主库全量密钥（含禁用/租约外），每次读取当前状态。
-    /// </summary>
-    private async Task<List<TenantAppSignatureKeyEntity>> GetKeysAsync()
+    private async Task<TenantAppSignatureKeyEntity?> GetKeyAsync(string kid)
     {
-        var db = _tenantDbProvider;
-        db.QueryFilter.ClearAndBackup();
-        try
-        {
-            var refreshed = await db.Queryable<TenantAppSignatureKeyEntity>().ToListAsync();
-            // 状态直接读取主库，避免同秒更新或非最大行删除导致撤销失效。
-            foreach (var key in refreshed)
-            {
-                key.Secret = TenantSecretCrypto.DecryptCached(key.Secret) ?? string.Empty;
-            }
-
-            return refreshed;
-        }
-        finally
-        {
-            db.QueryFilter.Restore();
-        }
+        // 元数据不缓存，跨宿主轮换、同秒撤销、删除与租约修改在下一请求立即生效。
+        return await _tenantDbProvider.Queryable<TenantAppSignatureKeyEntity>().ClearFilter()
+            .Where(key => key.Kid == kid && key.IsDeleted == false).FirstAsync();
     }
 
 }
