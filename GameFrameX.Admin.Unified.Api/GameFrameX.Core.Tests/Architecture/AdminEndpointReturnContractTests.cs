@@ -33,21 +33,21 @@ public sealed class AdminEndpointReturnContractTests
     private static readonly HashSet<string> SensitiveDisplayFieldAllowlist = new(StringComparer.Ordinal)
     {
         // App 签名密钥环：列表/详情恒 ******（PageAsync 强制重置）；AddAsync/RotateAsync 响应一次性回传明文（C2 TenantAppSignatureKeyEntityService）
-        "GameFrameX.Application.Game.Tenant.Security.TenantAppSignatureKey.Dto.TenantAppSignatureKeyResponse.Secret",
-        "GameFrameX.Application.Game.Tenant.Security.TenantAppSignatureKey.Dto.TenantAppSignatureKeyRevealResponse.Secret",
+        "GameFrameX.Application.ClientDelivery.Security.AppSignatureKey.Dto.TenantAppSignatureKeyResponse.Secret",
+        "GameFrameX.Application.ClientDelivery.Security.AppSignatureKey.Dto.TenantAppSignatureKeyRevealResponse.Secret",
         // App 会话密钥环：列表/详情恒 ******（PageAsync/DetailAsync 强制重置）；AddAsync/RotateAsync 响应一次性回传明文（C5 TenantSessionKeyEntityService）
-        "GameFrameX.Application.Game.Tenant.Security.TenantSessionKey.Dto.TenantSessionKeyResponse.Secret",
-        "GameFrameX.Application.Game.Tenant.Security.TenantSessionKey.Dto.TenantSessionKeyRevealResponse.Secret",
+        "GameFrameX.Application.ClientDelivery.Security.SessionKey.Dto.TenantSessionKeyResponse.Secret",
+        "GameFrameX.Application.ClientDelivery.Security.SessionKey.Dto.TenantSessionKeyRevealResponse.Secret",
         // OpenAccess 凭证签发/轮换响应一次性回传明文，列表与详情不再输出（TenantGameAppOpenAccessService）
-        "GameFrameX.Application.Game.Tenant.OpenAccess.TenantGameAppOpenAccess.Dto.TenantGameAppOpenAccessSecretResponse.AccessSecret",
+        "GameFrameX.Application.Platform.OpenAccess.GameAppOpenAccess.Dto.TenantGameAppOpenAccessSecretResponse.AccessSecret",
         // MaskSensitiveFields 输出 ******，表单回显依赖（SystemEmailProviderService）
-        "GameFrameX.Application.Game.System.Email.Dto.SystemEmailProviderResponse.Password",
-        "GameFrameX.Application.Game.System.Email.Dto.SystemEmailProviderResponse.SecretId",
-        "GameFrameX.Application.Game.System.Email.Dto.SystemEmailProviderResponse.SecretKey",
+        "GameFrameX.Application.Platform.Email.Dto.SystemEmailProviderResponse.Password",
+        "GameFrameX.Application.Platform.Email.Dto.SystemEmailProviderResponse.SecretId",
+        "GameFrameX.Application.Platform.Email.Dto.SystemEmailProviderResponse.SecretKey",
         // TenantClientApiConfigMaskHelper / 动态脱敏输出 ******（各 Config Service）
-        "GameFrameX.Application.Game.Tenant.Integration.TenantAdvertisementCallbackConfig.Dto.TenantAdvertisementCallbackConfigResponse.SigningSecret",
-        "GameFrameX.Application.Game.Tenant.Integration.TenantAdvertisementCallbackConfig.Dto.TenantAdvertisementCallbackConfigResponse.VerificationKeys",
-        "GameFrameX.Application.Game.Tenant.ClientApiPolicy.TenantClientApiPolicy.Dto.TenantClientApiPolicyResponse.SigningKey",
+        "GameFrameX.Application.ClientDelivery.AdvertisementCallbackConfig.Dto.TenantAdvertisementCallbackConfigResponse.SigningSecret",
+        "GameFrameX.Application.ClientDelivery.AdvertisementCallbackConfig.Dto.TenantAdvertisementCallbackConfigResponse.VerificationKeys",
+        "GameFrameX.Application.ClientDelivery.ClientApiPolicy.Dto.TenantClientApiPolicyResponse.SigningKey",
         // 平台 JWT 配置：IssuerSigningKey 恒为掩码常量（C244），Has*/Validate* 为布尔标志/配置（PlatformJwtConfigService）
         "GameFrameX.Core.Service.PlatformJwt.Dto.PlatformJwtConfigResponse.IssuerSigningKey",
         "GameFrameX.Core.Service.PlatformJwt.Dto.PlatformJwtConfigResponse.HasSigningKey",
@@ -60,7 +60,7 @@ public sealed class AdminEndpointReturnContractTests
         "GameFrameX.Core.Service.Auth.Dto.LoginConfigResponse.SuperAdminPasswordConfigured",
         // 一次性明文回传（response-envelope 规则 5）：重置密码初始值、OpenAccess 凭证签发
         "GameFrameX.Core.Service.User.Dto.ResetPwdResponse.NewPassword",
-        "GameFrameX.Application.System.OpenAccess.Dto.SecretCreateResponse.Secret",
+        "GameFrameX.Application.Platform.OpenAccess.Dto.SecretCreateResponse.Secret",
         // Client host（C227 批次 2 之前暂豁免）：游戏用户令牌 / Google OAuth 交换令牌为端点业务载荷本身
         "GameFrameX.Client.Api.GameUser.Dto.GetTenantGameUserEntityResponse.AccessToken",
         "GameFrameX.Client.Api.GameUser.Dto.GoogleAuthExchangeResponse.AccessToken",

@@ -1,9 +1,9 @@
 using GameFrameX.Client.Api.Services.GameLoginTicket;
 using GameFrameX.Client.Api.Services.Auth;
-using GameFrameX.Application.Game.ServerManager;
+using GameFrameX.Application.ServerCenter;
 using GameFrameX.Client.Api.GameLoginTicketKey.Dto;
-using GameFrameX.Application.Game.App.AppScope;
-using GameFrameX.Application.Game.Penalty.GamePenalty;
+using GameFrameX.Application.ClientDelivery.AppScope;
+using GameFrameX.Application.PlayerCenter.GamePenalty;
 using GameFrameX.Client.Api.GameRole.Dto;
 using GameFrameX.Client.Api.Middleware;
 using GameFrameX.Client.Api.Services;

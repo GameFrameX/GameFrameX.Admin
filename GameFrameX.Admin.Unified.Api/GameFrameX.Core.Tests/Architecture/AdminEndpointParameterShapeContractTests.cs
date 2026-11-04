@@ -1,7 +1,7 @@
 using System.Dynamic;
 using System.Reflection;
-using GameFrameX.Application.Game.Tenant.Penalty.TenantGamePenalty;
-using GameFrameX.Application.System.Dictionary;
+using GameFrameX.Application.PlayerCenter.GamePenalty;
+using GameFrameX.Application.Platform.Dictionary;
 using GameFrameX.Core.Api;
 using GameFrameX.Core.Service.Base;
 using Microsoft.AspNetCore.Http;
@@ -17,7 +17,7 @@ namespace GameFrameX.Core.Tests.Architecture;
 //   违规形状 —— 参数 ≥ 2（散参数 / body+query 混合绑定）；
 //              入参为 object/dynamic/ExpandoObject/IDynamicMetaObjectProvider（动态参数零容忍）；
 //              入参为 *Entity（Entity 直传：TenantId/IsDeleted 等系统字段进入请求契约构成越权攻击面，C228 入参侧对偶）
-// 扫描范围：三程序集（Application.System / Application.Game / Core.Service）全部 concrete IAdminApiController 实现，
+// 扫描范围：三程序集（Application.Platform / Application.Platform / Core.Service）全部 concrete IAdminApiController 实现，
 //          方法枚举含继承链（覆盖 GenericCrudService<,,,,> 泛型族基类 action 的实例化入参），
 //          过滤 [NonAction] / IsSpecialName / object 声明；违规按声明类名归因（泛型取泛型定义名）。
 // 双向断言：违规 ⊆ 例外清单（防新增）且例外清单 ⊆ 违规（防僵尸条目，参照 AdminActionStyleContractTests 模式）；例外清单只减不增。
@@ -176,8 +176,8 @@ public sealed class AdminEndpointParameterShapeContractTests
     {
         var assemblies = new[]
         {
-            typeof(GlobalDictionaryTypeService).Assembly, // GameFrameX.Application.System
-            typeof(TenantGamePenaltyEntityService).Assembly, // GameFrameX.Application.Game
+            typeof(GlobalDictionaryTypeService).Assembly, // GameFrameX.Application.Platform
+            typeof(TenantGamePenaltyEntityService).Assembly, // GameFrameX.Application.Platform
             typeof(BaseService<>).Assembly, // GameFrameX.Core
         };
         foreach (var assembly in assemblies.Distinct())

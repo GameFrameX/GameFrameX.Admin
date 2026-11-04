@@ -1,8 +1,8 @@
 using System.ComponentModel;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using GameFrameX.Application.Game.Tenant.Penalty.TenantGamePenalty;
-using GameFrameX.Application.System.Dictionary;
+using GameFrameX.Application.PlayerCenter.GamePenalty;
+using GameFrameX.Application.Platform.Dictionary;
 using GameFrameX.Core.Api;
 using GameFrameX.Core.Service.Base;
 using GameFrameX.Web.Api.ApiRouting;
@@ -172,36 +172,36 @@ public sealed class AdminActionStyleContractTests
 
     private static readonly Dictionary<string, int> BareChineseErrorSnapshot = new(StringComparer.Ordinal)
     {
-        { "GameFrameX.Application.System/DataBase/SystemDatabaseService.cs", 3 },
-        { "GameFrameX.Application.System/Tenant/Device/TenantGameAppDevice/TenantGameAppDeviceService.cs", 1 },
-        { "GameFrameX.Application.System/Tenant/Device/TenantDeviceGroup/TenantDeviceGroupService.cs", 1 },
-        { "GameFrameX.Application.System/ChannelDefinition/ChannelDefinitionManagementServiceBase.cs", 14 },
-        { "GameFrameX.Application.System/Const/SystemConstService.cs", 1 },
-        { "GameFrameX.Application.Game/Tenant/AntiCheat/TenantGameAntiCheatEvent/TenantGameAntiCheatEventEntityService.cs", 4 },
-        { "GameFrameX.Application.Game/Tenant/Penalty/TenantGamePenalty/TenantGamePenaltyEntityService.cs", 4 },
-        { "GameFrameX.Application.Game/Tenant/Report/TenantGameReport/TenantGameReportEntityService.cs", 5 },
-        { "GameFrameX.Application.Game/Tenant/Integration/TenantObjectStorageConfig/TenantObjectStorageConfigEntityService.cs", 8 },
-        { "GameFrameX.Application.Game/Tenant/Penalty/TenantGamePenaltyAppeal/TenantGamePenaltyAppealEntityService.cs", 6 },
-        { "GameFrameX.Application.Game/Reward/GameRewardTemplate/TenantGameRewardTemplateEntityService.cs", 8 },
-        { "GameFrameX.Application.Game/Mail/GameMailCampaign/TenantGameMailCampaignEntityService.cs", 3 },
-        { "GameFrameX.Application.Game/Tenant/Security/TenantSessionKey/TenantSessionKeyEntityService.cs", 6 },
-        { "GameFrameX.Application.Game/App/GameAppPackage/TenantGameAppPackageService.cs", 12 },
-        { "GameFrameX.Application.Game/Tenant/Security/TenantAppSignatureKey/TenantAppSignatureKeyEntityService.cs", 6 },
-        { "GameFrameX.Application.Game/Order/GamePaymentConfig/TenantGamePaymentConfigEntityService.cs", 6 },
-        { "GameFrameX.Application.Game/System/Email/SystemEmailProviderService.cs", 10 },
-        { "GameFrameX.Application.Game/Tenant/LoginTicket/TenantGameLoginTicketKey/TenantGameLoginTicketKeyEntityService.cs", 2 },
-        { "GameFrameX.Application.Game/Tenant/Integration/TenantAdvertisementCallbackConfig/TenantAdvertisementCallbackConfigEntityService.cs", 7 },
-        { "GameFrameX.Application.Game/RedeemCode/GameRedeemCodeChannel/TenantGameRedeemCodeChannelEntityService.cs", 1 },
-        { "GameFrameX.Application.Game/App/GameAppRemoteConfigMode/TenantGameAppRemoteConfigModeService.cs", 2 },
-        { "GameFrameX.Application.Game/App/GameAppReleaseVersion/TenantGameAppReleaseVersionService.cs", 1 },
-        { "GameFrameX.Application.Game/App/GameAppAssetPackageVersion/TenantGameAppAssetPackageVersionService.cs", 1 },
-        { "GameFrameX.Application.Game/App/GameAppRemoteConfigKey/TenantGameAppRemoteConfigKeyService.cs", 6 },
-        { "GameFrameX.Application.Game/App/GameAppAssetPackage/TenantGameAppAssetPackageService.cs", 3 },
-        { "GameFrameX.Application.Game/App/AppScope/AssetPackageScopeValidator.cs", 2 },
-        { "GameFrameX.Application.Game/App/AppScope/PackageScopeValidator.cs", 1 },
-        { "GameFrameX.Application.Game/App/GameAppVersionDefinition/TenantGameAppVersionDefinitionService.cs", 2 },
-        { "GameFrameX.Application.Game/App/GameAppRemoteConfig/TenantGameAppRemoteConfigService.cs", 5 },
-        { "GameFrameX.Application.Game/App/GameAppServerConfig/TenantGameAppServerConfigService.cs", 3 },
+        { "GameFrameX.Application/Platform/DataBase/SystemDatabaseService.cs", 3 },
+        { "GameFrameX.Application/ClientDelivery/Device/GameAppDevice/TenantGameAppDeviceService.cs", 1 },
+        { "GameFrameX.Application/ClientDelivery/Device/DeviceGroup/TenantDeviceGroupService.cs", 1 },
+        { "GameFrameX.Application/ClientDelivery/ChannelDefinition/ChannelDefinitionManagementServiceBase.cs", 14 },
+        { "GameFrameX.Application/Platform/Const/SystemConstService.cs", 1 },
+        { "GameFrameX.Application/GmCenter/GameAntiCheatEvent/TenantGameAntiCheatEventEntityService.cs", 4 },
+        { "GameFrameX.Application/PlayerCenter/GamePenalty/TenantGamePenaltyEntityService.cs", 4 },
+        { "GameFrameX.Application/GmCenter/GameReport/TenantGameReportEntityService.cs", 5 },
+        { "GameFrameX.Application/ClientDelivery/ObjectStorageConfig/TenantObjectStorageConfigEntityService.cs", 8 },
+        { "GameFrameX.Application/PlayerCenter/GamePenaltyAppeal/TenantGamePenaltyAppealEntityService.cs", 6 },
+        { "GameFrameX.Application/NoticeCenter/GameRewardTemplate/TenantGameRewardTemplateEntityService.cs", 8 },
+        { "GameFrameX.Application/NoticeCenter/GameMailCampaign/TenantGameMailCampaignEntityService.cs", 3 },
+        { "GameFrameX.Application/ClientDelivery/Security/SessionKey/TenantSessionKeyEntityService.cs", 6 },
+        { "GameFrameX.Application/ClientDelivery/GameAppPackage/TenantGameAppPackageService.cs", 12 },
+        { "GameFrameX.Application/ClientDelivery/Security/AppSignatureKey/TenantAppSignatureKeyEntityService.cs", 6 },
+        { "GameFrameX.Application/ClientDelivery/GamePaymentConfig/TenantGamePaymentConfigEntityService.cs", 6 },
+        { "GameFrameX.Application/Platform/Email/SystemEmailProviderService.cs", 10 },
+        { "GameFrameX.Application/ClientDelivery/LoginTicket/GameLoginTicketKey/TenantGameLoginTicketKeyEntityService.cs", 2 },
+        { "GameFrameX.Application/ClientDelivery/AdvertisementCallbackConfig/TenantAdvertisementCallbackConfigEntityService.cs", 7 },
+        { "GameFrameX.Application/CommerceCenter/GameRedeemCodeChannel/TenantGameRedeemCodeChannelEntityService.cs", 1 },
+        { "GameFrameX.Application/ClientDelivery/GameAppRemoteConfigMode/TenantGameAppRemoteConfigModeService.cs", 2 },
+        { "GameFrameX.Application/ClientDelivery/GameAppReleaseVersion/TenantGameAppReleaseVersionService.cs", 1 },
+        { "GameFrameX.Application/ClientDelivery/GameAppAssetPackageVersion/TenantGameAppAssetPackageVersionService.cs", 1 },
+        { "GameFrameX.Application/ClientDelivery/GameAppRemoteConfigKey/TenantGameAppRemoteConfigKeyService.cs", 6 },
+        { "GameFrameX.Application/ClientDelivery/GameAppAssetPackage/TenantGameAppAssetPackageService.cs", 3 },
+        { "GameFrameX.Application/ClientDelivery/AppScope/AssetPackageScopeValidator.cs", 2 },
+        { "GameFrameX.Application/ClientDelivery/AppScope/PackageScopeValidator.cs", 1 },
+        { "GameFrameX.Application/ClientDelivery/GameAppVersionDefinition/TenantGameAppVersionDefinitionService.cs", 2 },
+        { "GameFrameX.Application/ClientDelivery/GameAppRemoteConfig/TenantGameAppRemoteConfigService.cs", 5 },
+        { "GameFrameX.Application/ClientDelivery/GameAppServerConfig/TenantGameAppServerConfigService.cs", 3 },
         { "GameFrameX.Core/Service/Role/TenantRoleService.cs", 1 },
         { "GameFrameX.Core/Service/File/TenantFileService.cs", 7 },
         { "GameFrameX.Core/Service/Config/SystemConfigService.cs", 1 },
@@ -225,8 +225,7 @@ public sealed class AdminActionStyleContractTests
     // 服务文件清单来源：与盘点（C257 notes.md / inventory.json）同源——Admin host 四项目中声明 IAdminApiController 家族服务类的 .cs
     private static readonly string[] AdminServiceDirectories =
     {
-        "GameFrameX.Application.System",
-        "GameFrameX.Application.Game",
+        "GameFrameX.Application",
         "GameFrameX.Core/Service",
     };
 
@@ -425,8 +424,8 @@ public sealed class AdminActionStyleContractTests
     {
         var assemblies = new[]
         {
-            typeof(GlobalDictionaryTypeService).Assembly, // GameFrameX.Application.System
-            typeof(TenantGamePenaltyEntityService).Assembly, // GameFrameX.Application.Game
+            typeof(GlobalDictionaryTypeService).Assembly, // GameFrameX.Application.Platform
+            typeof(TenantGamePenaltyEntityService).Assembly, // GameFrameX.Application.Platform
             typeof(BaseService<>).Assembly, // GameFrameX.Core
         };
         foreach (var assembly in assemblies.Distinct())

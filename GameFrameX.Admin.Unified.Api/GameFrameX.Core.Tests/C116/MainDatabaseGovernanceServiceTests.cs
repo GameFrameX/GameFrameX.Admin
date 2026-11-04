@@ -1,6 +1,6 @@
-using GameFrameX.Application.Game.Tenant.Penalty.TenantGamePenalty;
-using GameFrameX.Application.Game.Tenant.Penalty.TenantGamePenaltyAppeal;
-using GameFrameX.Application.Game.Tenant.Report.TenantGameReport;
+using GameFrameX.Application.PlayerCenter.GamePenalty;
+using GameFrameX.Application.PlayerCenter.GamePenaltyAppeal;
+using GameFrameX.Application.GmCenter.GameReport;
 using GameFrameX.Core.Service.User;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Core.Tests.ClientApi;

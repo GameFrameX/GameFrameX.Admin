@@ -8,7 +8,7 @@ WORKDIR /src
 # Copy global build props and project files for restore
 COPY ["Directory.Build.props", "."]
 COPY ["GameFrameX.Client.Api/GameFrameX.Client.Api.csproj", "GameFrameX.Client.Api/"]
-COPY ["GameFrameX.Application.Game/GameFrameX.Application.Game.csproj", "GameFrameX.Application.Game/"]
+COPY ["GameFrameX.Application/GameFrameX.Application.csproj", "GameFrameX.Application/"]
 COPY ["GameFrameX.Core/GameFrameX.Core.csproj", "GameFrameX.Core/"]
 COPY ["GameFrameX.Core.BaseInputOutput/GameFrameX.Core.BaseInputOutput.csproj", "GameFrameX.Core.BaseInputOutput/"]
 COPY ["GameFrameX.Core.Extension/GameFrameX.Core.Extension.csproj", "GameFrameX.Core.Extension/"]

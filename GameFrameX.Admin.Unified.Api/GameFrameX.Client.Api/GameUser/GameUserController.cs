@@ -1,6 +1,6 @@
 using GameFrameX.Client.Api.Services.Auth;
-using GameFrameX.Application.Game.Penalty.GamePenalty;
-using GameFrameX.Application.Game.User.GameUser;
+using GameFrameX.Application.PlayerCenter.GamePenalty;
+using GameFrameX.Application.PlayerCenter.GameUser;
 using GameFrameX.Client.Api.GameUser.Dto;
 using GameFrameX.Client.Api.Filter;
 using GameFrameX.Client.Api.Middleware;

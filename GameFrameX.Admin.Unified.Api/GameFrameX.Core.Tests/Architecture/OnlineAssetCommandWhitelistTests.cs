@@ -11,10 +11,10 @@ public sealed class OnlineAssetCommandWhitelistTests
     private static readonly string RepositoryRoot = GetRepositoryRoot();
 
     private static readonly string AssetSourceDirectory = Path.Combine(
-        RepositoryRoot, "GameFrameX.Application.Game", "Online", "Asset");
+        RepositoryRoot, "GameFrameX.Application", "GmCenter", "Asset");
 
     private static readonly string ApplicationGameSourceDirectory = Path.Combine(
-        RepositoryRoot, "GameFrameX.Application.Game");
+        RepositoryRoot, "GameFrameX.Application");
 
     /// <summary>SqlSugar 数据面标识符：Online/Asset 源码出现任意一个即违反「Admin 侧零资产数据面」边界（X3 红线）。</summary>
     private static readonly string[] DataPlaneTokens =
@@ -31,9 +31,9 @@ public sealed class OnlineAssetCommandWhitelistTests
     /// <summary>查询 action → 唯一允许出现的源文件相对路径。</summary>
     private static readonly (string Action, string RelativeFile)[] QueryActionWhitelist =
     {
-        ("query_wallet_ledger", "GameFrameX.Application.Game/Online/Asset/OnlineAssetLedgerQueryService.cs"),
-        ("query_transaction_detail", "GameFrameX.Application.Game/Online/Asset/OnlineAssetTransactionQueryService.cs"),
-        ("query_asset_audit", "GameFrameX.Application.Game/Online/Asset/OnlineAssetAuditQueryService.cs"),
+        ("query_wallet_ledger", "GameFrameX.Application/GmCenter/Asset/OnlineAssetLedgerQueryService.cs"),
+        ("query_transaction_detail", "GameFrameX.Application/GmCenter/Asset/OnlineAssetTransactionQueryService.cs"),
+        ("query_asset_audit", "GameFrameX.Application/GmCenter/Asset/OnlineAssetAuditQueryService.cs"),
     };
 
     [Fact]

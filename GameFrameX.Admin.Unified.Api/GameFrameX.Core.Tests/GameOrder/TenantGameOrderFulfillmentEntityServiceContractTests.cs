@@ -1,6 +1,6 @@
 using System.Reflection;
-using GameFrameX.Application.Game.Order.GameOrderFulfillment;
-using GameFrameX.Application.Game.Order.GameOrderFulfillment.Dto;
+using GameFrameX.Application.CommerceCenter.GameOrderFulfillment;
+using GameFrameX.Application.CommerceCenter.GameOrderFulfillment.Dto;
 using GameFrameX.Core.Enum;
 using GameFrameX.Entity.Enum;
 

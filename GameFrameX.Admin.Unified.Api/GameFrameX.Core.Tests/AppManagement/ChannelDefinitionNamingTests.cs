@@ -39,10 +39,10 @@ public class ChannelDefinitionNamingTests
     [Fact]
     public void ChannelDefinition_ManagementServices_AreSplitByScope()
     {
-        var assembly = typeof(GameFrameX.Application.System.ChannelDefinition.GlobalChannelDefinitionService).Assembly;
+        var assembly = typeof(GameFrameX.Application.ClientDelivery.ChannelDefinition.GlobalChannelDefinitionService).Assembly;
 
-        Assert.NotNull(assembly.GetType("GameFrameX.Application.System.ChannelDefinition.GlobalChannelDefinitionService"));
-        Assert.NotNull(assembly.GetType("GameFrameX.Application.System.ChannelDefinition.TenantChannelDefinitionService"));
-        Assert.Null(assembly.GetType("GameFrameX.Application.System.ChannelDefinition.ChannelDefinitionService"));
+        Assert.NotNull(assembly.GetType("GameFrameX.Application.ClientDelivery.ChannelDefinition.GlobalChannelDefinitionService"));
+        Assert.NotNull(assembly.GetType("GameFrameX.Application.ClientDelivery.ChannelDefinition.TenantChannelDefinitionService"));
+        Assert.Null(assembly.GetType("GameFrameX.Application.ClientDelivery.ChannelDefinition.ChannelDefinitionService"));
     }
 }

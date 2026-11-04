@@ -1,4 +1,4 @@
-using GameFrameX.Application.Game.Penalty.GamePenalty;
+using GameFrameX.Application.PlayerCenter.GamePenalty;
 using GameFrameX.Core.Enum;
 using GameFrameX.Entity.Enum;
 using GameFrameX.Entity.Tenant.Game;

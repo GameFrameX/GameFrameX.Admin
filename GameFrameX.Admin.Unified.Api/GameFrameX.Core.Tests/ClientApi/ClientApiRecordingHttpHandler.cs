@@ -3,7 +3,7 @@ using System.Net;
 using System.Text;
 using GameFrameX.Client.Api.GameRole.Dto;
 using GameFrameX.Client.Api.GameUserEmail.Dto;
-using GameFrameX.Application.Game.Order.GameOrder.Dto;
+using GameFrameX.Application.CommerceCenter.GameOrder.Dto;
 using GameFrameX.Client.Api.GameRedeemCode.Dto;
 using GameFrameX.Client.Api.GameWebShop.Dto;
 using GameFrameX.Foundation.Http.Normalization;

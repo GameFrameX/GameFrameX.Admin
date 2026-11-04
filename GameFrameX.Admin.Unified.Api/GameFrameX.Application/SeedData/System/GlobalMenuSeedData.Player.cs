@@ -3,10 +3,10 @@ using GameFrameX.Core.Const.MenuSeed;
 using GameFrameX.Core.Enum;
 using GameFrameX.Entity.Enum;
 using GameFrameX.Entity.Global;
-using GameFrameX.Application.Game.Order.GameOrder;
-using GameFrameX.Application.Game.Order.GameOrderFulfillment;
-using GameFrameX.Application.Game.User.GameRole;
-using GameFrameX.Application.Game.User.GameUser;
+using GameFrameX.Application.CommerceCenter.GameOrder;
+using GameFrameX.Application.CommerceCenter.GameOrderFulfillment;
+using GameFrameX.Application.PlayerCenter.GameRole;
+using GameFrameX.Application.PlayerCenter.GameUser;
 using GameFrameX.Core.Api;
 
 namespace GameFrameX.Application.SeedData.System;

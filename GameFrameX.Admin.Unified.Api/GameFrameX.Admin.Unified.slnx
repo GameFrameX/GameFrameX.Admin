@@ -7,8 +7,6 @@
     <Project Path="GameFrameX.Core.Tests/GameFrameX.Core.Tests.csproj"/>
     <Project Path="GameFrameX.Core.Utility\GameFrameX.Core.Utility.csproj"/>
     <Project Path="GameFrameX.Application\GameFrameX.Application.csproj"/>
-    <Project Path="GameFrameX.Application.Game\GameFrameX.Application.Game.csproj"/>
-    <Project Path="GameFrameX.Application.System\GameFrameX.Application.System.csproj"/>
     <Project Path="GameFrameX.Web.Api\GameFrameX.Web.Api.csproj"/>
     <Project Path="GameFrameX.Client.Api\GameFrameX.Client.Api.csproj"/>
     <Project Path="GameFrameX.Hub.Api\GameFrameX.Hub.Api.csproj"/>

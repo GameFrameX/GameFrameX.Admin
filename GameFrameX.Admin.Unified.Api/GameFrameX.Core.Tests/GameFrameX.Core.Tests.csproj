@@ -20,7 +20,6 @@
         <ProjectReference Include="..\GameFrameX.Client.Api\GameFrameX.Client.Api.csproj" />
         <ProjectReference Include="..\GameFrameX.Hub.Api\GameFrameX.Hub.Api.csproj" />
         <ProjectReference Include="..\GameFrameX.Application\GameFrameX.Application.csproj" />
-        <ProjectReference Include="..\GameFrameX.Application.Game\GameFrameX.Application.Game.csproj" />
         <ProjectReference Include="..\GameFrameX.Core\GameFrameX.Core.csproj" />
         <ProjectReference Include="..\GameFrameX.Web.Api\GameFrameX.Web.Api.csproj" />
         <ProjectReference Include="..\ObjectStorage\GameFrameX.ObjectStorage.AliyunOss\GameFrameX.ObjectStorage.AliyunOss.csproj" />

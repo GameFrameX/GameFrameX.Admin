@@ -3,7 +3,7 @@ using GameFrameX.Core.Const.MenuSeed;
 using GameFrameX.Core.Enum;
 using GameFrameX.Entity.Enum;
 using GameFrameX.Entity.Global;
-using GameFrameX.Application.Game.Online.Match;
+using GameFrameX.Application.GmCenter.Match;
 using GameFrameX.Core.Api;
 
 namespace GameFrameX.Application.SeedData.System;

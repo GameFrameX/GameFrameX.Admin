@@ -1,11 +1,11 @@
 using System.Net;
 using System.Threading.RateLimiting;
-using GameFrameX.Application.System.Job;
-using GameFrameX.Application.Game.Job;
-using GameFrameX.Application.Game.ServerManager.Mail;
-using GameFrameX.Application.Game.Online.LiveOps.Dispatch;
-using GameFrameX.Application.Game.ServerManager.Online;
-using GameFrameX.Application.Game.Order.GamePaymentConfig;
+using GameFrameX.Application.Platform.Job;
+using GameFrameX.Application.Platform.Job;
+using GameFrameX.Application.ServerCenter.Mail;
+using GameFrameX.Application.GmCenter.LiveOps.Dispatch;
+using GameFrameX.Application.ServerCenter.Online;
+using GameFrameX.Application.ClientDelivery.GamePaymentConfig;
 using GameFrameX.Advertisement.Abstract;
 using GameFrameX.Payment.Abstract;
 using GameFrameX.Core.Bootstrap;
@@ -77,8 +77,8 @@ public class Startup
         services.AddScoped<IRefundManager, GameFrameX.Payment.AliPay.Refund.AliPayRefundManager>();
         // 广告回调配置 schema 提供器（供 TenantAdvertisementCallbackConfigEntityService 动态渲染和校验）
         services.AddScoped<IAdvertisementCallbackConfigSchemaProvider, AdvertisementCallbackConfigSchemaProvider>();
-        // 平台系统邮件发送器（ISystemEmailSender 实现位于 Application.Game；从主库 SystemEmailProviderEntity 读取）
-        services.AddSingleton<ISystemEmailSender, GameFrameX.Application.Game.System.Email.SystemEmailSender>();
+        // 平台系统邮件发送器（ISystemEmailSender 实现位于 Application.Platform；从主库 SystemEmailProviderEntity 读取）
+        services.AddSingleton<ISystemEmailSender, GameFrameX.Application.Platform.Email.SystemEmailSender>();
         // 对象存储配置 schema 提供器（供 TenantObjectStorageConfigEntityService 动态渲染和校验）
         services.AddScoped<IObjectStorageConfigSchemaProvider, ObjectStorageConfigSchemaProvider>();
         // 对象存储 Adapter 工厂（单例；供 TenantFileService 与 TestConnectionAsync 端点解析租户存储配置）

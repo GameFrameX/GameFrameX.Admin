@@ -2,7 +2,7 @@ namespace GameFrameX.Entity.Enum;
 
 /// <summary>
 /// 区服游戏服 Server HTTP 接口能力类型（来源 change C150 §3.1 / C175 后端拆分）。
-/// <para>调用游戏服 HTTP 时必须显式声明能力类型，由 <see cref="GameFrameX.Application.Game.ServerManager.GameServerEndpointUrlBuilder"/> 按能力类型选择区服对应前缀。</para>
+/// <para>调用游戏服 HTTP 时必须显式声明能力类型，由 <see cref="GameFrameX.Application.ServerCenter.GameServerEndpointUrlBuilder"/> 按能力类型选择区服对应前缀。</para>
 /// <para>C150 期「不得新增第五类」的授权 change 即 C339：OnlineAdmin 为第五类（Online 平台管理接口，vault:C2 S1.7）；此后新增能力仍须另建 change。</para>
 /// </summary>
 [Description("区服游戏服 HTTP 接口能力类型")]

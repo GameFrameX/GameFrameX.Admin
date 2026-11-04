@@ -54,7 +54,7 @@ internal static class Program
         // DI 不做基类向上匹配，须显式注册开放泛型基类 -> Repository<T> 实现（与上行为不同 descriptor，仓储无状态可各自实例化）
         builder.Services.AddScoped(typeof(SqlSugarRepository<>), typeof(Repository<>));
         // 活动/功能开关投放解析器（C345 共享实现，依赖 Scoped 租户仓储，FeatureSwitchSync 端点消费）
-        builder.Services.AddScoped<GameFrameX.Application.Game.App.FeatureSwitch.FeatureSwitchDeliveryResolver>();
+        builder.Services.AddScoped<GameFrameX.Application.ClientDelivery.FeatureSwitch.FeatureSwitchDeliveryResolver>();
         // OpenAccess 机器凭证中间件 nonce 去重依赖链（与 Client.Api 同款注册）：ICache + SystemCacheService（仅依赖 ICache + IOptions<CacheOptions>）
         builder.Services.AddCache();
         builder.Services.AddSingleton<SystemCacheService>();

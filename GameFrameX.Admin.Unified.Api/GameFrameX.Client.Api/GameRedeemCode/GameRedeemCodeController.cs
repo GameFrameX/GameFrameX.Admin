@@ -1,4 +1,4 @@
-using GameFrameX.Application.Game.ServerManager;
+using GameFrameX.Application.ServerCenter;
 using GameFrameX.Client.Api.GameRedeemCode.Dto;
 using GameFrameX.Client.Api.GameWebShop.Dto;
 using GameFrameX.Core.Service;

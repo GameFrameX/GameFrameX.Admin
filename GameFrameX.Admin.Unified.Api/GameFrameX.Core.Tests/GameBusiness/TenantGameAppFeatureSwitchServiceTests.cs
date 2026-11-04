@@ -1,5 +1,5 @@
-using GameFrameX.Application.Game.App.FeatureSwitch;
-using GameFrameX.Application.Game.App.FeatureSwitch.Dto;
+using GameFrameX.Application.ClientDelivery.FeatureSwitch;
+using GameFrameX.Application.ClientDelivery.FeatureSwitch.Dto;
 using GameFrameX.Core.Exceptions;
 using GameFrameX.Core.Extension;
 using GameFrameX.Core.SqlSugar;

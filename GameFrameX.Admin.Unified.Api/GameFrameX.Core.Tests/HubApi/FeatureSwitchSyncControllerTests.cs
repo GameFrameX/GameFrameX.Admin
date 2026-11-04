@@ -1,5 +1,5 @@
 using System.Text;
-using GameFrameX.Application.Game.App.FeatureSwitch;
+using GameFrameX.Application.ClientDelivery.FeatureSwitch;
 using GameFrameX.Core.Const;
 using GameFrameX.Core.Middleware;
 using GameFrameX.Entity.Enum;

@@ -1,10 +1,10 @@
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using ApiDescriptionSettingsAttribute = GameFrameX.Core.Api.ApiDescriptionSettingsAttribute;
-using GameFrameX.Application.Game.Reward.GameRewardTemplate;
-using GameFrameX.Application.Game.Reward.GameRewardTemplate.Dto;
-using GameFrameX.Application.Game.Reward.GameRewardTemplateGroup;
-using GameFrameX.Application.Game.Reward.GameRewardTemplateGroup.Dto;
+using GameFrameX.Application.NoticeCenter.GameRewardTemplate;
+using GameFrameX.Application.NoticeCenter.GameRewardTemplate.Dto;
+using GameFrameX.Application.NoticeCenter.GameRewardTemplateGroup;
+using GameFrameX.Application.NoticeCenter.GameRewardTemplateGroup.Dto;
 using GameFrameX.Application.SeedData.System;
 using GameFrameX.Core.Service.Base;
 using GameFrameX.Entity.Tenant.Game;
@@ -77,8 +77,8 @@ public class RewardTemplateContractTests
     [Fact]
     public void RewardTemplateServices_GuardRewardSnapshotContracts()
     {
-        var groupSource = File.ReadAllText(Path.Combine(FindRepoRoot(), "GameFrameX.Application.Game/Reward/GameRewardTemplateGroup/TenantGameRewardTemplateGroupEntityService.cs"));
-        var templateSource = File.ReadAllText(Path.Combine(FindRepoRoot(), "GameFrameX.Application.Game/Reward/GameRewardTemplate/TenantGameRewardTemplateEntityService.cs"));
+        var groupSource = File.ReadAllText(Path.Combine(FindRepoRoot(), "GameFrameX.Application/NoticeCenter/GameRewardTemplateGroup/TenantGameRewardTemplateGroupEntityService.cs"));
+        var templateSource = File.ReadAllText(Path.Combine(FindRepoRoot(), "GameFrameX.Application/NoticeCenter/GameRewardTemplate/TenantGameRewardTemplateEntityService.cs"));
 
         Assert.DoesNotContain("EnsureFactAppId", groupSource);
         Assert.DoesNotContain("EnsureFactAppId", templateSource);

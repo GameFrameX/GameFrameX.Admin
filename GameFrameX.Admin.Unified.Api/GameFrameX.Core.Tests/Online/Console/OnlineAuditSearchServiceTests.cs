@@ -1,6 +1,6 @@
-using GameFrameX.Application.Game.Online.Console;
-using GameFrameX.Application.Game.Online.Console.Dto;
-using GameFrameX.Application.Game.ServerManager.Online;
+using GameFrameX.Application.GmCenter.Console;
+using GameFrameX.Application.GmCenter.Console.Dto;
+using GameFrameX.Application.ServerCenter.Online;
 using GameFrameX.Core.Tests.Online.Asset;
 using GameFrameX.Core.Exceptions;
 using GameFrameX.Core.SqlSugar;

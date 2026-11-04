@@ -2,7 +2,7 @@ using GameFrameX.Client.Api.Services.Auth;
 using GameFrameX.Client.Api.GameUser;
 using GameFrameX.Client.Api.GameUser.Dto;
 using GameFrameX.Client.Api.Services;
-using GameFrameX.Application.Game.User.GameUser;
+using GameFrameX.Application.PlayerCenter.GameUser;
 using GameFrameX.Core.Enum;
 using GameFrameX.Entity.Enum;
 using GameFrameX.Entity.Tenant.Game;

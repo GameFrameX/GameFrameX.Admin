@@ -1,4 +1,4 @@
-using GameFrameX.Application.Game.Tenant.Security.TenantSessionKey;
+using GameFrameX.Application.ClientDelivery.Security.SessionKey;
 using GameFrameX.Entity.Tenant.Game;
 
 namespace GameFrameX.Client.Api.Services.Auth;

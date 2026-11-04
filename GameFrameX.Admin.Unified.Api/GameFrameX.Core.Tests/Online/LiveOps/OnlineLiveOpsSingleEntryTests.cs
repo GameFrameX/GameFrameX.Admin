@@ -1,26 +1,26 @@
 using System.Reflection;
-using GameFrameX.Application.Game.Announcement.GameAnnouncement;
-using GameFrameX.Application.Game.App.GameAppRemoteConfig;
-using GameFrameX.Application.Game.Mail.GameMailCampaign;
-using GameFrameX.Application.Game.Online.LiveOps.ConfigRollout;
-using GameFrameX.Application.Game.Online.LiveOps.Dispatch;
-using GameFrameX.Application.Game.Online.LiveOps.PlayerSegment;
-using GameFrameX.Application.Game.Online.RolloutSemanticMap;
-using GameFrameX.Application.Game.ServerManager.Online;
+using GameFrameX.Application.NoticeCenter.GameAnnouncement;
+using GameFrameX.Application.ClientDelivery.GameAppRemoteConfig;
+using GameFrameX.Application.NoticeCenter.GameMailCampaign;
+using GameFrameX.Application.GmCenter.LiveOps.ConfigRollout;
+using GameFrameX.Application.GmCenter.LiveOps.Dispatch;
+using GameFrameX.Application.GmCenter.LiveOps.PlayerSegment;
+using GameFrameX.Application.GmCenter.RolloutSemanticMap;
+using GameFrameX.Application.ServerCenter.Online;
 using GameFrameX.Core.Api;
 using GameFrameX.Entity.Game.Online;
 
 namespace GameFrameX.Core.Tests.Online.LiveOps;
 
 // C343 / GFX-755（vault:C8 S7.7）：LiveOps 统一下发单一入口守护测试。
-// 覆盖：Application.Game 业务层唯一 IOnlineServerClient 注入点 = OnlineLiveOpsDispatchService（旁路直连即失败）、
+// 覆盖：Application.Platform 业务层唯一 IOnlineServerClient 注入点 = OnlineLiveOpsDispatchService（旁路直连即失败）、
 // 七个 Online 命令名冻结、兄弟 Service 一律依赖 IOnlineLiveOpsDispatchService 转调、
 // LiveOpsSourceKind 五值契约、两个新 Service 可被动态 API 路由发现（IAdminApiController）、
 // 语义映射表边界与白名单唯一来源。纯反射无 DB。
 public sealed class OnlineLiveOpsSingleEntryTests
 {
     /// <summary>
-    /// 单一入口铁律：LiveOps 域（GameFrameX.Application.Game.Online.LiveOps）内除 Dispatch 实现类自身外，
+    /// 单一入口铁律：LiveOps 域（GameFrameX.Application.Platform.Online.LiveOps）内除 Dispatch 实现类自身外，
     /// 任何类都不得注入 IOnlineServerClient（旁路直连即失败）。
     /// 范围说明（2026-09-13 C340 rebase 收窄）：Asset/Social/Console/Match 观测域 Service 按各自 change 设计
     /// 直连 IOnlineServerClient（C339 基座的既定消费方式；Match 域为 C341 纯只读观测，不属于 LiveOps 写命令
@@ -39,7 +39,7 @@ public sealed class OnlineLiveOpsSingleEntryTests
             }
 
             if (type.Namespace is null ||
-                !type.Namespace.StartsWith("GameFrameX.Application.Game.Online.LiveOps", StringComparison.Ordinal))
+                !type.Namespace.StartsWith("GameFrameX.Application.Platform.Online.LiveOps", StringComparison.Ordinal))
             {
                 continue;
             }
@@ -80,7 +80,7 @@ public sealed class OnlineLiveOpsSingleEntryTests
     {
         var siblings = new[]
         {
-            typeof(GameFrameX.Application.Game.Online.LiveOps.PlayerSegment.TenantGameOnlinePlayerSegmentService),
+            typeof(GameFrameX.Application.GmCenter.LiveOps.PlayerSegment.TenantGameOnlinePlayerSegmentService),
             typeof(TenantGameOnlineConfigRolloutService),
             typeof(TenantGameAppRemoteConfigService),
             typeof(TenantGameAnnouncementEntityService),

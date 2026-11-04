@@ -6,9 +6,9 @@ using GameFrameX.Client.Api.Services.PublicCallback;
 using GameFrameX.Client.Api.Services.PayVerification;
 using GameFrameX.Entity.Tenant.Game.RemoteConfig;
 using GameFrameX.Entity.Tenant.Game.Release;
-using GameFrameX.Application.Game.Penalty.GamePenalty;
-using GameFrameX.Application.Game.User.GameUser;
-using GameFrameX.Application.Game.Order.GameOrder;
+using GameFrameX.Application.PlayerCenter.GamePenalty;
+using GameFrameX.Application.PlayerCenter.GameUser;
+using GameFrameX.Application.CommerceCenter.GameOrder;
 using GameFrameX.Client.Api.Filter;
 using GameFrameX.Client.Api.Middleware;
 using GameFrameX.Client.Api.Services;
@@ -117,11 +117,11 @@ internal static class Program
         builder.Services.AddScoped<GameAdvertisementRewardService>();
         builder.Services.AddScoped<RemoteConfigDeliveryService>();
         // 活动/功能开关投放解析器（C345 共享实现，依赖 Scoped 租户仓储，随请求作用域解析）
-        builder.Services.AddScoped<GameFrameX.Application.Game.App.FeatureSwitch.FeatureSwitchDeliveryResolver>();
+        builder.Services.AddScoped<GameFrameX.Application.ClientDelivery.FeatureSwitch.FeatureSwitchDeliveryResolver>();
         // 邮件分域：租户业务邮件（玩家注册 / 找回密码）；平台系统邮件（SystemMessageService 等）走 ISystemEmailSender
         builder.Services.AddScoped<ITenantEmailSender, TenantEmailSender>();
         builder.Services.AddSingleton<Core.Service.Message.ISystemEmailSender,
-            GameFrameX.Application.Game.System.Email.SystemEmailSender>();
+            GameFrameX.Application.Platform.Email.SystemEmailSender>();
         // Token / Ticket 签发服务依赖 IClientApiTenantOptionsProvider（Scoped），必须随之降为 Scoped
         builder.Services.AddScoped<ClientApiTokenIssuer>();
         // C7 登录会话密钥签发：依赖 Scoped 租户仓储（SqlSugarRepository<>），随请求作用域

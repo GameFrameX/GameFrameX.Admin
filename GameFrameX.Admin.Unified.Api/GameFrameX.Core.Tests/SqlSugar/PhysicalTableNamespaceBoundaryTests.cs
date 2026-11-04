@@ -113,8 +113,6 @@ public class PhysicalTableNamespaceBoundaryTests
             typeof(SystemAuthService).Assembly,
             typeof(AdvertisementPangleGlobalGameEntityRequest).Assembly,
             LoadAssembly("GameFrameX.Application"),
-            LoadAssembly("GameFrameX.Application.Game"),
-            LoadAssembly("GameFrameX.Application.System"),
             LoadAssembly("GameFrameX.Hub.Api"),
         }.Where(assembly => assembly != null).Distinct();
 

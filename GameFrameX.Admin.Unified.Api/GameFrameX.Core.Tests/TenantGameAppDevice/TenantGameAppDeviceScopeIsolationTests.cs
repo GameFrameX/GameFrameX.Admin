@@ -1,7 +1,7 @@
-using GameFrameX.Application.System.Tenant.Device.TenantGameAppDevice;
-using GameFrameX.Application.System.Tenant.Device.TenantGameAppDevice.Dto;
-using GameFrameX.Application.System.Tenant.Device.TenantDeviceGroup;
-using GameFrameX.Application.System.Tenant.Device.TenantDeviceGroup.Dto;
+using GameFrameX.Application.ClientDelivery.Device.GameAppDevice;
+using GameFrameX.Application.ClientDelivery.Device.GameAppDevice.Dto;
+using GameFrameX.Application.ClientDelivery.Device.DeviceGroup;
+using GameFrameX.Application.ClientDelivery.Device.DeviceGroup.Dto;
 using GameFrameX.Core.Exceptions;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Foundation.Orm.Entity;

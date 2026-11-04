@@ -1,7 +1,7 @@
-using GameFrameX.Application.Game.Announcement.GameAnnouncement;
-using GameFrameX.Application.Game.Announcement.GameAnnouncement.Dto;
-using GameFrameX.Application.Game.Mail.GameMailTemplateCategory;
-using GameFrameX.Application.Game.Mail.GameMailTemplateCategory.Dto;
+using GameFrameX.Application.NoticeCenter.GameAnnouncement;
+using GameFrameX.Application.NoticeCenter.GameAnnouncement.Dto;
+using GameFrameX.Application.NoticeCenter.GameMailTemplateCategory;
+using GameFrameX.Application.NoticeCenter.GameMailTemplateCategory.Dto;
 using GameFrameX.Core.Exceptions;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Core.Tests.ClientApi;

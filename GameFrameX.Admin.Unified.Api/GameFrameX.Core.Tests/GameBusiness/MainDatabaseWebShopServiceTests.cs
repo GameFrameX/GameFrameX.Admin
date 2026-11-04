@@ -1,5 +1,5 @@
-using GameFrameX.Application.Game.WebShop.GameWebShop;
-using GameFrameX.Application.Game.WebShop.GameWebShop.Dto;
+using GameFrameX.Application.CommerceCenter.GameWebShop;
+using GameFrameX.Application.CommerceCenter.GameWebShop.Dto;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Core.Tests.ClientApi;
 using GameFrameX.Entity.Tenant.Game;

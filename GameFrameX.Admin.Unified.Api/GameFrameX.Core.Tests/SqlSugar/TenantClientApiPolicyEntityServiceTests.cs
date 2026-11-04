@@ -1,5 +1,5 @@
-using GameFrameX.Application.Game.Tenant.ClientApiPolicy.TenantClientApiPolicy;
-using GameFrameX.Application.Game.Tenant.ClientApiPolicy.TenantClientApiPolicy.Dto;
+using GameFrameX.Application.ClientDelivery.ClientApiPolicy;
+using GameFrameX.Application.ClientDelivery.ClientApiPolicy.Dto;
 using GameFrameX.Core.Exceptions;
 using GameFrameX.Core.Service;
 using GameFrameX.Core.SqlSugar;

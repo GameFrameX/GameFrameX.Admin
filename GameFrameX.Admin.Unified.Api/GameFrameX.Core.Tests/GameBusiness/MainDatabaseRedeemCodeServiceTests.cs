@@ -1,5 +1,5 @@
-using GameFrameX.Application.Game.RedeemCode.GameRedeemCodeChannel;
-using GameFrameX.Application.Game.RedeemCode.GameRedeemCodeChannel.Dto;
+using GameFrameX.Application.CommerceCenter.GameRedeemCodeChannel;
+using GameFrameX.Application.CommerceCenter.GameRedeemCodeChannel.Dto;
 using GameFrameX.Core.Exceptions;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Core.Tests.ClientApi;

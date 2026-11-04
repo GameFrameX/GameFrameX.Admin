@@ -1,5 +1,5 @@
 using GameFrameX.Advertisement.Abstract;
-using GameFrameX.Application.Game.ServerManager;
+using GameFrameX.Application.ServerCenter;
 using GameFrameX.Client.Api.Services.ClientApiTenantOptions;
 using GameFrameX.Entity.Enum;
 using GameFrameX.Foundation.Idempotency;

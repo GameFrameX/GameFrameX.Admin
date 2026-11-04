@@ -1,4 +1,4 @@
-using GameFrameX.Application.Game.ServerManager.Online;
+using GameFrameX.Application.ServerCenter.Online;
 using GameFrameX.Core.Const;
 using GameFrameX.Core.Service.User;
 using GameFrameX.Core.SqlSugar;

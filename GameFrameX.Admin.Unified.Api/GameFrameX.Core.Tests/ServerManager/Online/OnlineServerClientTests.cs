@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Security.Claims;
 using System.Text.Json;
-using GameFrameX.Application.Game.ServerManager.Online;
+using GameFrameX.Application.ServerCenter.Online;
 using GameFrameX.Core.Const;
 using GameFrameX.Core.Exceptions;
 using GameFrameX.Core.Service.User;

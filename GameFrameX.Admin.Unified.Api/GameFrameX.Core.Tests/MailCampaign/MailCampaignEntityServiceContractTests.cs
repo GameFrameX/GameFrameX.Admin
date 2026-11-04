@@ -1,6 +1,6 @@
 using System.Reflection;
-using GameFrameX.Application.Game.Mail.GameMailCampaign;
-using GameFrameX.Application.Game.Mail.GameMailCampaign.Dto;
+using GameFrameX.Application.NoticeCenter.GameMailCampaign;
+using GameFrameX.Application.NoticeCenter.GameMailCampaign.Dto;
 using GameFrameX.Entity.Game.Mail;
 
 namespace GameFrameX.Core.Tests.MailCampaign;

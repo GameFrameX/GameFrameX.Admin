@@ -1,4 +1,4 @@
-using GameFrameX.Application.Game.User.GameUser;
+using GameFrameX.Application.PlayerCenter.GameUser;
 
 namespace GameFrameX.Core.Tests.GameUserPassword;
 

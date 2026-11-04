@@ -44,8 +44,6 @@ public class EntityStringLengthContractTests
             "GameFrameX.Entity",
             "GameFrameX.Core",
             "GameFrameX.Application",
-            "GameFrameX.Application.System",
-            "GameFrameX.Application.Game",
         };
         var forbiddenPatterns = new[]
         {

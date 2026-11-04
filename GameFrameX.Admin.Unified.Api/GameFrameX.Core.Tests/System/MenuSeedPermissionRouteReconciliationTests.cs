@@ -1,5 +1,5 @@
 using System.Reflection;
-using GameFrameX.Application.Game.Tenant.Penalty.TenantGamePenalty;
+using GameFrameX.Application.PlayerCenter.GamePenalty;
 using GameFrameX.Application.SeedData.System;
 using GameFrameX.Core.Api;
 using GameFrameX.Core.Authorization;

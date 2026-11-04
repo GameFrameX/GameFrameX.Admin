@@ -2,7 +2,7 @@ using GameFrameX.Core.Const.MenuSeed;
 using GameFrameX.Core.Enum;
 using GameFrameX.Entity.Enum;
 using GameFrameX.Entity.Global;
-using GameFrameX.Application.Game.Home.GameHome;
+using GameFrameX.Application.Dashboard.GameHome;
 using GameFrameX.Core.Api;
 
 namespace GameFrameX.Application.SeedData.System;

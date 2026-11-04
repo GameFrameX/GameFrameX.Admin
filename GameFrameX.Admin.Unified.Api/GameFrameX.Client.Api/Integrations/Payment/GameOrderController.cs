@@ -1,7 +1,7 @@
 using GameFrameX.Client.Api.Services.PayVerification;
 using GameFrameX.Client.Api.Services.PublicCallback;
-using GameFrameX.Application.Game.ServerManager;
-using GameFrameX.Application.Game.Order.GameOrder;
+using GameFrameX.Application.ServerCenter;
+using GameFrameX.Application.CommerceCenter.GameOrder;
 using GameFrameX.Client.Api.GameWebShop.Dto;
 using GameFrameX.Client.Api.Integrations.Payment.Dto;
 using GameFrameX.Client.Api.Services;

@@ -1,5 +1,5 @@
-using GameFrameX.Application.Game.Tenant.AntiCheat.TenantGameAntiCheatEvent;
-using GameFrameX.Application.Game.Order.GameOrder;
+using GameFrameX.Application.GmCenter.GameAntiCheatEvent;
+using GameFrameX.Application.CommerceCenter.GameOrder;
 using GameFrameX.Client.Api.Integrations.Advertisement;
 using GameFrameX.Core.Tests.ClientApi;
 using GameFrameX.Entity.Enum;

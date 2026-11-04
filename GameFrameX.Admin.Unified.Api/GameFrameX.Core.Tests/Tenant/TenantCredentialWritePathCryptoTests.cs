@@ -1,9 +1,9 @@
 using System.Text.Json.Nodes;
 using GameFrameX.Advertisement.Abstract;
-using GameFrameX.Application.Game.Tenant.Integration.TenantAdvertisementCallbackConfig;
-using GameFrameX.Application.Game.Tenant.Integration.TenantAdvertisementCallbackConfig.Dto;
-using GameFrameX.Application.Game.Tenant.Security.TenantAppSignatureKey;
-using GameFrameX.Application.Game.Tenant.Security.TenantAppSignatureKey.Dto;
+using GameFrameX.Application.ClientDelivery.AdvertisementCallbackConfig;
+using GameFrameX.Application.ClientDelivery.AdvertisementCallbackConfig.Dto;
+using GameFrameX.Application.ClientDelivery.Security.AppSignatureKey;
+using GameFrameX.Application.ClientDelivery.Security.AppSignatureKey.Dto;
 using GameFrameX.Core.Service;
 using GameFrameX.Core.Service.Tenant;
 using GameFrameX.Core.SqlSugar;

@@ -1,6 +1,6 @@
-using GameFrameX.Application.Game.User.GameUser;
-using GameFrameX.Application.Game.User.GameRole;
-using GameFrameX.Application.Game.User.GameRole.Dto;
+using GameFrameX.Application.PlayerCenter.GameUser;
+using GameFrameX.Application.PlayerCenter.GameRole;
+using GameFrameX.Application.PlayerCenter.GameRole.Dto;
 using GameFrameX.Core.Exceptions;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Core.Tests.ClientApi;

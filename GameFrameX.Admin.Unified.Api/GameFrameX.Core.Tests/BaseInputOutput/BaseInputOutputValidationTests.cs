@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
-using GameFrameX.Application.System.Dictionary.Dto;
+using GameFrameX.Application.Platform.Dictionary.Dto;
 using GameFrameX.Core.BaseInputOutput;
 
 namespace GameFrameX.Core.Tests.BaseInputOutput;

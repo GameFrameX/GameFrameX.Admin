@@ -1,6 +1,6 @@
 using System.Security.Claims;
-using GameFrameX.Application.System.Logging;
-using GameFrameX.Application.System.Logging.Dto;
+using GameFrameX.Application.Audit.Logging;
+using GameFrameX.Application.Audit.Logging.Dto;
 using GameFrameX.Core.Cache;
 using GameFrameX.Core.Tests.System;
 using GameFrameX.Core.Const;

@@ -25,7 +25,7 @@ public sealed partial class RuntimeCredentialReadPathGuardTests
         // Hub.Api 链路
         ("GameFrameX.Hub.Api/Middleware/TenantGameAppOpenAccessAuthMiddleware.cs", "TenantSecretCrypto.DecryptCached", 1),
         // C370 已收口的主库域读取（防回退）
-        ("GameFrameX.Application.System/OpenAccess/SystemOpenAccessService.cs", "TenantSecretCrypto.Decrypt", 1),
+        ("GameFrameX.Application/Platform/OpenAccess/SystemOpenAccessService.cs", "TenantSecretCrypto.Decrypt", 1),
     };
 
     /// <summary>

@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Security.Claims;
-using GameFrameX.Application.Game.Online.Social;
-using GameFrameX.Application.Game.Online.Social.Dto;
-using GameFrameX.Application.Game.ServerManager.Online;
-using GameFrameX.Application.Game.Tenant.Penalty.TenantGamePenalty;
+using GameFrameX.Application.GmCenter.Social;
+using GameFrameX.Application.GmCenter.Social.Dto;
+using GameFrameX.Application.ServerCenter.Online;
+using GameFrameX.Application.PlayerCenter.GamePenalty;
 using GameFrameX.Core.Const;
 using GameFrameX.Core.Enum;
 using GameFrameX.Core.Exceptions;

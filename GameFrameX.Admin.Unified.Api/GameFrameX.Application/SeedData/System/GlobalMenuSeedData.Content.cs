@@ -3,12 +3,12 @@ using GameFrameX.Core.Const.MenuSeed;
 using GameFrameX.Core.Enum;
 using GameFrameX.Entity.Enum;
 using GameFrameX.Entity.Global;
-using GameFrameX.Application.Game.Announcement.GameAnnouncement;
-using GameFrameX.Application.Game.Announcement.GameBannerAnnouncement;
-using GameFrameX.Application.Game.Mail.GameMail;
-using GameFrameX.Application.Game.Mail.GameMailCampaign;
-using GameFrameX.Application.Game.Mail.GameMailTemplate;
-using GameFrameX.Application.Game.Mail.GameMailTemplateCategory;
+using GameFrameX.Application.NoticeCenter.GameAnnouncement;
+using GameFrameX.Application.NoticeCenter.GameBannerAnnouncement;
+using GameFrameX.Application.NoticeCenter.GameMail;
+using GameFrameX.Application.NoticeCenter.GameMailCampaign;
+using GameFrameX.Application.NoticeCenter.GameMailTemplate;
+using GameFrameX.Application.NoticeCenter.GameMailTemplateCategory;
 using GameFrameX.Core.Api;
 
 namespace GameFrameX.Application.SeedData.System;

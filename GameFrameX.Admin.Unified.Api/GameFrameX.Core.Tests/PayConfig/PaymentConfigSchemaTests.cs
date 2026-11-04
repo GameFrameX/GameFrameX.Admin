@@ -1,5 +1,5 @@
 using System.Reflection;
-using GameFrameX.Application.Game.Order.GamePaymentConfig;
+using GameFrameX.Application.ClientDelivery.GamePaymentConfig;
 using GameFrameX.Payment.Abstract;
 using GameFrameX.Payment.AliPay;
 using GameFrameX.Payment.Apple.Option;

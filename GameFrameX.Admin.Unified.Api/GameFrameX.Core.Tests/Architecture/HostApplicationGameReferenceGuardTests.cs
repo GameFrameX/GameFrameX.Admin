@@ -2,11 +2,11 @@ using System.Reflection;
 
 namespace GameFrameX.Core.Tests.Architecture;
 
-// RemoteConfig 并入 Application.Game（游戏业务域聚合）后的引用边界守护测试。
-// Client.Api / Hub.Api 两个 host 对 GameFrameX.Application.Game 命名空间的可触达面实行
+// 应用层三项目合并为单一 GameFrameX.Application（按运营域重组）后的引用边界守护测试。
+// Client.Api / Hub.Api 两个 host 对 GameFrameX.Application 命名空间的可触达面实行
 // fail-closed 白名单：host 程序集内所有类型（Controller / Service / 闭包等）的构造函数参数、
-// 字段、属性、方法参数与返回值中出现的 Application.Game 类型，必须逐一登记在下方白名单内。
-// 扩展 Client/Hub 对 Application.Game 的可触达面，需在本测试白名单登记并说明理由；
+// 字段、属性、方法参数与返回值中出现的 Application 层类型，必须逐一登记在下方白名单内。
+// 扩展 Client/Hub 对 Application 层的可触达面，需在本测试白名单登记并说明理由；
 // 未登记的新引用直接失败，防止 Game 域业务类型向 host 层无序扩散。
 public sealed class HostApplicationGameReferenceGuardTests
 {
@@ -14,30 +14,30 @@ public sealed class HostApplicationGameReferenceGuardTests
     private static readonly HashSet<string> ClientApiAllowedReferences = new(StringComparer.Ordinal)
     {
         // GameUserController 封禁/踢下线联动处罚执行（DI 注入接口）
-        "GameFrameX.Application.Game.Penalty.GamePenalty.ITenantGamePenaltyEnforcementService",
+        "GameFrameX.Application.PlayerCenter.GamePenalty.ITenantGamePenaltyEnforcementService",
         // GameUserController 用户密码校验（C214 Argon2id 路径）
-        "GameFrameX.Application.Game.User.GameUser.TenantGameUserPasswordService",
+        "GameFrameX.Application.PlayerCenter.GameUser.TenantGameUserPasswordService",
         // GameOrderController 订单发货（Client.Api 支付回调后履约）
-        "GameFrameX.Application.Game.Order.GameOrder.TenantGameOrderShipService",
-        // C345 灰度判定原语唯一化：RemoteConfigRolloutMatcher 委托 Application.Game 共享实现，
+        "GameFrameX.Application.CommerceCenter.GameOrder.TenantGameOrderShipService",
+        // C345 灰度判定原语唯一化：RemoteConfigRolloutMatcher 委托 Application 层共享实现，
         // 与活动/功能开关投放共用同一套取模 + 白名单旁路语义（原 Client.Api 私有副本已收敛）。
-        "GameFrameX.Application.Game.App.Rollout.StableDeviceRolloutMatcher",
+        "GameFrameX.Application.ClientDelivery.Rollout.StableDeviceRolloutMatcher",
         // C347 活动/功能开关客户端通道：GameFeatureSwitchController 消费 C345 冻结的共享投放解析器，
         // Result/EffectiveItem 为解析器返回值与元素类型（控制器内做 Unix 秒 wire 转换）。
-        "GameFrameX.Application.Game.App.FeatureSwitch.FeatureSwitchDeliveryResolver",
-        "GameFrameX.Application.Game.App.FeatureSwitch.FeatureSwitchDeliveryResult",
-        "GameFrameX.Application.Game.App.FeatureSwitch.FeatureSwitchEffectiveItem",
+        "GameFrameX.Application.ClientDelivery.FeatureSwitch.FeatureSwitchDeliveryResolver",
+        "GameFrameX.Application.ClientDelivery.FeatureSwitch.FeatureSwitchDeliveryResult",
+        "GameFrameX.Application.ClientDelivery.FeatureSwitch.FeatureSwitchEffectiveItem",
     };
 
     private static readonly HashSet<string> HubApiAllowedReferences = new(StringComparer.Ordinal)
     {
-        // 原区服增删停三个 DTO（物理文件在 Hub.Api/Dto/GameArea/）曾命名空间挂在 Application.Game 根，
-        // 归位到 GameFrameX.Hub.Api.Dto.GameArea 后，Hub.Api 对 Application.Game 零可触达；新增引用须登记并说明理由。
+        // 原区服增删停三个 DTO（物理文件在 Hub.Api/Dto/GameArea/）曾命名空间挂在 Application.Platform 根，
+        // 归位到 GameFrameX.Hub.Api.Dto.GameArea 后，Hub.Api 对 Application 层零可触达；新增引用须登记并说明理由。
         // C347 活动/功能开关服务器同步通道：FeatureSwitchSyncController 消费 C345 冻结的共享投放解析器，
         // Result/EffectiveItem 为解析器返回值与元素类型（控制器内做 Unix 秒 wire 转换）。
-        "GameFrameX.Application.Game.App.FeatureSwitch.FeatureSwitchDeliveryResolver",
-        "GameFrameX.Application.Game.App.FeatureSwitch.FeatureSwitchDeliveryResult",
-        "GameFrameX.Application.Game.App.FeatureSwitch.FeatureSwitchEffectiveItem",
+        "GameFrameX.Application.ClientDelivery.FeatureSwitch.FeatureSwitchDeliveryResolver",
+        "GameFrameX.Application.ClientDelivery.FeatureSwitch.FeatureSwitchDeliveryResult",
+        "GameFrameX.Application.ClientDelivery.FeatureSwitch.FeatureSwitchEffectiveItem",
     };
 
     [Fact]
@@ -48,7 +48,7 @@ public sealed class HostApplicationGameReferenceGuardTests
 
         var unexpected = actual.Except(ClientApiAllowedReferences).Order(StringComparer.Ordinal).ToList();
         Assert.True(unexpected.Count == 0,
-                    "GameFrameX.Client.Api 出现未登记的 Application.Game 类型引用。扩展 Client/Hub 对 Application.Game 的可触达面，" +
+                    "GameFrameX.Client.Api 出现未登记的 Application 层类型引用。扩展 Client/Hub 对 Application 层的可触达面，" +
                     "需在本测试白名单登记并说明理由。未登记引用:" + Environment.NewLine + string.Join(Environment.NewLine, unexpected));
     }
 
@@ -60,11 +60,11 @@ public sealed class HostApplicationGameReferenceGuardTests
 
         var unexpected = actual.Except(HubApiAllowedReferences).Order(StringComparer.Ordinal).ToList();
         Assert.True(unexpected.Count == 0,
-                    "GameFrameX.Hub.Api 出现未登记的 Application.Game 类型引用。扩展 Client/Hub 对 Application.Game 的可触达面，" +
+                    "GameFrameX.Hub.Api 出现未登记的 Application 层类型引用。扩展 Client/Hub 对 Application 层的可触达面，" +
                     "需在本测试白名单登记并说明理由。未登记引用:" + Environment.NewLine + string.Join(Environment.NewLine, unexpected));
     }
 
-    /// <summary>枚举 host 程序集所有类型声明成员（构造函数参数 / 字段 / 属性 / 方法参数与返回值）中出现的 Application.Game 类型全名。</summary>
+    /// <summary>枚举 host 程序集所有类型声明成员（构造函数参数 / 字段 / 属性 / 方法参数与返回值）中出现的 Application 层类型全名。</summary>
     private static HashSet<string> CollectApplicationGameReferences(Assembly hostAssembly)
     {
         var references = new HashSet<string>(StringComparer.Ordinal);
@@ -108,7 +108,7 @@ public sealed class HostApplicationGameReferenceGuardTests
         return references;
     }
 
-    /// <summary>递归展开数组 / 指针 / byref 元素类型与泛型参数位置，收集命名空间以 GameFrameX.Application.Game 开头的类型。</summary>
+    /// <summary>递归展开数组 / 指针 / byref 元素类型与泛型参数位置，收集命名空间以 GameFrameX.Application. 开头的类型。</summary>
     private static void Collect(Type? type, HashSet<string> references)
     {
         if (type is null)
@@ -137,7 +137,7 @@ public sealed class HostApplicationGameReferenceGuardTests
             return;
         }
 
-        if (type.Namespace is not null && type.Namespace.StartsWith("GameFrameX.Application.Game", StringComparison.Ordinal))
+        if (type.Namespace is not null && type.Namespace.StartsWith("GameFrameX.Application.", StringComparison.Ordinal))
         {
             references.Add(type.FullName ?? type.Namespace);
         }

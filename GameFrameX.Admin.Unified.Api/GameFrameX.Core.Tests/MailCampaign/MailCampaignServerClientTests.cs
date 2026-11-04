@@ -1,6 +1,6 @@
 using System.Net;
 using System.Text.Json;
-using GameFrameX.Application.Game.ServerManager.Mail;
+using GameFrameX.Application.ServerCenter.Mail;
 using GameFrameX.Entity.Game.Mail;
 using GameFrameX.Entity.Tenant.Game;
 using GameFrameX.Foundation.Http.Normalization;

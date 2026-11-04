@@ -1,5 +1,5 @@
 using GameFrameX.Core.Job;
-using GameFrameX.Application.System.Job;
+using GameFrameX.Application.Platform.Job;
 
 namespace GameFrameX.Core.Tests.System.Job;
 

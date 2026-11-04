@@ -1,11 +1,11 @@
-using GameFrameX.Application.Game.App.Rollout;
+using GameFrameX.Application.ClientDelivery.Rollout;
 using GameFrameX.Entity.Tenant.Game.RemoteConfig;
 
 namespace GameFrameX.Client.Api.Services.RemoteConfig;
 
 /// <summary>
 /// 远程配置记录级投放规则。
-/// <para>灰度判定委托 <see cref="StableDeviceRolloutMatcher"/>（Application.Game 唯一实现），
+/// <para>灰度判定委托 <see cref="StableDeviceRolloutMatcher"/>（Application.Platform 唯一实现），
 /// 与活动/功能开关投放共用同一套取模 + 白名单旁路语义。</para>
 /// </summary>
 public static class RemoteConfigRolloutMatcher

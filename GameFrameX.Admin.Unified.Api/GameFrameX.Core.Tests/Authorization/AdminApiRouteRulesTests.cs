@@ -1,4 +1,4 @@
-using GameFrameX.Application.Game.Home.GameHome;
+using GameFrameX.Application.Dashboard.GameHome;
 using GameFrameX.Core.Service.Auth;
 using GameFrameX.Web.Api.ApiRouting;
 using Microsoft.AspNetCore.Mvc;

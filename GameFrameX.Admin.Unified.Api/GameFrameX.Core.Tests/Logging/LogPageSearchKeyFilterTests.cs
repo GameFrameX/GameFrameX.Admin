@@ -1,7 +1,7 @@
 using System.Security.Claims;
 using System.Threading;
-using GameFrameX.Application.System.Logging;
-using GameFrameX.Application.System.Logging.Dto;
+using GameFrameX.Application.Audit.Logging;
+using GameFrameX.Application.Audit.Logging.Dto;
 using GameFrameX.Core.Const;
 using GameFrameX.Core.Service.User;
 using GameFrameX.Core.SqlSugar;

@@ -1,5 +1,5 @@
 using GameFrameX.Core.Job;
-using GameFrameX.Application.System.Job;
+using GameFrameX.Application.Platform.Job;
 using GameFrameX.Core.Api;
 using GameFrameX.Core.DependencyInjection;
 using GameFrameX.Core.Service.Tenant;
@@ -21,9 +21,9 @@ public static class ProjectDependencyInjectionSetup
     private static readonly HashSet<string> ScopedTypes = new(StringComparer.Ordinal)
     {
         "GameFrameX.Core.Service.User.CurrentUserContext",
-        "GameFrameX.Application.Game.Tenant.ClientApiPolicy.RiskEnforcement.GameAppRiskEnforcementModeResolver",
-        "GameFrameX.Application.Game.Penalty.GamePenalty.TenantGamePenaltyEnforcementService",
-        "GameFrameX.Application.Game.User.GameUser.TenantGameUserPasswordService",
+        "GameFrameX.Core.Middleware.GameAppRiskEnforcementModeResolver",
+        "GameFrameX.Application.PlayerCenter.GamePenalty.TenantGamePenaltyEnforcementService",
+        "GameFrameX.Application.PlayerCenter.GameUser.TenantGameUserPasswordService",
     };
 
     /// <summary>
@@ -61,8 +61,6 @@ public static class ProjectDependencyInjectionSetup
     private static bool IsApplicationAssembly(string? assemblyName)
     {
         return assemblyName is "GameFrameX.Application"
-                   or "GameFrameX.Application.Game"
-                   or "GameFrameX.Application.System"
                    or "GameFrameX.Core"
                    or "GameFrameX.Core.Utility"
                    or "GameFrameX.ObjectStorage.Local";

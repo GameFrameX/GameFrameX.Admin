@@ -167,7 +167,7 @@ public class TenantGameAreaEntity : EntityBasicSelect
     /// <summary>
     /// 客户端转发 Server HTTP 路由前缀（来源 change C150 §3.2 / C175）。
     /// <para>Client API 代理玩家普通请求（建角、改名、查角色、创建订单等）的 Server HTTP 路由前缀。</para>
-    /// <para>默认 <c>game/api</c>；由 <see cref="GameFrameX.Application.Game.ServerManager.GameServerEndpointUrlBuilder"/> 按 <c>ClientDispatch</c> 能力消费。</para>
+    /// <para>默认 <c>game/api</c>；由 <see cref="GameFrameX.Application.ServerCenter.GameServerEndpointUrlBuilder"/> 按 <c>ClientDispatch</c> 能力消费。</para>
     /// </summary>
     [SugarColumn(ColumnDescription = "客户端转发 Server HTTP 路由前缀", Length = EntityStringLength.Length256, IsNullable = true)]
     public string ClientDispatchApiPrefix { get; set; } = "game/api";
@@ -175,7 +175,7 @@ public class TenantGameAreaEntity : EntityBasicSelect
     /// <summary>
     /// 履约投递 Server HTTP 路由前缀（来源 change C150 §3.2 / C175）。
     /// <para>后台履约、发货、退款、邮件投递、广告奖励、Campaign 发布、后台运营操作等资产或运营投递的前缀。</para>
-    /// <para>默认 <c>game/api</c>；由 <see cref="GameFrameX.Application.Game.ServerManager.GameServerEndpointUrlBuilder"/> 按 <c>Fulfillment</c> 能力消费。</para>
+    /// <para>默认 <c>game/api</c>；由 <see cref="GameFrameX.Application.ServerCenter.GameServerEndpointUrlBuilder"/> 按 <c>Fulfillment</c> 能力消费。</para>
     /// </summary>
     [SugarColumn(ColumnDescription = "履约投递 Server HTTP 路由前缀", Length = EntityStringLength.Length256, IsNullable = true)]
     public string FulfillmentApiPrefix { get; set; } = "game/api";

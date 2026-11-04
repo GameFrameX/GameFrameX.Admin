@@ -1,4 +1,4 @@
-using GameFrameX.Application.Game.Tenant.Advertisement.TenantGameAdvertisementRewardEntity;
+using GameFrameX.Application.ClientDelivery.AdvertisementReward;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Entity.Tenant.Game;
 
