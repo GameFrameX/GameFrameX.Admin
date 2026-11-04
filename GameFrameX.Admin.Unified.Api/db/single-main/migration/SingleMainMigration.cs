@@ -93,6 +93,8 @@ internal static class SingleMainMigration
                 Console.WriteLine($"未迁移表：{ignored}");
             }
 
+            ReportRetiredTables(source, "源库");
+            ReportRetiredTables(target, "目标库");
             if (dryRun)
             {
                 target.Ado.RollbackTran();
@@ -118,6 +120,25 @@ internal static class SingleMainMigration
             }
 
             target.Utilities.RemoveCacheAll();
+        }
+    }
+
+    private static void ReportRetiredTables(ISqlSugarClient database, string label)
+    {
+        var retiredTables = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "system_tenant_entity", "system_tenant_menu_sync_state_entity",
+            "global_package_entity", "global_package_menu_entity", "tenant_game_app_entity",
+            "tenant_notice_entity", "tenant_notice_user_entity", "tenant_organization_entity",
+            "tenant_position_entity", "tenant_role_organization_entity", "tenant_user_extension_organization_entity",
+            "system_open_access_entity", "system_register_email_code_entity", "system_log_audit_entity",
+        };
+        var remaining = database.DbMaintenance.GetTableInfoList(false).Select(table => table.Name)
+            .Where(retiredTables.Contains).OrderBy(name => name, StringComparer.Ordinal).ToArray();
+        Console.WriteLine($"{label}残留退场表（不自动删除）：{(remaining.Length == 0 ? "无" : string.Join(", ", remaining))}");
+        if (remaining.Length > 0)
+        {
+            Console.WriteLine("确认迁移、备份及重复执行完成后，可由运维手动 DROP；system_tenant_entity 可能含加密的旧租户库连接串，备份与清理按敏感凭据处理。");
         }
     }
 
