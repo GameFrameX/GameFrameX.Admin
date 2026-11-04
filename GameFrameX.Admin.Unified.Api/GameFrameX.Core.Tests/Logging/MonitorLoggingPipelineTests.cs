@@ -412,6 +412,26 @@ public sealed class MonitorLoggingPipelineTests : IAsyncLifetime
         Assert.DoesNotContain(plain, File.ReadAllText(Path.Combine(_contentRoot, "data", "logs", $"{DateTime.Now:yyyyMMdd}_Information.log")));
     }
 
+    [Fact]
+    public async Task DuplicateKeyJsonInParameterString_DoesNotAffectResponseAndFailsClosedInLog()
+    {
+        const string echoed = "dup-key-http-plain-34567";
+        const string hidden = "dup-key-inner-credential-45678";
+        var body = "{\"Password\":\"" + echoed + "\",\"Remark\":\"{\\\"Password\\\":\\\"a\\\",\\\"Password\\\":\\\"" + hidden + "\\\"}\"}";
+        using (var client = _host.GetTestClient())
+        using (var response = await client.PostAsync("/api/monitorPipeline/credential", new StringContent(body, Encoding.UTF8, "application/json")))
+        {
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Contains(echoed, await response.Content.ReadAsStringAsync());
+        }
+
+        await WaitDispatchDrainedAsync();
+        var row = Assert.Single(await _db.GetConnectionScope(MainConfigId).Queryable<SystemLogOperationEntity>().ToListAsync());
+        Assert.Contains(SensitiveLogRedactor.Mask, row.RequestParam);
+        Assert.DoesNotContain(hidden, row.RequestParam);
+        Assert.DoesNotContain(hidden, row.Message);
+    }
+
     private static JsonNode? ParseFirstMonitorLine(string fileName)
     {
         var content = File.ReadAllText(fileName);

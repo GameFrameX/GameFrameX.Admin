@@ -1,6 +1,6 @@
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using System.Text.RegularExpressions;
 
 namespace GameFrameX.Core.Logging;
 
@@ -31,7 +31,15 @@ public static class SensitiveLogRedactor
             return text;
         }
 
-        return RedactText(text, 0, new HashSet<string>(StringComparer.Ordinal));
+        try
+        {
+            return RedactText(text, 0, new HashSet<string>(StringComparer.Ordinal));
+        }
+        catch
+        {
+            // 兜底 fail-closed：脱敏环节自身出错时丢弃内容保留掩码，绝不把异常或原文抛回调用方。
+            return Mask;
+        }
     }
 
     private static string RedactText(string text, int depth, HashSet<string> secrets)
@@ -59,12 +67,133 @@ public static class SensitiveLogRedactor
             changed |= ReplaceSecretValues(node, secrets);
             return changed ? node.ToJsonString() : text;
         }
-        catch (JsonException)
+        catch (Exception exception) when (exception is JsonException or ArgumentException)
         {
-            // 不把残缺 JSON、URL 查询或未结构化凭据文本原样持久化。
-            return text.TrimStart().StartsWith('{') || text.TrimStart().StartsWith('[')
-                || Regex.IsMatch(text, "(password|secret|token|private.?key|signing.?key|session.?key|authorization|credential)[a-z0-9_]*[^a-z0-9_]*[:=]", RegexOptions.IgnoreCase)
-                ? Mask : text;
+            // 残缺 JSON、URL 查询或未结构化文本按凭据形态兜底扫描；以 { 或 [ 开头的结构残缺文本整体掩码。
+            return RedactUnstructured(text);
+        }
+    }
+
+    /// <summary>
+    /// 非 JSON 文本的线性兜底扫描：定位 <c>:</c>/<c>=</c> 后向左取连续键名字符段，
+    /// 归一化（含一次百分号解码）后与 <see cref="IsSensitiveName"/> 同源判定，命中即把值掩到引号闭合、下一个 &amp; 或行尾。
+    /// 单次遍历、无回溯。
+    /// </summary>
+    private static string RedactUnstructured(string text)
+    {
+        var trimmed = text.TrimStart();
+        if (trimmed.StartsWith('{') || trimmed.StartsWith('['))
+        {
+            // 结构残缺：无法确定值边界，整体 fail-closed。
+            return Mask;
+        }
+
+        StringBuilder? result = null;
+        var copiedLength = 0;
+        for (var index = 0; index < text.Length; index++)
+        {
+            var current = text[index];
+            if (current != ':' && current != '=')
+            {
+                continue;
+            }
+
+            var nameStart = index;
+            while (nameStart > 0 && IsNameCharacter(text[nameStart - 1]))
+            {
+                nameStart--;
+            }
+
+            if (nameStart == index || !IsSensitiveUnstructuredName(text.Substring(nameStart, index - nameStart)))
+            {
+                continue;
+            }
+
+            var valueStart = index + 1;
+            while (valueStart < text.Length && char.IsWhiteSpace(text[valueStart]) && text[valueStart] != '\n' && text[valueStart] != '\r')
+            {
+                valueStart++;
+            }
+
+            int valueEnd;
+            if (valueStart < text.Length && text[valueStart] == '"')
+            {
+                valueEnd = valueStart + 1;
+                while (valueEnd < text.Length && text[valueEnd] != '"')
+                {
+                    if (text[valueEnd] == '\\' && valueEnd + 1 < text.Length)
+                    {
+                        valueEnd++;
+                    }
+
+                    valueEnd++;
+                }
+
+                if (valueEnd < text.Length)
+                {
+                    valueEnd++;
+                }
+            }
+            else
+            {
+                valueEnd = valueStart;
+                while (valueEnd < text.Length && text[valueEnd] != '&' && text[valueEnd] != '\n' && text[valueEnd] != '\r')
+                {
+                    valueEnd++;
+                }
+
+                // 值已是掩码（上一轮结果）时跳过，避免把掩码后的同段内容再次吞并，保证幂等。
+                if (valueEnd - valueStart >= Mask.Length && text.AsSpan(valueStart, Mask.Length).SequenceEqual(Mask))
+                {
+                    valueEnd = valueStart;
+                }
+            }
+
+            if (valueEnd == valueStart)
+            {
+                continue;
+            }
+
+            result ??= new StringBuilder(text.Length);
+            result.Append(text, copiedLength, valueStart - copiedLength);
+            result.Append(Mask);
+            copiedLength = valueEnd;
+            index = valueEnd - 1;
+        }
+
+        if (result == null)
+        {
+            return text;
+        }
+
+        result.Append(text, copiedLength, text.Length - copiedLength);
+        return result.ToString();
+    }
+
+    private static bool IsNameCharacter(char character)
+    {
+        return char.IsLetterOrDigit(character) || character == '_' || character == '%' || character == '-' || character == '.';
+    }
+
+    private static bool IsSensitiveUnstructuredName(string name)
+    {
+        if (IsSensitiveName(name))
+        {
+            return true;
+        }
+
+        if (name.IndexOf('%') < 0)
+        {
+            return false;
+        }
+
+        try
+        {
+            return IsSensitiveName(Uri.UnescapeDataString(name));
+        }
+        catch (UriFormatException)
+        {
+            return false;
         }
     }
 
@@ -117,7 +246,21 @@ public static class SensitiveLogRedactor
     {
         foreach (var secret in secrets.Where(value => value.Length > 0 && value != Mask).OrderByDescending(value => value.Length))
         {
-            text = Regex.Replace(text, Regex.Escape(Mask) + "|" + Regex.Escape(secret), _ => Mask);
+            // 既有掩码内的字符不得再被逐字替换（如单字符密钥会把 ****** 逐字展开），按掩码切段后只在段内替换。
+            if (text.Contains(Mask))
+            {
+                var segments = text.Split(Mask);
+                for (var index = 0; index < segments.Length; index++)
+                {
+                    segments[index] = segments[index].Replace(secret, Mask, StringComparison.Ordinal);
+                }
+
+                text = string.Join(Mask, segments);
+            }
+            else
+            {
+                text = text.Replace(secret, Mask, StringComparison.Ordinal);
+            }
         }
 
         return text;
@@ -139,6 +282,16 @@ public static class SensitiveLogRedactor
                     {
                         secrets.Add(secret);
                     }
+                    else if (pair.Value is JsonValue scalarValue)
+                    {
+                        // 数字/布尔等非字符串标量也可能被其他字段回显，按原始 JSON 文本收集。
+                        secrets.Add(scalarValue.ToJsonString());
+                    }
+                    else if (pair.Value != null)
+                    {
+                        CollectSecretValues(pair.Value, secrets, depth);
+                    }
+
 
                     if (pair.Value?.ToJsonString() != JsonValue.Create(Mask)!.ToJsonString())
                     {
@@ -182,5 +335,56 @@ public static class SensitiveLogRedactor
         }
 
         return changed;
+    }
+
+    /// <summary>
+    /// 敏感键下的对象/数组值在被整体掩码前，递归收集其中全部字符串标量（含非字符串标量原始文本），
+    /// 供跨字段回显全局替换；深度沿用与 <see cref="RedactText"/> 相同的上限思路，超深即停止收集。
+    /// </summary>
+    private static void CollectSecretValues(JsonNode node, HashSet<string> secrets, int depth)
+    {
+        if (depth >= 32)
+        {
+            return;
+        }
+
+        if (node is JsonValue scalar)
+        {
+            if (scalar.TryGetValue<string>(out var secret) && secret.Length > 0)
+            {
+                secrets.Add(secret);
+            }
+            else
+            {
+                var raw = scalar.ToJsonString();
+                if (raw.Length > 0 && raw != Mask)
+                {
+                    secrets.Add(raw);
+                }
+            }
+
+            return;
+        }
+
+        if (node is JsonObject dictionary)
+        {
+            foreach (var pair in dictionary)
+            {
+                if (pair.Value != null)
+                {
+                    CollectSecretValues(pair.Value, secrets, depth + 1);
+                }
+            }
+        }
+        else if (node is JsonArray array)
+        {
+            foreach (var item in array)
+            {
+                if (item != null)
+                {
+                    CollectSecretValues(item, secrets, depth + 1);
+                }
+            }
+        }
     }
 }

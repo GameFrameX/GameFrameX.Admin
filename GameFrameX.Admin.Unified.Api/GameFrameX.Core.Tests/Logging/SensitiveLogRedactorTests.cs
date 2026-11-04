@@ -88,11 +88,79 @@ public sealed class SensitiveLogRedactorTests
         Assert.Equal(result, SensitiveLogRedactor.Redact(result));
     }
 
-    [Theory]
-    [InlineData("{\"Password\":\"truncated-credential")]
-    [InlineData("https://localhost/api/auth?accessToken=truncated-credential")]
-    public void UnstructuredOrTruncatedCredentials_FailClosed(string value)
+    [Fact]
+    public void TruncatedJsonText_FailsClosedWithWholeMask()
     {
-        Assert.Equal(SensitiveLogRedactor.Mask, SensitiveLogRedactor.Redact(value));
+        Assert.Equal(SensitiveLogRedactor.Mask, SensitiveLogRedactor.Redact("{\"Password\":\"truncated-credential"));
+    }
+
+    [Fact]
+    public void DuplicateKeyJsonInsideStringField_FailsClosedWithoutThrowing()
+    {
+        const string plain = "dup-credential-98765";
+        var payload = JsonSerializer.Serialize(new { Remark = "{\"Password\":\"a\",\"Password\":\"" + plain + "\"}" });
+
+        var redacted = SensitiveLogRedactor.Redact(payload);
+
+        Assert.NotNull(redacted);
+        Assert.DoesNotContain(plain, redacted);
+        Assert.Contains(SensitiveLogRedactor.Mask, redacted);
+        Assert.Equal(redacted, SensitiveLogRedactor.Redact(redacted));
+    }
+
+    [Theory]
+    [InlineData("https://localhost/api/auth?api_key=secret-value&keyword=plain-value", "secret-value", "keyword=plain-value")]
+    [InlineData("https://localhost/api/auth?pass___word=secret-value&keyword=plain-value", "secret-value", "keyword=plain-value")]
+    [InlineData("https://localhost/api/auth?pass%77ord=secret-value&keyword=plain-value", "secret-value", "keyword=plain-value")]
+    [InlineData("https://localhost/api/auth?CliEnT_SecReT=secret-value&keyword=plain-value", "secret-value", "keyword=plain-value")]
+    [InlineData("log line Password: \"quoted-secret-value\" keyword=plain-value", "quoted-secret-value", "keyword=plain-value")]
+    public void UnstructuredQueryCredentials_MaskValueButKeepNonSensitiveParameters(string value, string credential, string kept)
+    {
+        var redacted = SensitiveLogRedactor.Redact(value);
+
+        Assert.DoesNotContain(credential, redacted);
+        Assert.Contains(SensitiveLogRedactor.Mask, redacted);
+        Assert.Contains(kept, redacted);
+        Assert.Equal(redacted, SensitiveLogRedactor.Redact(redacted));
+    }
+
+    [Fact]
+    public void LargeAlphanumericTextWithKeywords_CompletesWithinLinearTimeBudget()
+    {
+        var text = string.Concat(Enumerable.Repeat("userpasswordtoken=secretvalue&", 24_000));
+
+        var stopwatch = new global::System.Diagnostics.Stopwatch();
+        stopwatch.Start();
+        var redacted = SensitiveLogRedactor.Redact(text);
+        stopwatch.Stop();
+
+        Assert.True(text.Length > 600_000);
+        Assert.DoesNotContain("secretvalue", redacted);
+        Assert.True(stopwatch.ElapsedMilliseconds < 2_000, $"640KB 级文本脱敏耗时 {stopwatch.ElapsedMilliseconds}ms，超过 2s 上限");
+    }
+
+    [Fact]
+    public void SensitiveObjectValueCredentials_AreCollectedAndMaskedAcrossEchoFields()
+    {
+        const string plain = "object-value-credential-88771";
+        var payload = JsonSerializer.Serialize(new { Credential = new { value = plain }, Echo = plain });
+
+        var redacted = SensitiveLogRedactor.Redact(payload);
+
+        Assert.DoesNotContain(plain, redacted);
+        Assert.Contains(SensitiveLogRedactor.Mask, redacted);
+        Assert.Equal(redacted, SensitiveLogRedactor.Redact(redacted));
+    }
+
+    [Fact]
+    public void NumericPasswordValue_IsCollectedAndMaskedAcrossEchoFields()
+    {
+        var payload = JsonSerializer.Serialize(new Dictionary<string, object> { ["Password"] = 123456L, ["Echo"] = "code 123456 end" });
+
+        var redacted = SensitiveLogRedactor.Redact(payload);
+
+        Assert.DoesNotContain("123456", redacted);
+        Assert.Contains(SensitiveLogRedactor.Mask, redacted);
+        Assert.Equal(redacted, SensitiveLogRedactor.Redact(redacted));
     }
 }
