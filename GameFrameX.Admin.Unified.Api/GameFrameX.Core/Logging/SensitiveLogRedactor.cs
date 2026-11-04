@@ -7,7 +7,7 @@ namespace GameFrameX.Core.Logging;
 /// <summary>日志专用凭据脱敏；从快照创建副本，不修改业务请求或响应。</summary>
 public static class SensitiveLogRedactor
 {
-    public const string Mask = "******";
+    public const string Mask = GameFrameX.Core.Service.SensitiveFieldMask.MaskValue;
 
     public static bool IsSensitiveName(string name)
     {
