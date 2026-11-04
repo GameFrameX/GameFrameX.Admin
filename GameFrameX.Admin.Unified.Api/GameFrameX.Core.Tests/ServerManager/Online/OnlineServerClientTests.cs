@@ -104,12 +104,14 @@ public sealed class OnlineServerClientTests : IDisposable
         var handler = new FakeHandler(SuccessEnvelope(new OnlineDemoData { PlayerId = "p-1", }));
         var client = CreateClient(handler);
 
-        await client.PostAsync<OnlineDemoData>("kick_player", new { TenantId = 999L, AppId = 888L, ServerId = 777L, Reason = 3, }, await CreateScopeAsync());
+        await client.PostAsync<OnlineDemoData>("kick_player", new { TenantId = 999L, AppId = 888L, ServerId = 777L, RequestId = "request-1", IdempotencyKey = "key-1", Reason = 3, }, await CreateScopeAsync());
 
         var body = handler.LastRequestBodyJson;
         Assert.False(body.ContainsKey("TenantId"));
         Assert.False(body.ContainsKey("AppId"));
         Assert.Equal(Area1001, Convert.ToInt64(body["ServerId"]?.ToString()));
+        Assert.Equal("request-1", body["RequestId"]?.ToString());
+        Assert.Equal("key-1", body["IdempotencyKey"]?.ToString());
         Assert.Equal(3, Convert.ToInt32(body["Reason"]?.ToString()));
     }
 
