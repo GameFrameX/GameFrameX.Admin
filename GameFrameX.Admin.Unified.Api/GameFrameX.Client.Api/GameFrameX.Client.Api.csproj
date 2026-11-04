@@ -7,7 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\GameFrameX.Application.Game\GameFrameX.Application.Game.csproj"/>
+        <ProjectReference Include="..\GameFrameX.Application\GameFrameX.Application.csproj"/>
         <ProjectReference Include="..\GameFrameX.Core.Extension\GameFrameX.Core.Extension.csproj"/>
         <ProjectReference Include="..\GameFrameX.Core.SqlSugar\GameFrameX.Core.SqlSugar.csproj"/>
         <ProjectReference Include="..\Email\GameFrameX.Email.Abstract\GameFrameX.Email.Abstract.csproj"/>

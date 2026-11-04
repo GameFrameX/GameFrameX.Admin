@@ -276,8 +276,6 @@ public sealed class NamingAbbreviationGuardTests
         "GameFrameX.Email.Smtp",
         "GameFrameX.Email.TencentSes",
         "GameFrameX.Application",
-        "GameFrameX.Application.Game",
-        "GameFrameX.Application.System",
         "GameFrameX.Client.Api",
         "GameFrameX.Core",
         "GameFrameX.Core.BaseInputOutput",

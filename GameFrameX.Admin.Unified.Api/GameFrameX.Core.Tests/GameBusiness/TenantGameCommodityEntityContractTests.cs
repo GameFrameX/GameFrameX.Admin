@@ -1,5 +1,5 @@
 using System.Text.Json;
-using GameFrameX.Application.Game.Goods.GameCommodity.Dto;
+using GameFrameX.Application.CommerceCenter.GameCommodity.Dto;
 using GameFrameX.Core.Extension.Json;
 
 namespace GameFrameX.Core.Tests.GameBusiness;

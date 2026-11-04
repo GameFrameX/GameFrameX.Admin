@@ -1,4 +1,4 @@
-using GameFrameX.Application.Game.App.AppScope;
+using GameFrameX.Application.ClientDelivery.AppScope;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Entity.Tenant.Game.Resource;
 using SqlSugar;

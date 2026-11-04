@@ -1,7 +1,7 @@
 using GameFrameX.Client.Api.Services.PublicCallback;
 using GameFrameX.Entity.Tenant.Game.App;
 using System.Text.Json;
-using GameFrameX.Application.Game.Order.GamePaymentConfig;
+using GameFrameX.Application.ClientDelivery.GamePaymentConfig;
 using GameFrameX.Client.Api.Services;
 using GameFrameX.Core.Service.Tenant;
 using GameFrameX.Payment.Abstract;

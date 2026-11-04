@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using GameFrameX.Application.Game.Online.LiveOps.Dispatch;
-using GameFrameX.Application.Game.Online.LiveOps.Dispatch.Dto;
-using GameFrameX.Application.Game.Online.LiveOps.PlayerSegment;
-using GameFrameX.Application.Game.Online.LiveOps.PlayerSegment.Dto;
+using GameFrameX.Application.GmCenter.LiveOps.Dispatch;
+using GameFrameX.Application.GmCenter.LiveOps.Dispatch.Dto;
+using GameFrameX.Application.GmCenter.LiveOps.PlayerSegment;
+using GameFrameX.Application.GmCenter.LiveOps.PlayerSegment.Dto;
 using GameFrameX.Core.BaseInputOutput;
 using GameFrameX.Core.Exceptions;
 using GameFrameX.Core.Extension;

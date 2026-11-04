@@ -1,4 +1,4 @@
-using GameFrameX.Application.Game.App.FeatureSwitch;
+using GameFrameX.Application.ClientDelivery.FeatureSwitch;
 using GameFrameX.Client.Api.GameFeatureSwitch;
 using GameFrameX.Client.Api.GameFeatureSwitch.Dto;
 using GameFrameX.Client.Api.Services.PackageVersion;

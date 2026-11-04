@@ -1,6 +1,6 @@
-using GameFrameX.Application.System.GlobalPlatform;
+using GameFrameX.Application.Platform.GlobalPlatform;
 using GameFrameX.Core.Job;
-using GameFrameX.Application.System.Job;
+using GameFrameX.Application.Platform.Job;
 using GameFrameX.Core.Service.Tenant;
 using GameFrameX.Core.Service.User;
 using GameFrameX.Foundation.Localization.Providers;

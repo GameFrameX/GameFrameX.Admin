@@ -1,4 +1,4 @@
-using GameFrameX.Application.Game.ServerManager;
+using GameFrameX.Application.ServerCenter;
 using GameFrameX.Core.Enum;
 using GameFrameX.Entity.Enum;
 using GameFrameX.Entity.Tenant.Game;

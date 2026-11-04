@@ -1,5 +1,5 @@
 using GameFrameX.Entity.Tenant.Game.App;
-using GameFrameX.Application.Game.Order.GamePaymentConfig;
+using GameFrameX.Application.ClientDelivery.GamePaymentConfig;
 using GameFrameX.Entity.Tenant.Game;
 
 namespace GameFrameX.Core.Tests.PayConfig;

@@ -5,7 +5,7 @@ using GameFrameX.Payment.Google;
 using GameFrameX.Payment.Apple;
 using GameFrameX.Payment.AliPay;
 using GameFrameX.Payment.Wechat;
-using GameFrameX.Application.Game.Order.GamePaymentConfig;
+using GameFrameX.Application.ClientDelivery.GamePaymentConfig;
 using GameFrameX.Client.Api.Services;
 
 namespace GameFrameX.Client.Api.Integrations.Payment;

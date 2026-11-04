@@ -3,7 +3,7 @@ using GameFrameX.Core.Const.MenuSeed;
 using GameFrameX.Core.Enum;
 using GameFrameX.Entity.Enum;
 using GameFrameX.Entity.Global;
-using GameFrameX.Application.Game.TimeJob.GameTimeJob;
+using GameFrameX.Application.Platform.TimeJob.GameTimeJob;
 using GameFrameX.Core.Api;
 
 namespace GameFrameX.Application.SeedData.System;

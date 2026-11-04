@@ -1,7 +1,7 @@
-using GameFrameX.Application.Game.Tenant.ClientApiPolicy.TenantClientApiPolicy;
-using GameFrameX.Application.Game.Tenant.ClientApiPolicy.TenantClientApiPolicy.Dto;
-using GameFrameX.Application.Game.Tenant.LoginTicket.TenantGameLoginTicketKey;
-using GameFrameX.Application.Game.Tenant.LoginTicket.TenantGameLoginTicketKey.Dto;
+using GameFrameX.Application.ClientDelivery.ClientApiPolicy;
+using GameFrameX.Application.ClientDelivery.ClientApiPolicy.Dto;
+using GameFrameX.Application.ClientDelivery.LoginTicket.GameLoginTicketKey;
+using GameFrameX.Application.ClientDelivery.LoginTicket.GameLoginTicketKey.Dto;
 using GameFrameX.Core.Exceptions;
 using GameFrameX.Core.BaseInputOutput;
 using GameFrameX.Core.Extension;
@@ -187,9 +187,9 @@ public sealed class KeyLifecycleRotateTests : IDisposable
     {
         var repositoryRoot = GetRepositoryRoot();
         var ticketKeySource = File.ReadAllText(Path.Combine(repositoryRoot,
-            "GameFrameX.Application.Game/Tenant/LoginTicket/TenantGameLoginTicketKey/TenantGameLoginTicketKeyEntityService.cs"));
+            "GameFrameX.Application/ClientDelivery/LoginTicket/GameLoginTicketKey/TenantGameLoginTicketKeyEntityService.cs"));
         var policySource = File.ReadAllText(Path.Combine(repositoryRoot,
-            "GameFrameX.Application.Game/Tenant/ClientApiPolicy/TenantClientApiPolicy/TenantClientApiPolicyEntityService.cs"));
+            "GameFrameX.Application/ClientDelivery/ClientApiPolicy/TenantClientApiPolicyEntityService.cs"));
 
         Assert.Contains("[KeyAudit] action=TicketKeyRotate", ticketKeySource, StringComparison.Ordinal);
         Assert.Contains("operator={_currentUserContext.Account}", ticketKeySource, StringComparison.Ordinal);

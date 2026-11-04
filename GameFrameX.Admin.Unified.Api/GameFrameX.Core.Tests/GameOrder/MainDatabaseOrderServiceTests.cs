@@ -1,5 +1,5 @@
-using GameFrameX.Application.Game.Order.GameOrder;
-using GameFrameX.Application.Game.Order.GameOrderFulfillment;
+using GameFrameX.Application.CommerceCenter.GameOrder;
+using GameFrameX.Application.CommerceCenter.GameOrderFulfillment;
 using GameFrameX.Core.Service.User;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Core.Tests.ClientApi;

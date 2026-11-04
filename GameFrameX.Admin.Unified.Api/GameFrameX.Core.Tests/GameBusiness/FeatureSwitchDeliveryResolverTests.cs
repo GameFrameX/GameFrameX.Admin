@@ -1,4 +1,4 @@
-using GameFrameX.Application.Game.App.FeatureSwitch;
+using GameFrameX.Application.ClientDelivery.FeatureSwitch;
 using GameFrameX.Core.Const;
 using GameFrameX.Core.Extension;
 using GameFrameX.Core.SqlSugar;
@@ -382,11 +382,11 @@ public sealed class FeatureSwitchDeliveryResolverTests : IDisposable
     public void DeviceRollout_IsStableNormalizedAndRecordSpecific()
     {
         var first = Enumerable.Range(0, 200).Select(index =>
-            GameFrameX.Application.Game.App.Rollout.StableDeviceRolloutMatcher.IsMatch(1, $"device-{index}", 50, null)).ToArray();
+            GameFrameX.Application.ClientDelivery.Rollout.StableDeviceRolloutMatcher.IsMatch(1, $"device-{index}", 50, null)).ToArray();
         var repeated = Enumerable.Range(0, 200).Select(index =>
-            GameFrameX.Application.Game.App.Rollout.StableDeviceRolloutMatcher.IsMatch(1, $" DEVICE-{index} ", 50, null)).ToArray();
+            GameFrameX.Application.ClientDelivery.Rollout.StableDeviceRolloutMatcher.IsMatch(1, $" DEVICE-{index} ", 50, null)).ToArray();
         var otherRecord = Enumerable.Range(0, 200).Select(index =>
-            GameFrameX.Application.Game.App.Rollout.StableDeviceRolloutMatcher.IsMatch(2, $"device-{index}", 50, null)).ToArray();
+            GameFrameX.Application.ClientDelivery.Rollout.StableDeviceRolloutMatcher.IsMatch(2, $"device-{index}", 50, null)).ToArray();
 
         Assert.Equal(first, repeated);
         Assert.Contains(true, first);

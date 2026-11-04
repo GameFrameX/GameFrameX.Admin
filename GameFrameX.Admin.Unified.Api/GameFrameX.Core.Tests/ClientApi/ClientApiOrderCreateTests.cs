@@ -1,7 +1,7 @@
 using GameFrameX.Client.Api.Services.PayVerification;
 using GameFrameX.Client.Api.Integrations.Payment.Dto;
 using GameFrameX.Client.Api.Services;
-using GameFrameX.Application.Game.Order.GameOrder;
+using GameFrameX.Application.CommerceCenter.GameOrder;
 using GameFrameX.Core.Enum;
 using GameFrameX.Entity.Enum;
 using GameFrameX.Entity.Tenant.Game;

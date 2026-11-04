@@ -14,8 +14,6 @@ public sealed class SqlSugarRepositoryChangeRepositoryGuardTests
         "GameFrameX.Core.SqlSugar",
         "GameFrameX.Core.BaseInputOutput",
         "GameFrameX.Application",
-        "GameFrameX.Application.System",
-        "GameFrameX.Application.Game",
         "GameFrameX.Web.Api",
         "GameFrameX.Client.Api",
         "GameFrameX.Hub.Api",

@@ -1,5 +1,5 @@
 using System.Globalization;
-using GameFrameX.Application.Game.Tenant.OpenAccess.TenantGameAppOpenAccess;
+using GameFrameX.Application.Platform.OpenAccess.GameAppOpenAccess;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Core.Tests.ClientApi;
 using GameFrameX.Entity.Tenant;

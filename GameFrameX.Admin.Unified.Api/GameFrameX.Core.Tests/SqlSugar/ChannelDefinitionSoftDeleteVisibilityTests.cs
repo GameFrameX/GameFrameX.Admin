@@ -1,5 +1,5 @@
-using GameFrameX.Application.System.ChannelDefinition;
-using GameFrameX.Application.System.ChannelDefinition.Dto;
+using GameFrameX.Application.ClientDelivery.ChannelDefinition;
+using GameFrameX.Application.ClientDelivery.ChannelDefinition.Dto;
 using GameFrameX.Core.BaseInputOutput;
 using GameFrameX.Core.Service.User;
 using GameFrameX.Core.Tests.ClientApi;

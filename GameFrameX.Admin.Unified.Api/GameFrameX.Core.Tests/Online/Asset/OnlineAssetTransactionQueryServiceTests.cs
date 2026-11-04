@@ -1,6 +1,6 @@
-using GameFrameX.Application.Game.Online.Asset;
-using GameFrameX.Application.Game.Online.Asset.Dto;
-using GameFrameX.Application.Game.ServerManager.Online;
+using GameFrameX.Application.GmCenter.Asset;
+using GameFrameX.Application.GmCenter.Asset.Dto;
+using GameFrameX.Application.ServerCenter.Online;
 using GameFrameX.Core.Exceptions;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Entity.Tenant.Game;

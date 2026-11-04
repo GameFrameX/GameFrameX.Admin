@@ -5,7 +5,7 @@ using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
-using GameFrameX.Application.Game.ServerManager;
+using GameFrameX.Application.ServerCenter;
 using GameFrameX.Client.Api.GameUserEmail.Dto;
 using GameFrameX.Client.Api.GameWebShop.Dto;
 using GameFrameX.Client.Api.Services;

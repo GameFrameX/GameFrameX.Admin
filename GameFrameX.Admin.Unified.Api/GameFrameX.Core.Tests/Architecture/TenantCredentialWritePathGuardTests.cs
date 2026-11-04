@@ -11,15 +11,15 @@ public sealed class TenantCredentialWritePathGuardTests
     /// </summary>
     private static readonly (string File, string Marker, int MinOccurrences)[] GuardedWritePaths =
     {
-        // 密钥环 / 凭证列直加密（Application.Game）
-        ("GameFrameX.Application.Game/Tenant/Security/TenantAppSignatureKey/TenantAppSignatureKeyEntityService.cs", "TenantSecretCrypto.Encrypt", 2),
-        ("GameFrameX.Application.Game/Tenant/Security/TenantSessionKey/TenantSessionKeyEntityService.cs", "TenantSecretCrypto.Encrypt", 2),
-        ("GameFrameX.Application.Game/Tenant/LoginTicket/TenantGameLoginTicketKey/TenantGameLoginTicketKeyEntityService.cs", "TenantSecretCrypto.Encrypt", 1),
-        ("GameFrameX.Application.Game/Tenant/ClientApiPolicy/TenantClientApiPolicy/TenantClientApiPolicyEntityService.cs", "TenantSecretCrypto.Encrypt", 2),
-        ("GameFrameX.Application.Game/Tenant/OpenAccess/TenantGameAppOpenAccess/TenantGameAppOpenAccessService.cs", "TenantSecretCrypto.Encrypt", 2),
-        ("GameFrameX.Application.Game/Tenant/Integration/TenantAdvertisementCallbackConfig/TenantAdvertisementCallbackConfigEntityService.cs", "TenantSecretCrypto.Encrypt", 4),
-        ("GameFrameX.Application.Game/Tenant/Integration/TenantAdvertisementCallbackConfig/TenantAdvertisementCallbackConfigEntityService.cs", "AdvertisementCallbackConfigCrypto.EncryptConfigJson", 2),
-        ("GameFrameX.Application.Game/Order/GamePaymentConfig/TenantGamePaymentConfigEntityService.cs", "PaymentConfigCrypto.EncryptConfigJson", 2),
+        // 密钥环 / 凭证列直加密（Application.Platform）
+        ("GameFrameX.Application/ClientDelivery/Security/AppSignatureKey/TenantAppSignatureKeyEntityService.cs", "TenantSecretCrypto.Encrypt", 2),
+        ("GameFrameX.Application/ClientDelivery/Security/SessionKey/TenantSessionKeyEntityService.cs", "TenantSecretCrypto.Encrypt", 2),
+        ("GameFrameX.Application/ClientDelivery/LoginTicket/GameLoginTicketKey/TenantGameLoginTicketKeyEntityService.cs", "TenantSecretCrypto.Encrypt", 1),
+        ("GameFrameX.Application/ClientDelivery/ClientApiPolicy/TenantClientApiPolicyEntityService.cs", "TenantSecretCrypto.Encrypt", 2),
+        ("GameFrameX.Application/Platform/OpenAccess/GameAppOpenAccess/TenantGameAppOpenAccessService.cs", "TenantSecretCrypto.Encrypt", 2),
+        ("GameFrameX.Application/ClientDelivery/AdvertisementCallbackConfig/TenantAdvertisementCallbackConfigEntityService.cs", "TenantSecretCrypto.Encrypt", 4),
+        ("GameFrameX.Application/ClientDelivery/AdvertisementCallbackConfig/TenantAdvertisementCallbackConfigEntityService.cs", "AdvertisementCallbackConfigCrypto.EncryptConfigJson", 2),
+        ("GameFrameX.Application/ClientDelivery/GamePaymentConfig/TenantGamePaymentConfigEntityService.cs", "PaymentConfigCrypto.EncryptConfigJson", 2),
         // 运行时签发路径（Client.Api）
         ("GameFrameX.Client.Api/Services/Auth/ClientApiSessionKeyIssuer.cs", "TenantSecretCrypto.Encrypt", 1),
         ("GameFrameX.Client.Api/Services/GameLoginTicket/GameLoginTicketKeyResolver.cs", "TenantSecretCrypto.Encrypt", 1),

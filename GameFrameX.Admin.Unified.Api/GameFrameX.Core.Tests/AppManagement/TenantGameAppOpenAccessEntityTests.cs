@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
-using GameFrameX.Application.Game.Tenant.OpenAccess.TenantGameAppOpenAccess;
-using GameFrameX.Application.Game.Tenant.OpenAccess.TenantGameAppOpenAccess.Dto;
+using GameFrameX.Application.Platform.OpenAccess.GameAppOpenAccess;
+using GameFrameX.Application.Platform.OpenAccess.GameAppOpenAccess.Dto;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Entity.Tenant.Game.App;
 

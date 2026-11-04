@@ -1,9 +1,9 @@
-using GameFrameX.Application.Game.Goods.GameCommodity;
-using GameFrameX.Application.Game.Goods.GameCommodity.Dto;
-using GameFrameX.Application.Game.Goods.GameGoods;
-using GameFrameX.Application.Game.Goods.GameGoods.Dto;
-using GameFrameX.Application.Game.Goods.GameGoodsCatalogue;
-using GameFrameX.Application.Game.Goods.GameGoodsCatalogue.Dto;
+using GameFrameX.Application.CommerceCenter.GameCommodity;
+using GameFrameX.Application.CommerceCenter.GameCommodity.Dto;
+using GameFrameX.Application.CommerceCenter.GameGoods;
+using GameFrameX.Application.CommerceCenter.GameGoods.Dto;
+using GameFrameX.Application.CommerceCenter.GameGoodsCatalogue;
+using GameFrameX.Application.CommerceCenter.GameGoodsCatalogue.Dto;
 using GameFrameX.Core.Exceptions;
 using GameFrameX.Core.Tests.ClientApi;
 using GameFrameX.Core.SqlSugar;

@@ -1,10 +1,10 @@
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Reflection;
-using GameFrameX.Application.Game.App.GameAppRemoteConfig.Dto;
-using GameFrameX.Application.Game.App.GameAppReleaseVersion.Dto;
-using GameFrameX.Application.Game.Announcement.GameAnnouncement.Dto;
-using GameFrameX.Application.Game.Mail.GameMailTemplate.Dto;
+using GameFrameX.Application.ClientDelivery.GameAppRemoteConfig.Dto;
+using GameFrameX.Application.ClientDelivery.GameAppReleaseVersion.Dto;
+using GameFrameX.Application.NoticeCenter.GameAnnouncement.Dto;
+using GameFrameX.Application.NoticeCenter.GameMailTemplate.Dto;
 using GameFrameX.Core.BaseInputOutput;
 
 namespace GameFrameX.Core.Tests.GameBusiness;

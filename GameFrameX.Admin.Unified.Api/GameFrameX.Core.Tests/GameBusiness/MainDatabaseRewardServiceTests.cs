@@ -1,7 +1,7 @@
-using GameFrameX.Application.Game.Reward.GameRewardTemplate;
-using GameFrameX.Application.Game.Reward.GameRewardTemplate.Dto;
-using GameFrameX.Application.Game.Reward.GameRewardTemplateGroup;
-using GameFrameX.Application.Game.Reward.GameRewardTemplateGroup.Dto;
+using GameFrameX.Application.NoticeCenter.GameRewardTemplate;
+using GameFrameX.Application.NoticeCenter.GameRewardTemplate.Dto;
+using GameFrameX.Application.NoticeCenter.GameRewardTemplateGroup;
+using GameFrameX.Application.NoticeCenter.GameRewardTemplateGroup.Dto;
 using GameFrameX.Core.Exceptions;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Core.Tests.ClientApi;

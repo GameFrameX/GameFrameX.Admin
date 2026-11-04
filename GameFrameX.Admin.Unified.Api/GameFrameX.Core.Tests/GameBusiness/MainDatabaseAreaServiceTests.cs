@@ -1,6 +1,6 @@
-using GameFrameX.Application.Game.Area.GameArea;
-using GameFrameX.Application.Game.Area.GameAreaClassify;
-using GameFrameX.Application.Game.Area.GameAreaClassify.Dto;
+using GameFrameX.Application.ServerCenter.GameArea;
+using GameFrameX.Application.ServerCenter.GameAreaClassify;
+using GameFrameX.Application.ServerCenter.GameAreaClassify.Dto;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Core.Tests.ClientApi;
 using GameFrameX.Entity.Tenant.Game;

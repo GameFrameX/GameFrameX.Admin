@@ -24,7 +24,7 @@ public sealed class SqlSugarTransactionBoundaryTests
         var assemblies = new[]
         {
             typeof(TenantUserService).Assembly,
-            typeof(GameFrameX.Application.System.OpenAccess.SystemOpenAccessService).Assembly,
+            typeof(GameFrameX.Application.Platform.OpenAccess.SystemOpenAccessService).Assembly,
         };
 
         var localTransactionMethods = assemblies

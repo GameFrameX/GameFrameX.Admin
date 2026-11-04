@@ -3,9 +3,9 @@ using GameFrameX.Core.Const.MenuSeed;
 using GameFrameX.Core.Enum;
 using GameFrameX.Entity.Enum;
 using GameFrameX.Entity.Global;
-using GameFrameX.Application.Game.Goods.GameCommodity;
-using GameFrameX.Application.Game.Goods.GameGoods;
-using GameFrameX.Application.Game.Goods.GameGoodsCatalogue;
+using GameFrameX.Application.CommerceCenter.GameCommodity;
+using GameFrameX.Application.CommerceCenter.GameGoods;
+using GameFrameX.Application.CommerceCenter.GameGoodsCatalogue;
 using GameFrameX.Core.Api;
 
 namespace GameFrameX.Application.SeedData.System;

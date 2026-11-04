@@ -2,14 +2,14 @@ namespace GameFrameX.Core.Tests.Architecture;
 
 // C341 / GFX-753（vault:C5 S4.9）：Online 匹配观测域零持久化守护测试。
 // Admin 定位为只读观测方：观测数据是运行态快照，Service 层禁止 Repository 注入、禁止 SqlSugar 客户端持有、
-// 禁止 Entity 引用（不落队列/Ticket 镜像表或缓存）。文本级源扫描 Application.Game/Online/Match/ 全部 .cs；
+// 禁止 Entity 引用（不落队列/Ticket 镜像表或缓存）。文本级源扫描 Application.Platform/Online/Match/ 全部 .cs；
 // 双断言：目录非空（防目录改名后扫描扑空静默绿）+ 禁用模式零命中。
 // root 定位沿用 AdminEndpointGoldenSnapshotTests.GetRepositoryRoot 模式（向上找 slnx）。
 public sealed class OnlineObservatoryNoPersistenceTests
 {
     private static readonly string MatchSourceDirectory = Path.Combine(
         GetRepositoryRoot(),
-        Path.Combine("GameFrameX.Application.Game", "Online", "Match"));
+        Path.Combine("GameFrameX.Application", "GmCenter", "Match"));
 
     // 禁用模式：仓储注入 / SqlSugar 客户端 / 表特性 / Entity 命名空间引用（含 global using 形态的整行排除判定）
     private static readonly string[] ForbiddenPatterns =
@@ -24,7 +24,7 @@ public sealed class OnlineObservatoryNoPersistenceTests
     [Fact]
     public void MatchObservatoryDirectory_ExistsAndHasSources()
     {
-        Assert.True(Directory.Exists(MatchSourceDirectory), "Application.Game/Online/Match/ 目录不存在（被改名或删除须回 change 评审）");
+        Assert.True(Directory.Exists(MatchSourceDirectory), "Application.Platform/Online/Match/ 目录不存在（被改名或删除须回 change 评审）");
 
         var sourceFiles = Directory.EnumerateFiles(MatchSourceDirectory, "*.cs", SearchOption.AllDirectories).ToList();
         Assert.NotEmpty(sourceFiles);

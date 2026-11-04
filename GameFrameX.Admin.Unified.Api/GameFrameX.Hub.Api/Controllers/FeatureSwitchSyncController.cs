@@ -1,4 +1,4 @@
-using GameFrameX.Application.Game.App.FeatureSwitch;
+using GameFrameX.Application.ClientDelivery.FeatureSwitch;
 using GameFrameX.Core.Service;
 using GameFrameX.Hub.Api.Const;
 using GameFrameX.Hub.Api.Dto.FeatureSwitchSync;

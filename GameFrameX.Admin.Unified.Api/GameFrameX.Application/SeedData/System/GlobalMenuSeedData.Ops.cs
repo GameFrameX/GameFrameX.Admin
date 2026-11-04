@@ -3,10 +3,10 @@ using GameFrameX.Core.Const.MenuSeed;
 using GameFrameX.Core.Enum;
 using GameFrameX.Entity.Enum;
 using GameFrameX.Entity.Global;
-using GameFrameX.Application.Game.Area.GameArea;
-using GameFrameX.Application.Game.Area.GameAreaClassify;
-using GameFrameX.Application.Game.DockerTag.GameDockerTag;
-using GameFrameX.Application.Game.Tenant.Penalty.TenantGamePenalty;
+using GameFrameX.Application.ServerCenter.GameArea;
+using GameFrameX.Application.ServerCenter.GameAreaClassify;
+using GameFrameX.Application.ServerCenter.GameDockerTag;
+using GameFrameX.Application.PlayerCenter.GamePenalty;
 using GameFrameX.Core.Api;
 
 namespace GameFrameX.Application.SeedData.System;

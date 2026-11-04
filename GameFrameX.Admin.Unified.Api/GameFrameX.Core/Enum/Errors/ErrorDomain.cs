@@ -22,7 +22,7 @@ public enum ErrorDomain
     Protocol = 2,
 
     /// <summary>
-    /// Admin 业务域（首位 3-5，按 Application.System 服务域一段一模块）。
+    /// Admin 业务域（首位 3-5，按 Application.Platform 服务域一段一模块）。
     /// </summary>
     AdminBusiness = 3,
 

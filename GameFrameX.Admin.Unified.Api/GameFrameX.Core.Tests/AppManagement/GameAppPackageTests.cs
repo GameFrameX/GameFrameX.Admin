@@ -1,7 +1,7 @@
 using GameFrameX.Entity.Tenant.Game.App;
 using System.ComponentModel.DataAnnotations;
-using GameFrameX.Application.Game.App.GameAppPackage.Dto;
-using GameFrameX.Application.Game.App.GameAppPackage;
+using GameFrameX.Application.ClientDelivery.GameAppPackage.Dto;
+using GameFrameX.Application.ClientDelivery.GameAppPackage;
 using GameFrameX.Core.Enum;
 using ApiDescriptionSettingsAttribute = GameFrameX.Core.Api.ApiDescriptionSettingsAttribute;
 using Microsoft.AspNetCore.Mvc;

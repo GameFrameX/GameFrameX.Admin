@@ -1,8 +1,8 @@
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
-using GameFrameX.Application.Game.App.GameAppServerConfig;
-using GameFrameX.Application.Game.App.GameAppServerConfig.Dto;
+using GameFrameX.Application.ClientDelivery.GameAppServerConfig;
+using GameFrameX.Application.ClientDelivery.GameAppServerConfig.Dto;
 using GameFrameX.Core.Exceptions;
 using GameFrameX.Core.Extension;
 using GameFrameX.Core.SqlSugar;

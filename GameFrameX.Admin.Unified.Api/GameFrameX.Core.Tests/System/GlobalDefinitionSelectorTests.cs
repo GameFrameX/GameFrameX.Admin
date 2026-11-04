@@ -1,5 +1,5 @@
-using GameFrameX.Application.System.GlobalLanguage;
-using GameFrameX.Application.System.GlobalPlatform;
+using GameFrameX.Application.Platform.GlobalLanguage;
+using GameFrameX.Application.Platform.GlobalPlatform;
 using GameFrameX.Core.BaseInputOutput;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Entity.Global;

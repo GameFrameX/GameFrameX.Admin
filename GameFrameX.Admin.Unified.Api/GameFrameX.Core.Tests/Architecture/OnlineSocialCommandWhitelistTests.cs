@@ -11,10 +11,10 @@ public sealed class OnlineSocialCommandWhitelistTests
     private static readonly string RepositoryRoot = GetRepositoryRoot();
 
     private static readonly string SocialSourceDirectory = Path.Combine(
-        RepositoryRoot, "GameFrameX.Application.Game", "Online", "Social");
+        RepositoryRoot, "GameFrameX.Application", "GmCenter", "Social");
 
     private static readonly string ApplicationGameSourceDirectory = Path.Combine(
-        RepositoryRoot, "GameFrameX.Application.Game");
+        RepositoryRoot, "GameFrameX.Application");
 
     /// <summary>SqlSugar 写路径 API 标识符：Online/Social 源码出现任意一个即违反「事实源只经 EntityService 写入」边界。</summary>
     private static readonly string[] WriteApiTokens =

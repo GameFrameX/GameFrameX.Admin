@@ -1,4 +1,4 @@
-using GameFrameX.Application.Game.RedeemCode.GameRedeemCodeUseRecord.Dto;
+using GameFrameX.Application.CommerceCenter.GameRedeemCodeUseRecord.Dto;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Entity.Tenant.Game;
 using SqlSugar;

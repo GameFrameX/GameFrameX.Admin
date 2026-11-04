@@ -1,5 +1,5 @@
 using System.Net;
-using GameFrameX.Application.Game.Home.GameHome;
+using GameFrameX.Application.Dashboard.GameHome;
 using GameFrameX.Core.Exceptions;
 using GameFrameX.Core.Service.Tenant;
 using GameFrameX.Core.SqlSugar;

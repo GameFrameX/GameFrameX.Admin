@@ -1,5 +1,5 @@
-using GameFrameX.Application.Game.App.GameAppVersionDefinition;
-using GameFrameX.Application.Game.App.GameAppVersionDefinition.Dto;
+using GameFrameX.Application.ClientDelivery.GameAppVersionDefinition;
+using GameFrameX.Application.ClientDelivery.GameAppVersionDefinition.Dto;
 using GameFrameX.Core.Exceptions;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Core.Tests.ClientApi;

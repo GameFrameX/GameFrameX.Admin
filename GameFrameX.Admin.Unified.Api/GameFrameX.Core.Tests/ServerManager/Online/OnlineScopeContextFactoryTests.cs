@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Security.Claims;
-using GameFrameX.Application.Game.ServerManager.Online;
+using GameFrameX.Application.ServerCenter.Online;
 using GameFrameX.Core.Const;
 using GameFrameX.Core.Exceptions;
 using GameFrameX.Core.Service.User;

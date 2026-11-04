@@ -1,4 +1,4 @@
-using GameFrameX.Application.Game.Goods.GameCommodity;
+using GameFrameX.Application.CommerceCenter.GameCommodity;
 using GameFrameX.Core.Enum.Errors;
 using GameFrameX.Core.Exceptions;
 

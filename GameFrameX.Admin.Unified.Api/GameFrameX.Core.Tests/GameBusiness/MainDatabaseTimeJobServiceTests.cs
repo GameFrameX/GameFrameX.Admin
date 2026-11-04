@@ -1,5 +1,5 @@
-using GameFrameX.Application.Game.TimeJob.GameTimeJob;
-using GameFrameX.Application.Game.TimeJob.GameTimeJob.Dto;
+using GameFrameX.Application.Platform.TimeJob.GameTimeJob;
+using GameFrameX.Application.Platform.TimeJob.GameTimeJob.Dto;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Core.Tests.ClientApi;
 using GameFrameX.Entity.Tenant.Game;

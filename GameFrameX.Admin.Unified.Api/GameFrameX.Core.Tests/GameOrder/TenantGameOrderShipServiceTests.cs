@@ -1,6 +1,6 @@
-using GameFrameX.Application.Game.Order.GameOrder;
+using GameFrameX.Application.CommerceCenter.GameOrder;
 using GameFrameX.Core.Enum;
-using GameFrameX.Application.Game.Order.GameOrder.Dto;
+using GameFrameX.Application.CommerceCenter.GameOrder.Dto;
 using GameFrameX.Entity.Enum;
 using GameFrameX.Entity.Tenant.Game;
 using GameFrameX.Foundation.Http.Normalization;

@@ -3,8 +3,8 @@ using GameFrameX.Core.Const.MenuSeed;
 using GameFrameX.Core.Enum;
 using GameFrameX.Entity.Enum;
 using GameFrameX.Entity.Global;
-using GameFrameX.Application.Game.Order.GameWebShopOrder;
-using GameFrameX.Application.Game.WebShop.GameWebShop;
+using GameFrameX.Application.CommerceCenter.GameWebShopOrder;
+using GameFrameX.Application.CommerceCenter.GameWebShop;
 using GameFrameX.Core.Api;
 
 namespace GameFrameX.Application.SeedData.System;

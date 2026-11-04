@@ -1,4 +1,4 @@
-using GameFrameX.Application.Game.System.Email;
+using GameFrameX.Application.Platform.Email;
 using GameFrameX.Entity.Tenant.ClientApiConfig;
 using GameFrameX.Entity.System;
 using GameFrameX.Client.Api.Services.Email;

@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Security.Claims;
-using GameFrameX.Application.Game.Online.LiveOps.Dispatch;
-using GameFrameX.Application.Game.Online.LiveOps.Dispatch.Dto;
-using GameFrameX.Application.Game.ServerManager.Online;
+using GameFrameX.Application.GmCenter.LiveOps.Dispatch;
+using GameFrameX.Application.GmCenter.LiveOps.Dispatch.Dto;
+using GameFrameX.Application.ServerCenter.Online;
 using GameFrameX.Core.Const;
 using GameFrameX.Core.Exceptions;
 using GameFrameX.Core.Service.User;

@@ -8,7 +8,7 @@ using GameFrameX.Core.Tests.System;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Core.Enum;
 using GameFrameX.Core.Const.MenuSeed;
-using GameFrameX.Application.Game.TimeJob.GameTimeJob.Dto;
+using GameFrameX.Application.Platform.TimeJob.GameTimeJob.Dto;
 using GameFrameX.Entity.Enum;
 using GameFrameX.Entity.Tenant.Game;
 using GameFrameX.Entity.Global;

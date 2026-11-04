@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using GameFrameX.Core.Service;
 using System.Net;
-using GameFrameX.Application.Game.ServerManager;
+using GameFrameX.Application.ServerCenter;
 using GameFrameX.Hub.Api.Dto.GameArea;
 using GameFrameX.Core.BaseInputOutput;
 using GameFrameX.Entity.Enum;

@@ -1,4 +1,4 @@
-using GameFrameX.Application.Game.Online.Match;
+using GameFrameX.Application.GmCenter.Match;
 
 namespace GameFrameX.Core.Tests.Online.Match;
 
