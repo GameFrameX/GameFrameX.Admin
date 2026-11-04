@@ -1,11 +1,13 @@
 using GameFrameX.Client.Api.GameWebShop;
 using System.Globalization;
 using System.Net;
+using GameFrameX.Client.Api.GameUserEmail.Dto;
 using GameFrameX.Client.Api.GameWebShop.Dto;
 using GameFrameX.Core.Enum;
 using GameFrameX.Entity.Enum;
 using GameFrameX.Entity.System;
 using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Foundation.Http.Normalization;
 using GameFrameX.Foundation.Json;
 using Microsoft.AspNetCore.Mvc;
 
@@ -32,14 +34,14 @@ public sealed class ClientApiWebShopEndpointTests
     }
 
     [Fact]
-    public async Task GameWebShop_Buy_UsesConfiguredCallbackUrlWithoutTenantOrAppSegments()
+    public async Task GameWebShop_Buy_BuildsCallbackUrlFromSiteRootWithPackageSegment()
     {
         using var db = new ClientApiTestDb();
         db.SeedAreaClassify(10);
         db.SeedArea(2001, 10);
         db.SeedRole(3001, 1001, 2001);
         db.SeedWebShop(5001, "6.50", ItemJson());
-        db.SeedSystemConfig("web_shop_params", WebShopConfigJson());
+        db.SeedSystemConfig("web_shop_params", WebShopConfigJson("https://client.example.test"));
         var handler = ClientApiRecordingHttpHandler.WithGameServerDefaults();
         var controller = CreateController(db, handler);
         controller.ControllerContext = new ControllerContext { HttpContext = db.CreateHttpContext(true, true, 7001), };
@@ -55,7 +57,65 @@ public sealed class ClientApiWebShopEndpointTests
         var root = ClientApiResultReader.Read(result);
         Assert.Equal(0, ClientApiResultReader.Code(root));
         Assert.Contains("/submit.php", handler.RequestPaths);
-        Assert.Contains(handler.RequestBodies, requestBody => requestBody.Contains("NotifyWebShop", StringComparison.Ordinal));
+        // 站点根地址自动补全路由段 + 当前分包段，提交给网关的 notify_url 能命中 {packageId} 路由
+        Assert.Contains(handler.RequestBodies, requestBody => requestBody.Contains("notify_url=https%3A%2F%2Fclient.example.test%2Fapi%2FGameWebShop%2FNotifyWebShop%2F7001", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public async Task GameWebShop_Buy_NormalizesLegacyThreeSegmentCallbackUrl()
+    {
+        using var db = new ClientApiTestDb();
+        db.SeedAreaClassify(10);
+        db.SeedArea(2001, 10);
+        db.SeedRole(3001, 1001, 2001);
+        db.SeedWebShop(5001, "6.50", ItemJson());
+        db.SeedSystemConfig("web_shop_params", WebShopConfigJson("https://client.example.test/api/GameWebShop/NotifyWebShop/123/456/7001"));
+        var handler = ClientApiRecordingHttpHandler.WithGameServerDefaults();
+        var controller = CreateController(db, handler);
+        controller.ControllerContext = new ControllerContext { HttpContext = db.CreateHttpContext(true, true, 7001), };
+
+        var result = await controller.Buy(new TenantGameWebShopEntityBuyRequest
+        {
+            Id = 5001,
+            AreaId = 2001,
+            RoleId = 3001,
+            Type = "alipay",
+        });
+
+        var root = ClientApiResultReader.Read(result);
+        Assert.Equal(0, ClientApiResultReader.Code(root));
+        // 旧「回调/租户/应用/分包」三段地址被去段重建，只保留新路由 + 当前分包段
+        Assert.Contains(handler.RequestBodies, requestBody => requestBody.Contains("NotifyWebShop%2F7001", StringComparison.Ordinal));
+        Assert.DoesNotContain(handler.RequestBodies, requestBody => requestBody.Contains("NotifyWebShop%2F123", StringComparison.Ordinal));
+        Assert.DoesNotContain(handler.RequestBodies, requestBody => requestBody.Contains("NotifyWebShop%2F456", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public async Task GameWebShop_Buy_RejectsUnmappableCallbackUrl()
+    {
+        using var db = new ClientApiTestDb();
+        db.SeedAreaClassify(10);
+        db.SeedArea(2001, 10);
+        db.SeedRole(3001, 1001, 2001);
+        db.SeedWebShop(5001, "6.50", ItemJson());
+        db.SeedSystemConfig("web_shop_params", WebShopConfigJson("https://client.example.test/pay/notify"));
+        var handler = ClientApiRecordingHttpHandler.WithGameServerDefaults();
+        var controller = CreateController(db, handler);
+        db.AttachContext(controller);
+
+        var result = await controller.Buy(new TenantGameWebShopEntityBuyRequest
+        {
+            Id = 5001,
+            AreaId = 2001,
+            RoleId = 3001,
+            Type = "alipay",
+        });
+
+        var root = ClientApiResultReader.Read(result);
+        // 无法映射到回调路由的地址在下单前拒绝：不提交网关、不预创建订单
+        Assert.Equal((int)AreaErrorCode.AreaCannotBuy, ClientApiResultReader.Code(root));
+        Assert.DoesNotContain("/submit.php", handler.RequestPaths);
+        Assert.Equal(0, await db.MainDb.Queryable<TenantGameOrderEntity>().CountAsync());
     }
 
     [Fact]
@@ -133,10 +193,12 @@ public sealed class ClientApiWebShopEndpointTests
         Assert.Equal(OrderStatusEnum.Shipped, order.Status);
         Assert.Equal(650, role.AllRecharge);
         Assert.Equal(1, handler.Count("/game/api/post_mail"));
+        // 邮件按订单快照发货：商品 Id 已映射为道具 ConfigId
+        Assert.Contains(handler.RequestBodies, requestBody => requestBody.Contains("90011", StringComparison.Ordinal));
     }
 
     [Fact]
-    public async Task GameWebShop_NotifyWebShop_EnforceMode_RejectsForgedSign()
+    public async Task GameWebShop_NotifyWebShop_RejectsForgedSign()
     {
         using var db = new ClientApiTestDb();
         db.SeedAreaClassify(10);
@@ -144,7 +206,7 @@ public sealed class ClientApiWebShopEndpointTests
         db.SeedRole(3001, 1001, 2001);
         db.SeedGoods(11, configId: 90011);
         db.SeedWebShop(5001, "6.50", ItemJson());
-        db.SeedSystemConfig("web_shop_params", WebShopConfigJson("enforce"));
+        db.SeedSystemConfig("web_shop_params", WebShopConfigJson());
         var handler = ClientApiRecordingHttpHandler.WithGameServerDefaults();
         var controller = CreateController(db, handler);
         db.AttachContext(controller);
@@ -156,12 +218,83 @@ public sealed class ClientApiWebShopEndpointTests
         var order = await db.TenantDb.Queryable<TenantGameOrderEntity>().FirstAsync(u => u.OrderId == outTradeNo);
         var role = await db.TenantDb.Queryable<TenantGameRoleEntity>().FirstAsync(u => u.Id == 3001);
         var failedOrders = await db.TenantDb.Queryable<TenantGameWebShopOrderEntity>().ToListAsync();
+        // 验签缺省强制：伪造签名一律拒绝且不发货（不再有 log 灰度放行）
         Assert.Equal((int)AuthErrorCode.SignatureVerifyFailed, ClientApiResultReader.Code(root));
         Assert.Equal(OrderStatusEnum.Unpaid, order.Status);
         Assert.Equal(0, role.AllRecharge);
         Assert.Equal(0, handler.Count("/game/api/post_mail"));
         Assert.Single(failedOrders);
         Assert.Contains("验签失败", failedOrders[0].Reason);
+    }
+
+    [Fact]
+    public async Task GameWebShop_NotifyWebShop_ShipsFromOrderSnapshotWhenShopChangedOrDelisted()
+    {
+        using var db = new ClientApiTestDb();
+        db.SeedAreaClassify(10);
+        db.SeedArea(2001, 10);
+        db.SeedRole(3001, 1001, 2001);
+        db.SeedGoods(11, configId: 90011);
+        db.SeedGoods(12, configId: 90012);
+        // 下单后商品被修改（换成 goods 12）并下架：发货仍按订单快照（goods 11）
+        db.SeedWebShop(5001, "6.50", JsonHelper.Serialize(new[] { new PropertyItemResponse { Id = 12, ItemId = 12, Count = 9, }, }), isUp: false);
+        db.SeedSystemConfig("web_shop_params", WebShopConfigJson());
+        var handler = ClientApiRecordingHttpHandler.WithGameServerDefaults();
+        var controller = CreateController(db, handler);
+        db.AttachContext(controller);
+
+        var outTradeNo = await SeedUnpaidOrderAsync(db);
+        var result = await controller.NotifyWebShop(BuildSignedNotifyRequest(outTradeNo, 6.50m, "sign-secret"));
+
+        var root = ClientApiResultReader.Read(result);
+        var order = await db.TenantDb.Queryable<TenantGameOrderEntity>().FirstAsync(u => u.OrderId == outTradeNo);
+        var role = await db.TenantDb.Queryable<TenantGameRoleEntity>().FirstAsync(u => u.Id == 3001);
+        Assert.Equal(0, ClientApiResultReader.Code(root));
+        Assert.Equal(OrderStatusEnum.Shipped, order.Status);
+        Assert.Equal(650, role.AllRecharge);
+        Assert.Equal(1, handler.Count("/game/api/post_mail"));
+        // 邮件内容来自订单快照的 goods 11（ConfigId 90011），不是商品当前被改成的 goods 12
+        Assert.Contains(handler.RequestBodies, requestBody => requestBody.Contains("90011", StringComparison.Ordinal));
+        Assert.DoesNotContain(handler.RequestBodies, requestBody => requestBody.Contains("90012", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public async Task GameWebShop_NotifyWebShop_MailFailureKeepsOrderRetryableThenSucceedsOnRetry()
+    {
+        using var db = new ClientApiTestDb();
+        db.SeedAreaClassify(10);
+        db.SeedArea(2001, 10);
+        db.SeedRole(3001, 1001, 2001);
+        db.SeedGoods(11, configId: 90011);
+        db.SeedWebShop(5001, "6.50", ItemJson());
+        db.SeedSystemConfig("web_shop_params", WebShopConfigJson());
+        var handler = ClientApiRecordingHttpHandler.WithGameServerDefaults();
+        handler.SetJson("/game/api/post_mail", HttpJsonResultData<GameWebShpBuySendMailResponse>.Fail("游戏服邮件网关不可用").ToString());
+        var controller = CreateController(db, handler);
+        db.AttachContext(controller);
+
+        var outTradeNo = await SeedUnpaidOrderAsync(db);
+        var failed = ClientApiResultReader.Read(await controller.NotifyWebShop(BuildSignedNotifyRequest(outTradeNo, 6.50m, "sign-secret")));
+
+        var orderAfterFailure = await db.TenantDb.Queryable<TenantGameOrderEntity>().FirstAsync(u => u.OrderId == outTradeNo);
+        var roleAfterFailure = await db.TenantDb.Queryable<TenantGameRoleEntity>().FirstAsync(u => u.Id == 3001);
+        var failedRows = await db.TenantDb.Queryable<TenantGameWebShopOrderEntity>().ToListAsync();
+        // 发货失败：订单不能停在已完成，保留 NotShipped 可重试状态，累充不增加
+        Assert.Equal((int)AreaErrorCode.AreaCannotBuy, ClientApiResultReader.Code(failed));
+        Assert.Equal(OrderStatusEnum.NotShipped, orderAfterFailure.Status);
+        Assert.Equal(0, roleAfterFailure.AllRecharge);
+        Assert.Single(failedRows);
+
+        // 游戏服恢复后网关重试：重新发货成功，迁移 Shipped 并恰一累充
+        handler.SetJson("/game/api/post_mail", HttpJsonResultData<string>.Success(JsonHelper.Serialize(new GameWebShpBuySendMailResponse { ErrorCode = 0, })).ToString());
+        var retried = ClientApiResultReader.Read(await controller.NotifyWebShop(BuildSignedNotifyRequest(outTradeNo, 6.50m, "sign-secret")));
+
+        var orderAfterRetry = await db.TenantDb.Queryable<TenantGameOrderEntity>().FirstAsync(u => u.OrderId == outTradeNo);
+        var roleAfterRetry = await db.TenantDb.Queryable<TenantGameRoleEntity>().FirstAsync(u => u.Id == 3001);
+        Assert.Equal(0, ClientApiResultReader.Code(retried));
+        Assert.Equal(OrderStatusEnum.Shipped, orderAfterRetry.Status);
+        Assert.Equal(650, roleAfterRetry.AllRecharge);
+        Assert.Equal(2, handler.Count("/game/api/post_mail"));
     }
 
     [Fact]
@@ -222,30 +355,6 @@ public sealed class ClientApiWebShopEndpointTests
     }
 
     [Fact]
-    public async Task GameWebShop_NotifyWebShop_LogMode_AllowsMismatchedSignAndShips()
-    {
-        using var db = new ClientApiTestDb();
-        db.SeedAreaClassify(10);
-        db.SeedArea(2001, 10);
-        db.SeedRole(3001, 1001, 2001);
-        db.SeedGoods(11, configId: 90011);
-        db.SeedWebShop(5001, "6.50", ItemJson());
-        db.SeedSystemConfig("web_shop_params", WebShopConfigJson());
-        var handler = ClientApiRecordingHttpHandler.WithGameServerDefaults();
-        var controller = CreateController(db, handler);
-        db.AttachContext(controller);
-
-        var outTradeNo = await SeedUnpaidOrderAsync(db);
-        var result = await controller.NotifyWebShop(BuildSignedNotifyRequest(outTradeNo, 6.50m, "sign-secret", "forged-sign"));
-
-        var root = ClientApiResultReader.Read(result);
-        var order = await db.TenantDb.Queryable<TenantGameOrderEntity>().FirstAsync(u => u.OrderId == outTradeNo);
-        Assert.Equal(0, ClientApiResultReader.Code(root));
-        Assert.Equal(OrderStatusEnum.Shipped, order.Status);
-        Assert.Equal(1, handler.Count("/game/api/post_mail"));
-    }
-
-    [Fact]
     public async Task GameWebShop_NotifyWebShop_RejectsUnknownOrder()
     {
         using var db = new ClientApiTestDb();
@@ -286,7 +395,7 @@ public sealed class ClientApiWebShopEndpointTests
         Assert.Contains("联系管理员", ClientApiResultReader.Message(root));
     }
 
-    // 当前下单因回调升级而拒绝，入站回调测试使用发布前已创建的订单快照。
+    // 入站回调测试使用 Buy 同口径的预创建订单快照（Content 含 RewardsItem）。
     private static async Task<string> SeedUnpaidOrderAsync(ClientApiTestDb db)
     {
         const string orderId = "800000000000001";
@@ -300,7 +409,17 @@ public sealed class ClientApiWebShopEndpointTests
             AccountId = "1001",
             Amount = 650,
             Status = OrderStatusEnum.Unpaid,
-            Content = "{}",
+            Content = JsonHelper.Serialize(new PlayerCreateOrderResponse
+            {
+                RoleId = 3001,
+                Sku = 5001,
+                Amount = 650,
+                IsNeedPay = true,
+                RewardsItem = new List<PropertyItemResponse>
+                {
+                    new() { Id = 11, ItemId = 11, Count = 2, },
+                },
+            }),
             Channel = "聚支付平台",
             PayChannel = "网页支付",
             Platform = "web",
@@ -377,15 +496,14 @@ public sealed class ClientApiWebShopEndpointTests
         return JsonHelper.Serialize(new[] { new PropertyItemResponse { Id = 11, ItemId = 11, Count = 2, }, });
     }
 
-    private static string WebShopConfigJson(string verifySignMode = "log")
+    private static string WebShopConfigJson(string notifyUrl = "https://client.example.test/api/GameWebShop/NotifyWebShop")
     {
         return JsonHelper.Serialize(new GameWebConfig
         {
-            VerifySignMode = verifySignMode,
             Pid = "pid",
             Type = "alipay",
             Sign = "sign-secret",
-            NotifyUrl = "https://client.example.test/api/GameWebShop/NotifyWebShop",
+            NotifyUrl = notifyUrl,
             ReturnUrl = "https://client.example.test/return",
             WebShopTitle = "Gift",
             WebShopSubTitle = "Gift sub",
