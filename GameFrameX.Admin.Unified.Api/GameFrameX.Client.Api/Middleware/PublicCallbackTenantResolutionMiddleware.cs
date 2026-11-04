@@ -4,7 +4,7 @@ using GameFrameX.Client.Api.Integrations.Payment;
 namespace GameFrameX.Client.Api.Middleware;
 
 /// <summary>
-/// 公开 provider 回调租户解析中间件。
+/// 公开 provider 回调路由解析中间件。
 /// <para>该中间件只处理白名单回调入口；provider 签名或 JWT 仍由具体回调 action 使用主库配置校验。</para>
 /// </summary>
 public sealed class PublicCallbackTenantResolutionMiddleware
@@ -38,7 +38,6 @@ public sealed class PublicCallbackTenantResolutionMiddleware
             return;
         }
 
-        // S3/C401 断链修复点：保留旧路由入口，移除租户和应用上下文。
         context.Items[PublicCallbackRouteContext.ItemKey] = routeContext;
         if (routeContext.PackageId.HasValue)
         {

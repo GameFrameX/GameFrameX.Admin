@@ -16,15 +16,13 @@ namespace GameFrameX.Core.Tests.ClientApi;
 public sealed class PublicCallbackTenantRoutingTests
 {
     [Fact]
-    public async Task Middleware_WithValidRouteParameters_EstablishesCallbackContextBeforeNext()
+    public async Task Middleware_WithPackageRouteParameter_EstablishesCallbackContextBeforeNext()
     {
         const long packageId = 1900000000201;
         using (var fixture = CreateFixture(packageId))
         {
             var context = new DefaultHttpContext();
             SetPublicCallbackEndpoint(context, "alipay", "payment");
-            context.Request.RouteValues["tenantId"] = 1900000000001L;
-            context.Request.RouteValues["appId"] = 1900000000101L;
             context.Request.RouteValues["packageId"] = packageId;
             var nextCalled = false;
             var middleware = new PublicCallbackTenantResolutionMiddleware(current =>
@@ -43,16 +41,19 @@ public sealed class PublicCallbackTenantRoutingTests
     }
 
     [Fact]
-    public async Task Middleware_MissingRouteParameters_FailsClosedBeforeNext()
+    public async Task Middleware_WithoutPackageRouteParameter_EstablishesCallbackContext()
     {
         using (var fixture = CreateFixture())
         {
             var context = new DefaultHttpContext();
             SetPublicCallbackEndpoint(context, "alipay", "payment");
-            context.Request.RouteValues["tenantId"] = 1900000001001L;
-            var middleware = new PublicCallbackTenantResolutionMiddleware(_ => throw new InvalidOperationException("不应进入下游控制器"));
+            var middleware = new PublicCallbackTenantResolutionMiddleware(current =>
+            {
+                Assert.IsType<PublicCallbackRouteContext>(current.Items[PublicCallbackRouteContext.ItemKey]);
+                return Task.CompletedTask;
+            });
             await middleware.InvokeAsync(context, new PublicCallbackRouteResolver(fixture.MainDb));
-            Assert.Equal(400, context.Response.StatusCode);
+            Assert.Equal(200, context.Response.StatusCode);
             Assert.False(context.Items.ContainsKey("TenantId"));
         }
     }
@@ -73,19 +74,18 @@ public sealed class PublicCallbackTenantRoutingTests
     }
 
     [Fact]
-    public void PaymentProvider_RejectsOutboundAliPayUntilCallbackRouteUpgrade()
+    public void PaymentProvider_UsesConfiguredAliPayCallbackUrlWithoutTenantScope()
     {
         const long packageId = 1900000003201;
         using (var fixture = CreateFixture(packageId))
         {
             InsertAliPayConfig(fixture.MainDb, true);
             var context = new DefaultHttpContext();
-            context.Items["TenantId"] = 1900000003001L;
             context.Items[PaymentOptionSettingProvider.PackageIdKey] = packageId;
             context.Items[PaymentOptionSettingProvider.PaymentIsSandboxKey] = true;
             var provider = new PaymentOptionSettingProvider(fixture.MainDb, new HttpContextAccessor { HttpContext = context });
-            var error = Assert.Throws<InvalidOperationException>(() => provider.GetOptionSetting<AliPayOptionSetting>("alipay"));
-            Assert.Contains("完整支付回调路由", error.Message);
+            var setting = provider.GetOptionSetting<AliPayOptionSetting>("alipay");
+            Assert.Equal("https://client.example.com/api/GameOrder/NotifyAliPay", setting.AliPayNotifyUrl);
         }
     }
 

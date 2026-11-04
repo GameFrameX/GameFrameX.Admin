@@ -46,7 +46,7 @@ public partial class GameOrderController
     /// </summary>
     /// <returns></returns>
     [PublicCallbackEndpoint("apple", "payment")]
-    [HttpPost("{tenantId:long}/{appId:long}/{packageId:long?}")]
+    [HttpPost("{packageId:long?}")]
     public async Task<HttpJsonResultData<BaseOperationAckResponse>> NotifyApple()
     {
         using (var reader = new StreamReader(Request.Body, Encoding.UTF8))

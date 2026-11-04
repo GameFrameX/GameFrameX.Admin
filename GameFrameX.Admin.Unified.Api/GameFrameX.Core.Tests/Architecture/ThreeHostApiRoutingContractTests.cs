@@ -91,7 +91,7 @@ public sealed class ThreeHostApiRoutingContractTests
     [Theory]
     [InlineData(typeof(GameUserController), nameof(GameUserController.WeChatLogin), "POST", null)]
     [InlineData(typeof(GameAnnouncementController), nameof(GameAnnouncementController.List), "GET", null)]
-    [InlineData(typeof(GameWebShopController), nameof(GameWebShopController.NotifyWebShop), "GET", "{tenantId:long}/{appId:long}/{packageId:long?}")]
+    [InlineData(typeof(GameWebShopController), nameof(GameWebShopController.NotifyWebShop), "GET", "{packageId:long?}")]
     [InlineData(typeof(GameOrderController), nameof(GameOrderController.Create), "POST", null)]
     [InlineData(typeof(GameLoginTicketKeyController), nameof(GameLoginTicketKeyController.PublicKeys), "GET", null)]
     [InlineData(typeof(HubGameAreaController), nameof(HubGameAreaController.ServerVersionAdd), "POST", null)]

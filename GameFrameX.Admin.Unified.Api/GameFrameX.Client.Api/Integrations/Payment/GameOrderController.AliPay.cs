@@ -13,7 +13,7 @@ public partial class GameOrderController
     /// </summary>
     /// <returns></returns>
     [PublicCallbackEndpoint("alipay", "payment")]
-    [HttpPost("{tenantId:long}/{appId:long}/{packageId:long?}")]
+    [HttpPost("{packageId:long?}")]
     public async Task<HttpJsonResultData<BaseOperationAckResponse>> NotifyAliPay()
     {
         var data = GetAliPayNotifyParameters();

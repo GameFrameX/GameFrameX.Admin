@@ -23,11 +23,11 @@ internal static class ClientApiEndpointCoverageMatrix
         Endpoint("GameLoginTicketKey.PublicKeys", "GET", "api/GameLoginTicketKey/PublicKeys", "ticket", true, true, false, false, "returns tenant-app public keys only", "missing-tenant", "missing-app", "private-key-not-returned"),
 
         Endpoint("GameOrder.Create", "POST", "api/GameOrder/Create", "payment", true, true, false, false, "creates order and payment payload", "missing-app", "area-not-found", "role-not-found", "unsupported-channel", "amount-boundary"),
-        Endpoint("GameOrder.NotifyAliPay", "POST", "api/GameOrder/NotifyAliPay/{tenantId:long}/{appId:long}/{packageId:long?}", "payment-callback", true, true, false, true, "valid AliPay notify ships once", "invalid-route", "signature-failed", "order-not-found", "amount-mismatch", "duplicate-callback"),
-        Endpoint("GameOrder.NotifyApple", "POST", "api/GameOrder/NotifyApple/{tenantId:long}/{appId:long}/{packageId:long?}", "payment-callback", true, true, false, true, "valid Apple notification ships once", "invalid-route", "signature-failed", "order-not-found", "duplicate-callback", "refund-boundary"),
-        Endpoint("GameOrder.NotifyGoogle", "POST", "api/GameOrder/NotifyGoogle/{tenantId:long}/{appId:long}/{packageId:long?}", "payment-callback", true, true, false, true, "valid Google Pub/Sub ships once", "invalid-route", "jwt-failed", "purchase-invalid", "order-not-found", "duplicate-callback"),
-        Endpoint("GameOrder.NotifyWeChatPay", "POST", "api/GameOrder/NotifyWeChatPay/{tenantId:long}/{appId:long}/{packageId:long?}", "payment-callback", true, true, false, true, "valid WeChat Pay callback ships once", "invalid-route", "signature-failed", "amount-mismatch", "duplicate-callback"),
-        Endpoint("GameOrder.NotifyXsolla", "POST", "api/GameOrder/NotifyXsolla/{tenantId:long}/{appId:long}/{packageId:long?}", "payment-callback", true, true, false, true, "valid Xsolla webhook ships once", "invalid-route", "signature-failed", "notification-unsupported", "order-not-found", "duplicate-callback"),
+        Endpoint("GameOrder.NotifyAliPay", "POST", "api/GameOrder/NotifyAliPay/{packageId:long?}", "payment-callback", false, false, false, true, "valid AliPay notify ships once", "invalid-route", "signature-failed", "order-not-found", "amount-mismatch", "duplicate-callback"),
+        Endpoint("GameOrder.NotifyApple", "POST", "api/GameOrder/NotifyApple/{packageId:long?}", "payment-callback", false, false, false, true, "valid Apple notification ships once", "invalid-route", "signature-failed", "order-not-found", "duplicate-callback", "refund-boundary"),
+        Endpoint("GameOrder.NotifyGoogle", "POST", "api/GameOrder/NotifyGoogle/{packageId:long?}", "payment-callback", false, false, false, true, "valid Google Pub/Sub ships once", "invalid-route", "jwt-failed", "purchase-invalid", "order-not-found", "duplicate-callback"),
+        Endpoint("GameOrder.NotifyWeChatPay", "POST", "api/GameOrder/NotifyWeChatPay/{packageId:long?}", "payment-callback", false, false, false, true, "valid WeChat Pay callback ships once", "invalid-route", "signature-failed", "amount-mismatch", "duplicate-callback"),
+        Endpoint("GameOrder.NotifyXsolla", "POST", "api/GameOrder/NotifyXsolla/{packageId:long?}", "payment-callback", false, false, false, true, "valid Xsolla webhook ships once", "invalid-route", "signature-failed", "notification-unsupported", "order-not-found", "duplicate-callback"),
 
         Endpoint("GameRedeemCode.Consume", "POST", "api/GameRedeemCode/Consume", "redeem-code", true, true, false, false, "consumes active code once and sends item", "missing-app", "code-not-found", "not-active", "expired", "limit-exhausted", "already-used", "area-not-found"),
 
@@ -97,7 +97,7 @@ internal static class ClientApiEndpointCoverageMatrix
 
         Endpoint("GameWebShop.Get", "GET", "api/GameWebShop/Get", "web-shop", true, true, false, false, "lists enabled webshop goods", "missing-tenant", "disabled-goods-hidden"),
         Endpoint("GameWebShop.Buy", "POST", "api/GameWebShop/Buy", "web-shop", true, true, false, false, "creates webshop buy request", "role-not-found", "area-not-found", "area-cannot-buy", "goods-not-found", "notify-url-context-missing"),
-        Endpoint("GameWebShop.NotifyWebShop", "GET", "api/GameWebShop/NotifyWebShop/{tenantId:long}/{appId:long}/{packageId:long?}", "web-shop-callback", true, true, false, true, "valid webshop notify sends mail once", "invalid-route", "signature-failed", "role-not-found", "goods-not-found", "duplicate-callback"),
+        Endpoint("GameWebShop.NotifyWebShop", "GET", "api/GameWebShop/NotifyWebShop/{packageId:long?}", "web-shop-callback", false, false, false, true, "valid webshop notify sends mail once", "invalid-route", "signature-failed", "role-not-found", "goods-not-found", "duplicate-callback"),
     };
 
     public static IReadOnlyDictionary<string, ClientApiEndpointCoverage> ByKey { get; } =
