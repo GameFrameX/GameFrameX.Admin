@@ -3,12 +3,12 @@
  *
  * 契约来源：C298 gfx704-api-url-case-alignment（GFX-704）+ spec `## Payment Config Copy Notify URL`。
  * 必须与后端 `GameOrderController` 公开 provider 回调路由一致：
- *   `/api/gameOrder/{action}/{tenantId}/{appId}/{packageId?}`
+ *   `/api/gameOrder/{action}/{packageId?}`
  * 其中 `{action}` 为 lowerCamelCase（`notifyApple` 等）。后端为 `BaseController` token 路由
  * `api/[controller]/[action]`，ASP.NET Core literal 路由段匹配大小写不敏感（C298 已实测：
  * 小写 / PascalCase 回调 URL 均命中路由），故前端统一输出小写 camel 规范形态，
  * 不要求与后端 action 方法名逐字符一致。公开回调只从 URL 路由段解析租户上下文，
- * 不得退化回旧 `/client/gameOrder/...` 或 `?tenantId=&appId=&packageId=` query 形式。
+ * 不得退化回旧 `/client/gameOrder/...` 或 query 形式。
  *
  * 本文件不依赖任何 `/@/` 别名或 Vue 运行时，可被 node:test 直接加载（Node 24 原生 type stripping）。
  */
@@ -43,23 +43,17 @@ export const buildNotifyAction = (channel: string): string => {
 /** 复制回调地址行数据的最小契约（与列表行字段对齐，宽松可选）。 */
 export interface NotifyUrlRow {
   payChannel?: string;
-  tenantId?: number | string;
-  gameAppId?: number | string;
-  appId?: number | string;
   packageId?: number | string;
 }
 
 /**
  * 拼接公开回调地址 URL。
- * - `tenantId` / `appId` 缺失时回退占位 `{tenantId}` / `{appId}`（与 C65 既有行为一致，便于人工识别未补全的行）。
  * - `packageId` 存在（truthy）时作为路径段追加；缺失/为 0 时不出现（与原 index.vue `if (row.packageId)` 一致）。
  * - 输出恒为路由段格式，永不包含 query 串或 `/client/gameOrder/` 前缀。
  */
 export const buildNotifyUrl = (row: NotifyUrlRow): string => {
-  const tenantId = row.tenantId ?? '{tenantId}';
-  const appId = row.gameAppId ?? row.appId ?? '{appId}';
   const action = buildNotifyAction(String(row.payChannel ?? ''));
-  let url = `/api/gameOrder/${action}/${tenantId}/${appId}`;
+  let url = `/api/gameOrder/${action}`;
   if (row.packageId) {
     url += `/${row.packageId}`;
   }

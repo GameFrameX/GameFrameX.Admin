@@ -14,7 +14,7 @@ import {
 
 /** 契约级不变量：任何渠道输出都不含旧前缀或 query。被五个独立用例共用 → 抽作辅助函数。 */
 function assertRouteSegmentFormat(url: string) {
-  expect(url).toMatch(/^\/api\/gameOrder\/notify[A-Za-z]+\/[^/]+\/[^/]+(\/[^/]+)?$/)
+  expect(url).toMatch(/^\/api\/gameOrder\/notify[A-Za-z]+(\/[^/]+)?$/)
   expect(url).not.toContain('?')
   expect(url).not.toContain('/client/gameOrder/')
 }
@@ -48,7 +48,7 @@ test('capitalizeChannel handles empty / single-char / multi-char', () => {
 })
 
 test('buildNotifyUrl produces route-segment format for each known channel without packageId', () => {
-  const base = { tenantId: 1300000000001, gameAppId: 7 }
+  const base = {}
   const cases = [
     { channel: 'apple', action: 'notifyApple' },
     { channel: 'google', action: 'notifyGoogle' },
@@ -57,41 +57,36 @@ test('buildNotifyUrl produces route-segment format for each known channel withou
   ]
   for (const { channel, action } of cases) {
     const url = buildNotifyUrl({ ...base, payChannel: channel })
-    expect(url).toBe(`/api/gameOrder/${action}/1300000000001/7`)
+    expect(url).toBe(`/api/gameOrder/${action}`)
     assertRouteSegmentFormat(url)
   }
 })
 
 test('buildNotifyUrl appends packageId segment when present', () => {
-  const url = buildNotifyUrl({ payChannel: 'apple', tenantId: 1300000000001, gameAppId: 7, packageId: 42 })
-  expect(url).toBe('/api/gameOrder/notifyApple/1300000000001/7/42')
+  const url = buildNotifyUrl({ payChannel: 'apple', packageId: 42 })
+  expect(url).toBe('/api/gameOrder/notifyApple/42')
   assertRouteSegmentFormat(url)
 })
 
 test('buildNotifyUrl omits packageId segment when missing, zero, or empty', () => {
-  const base = { payChannel: 'apple', tenantId: 1300000000001, gameAppId: 7 }
-  expect(buildNotifyUrl(base)).toBe('/api/gameOrder/notifyApple/1300000000001/7')
-  expect(buildNotifyUrl({ ...base, packageId: 0 })).toBe('/api/gameOrder/notifyApple/1300000000001/7')
-  expect(buildNotifyUrl({ ...base, packageId: undefined })).toBe('/api/gameOrder/notifyApple/1300000000001/7')
+  const base = { payChannel: 'apple' }
+  expect(buildNotifyUrl(base)).toBe('/api/gameOrder/notifyApple')
+  expect(buildNotifyUrl({ ...base, packageId: 0 })).toBe('/api/gameOrder/notifyApple')
+  expect(buildNotifyUrl({ ...base, packageId: undefined })).toBe('/api/gameOrder/notifyApple')
 })
 
-test('buildNotifyUrl accepts appId as fallback when gameAppId absent', () => {
-  const url = buildNotifyUrl({ payChannel: 'google', tenantId: 99, appId: 5 })
-  expect(url).toBe('/api/gameOrder/notifyGoogle/99/5')
-})
-
-test('buildNotifyUrl falls back to placeholders when tenant/app missing', () => {
+test('buildNotifyUrl omits tenant and app path segments', () => {
   const url = buildNotifyUrl({ payChannel: 'alipay' })
-  expect(url).toBe('/api/gameOrder/notifyAliPay/{tenantId}/{appId}')
+  expect(url).toBe('/api/gameOrder/notifyAliPay')
 })
 
 test('buildNotifyUrl never emits legacy query or /client/gameOrder/ format across channels', () => {
   const rows = [
-    { payChannel: 'apple', tenantId: 1, gameAppId: 2 },
-    { payChannel: 'google', tenantId: 1, gameAppId: 2, packageId: 3 },
-    { payChannel: 'alipay', tenantId: 1, appId: 2 },
+    { payChannel: 'apple' },
+    { payChannel: 'google', packageId: 3 },
+    { payChannel: 'alipay' },
     { payChannel: 'xsolla' },
-    { payChannel: 'wechat', tenantId: 1, gameAppId: 2, packageId: 9 },
+    { payChannel: 'wechat', packageId: 9 },
   ]
   for (const row of rows) {
     const url = buildNotifyUrl(row)
