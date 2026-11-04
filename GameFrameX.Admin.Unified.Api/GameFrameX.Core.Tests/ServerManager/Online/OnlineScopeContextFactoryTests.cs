@@ -12,8 +12,10 @@ using GameFrameX.Foundation.Orm.Entity;
 using Microsoft.AspNetCore.Http;
 using SqlSugar;
 
+// S3/C401 断链修复点
 namespace GameFrameX.Core.Tests.ServerManager.Online;
 
+// S3/C401 断链修复点
 public sealed class OnlineScopeContextFactoryTests : IDisposable
 {
     private const long TenantA = 1001;

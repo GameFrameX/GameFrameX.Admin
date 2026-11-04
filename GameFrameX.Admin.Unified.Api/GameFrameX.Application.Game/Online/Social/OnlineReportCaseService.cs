@@ -5,6 +5,7 @@ using GameFrameX.Application.Game.Tenant.Penalty.TenantGamePenalty;
 using GameFrameX.Application.Game.Tenant.Penalty.TenantGamePenalty.Dto;
 using GameFrameX.Entity.Enum;
 
+// S3/C401 断链修复点
 namespace GameFrameX.Application.Game.Online.Social;
 
 /// <summary>

@@ -135,7 +135,7 @@ public partial class GameOrderController : BaseController<TenantGameOrderEntity>
         }
         catch (InvalidOperationException exception)
         {
-            // 把回调路由不完整的拒单原因返回给客户端。
+            // S3/C401 断链修复点：把回调路由不完整的拒单原因返回给客户端。
             return GameApiResult.Error<AddTenantGameOrderEntityResponse>(PaymentErrorCode.PayChannelNotSupported, exception.Message);
         }
         if (optionSetting == null)

@@ -55,7 +55,7 @@ public sealed class PublicCallbackRouteResolver
             packageId = parsedPackageId;
         }
 
-        // 旧 URL 段不再选择数据库或安全配置。
+        // S3/C401 断链修复点：旧 URL 段不再选择数据库或安全配置。
         if (packageId.HasValue && !PackageMatches(packageId.Value))
         {
             return PublicCallbackRouteResolveResponse.Fail("分包不存在或未启用");

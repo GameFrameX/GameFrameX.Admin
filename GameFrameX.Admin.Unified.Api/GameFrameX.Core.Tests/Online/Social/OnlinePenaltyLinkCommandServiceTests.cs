@@ -15,6 +15,7 @@ using GameFrameX.Foundation.Orm.Entity;
 using Microsoft.AspNetCore.Http;
 using SqlSugar;
 
+// S3/C401 断链修复点
 namespace GameFrameX.Core.Tests.Online.Social;
 
 // C350 / GFX-754（vault:C7、vault:C2 S1.4/S1.5）：处罚联动命令服务契约自检。

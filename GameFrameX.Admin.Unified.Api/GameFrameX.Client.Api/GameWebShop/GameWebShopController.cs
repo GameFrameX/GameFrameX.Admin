@@ -482,7 +482,7 @@ public class GameWebShopController : BaseController<TenantGameWebShopEntity>
 
     private string? BuildWebShopNotifyUrl(string notifyUrl, bool isSandbox)
     {
-        // 预下单必须有完整回调路由，不能提交裸基础 URL。
+        // S3/C401 断链修复点：预下单必须有完整回调路由，不能提交裸基础 URL。
         return null;
     }
 

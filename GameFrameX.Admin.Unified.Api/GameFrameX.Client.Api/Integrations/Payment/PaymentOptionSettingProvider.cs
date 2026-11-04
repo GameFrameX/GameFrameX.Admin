@@ -157,7 +157,7 @@ public class PaymentOptionSettingProvider : IPaymentOptionSettingProvider
             return setting;
         }
 
-        // 出站回调路由待线缆阶段对齐，禁止将裸基础 URL 发给支付网关。
+        // S3/C401 断链修复点：出站回调路由待线缆阶段对齐，禁止将裸基础 URL 发给支付网关。
         throw new InvalidOperationException("无法构造完整支付回调路由，暂不支持该渠道下单；请完成回调路由升级后重试。");
     }
 
