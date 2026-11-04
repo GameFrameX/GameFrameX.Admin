@@ -14,8 +14,9 @@ public sealed partial class RuntimeCredentialReadPathGuardTests
     private static readonly (string File, string Marker, int MinOccurrences)[] GuardedReadPaths =
     {
         // Client.Api 六链路
-        ("GameFrameX.Core/Middleware/SignatureKeyResolver.cs", "TenantSecretCrypto.DecryptCached", 1),
-        ("GameFrameX.Core/Middleware/SessionKeyResolver.cs", "TenantSecretCrypto.DecryptCached", 1),
+        ("GameFrameX.Core/Middleware/SignatureKeyResolver.cs", "RuntimeKeyMaterialCache.Decrypt", 2),
+        ("GameFrameX.Core/Middleware/SessionKeyResolver.cs", "RuntimeKeyMaterialCache.Decrypt", 1),
+        ("GameFrameX.Core/Middleware/RuntimeKeyMaterialCache.cs", "TenantSecretCrypto.Decrypt(storedSecret)", 1),
         ("GameFrameX.Client.Api/Services/GameLoginTicket/GameLoginTicketKeyResolver.cs", "TenantSecretCrypto.DecryptCached", 1),
         ("GameFrameX.Client.Api/Services/ClientApiTenantOptions/ClientApiTenantOptionsProvider.cs", "TenantSecretCrypto.DecryptCached", 3),
         ("GameFrameX.Client.Api/Services/ClientApiTenantOptions/ClientApiTenantOptionsProvider.cs", "AdvertisementCallbackConfigCrypto.DecryptConfigJson", 1),
