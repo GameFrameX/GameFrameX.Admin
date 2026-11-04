@@ -1,3 +1,4 @@
+using System.Globalization;
 using GameFrameX.Application.Game.Tenant.OpenAccess.TenantGameAppOpenAccess;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Core.Tests.ClientApi;
@@ -6,8 +7,20 @@ using GameFrameX.Entity.Tenant.Game.App;
 
 namespace GameFrameX.Core.Tests.AppManagement;
 
-public sealed class MainDatabaseOpenAccessServiceTests
+public sealed class MainDatabaseOpenAccessServiceTests : IDisposable
 {
+    private readonly CultureInfo _originalCulture = CultureInfo.CurrentUICulture;
+
+    public MainDatabaseOpenAccessServiceTests()
+    {
+        CultureInfo.CurrentUICulture = CultureInfo.GetCultureInfo("zh-CN");
+    }
+
+    public void Dispose()
+    {
+        CultureInfo.CurrentUICulture = _originalCulture;
+    }
+
     [Fact]
     public async Task CredentialLifecycle_RequiresRealUserAndKeepsRevocationFinal()
     {
