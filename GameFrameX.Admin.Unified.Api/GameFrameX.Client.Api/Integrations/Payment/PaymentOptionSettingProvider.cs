@@ -69,7 +69,6 @@ public class PaymentOptionSettingProvider : IPaymentOptionSettingProvider
                // C372（GFX-838）：支付配置读取边界字段级解密（C371 起库内敏感字段密文；
                // DecryptConfigJson 自带密文→明文进程缓存；未注册渠道 schema 未知的字段原样透传）
                .Select(config => DeserializeOptionSetting(normalizedChannel, PaymentConfigCrypto.DecryptConfigJson(normalizedChannel, config.ConfigJson)))
-               .Select(setting => ApplyPublicCallbackRoute(normalizedChannel, setting, context))
                .OfType<IPaymentOptionSetting>()
                .ToList();
     }
@@ -141,24 +140,6 @@ public class PaymentOptionSettingProvider : IPaymentOptionSettingProvider
             LogHelper.Error($"支付配置JSON解析失败 - channel:{channelName}, error:{ex.Message}");
             return null;
         }
-    }
-
-    internal static IPaymentOptionSetting? ApplyPublicCallbackRoute(string channelName, IPaymentOptionSetting? setting, HttpContext? context)
-    {
-        if (setting == null)
-        {
-            return null;
-        }
-
-        var requiresCallback = string.Equals(channelName, "alipay", StringComparison.OrdinalIgnoreCase) ||
-                               string.Equals(channelName, "wechat", StringComparison.OrdinalIgnoreCase);
-        if (!requiresCallback || context?.Items.ContainsKey(PublicCallbackRouteContext.ItemKey) == true)
-        {
-            return setting;
-        }
-
-        // S3/C401 断链修复点：出站回调路由待线缆阶段对齐，禁止将裸基础 URL 发给支付网关。
-        throw new InvalidOperationException("无法构造完整支付回调路由，暂不支持该渠道下单；请完成回调路由升级后重试。");
     }
 
     private static long? ResolveCurrentPackageId(HttpContext? context, ISqlSugarClient db)

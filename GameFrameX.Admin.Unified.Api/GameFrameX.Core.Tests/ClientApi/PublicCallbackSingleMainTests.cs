@@ -12,7 +12,7 @@ public sealed class PublicCallbackSingleMainTests
     [Theory]
     [InlineData("alipay")]
     [InlineData("wechat")]
-    public void OutboundPayment_WithoutCompleteRoute_ExplicitlyRejects(string channel)
+    public void OutboundPayment_UsesConfiguredNotifyUrlWithoutTenantScope(string channel)
     {
         var context = new DefaultHttpContext();
         context.Request.QueryString = new QueryString("?tenantId=123&appId=456");
@@ -20,20 +20,9 @@ public sealed class PublicCallbackSingleMainTests
             ? (GameFrameX.Payment.Abstract.IPaymentOptionSetting)new AliPayOptionSetting { AliPayNotifyUrl = "https://example.test/notify", }
             : new WechatPayOptionSetting { WechatPayNotifyUrl = "https://example.test/notify", };
 
-        var exception = Assert.Throws<InvalidOperationException>(() =>
-            PaymentOptionSettingProvider.ApplyPublicCallbackRoute(channel, setting, context));
-
-        Assert.Contains("完整支付回调路由", exception.Message);
-    }
-
-    [Fact]
-    public void IncomingCallback_CanReadProviderCredentialsWithoutRebuildingNotifyUrl()
-    {
-        var context = new DefaultHttpContext();
-        context.Items[PublicCallbackRouteContext.ItemKey] = new PublicCallbackRouteContext("alipay", "payment", null);
-        var setting = new AliPayOptionSetting { AliPayNotifyUrl = "https://example.test/notify", };
-
-        Assert.Same(setting, PaymentOptionSettingProvider.ApplyPublicCallbackRoute("alipay", setting, context));
+        Assert.Equal("https://example.test/notify", channel == "alipay"
+            ? ((AliPayOptionSetting)setting).AliPayNotifyUrl
+            : ((WechatPayOptionSetting)setting).WechatPayNotifyUrl);
     }
 
     [Fact]

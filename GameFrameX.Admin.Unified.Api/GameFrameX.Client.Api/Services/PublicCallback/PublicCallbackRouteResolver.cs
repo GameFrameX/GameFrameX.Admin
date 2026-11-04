@@ -5,7 +5,7 @@ namespace GameFrameX.Client.Api.Services.PublicCallback;
 
 /// <summary>
 /// 公开 provider 回调 URL 路由参数解析与校验服务。
-/// <para>旧 URL 的租户与应用段仅保留参数绑定；provider 与回调类型由 action 确定，配置始终读取主库。</para>
+/// <para>回调配置始终读取主库；回调 URL 只携带可选分包标识。</para>
 /// </summary>
 public sealed class PublicCallbackRouteResolver
 {
@@ -34,16 +34,6 @@ public sealed class PublicCallbackRouteResolver
             return PublicCallbackRouteResolveResponse.NotPublicCallback();
         }
 
-        if (!TryReadPositiveLong(context, "tenantId", out _))
-        {
-            return PublicCallbackRouteResolveResponse.Fail("缺少或非法的 tenantId");
-        }
-
-        if (!TryReadPositiveLong(context, "appId", out _))
-        {
-            return PublicCallbackRouteResolveResponse.Fail("缺少或非法的 appId");
-        }
-
         long? packageId = null;
         if (HasParameter(context, "packageId"))
         {
@@ -55,7 +45,6 @@ public sealed class PublicCallbackRouteResolver
             packageId = parsedPackageId;
         }
 
-        // S3/C401 断链修复点：旧 URL 段不再选择数据库或安全配置。
         if (packageId.HasValue && !PackageMatches(packageId.Value))
         {
             return PublicCallbackRouteResolveResponse.Fail("分包不存在或未启用");

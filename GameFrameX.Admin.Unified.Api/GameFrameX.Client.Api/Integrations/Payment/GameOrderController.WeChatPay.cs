@@ -25,7 +25,7 @@ public partial class GameOrderController
     /// </summary>
     /// <returns>微信规范 JSON 应答</returns>
     [PublicCallbackEndpoint("wechat", "payment")]
-    [HttpPost("{tenantId:long}/{appId:long}/{packageId:long?}")]
+    [HttpPost("{packageId:long?}")]
     public async Task<IActionResult> NotifyWeChatPay()
     {
         string callbackJson;

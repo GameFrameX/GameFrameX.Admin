@@ -19,7 +19,7 @@ public partial class GameOrderController
     /// </summary>
     /// <returns></returns>
     [PublicCallbackEndpoint("xsolla", "payment")]
-    [HttpPost("{tenantId:long}/{appId:long}/{packageId:long?}")]
+    [HttpPost("{packageId:long?}")]
     public async Task<HttpJsonResultData<BaseOperationAckResponse>> NotifyXsolla()
     {
         using (var reader = new StreamReader(Request.Body, Encoding.UTF8))

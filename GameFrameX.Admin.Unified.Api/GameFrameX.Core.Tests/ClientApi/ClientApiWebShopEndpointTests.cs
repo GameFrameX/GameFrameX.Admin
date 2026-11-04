@@ -32,7 +32,7 @@ public sealed class ClientApiWebShopEndpointTests
     }
 
     [Fact]
-    public async Task GameWebShop_Buy_RejectsUntilCallbackRouteUpgrade()
+    public async Task GameWebShop_Buy_UsesConfiguredCallbackUrlWithoutTenantOrAppSegments()
     {
         using var db = new ClientApiTestDb();
         db.SeedAreaClassify(10);
@@ -53,12 +53,13 @@ public sealed class ClientApiWebShopEndpointTests
         });
 
         var root = ClientApiResultReader.Read(result);
-        Assert.Equal((int)AreaErrorCode.AreaCannotBuy, ClientApiResultReader.Code(root));
-        Assert.Empty(handler.RequestBodies);
+        Assert.Equal(0, ClientApiResultReader.Code(root));
+        Assert.Contains("/submit.php", handler.RequestPaths);
+        Assert.Contains(handler.RequestBodies, requestBody => requestBody.Contains("NotifyWebShop", StringComparison.Ordinal));
     }
 
     [Fact]
-    public async Task GameWebShop_Buy_RejectsWithoutLegacyContextUntilCallbackRouteUpgrade()
+    public async Task GameWebShop_Buy_DoesNotRequireLegacyTenantOrAppContext()
     {
         using var db = new ClientApiTestDb();
         db.SeedAreaClassify(10);
@@ -78,12 +79,11 @@ public sealed class ClientApiWebShopEndpointTests
         });
 
         var root = ClientApiResultReader.Read(result);
-        Assert.Equal(60300006, ClientApiResultReader.Code(root));
-        Assert.Equal("无法构造完整支付回调路由，请完成回调路由升级后重试", ClientApiResultReader.Message(root));
+        Assert.Equal(0, ClientApiResultReader.Code(root));
     }
 
     [Fact]
-    public async Task GameWebShop_Buy_DoesNotPersistOrderUntilCallbackRouteUpgrade()
+    public async Task GameWebShop_Buy_PersistsOrderWithSingleKeyCallbackRoute()
     {
         using var db = new ClientApiTestDb();
         db.SeedAreaClassify(10);
@@ -104,9 +104,9 @@ public sealed class ClientApiWebShopEndpointTests
         });
 
         var root = ClientApiResultReader.Read(result);
-        Assert.Equal((int)AreaErrorCode.AreaCannotBuy, ClientApiResultReader.Code(root));
-        Assert.Equal(0, await db.MainDb.Queryable<TenantGameOrderEntity>().CountAsync());
-        Assert.Empty(handler.RequestBodies);
+        Assert.Equal(0, ClientApiResultReader.Code(root));
+        Assert.Equal(1, await db.MainDb.Queryable<TenantGameOrderEntity>().CountAsync());
+        Assert.Contains(handler.RequestBodies, requestBody => requestBody.Contains("NotifyWebShop", StringComparison.Ordinal));
     }
 
     [Fact]

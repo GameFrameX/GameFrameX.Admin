@@ -136,7 +136,7 @@ public class GameWebShopController : BaseController<TenantGameWebShopEntity>
             postParams["pid"] = systemConfigParams.Pid;
             postParams["type"] = input.Type;
             postParams["out_trade_no"] = outTradeNo;
-            var notifyUrl = BuildWebShopNotifyUrl(systemConfigParams.NotifyUrl, role.IsSandbox ?? false);
+            var notifyUrl = BuildWebShopNotifyUrl(systemConfigParams.NotifyUrl);
             if (string.IsNullOrWhiteSpace(notifyUrl))
             {
                 return GameApiResult.Error<TenantGameWebShopEntityBuyResponse>(AreaErrorCode.AreaCannotBuy, "无法构造完整支付回调路由，请完成回调路由升级后重试");
@@ -190,7 +190,7 @@ public class GameWebShopController : BaseController<TenantGameWebShopEntity>
     /// </summary>
     /// <returns></returns>
     [PublicCallbackEndpoint("webshop", "payment")]
-    [HttpGet("{tenantId:long}/{appId:long}/{packageId:long?}")]
+    [HttpGet("{packageId:long?}")]
     public async Task<HttpJsonResultData<BaseOperationAckResponse>> NotifyWebShop([FromQuery] TenantGameWebShopEntityBuyNotifyRequest data)
     {
         if (data.TradeStatus != "TRADE_SUCCESS")
@@ -480,10 +480,15 @@ public class GameWebShopController : BaseController<TenantGameWebShopEntity>
         });
     }
 
-    private string? BuildWebShopNotifyUrl(string notifyUrl, bool isSandbox)
+    private string? BuildWebShopNotifyUrl(string notifyUrl)
     {
-        // S3/C401 断链修复点：预下单必须有完整回调路由，不能提交裸基础 URL。
-        return null;
+        if (!Uri.TryCreate(notifyUrl, UriKind.Absolute, out var callbackUri)
+            || (callbackUri.Scheme != Uri.UriSchemeHttp && callbackUri.Scheme != Uri.UriSchemeHttps))
+        {
+            return null;
+        }
+
+        return callbackUri.ToString().TrimEnd('/');
     }
 
 }

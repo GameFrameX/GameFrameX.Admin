@@ -43,20 +43,21 @@ public sealed class ClientApiEndpointCoverageTests
     }
 
     [Fact]
-    public void PublicCallbackEndpoints_DeclareFailClosedBoundaries()
+    public void PublicCallbackEndpoints_DeclareOptionalPackageBoundary()
     {
         var callbacks = ClientApiEndpointCoverageMatrix.ByKey.Values
                                                        .Where(endpoint => endpoint.IsPublicCallback)
+                                                       .Where(endpoint => endpoint.Group == "payment-callback" || endpoint.Group == "web-shop-callback")
                                                        .ToArray();
 
         Assert.NotEmpty(callbacks);
         foreach (var endpoint in callbacks)
         {
-            Assert.Contains("{tenantId:long}", endpoint.Route);
-            Assert.Contains("{appId:long}", endpoint.Route);
             Assert.Contains("invalid-route", endpoint.FailureCases);
-            Assert.True(endpoint.RequiresTenant);
-            Assert.True(endpoint.RequiresApp);
+            Assert.DoesNotContain("{tenantId:long}", endpoint.Route);
+            Assert.DoesNotContain("{appId:long}", endpoint.Route);
+            Assert.False(endpoint.RequiresTenant);
+            Assert.False(endpoint.RequiresApp);
         }
     }
 
