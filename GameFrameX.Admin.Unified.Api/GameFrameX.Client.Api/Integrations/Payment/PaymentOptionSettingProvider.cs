@@ -21,6 +21,16 @@ public class PaymentOptionSettingProvider : IPaymentOptionSettingProvider
     public const string PackageIdHeader = "GameFrameX-Package-Id";
     public const string PackageNameHeader = "GameFrameX-Package-Name";
 
+    /// <summary>
+    /// 支付宝公开回调端点路由段（{packageId} 可选路由模板，不含分包段）。
+    /// </summary>
+    private const string AliPayNotifyCallbackRoute = "api/GameOrder/NotifyAliPay";
+
+    /// <summary>
+    /// 微信支付公开回调端点路由段（{packageId} 可选路由模板，不含分包段）。
+    /// </summary>
+    private const string WechatPayNotifyCallbackRoute = "api/GameOrder/NotifyWeChatPay";
+
     private static readonly JsonSerializerOptions SerializerOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -64,12 +74,16 @@ public class PaymentOptionSettingProvider : IPaymentOptionSettingProvider
         }
 
         var context = _httpContextAccessor.HttpContext;
-        return GetPaymentConfigs(normalizedChannel)
+        var packageId = ResolveCurrentPackageId(context, _tenantDbProvider);
+        return GetPaymentConfigs(normalizedChannel, packageId)
                .Where(config => !string.IsNullOrWhiteSpace(config.ConfigJson))
                // C372（GFX-838）：支付配置读取边界字段级解密（C371 起库内敏感字段密文；
                // DecryptConfigJson 自带密文→明文进程缓存；未注册渠道 schema 未知的字段原样透传）
                .Select(config => DeserializeOptionSetting(normalizedChannel, PaymentConfigCrypto.DecryptConfigJson(normalizedChannel, config.ConfigJson)))
                .OfType<IPaymentOptionSetting>()
+               // C401（GFX-1213）：回调通知地址按当前 {packageId} 回调路由运行期补全/规范化，
+               // 保证提交给网关的地址能命中公开回调端点（详见 NormalizeCallbackNotifyUrl）
+               .Select(setting => NormalizeCallbackNotifyUrl(normalizedChannel, setting, packageId))
                .ToList();
     }
 
@@ -97,11 +111,16 @@ public class PaymentOptionSettingProvider : IPaymentOptionSettingProvider
         return GetOptionSettings(channelName).OfType<T>().ToList();
     }
 
-    private List<TenantGamePaymentConfigEntity> GetPaymentConfigs(string channelName)
+    /// <summary>
+    /// 查询指定渠道的候选支付配置（packageId 由调用方一次解析后传入，供查询与回调地址规范化共用）。
+    /// </summary>
+    /// <param name="channelName">渠道名称（已小写规范化）。</param>
+    /// <param name="packageId">当前上下文分包标识。</param>
+    /// <returns>候选支付配置列表。</returns>
+    private List<TenantGamePaymentConfigEntity> GetPaymentConfigs(string channelName, long? packageId)
     {
         var context = _httpContextAccessor.HttpContext;
         var db = _tenantDbProvider;
-        var packageId = ResolveCurrentPackageId(context, db);
         var environments = GetRequestedEnvironments(context);
         var hasPackageId = packageId.HasValue;
         var packageIdValue = packageId.GetValueOrDefault();
@@ -142,6 +161,58 @@ public class PaymentOptionSettingProvider : IPaymentOptionSettingProvider
         }
     }
 
+    /// <summary>
+    /// 按公开回调路由规范化支付渠道的回调通知地址（C401，GFX-1213）：站点根地址自动补全路由段
+    /// （含当前分包段），旧「回调/{tenantId}/{appId}/{packageId}」三段地址自动去段重建；
+    /// 无法识别的地址置空并由支付处理器按「通知地址未配置」拒绝下单，避免网关回调打在无法命中的地址上
+    /// 导致已付款订单不发货。其余渠道地址原样透传。
+    /// </summary>
+    /// <param name="channelName">渠道名称（已小写规范化）。</param>
+    /// <param name="setting">反序列化后的支付配置。</param>
+    /// <param name="packageId">当前上下文分包标识。</param>
+    /// <returns>回调地址规范化后的支付配置。</returns>
+    private static IPaymentOptionSetting NormalizeCallbackNotifyUrl(string channelName, IPaymentOptionSetting setting, long? packageId)
+    {
+        if (setting is AliPayOptionSetting aliPayOptionSetting)
+        {
+            aliPayOptionSetting.AliPayNotifyUrl = BuildCallbackNotifyUrl(channelName, aliPayOptionSetting.AliPayNotifyUrl, AliPayNotifyCallbackRoute, packageId) ?? string.Empty;
+            return aliPayOptionSetting;
+        }
+
+        if (setting is WechatPayOptionSetting wechatPayOptionSetting)
+        {
+            wechatPayOptionSetting.WechatPayNotifyUrl = BuildCallbackNotifyUrl(channelName, wechatPayOptionSetting.WechatPayNotifyUrl, WechatPayNotifyCallbackRoute, packageId) ?? string.Empty;
+            return wechatPayOptionSetting;
+        }
+
+        return setting;
+    }
+
+    /// <summary>
+    /// 单条配置的回调地址规范化：空值保持原样（由处理器既有「未配置」校验拒绝），
+    /// 可识别地址交 <see cref="PublicCallbackNotifyUrlBuilder"/> 重建，无法识别返回 null。
+    /// </summary>
+    /// <param name="channelName">渠道名称。</param>
+    /// <param name="configuredNotifyUrl">配置的回调通知地址。</param>
+    /// <param name="callbackRoute">回调端点路由段。</param>
+    /// <param name="packageId">当前上下文分包标识。</param>
+    /// <returns>规范化后的回调地址；无法识别时 null。</returns>
+    private static string? BuildCallbackNotifyUrl(string channelName, string? configuredNotifyUrl, string callbackRoute, long? packageId)
+    {
+        if (string.IsNullOrWhiteSpace(configuredNotifyUrl))
+        {
+            return configuredNotifyUrl;
+        }
+
+        var normalizedNotifyUrl = PublicCallbackNotifyUrlBuilder.Build(configuredNotifyUrl, callbackRoute, packageId);
+        if (normalizedNotifyUrl == null)
+        {
+            LogHelper.Error($"支付回调通知地址无法映射到回调路由，已拒绝：channel={channelName} notifyUrl={configuredNotifyUrl}");
+        }
+
+        return normalizedNotifyUrl;
+    }
+
     private static long? ResolveCurrentPackageId(HttpContext? context, ISqlSugarClient db)
     {
         if (context == null)
@@ -173,7 +244,12 @@ public class PaymentOptionSettingProvider : IPaymentOptionSettingProvider
         return package != null && package.IsEnabled == true;
     }
 
-    private static long? GetCurrentPackageId(HttpContext context)
+    /// <summary>
+    /// 读取当前请求上下文的分包标识（中间件注入 Items 优先，其次协议头与查询参数），供回调地址构造复用。
+    /// </summary>
+    /// <param name="context">当前 HTTP 上下文，可为 null。</param>
+    /// <returns>有效的分包标识；未携带时为 null。</returns>
+    public static long? GetCurrentPackageId(HttpContext? context)
     {
         if (context == null)
         {
