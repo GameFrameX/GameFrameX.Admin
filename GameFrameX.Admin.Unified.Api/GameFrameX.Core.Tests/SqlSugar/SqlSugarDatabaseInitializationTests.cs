@@ -41,6 +41,38 @@ public class SqlSugarDatabaseInitializationTests : IDisposable
 
     private readonly List<string> _dbPaths = new();
 
+    [Fact]
+    public void InitDatabase_OnlySeedsSuperAdmin_AndPreservesExistingOperationsUsers()
+    {
+        SqlSugarCache.Configure(new FakeCache());
+        using (var scope = CreateScope("main"))
+        {
+            var config = CreateConfig("main");
+            config.SeedSettings.EnableInitSeed = true;
+            var userSeeds = typeof(SystemUserSeedData).Assembly.GetTypes().Where(type => !type.IsAbstract
+                && type.GetInterfaces().Any(contract => contract.IsGenericType
+                    && contract.GetGenericTypeDefinition() == typeof(ISqlSugarEntitySeedData<>)
+                    && new[] { typeof(TenantUserEntity), typeof(SystemUserEntity) }.Contains(contract.GetGenericArguments()[0]))).ToArray();
+            var types = userSeeds.Concat(new[] { typeof(SystemUserEntity), typeof(TenantUserEntity), typeof(GlobalMenuEntity), typeof(GlobalMenuSeedData) }).ToArray();
+            SqlSugarSetup.InitDatabase(scope, config, types);
+            var database = scope.GetConnectionScope("main");
+            Assert.Equal("superadmin", Assert.Single(database.Queryable<SystemUserEntity>().ToList()).Account);
+            Assert.Empty(database.Queryable<TenantUserEntity>().ToList());
+            var existing = new TenantUserEntity { Id = 5001, Account = "existing-operator", Password = "existing-hash" };
+            foreach (var property in typeof(TenantUserEntity).GetProperties().Where(property => property.PropertyType == typeof(string) && property.CanWrite))
+            {
+                if (property.GetValue(existing) == null)
+                {
+                    property.SetValue(existing, string.Empty);
+                }
+            }
+
+            database.Insertable(existing).ExecuteCommand();
+            SqlSugarSetup.InitDatabase(scope, config, types);
+            Assert.Equal("existing-hash", Assert.Single(database.Queryable<TenantUserEntity>().ToList()).Password);
+        }
+    }
+
     [Theory]
     [InlineData(false, false)]
     [InlineData(true, true)]
