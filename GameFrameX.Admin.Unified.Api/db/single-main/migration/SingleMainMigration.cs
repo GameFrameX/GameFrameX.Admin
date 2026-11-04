@@ -131,7 +131,6 @@ internal static class SingleMainMigration
             "global_package_entity", "global_package_menu_entity", "tenant_game_app_entity",
             "tenant_notice_entity", "tenant_notice_user_entity", "tenant_organization_entity",
             "tenant_position_entity", "tenant_role_organization_entity", "tenant_user_extension_organization_entity",
-            "system_open_access_entity", "system_register_email_code_entity", "system_log_audit_entity",
         };
         var remaining = database.DbMaintenance.GetTableInfoList(false).Select(table => table.Name)
             .Where(retiredTables.Contains).OrderBy(name => name, StringComparer.Ordinal).ToArray();
