@@ -218,7 +218,8 @@ public static class SqlSugarSetup
             return;
         }
 
-        db.Aop.OnDiffLogEvent = async u =>
+        // SqlSugar 事件为同步 Action；必须写完审计后再返回，避免 async void 与下一条业务命令争用连接。
+        db.Aop.OnDiffLogEvent = u =>
         {
             // 默认保留 SqlSugar 原始数据；UpdateAsync 时裁剪为只含变化字段
             var beforeList = u.BeforeData;
@@ -242,7 +243,7 @@ public static class SqlSugarSetup
 
             var logDiff = new SystemLogDiffEntity();
             FillDiffLogFields(logDiff, u, config, beforeList, afterList, snapshot);
-            await db.Insertable(logDiff).ExecuteCommandAsync();
+            db.Insertable(logDiff).ExecuteCommand();
             var serialized = Json.Serialize(logDiff);
 
             Console.ForegroundColor = ConsoleColor.Red;
