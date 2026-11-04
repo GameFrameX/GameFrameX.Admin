@@ -1,3 +1,4 @@
+using GameFrameX.Core.Logging;
 using GameFrameX.Foundation.Orm.Attribute;
 using GameFrameX.Core.Const.MenuSeed;
 using GameFrameX.Core.Extension.Cache;
@@ -258,17 +259,17 @@ public static class SqlSugarSetup
     private static void FillDiffLogFields(LogDiffFields target, DiffLogModel u, DbConnectionConfig config, List<DiffLogTableInfo>? beforeList, List<DiffLogTableInfo>? afterList, string? snapshot)
     {
         // 操作后记录（UpdateAsync 时仅变化字段；Insert/DeleteAsync 时全字段）
-        target.AfterData = Json.Serialize(afterList);
+        target.AfterData = SensitiveLogRedactor.Redact(Json.Serialize(afterList));
         // 操作前记录（UpdateAsync 时仅变化字段；Insert/DeleteAsync 时全字段）
-        target.BeforeData = Json.Serialize(beforeList);
+        target.BeforeData = SensitiveLogRedactor.Redact(Json.Serialize(beforeList));
         // 全字段快照（仅 Insert/UpdateAsync 写入）
-        target.Snapshot = snapshot;
+        target.Snapshot = SensitiveLogRedactor.Redact(snapshot);
         // 传进来的对象
-        target.BusinessData = Json.Serialize(u.BusinessData);
+        target.BusinessData = SensitiveLogRedactor.Redact(Json.Serialize(u.BusinessData));
         // 枚举（insert、update、delete）
         target.DiffType = u.DiffType.ToString();
-        target.Sql = UtilMethods.GetSqlString(config.DbType, u.Sql, u.Parameters);
-        target.Parameters = Json.Serialize(u.Parameters);
+        target.Sql = SensitiveLogRedactor.Mask;
+        target.Parameters = SensitiveLogRedactor.Mask;
         target.Elapsed = u.Time == null ? 0 : (long)u.Time.Value.TotalMilliseconds;
     }
 

@@ -13,6 +13,12 @@ namespace GameFrameX.Core.Tests.Logging;
 [ApiController]
 public sealed class MonitorPipelineTestController : ControllerBase
 {
+    [HttpPost("credential")]
+    public object Credential([FromBody] global::System.Text.Json.Nodes.JsonObject request)
+    {
+        return new { AccessToken = request["Password"]!.GetValue<string>(), RefreshToken = request["Password"]!.GetValue<string>() };
+    }
+
     /// <summary>
     /// 操作日志路径：复杂参数 → 操作日志行 RequestParam 断言。
     /// </summary>

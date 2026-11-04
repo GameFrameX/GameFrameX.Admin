@@ -48,7 +48,7 @@ public class DatabaseLoggingWriter : IDatabaseLoggingWriter, IDisposable
             return;
         }
 
-        var loggingMonitor = JsonNode.Parse(jsonStr)!.AsObject();
+        var loggingMonitor = JsonNode.Parse(SensitiveLogRedactor.Redact(jsonStr)!)!.AsObject();
 
         // 不记录数据校验日志
         if (loggingMonitor["validation"] != null)
@@ -194,14 +194,14 @@ public class DatabaseLoggingWriter : IDatabaseLoggingWriter, IDisposable
         FillVisitFields(target, ctx);
         var monitor = ctx.Monitor;
         target.HttpMethod = (string?)monitor["httpMethod"];
-        target.RequestUrl = (string?)monitor["requestUrl"];
+        target.RequestUrl = SensitiveLogRedactor.Redact((string?)monitor["requestUrl"]);
         var parameters = monitor["parameters"]?.AsArray();
         target.RequestParam = parameters == null || parameters.Count == 0 ? null : parameters[0]?["value"]?.ToJsonString();
         target.ReturnResult = monitor["returnInformation"]?.ToJsonString();
         target.EventId = ctx.LogMsg.EventId.Id;
         target.ThreadId = ctx.LogMsg.ThreadId;
         target.TraceId = ctx.LogMsg.TraceId;
-        target.Message = ctx.LogMsg.Message;
+        target.Message = SensitiveLogRedactor.Redact(ctx.LogMsg.Message);
     }
 
     private void TryFillAccountFromSuccessfulLoginParameters(

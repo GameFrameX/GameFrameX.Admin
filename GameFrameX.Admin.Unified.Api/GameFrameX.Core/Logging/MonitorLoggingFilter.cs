@@ -162,7 +162,7 @@ internal sealed class MonitorLoggingFilter : IAsyncActionFilter, IOrderedFilter
             writer.WriteEndObject();
         }
 
-        var monitorJson = Encoding.UTF8.GetString(bufferWriter.WrittenSpan);
+        var monitorJson = SensitiveLogRedactor.Redact(Encoding.UTF8.GetString(bufferWriter.WrittenSpan))!;
         var logLevel = LogLevel.Information;
         if (executionException != null)
         {
@@ -365,7 +365,7 @@ internal sealed class MonitorLoggingFilter : IAsyncActionFilter, IOrderedFilter
             }
             else if (settings.ReturnValueThreshold > 0)
             {
-                var serialized = returnValueNode.ToJsonString();
+                var serialized = SensitiveLogRedactor.Redact(returnValueNode.ToJsonString())!;
                 if (serialized.Length > settings.ReturnValueThreshold)
                 {
                     // 超阈值截断为字符串，避免截断后的残缺 JSON 破坏行格式
@@ -373,12 +373,12 @@ internal sealed class MonitorLoggingFilter : IAsyncActionFilter, IOrderedFilter
                 }
                 else
                 {
-                    returnValueNode.WriteTo(writer);
+                    JsonNode.Parse(SensitiveLogRedactor.Redact(returnValueNode.ToJsonString())!)!.WriteTo(writer);
                 }
             }
             else
             {
-                returnValueNode.WriteTo(writer);
+                JsonNode.Parse(SensitiveLogRedactor.Redact(returnValueNode.ToJsonString())!)!.WriteTo(writer);
             }
         }
         else

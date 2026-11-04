@@ -1,7 +1,7 @@
 using System.Net;
 using System.Security.Claims;
 using System.Text;
-using System.Text.Json.Nodes;
+using global::System.Text.Json.Nodes;
 using GameFrameX.Application.System.Logging;
 using GameFrameX.Application.System.Logging.Dto;
 using GameFrameX.Core.Service.User;
@@ -73,6 +73,7 @@ public sealed class MonitorLoggingPipelineTests : IAsyncLifetime
             typeof(SystemLogVisitEntity),
             typeof(SystemLogExceptionEntity),
             typeof(SystemConfigEntity),
+            typeof(SystemUserEntity),
             typeof(TenantLogOperationEntity),
         });
         SqlSugarSetup.InitDatabase(_db, tenantConfig, new[]
@@ -334,6 +335,81 @@ public sealed class MonitorLoggingPipelineTests : IAsyncLifetime
 
         var errorMonitor = ParseFirstMonitorLine(errorFile);
         Assert.Equal("monitor-pipeline-fail", (string?)errorMonitor?["exception"]?["message"]);
+    }
+
+    // 每个生产凭据入口分别经过真实数据库 Writer；HTTP 管线另验证返回给调用方的原文不变。
+    [Theory]
+    [InlineData("systemAuth/login", "Password")]
+    [InlineData("systemAuth/setupSuperAdminPassword", "ConfirmPassword")]
+    [InlineData("systemAuth/refreshToken", "accessToken")]
+    [InlineData("swagger/submitUrl", "Password")]
+    [InlineData("tenantUser/changePwd", "PasswordOld")]
+    [InlineData("tenantUser/resetPwd", "NewPassword")]
+    [InlineData("tenantUser/add", "initialPassword")]
+    [InlineData("tenantUser/update", "Password")]
+    [InlineData("tenantUser/baseInfo", "Password")]
+    [InlineData("tenantSessionKeyEntity/add", "Secret")]
+    [InlineData("tenantSessionKeyEntity/rotate", "Secret")]
+    [InlineData("tenantAppSignatureKeyEntity/add", "Secret")]
+    [InlineData("tenantAppSignatureKeyEntity/rotate", "Secret")]
+    [InlineData("tenantGameLoginTicketKeyEntity/rotate", "PrivateKey")]
+    [InlineData("tenantGameAppOpenAccess/add", "AccessSecret")]
+    [InlineData("tenantGameAppOpenAccess/refresh", "AccessSecret")]
+    [InlineData("systemOpenAccess/add", "AccessSecret")]
+    [InlineData("systemOpenAccess/update", "AccessSecret")]
+    [InlineData("systemOpenAccess/createSecret", "Secret")]
+    [InlineData("tenantClientApiPolicyEntity/add", "SigningKey")]
+    [InlineData("tenantClientApiPolicyEntity/update", "SigningKey")]
+    [InlineData("tenantClientApiPolicyEntity/rotate", "SigningKey")]
+    [InlineData("platformJwtConfig/update", "IssuerSigningKey")]
+    [InlineData("systemEmailProvider/add", "Password")]
+    [InlineData("systemEmailProvider/update", "SecretKey")]
+    [InlineData("tenantAdvertisementCallbackConfigEntity/add", "SigningSecret")]
+    [InlineData("tenantAdvertisementCallbackConfigEntity/update", "VerificationKeys")]
+    [InlineData("tenantGameUserEntity/add", "Password")]
+    [InlineData("tenantGameUserEntity/update", "Password")]
+    [InlineData("tenantGameUserEntity/addByMail", "EmailPassword")]
+    [InlineData("tenantGameAreaClassifyEntity/add", "DockerPassword")]
+    [InlineData("tenantGameAreaClassifyEntity/update", "DockerPassword")]
+    public async Task CredentialEndpointSnapshot_NeverPersistsRequestOrResponseCredentials(string endpoint, string field)
+    {
+        var plain = "unique-credential-material-12345";
+        var value = new JsonObject { [field] = plain, ["AccessToken"] = plain, ["RefreshToken"] = plain };
+        var monitor = new JsonObject
+        {
+            ["controllerName"] = endpoint.Split('/')[0], ["actionName"] = endpoint.Split('/')[1],
+            ["actionTypeName"] = "CredentialAction", ["requestUrl"] = (endpoint.StartsWith("swagger/") ? "/" : "/api/") + endpoint,
+            ["parameters"] = new JsonArray(new JsonObject { ["name"] = "input", ["value"] = value.DeepClone() }),
+            ["returnInformation"] = new JsonObject { ["httpStatusCode"] = 200, ["value"] = value.DeepClone() },
+        };
+        var message = new LogMessage { Message = monitor.ToJsonString() };
+        message.Context["loggingMonitor"] = message.Message;
+        using (var writer = new DatabaseLoggingWriter(_host.Services.GetRequiredService<IServiceScopeFactory>()))
+        {
+            await writer.WriteAsync(new[] { message }, true);
+        }
+
+        var row = Assert.Single(await _db.GetConnectionScope(MainConfigId).Queryable<SystemLogOperationEntity>().ToListAsync());
+        Assert.DoesNotContain(plain, global::System.Text.Json.JsonSerializer.Serialize(row));
+        Assert.Contains(SensitiveLogRedactor.Mask, row.Message);
+        Assert.Contains(plain, message.Message);
+    }
+
+    [Fact]
+    public async Task CredentialHttpResponse_IsUnchangedWhileAllPersistedSnapshotsAreMasked()
+    {
+        const string plain = "unique-http-credential-23456";
+        using (var client = _host.GetTestClient())
+        using (var response = await client.PostAsync("/api/monitorPipeline/credential", new StringContent("{\"Password\":\"" + plain + "\"}", Encoding.UTF8, "application/json")))
+        {
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Contains(plain, await response.Content.ReadAsStringAsync());
+        }
+
+        await WaitDispatchDrainedAsync();
+        var row = Assert.Single(await _db.GetConnectionScope(MainConfigId).Queryable<SystemLogOperationEntity>().ToListAsync());
+        Assert.DoesNotContain(plain, global::System.Text.Json.JsonSerializer.Serialize(row));
+        Assert.DoesNotContain(plain, File.ReadAllText(Path.Combine(_contentRoot, "data", "logs", $"{DateTime.Now:yyyyMMdd}_Information.log")));
     }
 
     private static JsonNode? ParseFirstMonitorLine(string fileName)

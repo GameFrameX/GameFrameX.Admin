@@ -1,0 +1,56 @@
+using System.Text.Json;
+using GameFrameX.Core.Logging;
+
+namespace GameFrameX.Core.Tests.Logging;
+
+public sealed class SensitiveLogRedactorTests
+{
+    [Theory]
+    [InlineData("password")]
+    [InlineData("PasswordOld")]
+    [InlineData("PasswordNew")]
+    [InlineData("confirmPassword")]
+    [InlineData("initialPassword")]
+    [InlineData("ACCESS_TOKEN")]
+    [InlineData("refreshToken")]
+    [InlineData("token")]
+    [InlineData("secret")]
+    [InlineData("accessSecret")]
+    [InlineData("appSecret")]
+    [InlineData("privateKey")]
+    [InlineData("signingKey")]
+    [InlineData("sessionKey")]
+    public void NestedSnapshotsAndDescriptorValues_AreMaskedAndIdempotent(string field)
+    {
+        const string plain = "credential-value-unique";
+        var inner = JsonSerializer.Serialize(new Dictionary<string, string> { [field] = plain });
+        var payload = JsonSerializer.Serialize(new { Nested = inner, Columns = new[] { new { ColumnName = field, Value = plain } }, parameters = new[] { new { name = field, value = plain } } });
+        var redacted = SensitiveLogRedactor.Redact(payload);
+        Assert.DoesNotContain(plain, redacted);
+        Assert.Equal(redacted, SensitiveLogRedactor.Redact(redacted));
+        Assert.Contains(SensitiveLogRedactor.Mask, redacted);
+        Assert.Contains(plain, payload);
+    }
+
+    [Fact]
+    public void RepeatedJsonStringEncoding_CannotHideCredentials()
+    {
+        var value = "{\"Password\":\"multilayer-credential\"}";
+        for (var index = 0; index < 4; index++)
+        {
+            value = JsonSerializer.Serialize(value);
+        }
+
+        var result = SensitiveLogRedactor.Redact(value);
+        Assert.DoesNotContain("multilayer-credential", result);
+        Assert.Equal(result, SensitiveLogRedactor.Redact(result));
+    }
+
+    [Theory]
+    [InlineData("{\"Password\":\"truncated-credential")]
+    [InlineData("https://localhost/api/auth?accessToken=truncated-credential")]
+    public void UnstructuredOrTruncatedCredentials_FailClosed(string value)
+    {
+        Assert.Equal(SensitiveLogRedactor.Mask, SensitiveLogRedactor.Redact(value));
+    }
+}
