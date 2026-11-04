@@ -322,7 +322,35 @@ public sealed class ClientApiWebShopEndpointTests
         Assert.Equal(0, ClientApiResultReader.Code(second));
         Assert.Equal(OrderStatusEnum.Shipped, order.Status);
         Assert.Equal(650, role.AllRecharge);
-        Assert.Equal(1, handler.Count("/game/api/post_mail"));
+    }
+
+    [Theory]
+    [InlineData(OrderStatusEnum.Voided)]
+    [InlineData(OrderStatusEnum.Refunded)]
+    public async Task GameWebShop_NotifyWebShop_TerminalStatusOrder_DoesNotShip(OrderStatusEnum status)
+    {
+        using var db = new ClientApiTestDb();
+        db.SeedAreaClassify(10);
+        db.SeedArea(2001, 10);
+        db.SeedRole(3001, 1001, 2001);
+        db.SeedGoods(11, configId: 90011);
+        db.SeedWebShop(5001, "6.50", ItemJson());
+        db.SeedSystemConfig("web_shop_params", WebShopConfigJson());
+        var handler = ClientApiRecordingHttpHandler.WithGameServerDefaults();
+        var controller = CreateController(db, handler);
+        db.AttachContext(controller);
+
+        // 已作废 / 已退款订单收到有效签名回调：幂等返回成功，不发货、不累充、状态不变
+        var outTradeNo = await SeedUnpaidOrderAsync(db, status);
+        var result = await controller.NotifyWebShop(BuildSignedNotifyRequest(outTradeNo, 6.50m, "sign-secret"));
+
+        var root = ClientApiResultReader.Read(result);
+        var order = await db.TenantDb.Queryable<TenantGameOrderEntity>().FirstAsync(u => u.OrderId == outTradeNo);
+        var role = await db.TenantDb.Queryable<TenantGameRoleEntity>().FirstAsync(u => u.Id == 3001);
+        Assert.Equal(0, ClientApiResultReader.Code(root));
+        Assert.Equal(status, order.Status);
+        Assert.Equal(0, role.AllRecharge);
+        Assert.Equal(0, handler.Count("/game/api/post_mail"));
     }
 
     [Fact]
@@ -396,7 +424,7 @@ public sealed class ClientApiWebShopEndpointTests
     }
 
     // 入站回调测试使用 Buy 同口径的预创建订单快照（Content 含 RewardsItem）。
-    private static async Task<string> SeedUnpaidOrderAsync(ClientApiTestDb db)
+    private static async Task<string> SeedUnpaidOrderAsync(ClientApiTestDb db, OrderStatusEnum status = OrderStatusEnum.Unpaid)
     {
         const string orderId = "800000000000001";
         await db.MainDb.Insertable(new TenantGameOrderEntity
@@ -408,7 +436,7 @@ public sealed class ClientApiWebShopEndpointTests
             Sku = 5001,
             AccountId = "1001",
             Amount = 650,
-            Status = OrderStatusEnum.Unpaid,
+            Status = status,
             Content = JsonHelper.Serialize(new PlayerCreateOrderResponse
             {
                 RoleId = 3001,

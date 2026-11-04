@@ -1,14 +1,6 @@
 using GameFrameX.Client.Api.Services.PublicCallback;
 using System.Collections.Concurrent;
 using System.Globalization;
-    /// <summary>
-    /// 支付网关回调（zlpay notify）。信任链固定为：① 强制验签（签名不匹配一律拒绝且不发货）→ ② 按 out_trade_no 幂等查单
-    /// → ③ 金额比对 → ④ 按订单快照（order.Content）解出发货商品 → ⑤ Unpaid→NotShipped 认领 → ⑥ 区服校验
-    /// → ⑦ 邮件发货 → ⑧ 发货成功后迁移 Shipped 并累充。业务参数（RoleId/AreaId/ShopId/实付金额）不取自回调，
-    /// 一律回读 Buy 预创建的订单快照；param 回显不解析（不可信输入不参与解析）。
-    /// 发货失败（区服离线 / 邮件失败等）订单保留 NotShipped 可重试状态，后续回调可再次尝试发货。
-    /// </summary>
-    /// <returns></returns>
 using System.Net;
 using System.Security.Cryptography;
 using System.Text;
@@ -206,9 +198,12 @@ public class GameWebShopController : BaseController<TenantGameWebShopEntity>
     }
 
     /// <summary>
-    /// 支付网关回调（zlpay notify）。信任链固定为：① 验签（VerifySignMode log/enforce 灰度）→ ② 按 out_trade_no 幂等查单
-    /// → ③ 金额比对 → ④ Unpaid→Shipped 迁移发货。业务参数（RoleId/AreaId/ShopId/实付金额）不取自回调，
+    /// 支付网关回调（zlpay notify）。信任链固定为：① 强制验签（签名不匹配一律拒绝且不发货）→ ② 按 out_trade_no 幂等查单
+    /// → ③ 金额比对 → ④ 按订单快照（order.Content）解出发货商品 → ⑤ Unpaid→NotShipped 认领 → ⑥ 区服校验
+    /// → ⑦ 邮件发货 → ⑧ 发货成功后迁移 Shipped 并累充。业务参数（RoleId/AreaId/ShopId/实付金额）不取自回调，
     /// 一律回读 Buy 预创建的订单快照；param 回显不解析（不可信输入不参与解析）。
+    /// 仅 Unpaid / NotShipped 可进入发货，其余状态（已发货、退款中、已退款、已作废等）幂等返回成功；
+    /// 发货失败（区服离线 / 邮件失败等）订单保留 NotShipped 可重试状态，后续回调可再次尝试发货。
     /// </summary>
     /// <returns></returns>
     [PublicCallbackEndpoint("webshop", "payment")]
@@ -231,7 +226,7 @@ public class GameWebShopController : BaseController<TenantGameWebShopEntity>
         // ① 验签（强制）：以回传业务参数重建字典重算 MD5（key 复用 web_shop_params.Sign）。
         // 签名不匹配一律拒绝回调且不发货（公开回调可被任意调用，伪造签名不得换货）；expected/received 落日志便于排障。
         var expectedSign = CreateMd5Sign(BuildNotifySignParameters(data), systemConfigParams.Sign);
-        if (!string.Equals(expectedSign, data.Sign, StringComparison.OrdinalIgnoreCase))
+        if (!FixedTimeEqualsIgnoreCase(expectedSign, data.Sign))
         {
             LogHelper.Warning($"网页商城回调验签不匹配：out_trade_no={data.OutTradeNo} expected={expectedSign} received={data.Sign}");
             await InsertFailedWebShopOrderAsync(data.OutTradeNo, 0, 0, 0, "验签失败");
@@ -254,7 +249,11 @@ public class GameWebShopController : BaseController<TenantGameWebShopEntity>
         {
             order = await _gameOrderEntity.GetAsync(g => g.OrderId == data.OutTradeNo);
 
-            if (order.Status == OrderStatusEnum.Shipped)
+            // 状态守卫：仅 Unpaid（待认领）与 NotShipped（认领后待发货 / 失败重试）可进入发货；
+            // 其余状态（Shipped 已发货、InitiateRefund/RefundAgreement 退款中、Refunded 已退款、
+            // Voided 已作废、Completed 已完成等）按既定口径幂等返回成功，不发邮件、不累充
+            //（同 TenantGameOrderShipService 对 Refunded/Voided 等终态订单的守卫处理）。
+            if (order.Status is not (OrderStatusEnum.Unpaid or OrderStatusEnum.NotShipped))
             {
                 return HttpJsonResultData<BaseOperationAckResponse>.Success();
             }
@@ -419,6 +418,22 @@ public class GameWebShopController : BaseController<TenantGameWebShopEntity>
             var hash = md5.ComputeHash(Encoding.UTF8.GetBytes(raw));
             return BitConverter.ToString(hash).Replace("-", "").ToLower();
         }
+    }
+
+    /// <summary>
+    /// 常量时间比较两个十六进制签名（忽略大小写）：统一小写转字节后用
+    /// <see cref="CryptographicOperations.FixedTimeEquals"/> 比较，避免短路字符串比较
+    /// 向定时攻击泄露匹配前缀长度；长度不等直接返回 false（仅泄露长度差异）。
+    /// </summary>
+    /// <param name="expectedSign">本地重算的期望签名（小写十六进制）。</param>
+    /// <param name="receivedSign">回调回传签名，可为 null。</param>
+    /// <returns>是否一致。</returns>
+    private static bool FixedTimeEqualsIgnoreCase(string expectedSign, string? receivedSign)
+    {
+        var expectedBytes = Encoding.UTF8.GetBytes(expectedSign.ToLowerInvariant());
+        var receivedBytes = Encoding.UTF8.GetBytes((receivedSign ?? string.Empty).ToLowerInvariant());
+        return expectedBytes.Length == receivedBytes.Length
+               && CryptographicOperations.FixedTimeEquals(expectedBytes, receivedBytes);
     }
 
     /// <summary>
