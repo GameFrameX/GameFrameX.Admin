@@ -35,14 +35,18 @@ public sealed class SensitiveLogRedactorTests
     [Theory]
     [InlineData("quote\"and\\slash")]
     [InlineData("short")]
+    [InlineData("*")]
     public void SecretsEchoedAcrossSerializedColumns_RemainValidJsonAndAreMasked(string plain)
     {
         var payload = JsonSerializer.Serialize(new { Exception = "failed with " + plain, RequestParam = JsonSerializer.Serialize(new { Password = plain }) });
         var result = SensitiveLogRedactor.Redact(payload);
         using (var document = JsonDocument.Parse(result!))
         {
-            Assert.DoesNotContain(plain, document.RootElement.GetProperty("Exception").GetString());
-            Assert.DoesNotContain(plain, document.RootElement.GetProperty("RequestParam").GetString());
+            Assert.Equal("failed with " + SensitiveLogRedactor.Mask, document.RootElement.GetProperty("Exception").GetString());
+            using (var parameters = JsonDocument.Parse(document.RootElement.GetProperty("RequestParam").GetString()!))
+            {
+                Assert.Equal(SensitiveLogRedactor.Mask, parameters.RootElement.GetProperty("Password").GetString());
+            }
         }
 
         Assert.Equal(result, SensitiveLogRedactor.Redact(result));

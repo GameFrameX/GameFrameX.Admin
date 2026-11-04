@@ -112,7 +112,7 @@ public static class SensitiveLogRedactor
     {
         foreach (var secret in secrets.Where(value => value.Length > 0 && value != Mask).OrderByDescending(value => value.Length))
         {
-            text = text.Replace(secret, Mask, StringComparison.Ordinal);
+            text = Regex.Replace(text, Regex.Escape(Mask) + "|" + Regex.Escape(secret), _ => Mask);
         }
 
         return text;
