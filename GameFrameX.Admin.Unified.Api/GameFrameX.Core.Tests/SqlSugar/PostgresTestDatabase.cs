@@ -58,7 +58,7 @@ public sealed class PostgresTestDatabase : IDisposable
         {
             database = null;
             unavailableReason = "PostgreSQL 不可达（" + e.Message + "）。DDL 行为测试必须连真实 PG"
-                + "（SQLite 不加列、丢默认值，测不出 23502 类问题）。可启动本地 docker gameframex-postgres"
+                + "（SQLite 不加列、丢默认值，测不出 23502 类问题）。请启动获授权的隔离 PostgreSQL 测试实例"
                 + " 或设置 " + ConnectionStringEnvironmentVariable + "。";
             return false;
         }

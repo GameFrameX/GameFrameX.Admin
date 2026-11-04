@@ -52,9 +52,8 @@ public sealed class CodeFirstSchemaEvolutionPostgresTests
             SqlSugarSetup.InitDatabase(scope, config, new[] { typeof(GlobalMenuEntity), typeof(SystemUserEntity), });
             mainDatabase.Insertable(BuildLegacyMenu()).ExecuteCommand();
 
-            // 模拟 2026-07 之前的存量库：DROP 四列（老行四列数据随列丢弃）
+            // 模拟 2026-07 之前的存量库：DROP 三个存活列（老行对应数据随列丢弃）
             mainDatabase.Ado.ExecuteCommand("ALTER TABLE global_menu_entity DROP COLUMN super_admin_only");
-            mainDatabase.Ado.ExecuteCommand("ALTER TABLE global_menu_entity DROP COLUMN sync_roles");
             mainDatabase.Ado.ExecuteCommand("ALTER TABLE global_menu_entity DROP COLUMN allow_tenant_when_super_admin_only");
             mainDatabase.Ado.ExecuteCommand("ALTER TABLE global_menu_entity DROP COLUMN app_scope");
 
@@ -62,12 +61,11 @@ public sealed class CodeFirstSchemaEvolutionPostgresTests
             SqlSugarSetup.InitDatabase(scope, config, new[] { typeof(GlobalMenuEntity), typeof(SystemUserEntity), });
 
             var legacyRow = mainDatabase.Ado.SqlQuery<dynamic>(
-                "SELECT super_admin_only, sync_roles, allow_tenant_when_super_admin_only, app_scope FROM global_menu_entity WHERE id = @id",
+                "SELECT super_admin_only, allow_tenant_when_super_admin_only, app_scope FROM global_menu_entity WHERE id = @id",
                 new SugarParameter("@id", LegacyMenuId)).Single();
 
             // 老行读到实体 DefaultValue（与原 EnsureColumn 回填值一致：false/0/false/Tenant=0）
             Assert.False((bool)legacyRow.super_admin_only);
-            Assert.Equal(0, (int)legacyRow.sync_roles);
             Assert.False((bool)legacyRow.allow_tenant_when_super_admin_only);
             Assert.Equal((int)MenuAppScopeEnum.Console, (int)legacyRow.app_scope);
         }
