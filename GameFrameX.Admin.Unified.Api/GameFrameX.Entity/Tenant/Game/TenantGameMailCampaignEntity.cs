@@ -16,6 +16,7 @@ namespace GameFrameX.Entity.Tenant.Game;
 /// </summary>
 [SugarTable(null, "运营邮件Campaign")]
 [TenantTable]
+[IncrementTable]
 public class TenantGameMailCampaignEntity : EntityBasic
 {
 

@@ -16,6 +16,7 @@ namespace GameFrameX.Entity.Tenant.Game.Online;
 /// </summary>
 [SugarTable(null, "配置灰度发布版本")]
 [TenantTable]
+[IncrementTable]
 public class TenantGameOnlineConfigRolloutEntity : EntityBasic
 {
 

@@ -16,6 +16,7 @@ namespace GameFrameX.Entity.Tenant.Game.Online;
 /// </summary>
 [SugarTable(null, "玩家分群定义")]
 [TenantTable]
+[IncrementTable]
 public class TenantGameOnlinePlayerSegmentEntity : EntityBasic
 {
 

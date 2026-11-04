@@ -72,6 +72,26 @@ public class SqlSugarDatabaseInitializationTests : IDisposable
     }
 
     [Fact]
+    public void InitDatabase_WithDefaultIncrementalSettings_CreatesEveryManagedEntity()
+    {
+        using (var scope = CreateScope("main"))
+        {
+            var config = CreateConfig("main");
+            config.TableSettings.EnableIncreTable = true;
+            var entities = typeof(SystemUserEntity).Assembly.GetTypes()
+                .Where(type => type.IsClass && !type.IsAbstract && type.IsDefined(typeof(SugarTable), false)).ToArray();
+            SqlSugarSetup.InitDatabase(scope, config, entities);
+            var database = scope.GetConnectionScope("main");
+            var tables = database.DbMaintenance.GetTableInfoList(false).Select(table => table.Name).ToArray();
+            foreach (var entity in entities)
+            {
+                var name = TableName(database, entity);
+                Assert.Contains(tables, table => table == name || table.StartsWith(name + "_", StringComparison.Ordinal));
+            }
+        }
+    }
+
+    [Fact]
     public void InitDatabase_ForMainConfig_CreatesAllManagedTables()
     {
         using var scope = CreateScope("main");
