@@ -22,10 +22,10 @@ namespace GameFrameX.Application.GmCenter.LiveOps.PlayerSegment;
 /// 编辑定义不会自动重同步，须再次 syncOnline（显式生效，避免隐式半生效状态）。</para>
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
-public class TenantGameOnlinePlayerSegmentService
+public class GameOnlinePlayerSegmentService
     : GenericCrudService<TenantGameOnlinePlayerSegmentEntity,
         AddTenantGameOnlinePlayerSegmentRequest, UpdateTenantGameOnlinePlayerSegmentRequest,
-        TenantGameOnlinePlayerSegmentResponse, PageTenantGameOnlinePlayerSegmentRequest>
+        GameOnlinePlayerSegmentResponse, PageTenantGameOnlinePlayerSegmentRequest>
 {
     private readonly SqlSugarRepository<TenantGameOnlineConfigRolloutEntity> _rolloutRepository;
     private readonly IOnlineLiveOpsDispatchService _dispatchService;
@@ -36,7 +36,7 @@ public class TenantGameOnlinePlayerSegmentService
     /// <param name="repository"></param>
     /// <param name="rolloutRepository"></param>
     /// <param name="dispatchService"></param>
-    public TenantGameOnlinePlayerSegmentService(SqlSugarRepository<TenantGameOnlinePlayerSegmentEntity> repository,
+    public GameOnlinePlayerSegmentService(SqlSugarRepository<TenantGameOnlinePlayerSegmentEntity> repository,
         SqlSugarRepository<TenantGameOnlineConfigRolloutEntity> rolloutRepository,
         IOnlineLiveOpsDispatchService dispatchService)
         : base(repository)
@@ -48,12 +48,12 @@ public class TenantGameOnlinePlayerSegmentService
     /// <summary>
     /// 分页查询：按 Name / SyncStatus 过滤。
     /// </summary>
-    protected override ISugarQueryable<TenantGameOnlinePlayerSegmentResponse> BuildPageQuery(PageTenantGameOnlinePlayerSegmentRequest input)
+    protected override ISugarQueryable<GameOnlinePlayerSegmentResponse> BuildPageQuery(PageTenantGameOnlinePlayerSegmentRequest input)
     {
         return Repository.AsQueryable()
                          .WhereIF(!string.IsNullOrWhiteSpace(input.Name), u => u.Name.Contains(input.Name.Trim()))
                          .WhereIF(input.SyncStatus.HasValue, u => u.SyncStatus == input.SyncStatus.Value)
-                         .Select<TenantGameOnlinePlayerSegmentResponse>();
+                         .Select<GameOnlinePlayerSegmentResponse>();
     }
 
     /// <summary>

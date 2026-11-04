@@ -10,12 +10,12 @@ namespace GameFrameX.Application.PlayerCenter.GameUser;
 /// 游戏账号服务
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 111)]
-public class TenantGameUserEntityService : GenericCrudSelectService<Entity.Tenant.Game.TenantGameUserEntity, AddTenantGameUserEntityByMailRequest, UpdateTenantGameUserEntityRequest, TenantGameUserEntityResponse, PageTenantGameUserEntityRequest>
+public class GameUserService : GenericCrudSelectService<Entity.Tenant.Game.TenantGameUserEntity, AddTenantGameUserEntityByMailRequest, UpdateTenantGameUserEntityRequest, GameUserResponse, PageTenantGameUserEntityRequest>
 {
-    private readonly TenantGameUserPasswordService _tenantGameUserPasswordService;
+    private readonly GameUserPasswordService _tenantGameUserPasswordService;
 
-    public TenantGameUserEntityService(SqlSugarRepository<Entity.Tenant.Game.TenantGameUserEntity> repository,
-        TenantGameUserPasswordService tenantGameUserPasswordService) : base(repository)
+    public GameUserService(SqlSugarRepository<Entity.Tenant.Game.TenantGameUserEntity> repository,
+        GameUserPasswordService tenantGameUserPasswordService) : base(repository)
     {
         _tenantGameUserPasswordService = tenantGameUserPasswordService;
     }
@@ -23,14 +23,14 @@ public class TenantGameUserEntityService : GenericCrudSelectService<Entity.Tenan
     /// <summary>
     /// 构建分页查询条件
     /// </summary>
-    protected override ISugarQueryable<TenantGameUserEntityResponse> BuildPageQuery(PageTenantGameUserEntityRequest input)
+    protected override ISugarQueryable<GameUserResponse> BuildPageQuery(PageTenantGameUserEntityRequest input)
     {
         return Repository.AsQueryable()
                          .WhereIF(input.Id > 0, u => u.Id == input.Id)
                          .WhereIF(!string.IsNullOrWhiteSpace(input.UserName), u => u.UserName.Contains(input.UserName.Trim()))
                          .WhereIF(!string.IsNullOrWhiteSpace(input.Name), u => u.Name.Contains(input.Name.Trim()))
                          .WhereIF(input.Status.HasValue, u => u.Status == input.Status.Value)
-                         .Select<TenantGameUserEntityResponse>();
+                         .Select<GameUserResponse>();
     }
 
     /// <summary>
@@ -40,7 +40,7 @@ public class TenantGameUserEntityService : GenericCrudSelectService<Entity.Tenan
     /// <returns></returns>
     [HttpPost]
     [ApiDescriptionSettings(Name = "addByMail")]
-    public async Task<TenantGameUserEntityResponse> AddByMailAsync(AddTenantGameUserEntityByMailRequest input)
+    public async Task<GameUserResponse> AddByMailAsync(AddTenantGameUserEntityByMailRequest input)
     {
         //判断邮箱是否已经存在
         var entity = await Repository.GetFirstAsync(x => x.Email == input.Email);
@@ -55,7 +55,7 @@ public class TenantGameUserEntityService : GenericCrudSelectService<Entity.Tenan
         entity.Password = _tenantGameUserPasswordService.Hash(input.Password);
         await Repository.InsertAsync(entity);
 
-        return entity.Adapt<TenantGameUserEntityResponse>();
+        return entity.Adapt<GameUserResponse>();
     }
 
     /// <summary>

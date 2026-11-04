@@ -12,7 +12,7 @@ namespace GameFrameX.Application.NoticeCenter.GameMailCampaign.Dto;
 /// 运营邮件 Campaign 实体输入基类（AddAsync / UpdateAsync 公共字段）。
 /// <para>多语言内容 / 附件 / 过滤条件以 JSON 字符串承载（与实体列一致），由前端编辑器序列化后传入。</para>
 /// </summary>
-public abstract class TenantGameMailCampaignEntityBaseRequest : BaseUpdateRequest
+public abstract class GameMailCampaignBaseRequest : BaseUpdateRequest
 {
     /// <summary>
     /// 区服Id。用于解析目标游戏服 HttpManageUrl 调用 Server 发布接口。

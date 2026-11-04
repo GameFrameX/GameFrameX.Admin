@@ -21,8 +21,8 @@ public sealed class MainDatabaseGovernanceServiceTests
             var penalties = new SqlSugarRepository<TenantGamePenaltyEntity> { Context = database.MainDb };
             var appeals = new SqlSugarRepository<TenantGamePenaltyAppealEntity> { Context = database.MainDb };
             var user = new CurrentUserContext(new HttpContextAccessor());
-            var penaltyService = new TenantGamePenaltyEntityService(penalties, user, null!);
-            var appealService = new TenantGamePenaltyAppealEntityService(appeals, penalties, user);
+            var penaltyService = new GamePenaltyService(penalties, user, null!);
+            var appealService = new GamePenaltyAppealService(appeals, penalties, user);
             var penalty = await penaltyService.AddAsync(new() { TargetId = "account-1", Reason = "test", ActionType = PenaltyActionTypeEnum.Ban });
             Assert.Equal(PenaltyStatusEnum.Active, penalty.Status);
             Assert.Single((await penaltyService.PageAsync(new() { TargetId = "account-1" })).Items);
@@ -41,7 +41,7 @@ public sealed class MainDatabaseGovernanceServiceTests
         {
             database.InitTenantTables(typeof(TenantGamePenaltyEntity), typeof(TenantGameReportEntity));
             var reports = new SqlSugarRepository<TenantGameReportEntity> { Context = database.MainDb };
-            var service = new TenantGameReportEntityService(reports,
+            var service = new GameReportService(reports,
                 new SqlSugarRepository<TenantGamePenaltyEntity> { Context = database.MainDb },
                 new CurrentUserContext(new HttpContextAccessor()));
             var report = await service.AddAsync(new() { ReporterId = 1, TargetId = "account-1", EvidenceJson = "{}" });

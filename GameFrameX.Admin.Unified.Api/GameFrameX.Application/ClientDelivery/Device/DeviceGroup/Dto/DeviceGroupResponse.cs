@@ -4,8 +4,8 @@ namespace GameFrameX.Application.ClientDelivery.Device.DeviceGroup.Dto;
 /// 机器码分组输出参数
 /// </summary>
 // 纯 POCO 投影（C228）：属性名与 TenantGameAppDeviceGroupEntity 保持一致，
-// 供 .Select&lt;TenantDeviceGroupResponse&gt;() 自动投影与 Mapster 按名映射。
-public class TenantDeviceGroupResponse : IBasePageResponse<global::GameFrameX.Entity.Tenant.Device.TenantGameAppDeviceGroupEntity>
+// 供 .Select&lt;DeviceGroupResponse&gt;() 自动投影与 Mapster 按名映射。
+public class DeviceGroupResponse : IBasePageResponse<global::GameFrameX.Entity.Tenant.Device.TenantGameAppDeviceGroupEntity>
 {
     /// <summary>
     /// Id

@@ -12,12 +12,12 @@ namespace GameFrameX.Application.Dashboard.GameHome;
 /// 游戏账号服务
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 111)]
-public class TenantGameHomeEntityService : IAdminApiController
+public class GameHomeService : IAdminApiController
 {
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ISqlSugarClient _tenantDbConnectionProvider;
 
-    public TenantGameHomeEntityService(IHttpClientFactory httpClientFactory, ISqlSugarClient tenantDbConnectionProvider)
+    public GameHomeService(IHttpClientFactory httpClientFactory, ISqlSugarClient tenantDbConnectionProvider)
     {
         _httpClientFactory = httpClientFactory;
         _tenantDbConnectionProvider = tenantDbConnectionProvider;

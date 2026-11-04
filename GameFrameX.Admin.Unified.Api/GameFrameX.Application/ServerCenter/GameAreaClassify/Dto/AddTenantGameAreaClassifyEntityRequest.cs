@@ -4,8 +4,8 @@ namespace GameFrameX.Application.ServerCenter.GameAreaClassify.Dto;
 /// 游戏大区分类增加输入参数
 /// </summary>
 // AddAsync 必须继承 BaseAddRequest（空基类），不应携带主键/版本号。
-// 此前继承 TenantGameAreaClassifyEntityBaseRequest（其又继承 BaseUpdateRequest），会把 [Required] Id/Version 带入 AddAsync 校验，
-// 导致新增报 {"Version":["版本号不能为空"]}。业务字段在此直接声明（与 TenantGameAreaClassifyEntityBaseRequest 镜像），与 AddGameAppRequest 约定一致。
+// 此前继承 GameAreaClassifyBaseRequest（其又继承 BaseUpdateRequest），会把 [Required] Id/Version 带入 AddAsync 校验，
+// 导致新增报 {"Version":["版本号不能为空"]}。业务字段在此直接声明（与 GameAreaClassifyBaseRequest 镜像），与 AddGameAppRequest 约定一致。
 public class AddTenantGameAreaClassifyEntityRequest : BaseAddRequest
 {
 

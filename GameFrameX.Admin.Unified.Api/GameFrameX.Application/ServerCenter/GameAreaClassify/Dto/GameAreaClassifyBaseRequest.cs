@@ -3,7 +3,7 @@ namespace GameFrameX.Application.ServerCenter.GameAreaClassify.Dto;
 /// <summary>
 /// 游戏大区分类实体基类 - 包含 AddInput 和 UpdateInput 的公共字段
 /// </summary>
-public abstract class TenantGameAreaClassifyEntityBaseRequest : BaseUpdateRequest
+public abstract class GameAreaClassifyBaseRequest : BaseUpdateRequest
 {
 
     /// <summary>

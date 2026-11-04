@@ -3,8 +3,8 @@
 /// <summary>
 /// 游戏内横幅公告更新输入参数
 /// </summary>
-public class UpdateTenantGameBannerAnnouncementEntityRequest : TenantGameBannerAnnouncementEntityBaseRequest
+public class UpdateTenantGameBannerAnnouncementEntityRequest : GameBannerAnnouncementBaseRequest
 {
-    // Id 字段已从 TenantGameBannerAnnouncementEntityBaseRequest → BaseUpdateRequest 继承
+    // Id 字段已从 GameBannerAnnouncementBaseRequest → BaseUpdateRequest 继承
     // 所有公共字段也已继承
 }

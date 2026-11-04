@@ -11,12 +11,12 @@ namespace GameFrameX.Application.NoticeCenter.GameAnnouncement;
 /// 游戏公告服务
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
-public class TenantGameAnnouncementEntityService : GenericCrudService<Entity.Tenant.Game.Announcement.TenantGameAnnouncementEntity, AddTenantGameAnnouncementEntityRequest, UpdateTenantGameAnnouncementEntityRequest, TenantGameAnnouncementEntityResponse, PageTenantGameAnnouncementEntityRequest>
+public class GameAnnouncementService : GenericCrudService<Entity.Tenant.Game.Announcement.TenantGameAnnouncementEntity, AddTenantGameAnnouncementEntityRequest, UpdateTenantGameAnnouncementEntityRequest, GameAnnouncementResponse, PageTenantGameAnnouncementEntityRequest>
 {
     private const string DefaultLanguage = "default";
     private readonly IOnlineLiveOpsDispatchService _dispatchService;
 
-    public TenantGameAnnouncementEntityService(
+    public GameAnnouncementService(
         SqlSugarRepository<Entity.Tenant.Game.Announcement.TenantGameAnnouncementEntity> repository,
         IOnlineLiveOpsDispatchService dispatchService) : base(repository)
     {
@@ -26,7 +26,7 @@ public class TenantGameAnnouncementEntityService : GenericCrudService<Entity.Ten
     /// <summary>
     /// 构建分页查询条件（含日期范围过滤）
     /// </summary>
-    protected override ISugarQueryable<TenantGameAnnouncementEntityResponse> BuildPageQuery(PageTenantGameAnnouncementEntityRequest input)
+    protected override ISugarQueryable<GameAnnouncementResponse> BuildPageQuery(PageTenantGameAnnouncementEntityRequest input)
     {
         var language = input.Language?.Trim();
         var hasLanguage = !string.IsNullOrWhiteSpace(language);
@@ -36,7 +36,7 @@ public class TenantGameAnnouncementEntityService : GenericCrudService<Entity.Ten
                               .WhereIF(hasLanguage && isDefaultLanguage, u => u.Language == language || u.Language == null || u.Language == string.Empty)
                               .WhereIF(input.AreaId > 0, u => u.AreaId == input.AreaId)
                               .WhereIF(!string.IsNullOrWhiteSpace(input.Title), u => u.Title.Contains(input.Title.Trim()))
-                              .Select<TenantGameAnnouncementEntityResponse>()
+                              .Select<GameAnnouncementResponse>()
             ;
 
         query = ApplyDateRangeFilter(query, input.StartTimeRange, "u.StartTime");
@@ -68,7 +68,7 @@ public class TenantGameAnnouncementEntityService : GenericCrudService<Entity.Ten
         NormalizeInput(input);
     }
 
-    private static void NormalizeInput(ITenantGameAnnouncementEntityRequest input)
+    private static void NormalizeInput(IGameAnnouncementRequest input)
     {
         input.Language = string.IsNullOrWhiteSpace(input.Language)
                              ? DefaultLanguage

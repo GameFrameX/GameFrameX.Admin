@@ -41,15 +41,15 @@ public sealed class TenantCredentialWritePathCryptoTests : IDisposable
     [Fact]
     public async Task SignatureKey_AddAndRotate_RevealPlaintextOnce_StoreCipherOnly()
     {
-        var service = new TenantAppSignatureKeyEntityService(
+        var service = new AppSignatureKeyService(
             new Repository<TenantAppSignatureKeyEntity>(_db.MainDb));
 
-        var added = await service.AddAsync(new TenantAppSignatureKeyAddRequest { Remark = "unit-add", });
+        var added = await service.AddAsync(new AppSignatureKeyAddRequest { Remark = "unit-add", });
         var storedAdded = _db.TenantDb.Queryable<TenantAppSignatureKeyEntity>().Filter(null, true).First(u => u.Id == added.Id);
         Assert.StartsWith(TenantSecretCrypto.EncryptedPrefix, storedAdded.Secret, StringComparison.Ordinal);
         Assert.Equal(added.Secret, TenantSecretCrypto.Decrypt(storedAdded.Secret));
 
-        var rotated = await service.RotateAsync(new TenantAppSignatureKeyRotateRequest { });
+        var rotated = await service.RotateAsync(new AppSignatureKeyRotateRequest { });
         var storedRotated = _db.TenantDb.Queryable<TenantAppSignatureKeyEntity>().Filter(null, true).First(u => u.Id == rotated.Id);
         Assert.StartsWith(TenantSecretCrypto.EncryptedPrefix, storedRotated.Secret, StringComparison.Ordinal);
         Assert.Equal(rotated.Secret, TenantSecretCrypto.Decrypt(storedRotated.Secret));
@@ -60,7 +60,7 @@ public sealed class TenantCredentialWritePathCryptoTests : IDisposable
     [Fact]
     public async Task AdvertisementConfig_AddEncryptsColumnsAndSensitiveJsonFields_MaskUpdatePreserves()
     {
-        var service = new TenantAdvertisementCallbackConfigEntityService(
+        var service = new AdvertisementCallbackConfigService(
             new Repository<TenantAdvertisementCallbackConfigEntity>(_db.MainDb),
             new AdvertisementCallbackConfigSchemaProvider());
         var configJson = "{\"callbackUrl\":\"https://cb.example.com/hook\",\"signingSecret\":\"ad-plain-secret\"}";

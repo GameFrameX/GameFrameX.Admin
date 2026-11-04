@@ -35,7 +35,7 @@ public sealed class MainDatabaseOpenAccessServiceTests : IDisposable
 
             database.MainDb.Insertable(user).ExecuteCommand();
             var repository = new SqlSugarRepository<TenantGameAppOpenAccessEntity> { Context = database.MainDb };
-            var service = new TenantGameAppOpenAccessService(repository,
+            var service = new GameAppOpenAccessService(repository,
                 new SqlSugarRepository<TenantUserEntity> { Context = database.MainDb });
             await Assert.ThrowsAnyAsync<Exception>(() => service.AddAsync(new()
             {

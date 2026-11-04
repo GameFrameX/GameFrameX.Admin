@@ -102,13 +102,13 @@ public sealed class ChannelDefinitionSoftDeleteVisibilityTests : IDisposable
         }).ExecuteCommand();
     }
 
-    private TenantChannelDefinitionService CreateService()
+    private ChannelDefinitionService CreateService()
     {
         // 复刻 Admin host DI 形态：Repository<T> 按实体边界路由——租户表经 TenantDbProvider 走租户库
         // （生产过滤器 + TenantId 填充 AOP 已装配），全局表落主库连接。
         var currentUserContext = new CurrentUserContext(new HttpContextAccessor());
 
-        return new TenantChannelDefinitionService(
+        return new ChannelDefinitionService(
             _db.Repository<TenantChannelDefinitionEntity>(),
             _db.Repository<GlobalChannelDefinitionEntity>(),
             _db.Repository<TenantGameAppPackageEntity>(),

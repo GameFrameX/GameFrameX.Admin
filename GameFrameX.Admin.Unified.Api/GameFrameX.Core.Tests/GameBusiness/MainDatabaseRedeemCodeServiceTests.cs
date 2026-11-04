@@ -15,7 +15,7 @@ public sealed class MainDatabaseRedeemCodeServiceTests
         using (var database = new ClientApiTestDb())
         {
             database.InitTenantTables(typeof(TenantGameRedeemCodeChannelEntity));
-            var service = new TenantGameRedeemCodeChannelEntityService(new SqlSugarRepository<TenantGameRedeemCodeChannelEntity>
+            var service = new GameRedeemCodeChannelService(new SqlSugarRepository<TenantGameRedeemCodeChannelEntity>
             {
                 Context = database.MainDb,
             });

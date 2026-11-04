@@ -2,7 +2,7 @@ namespace GameFrameX.Application.CommerceCenter.GameOrderFulfillment.Dto;
 
 /// <summary>
 /// 权益发货账本高风险动作输入参数（C120）：RefundAsync / CompensateAsync / ResendAsync 共用。
-/// 兼作 GenericCrudService 的 TAddRequest（AddAsync 端点已由 OnAddingAsync 抛错关闭，与 TenantGameOrderEntityService 复用 AddInput 于 SendAsync 同款）。
+/// 兼作 GenericCrudService 的 TAddRequest（AddAsync 端点已由 OnAddingAsync 抛错关闭，与 GameOrderService 复用 AddInput 于 SendAsync 同款）。
 /// </summary>
 public class FulfillmentActionRequest : BaseAddRequest
 {

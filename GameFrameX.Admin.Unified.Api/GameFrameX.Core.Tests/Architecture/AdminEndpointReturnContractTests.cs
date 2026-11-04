@@ -32,22 +32,22 @@ public sealed class AdminEndpointReturnContractTests
     /// </summary>
     private static readonly HashSet<string> SensitiveDisplayFieldAllowlist = new(StringComparer.Ordinal)
     {
-        // App 签名密钥环：列表/详情恒 ******（PageAsync 强制重置）；AddAsync/RotateAsync 响应一次性回传明文（C2 TenantAppSignatureKeyEntityService）
-        "GameFrameX.Application.ClientDelivery.Security.AppSignatureKey.Dto.TenantAppSignatureKeyResponse.Secret",
-        "GameFrameX.Application.ClientDelivery.Security.AppSignatureKey.Dto.TenantAppSignatureKeyRevealResponse.Secret",
-        // App 会话密钥环：列表/详情恒 ******（PageAsync/DetailAsync 强制重置）；AddAsync/RotateAsync 响应一次性回传明文（C5 TenantSessionKeyEntityService）
-        "GameFrameX.Application.ClientDelivery.Security.SessionKey.Dto.TenantSessionKeyResponse.Secret",
-        "GameFrameX.Application.ClientDelivery.Security.SessionKey.Dto.TenantSessionKeyRevealResponse.Secret",
-        // OpenAccess 凭证签发/轮换响应一次性回传明文，列表与详情不再输出（TenantGameAppOpenAccessService）
-        "GameFrameX.Application.Platform.OpenAccess.GameAppOpenAccess.Dto.TenantGameAppOpenAccessSecretResponse.AccessSecret",
+        // App 签名密钥环：列表/详情恒 ******（PageAsync 强制重置）；AddAsync/RotateAsync 响应一次性回传明文（C2 AppSignatureKeyService）
+        "GameFrameX.Application.ClientDelivery.Security.AppSignatureKey.Dto.AppSignatureKeyResponse.Secret",
+        "GameFrameX.Application.ClientDelivery.Security.AppSignatureKey.Dto.AppSignatureKeyRevealResponse.Secret",
+        // App 会话密钥环：列表/详情恒 ******（PageAsync/DetailAsync 强制重置）；AddAsync/RotateAsync 响应一次性回传明文（C5 SessionKeyService）
+        "GameFrameX.Application.ClientDelivery.Security.SessionKey.Dto.SessionKeyResponse.Secret",
+        "GameFrameX.Application.ClientDelivery.Security.SessionKey.Dto.SessionKeyRevealResponse.Secret",
+        // OpenAccess 凭证签发/轮换响应一次性回传明文，列表与详情不再输出（GameAppOpenAccessService）
+        "GameFrameX.Application.Platform.OpenAccess.GameAppOpenAccess.Dto.GameAppOpenAccessSecretResponse.AccessSecret",
         // MaskSensitiveFields 输出 ******，表单回显依赖（SystemEmailProviderService）
         "GameFrameX.Application.Platform.Email.Dto.SystemEmailProviderResponse.Password",
         "GameFrameX.Application.Platform.Email.Dto.SystemEmailProviderResponse.SecretId",
         "GameFrameX.Application.Platform.Email.Dto.SystemEmailProviderResponse.SecretKey",
         // TenantClientApiConfigMaskHelper / 动态脱敏输出 ******（各 Config Service）
-        "GameFrameX.Application.ClientDelivery.AdvertisementCallbackConfig.Dto.TenantAdvertisementCallbackConfigResponse.SigningSecret",
-        "GameFrameX.Application.ClientDelivery.AdvertisementCallbackConfig.Dto.TenantAdvertisementCallbackConfigResponse.VerificationKeys",
-        "GameFrameX.Application.ClientDelivery.ClientApiPolicy.Dto.TenantClientApiPolicyResponse.SigningKey",
+        "GameFrameX.Application.ClientDelivery.AdvertisementCallbackConfig.Dto.AdvertisementCallbackConfigResponse.SigningSecret",
+        "GameFrameX.Application.ClientDelivery.AdvertisementCallbackConfig.Dto.AdvertisementCallbackConfigResponse.VerificationKeys",
+        "GameFrameX.Application.ClientDelivery.ClientApiPolicy.Dto.ClientApiPolicyResponse.SigningKey",
         // 平台 JWT 配置：IssuerSigningKey 恒为掩码常量（C244），Has*/Validate* 为布尔标志/配置（PlatformJwtConfigService）
         "GameFrameX.Core.Service.PlatformJwt.Dto.PlatformJwtConfigResponse.IssuerSigningKey",
         "GameFrameX.Core.Service.PlatformJwt.Dto.PlatformJwtConfigResponse.HasSigningKey",

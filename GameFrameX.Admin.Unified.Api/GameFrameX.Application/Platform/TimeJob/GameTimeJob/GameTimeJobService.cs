@@ -6,12 +6,12 @@ namespace GameFrameX.Application.Platform.TimeJob.GameTimeJob;
 /// 游戏定时任务服务
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
-public class TenantGameTimeJobEntityService
+public class GameTimeJobService
     : GenericCrudSelectService<Entity.Tenant.Game.TenantGameTimeJobEntity,
         AddTenantGameTimeJobEntityRequest, UpdateTenantGameTimeJobEntityRequest,
-        TenantGameTimeJobEntityResponse, PageTenantGameTimeJobEntityRequest>
+        GameTimeJobResponse, PageTenantGameTimeJobEntityRequest>
 {
-    public TenantGameTimeJobEntityService(SqlSugarRepository<Entity.Tenant.Game.TenantGameTimeJobEntity> repository)
+    public GameTimeJobService(SqlSugarRepository<Entity.Tenant.Game.TenantGameTimeJobEntity> repository)
         : base(repository)
     {
     }
@@ -38,10 +38,10 @@ public class TenantGameTimeJobEntityService
         }
     }
 
-    protected override ISugarQueryable<TenantGameTimeJobEntityResponse> BuildPageQuery(PageTenantGameTimeJobEntityRequest input)
+    protected override ISugarQueryable<GameTimeJobResponse> BuildPageQuery(PageTenantGameTimeJobEntityRequest input)
     {
         return Repository.AsQueryable()
                          .WhereIF(!string.IsNullOrWhiteSpace(input.Name), u => u.Name.Contains(input.Name.Trim()))
-                         .Select<TenantGameTimeJobEntityResponse>();
+                         .Select<GameTimeJobResponse>();
     }
 }

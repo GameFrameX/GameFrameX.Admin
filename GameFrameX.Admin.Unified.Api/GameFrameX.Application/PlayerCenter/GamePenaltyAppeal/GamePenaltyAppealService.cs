@@ -11,15 +11,15 @@ namespace GameFrameX.Application.PlayerCenter.GamePenaltyAppeal;
 /// <para>ReviewAsync：通过→同步撤销关联处罚（写 RevokeAsync* + SourceAppealId 审计链）；驳回→写 Rejected。同一申诉不可重复 ReviewAsync。</para>
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
-public class TenantGamePenaltyAppealEntityService
+public class GamePenaltyAppealService
     : GenericCrudService<Entity.Tenant.Game.TenantGamePenaltyAppealEntity,
         AddTenantGamePenaltyAppealEntityRequest, UpdateTenantGamePenaltyAppealEntityRequest,
-        TenantGamePenaltyAppealEntityResponse, PageTenantGamePenaltyAppealEntityRequest>
+        GamePenaltyAppealResponse, PageTenantGamePenaltyAppealEntityRequest>
 {
     private readonly CurrentUserContext _currentUserContext;
     private readonly SqlSugarRepository<Entity.Tenant.Game.TenantGamePenaltyEntity> _penaltyRepository;
 
-    public TenantGamePenaltyAppealEntityService(SqlSugarRepository<Entity.Tenant.Game.TenantGamePenaltyAppealEntity> repository,
+    public GamePenaltyAppealService(SqlSugarRepository<Entity.Tenant.Game.TenantGamePenaltyAppealEntity> repository,
         SqlSugarRepository<Entity.Tenant.Game.TenantGamePenaltyEntity> penaltyRepository,
         CurrentUserContext currentUserContext)
         : base(repository)
@@ -31,7 +31,7 @@ public class TenantGamePenaltyAppealEntityService
     /// <summary>
     /// 提交申诉：校验处罚生效中、同一处罚无待审申诉；Status 服务端强制为 Pending。
     /// </summary>
-    public override async Task<TenantGamePenaltyAppealEntityResponse> AddAsync(AddTenantGamePenaltyAppealEntityRequest input)
+    public override async Task<GamePenaltyAppealResponse> AddAsync(AddTenantGamePenaltyAppealEntityRequest input)
     {
         var penalty = await _penaltyRepository.GetFirstAsync(p => p.Id == input.PenaltyId);
         if (penalty == null)
@@ -60,19 +60,19 @@ public class TenantGamePenaltyAppealEntityService
         var entity = input.Adapt<Entity.Tenant.Game.TenantGamePenaltyAppealEntity>();
         entity.Status = AppealStatusEnum.Pending;
         await Repository.InsertWithDiffLogAsync(entity);
-        return entity.Adapt<TenantGamePenaltyAppealEntityResponse>();
+        return entity.Adapt<GamePenaltyAppealResponse>();
     }
 
     /// <summary>
     /// 分页查询：按 PenaltyId / Status 过滤。
     /// </summary>
-    protected override ISugarQueryable<TenantGamePenaltyAppealEntityResponse> BuildPageQuery(PageTenantGamePenaltyAppealEntityRequest input)
+    protected override ISugarQueryable<GamePenaltyAppealResponse> BuildPageQuery(PageTenantGamePenaltyAppealEntityRequest input)
     {
         return Repository.AsQueryable()
 
                          .WhereIF(input.PenaltyId.HasValue, a => a.PenaltyId == input.PenaltyId.Value)
                          .WhereIF(input.Status.HasValue, a => a.Status == input.Status.Value)
-                         .Select<TenantGamePenaltyAppealEntityResponse>();
+                         .Select<GamePenaltyAppealResponse>();
     }
 
     /// <summary>

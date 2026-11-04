@@ -93,19 +93,19 @@ public class TenantGameAppOpenAccessEntityTests
     [Fact]
     public void TenantGameAppOpenAccessActionInput_HasNoApplicationDimension()
     {
-        var input = new TenantGameAppOpenAccessActionRequest();
+        var input = new GameAppOpenAccessActionRequest();
         var results = new List<ValidationResult>();
         var isValid = Validator.TryValidateObject(input, new ValidationContext(input), results, true);
 
         Assert.False(isValid);
-        Assert.Null(typeof(TenantGameAppOpenAccessActionRequest).GetProperty("AppId"));
+        Assert.Null(typeof(GameAppOpenAccessActionRequest).GetProperty("AppId"));
     }
 
     [Fact]
     public void GenerateAccessKey_ReturnsNonEmptyAndUnique()
     {
-        var k1 = TenantGameAppOpenAccessService.GenerateAccessKey();
-        var k2 = TenantGameAppOpenAccessService.GenerateAccessKey();
+        var k1 = GameAppOpenAccessService.GenerateAccessKey();
+        var k2 = GameAppOpenAccessService.GenerateAccessKey();
 
         Assert.False(string.IsNullOrEmpty(k1));
         Assert.NotEqual(k1, k2);
@@ -114,8 +114,8 @@ public class TenantGameAppOpenAccessEntityTests
     [Fact]
     public void GenerateAccessSecret_ReturnsNonEmptyAndUnique()
     {
-        var s1 = TenantGameAppOpenAccessService.GenerateAccessSecret();
-        var s2 = TenantGameAppOpenAccessService.GenerateAccessSecret();
+        var s1 = GameAppOpenAccessService.GenerateAccessSecret();
+        var s2 = GameAppOpenAccessService.GenerateAccessSecret();
 
         Assert.False(string.IsNullOrEmpty(s1));
         Assert.NotEqual(s1, s2);
@@ -126,7 +126,7 @@ public class TenantGameAppOpenAccessEntityTests
     [Fact]
     public void EnsureValidScopes_AcceptsValidArray()
     {
-        var scopes = TenantGameAppOpenAccessService.EnsureValidScopes("[\"package-report\",\"ci-trigger\"]");
+        var scopes = GameAppOpenAccessService.EnsureValidScopes("[\"package-report\",\"ci-trigger\"]");
 
         Assert.Equal(2, scopes.Count);
         Assert.Contains("package-report", scopes);
@@ -136,30 +136,30 @@ public class TenantGameAppOpenAccessEntityTests
     [Fact]
     public void EnsureValidScopes_RejectsNullOrWhitespace()
     {
-        Assert.ThrowsAny<Exception>(() => TenantGameAppOpenAccessService.EnsureValidScopes(null!));
-        Assert.ThrowsAny<Exception>(() => TenantGameAppOpenAccessService.EnsureValidScopes(string.Empty));
-        Assert.ThrowsAny<Exception>(() => TenantGameAppOpenAccessService.EnsureValidScopes("   "));
+        Assert.ThrowsAny<Exception>(() => GameAppOpenAccessService.EnsureValidScopes(null!));
+        Assert.ThrowsAny<Exception>(() => GameAppOpenAccessService.EnsureValidScopes(string.Empty));
+        Assert.ThrowsAny<Exception>(() => GameAppOpenAccessService.EnsureValidScopes("   "));
     }
 
     [Fact]
     public void EnsureValidScopes_RejectsInvalidJson()
     {
-        Assert.ThrowsAny<Exception>(() => TenantGameAppOpenAccessService.EnsureValidScopes("not-json"));
+        Assert.ThrowsAny<Exception>(() => GameAppOpenAccessService.EnsureValidScopes("not-json"));
     }
 
     [Fact]
     public void EnsureValidScopes_RejectsEmptyArrayOrBlankItem()
     {
-        Assert.ThrowsAny<Exception>(() => TenantGameAppOpenAccessService.EnsureValidScopes("[]"));
-        Assert.ThrowsAny<Exception>(() => TenantGameAppOpenAccessService.EnsureValidScopes("[\"\",\"x\"]"));
+        Assert.ThrowsAny<Exception>(() => GameAppOpenAccessService.EnsureValidScopes("[]"));
+        Assert.ThrowsAny<Exception>(() => GameAppOpenAccessService.EnsureValidScopes("[\"\",\"x\"]"));
     }
 
     [Fact]
     public void NormalizeScopesJson_RoundTripsThroughEnsureValidScopes()
     {
         var scopes = new List<string> { "package-report", "ci-trigger", };
-        var json = TenantGameAppOpenAccessService.NormalizeScopesJson(scopes);
-        var parsed = TenantGameAppOpenAccessService.EnsureValidScopes(json);
+        var json = GameAppOpenAccessService.NormalizeScopesJson(scopes);
+        var parsed = GameAppOpenAccessService.EnsureValidScopes(json);
 
         Assert.Equal(scopes.Count, parsed.Count);
         Assert.Equal("package-report", parsed[0]);
@@ -170,7 +170,7 @@ public class TenantGameAppOpenAccessEntityTests
     public void TenantGameAppOpenAccessSecretResult_SerializesSecretForOneTimeDisplay()
     {
         // SecretResult 仅签发/轮换响应返回，前端一次性展示；序列化含明文 AccessSecret。
-        var result = new TenantGameAppOpenAccessSecretResponse
+        var result = new GameAppOpenAccessSecretResponse
         {
             Id = 1,
             AccessKey = "ak_test",

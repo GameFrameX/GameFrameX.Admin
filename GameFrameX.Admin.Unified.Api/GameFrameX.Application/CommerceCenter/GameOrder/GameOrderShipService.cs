@@ -16,13 +16,13 @@ namespace GameFrameX.Application.CommerceCenter.GameOrder;
 /// 重复请求回放首次结果（Success 口径）。订单 Status 前置守卫保留领域完整性语义；进程内订单锁仅作
 /// 同订单操作串行化。站点规则见 Store 类备注。</para>
 /// </summary>
-public class TenantGameOrderShipService
+public class GameOrderShipService
 {
     private static readonly ConcurrentDictionary<long, SemaphoreSlim> OrderLocks = new();
     private readonly ISqlSugarClient _db;
     private readonly IHttpClientFactory _httpClientFactory;
 
-    public TenantGameOrderShipService(ISqlSugarClient db, IHttpClientFactory httpClientFactory)
+    public GameOrderShipService(ISqlSugarClient db, IHttpClientFactory httpClientFactory)
     {
         _db = db;
         _httpClientFactory = httpClientFactory;

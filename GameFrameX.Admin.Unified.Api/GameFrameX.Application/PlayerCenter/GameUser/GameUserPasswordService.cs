@@ -11,7 +11,7 @@ namespace GameFrameX.Application.PlayerCenter.GameUser;
 /// <para>Hash/Verify 入口对 null 明文统一按空串处理（兼容 C198 既有测试矩阵 + 防止上层漏校验时 Foundation 抛
 /// ArgumentNullException）；null storedHash 在 Verify 中直接返回 false（Foundation Verify 对 null 抛）。</para>
 /// </summary>
-public class TenantGameUserPasswordService
+public class GameUserPasswordService
 {
     /// <summary>
     /// 账号枚举防护诱饵哈希：登录路径账号不存在时，用它跑一次 <see cref="Verify"/>，

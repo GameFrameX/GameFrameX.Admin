@@ -63,7 +63,7 @@ public sealed class GameAppAssetPackageVersionSelectTests : IDisposable
 
     private async Task<List<BaseSelectPageResponse>> BuildSelectAsync(long? appPackageId, string? searchKey = null)
     {
-        var service = new TenantGameAppAssetPackageVersionService(
+        var service = new GameAppAssetPackageVersionService(
             Repository<TenantGameAppAssetPackageVersionEntity>(),
             Repository<TenantGameAppAssetPackageVersionHistoryEntity>(),
             Repository<TenantGameAppPackageEntity>(),

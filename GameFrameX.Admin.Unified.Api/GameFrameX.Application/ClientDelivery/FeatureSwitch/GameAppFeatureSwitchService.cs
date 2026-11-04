@@ -12,7 +12,7 @@ namespace GameFrameX.Application.ClientDelivery.FeatureSwitch;
 /// Default 哨兵、同作用域组合不重复。</para>
 /// </summary>
 [ApiDescriptionSettings(ClientConst.GroupName, Order = 100)]
-public class TenantGameAppFeatureSwitchService : GenericCrudService<TenantGameAppFeatureSwitchEntity, AddGameAppFeatureSwitchRequest, UpdateGameAppFeatureSwitchRequest, GameAppFeatureSwitchResponse, PageGameAppFeatureSwitchRequest>
+public class GameAppFeatureSwitchService : GenericCrudService<TenantGameAppFeatureSwitchEntity, AddGameAppFeatureSwitchRequest, UpdateGameAppFeatureSwitchRequest, GameAppFeatureSwitchResponse, PageGameAppFeatureSwitchRequest>
 {
     private readonly SqlSugarRepository<TenantGameAppPackageEntity> _packageRepository;
 
@@ -21,7 +21,7 @@ public class TenantGameAppFeatureSwitchService : GenericCrudService<TenantGameAp
     /// </summary>
     /// <param name="repository">开关注册表仓储。</param>
     /// <param name="packageRepository">分包仓储，供包名作用域校验使用。</param>
-    public TenantGameAppFeatureSwitchService(SqlSugarRepository<TenantGameAppFeatureSwitchEntity> repository,
+    public GameAppFeatureSwitchService(SqlSugarRepository<TenantGameAppFeatureSwitchEntity> repository,
         SqlSugarRepository<TenantGameAppPackageEntity> packageRepository) : base(repository)
     {
         _packageRepository = packageRepository;

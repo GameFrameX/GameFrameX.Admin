@@ -3,7 +3,7 @@ namespace GameFrameX.Application.ServerCenter.GameArea.Dto;
 /// <summary>
 /// 游戏区服更新输入参数
 /// </summary>
-public class UpdateTenantGameAreaEntityRequest : TenantGameAreaEntityBaseRequest
+public class UpdateTenantGameAreaEntityRequest : GameAreaBaseRequest
 {
     /// <summary>
     /// 是否启用
@@ -25,5 +25,5 @@ public class UpdateTenantGameAreaEntityRequest : TenantGameAreaEntityBaseRequest
     /// </summary>
     public long PackageId { get; set; }
 
-    // Id、ServerParams 及其余公共字段已从 TenantGameAreaEntityBaseRequest 继承
+    // Id、ServerParams 及其余公共字段已从 GameAreaBaseRequest 继承
 }

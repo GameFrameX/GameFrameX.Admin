@@ -272,7 +272,7 @@ public sealed class OnlineReportCaseServiceTests : IDisposable
             Repository<TenantGameAreaEntity>(),
             onlineServerClient,
             factory);
-        var penaltyService = new TenantGamePenaltyEntityService(
+        var penaltyService = new GamePenaltyService(
             Repository<TenantGamePenaltyEntity>(),
             userContext,
             linkService);

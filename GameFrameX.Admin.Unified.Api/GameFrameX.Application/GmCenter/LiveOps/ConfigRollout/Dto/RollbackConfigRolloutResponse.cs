@@ -5,6 +5,6 @@ namespace GameFrameX.Application.GmCenter.LiveOps.ConfigRollout.Dto;
 /// <summary>
 /// 灰度回滚输出（回滚生成的版本化新行回显，TargetVersion 指向恢复目标）。
 /// </summary>
-public sealed class RollbackConfigRolloutResponse : TenantGameOnlineConfigRolloutResponse
+public sealed class RollbackConfigRolloutResponse : GameOnlineConfigRolloutResponse
 {
 }

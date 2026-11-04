@@ -3,7 +3,7 @@ namespace GameFrameX.Application.NoticeCenter.GameAnnouncement.Dto;
 /// <summary>
 /// 游戏公告新增/更新共有输入参数。
 /// </summary>
-public class TenantGameAnnouncementEntityBaseRequest : BaseAddRequest, ITenantGameAnnouncementEntityRequest
+public class GameAnnouncementBaseRequest : BaseAddRequest, IGameAnnouncementRequest
 {
     /// <inheritdoc />
     public string Language { get; set; } = null!;

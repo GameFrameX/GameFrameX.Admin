@@ -12,7 +12,7 @@ public sealed class AdminApiRouteRulesTests
     public void ServiceName_BecomesLowerCamelControllerRoute()
     {
         Assert.Equal("systemAuth", AdminApiRouteRules.GetControllerRouteSegment(typeof(SystemAuthService)));
-        Assert.Equal("tenantGameHomeEntity", AdminApiRouteRules.GetControllerRouteSegment(typeof(TenantGameHomeEntityService)));
+        Assert.Equal("gameHome", AdminApiRouteRules.GetControllerRouteSegment(typeof(GameHomeService)));
     }
 
     [Fact]
@@ -28,11 +28,11 @@ public sealed class AdminApiRouteRulesTests
     [Fact]
     public void ExplicitHttpMethod_KeepsConfiguredActionName()
     {
-        var method = typeof(TenantGameHomeEntityService).GetMethod(nameof(TenantGameHomeEntityService.GetOnlineAsync))!;
+        var method = typeof(GameHomeService).GetMethod(nameof(GameHomeService.GetOnlineAsync))!;
         var httpPost = method.GetCustomAttributes(typeof(HttpPostAttribute), true).OfType<HttpPostAttribute>().Single();
 
         Assert.Equal("getOnline", AdminApiRouteRules.GetActionRouteSegment(method, httpPost));
-        Assert.Equal("api/tenantGameHomeEntity/getOnline", AdminApiRouteRules.CombineRoute("tenantGameHomeEntity", "getOnline", httpPost.Template));
+        Assert.Equal("api/gameHome/getOnline", AdminApiRouteRules.CombineRoute("gameHome", "getOnline", httpPost.Template));
     }
 
     [Fact]

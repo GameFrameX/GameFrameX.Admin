@@ -3,7 +3,7 @@ namespace GameFrameX.Application.CommerceCenter.GameWebShop.Dto;
 /// <summary>
 /// 游戏商城实体基类 - 包含 AddInput 和 UpdateInput 的公共字段
 /// </summary>
-public abstract class TenantGameWebShopEntityBaseRequest : BaseUpdateRequest
+public abstract class GameWebShopBaseRequest : BaseUpdateRequest
 {
 
     /// <summary>
@@ -59,9 +59,9 @@ public abstract class TenantGameWebShopEntityBaseRequest : BaseUpdateRequest
     /// <summary>
     /// 转换为共享数据类
     /// </summary>
-    public TenantGameWebShopEntityDataRequest ToData()
+    public GameWebShopDataRequest ToData()
     {
-        return new TenantGameWebShopEntityDataRequest
+        return new GameWebShopDataRequest
         {
             Name = Name,
             Logo = Logo,

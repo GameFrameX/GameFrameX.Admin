@@ -9,6 +9,6 @@ namespace GameFrameX.Application.NoticeCenter.GameMailCampaign.Dto;
 /// <summary>
 /// 新增 Campaign 输入。
 /// </summary>
-public sealed class AddTenantGameMailCampaignEntityRequest : TenantGameMailCampaignEntityBaseRequest
+public sealed class AddTenantGameMailCampaignEntityRequest : GameMailCampaignBaseRequest
 {
 }

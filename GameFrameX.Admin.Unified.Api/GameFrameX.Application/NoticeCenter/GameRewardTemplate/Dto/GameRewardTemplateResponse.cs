@@ -3,7 +3,7 @@ namespace GameFrameX.Application.NoticeCenter.GameRewardTemplate.Dto;
 /// <summary>
 /// 奖励模板输出参数。
 /// </summary>
-public class TenantGameRewardTemplateEntityResponse : IBasePageResponse<Entity.Tenant.Game.TenantGameRewardTemplateEntity>
+public class GameRewardTemplateResponse : IBasePageResponse<Entity.Tenant.Game.TenantGameRewardTemplateEntity>
 {
     /// <summary>
     /// Id

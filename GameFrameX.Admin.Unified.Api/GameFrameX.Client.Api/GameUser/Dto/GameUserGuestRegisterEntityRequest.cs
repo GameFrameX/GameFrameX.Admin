@@ -5,7 +5,7 @@ namespace GameFrameX.Client.Api.GameUser.Dto;
 /// <summary>
 /// 游戏账号增加输入参数
 /// </summary>
-public class GameUserGuestRegisterEntityRequest : TenantGameUserEntityBaseRequest
+public class GameUserGuestRegisterEntityRequest : GameUserBaseRequest
 {
     /// <summary>
     /// 账号

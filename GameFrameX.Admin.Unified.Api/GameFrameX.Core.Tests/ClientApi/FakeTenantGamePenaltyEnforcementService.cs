@@ -8,7 +8,7 @@ namespace GameFrameX.Core.Tests.ClientApi;
 /// <summary>
 /// 处罚阻断查询测试替身。默认不阻断（返回 null）；传入 <paramref name="blocking"/> 可模拟命中封禁。
 /// </summary>
-internal sealed class FakeTenantGamePenaltyEnforcementService : ITenantGamePenaltyEnforcementService
+internal sealed class FakeTenantGamePenaltyEnforcementService : IGamePenaltyEnforcementService
 {
     private readonly TenantGamePenaltyEntity _blocking = null!;
 

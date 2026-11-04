@@ -10,27 +10,27 @@ namespace GameFrameX.Application.CommerceCenter.GameOrderFulfillment;
 /// <summary>
 /// 权益发货账本 Admin 查询/管理服务（C11-A / C120，承接 C113 账本事实源）。
 /// <para>只读：PageAsync（继承基类）/ GetAsync 详情（继承基类）/ ExportAsync 导出当前过滤列表（上限 1000 行）。</para>
-/// <para>高风险动作：RefundAsync / CompensateAsync / ResendAsync，全部委托 TenantGameOrderShipService（C113 已落地的账本写入 + 操作人审计 + 幂等链路）。</para>
+/// <para>高风险动作：RefundAsync / CompensateAsync / ResendAsync，全部委托 GameOrderShipService（C113 已落地的账本写入 + 操作人审计 + 幂等链路）。</para>
 /// <para>事实数据铁律：OnAddingAsync / OnUpdatingAsync 抛错关闭默认 AddAsync/UpdateAsync 端点，无 DeleteAsync 端点。</para>
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
-public class TenantGameOrderFulfillmentEntityService
+public class GameOrderFulfillmentService
     : GenericCrudService<Entity.Tenant.Game.TenantGameOrderFulfillmentEntity,
         FulfillmentActionRequest,
         UpdateTenantGameOrderFulfillmentEntityRequest,
-        TenantGameOrderFulfillmentEntityResponse,
+        GameOrderFulfillmentResponse,
         PageTenantGameOrderFulfillmentEntityRequest>
 {
-    private readonly TenantGameOrderShipService _shipService;
-    private readonly TenantGameOrderChannelRefundService _channelRefundService;
+    private readonly GameOrderShipService _shipService;
+    private readonly GameOrderChannelRefundService _channelRefundService;
     private readonly SqlSugarRepository<Entity.Tenant.Game.TenantGameOrderEntity> _orderRepository;
     private readonly CurrentUserContext _currentUserContext;
 
-    public TenantGameOrderFulfillmentEntityService(
+    public GameOrderFulfillmentService(
         SqlSugarRepository<Entity.Tenant.Game.TenantGameOrderFulfillmentEntity> repository,
         SqlSugarRepository<Entity.Tenant.Game.TenantGameOrderEntity> orderRepository,
-        TenantGameOrderShipService shipService,
-        TenantGameOrderChannelRefundService channelRefundService,
+        GameOrderShipService shipService,
+        GameOrderChannelRefundService channelRefundService,
         CurrentUserContext currentUserContext)
         : base(repository)
     {
@@ -59,7 +59,7 @@ public class TenantGameOrderFulfillmentEntityService
     /// <summary>
     /// 账本分页查询过滤（字段穷举见 change C120 §3）。
     /// </summary>
-    protected override ISugarQueryable<TenantGameOrderFulfillmentEntityResponse> BuildPageQuery(PageTenantGameOrderFulfillmentEntityRequest input)
+    protected override ISugarQueryable<GameOrderFulfillmentResponse> BuildPageQuery(PageTenantGameOrderFulfillmentEntityRequest input)
     {
         return Repository.AsQueryable()
                          .WhereIF(input.OrderId.HasValue, u => u.OrderId == input.OrderId.Value)
@@ -75,7 +75,7 @@ public class TenantGameOrderFulfillmentEntityService
                          .WhereIF(input.CreateTimeRange != null && input.CreateTimeRange.Count == 2 && input.CreateTimeRange[0] < input.CreateTimeRange[1],
                                   u => u.CreatedTime >= input.CreateTimeRange[0]
                                        && u.CreatedTime <= input.CreateTimeRange[1])
-                         .Select<TenantGameOrderFulfillmentEntityResponse>();
+                         .Select<GameOrderFulfillmentResponse>();
     }
 
     /// <summary>
@@ -83,7 +83,7 @@ public class TenantGameOrderFulfillmentEntityService
     /// </summary>
     [HttpPost]
     [ApiDescriptionSettings(Name = "Export")]
-    public async Task<List<TenantGameOrderFulfillmentEntityResponse>> ExportAsync(PageTenantGameOrderFulfillmentEntityRequest input)
+    public async Task<List<GameOrderFulfillmentResponse>> ExportAsync(PageTenantGameOrderFulfillmentEntityRequest input)
     {
         return await BuildPageQuery(input).Take(1000).ToListAsync();
     }
@@ -91,7 +91,7 @@ public class TenantGameOrderFulfillmentEntityService
     /// <summary>
     /// 退款扣除（高风险）。C310 / GFX-718 起两阶段：已支付订单先渠道退款（按 PayChannel 路由 IRefundManager——
     /// 渠道失败 / 不支持主动退款 / 配置缺失抛统一错误码 PaymentErrorCode 段 704，本地账本不动），
-    /// 渠道成功后委托 TenantGameOrderShipService.RefundAsync（C113）：按订单状态走作废 / 扣除路径，账本落 RefundAsync 类型 + 状态 + FailureReason。
+    /// 渠道成功后委托 GameOrderShipService.RefundAsync（C113）：按订单状态走作废 / 扣除路径，账本落 RefundAsync 类型 + 状态 + FailureReason。
     /// Unpaid 订单未收款，跳过渠道直接本地作废。
     /// <para>C223：Admin result 统一对象契约——失败抛 BusinessException 走 AdminResultFilter 统一错误路径，不再透传 HttpJsonResultData 双重信封。</para>
     /// </summary>
@@ -112,7 +112,7 @@ public class TenantGameOrderFulfillmentEntityService
     }
 
     /// <summary>
-    /// 人工补偿/补发（高风险）。委托 TenantGameOrderShipService.CompensateAsync（C113）：按 Purchase 链路重发，账本落 CompensateAsync 类型 + OperatorId 审计。
+    /// 人工补偿/补发（高风险）。委托 GameOrderShipService.CompensateAsync（C113）：按 Purchase 链路重发，账本落 CompensateAsync 类型 + OperatorId 审计。
     /// <para>C223：Admin result 统一对象契约——失败抛 BusinessException 走 AdminResultFilter 统一错误路径，不再透传 HttpJsonResultData 双重信封。</para>
     /// </summary>
     [HttpPost]
@@ -140,7 +140,7 @@ public class TenantGameOrderFulfillmentEntityService
     }
 
     /// <summary>
-    /// 解析退款动作对应的订单（C310）：input.Id 兼容订单 Id（TenantGameOrderShipService 既有口径）与账本行 Id（账本页动作语义）两种传参，
+    /// 解析退款动作对应的订单（C310）：input.Id 兼容订单 Id（GameOrderShipService 既有口径）与账本行 Id（账本页动作语义）两种传参，
     /// 后者按账本行 OrderId 映射回订单实体。
     /// </summary>
     private async Task<Entity.Tenant.Game.TenantGameOrderEntity> GetOrderForChannelRefundAsync(long inputId)
@@ -162,7 +162,7 @@ public class TenantGameOrderFulfillmentEntityService
     }
 
     /// <summary>
-    /// 转译 TenantGameOrderShipService 的信封结果：失败抛 BusinessException（AdminResultFilter 统一包装非 0 响应码），
+    /// 转译 GameOrderShipService 的信封结果：失败抛 BusinessException（AdminResultFilter 统一包装非 0 响应码），
     /// 成功无返回。C227 起 ShipService 泛型为 BaseOperationAckResponse（data 恒空，仅承载成败与消息），转译仍收敛在本服务边界内。
     /// </summary>
     private static void EnsureActionSucceeded(HttpJsonResultData<BaseOperationAckResponse> result)

@@ -14,7 +14,7 @@ public sealed class MainDatabaseTimeJobServiceTests
         using (var database = new ClientApiTestDb())
         {
             database.InitTenantTables(typeof(TenantGameTimeJobEntity));
-            var service = new TenantGameTimeJobEntityService(new SqlSugarRepository<TenantGameTimeJobEntity>
+            var service = new GameTimeJobService(new SqlSugarRepository<TenantGameTimeJobEntity>
             {
                 Context = database.MainDb,
             });

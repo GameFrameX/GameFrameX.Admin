@@ -6,14 +6,14 @@ namespace GameFrameX.Application.CommerceCenter.GameRedeemCodeUseRecord;
 /// 兑换记录服务
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
-public class TenantGameRedeemCodeUseRecordEntityService
+public class GameRedeemCodeUseRecordService
     : GenericCrudService<Entity.Tenant.Game.TenantGameRedeemCodeUseRecordEntity,
         AddTenantGameRedeemCodeUseRecordEntityRequest, UpdateTenantGameRedeemCodeUseRecordEntityRequest,
-        TenantGameRedeemCodeUseRecordEntityResponse, PageTenantGameRedeemCodeUseRecordEntityRequest>
+        GameRedeemCodeUseRecordResponse, PageTenantGameRedeemCodeUseRecordEntityRequest>
 {
     private readonly SqlSugarRepository<Entity.Tenant.Game.TenantGameAreaEntity> _areaRepository;
 
-    public TenantGameRedeemCodeUseRecordEntityService(
+    public GameRedeemCodeUseRecordService(
         SqlSugarRepository<Entity.Tenant.Game.TenantGameRedeemCodeUseRecordEntity> repository,
         SqlSugarRepository<Entity.Tenant.Game.TenantGameAreaEntity> areaRepository)
         : base(repository)
@@ -30,7 +30,7 @@ public class TenantGameRedeemCodeUseRecordEntityService
         throw new Exception("兑换码使用记录由客户端兑换链路产生，不支持通过管理后台直接创建");
     }
 
-    protected override ISugarQueryable<TenantGameRedeemCodeUseRecordEntityResponse> BuildPageQuery(PageTenantGameRedeemCodeUseRecordEntityRequest input)
+    protected override ISugarQueryable<GameRedeemCodeUseRecordResponse> BuildPageQuery(PageTenantGameRedeemCodeUseRecordEntityRequest input)
     {
         return Repository.AsQueryable()
                          .WhereIF(input.AreaId > 0, u => u.AreaId == input.AreaId)
@@ -42,7 +42,7 @@ public class TenantGameRedeemCodeUseRecordEntityService
                          .LeftJoin<Entity.Tenant.Game.TenantGameRedeemCodeEntity>((u, areaid, code) => u.Code == code.Code && u.AreaId == code.AreaId)
                          .LeftJoin<Entity.Tenant.Game.TenantGameRedeemCodeChannelEntity>((u, areaid, code, channel) => code.ChannelId == channel.Id)
                          .WhereIF(input.ChannelId > 0, (u, areaid, code, channel) => code.ChannelId == input.ChannelId)
-                         .Select((u, areaid, code, channel) => new TenantGameRedeemCodeUseRecordEntityResponse
+                         .Select((u, areaid, code, channel) => new GameRedeemCodeUseRecordResponse
                          {
                              Id = u.Id,
                              AreaId = u.AreaId,
@@ -60,7 +60,7 @@ public class TenantGameRedeemCodeUseRecordEntityService
                          });
     }
 
-    protected override ISugarQueryable<TenantGameRedeemCodeUseRecordEntityResponse> ApplyOrdering(ISugarQueryable<TenantGameRedeemCodeUseRecordEntityResponse> query, PageTenantGameRedeemCodeUseRecordEntityRequest input)
+    protected override ISugarQueryable<GameRedeemCodeUseRecordResponse> ApplyOrdering(ISugarQueryable<GameRedeemCodeUseRecordResponse> query, PageTenantGameRedeemCodeUseRecordEntityRequest input)
     {
         if (!string.IsNullOrEmpty(input.OrderBy))
         {

@@ -17,7 +17,7 @@ public sealed class MainDatabaseAdvertisementLedgerTests
                 Id = 100, Provider = "TopOn", TransactionId = "transaction-100", RoleId = "role-100",
                 IdempotencyKey = "adreward:topon:transaction-100", AreaId = 10,
             }).ExecuteCommand();
-            var service = new TenantGameAdvertisementRewardEntityService(
+            var service = new GameAdvertisementRewardService(
                 new SqlSugarRepository<TenantGameAdvertisementRewardEntity> { Context = database.MainDb });
             Assert.Equal(100, Assert.Single((await service.PageAsync(new() { Provider = "TopOn", AreaId = 10 })).Items).Id);
             Assert.Empty(await service.ExportAsync(new() { Provider = "UnityAds" }));

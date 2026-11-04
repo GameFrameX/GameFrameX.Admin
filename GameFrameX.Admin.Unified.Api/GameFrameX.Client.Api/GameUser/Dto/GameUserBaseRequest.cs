@@ -3,7 +3,7 @@ namespace GameFrameX.Client.Api.GameUser.Dto;
 /// <summary>
 /// 游戏账号基础输入参数
 /// </summary>
-public class TenantGameUserEntityBaseRequest
+public class GameUserBaseRequest
 {
     /// <summary>
     /// 昵称

@@ -5,7 +5,7 @@ namespace GameFrameX.Application.PlayerCenter.GameUser.Dto;
 /// <summary>
 /// 游戏账号输出参数
 /// </summary>
-public class TenantGameUserEntityResponse
+public class GameUserResponse
 {
     /// <summary>
     /// Id

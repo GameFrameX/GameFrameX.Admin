@@ -3,7 +3,7 @@ namespace GameFrameX.Client.Api.GameRole.Dto;
 /// <summary>
 /// 游戏角色增加输入参数
 /// </summary>
-public class AddTenantGameRoleEntityRequest : TenantGameRoleEntityBaseRequest
+public class AddTenantGameRoleEntityRequest : GameRoleBaseRequest
 {
     /// <summary>
     /// 英雄发型配置id

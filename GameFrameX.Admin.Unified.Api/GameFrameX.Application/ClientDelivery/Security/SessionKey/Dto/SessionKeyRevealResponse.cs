@@ -5,7 +5,7 @@ namespace GameFrameX.Application.ClientDelivery.Security.SessionKey.Dto;
 /// <para>明文只在密钥生成的那一次响应中出现，前端展示后即失；此后任何接口不再提供明文
 /// （列表/详情均为 ****** 脱敏，实体禁删）。丢失明文只能通过 RotateAsync 再生成新 key。</para>
 /// </summary>
-public class TenantSessionKeyRevealResponse
+public class SessionKeyRevealResponse
 {
     /// <summary>
     /// 主键 ID。

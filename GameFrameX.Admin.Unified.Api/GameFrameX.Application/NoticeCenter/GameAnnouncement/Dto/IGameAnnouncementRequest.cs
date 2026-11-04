@@ -3,7 +3,7 @@ namespace GameFrameX.Application.NoticeCenter.GameAnnouncement.Dto;
 /// <summary>
 /// 游戏公告输入参数公共契约。
 /// </summary>
-public interface ITenantGameAnnouncementEntityRequest
+public interface IGameAnnouncementRequest
 {
     /// <summary>
     /// 语言。default 表示兜底公告。

@@ -5,7 +5,7 @@ namespace GameFrameX.Client.Api.GameUser.Dto;
 /// <summary>
 /// 游戏账号更新输入参数
 /// </summary>
-public class UpdateTenantGameUserEntityRequest : TenantGameUserEntityBaseRequest
+public class UpdateTenantGameUserEntityRequest : GameUserBaseRequest
 {
     /// <summary>
     /// Id

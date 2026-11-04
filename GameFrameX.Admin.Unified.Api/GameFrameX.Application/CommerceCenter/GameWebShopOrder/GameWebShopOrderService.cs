@@ -14,7 +14,7 @@ namespace GameFrameX.Application.CommerceCenter.GameWebShopOrder;
 /// 页面商城订单
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
-public class TenantGameWebShopOrderEntityService : GenericCrudSelectService<Entity.Tenant.Game.TenantGameWebShopOrderEntity, AddTenantGameWebShopOrderEntityRequest, UpdateTenantGameWebShopOrderEntityRequest, TenantGameWebShopOrderEntityResponse, PageTenantGameWebShopOrderEntityRequest>
+public class GameWebShopOrderService : GenericCrudSelectService<Entity.Tenant.Game.TenantGameWebShopOrderEntity, AddTenantGameWebShopOrderEntityRequest, UpdateTenantGameWebShopOrderEntityRequest, GameWebShopOrderResponse, PageTenantGameWebShopOrderEntityRequest>
 {
     private readonly SqlSugarRepository<SystemConfigEntity> _configService;
     private readonly SqlSugarRepository<Entity.Tenant.Game.TenantGameWebShopEntity> _webShopService;
@@ -30,7 +30,7 @@ public class TenantGameWebShopOrderEntityService : GenericCrudSelectService<Enti
     /// <param name="gameAreaService">区服信息</param>
     /// <param name="httpClient"></param>
     /// <returns></returns>
-    public TenantGameWebShopOrderEntityService(
+    public GameWebShopOrderService(
         SqlSugarRepository<Entity.Tenant.Game.TenantGameWebShopOrderEntity> repository,
         SqlSugarRepository<SystemConfigEntity> configService,
         SqlSugarRepository<Entity.Tenant.Game.TenantGameWebShopEntity> webShopService,
@@ -54,14 +54,14 @@ public class TenantGameWebShopOrderEntityService : GenericCrudSelectService<Enti
     /// <summary>
     /// 构建分页查询条件
     /// </summary>
-    protected override ISugarQueryable<TenantGameWebShopOrderEntityResponse> BuildPageQuery(PageTenantGameWebShopOrderEntityRequest input)
+    protected override ISugarQueryable<GameWebShopOrderResponse> BuildPageQuery(PageTenantGameWebShopOrderEntityRequest input)
     {
         return Repository.AsQueryable()
                          .WhereIF(!string.IsNullOrWhiteSpace(input.SearchKey), u =>
                                       u.Name.Contains(input.SearchKey.Trim())
                          )
                          .WhereIF(!string.IsNullOrWhiteSpace(input.Title), u => u.Name.Contains(input.Title.Trim()))
-                         .Select<TenantGameWebShopOrderEntityResponse>();
+                         .Select<GameWebShopOrderResponse>();
     }
 
     /// <summary>

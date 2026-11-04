@@ -7,24 +7,24 @@ namespace GameFrameX.Application.NoticeCenter.GameMailTemplateCategory;
 /// 邮件模板分类服务
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
-public class TenantGameMailTemplateCategoryEntityService
+public class GameMailTemplateCategoryService
     : GenericCrudSelectService<Entity.Tenant.Game.TenantGameMailTemplateCategoryEntity,
         AddTenantGameMailTemplateCategoryEntityRequest, UpdateTenantGameMailTemplateCategoryEntityRequest,
-        TenantGameMailTemplateCategoryEntityResponse, PageTenantGameMailTemplateCategoryEntityRequest>
+        GameMailTemplateCategoryResponse, PageTenantGameMailTemplateCategoryEntityRequest>
 {
 
-    public TenantGameMailTemplateCategoryEntityService(
+    public GameMailTemplateCategoryService(
         SqlSugarRepository<Entity.Tenant.Game.TenantGameMailTemplateCategoryEntity> repository)
         : base(repository)
     {
     }
 
-    protected override ISugarQueryable<TenantGameMailTemplateCategoryEntityResponse> BuildPageQuery(PageTenantGameMailTemplateCategoryEntityRequest input)
+    protected override ISugarQueryable<GameMailTemplateCategoryResponse> BuildPageQuery(PageTenantGameMailTemplateCategoryEntityRequest input)
     {
         return Repository.AsQueryable()
                          .WhereIF(!string.IsNullOrWhiteSpace(input.Name), u => u.Name.Contains(input.Name.Trim()))
                          .WhereIF(input.IsEnabled.HasValue, u => u.IsEnabled == input.IsEnabled.Value)
-                         .Select<TenantGameMailTemplateCategoryEntityResponse>();
+                         .Select<GameMailTemplateCategoryResponse>();
     }
 
     /// <summary>

@@ -4,7 +4,7 @@ namespace GameFrameX.Application.CommerceCenter.GameWebShop.Dto;
 /// 游戏商城实体新增输入参数
 /// </summary>
 // AddAsync 必须继承 BaseAddRequest（空基类），不应携带主键/版本号。
-// 此前继承 TenantGameWebShopEntityBaseRequest（其又继承 BaseUpdateRequest），会把 [Required] Id/Version 带入 AddAsync 校验，
+// 此前继承 GameWebShopBaseRequest（其又继承 BaseUpdateRequest），会把 [Required] Id/Version 带入 AddAsync 校验，
 // 导致新增报 {"Version":["版本号不能为空"]}。业务字段在此直接声明，与 B1 约定一致。
 public class AddTenantGameWebShopEntityRequest : BaseAddRequest
 {

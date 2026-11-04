@@ -3,7 +3,7 @@ namespace GameFrameX.Client.Api.GameWebShop.Dto;
 /// <summary>
 /// 游戏角色输出参数
 /// </summary>
-public sealed class TenantGameWebShopEntityResponse : EntityBaseId
+public sealed class GameWebShopResponse : EntityBaseId
 {
     /// <summary>
     /// 商品名称

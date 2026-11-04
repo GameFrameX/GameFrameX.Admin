@@ -26,7 +26,7 @@ public class GameAppPackageTests
     [Fact]
     public void GameAppPackageService_ExposesStandardSelectApi()
     {
-        var method = typeof(TenantGameAppPackageService).GetMethod(nameof(TenantGameAppPackageService.SelectAsync));
+        var method = typeof(GameAppPackageService).GetMethod(nameof(GameAppPackageService.SelectAsync));
 
         Assert.NotNull(method);
         Assert.NotNull(method.GetCustomAttributes(typeof(HttpPostAttribute), false).SingleOrDefault());
@@ -145,14 +145,14 @@ public class GameAppPackageTests
     [Fact]
     public void EnsurePackageKindConsistency_DerivedWithParent_Accepts()
     {
-        TenantGameAppPackageService.EnsurePackageKindConsistency(9201, PackageKindEnum.Derived);
+        GameAppPackageService.EnsurePackageKindConsistency(9201, PackageKindEnum.Derived);
     }
 
     [Fact]
     public void EnsurePackageKindConsistency_NormalOrMasterWithoutParent_Accepts()
     {
-        TenantGameAppPackageService.EnsurePackageKindConsistency(null, PackageKindEnum.Normal);
-        TenantGameAppPackageService.EnsurePackageKindConsistency(null, PackageKindEnum.Master);
+        GameAppPackageService.EnsurePackageKindConsistency(null, PackageKindEnum.Normal);
+        GameAppPackageService.EnsurePackageKindConsistency(null, PackageKindEnum.Master);
     }
 
     [Fact]
@@ -162,8 +162,8 @@ public class GameAppPackageTests
         var masterDeclared = new TenantGameAppPackageEntity { ParentPackageId = 9201, PackageKind = PackageKindEnum.Master, };
         var normalDeclared = new TenantGameAppPackageEntity { ParentPackageId = 9201, PackageKind = PackageKindEnum.Normal, };
 
-        TenantGameAppPackageService.NormalizePackageKind(masterDeclared);
-        TenantGameAppPackageService.NormalizePackageKind(normalDeclared);
+        GameAppPackageService.NormalizePackageKind(masterDeclared);
+        GameAppPackageService.NormalizePackageKind(normalDeclared);
 
         Assert.Equal(PackageKindEnum.Derived, masterDeclared.PackageKind);
         Assert.Equal(PackageKindEnum.Derived, normalDeclared.PackageKind);
@@ -175,8 +175,8 @@ public class GameAppPackageTests
         var master = new TenantGameAppPackageEntity { ParentPackageId = null, PackageKind = PackageKindEnum.Master, };
         var normal = new TenantGameAppPackageEntity { ParentPackageId = null, PackageKind = PackageKindEnum.Normal, };
 
-        TenantGameAppPackageService.NormalizePackageKind(master);
-        TenantGameAppPackageService.NormalizePackageKind(normal);
+        GameAppPackageService.NormalizePackageKind(master);
+        GameAppPackageService.NormalizePackageKind(normal);
 
         Assert.Equal(PackageKindEnum.Master, master.PackageKind);
         Assert.Equal(PackageKindEnum.Normal, normal.PackageKind);

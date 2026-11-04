@@ -3,7 +3,7 @@ namespace GameFrameX.Application.CommerceCenter.GameRedeemCodeUseRecord.Dto;
 /// <summary>
 /// 兑换记录输出参数
 /// </summary>
-public class TenantGameRedeemCodeUseRecordEntityResponse : IBasePageResponse<Entity.Tenant.Game.TenantGameRedeemCodeUseRecordEntity>
+public class GameRedeemCodeUseRecordResponse : IBasePageResponse<Entity.Tenant.Game.TenantGameRedeemCodeUseRecordEntity>
 {
     /// <summary>
     /// Id

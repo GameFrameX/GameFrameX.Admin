@@ -3,7 +3,7 @@ namespace GameFrameX.Application.ClientDelivery.LoginTicket.GameLoginTicketKey.D
 /// <summary>
 /// 租户 Game 登录票据签名密钥输出参数（仅公钥与元数据，私钥永不回显）。
 /// </summary>
-public class TenantGameLoginTicketKeyResponse
+public class GameLoginTicketKeyResponse
 {
     /// <summary>
     /// 主键 ID。

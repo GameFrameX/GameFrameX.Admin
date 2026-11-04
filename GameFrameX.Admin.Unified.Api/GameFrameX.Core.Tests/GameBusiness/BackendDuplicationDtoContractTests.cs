@@ -113,8 +113,8 @@ public class BackendDuplicationDtoContractTests
     {
         AssertDeclaredOn<GameAppRemoteConfigEditRequest, UpdateGameAppRemoteConfigRequest>(RemoteConfigEditFields);
         AssertDeclaredOn<GameAppReleaseVersionEditRequest, UpdateGameAppReleaseVersionRequest>(ReleaseVersionEditFields);
-        AssertDeclaredOn<TenantGameMailTemplateEntityBaseRequest, UpdateTenantGameMailTemplateEntityRequest>(MailTemplateSharedFields);
-        AssertDeclaredOn<TenantGameAnnouncementEntityBaseRequest, UpdateTenantGameAnnouncementEntityRequest>(AnnouncementSharedFields);
+        AssertDeclaredOn<GameMailTemplateBaseRequest, UpdateTenantGameMailTemplateEntityRequest>(MailTemplateSharedFields);
+        AssertDeclaredOn<GameAnnouncementBaseRequest, UpdateTenantGameAnnouncementEntityRequest>(AnnouncementSharedFields);
     }
 
     private static readonly string[] UpdateContractFields = { "Id", "RowVersion", };

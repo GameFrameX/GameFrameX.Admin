@@ -25,7 +25,7 @@ namespace GameFrameX.Application.GmCenter.LiveOps.ConfigRollout;
 /// Admin 只编排不解释（分群命中与百分比桶展开在 Online 侧）。</para>
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
-public class TenantGameOnlineConfigRolloutService : IAdminApiController
+public class GameOnlineConfigRolloutService : IAdminApiController
 {
     private readonly SqlSugarRepository<TenantGameOnlineConfigRolloutEntity> _repository;
     private readonly SqlSugarRepository<TenantGameOnlinePlayerSegmentEntity> _segmentRepository;
@@ -39,7 +39,7 @@ public class TenantGameOnlineConfigRolloutService : IAdminApiController
     /// <param name="segmentRepository"></param>
     /// <param name="dispatchService"></param>
     /// <param name="currentUserContext"></param>
-    public TenantGameOnlineConfigRolloutService(SqlSugarRepository<TenantGameOnlineConfigRolloutEntity> repository,
+    public GameOnlineConfigRolloutService(SqlSugarRepository<TenantGameOnlineConfigRolloutEntity> repository,
         SqlSugarRepository<TenantGameOnlinePlayerSegmentEntity> segmentRepository,
         IOnlineLiveOpsDispatchService dispatchService,
         CurrentUserContext currentUserContext)
@@ -56,7 +56,7 @@ public class TenantGameOnlineConfigRolloutService : IAdminApiController
     [HttpPost(CrudActionRoutes.Page)]
     [ApiDescriptionSettings(Name = "Page")]
     [DisplayName("分页查询灰度版本行")]
-    public async Task<SqlSugarPagedList<TenantGameOnlineConfigRolloutResponse>> PageAsync(PageTenantGameOnlineConfigRolloutRequest input)
+    public async Task<SqlSugarPagedList<GameOnlineConfigRolloutResponse>> PageAsync(PageTenantGameOnlineConfigRolloutRequest input)
     {
         return await _repository.AsQueryable()
                          .WhereIF(input.ConfigKind.HasValue, u => u.ConfigKind == input.ConfigKind.Value)
@@ -64,7 +64,7 @@ public class TenantGameOnlineConfigRolloutService : IAdminApiController
                          .WhereIF(input.Status.HasValue, u => u.Status == input.Status.Value)
                          .WhereIF(input.ServerId.HasValue, u => u.ServerId == input.ServerId.Value)
                          .OrderByDescending(u => u.Id)
-                         .Select<TenantGameOnlineConfigRolloutResponse>()
+                         .Select<GameOnlineConfigRolloutResponse>()
                          .ToPagedListAsync(input.Page, input.PageSize);
     }
 

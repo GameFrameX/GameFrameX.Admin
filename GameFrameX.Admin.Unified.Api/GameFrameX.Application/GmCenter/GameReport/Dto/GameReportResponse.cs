@@ -5,7 +5,7 @@ namespace GameFrameX.Application.GmCenter.GameReport.Dto;
 /// <summary>
 /// 举报输出参数（含处理人 / 结果处罚关联，供后台只读展示）。
 /// </summary>
-public class TenantGameReportEntityResponse : IBasePageResponse<Entity.Tenant.Game.TenantGameReportEntity>
+public class GameReportResponse : IBasePageResponse<Entity.Tenant.Game.TenantGameReportEntity>
 {
     /// <summary>
     /// Id

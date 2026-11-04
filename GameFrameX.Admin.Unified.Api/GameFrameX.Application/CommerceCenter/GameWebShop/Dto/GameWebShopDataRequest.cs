@@ -3,7 +3,7 @@ namespace GameFrameX.Application.CommerceCenter.GameWebShop.Dto;
 /// <summary>
 /// 游戏商城实体数据
 /// </summary>
-public class TenantGameWebShopEntityDataRequest
+public class GameWebShopDataRequest
 {
     /// <summary>
     /// 商品名称

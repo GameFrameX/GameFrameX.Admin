@@ -27,12 +27,12 @@ public class MenuSeedPermissionRouteReconciliationTests
     /// </summary>
     private static readonly string[] LegacyOrphanAllowlist =
     {
-        "tenantGameAppAssetPackageVersion:history", // 版本历史改由 tenantGameAppAssetPackageVersionHistory 域承载
-        "tenantGameAppAssetPackageVersion:restore", // 动作语义变更为 return
-        "tenantGamePaymentConfigEntity:copyNotifyUrl", // 端点下线，前端改从详情复制
-        "tenantGameLoginTicketKeyEntity:update", // 动作被 rotate 取代
-        "tenantAppSignatureKeyEntity:update", // 动作被 renew/rotate 取代
-        "tenantSessionKeyEntity:update", // 动作被 enable/disable 体系取代
+        "gameAppAssetPackageVersion:history", // 版本历史改由 gameAppAssetPackageVersionHistory 域承载
+        "gameAppAssetPackageVersion:restore", // 动作语义变更为 return
+        "gamePaymentConfig:copyNotifyUrl", // 端点下线，前端改从详情复制
+        "gameLoginTicketKey:update", // 动作被 rotate 取代
+        "appSignatureKey:update", // 动作被 renew/rotate 取代
+        "sessionKey:update", // 动作被 enable/disable 体系取代
         "tenantUser:detail", // 端点下线
     };
 
@@ -75,7 +75,7 @@ public class MenuSeedPermissionRouteReconciliationTests
     [Fact]
     public void MenuSeedRouteNameOfProducesCanonicalRouteNames()
     {
-        Assert.Equal("tenantGamePenaltyEntity:detail", MenuSeedRouteName.Of<TenantGamePenaltyEntityService>(nameof(TenantGamePenaltyEntityService.GetAsync)));
+        Assert.Equal("gamePenalty:detail", MenuSeedRouteName.Of<GamePenaltyService>(nameof(GamePenaltyService.GetAsync)));
         Assert.Equal("tenantUser:ownRoleList:{userId}", MenuSeedRouteName.Of<TenantUserService>(nameof(TenantUserService.GetOwnRoleListAsync)));
     }
 

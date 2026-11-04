@@ -189,9 +189,9 @@ public sealed class TenantGameAppServerConfigServiceTests : IDisposable
         Assert.Equal(2, page.Items.Count());
     }
 
-    private TenantGameAppServerConfigService CreateService()
+    private GameAppServerConfigService CreateService()
     {
-        return new TenantGameAppServerConfigService(new SqlSugarRepository<TenantGameAppServerConfigEntity> { Context = _db, });
+        return new GameAppServerConfigService(new SqlSugarRepository<TenantGameAppServerConfigEntity> { Context = _db, });
     }
 
     private long _nextSeedId = 900000;

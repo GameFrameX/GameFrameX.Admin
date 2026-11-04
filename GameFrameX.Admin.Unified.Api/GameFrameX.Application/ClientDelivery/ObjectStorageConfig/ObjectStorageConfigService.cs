@@ -15,10 +15,10 @@ namespace GameFrameX.Application.ClientDelivery.ObjectStorageConfig;
 /// 业务规则：Provider 创建后不可变更；同租户至多一条启用；ConfigJson 白名单规范化与脱敏。
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 111)]
-public class TenantObjectStorageConfigEntityService
+public class ObjectStorageConfigService
     : GenericCrudService<TenantObjectStorageConfigEntity,
         AddTenantObjectStorageConfigRequest, UpdateTenantObjectStorageConfigRequest,
-        TenantObjectStorageConfigResponse, PageTenantObjectStorageConfigRequest>
+        ObjectStorageConfigResponse, PageTenantObjectStorageConfigRequest>
 {
     /// <summary>
     /// 启用切换进程级串行锁。同租户“停用其它 + 写当前启用”必须串行，避免并发 AddAsync/UpdateAsync 产生多条启用配置。
@@ -29,7 +29,7 @@ public class TenantObjectStorageConfigEntityService
     private readonly IObjectStorageConfigSchemaProvider _schemaProvider;
     private readonly IObjectStorageAdapterFactory _adapterFactory;
 
-    public TenantObjectStorageConfigEntityService(
+    public ObjectStorageConfigService(
         SqlSugarRepository<TenantObjectStorageConfigEntity> repository,
         IObjectStorageConfigSchemaProvider schemaProvider,
         IObjectStorageAdapterFactory adapterFactory)
@@ -39,7 +39,7 @@ public class TenantObjectStorageConfigEntityService
         _adapterFactory = adapterFactory;
     }
 
-    protected override ISugarQueryable<TenantObjectStorageConfigResponse> BuildPageQuery(PageTenantObjectStorageConfigRequest input)
+    protected override ISugarQueryable<ObjectStorageConfigResponse> BuildPageQuery(PageTenantObjectStorageConfigRequest input)
     {
         var searchKey = input.SearchKey?.Trim();
         var provider = NormalizeProvider(input.Provider);
@@ -49,13 +49,13 @@ public class TenantObjectStorageConfigEntityService
                                       (u.Remark ?? string.Empty).Contains(searchKey))
                          .WhereIF(!string.IsNullOrWhiteSpace(provider), u => u.Provider == provider)
                          .WhereIF(input.IsEnabled.HasValue, u => (u.IsEnabled ?? false) == input.IsEnabled.Value)
-                         .Select<TenantObjectStorageConfigResponse>();
+                         .Select<ObjectStorageConfigResponse>();
     }
 
     /// <summary>
     /// 新增配置。校验 Provider 已注册、规范化 ConfigJson；若启用则在事务内停用同租户其它配置。
     /// </summary>
-    public override async Task<TenantObjectStorageConfigResponse> AddAsync(AddTenantObjectStorageConfigRequest input)
+    public override async Task<ObjectStorageConfigResponse> AddAsync(AddTenantObjectStorageConfigRequest input)
     {
         var provider = NormalizeProvider(input.Provider);
         EnsureProviderRegistered(provider);
@@ -90,7 +90,7 @@ public class TenantObjectStorageConfigEntityService
             ActiveConfigTransitionLock.Release();
         }
 
-        return entity.Adapt<TenantObjectStorageConfigResponse>();
+        return entity.Adapt<ObjectStorageConfigResponse>();
     }
 
     /// <summary>
@@ -161,7 +161,7 @@ public class TenantObjectStorageConfigEntityService
     /// </summary>
     [HttpPost(CrudActionRoutes.Page)]
     [ApiDescriptionSettings(Name = "Page")]
-    public override async Task<SqlSugarPagedList<TenantObjectStorageConfigResponse>> PageAsync(PageTenantObjectStorageConfigRequest input)
+    public override async Task<SqlSugarPagedList<ObjectStorageConfigResponse>> PageAsync(PageTenantObjectStorageConfigRequest input)
     {
         var result = await base.PageAsync(input);
         foreach (var item in result.Items)
@@ -177,7 +177,7 @@ public class TenantObjectStorageConfigEntityService
     /// </summary>
     [HttpGet(CrudActionRoutes.Detail)]
     [ApiDescriptionSettings(Name = "Detail")]
-    public override async Task<TenantObjectStorageConfigResponse> GetAsync([FromQuery] BaseIdRequest input)
+    public override async Task<ObjectStorageConfigResponse> GetAsync([FromQuery] BaseIdRequest input)
     {
         var entity = await Repository.GetFirstAsync(e => e.Id == input.Id);
         if (entity == null)
@@ -186,7 +186,7 @@ public class TenantObjectStorageConfigEntityService
         }
 
         entity.ConfigJson = ObjectStorageConfigNormalizer.MaskFields(_schemaProvider, entity.Provider, entity.ConfigJson);
-        return entity.Adapt<TenantObjectStorageConfigResponse>();
+        return entity.Adapt<ObjectStorageConfigResponse>();
     }
 
     /// <summary>

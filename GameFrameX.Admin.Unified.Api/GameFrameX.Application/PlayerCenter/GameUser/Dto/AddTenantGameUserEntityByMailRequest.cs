@@ -5,7 +5,7 @@ namespace GameFrameX.Application.PlayerCenter.GameUser.Dto;
 /// <summary>
 /// 根据邮箱添加账号
 /// </summary>
-public class AddTenantGameUserEntityByMailRequest : TenantGameUserEntityBaseRequest
+public class AddTenantGameUserEntityByMailRequest : GameUserBaseRequest
 {
     /// <summary>
     /// 账号

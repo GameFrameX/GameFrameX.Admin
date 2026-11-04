@@ -22,8 +22,8 @@ public static class ProjectDependencyInjectionSetup
     {
         "GameFrameX.Core.Service.User.CurrentUserContext",
         "GameFrameX.Core.Middleware.GameAppRiskEnforcementModeResolver",
-        "GameFrameX.Application.PlayerCenter.GamePenalty.TenantGamePenaltyEnforcementService",
-        "GameFrameX.Application.PlayerCenter.GameUser.TenantGameUserPasswordService",
+        "GameFrameX.Application.PlayerCenter.GamePenalty.GamePenaltyEnforcementService",
+        "GameFrameX.Application.PlayerCenter.GameUser.GameUserPasswordService",
     };
 
     /// <summary>

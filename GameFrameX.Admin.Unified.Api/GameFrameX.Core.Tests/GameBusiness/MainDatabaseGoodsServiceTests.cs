@@ -21,7 +21,7 @@ public sealed class MainDatabaseGoodsServiceTests
         {
             database.InitTenantTables(typeof(TenantGameGoodsEntity), typeof(TenantGameGoodsCatalogueEntity));
             var repository = new SqlSugarRepository<TenantGameGoodsEntity> { Context = database.MainDb };
-            var service = new TenantGameGoodsEntityService(repository);
+            var service = new GameGoodsService(repository);
             var created = await service.AddAsync(new AddTenantGameGoodsEntityRequest
             {
                 ConfigId = 1501, ClassifyId = 1, Name = "reward", Description = "reward description",
@@ -47,7 +47,7 @@ public sealed class MainDatabaseGoodsServiceTests
         using (var database = new ClientApiTestDb())
         {
             database.InitTenantTables(typeof(TenantGameGoodsCatalogueEntity));
-            var service = new TenantGameGoodsCatalogueEntityService(new SqlSugarRepository<TenantGameGoodsCatalogueEntity>
+            var service = new GameGoodsCatalogueService(new SqlSugarRepository<TenantGameGoodsCatalogueEntity>
             {
                 Context = database.MainDb,
             });
@@ -69,7 +69,7 @@ public sealed class MainDatabaseGoodsServiceTests
         using (var database = new ClientApiTestDb())
         {
             database.InitTenantTables(typeof(TenantGameCommodityEntity));
-            var service = new TenantGameCommodityEntityService(new SqlSugarRepository<TenantGameCommodityEntity>
+            var service = new GameCommodityService(new SqlSugarRepository<TenantGameCommodityEntity>
             {
                 Context = database.MainDb,
             });

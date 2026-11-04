@@ -55,12 +55,12 @@ public class ScheduledTaskHostedService : BackgroundService
 
     private async Task LoadScheduledTasksAsync(CancellationToken cancellationToken)
     {
-        List<TenantGameTimeJobEntityResponse> jobEntityOutputs;
+        List<GameTimeJobResponse> jobEntityOutputs;
         using (var scope = _serviceProvider.CreateScope())
         {
             var database = scope.ServiceProvider.GetRequiredService<ISqlSugarClient>();
             jobEntityOutputs = await database.Queryable<TenantGameTimeJobEntity>()
-                                             .Select<TenantGameTimeJobEntityResponse>()
+                                             .Select<GameTimeJobResponse>()
                                              .ToListAsync(cancellationToken);
         }
 

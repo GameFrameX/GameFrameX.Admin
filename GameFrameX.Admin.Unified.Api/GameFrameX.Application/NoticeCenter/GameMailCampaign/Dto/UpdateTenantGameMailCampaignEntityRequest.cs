@@ -11,7 +11,7 @@ namespace GameFrameX.Application.NoticeCenter.GameMailCampaign.Dto;
 /// <summary>
 /// 更新 Campaign 输入。仅 Draft 可更新（Published/Revoked 主体不可变 B1）。
 /// </summary>
-public sealed class UpdateTenantGameMailCampaignEntityRequest : TenantGameMailCampaignEntityBaseRequest
+public sealed class UpdateTenantGameMailCampaignEntityRequest : GameMailCampaignBaseRequest
 {
     // 发布状态机字段不在 BaseRequest：Adapt 后 enum/long 默认 0 穿透 IgnoreColumns 写库，
     // 会把 Failed(3) 重置为 Draft 并清掉 LastServerCode（见 OnUpdatingAsync 回填）

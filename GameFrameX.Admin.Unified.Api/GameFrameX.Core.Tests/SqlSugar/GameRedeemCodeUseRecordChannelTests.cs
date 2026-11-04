@@ -6,7 +6,7 @@ using SqlSugar;
 namespace GameFrameX.Core.Tests.SqlSugar;
 
 /// <summary>
-/// BLA-32 / C71 回归测试：复刻 TenantGameRedeemCodeUseRecordEntityService.BuildPageQuery 的查询形状
+/// BLA-32 / C71 回归测试：复刻 GameRedeemCodeUseRecordService.BuildPageQuery 的查询形状
 /// （区服 + 兑换码(Code+AreaId) + 渠道 三重 LeftJoin，新增 input.ChannelId WhereIF 与 ChannelId/ChannelName 投影）。
 /// 用 Sqlite 内存文件库 + ConfigureBaseFilters 做端到端查询验证。
 /// </summary>
@@ -95,7 +95,7 @@ public sealed class GameRedeemCodeUseRecordChannelTests : IDisposable
         Assert.Equal(11, rows[0].ChannelId);
     }
 
-    private ISugarQueryable<TenantGameRedeemCodeUseRecordEntityResponse> BuildQuery(long? channelId, long? areaId = null, string? code = null, long? playerId = null)
+    private ISugarQueryable<GameRedeemCodeUseRecordResponse> BuildQuery(long? channelId, long? areaId = null, string? code = null, long? playerId = null)
     {
         // 复刻 GameRedeemCodeUseRecordEntityService.BuildPageQuery 的 BLA-32 增量部分（兑换码 + 渠道 join、ChannelId 过滤与投影）。
         // 注：区服 LeftJoin 是 BuildPageQuery 既有逻辑（非 BLA-32 范围）且本测试不校验区服列，此处不复刻；
@@ -107,7 +107,7 @@ public sealed class GameRedeemCodeUseRecordChannelTests : IDisposable
                   .LeftJoin<TenantGameRedeemCodeEntity>((u, c) => u.Code == c.Code && u.AreaId == c.AreaId)
                   .LeftJoin<TenantGameRedeemCodeChannelEntity>((u, c, channel) => c.ChannelId == channel.Id)
                   .WhereIF(channelId > 0, (u, c, channel) => c.ChannelId == channelId)
-                  .Select((u, c, channel) => new TenantGameRedeemCodeUseRecordEntityResponse
+                  .Select((u, c, channel) => new GameRedeemCodeUseRecordResponse
                   {
                       Id = u.Id,
                       AreaId = u.AreaId,

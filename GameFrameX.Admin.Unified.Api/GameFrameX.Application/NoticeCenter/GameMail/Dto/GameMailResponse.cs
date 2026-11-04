@@ -5,7 +5,7 @@ namespace GameFrameX.Application.NoticeCenter.GameMail.Dto;
 /// <summary>
 /// 游戏邮件输出参数
 /// </summary>
-public class TenantGameMailEntityResponse : IBasePageResponse<Entity.Tenant.Game.TenantGameMailEntity>
+public class GameMailResponse : IBasePageResponse<Entity.Tenant.Game.TenantGameMailEntity>
 {
     /// <summary>
     /// Id

@@ -42,7 +42,7 @@ public class ChannelDefinitionNamingTests
         var assembly = typeof(GameFrameX.Application.ClientDelivery.ChannelDefinition.GlobalChannelDefinitionService).Assembly;
 
         Assert.NotNull(assembly.GetType("GameFrameX.Application.ClientDelivery.ChannelDefinition.GlobalChannelDefinitionService"));
-        Assert.NotNull(assembly.GetType("GameFrameX.Application.ClientDelivery.ChannelDefinition.TenantChannelDefinitionService"));
-        Assert.Null(assembly.GetType("GameFrameX.Application.ClientDelivery.ChannelDefinition.ChannelDefinitionService"));
+        Assert.NotNull(assembly.GetType("GameFrameX.Application.ClientDelivery.ChannelDefinition.ChannelDefinitionService"));
+        Assert.Null(assembly.GetType("GameFrameX.Application.ClientDelivery.ChannelDefinition.TenantChannelDefinitionService"));
     }
 }

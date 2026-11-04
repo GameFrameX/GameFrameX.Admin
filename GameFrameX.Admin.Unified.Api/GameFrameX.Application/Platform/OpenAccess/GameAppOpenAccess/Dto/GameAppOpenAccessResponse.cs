@@ -5,7 +5,7 @@ namespace GameFrameX.Application.Platform.OpenAccess.GameAppOpenAccess.Dto;
 /// <para>注意：<see cref="Entity.Tenant.Game.App.TenantGameAppOpenAccessEntity.AccessSecret"/> 永不输出（明文仅签发 / 轮换时一次性返回）。
 /// Output 不含 AccessSecret 字段，Service 投影时也不得引入。</para>
 /// </summary>
-public class TenantGameAppOpenAccessResponse
+public class GameAppOpenAccessResponse
 {
     /// <summary>
     /// Id

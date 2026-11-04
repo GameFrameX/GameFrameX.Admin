@@ -11,7 +11,7 @@ namespace GameFrameX.Application.NoticeCenter.GameMailCampaign.Dto;
 /// <summary>
 /// Campaign 输出 DTO。
 /// </summary>
-public sealed class TenantGameMailCampaignEntityResponse
+public sealed class GameMailCampaignResponse
 {
     /// <summary>主键Id。</summary>
     public long Id { get; set; }

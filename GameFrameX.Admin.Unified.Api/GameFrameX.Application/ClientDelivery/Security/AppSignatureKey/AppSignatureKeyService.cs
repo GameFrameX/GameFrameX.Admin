@@ -14,9 +14,9 @@ namespace GameFrameX.Application.ClientDelivery.Security.AppSignatureKey;
 /// <para>作用域：主库。路由前缀 /api/tenantAppSignatureKeyEntity（动态路由规则：去 Service 后缀 + lowerCamelCase）。</para>
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 114)]
-public class TenantAppSignatureKeyEntityService : BaseService<TenantAppSignatureKeyEntity>
+public class AppSignatureKeyService : BaseService<TenantAppSignatureKeyEntity>
 {
-    public TenantAppSignatureKeyEntityService(SqlSugarRepository<TenantAppSignatureKeyEntity> repository)
+    public AppSignatureKeyService(SqlSugarRepository<TenantAppSignatureKeyEntity> repository)
         : base(repository)
     {
     }
@@ -26,13 +26,13 @@ public class TenantAppSignatureKeyEntityService : BaseService<TenantAppSignature
     /// </summary>
     [HttpPost("page")]
     [ApiDescriptionSettings(Name = "Page")]
-    public async Task<SqlSugarPagedList<TenantAppSignatureKeyResponse>> PageAsync(PageTenantAppSignatureKeyRequest input)
+    public async Task<SqlSugarPagedList<AppSignatureKeyResponse>> PageAsync(PageTenantAppSignatureKeyRequest input)
     {
         var page = await Repository.AsQueryable()
                                    .Where(u => u.IsDeleted == false)
                                    .WhereIF(input.IsActive.HasValue, u => u.IsEnabled == input.IsActive.Value)
                                    .OrderBy(u => u.CreatedTime, OrderByType.Desc)
-                                   .Select<TenantAppSignatureKeyResponse>()
+                                   .Select<AppSignatureKeyResponse>()
                                    .ToPagedListAsync(input.Page, input.PageSize);
         foreach (var item in page.Items)
         {
@@ -49,7 +49,7 @@ public class TenantAppSignatureKeyEntityService : BaseService<TenantAppSignature
     /// </summary>
     [HttpPost("add")]
     [ApiDescriptionSettings(Name = "Add")]
-    public async Task<TenantAppSignatureKeyRevealResponse> AddAsync(TenantAppSignatureKeyAddRequest input)
+    public async Task<AppSignatureKeyRevealResponse> AddAsync(AppSignatureKeyAddRequest input)
     {
         var now = TimerHelper.UnixTimeSeconds();
         var notBefore = input.NotBeforeTime ?? now;
@@ -78,7 +78,7 @@ public class TenantAppSignatureKeyEntityService : BaseService<TenantAppSignature
     /// </summary>
     [HttpPost("rotate")]
     [ApiDescriptionSettings(Name = "Rotate")]
-    public async Task<TenantAppSignatureKeyRevealResponse> RotateAsync(TenantAppSignatureKeyRotateRequest input)
+    public async Task<AppSignatureKeyRevealResponse> RotateAsync(AppSignatureKeyRotateRequest input)
     {
         var now = TimerHelper.UnixTimeSeconds();
         if (input.OldKeyExpireTime.HasValue && input.OldKeyExpireTime.Value <= now)
@@ -128,7 +128,7 @@ public class TenantAppSignatureKeyEntityService : BaseService<TenantAppSignature
     /// </summary>
     [HttpPost("renew")]
     [ApiDescriptionSettings(Name = "Renew")]
-    public async Task RenewAsync(TenantAppSignatureKeyRenewRequest input)
+    public async Task RenewAsync(AppSignatureKeyRenewRequest input)
     {
         var now = TimerHelper.UnixTimeSeconds();
         if (input.ExpireTime.HasValue && input.ExpireTime.Value <= now)
@@ -231,9 +231,9 @@ public class TenantAppSignatureKeyEntityService : BaseService<TenantAppSignature
     /// <summary>
     /// 一次性回显输出：库内密文（C371），响应携带生成时明文。
     /// </summary>
-    private static TenantAppSignatureKeyRevealResponse ToRevealOutput(TenantAppSignatureKeyEntity entity, string plainSecret)
+    private static AppSignatureKeyRevealResponse ToRevealOutput(TenantAppSignatureKeyEntity entity, string plainSecret)
     {
-        return new TenantAppSignatureKeyRevealResponse
+        return new AppSignatureKeyRevealResponse
         {
             Id = entity.Id,
             Kid = entity.Kid,

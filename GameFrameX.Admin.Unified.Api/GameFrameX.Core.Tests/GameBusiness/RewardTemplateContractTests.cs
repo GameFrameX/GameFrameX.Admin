@@ -41,15 +41,15 @@ public class RewardTemplateContractTests
         Assert.Null(typeof(AddTenantGameRewardTemplateEntityRequest).GetProperty("AppId"));
         AssertRequired<AddTenantGameRewardTemplateEntityRequest>(nameof(AddTenantGameRewardTemplateEntityRequest.GroupId));
         AssertRequired<AddTenantGameRewardTemplateEntityRequest>(nameof(AddTenantGameRewardTemplateEntityRequest.RewardItemsJson));
-        Assert.Null(typeof(TenantGameRewardTemplateSnapshotRequest).GetProperty("AppId"));
+        Assert.Null(typeof(GameRewardTemplateSnapshotRequest).GetProperty("AppId"));
     }
 
     [Fact]
     public void RewardTemplateService_ExposesSelectorAndSnapshotActions()
     {
-        AssertAction<TenantGameRewardTemplateGroupEntityService>("SelectAsync", "Select", CrudActionRoutes.Select);
-        AssertAction<TenantGameRewardTemplateEntityService>("SelectAsync", "Select", CrudActionRoutes.Select);
-        AssertAction<TenantGameRewardTemplateEntityService>("CopySnapshotAsync", "CopySnapshot", "copySnapshot");
+        AssertAction<GameRewardTemplateGroupService>("SelectAsync", "Select", CrudActionRoutes.Select);
+        AssertAction<GameRewardTemplateService>("SelectAsync", "Select", CrudActionRoutes.Select);
+        AssertAction<GameRewardTemplateService>("CopySnapshotAsync", "CopySnapshot", "copySnapshot");
     }
 
     [Fact]
@@ -69,16 +69,16 @@ public class RewardTemplateContractTests
         Assert.Equal("/app/contentCenter/reward/gameRewardTemplateEntity", templatePage.Path);
         Assert.Equal("/app/contentCenter/reward/gameRewardTemplateEntity/index", templatePage.Component);
 
-        Assert.Contains("tenantGameRewardTemplateGroupEntity:Select", permissions);
-        Assert.Contains("tenantGameRewardTemplateEntity:Select", permissions);
-        Assert.Contains("tenantGameRewardTemplateEntity:CopySnapshot", permissions);
+        Assert.Contains("gameRewardTemplateGroup:Select", permissions);
+        Assert.Contains("gameRewardTemplate:Select", permissions);
+        Assert.Contains("gameRewardTemplate:CopySnapshot", permissions);
     }
 
     [Fact]
     public void RewardTemplateServices_GuardRewardSnapshotContracts()
     {
-        var groupSource = File.ReadAllText(Path.Combine(FindRepoRoot(), "GameFrameX.Application/NoticeCenter/GameRewardTemplateGroup/TenantGameRewardTemplateGroupEntityService.cs"));
-        var templateSource = File.ReadAllText(Path.Combine(FindRepoRoot(), "GameFrameX.Application/NoticeCenter/GameRewardTemplate/TenantGameRewardTemplateEntityService.cs"));
+        var groupSource = File.ReadAllText(Path.Combine(FindRepoRoot(), "GameFrameX.Application/NoticeCenter/GameRewardTemplateGroup/GameRewardTemplateGroupService.cs"));
+        var templateSource = File.ReadAllText(Path.Combine(FindRepoRoot(), "GameFrameX.Application/NoticeCenter/GameRewardTemplate/GameRewardTemplateService.cs"));
 
         Assert.DoesNotContain("EnsureFactAppId", groupSource);
         Assert.DoesNotContain("EnsureFactAppId", templateSource);

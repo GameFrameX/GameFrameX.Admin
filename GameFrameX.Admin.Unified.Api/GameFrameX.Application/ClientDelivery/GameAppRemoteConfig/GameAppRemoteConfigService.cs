@@ -12,12 +12,12 @@ namespace GameFrameX.Application.ClientDelivery.GameAppRemoteConfig;
 /// 远程配置管理服务
 /// </summary>
 [ApiDescriptionSettings(ClientConst.GroupName, Order = 100)]
-public class TenantGameAppRemoteConfigService : GenericCrudService<Entity.Tenant.Game.RemoteConfig.TenantGameAppRemoteConfigEntity, AddGameAppRemoteConfigRequest, UpdateGameAppRemoteConfigRequest, GameAppRemoteConfigResponse, PageGameAppRemoteConfigRequest>
+public class GameAppRemoteConfigService : GenericCrudService<Entity.Tenant.Game.RemoteConfig.TenantGameAppRemoteConfigEntity, AddGameAppRemoteConfigRequest, UpdateGameAppRemoteConfigRequest, GameAppRemoteConfigResponse, PageGameAppRemoteConfigRequest>
 {
     private readonly SqlSugarRepository<TenantGameAppPackageEntity> _packageRepository;
     private readonly IOnlineLiveOpsDispatchService _dispatchService;
 
-    public TenantGameAppRemoteConfigService(SqlSugarRepository<Entity.Tenant.Game.RemoteConfig.TenantGameAppRemoteConfigEntity> repository,
+    public GameAppRemoteConfigService(SqlSugarRepository<Entity.Tenant.Game.RemoteConfig.TenantGameAppRemoteConfigEntity> repository,
         SqlSugarRepository<TenantGameAppPackageEntity> packageRepository,
         IOnlineLiveOpsDispatchService dispatchService) : base(repository)
     {

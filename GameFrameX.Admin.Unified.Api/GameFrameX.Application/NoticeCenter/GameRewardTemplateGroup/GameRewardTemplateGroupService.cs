@@ -7,25 +7,25 @@ namespace GameFrameX.Application.NoticeCenter.GameRewardTemplateGroup;
 /// 奖励模板分组服务。
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
-public class TenantGameRewardTemplateGroupEntityService
+public class GameRewardTemplateGroupService
     : GenericCrudSelectService<Entity.Tenant.Game.TenantGameRewardTemplateGroupEntity,
         AddTenantGameRewardTemplateGroupEntityRequest, UpdateTenantGameRewardTemplateGroupEntityRequest,
-        TenantGameRewardTemplateGroupEntityResponse, PageTenantGameRewardTemplateGroupEntityRequest>
+        GameRewardTemplateGroupResponse, PageTenantGameRewardTemplateGroupEntityRequest>
 {
 
-    public TenantGameRewardTemplateGroupEntityService(
+    public GameRewardTemplateGroupService(
         SqlSugarRepository<Entity.Tenant.Game.TenantGameRewardTemplateGroupEntity> repository)
         : base(repository)
     {
     }
 
-    protected override ISugarQueryable<TenantGameRewardTemplateGroupEntityResponse> BuildPageQuery(PageTenantGameRewardTemplateGroupEntityRequest input)
+    protected override ISugarQueryable<GameRewardTemplateGroupResponse> BuildPageQuery(PageTenantGameRewardTemplateGroupEntityRequest input)
     {
         return Repository.AsQueryable()
                          .WhereIF(!string.IsNullOrWhiteSpace(input.SearchKey), u => u.Name.Contains(input.SearchKey.Trim()))
                          .WhereIF(!string.IsNullOrWhiteSpace(input.Name), u => u.Name.Contains(input.Name.Trim()))
                          .WhereIF(input.IsEnabled.HasValue, u => u.IsEnabled == input.IsEnabled.Value)
-                         .Select<TenantGameRewardTemplateGroupEntityResponse>();
+                         .Select<GameRewardTemplateGroupResponse>();
     }
 
     /// <summary>

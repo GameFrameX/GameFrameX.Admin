@@ -3,7 +3,7 @@
 /// <summary>
 /// 游戏资源选择器输出参数
 /// </summary>
-public class TenantGameGoodsEntitySelectPageStringResponse : BaseSelectPageStringResponse
+public class GameGoodsSelectPageStringResponse : BaseSelectPageStringResponse
 {
     /// <summary>
     /// 星级

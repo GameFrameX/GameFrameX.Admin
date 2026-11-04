@@ -14,7 +14,7 @@ public class GenericCrudServiceNullInputGuardTests
     [Fact]
     public async Task PageAsync_NullInput_ThrowsParameterValidationFailed()
     {
-        var service = new TenantGameCommodityEntityService(null!);
+        var service = new GameCommodityService(null!);
 
         var exception = await Assert.ThrowsAsync<BusinessException>(() => service.PageAsync(null!));
 
@@ -24,7 +24,7 @@ public class GenericCrudServiceNullInputGuardTests
     [Fact]
     public async Task AddAsync_NullInput_ThrowsParameterValidationFailed()
     {
-        var service = new TenantGameCommodityEntityService(null!);
+        var service = new GameCommodityService(null!);
 
         var exception = await Assert.ThrowsAsync<BusinessException>(() => service.AddAsync(null!));
 
@@ -34,7 +34,7 @@ public class GenericCrudServiceNullInputGuardTests
     [Fact]
     public async Task UpdateAsync_NullInput_ThrowsParameterValidationFailed()
     {
-        var service = new TenantGameCommodityEntityService(null!);
+        var service = new GameCommodityService(null!);
 
         var exception = await Assert.ThrowsAsync<BusinessException>(() => service.UpdateAsync(null!));
 

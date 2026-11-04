@@ -7,9 +7,9 @@ namespace GameFrameX.Application.NoticeCenter.GameBannerAnnouncement;
 /// 游戏内横幅公告服务
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
-public class TenantGameBannerAnnouncementEntityService : GenericCrudService<Entity.Tenant.Game.Announcement.TenantGameBannerAnnouncementEntity, AddTenantGameBannerAnnouncementEntityRequest, UpdateTenantGameBannerAnnouncementEntityRequest, TenantGameBannerAnnouncementEntityResponse, PageTenantGameBannerAnnouncementEntityRequest>
+public class GameBannerAnnouncementService : GenericCrudService<Entity.Tenant.Game.Announcement.TenantGameBannerAnnouncementEntity, AddTenantGameBannerAnnouncementEntityRequest, UpdateTenantGameBannerAnnouncementEntityRequest, GameBannerAnnouncementResponse, PageTenantGameBannerAnnouncementEntityRequest>
 {
-    public TenantGameBannerAnnouncementEntityService(
+    public GameBannerAnnouncementService(
         SqlSugarRepository<Entity.Tenant.Game.Announcement.TenantGameBannerAnnouncementEntity> repository) : base(repository)
     {
     }
@@ -17,7 +17,7 @@ public class TenantGameBannerAnnouncementEntityService : GenericCrudService<Enti
     /// <summary>
     /// 构建分页查询条件（含日期范围过滤）
     /// </summary>
-    protected override ISugarQueryable<TenantGameBannerAnnouncementEntityResponse> BuildPageQuery(PageTenantGameBannerAnnouncementEntityRequest input)
+    protected override ISugarQueryable<GameBannerAnnouncementResponse> BuildPageQuery(PageTenantGameBannerAnnouncementEntityRequest input)
     {
         var query = Repository.AsQueryable()
                               .WhereIF(input.AreaId > 0, u => u.AreaId == input.AreaId)
@@ -26,7 +26,7 @@ public class TenantGameBannerAnnouncementEntityService : GenericCrudService<Enti
                               .WhereIF(input.Interval > 0, u => u.Interval == input.Interval)
                               .WhereIF(input.RepeatCount > 0, u => u.RepeatCount == input.RepeatCount)
                               .WhereIF(input.IsActive.HasValue, u => u.IsActive == input.IsActive.Value)
-                              .Select<TenantGameBannerAnnouncementEntityResponse>()
+                              .Select<GameBannerAnnouncementResponse>()
             ;
 
         query = ApplyDateRangeFilter(query, input.StartTimeRange, "u.StartTime");

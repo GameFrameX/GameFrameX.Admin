@@ -7,23 +7,23 @@ namespace GameFrameX.Application.ServerCenter.GameAreaClassify;
 /// 游戏大区分类服务
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
-public class TenantGameAreaClassifyEntityService
+public class GameAreaClassifyService
     : GenericCrudSelectService<Entity.Tenant.Game.TenantGameAreaClassifyEntity,
         AddTenantGameAreaClassifyEntityRequest, UpdateTenantGameAreaClassifyEntityRequest,
-        TenantGameAreaClassifyEntityResponse, PageTenantGameAreaClassifyEntityRequest>
+        GameAreaClassifyResponse, PageTenantGameAreaClassifyEntityRequest>
 {
 
-    public TenantGameAreaClassifyEntityService(
+    public GameAreaClassifyService(
         SqlSugarRepository<Entity.Tenant.Game.TenantGameAreaClassifyEntity> repository)
         : base(repository)
     {
     }
 
-    protected override ISugarQueryable<TenantGameAreaClassifyEntityResponse> BuildPageQuery(PageTenantGameAreaClassifyEntityRequest input)
+    protected override ISugarQueryable<GameAreaClassifyResponse> BuildPageQuery(PageTenantGameAreaClassifyEntityRequest input)
     {
         return Repository.AsQueryable()
                          .WhereIF(!string.IsNullOrWhiteSpace(input.Name), u => u.Name.Contains(input.Name.Trim()))
-                         .Select<TenantGameAreaClassifyEntityResponse>();
+                         .Select<GameAreaClassifyResponse>();
     }
 
     /// <summary>

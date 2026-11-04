@@ -5,7 +5,7 @@ namespace GameFrameX.Application.NoticeCenter.GameMailTemplate.Dto;
 /// <summary>
 /// 邮件模板新增/更新共有输入参数。
 /// </summary>
-public class TenantGameMailTemplateEntityBaseRequest : BaseAddRequest
+public class GameMailTemplateBaseRequest : BaseAddRequest
 {
     /// <summary>
     /// 名称

@@ -74,10 +74,10 @@ public sealed class MainDatabaseVersionDefinitionTests
         }
     }
 
-    private static async Task<TenantGameAppVersionDefinitionService> CreateServiceAsync(ClientApiTestDb database)
+    private static async Task<GameAppVersionDefinitionService> CreateServiceAsync(ClientApiTestDb database)
     {
         database.InitTenantTables(typeof(TenantGameAppVersionDefinitionEntity));
-        var service = new TenantGameAppVersionDefinitionService(new SqlSugarRepository<TenantGameAppVersionDefinitionEntity>
+        var service = new GameAppVersionDefinitionService(new SqlSugarRepository<TenantGameAppVersionDefinitionEntity>
         {
             Context = database.MainDb,
         });

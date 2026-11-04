@@ -7,12 +7,12 @@ namespace GameFrameX.Application.ClientDelivery.GameAppVersionDefinition;
 /// 版本管理服务
 /// </summary>
 [ApiDescriptionSettings(ClientConst.GroupName, Order = 100)]
-public class TenantGameAppVersionDefinitionService
+public class GameAppVersionDefinitionService
     : GenericCrudSelectService<Entity.Tenant.Game.Release.TenantGameAppVersionDefinitionEntity,
         AddGameAppVersionDefinitionRequest, UpdateGameAppVersionDefinitionRequest,
         GameAppVersionDefinitionPageResponse, PageGameAppVersionDefinitionRequest>
 {
-    public TenantGameAppVersionDefinitionService(
+    public GameAppVersionDefinitionService(
         SqlSugarRepository<Entity.Tenant.Game.Release.TenantGameAppVersionDefinitionEntity> repository)
         : base(repository)
     {

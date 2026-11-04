@@ -3,7 +3,7 @@ namespace GameFrameX.Application.PlayerCenter.GameRole.Dto;
 /// <summary>
 /// 游戏角色基础输入参数
 /// </summary>
-public class TenantGameRoleEntityBaseRequest : BaseAddRequest
+public class GameRoleBaseRequest : BaseAddRequest
 {
     /// <summary>
     /// 角色Id

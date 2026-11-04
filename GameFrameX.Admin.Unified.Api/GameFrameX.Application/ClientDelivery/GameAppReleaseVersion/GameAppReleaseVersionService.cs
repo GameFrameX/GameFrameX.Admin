@@ -8,11 +8,11 @@ namespace GameFrameX.Application.ClientDelivery.GameAppReleaseVersion;
 /// 游戏版本管理服务
 /// </summary>
 [ApiDescriptionSettings(ClientConst.GroupName, Order = 100)]
-public class TenantGameAppReleaseVersionService : GenericCrudService<Entity.Tenant.Game.Release.TenantGameAppReleaseVersionEntity, AddGameAppReleaseVersionRequest, UpdateGameAppReleaseVersionRequest, GameAppReleaseVersionResponse, PageGameAppReleaseVersionRequest>
+public class GameAppReleaseVersionService : GenericCrudService<Entity.Tenant.Game.Release.TenantGameAppReleaseVersionEntity, AddGameAppReleaseVersionRequest, UpdateGameAppReleaseVersionRequest, GameAppReleaseVersionResponse, PageGameAppReleaseVersionRequest>
 {
     private readonly SqlSugarRepository<TenantGameAppPackageEntity> _packageRepository;
 
-    public TenantGameAppReleaseVersionService(SqlSugarRepository<Entity.Tenant.Game.Release.TenantGameAppReleaseVersionEntity> repository, SqlSugarRepository<TenantGameAppPackageEntity> packageRepository) : base(repository)
+    public GameAppReleaseVersionService(SqlSugarRepository<Entity.Tenant.Game.Release.TenantGameAppReleaseVersionEntity> repository, SqlSugarRepository<TenantGameAppPackageEntity> packageRepository) : base(repository)
     {
         _packageRepository = packageRepository;
     }

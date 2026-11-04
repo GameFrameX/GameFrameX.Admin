@@ -3,14 +3,14 @@ using GameFrameX.Application.PlayerCenter.GameUser;
 namespace GameFrameX.Core.Tests.GameUserPassword;
 
 /// <summary>
-/// TenantGameUserPasswordService 单测：纯 Argon2id 哈希 / 校验，非法格式（含历史 PBKDF2/MD5）一律 false。
+/// GameUserPasswordService 单测：纯 Argon2id 哈希 / 校验，非法格式（含历史 PBKDF2/MD5）一律 false。
 /// <para>常量时间比对由 Foundation <c>PasswordHashHelper.Verify</c> 算法层保证，此处不重复测时间维度。</para>
 /// <para>内部使用 Argon2id（Foundation.PasswordHashHelper）。
 /// 接口签名（<c>Hash(string) / Verify(string,string)</c>）保持不变，19 处调用方零改动。</para>
 /// </summary>
 public class TenantGameUserPasswordServiceTests
 {
-    private readonly TenantGameUserPasswordService _service = new();
+    private readonly GameUserPasswordService _service = new();
 
     [Fact]
     public void Hash_Then_Verify_Should_Succeed()
@@ -33,7 +33,7 @@ public class TenantGameUserPasswordServiceTests
     [InlineData("")]
     public void Hash_Null_Or_Empty_Plaintext_Should_Not_Throw_And_Verify_Consistently(string? plaintext)
     {
-        // TenantGameUserPasswordService 层 plaintext ?? ""，Hash 不抛；Verify 同口径
+        // GameUserPasswordService 层 plaintext ?? ""，Hash 不抛；Verify 同口径
 #pragma warning disable CS8604 // 测试意图：传入 null 验证生产端 null 处理（plaintext ?? ""）
         var hash = _service.Hash(plaintext);
 
@@ -92,7 +92,7 @@ public class TenantGameUserPasswordServiceTests
     {
         // 枚举诱饵哈希：合法 Argon2id PHC 格式（供登录账号不存在路径跑假 Verify，使耗时与密码错误路径对齐），
         // 但不匹配任意真实玩家密码
-        Assert.StartsWith("$argon2id$", TenantGameUserPasswordService.EnumerationDecoyHash);
-        Assert.False(_service.Verify("any-user-password", TenantGameUserPasswordService.EnumerationDecoyHash));
+        Assert.StartsWith("$argon2id$", GameUserPasswordService.EnumerationDecoyHash);
+        Assert.False(_service.Verify("any-user-password", GameUserPasswordService.EnumerationDecoyHash));
     }
 }

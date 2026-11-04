@@ -3,7 +3,7 @@ namespace GameFrameX.Application.CommerceCenter.GameRedeemCodeChannel.Dto;
 /// <summary>
 /// 兑换码渠道输出参数
 /// </summary>
-public class TenantGameRedeemCodeChannelEntityResponse : IBasePageResponse<Entity.Tenant.Game.TenantGameRedeemCodeChannelEntity>
+public class GameRedeemCodeChannelResponse : IBasePageResponse<Entity.Tenant.Game.TenantGameRedeemCodeChannelEntity>
 {
     /// <summary>
     /// Id

@@ -22,7 +22,7 @@ public class GameRoleController : BaseController<TenantGameRoleEntity>
     private readonly ClientApiTokenIssuer _clientApiTokenIssuer;
     private readonly GameLoginTicketIssuer _gameLoginTicketIssuer;
     private readonly Repository<TenantGameAreaEntity> _areaService;
-    private readonly ITenantGamePenaltyEnforcementService _tenantGamePenaltyEnforcementService;
+    private readonly IGamePenaltyEnforcementService _tenantGamePenaltyEnforcementService;
 
     /// <summary>
     /// </summary>
@@ -37,7 +37,7 @@ public class GameRoleController : BaseController<TenantGameRoleEntity>
         Repository<TenantGameAreaEntity> areaService,
         ClientApiTokenIssuer clientApiTokenIssuer,
         GameLoginTicketIssuer gameLoginTicketIssuer,
-        ITenantGamePenaltyEnforcementService tenantGamePenaltyEnforcementService) : base(service)
+        IGamePenaltyEnforcementService tenantGamePenaltyEnforcementService) : base(service)
     {
         _httpClientFactory = httpClientFactory;
         _clientApiTokenIssuer = clientApiTokenIssuer;
@@ -100,29 +100,29 @@ public class GameRoleController : BaseController<TenantGameRoleEntity>
     /// <param name="input"></param>
     /// <returns></returns>
     [HttpPost]
-    [ProducesResponseType(200, Type = typeof(TenantGameRoleEntityResponse))]
-    public async Task<HttpJsonResultData<TenantGameRoleEntityResponse>> Add([FromBody] AddTenantGameRoleEntityRequest input)
+    [ProducesResponseType(200, Type = typeof(GameRoleResponse))]
+    public async Task<HttpJsonResultData<GameRoleResponse>> Add([FromBody] AddTenantGameRoleEntityRequest input)
     {
         var user = await PRepository.AsSugarClient().Queryable<TenantGameUserEntity>().Where(u => u.Id == input.UserId).FirstAsync();
         if (user == null)
         {
-            return GameApiResult.Error<TenantGameRoleEntityResponse>(AccountErrorCode.AccountExists, "账号不存在");
+            return GameApiResult.Error<GameRoleResponse>(AccountErrorCode.AccountExists, "账号不存在");
         }
 
         var gameAreaEntity = await PRepository.AsSugarClient().Queryable<TenantGameAreaEntity>().Filter(null, true).Where(u => u.IsDeleted == false).Where(u => u.Id == input.AreaId).FirstAsync();
         if (gameAreaEntity == null)
         {
-            return GameApiResult.Error<TenantGameRoleEntityResponse>(AreaErrorCode.AreaNotFound, "区服不存在");
+            return GameApiResult.Error<GameRoleResponse>(AreaErrorCode.AreaNotFound, "区服不存在");
         }
 
         if (gameAreaEntity.ServerStatus != GameServerStatus.Online)
         {
-            return GameApiResult.Error<TenantGameRoleEntityResponse>(AreaErrorCode.AreaCannotRegister, "当前状态不能注册");
+            return GameApiResult.Error<GameRoleResponse>(AreaErrorCode.AreaCannotRegister, "当前状态不能注册");
         }
 
         if (gameAreaEntity.ServerStatus == GameServerStatus.Full)
         {
-            return GameApiResult.Error<TenantGameRoleEntityResponse>(AreaErrorCode.AreaHasFull, "当前区服已满员");
+            return GameApiResult.Error<GameRoleResponse>(AreaErrorCode.AreaHasFull, "当前区服已满员");
         }
 
         var content = await _httpClientFactory.PostJsonToStringAsync(GameServerEndpointUrlBuilder.Build(gameAreaEntity, GameServerEndpointKindEnum.ClientDispatch, "req_player_create"),
@@ -135,7 +135,7 @@ public class GameRoleController : BaseController<TenantGameRoleEntity>
                                                                      });
         if (content == null)
         {
-            return GameApiResult.Error<TenantGameRoleEntityResponse>(SystemErrorCode.InnerError, "游戏服务器响应错误");
+            return GameApiResult.Error<GameRoleResponse>(SystemErrorCode.InnerError, "游戏服务器响应错误");
         }
 
         var respPlayerCreate = content.ToHttpJsonResult<PlayerCreateResponse>();
@@ -149,14 +149,14 @@ public class GameRoleController : BaseController<TenantGameRoleEntity>
             var res = await PRepository.InsertAsync(entity);
             if (res)
             {
-                var result = entity.Adapt<TenantGameRoleEntityResponse>();
+                var result = entity.Adapt<GameRoleResponse>();
                 result.HairstyleConfigId = input.HairstyleConfigId;
                 result.HeroConfigId = input.HeroConfigId;
-                return HttpJsonResultData<TenantGameRoleEntityResponse>.Success(result);
+                return HttpJsonResultData<GameRoleResponse>.Success(result);
             }
         }
 
-        return HttpJsonResultData<TenantGameRoleEntityResponse>.Error(respPlayerCreate.Code, "创建角色失败");
+        return HttpJsonResultData<GameRoleResponse>.Error(respPlayerCreate.Code, "创建角色失败");
     }
 
     /// <summary>
@@ -184,13 +184,13 @@ public class GameRoleController : BaseController<TenantGameRoleEntity>
     /// <param name="input"></param>
     /// <returns></returns>
     [HttpPost]
-    [ProducesResponseType(200, Type = typeof(TenantGameRoleEntityResponse))]
-    public async Task<HttpJsonResultData<TenantGameRoleEntityResponse>> Update([FromBody] UpdateTenantGameRoleEntityRequest input)
+    [ProducesResponseType(200, Type = typeof(GameRoleResponse))]
+    public async Task<HttpJsonResultData<GameRoleResponse>> Update([FromBody] UpdateTenantGameRoleEntityRequest input)
     {
         var entity = input.Adapt<TenantGameRoleEntity>();
         var res = await PRepository.AsUpdateable(entity).IgnoreColumns(true).ExecuteCommandWithOptLockAsync(true);
-        var result = entity.Adapt<TenantGameRoleEntityResponse>();
-        return HttpJsonResultData<TenantGameRoleEntityResponse>.Success(result);
+        var result = entity.Adapt<GameRoleResponse>();
+        return HttpJsonResultData<GameRoleResponse>.Success(result);
     }
 
 
@@ -200,17 +200,17 @@ public class GameRoleController : BaseController<TenantGameRoleEntity>
     /// <param name="input"></param>
     /// <returns></returns>
     [HttpPost]
-    [ProducesResponseType(200, Type = typeof(List<TenantGameRoleEntityResponse>))]
-    public async Task<HttpJsonResultData<List<TenantGameRoleEntityResponse>>> GetList([FromBody] GetListTenantGameRoleEntityRequest input)
+    [ProducesResponseType(200, Type = typeof(List<GameRoleResponse>))]
+    public async Task<HttpJsonResultData<List<GameRoleResponse>>> GetList([FromBody] GetListTenantGameRoleEntityRequest input)
     {
         var gameRoleEntities = await PRepository.GetListAsync(a => a.UserId == input.UserId);
-        var result = new List<TenantGameRoleEntityResponse>(gameRoleEntities.Count);
+        var result = new List<GameRoleResponse>(gameRoleEntities.Count);
         foreach (var entity in gameRoleEntities)
         {
-            result.Add(entity.Adapt<TenantGameRoleEntityResponse>());
+            result.Add(entity.Adapt<GameRoleResponse>());
         }
 
-        return HttpJsonResultData<List<TenantGameRoleEntityResponse>>.Success(result);
+        return HttpJsonResultData<List<GameRoleResponse>>.Success(result);
     }
 
     /// <summary>
@@ -298,7 +298,7 @@ public class GameRoleController : BaseController<TenantGameRoleEntity>
             return GameApiResult.Error<GameLoginTicketResponse>(GameRoleErrorCode.RoleBanned, $"角色已被封禁：{roleBlocking.Reason}");
         }
 
-        var result = entity.Adapt<TenantGameRoleEntityResponse>();
+        var result = entity.Adapt<GameRoleResponse>();
         await TryRefreshPlayerInfo(entity, gameAreaEntity);
 
         var routeTarget = BuildRouteTarget(gameAreaEntity);
@@ -405,12 +405,12 @@ public class GameRoleController : BaseController<TenantGameRoleEntity>
     /// <param name="input"></param>
     /// <returns></returns>
     [HttpPost]
-    [ProducesResponseType(200, Type = typeof(TenantGameRoleEntityResponse))]
-    public async Task<HttpJsonResultData<TenantGameRoleEntityResponse>> Get([FromBody] GetTenantGameRoleEntityRequest input)
+    [ProducesResponseType(200, Type = typeof(GameRoleResponse))]
+    public async Task<HttpJsonResultData<GameRoleResponse>> Get([FromBody] GetTenantGameRoleEntityRequest input)
     {
         var entity = await PRepository.GetSingleAsync(a => a.UserId == input.UserId && a.AreaId == input.AreaId);
-        var result = entity.Adapt<TenantGameRoleEntityResponse>();
-        return HttpJsonResultData<TenantGameRoleEntityResponse>.Success(result);
+        var result = entity.Adapt<GameRoleResponse>();
+        return HttpJsonResultData<GameRoleResponse>.Success(result);
     }
 
     /// <summary>
@@ -419,22 +419,22 @@ public class GameRoleController : BaseController<TenantGameRoleEntity>
     /// <param name="input"></param>
     /// <returns></returns>
     [HttpPost]
-    [ProducesResponseType(200, Type = typeof(TenantGameRoleEntityResponse))]
-    public async Task<HttpJsonResultData<TenantGameRoleEntityResponse>> GetById([FromBody] GetByIdTenantGameRoleEntityRequest input)
+    [ProducesResponseType(200, Type = typeof(GameRoleResponse))]
+    public async Task<HttpJsonResultData<GameRoleResponse>> GetById([FromBody] GetByIdTenantGameRoleEntityRequest input)
     {
         if (long.TryParse(input.Id, out var id))
         {
             var entity = await PRepository.GetFirstAsync(a => a.Id == id);
-            var result = entity.Adapt<TenantGameRoleEntityResponse>();
+            var result = entity.Adapt<GameRoleResponse>();
             var gameAreaEntity = await _areaService.AsQueryable().Filter(null, true).Where(u => u.IsDeleted == false).FirstAsync(g => g.Id == entity.AreaId);
             if (gameAreaEntity.IsNotNull())
             {
                 result.ServerName = gameAreaEntity.Name;
             }
 
-            return HttpJsonResultData<TenantGameRoleEntityResponse>.Success(result);
+            return HttpJsonResultData<GameRoleResponse>.Success(result);
         }
 
-        return GameApiResult.Error<TenantGameRoleEntityResponse>(GameRoleErrorCode.RoleNotFound, "角色不存在");
+        return GameApiResult.Error<GameRoleResponse>(GameRoleErrorCode.RoleNotFound, "角色不存在");
     }
 }

@@ -3,7 +3,7 @@ namespace GameFrameX.Application.PlayerCenter.GameRole.Dto;
 /// <summary>
 /// 游戏角色输出参数
 /// </summary>
-public class TenantGameRoleEntityResponse
+public class GameRoleResponse
 {
     /// <summary>
     /// 角色Id

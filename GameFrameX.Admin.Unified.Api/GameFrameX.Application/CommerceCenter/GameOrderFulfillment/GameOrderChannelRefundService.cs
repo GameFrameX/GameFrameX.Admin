@@ -10,12 +10,12 @@ namespace GameFrameX.Application.CommerceCenter.GameOrderFulfillment;
 
 /// <summary>
 /// 渠道退款路由服务：按订单支付渠道解析 <see cref="IRefundManager"/> 与主库支付配置，执行渠道侧退款。
-/// <para>渠道退款必须先于本地账本扣除（<c>TenantGameOrderShipService.RefundAsync</c>）成功执行：
+/// <para>渠道退款必须先于本地账本扣除（<c>GameOrderShipService.RefundAsync</c>）成功执行：
 /// 渠道失败 / 渠道不支持主动退款 / 渠道配置缺失时抛 <see cref="BusinessError"/>（错误码进 PaymentErrorCode 段 704），本地账本不动。</para>
 /// <para>渠道配置来源：主库 TenantGamePaymentConfigEntity 中对应支付渠道的基础分包配置，
 /// IsSandbox 与订单匹配者优先；ConfigJson 经 <see cref="PaymentChannelRegistry"/> 反序列化为渠道 Option 类型。</para>
 /// </summary>
-public class TenantGameOrderChannelRefundService
+public class GameOrderChannelRefundService
 {
     private static readonly JsonSerializerOptions ConfigSerializerOptions = new()
     {
@@ -26,7 +26,7 @@ public class TenantGameOrderChannelRefundService
     private readonly ISqlSugarClient _db;
     private readonly IHttpClientFactory _httpClientFactory;
 
-    public TenantGameOrderChannelRefundService(IEnumerable<IRefundManager> refundManagers, ISqlSugarClient db, IHttpClientFactory httpClientFactory)
+    public GameOrderChannelRefundService(IEnumerable<IRefundManager> refundManagers, ISqlSugarClient db, IHttpClientFactory httpClientFactory)
     {
         _refundManagers = refundManagers.ToDictionary(m => m.ChannelName, m => m, StringComparer.OrdinalIgnoreCase);
         _db = db;

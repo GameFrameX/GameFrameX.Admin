@@ -9,12 +9,12 @@ namespace GameFrameX.Application.CommerceCenter.GameOrder;
 /// 游戏支付订单服务
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
-public class TenantGameOrderEntityService : GenericCrudService<Entity.Tenant.Game.TenantGameOrderEntity, AddTenantGameOrderEntityRequest, UpdateTenantGameOrderEntityRequest, TenantGameOrderEntityResponse, PageTenantGameOrderEntityRequest>
+public class GameOrderService : GenericCrudService<Entity.Tenant.Game.TenantGameOrderEntity, AddTenantGameOrderEntityRequest, UpdateTenantGameOrderEntityRequest, GameOrderResponse, PageTenantGameOrderEntityRequest>
 {
-    private readonly TenantGameOrderShipService _shipService;
+    private readonly GameOrderShipService _shipService;
     private readonly CurrentUserContext _currentUserContext;
 
-    public TenantGameOrderEntityService(SqlSugarRepository<Entity.Tenant.Game.TenantGameOrderEntity> repository, TenantGameOrderShipService shipService, CurrentUserContext currentUserContext) : base(repository)
+    public GameOrderService(SqlSugarRepository<Entity.Tenant.Game.TenantGameOrderEntity> repository, GameOrderShipService shipService, CurrentUserContext currentUserContext) : base(repository)
     {
         _shipService = shipService;
         _currentUserContext = currentUserContext;
@@ -28,7 +28,7 @@ public class TenantGameOrderEntityService : GenericCrudService<Entity.Tenant.Gam
         throw new Exception("游戏订单由客户端下单链路产生，不支持通过管理后台直接创建");
     }
 
-    protected override ISugarQueryable<TenantGameOrderEntityResponse> BuildPageQuery(PageTenantGameOrderEntityRequest input)
+    protected override ISugarQueryable<GameOrderResponse> BuildPageQuery(PageTenantGameOrderEntityRequest input)
     {
         return Repository.AsQueryable()
                          .WhereIF(input.Status.HasValue, u => u.Status == input.Status)
@@ -45,7 +45,7 @@ public class TenantGameOrderEntityService : GenericCrudService<Entity.Tenant.Gam
                          .WhereIF(input.CreateTimeRange != null && input.CreateTimeRange.Count == 2 && input.CreateTimeRange[0] < input.CreateTimeRange[1],
                                   u => u.CreatedTime >= input.CreateTimeRange[0]
                                        && u.CreatedTime <= input.CreateTimeRange[1])
-                         .Select<TenantGameOrderEntityResponse>();
+                         .Select<GameOrderResponse>();
     }
 
     /// <summary>
@@ -112,7 +112,7 @@ public class TenantGameOrderEntityService : GenericCrudService<Entity.Tenant.Gam
     }
 
     /// <summary>
-    /// 游戏支付订单人工补发（高风险）。走 <see cref="TenantGameOrderShipService.CompensateAsync"/> 审计路径：
+    /// 游戏支付订单人工补发（高风险）。走 <see cref="GameOrderShipService.CompensateAsync"/> 审计路径：
     /// 必须带操作人（当前登录 Admin），独立幂等键 + OperatorId 落账，不改动订单状态、不重复累加角色累充。
     /// </summary>
     [HttpPost]

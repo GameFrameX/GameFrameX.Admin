@@ -3,7 +3,7 @@ namespace GameFrameX.Application.ClientDelivery.Security.AppSignatureKey.Dto;
 /// <summary>
 /// 续租 App 传输签名密钥输入参数：仅更新到期时间，不产生新密钥。
 /// </summary>
-public class TenantAppSignatureKeyRenewRequest
+public class AppSignatureKeyRenewRequest
 {
     /// <summary>
     /// 密钥主键 ID。

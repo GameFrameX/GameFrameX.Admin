@@ -18,7 +18,7 @@ public sealed class MainDatabaseContentServiceTests
         using (var database = new ClientApiTestDb())
         {
             database.InitTenantTables(typeof(TenantGameAnnouncementEntity));
-            var service = new TenantGameAnnouncementEntityService(new SqlSugarRepository<TenantGameAnnouncementEntity>
+            var service = new GameAnnouncementService(new SqlSugarRepository<TenantGameAnnouncementEntity>
             {
                 Context = database.MainDb,
             }, null!);
@@ -49,7 +49,7 @@ public sealed class MainDatabaseContentServiceTests
         using (var database = new ClientApiTestDb())
         {
             database.InitTenantTables(typeof(TenantGameMailTemplateCategoryEntity));
-            var service = new TenantGameMailTemplateCategoryEntityService(new SqlSugarRepository<TenantGameMailTemplateCategoryEntity>
+            var service = new GameMailTemplateCategoryService(new SqlSugarRepository<TenantGameMailTemplateCategoryEntity>
             {
                 Context = database.MainDb,
             });

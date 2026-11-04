@@ -10,7 +10,7 @@ namespace GameFrameX.Application.GmCenter.LiveOps.PlayerSegment.Dto;
 /// <para>条件以 JSON 字符串承载（List&lt;<see cref="OnlineSegmentCondition"/>&gt;），字段名与操作符受
 /// <c>OnlineRolloutSemanticMap</c> 白名单校验（Admin 只校验不解释，语义解释在 Online 侧）。</para>
 /// </summary>
-public abstract class TenantGameOnlinePlayerSegmentBaseRequest : BaseUpdateRequest
+public abstract class GameOnlinePlayerSegmentBaseRequest : BaseUpdateRequest
 {
     /// <summary>
     /// 分群名称。

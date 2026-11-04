@@ -15,30 +15,30 @@ public sealed class BusinessPageSearchKeyRemovalGuardTests
     /// <summary>GFX-739 清理触及的 17 个 Service（16 个删重复 SearchKey WhereIF + TimeJob 补 Name 条件）。</summary>
     private static readonly string[] CleanedServices =
     {
-        "TenantGameAnnouncementEntityService",
-        "TenantGameBannerAnnouncementEntityService",
-        "TenantGameAppAssetPackageService",
-        "TenantGameAppAssetPackageVersionService",
-        "TenantGameAppPackageService",
-        "TenantGameAreaEntityService",
-        "TenantGameAreaClassifyEntityService",
-        "TenantGameDockerTagEntityService",
-        "TenantGameGoodsCatalogueEntityService",
-        "TenantGameMailTemplateCategoryEntityService",
-        "TenantGameOrderEntityService",
-        "TenantGameOrderFulfillmentEntityService",
-        "TenantGameRedeemCodeChannelEntityService",
-        "TenantGameRoleEntityService",
-        "TenantGameTimeJobEntityService",
-        "TenantGameUserEntityService",
+        "GameAnnouncementService",
+        "GameBannerAnnouncementService",
+        "GameAppAssetPackageService",
+        "GameAppAssetPackageVersionService",
+        "GameAppPackageService",
+        "GameAreaService",
+        "GameAreaClassifyService",
+        "GameDockerTagService",
+        "GameGoodsCatalogueService",
+        "GameMailTemplateCategoryService",
+        "GameOrderService",
+        "GameOrderFulfillmentService",
+        "GameRedeemCodeChannelService",
+        "GameRoleService",
+        "GameTimeJobService",
+        "GameUserService",
     };
 
     /// <summary>SelectAsync 下拉搜索保留 searchKey 用法的 3 个 Service（issue 明确保留项，整文件断言豁免）。</summary>
     private static readonly string[] ServicesWithSelectAsyncKeep =
     {
-        "TenantGameAppAssetPackageService",
-        "TenantGameAppAssetPackageVersionService",
-        "TenantGameAppPackageService",
+        "GameAppAssetPackageService",
+        "GameAppAssetPackageVersionService",
+        "GameAppPackageService",
     };
 
     [Fact]
@@ -83,7 +83,7 @@ public sealed class BusinessPageSearchKeyRemovalGuardTests
         Assert.Contains("public string Name", requestSource, StringComparison.Ordinal);
         Assert.DoesNotContain("SearchKey", requestSource, StringComparison.Ordinal);
 
-        var serviceBody = ExtractMethodBody(ReadSource("TenantGameTimeJobEntityService"), "BuildPageQuery");
+        var serviceBody = ExtractMethodBody(ReadSource("GameTimeJobService"), "BuildPageQuery");
         Assert.Contains("input.Name", serviceBody, StringComparison.Ordinal);
     }
 

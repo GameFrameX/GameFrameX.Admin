@@ -235,7 +235,7 @@ public sealed class ClientApiPaymentCallbackEndpointTests
             FakeOptionsProvider.WithAreaPolicy(false),
             db.Repository<TenantGameRoleEntity>(),
             new HttpClient(handler, false),
-            new TenantGameOrderShipService(db.TenantDb, new ClientApiTestHttpClientFactory(handler)),
+            new GameOrderShipService(db.TenantDb, new ClientApiTestHttpClientFactory(handler)),
             factory,
             authenticator ?? new TestGooglePubSubPushAuthenticator(false),
             googlePurchaseService ?? new TestGooglePlayPurchaseService(null));

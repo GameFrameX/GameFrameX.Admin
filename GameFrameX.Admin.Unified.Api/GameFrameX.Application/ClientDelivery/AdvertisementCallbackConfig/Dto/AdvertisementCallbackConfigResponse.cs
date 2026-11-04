@@ -5,7 +5,7 @@ namespace GameFrameX.Application.ClientDelivery.AdvertisementCallbackConfig.Dto;
 /// <summary>
 /// 租户广告回调配置输出参数（敏感字段已脱敏）
 /// </summary>
-public class TenantAdvertisementCallbackConfigResponse : IBasePageResponse<TenantAdvertisementCallbackConfigEntity>
+public class AdvertisementCallbackConfigResponse : IBasePageResponse<TenantAdvertisementCallbackConfigEntity>
 {
     /// <summary>
     /// Id

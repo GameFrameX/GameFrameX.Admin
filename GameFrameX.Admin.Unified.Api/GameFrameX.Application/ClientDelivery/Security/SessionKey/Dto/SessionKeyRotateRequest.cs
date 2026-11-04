@@ -3,7 +3,7 @@ namespace GameFrameX.Application.ClientDelivery.Security.SessionKey.Dto;
 /// <summary>
 /// 轮换 App 会话密钥输入参数：新插一把立即生效的 key（双活），旧 key 不动、按其租约自然退场。
 /// </summary>
-public class TenantSessionKeyRotateRequest
+public class SessionKeyRotateRequest
 {
     /// <summary>
     /// 旧密钥的新到期时间（Unix 秒）：建议设为「双活窗口」结束时刻（客户端全量切换完成后）；

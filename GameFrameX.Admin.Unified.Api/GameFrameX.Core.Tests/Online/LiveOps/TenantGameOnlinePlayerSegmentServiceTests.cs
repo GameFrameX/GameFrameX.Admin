@@ -197,9 +197,9 @@ public sealed class TenantGameOnlinePlayerSegmentServiceTests : IDisposable
         };
     }
 
-    private TenantGameOnlinePlayerSegmentService CreateService()
+    private GameOnlinePlayerSegmentService CreateService()
     {
-        return new TenantGameOnlinePlayerSegmentService(
+        return new GameOnlinePlayerSegmentService(
             Repository<TenantGameOnlinePlayerSegmentEntity>(),
             Repository<TenantGameOnlineConfigRolloutEntity>(),
             _dispatch);

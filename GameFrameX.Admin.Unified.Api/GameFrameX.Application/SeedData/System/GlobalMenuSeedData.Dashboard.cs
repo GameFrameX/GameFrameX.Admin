@@ -105,15 +105,15 @@ public partial class GlobalMenuSeedData
             },
             new()
             {
-                Id = StableSeedId.Menu("tenantGameHomeEntity:GetOnline"),
-                Key = "tenantGameHomeEntity:GetOnline",
+                Id = StableSeedId.Menu("gameHome:GetOnline"),
+                Key = "gameHome:GetOnline",
                 Pid = StableSeedId.Menu("route:home"),
                 Type = MenuTypeEnum.Button,
                 Name = null,
                 Path = null,
                 Component = null,
                 Redirect = null,
-                Permission = MenuSeedRouteName.Of<TenantGameHomeEntityService>(nameof(TenantGameHomeEntityService.GetOnlineAsync)),
+                Permission = MenuSeedRouteName.Of<GameHomeService>(nameof(GameHomeService.GetOnlineAsync)),
                 Title = "查询在线玩家",
                 TitleCode = null,
                 Icon = null,

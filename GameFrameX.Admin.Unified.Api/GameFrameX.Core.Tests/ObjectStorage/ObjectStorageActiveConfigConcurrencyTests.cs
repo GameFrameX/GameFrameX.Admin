@@ -10,7 +10,7 @@ namespace GameFrameX.Core.Tests.ObjectStorage;
 /// <summary>
 /// 唯一活动配置不变量的 DB 级测试（P1-3）。
 /// 验证“停用其它 + 写当前启用”的事务在串行纪律下维持至多一条启用配置。
-/// <para>注：测试复刻 <see cref="TenantObjectStorageConfigEntityService"/> AddAsync/UpdateAsync 的串行纪律
+/// <para>注：测试复刻 <see cref="ObjectStorageConfigService"/> AddAsync/UpdateAsync 的串行纪律
 /// （SemaphoreSlim 包裹 UseTran(DeactivateOthers + Insert/UpdateAsync)）；service 使用同一纪律的进程级
 /// static SemaphoreSlim（见 service 字段 ActiveConfigTransitionLock 注释）。</para>
 /// </summary>

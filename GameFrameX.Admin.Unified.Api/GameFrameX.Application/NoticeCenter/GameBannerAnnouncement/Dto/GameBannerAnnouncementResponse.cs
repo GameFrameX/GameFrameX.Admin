@@ -3,7 +3,7 @@ namespace GameFrameX.Application.NoticeCenter.GameBannerAnnouncement.Dto;
 /// <summary>
 /// 游戏内横幅公告输出参数
 /// </summary>
-public class TenantGameBannerAnnouncementEntityResponse : IBasePageResponse<Entity.Tenant.Game.Announcement.TenantGameBannerAnnouncementEntity>
+public class GameBannerAnnouncementResponse : IBasePageResponse<Entity.Tenant.Game.Announcement.TenantGameBannerAnnouncementEntity>
 {
     /// <summary>
     /// Id

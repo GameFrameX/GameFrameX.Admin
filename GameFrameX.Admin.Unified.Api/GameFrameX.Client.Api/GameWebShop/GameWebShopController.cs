@@ -60,11 +60,11 @@ public class GameWebShopController : BaseController<TenantGameWebShopEntity>
     /// </summary>
     /// <returns></returns>
     [HttpGet]
-    [ProducesResponseType(200, Type = typeof(TenantGameWebShopEntityResponse))]
-    public async Task<HttpJsonResultData<List<TenantGameWebShopEntityResponse>>> Get()
+    [ProducesResponseType(200, Type = typeof(GameWebShopResponse))]
+    public async Task<HttpJsonResultData<List<GameWebShopResponse>>> Get()
     {
-        var list = await PRepository.AsQueryable().Where(g => g.IsUp).Select<TenantGameWebShopEntityResponse>().OrderByDescending(g => g.Weight).ToListAsync();
-        return HttpJsonResultData<List<TenantGameWebShopEntityResponse>>.Success(list);
+        var list = await PRepository.AsQueryable().Where(g => g.IsUp).Select<GameWebShopResponse>().OrderByDescending(g => g.Weight).ToListAsync();
+        return HttpJsonResultData<List<GameWebShopResponse>>.Success(list);
     }
 
 

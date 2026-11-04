@@ -3,7 +3,7 @@ namespace GameFrameX.Application.ClientDelivery.Security.SessionKey.Dto;
 /// <summary>
 /// 续租 App 会话密钥输入参数：仅更新到期时间，不产生新密钥。
 /// </summary>
-public class TenantSessionKeyRenewRequest
+public class SessionKeyRenewRequest
 {
     /// <summary>
     /// 密钥主键 ID。

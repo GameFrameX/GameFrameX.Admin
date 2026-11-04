@@ -20,13 +20,13 @@ namespace GameFrameX.Application.NoticeCenter.GameMailCampaign;
 /// <summary>
 /// 运营邮件 Campaign 草稿/发布/撤回管理服务。路由前缀 /api/tenantGameMailCampaignEntity（历史框架 去后缀 + lowerCamelCase）。
 /// <para>状态机 B1/B3/B4：Draft 可自由增删改与发布重试；Published/Revoked 主体不可编辑/删除（B1），仅 Published 可撤回（撤回不可逆 B3）；Server 拒绝落 Failed。</para>
-/// <para>与既有 <c>TenantGameMailEntityService</c>（直发 post_mail）是两套独立系统，不合并。</para>
+/// <para>与既有 <c>GameMailService</c>（直发 post_mail）是两套独立系统，不合并。</para>
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
-public class TenantGameMailCampaignEntityService
+public class GameMailCampaignService
     : GenericCrudService<TenantGameMailCampaignEntity,
         AddTenantGameMailCampaignEntityRequest, UpdateTenantGameMailCampaignEntityRequest,
-        TenantGameMailCampaignEntityResponse, PageTenantGameMailCampaignEntityRequest>
+        GameMailCampaignResponse, PageTenantGameMailCampaignEntityRequest>
 {
     private readonly SqlSugarRepository<Entity.Tenant.Game.TenantGameAreaEntity> _gameAreaRepository;
     private readonly IMailCampaignServerClient _serverClient;
@@ -41,7 +41,7 @@ public class TenantGameMailCampaignEntityService
     /// <param name="serverClient"></param>
     /// <param name="dispatchService"></param>
     /// <param name="currentUserContext"></param>
-    public TenantGameMailCampaignEntityService(SqlSugarRepository<TenantGameMailCampaignEntity> repository,
+    public GameMailCampaignService(SqlSugarRepository<TenantGameMailCampaignEntity> repository,
         SqlSugarRepository<Entity.Tenant.Game.TenantGameAreaEntity> gameAreaRepository,
         IMailCampaignServerClient serverClient,
         IOnlineLiveOpsDispatchService dispatchService,
@@ -57,7 +57,7 @@ public class TenantGameMailCampaignEntityService
     /// <summary>
     /// 分页查询：按 Name / MailType / PublishStatus / TemplateId / ServerCampaignId / AreaId 过滤。
     /// </summary>
-    protected override ISugarQueryable<TenantGameMailCampaignEntityResponse> BuildPageQuery(PageTenantGameMailCampaignEntityRequest input)
+    protected override ISugarQueryable<GameMailCampaignResponse> BuildPageQuery(PageTenantGameMailCampaignEntityRequest input)
     {
         return Repository.AsQueryable()
                          .WhereIF(input.AreaId.HasValue, u => u.AreaId == input.AreaId.Value)
@@ -66,7 +66,7 @@ public class TenantGameMailCampaignEntityService
                          .WhereIF(input.PublishStatus.HasValue, u => u.PublishStatus == input.PublishStatus.Value)
                          .WhereIF(input.TemplateId.HasValue, u => u.TemplateId == input.TemplateId.Value)
                          .WhereIF(input.ServerCampaignId.HasValue, u => u.ServerCampaignId == input.ServerCampaignId.Value)
-                         .Select<TenantGameMailCampaignEntityResponse>();
+                         .Select<GameMailCampaignResponse>();
     }
 
     /// <summary>

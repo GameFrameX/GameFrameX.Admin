@@ -7,12 +7,12 @@ namespace GameFrameX.Application.CommerceCenter.GameRedeemCodeChannel;
 /// 兑换码渠道服务
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
-public class TenantGameRedeemCodeChannelEntityService
+public class GameRedeemCodeChannelService
     : GenericCrudSelectService<Entity.Tenant.Game.TenantGameRedeemCodeChannelEntity,
         AddTenantGameRedeemCodeChannelEntityRequest, UpdateTenantGameRedeemCodeChannelEntityRequest,
-        TenantGameRedeemCodeChannelEntityResponse, PageTenantGameRedeemCodeChannelEntityRequest>
+        GameRedeemCodeChannelResponse, PageTenantGameRedeemCodeChannelEntityRequest>
 {
-    public TenantGameRedeemCodeChannelEntityService(SqlSugarRepository<Entity.Tenant.Game.TenantGameRedeemCodeChannelEntity> repository)
+    public GameRedeemCodeChannelService(SqlSugarRepository<Entity.Tenant.Game.TenantGameRedeemCodeChannelEntity> repository)
         : base(repository)
     {
     }
@@ -51,11 +51,11 @@ public class TenantGameRedeemCodeChannelEntityService
         }
     }
 
-    protected override ISugarQueryable<TenantGameRedeemCodeChannelEntityResponse> BuildPageQuery(PageTenantGameRedeemCodeChannelEntityRequest input)
+    protected override ISugarQueryable<GameRedeemCodeChannelResponse> BuildPageQuery(PageTenantGameRedeemCodeChannelEntityRequest input)
     {
         return Repository.AsQueryable()
                          .WhereIF(!string.IsNullOrWhiteSpace(input.Name), u => u.Name.Contains(input.Name.Trim()))
-                         .Select<TenantGameRedeemCodeChannelEntityResponse>();
+                         .Select<GameRedeemCodeChannelResponse>();
     }
 }
 #pragma warning restore CS8602, CS8604, CS8629

@@ -19,7 +19,7 @@ public sealed class MainDatabaseOrderServiceTests
             var order = database.SeedOrder(101, 201, 10, status: OrderStatusEnum.Shipped, amount: 100, providerTransactionId: "tx-101");
             database.MainDb.Updateable<TenantGameOrderEntity>().SetColumns(x => x.AppleTransactionId == "apple-101").Where(x => x.Id == 101).ExecuteCommand();
             database.SeedOrder(102, 202, 11, status: OrderStatusEnum.Unpaid, amount: 50, providerTransactionId: "tx-102");
-            var service = new TenantGameOrderEntityService(new SqlSugarRepository<TenantGameOrderEntity>
+            var service = new GameOrderService(new SqlSugarRepository<TenantGameOrderEntity>
             {
                 Context = database.MainDb,
             }, null!, new CurrentUserContext(new HttpContextAccessor()));
@@ -44,7 +44,7 @@ public sealed class MainDatabaseOrderServiceTests
                 PayChannel = "google", ProviderTransactionId = "tx-101", AccountId = "100", ItemsJson = "[]",
                 Type = FulfillmentTypeEnum.Purchase, Status = FulfillmentStatusEnum.Success,
             }).ExecuteCommand();
-            var service = new TenantGameOrderFulfillmentEntityService(
+            var service = new GameOrderFulfillmentService(
                 new SqlSugarRepository<TenantGameOrderFulfillmentEntity> { Context = database.MainDb },
                 new SqlSugarRepository<TenantGameOrderEntity> { Context = database.MainDb },
                 null!, null!, new CurrentUserContext(new HttpContextAccessor()));
