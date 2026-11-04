@@ -9,7 +9,7 @@ namespace GameFrameX.Entity.Tenant.Device;
 /// <para>命名遵循 C210 应用中心实体家族 <c>TenantGameApp*Entity</c>；物理表名由类名下划线生成（<c>tenant_game_app_device_group_entity</c>）。</para>
 /// </summary>
 [SugarTable(null, "客户机器码分组")]
-[SugarIndex("idx_tenant_game_app_device_group_tenant_app_name", nameof(Name), OrderByType.Asc)]
+[SugarIndex("idx_device_group_name", nameof(Name), OrderByType.Asc)]
 [TenantTable]
 [IncrementTable]
 public sealed class TenantGameAppDeviceGroupEntity : EntityBasic, ISelectFilter

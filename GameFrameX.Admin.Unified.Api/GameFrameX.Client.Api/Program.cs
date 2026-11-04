@@ -176,9 +176,7 @@ internal static class Program
 
         app.UseRouting();
 
-        // 租户解析中间件
-
-        // 公开 provider 回调租户解析中间件
+        // 公开 provider 回调路由解析中间件
         app.UseMiddleware<PublicCallbackTenantResolutionMiddleware>();
 
         // 协议版本中间件（C5 server-envelope-middleware）：X-Proto-Ver 缺头拒绝，未知版本 AuditOnly 只告警不拦截
@@ -189,8 +187,6 @@ internal static class Program
 
         // 加密信封中间件（C5 server-envelope-middleware）：挂签名之后——签名覆盖线上信封字节，验签先于解密；请求解密、响应加密
         app.UseMiddleware<CryptoEnvelopeMiddleware>();
-
-        // 租户到期拦截中间件
 
         // 启动时加载包映射缓存
         var packageResolver = app.Services.GetRequiredService<GameAppPackageResolver>();

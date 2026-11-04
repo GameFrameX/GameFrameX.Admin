@@ -24,7 +24,7 @@ public sealed class AuthenticatedOnlyRouteWhitelistTests
     }
 
     /// <summary>
-    /// 逃生通道端点必须同时标注 [AuthenticatedOnly]：[BypassTenantExpiration] 只豁免租户门禁，
+    /// 仅登录端点必须显式标注 [AuthenticatedOnly]，
     /// 端点仍需落在「仅需登录」档，否则 tenant admin 会被自动隐藏按钮挡成 403（GFX-683 回潮）。
     /// </summary>
     [Theory]
@@ -34,7 +34,7 @@ public sealed class AuthenticatedOnlyRouteWhitelistTests
         var method = serviceType.GetMethod(methodName, BindingFlags.Public | BindingFlags.Instance);
         Assert.NotNull(method);
         Assert.True(method!.IsDefined(typeof(AuthenticatedOnlyAttribute), false),
-                    $"{serviceType.Name}.{methodName} 标注了 [BypassTenantExpiration] 却未标注 [AuthenticatedOnly]——tenant admin 会被自动隐藏按钮挡成 403（GFX-683 回潮）");
+                    $"{serviceType.Name}.{methodName} 未标注 [AuthenticatedOnly]，运营账号会被自动隐藏按钮挡成 403");
     }
 
     /// <summary>

@@ -7,7 +7,7 @@ namespace GameFrameX.Entity.Tenant.Game.Release;
 /// 客户端程序版本号字典（应用作用域事实数据）。
 /// </summary>
 [SugarTable(null, "客户端程序版本配置表")]
-[SugarIndex("idx_tenant_game_app_version_def_tenant_app_name", nameof(Name), OrderByType.Asc, true)]
+[SugarIndex("idx_version_definition_name", nameof(Name), OrderByType.Asc, true)]
 [TenantTable]
 [IncrementTable]
 public sealed class TenantGameAppVersionDefinitionEntity : EntityBasic, ISelectFilter

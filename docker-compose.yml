@@ -36,23 +36,10 @@ x-main-db: &main-db
   #   Database        → 业务主库库名（由 init.sql 预建，启动时会自动补建缺失的库）
   #   Username/Password → 登录账号/密码，默认值与下方 postgres 服务的初始化账号一致
   GFX_MAIN_DB_CONNECTION_STRING: "Host=${POSTGRES_HOST:-postgres};Port=${POSTGRES_PORT:-5432};Database=gameframex_admin;Username=${POSTGRES_USER:-gameframex};Password=${POSTGRES_PASSWORD:-GameFrameX@Local2026}"
-  # 租户库连接串加密密钥（C317/GFX-726，system_tenant.connection 以 enc:v1: 密文落库）：
-  #   留空 = 降级模式（明文直存/直读）；设置后三 host 必须同值，否则跨 host 解密失败。
-  #   凭证不进 git，写入仓库根 .env 文件即可（GFX_TENANT_CONN_ENC_KEY=...）。
-  GFX_TENANT_CONN_ENC_KEY: ${GFX_TENANT_CONN_ENC_KEY:-}
   # 租户凭证静态加密密钥（C370/C371，签名/会话/票据私钥/邮件/广告/支付等敏感列以 enc:sec:v1: 密文落库）：
   #   留空 = 降级模式（明文直存/直读，功能不阻断）；设置后三 host 必须同值，且不得再变更
   #   （密钥丢失 = 存量密文不可解）。同样写入根 .env（GFX_TENANT_SECRET_ENC_KEY=...）。
   GFX_TENANT_SECRET_ENC_KEY: ${GFX_TENANT_SECRET_ENC_KEY:-}
-  # C371 租户域 10 实体存量明文回填开关：=1 时启动期扫描加密存量行（幂等，稳态 0 行）。
-  #   验收后按 gfx-doc C371 change.md §6 D4 的开启条件评估再开；默认关闭。
-  GFX_TENANT_CREDENTIAL_BACKFILL: ${GFX_TENANT_CREDENTIAL_BACKFILL:-}
-  # 默认租户库显式连接对（C269 推导的替代形态）：GFX-727 存量迁移把默认租户库 REVOKE CONNECT FROM PUBLIC
-  #   后，主库账号（推导连接）无法再连，必须显式指向租户独立账号。留空 = 维持主库推导（未迁移环境）。
-  GFX_DEFAULT_TENANT_DB_TYPE: ${GFX_DEFAULT_TENANT_DB_TYPE:-}
-  GFX_DEFAULT_TENANT_DB_CONNECTION_STRING: ${GFX_DEFAULT_TENANT_DB_CONNECTION_STRING:-}
-  # 建库专用管理连接（C317）：gfx_provisioner 独立账号；留空 = 回落主库连接并告警（降级模式）。
-  DbConnection__ProvisioningConnectionString: ${GFX_DB_PROVISIONING_CONNECTION_STRING:-}
 
 # 【修改数据库密码的完整步骤】（重要：只改本文件不生效！）
 #   POSTGRES_PASSWORD 只在数据卷「第一次初始化」时生效，已有数据的老库不会跟着变。

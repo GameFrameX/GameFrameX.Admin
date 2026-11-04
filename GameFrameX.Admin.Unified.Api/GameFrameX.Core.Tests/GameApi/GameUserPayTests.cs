@@ -415,7 +415,7 @@ public sealed class GameUserPayTests
         var controller = new GameUserPayController(CreatePayRepository(db), CreateOptionsProvider(db, withAppContext), verifier);
         if (withAppContext)
         {
-            // Items 键与 ClientApiAppContext.AppIdKey / "TenantId" 同串
+            // 旧请求作用域键不影响主库支付查询
             controller.ControllerContext = new ControllerContext { HttpContext = db.CreateHttpContext(true, true), };
         }
 

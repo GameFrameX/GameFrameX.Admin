@@ -8,7 +8,7 @@ namespace GameFrameX.Entity.Tenant.Game.FeatureSwitch;
 /// 按 <see cref="Audience"/> 过滤后拉取，玩法 gate 判定权在使用方业务端点，本表只承载配置分发。</para>
 /// </summary>
 [SugarTable(null, "活动/功能开关注册表")]
-[SugarIndex("idx_tenant_game_app_feature_switch_tenant_app_key", nameof(SwitchKey), OrderByType.Asc)]
+[SugarIndex("idx_feature_switch_key", nameof(SwitchKey), OrderByType.Asc)]
 [TenantTable]
 [IncrementTable]
 public sealed class TenantGameAppFeatureSwitchEntity : EntityBasic

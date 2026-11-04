@@ -12,8 +12,8 @@ namespace GameFrameX.Entity.Tenant.Game;
 /// </summary>
 [SugarTable(null, "反作弊事件账本")]
 [SugarIndex("ux_anticheat_idempotency", nameof(IdempotencyKey), OrderByType.Asc, true)]
-[SugarIndex("idx_anticheat_tenant_app_level", nameof(RiskLevel), OrderByType.Asc)]
-[SugarIndex("idx_anticheat_tenant_app_review", nameof(ManualReviewState), OrderByType.Asc)]
+[SugarIndex("idx_anticheat_risk_level", nameof(RiskLevel), OrderByType.Asc)]
+[SugarIndex("idx_anticheat_manual_review", nameof(ManualReviewState), OrderByType.Asc)]
 [TenantTable]
 [IncrementTable]
 public class TenantGameAntiCheatEventEntity : EntityBasic

@@ -7,7 +7,7 @@ namespace GameFrameX.Core.Tests.Architecture;
 // 豁免三类既有约定（豁免规则本身即规范，无静态例外清单，双向断言：新增违规失败）：
 //   E1 partial 分片 TypeName.Suffix.cs——文件声明同名 partial 类型（如 GlobalMenuSeedData.*.cs、GameOrderController.*.cs、GooglePlayApiManager.UploadSku.cs）；
 //   E2 泛型 OfT 后缀——文件名 TypeNameOfT.cs 声明泛型 TypeName<T>（IBaseRequestOfT / IConfigurableOptionsOfT / BaseControllerOfT 3 处）；
-//   E3 无类型声明文件（top-level 语句 Program.cs）与生成文件（*.g.cs，如 TenantDefaultTemplateDefinitions.g.cs）。
+//   E3 无类型声明文件（top-level 语句 Program.cs）与生成文件（*.g.cs）。
 public sealed class FileNameTypeNameAlignmentTests
 {
     private static readonly string RepositoryRoot = GetRepositoryRoot();

@@ -35,7 +35,7 @@ public sealed class ClientApiTokenIssuer
     {
         var policy = await _optionsProvider.GetTokenPolicyAsync();
         var signingKey = policy.SigningKey
-                         ?? throw new InvalidOperationException("当前租户未配置 Client API 访问令牌签名密钥，禁止回落到进程级或平台全局密钥。");
+                         ?? throw new InvalidOperationException("主库未配置 Client API 访问令牌签名密钥，禁止回落到进程级密钥。");
 
         var now = DateTimeOffset.UtcNow;
         var expiresAt = now.AddMinutes(Math.Max(1, policy.LifetimeMinutes));
