@@ -61,7 +61,7 @@ public static class SqlSugarFilter
         var cachedDataScope = systemCacheService.Get<int>(CacheConst.KeyRoleMaxDataScope + userId);
         if (cachedDataScope > 0)
         {
-            maxDataScope = cachedDataScope;
+            maxDataScope = NormalizeDataScope(cachedDataScope);
         }
         else
         {
@@ -73,13 +73,14 @@ public static class SqlSugarFilter
                              .ToList();
             if (roleList.Count > 0)
             {
-                maxDataScope = roleList.Min(u => (int)u);
+                maxDataScope = roleList.Min(u => NormalizeDataScope((int)u));
             }
 
             systemCacheService.Set(CacheConst.KeyRoleMaxDataScope + userId, maxDataScope);
         }
 
-        if (maxDataScope != (int)DataScopeEnum.Self)
+        // 组织机制退场后，部门及自定义范围收紧为本人；只有明确 All 才可读取全部。
+        if (maxDataScope == (int)DataScopeEnum.All)
         {
             return maxDataScope;
         }
@@ -127,6 +128,11 @@ public static class SqlSugarFilter
         }
 
         return maxDataScope;
+    }
+
+    internal static int NormalizeDataScope(int dataScope)
+    {
+        return dataScope == (int)DataScopeEnum.All ? (int)DataScopeEnum.All : (int)DataScopeEnum.Self;
     }
 
     private static ICache GetCache()
