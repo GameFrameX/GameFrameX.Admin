@@ -1,20 +1,10 @@
 // APP-驾驶舱（/dashboard/appHome）数据编排。
 // KPI 与趋势走 #211（GFX-730）真实聚合接口：overview 为租户级聚合
 // （应用维度拆分待 Unified.Api#209 后续）；onlineTrend 为最近 24 个整点桶，
-// 无采样桶 OnlineCount 为 null（趋势图断点）。公告走 tenantNotice。
+// 无采样桶 OnlineCount 为 null（趋势图断点）。公告区已随 tenantNotice 退场置空（C400/C403）。
 import {onMounted, reactive} from 'vue';
 import {gameHomeOverviewPost, gameHomeOnlineTrendPost} from '/@/api/gameHome';
-import {tenantNoticePageReceivedGet} from '/@/api/tenantNotice';
 import type {HomeNoticeItem} from '/@/views/tenant/home/composables/usePlatformHomeData';
-
-// 通知列表行的 systemNotice 嵌套投影（生成类型未透出该嵌套，按接口实际返回声明）
-interface NoticeRow {
-  id: string;
-  systemNotice?: {
-    title?: string | null;
-    publicTime?: number | null;
-  };
-}
 
 export function useAppHomeData() {
   const state = reactive({
@@ -73,19 +63,9 @@ export function useAppHomeData() {
   };
 
   const loadNotices = async () => {
-    try {
-      const res = await tenantNoticePageReceivedGet({page: 1, pageSize: 4});
-      const rows = (res.data.data?.items ?? []) as unknown as NoticeRow[];
-      state.notices = rows
-          .filter((row) => row.systemNotice?.title)
-          .map((row) => ({
-            id: row.id,
-            title: row.systemNotice?.title ?? '',
-            publicTime: row.systemNotice?.publicTime ?? null,
-          }));
-    } catch {
-      // 公告拉取失败保持空态，不阻断驾驶舱
-    }
+    // ponytail: C400 已删除后端端点，此处只为保持 build 可用；C403 连页删除
+    // tenantNotice 已删：公告列表恒为空，不发请求、不伪造数据。
+    state.notices = [];
   };
 
   onMounted(() => {

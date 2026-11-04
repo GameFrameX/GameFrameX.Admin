@@ -40,7 +40,7 @@ export const REASON_MAX_LENGTH = 500
 
 export interface ControlledCommandFormState {
     commandKind: OnlineControlledCommandKind | ''
-    appId: string | number
+    appId?: string | number
     serverId: string
     ticketId: string
     matchId: string
@@ -115,7 +115,6 @@ export function buildControlledCommandRequest(form: ControlledCommandFormState):
     const meta = CONTROLLED_COMMAND_META[kind]
     const request: OnlineControlledCommandRequest = {
         command: meta.kind,
-        appId: String(form.appId),
         serverId: trim(form.serverId),
         reason: trim(form.reason),
         reviewerOperatorId: trim(form.reviewerOperatorId),

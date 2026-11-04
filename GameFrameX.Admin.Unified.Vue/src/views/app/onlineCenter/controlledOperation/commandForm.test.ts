@@ -16,7 +16,6 @@ import {
 
 const validForm = (): ControlledCommandFormState => ({
   commandKind: 1,
-  appId: '9000000000001',
   serverId: 'srv-1',
   ticketId: 'TICKET-1',
   matchId: '',
@@ -106,7 +105,7 @@ test('请求组装：command 数字 + 恰好一个目标字段 + 开关型带 di
     }),
   )
   expect(req.command).toBe(3)
-  expect(req.appId).toBe('9000000000001')
+  expect('appId' in req).toBe(false)
   expect(req.serverId).toBe('srv-1')
   expect(req.playerId).toBe('player-100')
   expect(req.direction).toBe(2)
