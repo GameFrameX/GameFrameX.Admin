@@ -2,8 +2,9 @@
 // 租户总数与套餐总数为真实接口（分页 total）；应用总数与到期预警为 mock，
 // 待后端平台聚合接口（TODO(HOME-AGG GameFrameX.Admin.Unified.Api#209)）。
 import {onMounted, reactive} from 'vue';
-import {systemTenantPagePost} from '/@/api/systemTenant';
-import {globalPackagePagePost} from '/@/api/globalPackage';
+
+// ponytail: C400 已删除后端端点，此处只为保持 build 可用；C403 连页删除
+// systemTenant / globalPackage 两接口已删：租户数与套餐数恒为 0，不发请求、不伪造数据。
 
 export interface HomeNoticeItem {
   id: string;
@@ -29,25 +30,15 @@ export function usePlatformHomeData() {
   });
 
   const loadTenants = async () => {
-    try {
-      const res = await systemTenantPagePost({page: 1, pageSize: 1});
-      state.tenants = res.data.data?.total ?? 0;
-    } catch {
-      // 平台接口失败保持 0，显示 '—' 由 onlineFailed 类似逻辑处理（这里直接显示 0 亦可）
-    } finally {
-      state.tenantsLoaded = true;
-    }
+    // ponytail: C400 已删除后端端点，此处只为保持 build 可用；C403 连页删除
+    state.tenants = 0;
+    state.tenantsLoaded = true;
   };
 
   const loadPackages = async () => {
-    try {
-      const res = await globalPackagePagePost({page: 1, pageSize: 1});
-      state.packages = res.data.data?.total ?? 0;
-    } catch {
-      // 同上，静默
-    } finally {
-      state.packagesLoaded = true;
-    }
+    // ponytail: C400 已删除后端端点，此处只为保持 build 可用；C403 连页删除
+    state.packages = 0;
+    state.packagesLoaded = true;
   };
 
   onMounted(() => {

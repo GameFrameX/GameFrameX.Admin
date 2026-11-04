@@ -39,7 +39,10 @@
 import {reactive, ref} from 'vue';
 import OrgTree from '/@/components/org-tree/OrgTree.vue';
 
-import {tenantRoleOwnOrgListGet, tenantRoleGrantDataScopePost} from '../../../../../api/tenantRole';
+// ponytail: C400 已删除后端端点，此处只为保持 build 可用；C403 连页删除
+// 组织树授权两端点（ownOrgList/grantDataScope）已随组织域删除：本地失败桩与 404 行为一致，不发请求、不伪造数据。
+const tenantRoleOwnOrgListGet = (..._args: unknown[]): Promise<never> => Promise.reject(new Error('role data-scope org endpoints retired'));
+const tenantRoleGrantDataScopePost = (..._args: unknown[]): Promise<never> => Promise.reject(new Error('role data-scope org endpoints retired'));
 import {RoleOrgInput} from '../../../../../api/_shared/data-contracts.ts';
 
 import Dialog from 'primevue/dialog';

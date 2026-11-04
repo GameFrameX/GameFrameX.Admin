@@ -170,7 +170,10 @@ import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import BaseEditFieldGroup from '/@/components/base-edit-dialog/FieldGroup.vue'
 import {tenantPositionListGet} from '../../../../../api/tenantPosition';
 import {tenantRoleListGet} from '../../../../../api/tenantRole';
-import {tenantUserAddPost, tenantUserUpdatePost, tenantUserOwnRoleListGet, tenantUserOwnExtOrgListGet} from '../../../../../api/tenantUser';
+import {tenantUserAddPost, tenantUserUpdatePost, tenantUserOwnRoleListGet} from '../../../../../api/tenantUser';
+// ponytail: C400 已删除后端端点，此处只为保持 build 可用；C403 连页删除
+// 扩展组织列表端点已随组织域删除：本地失败桩与 404 行为一致，不发请求、不伪造数据。
+const tenantUserOwnExtOrgListGet = (..._args: unknown[]): Promise<never> => Promise.reject(new Error('ownExtOrgList retired'));
 import {RoleOutput, TenantOrganizationEntity, TenantPositionEntity} from '../../../../../api/_shared/data-contracts.ts'
 
 import Button from 'primevue/button';

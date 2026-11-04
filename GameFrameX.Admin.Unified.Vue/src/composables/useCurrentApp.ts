@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 import type { LocationQuery } from 'vue-router'
-import { tenantGameAppEntityListGet } from '../api/tenantGameAppEntity'
+// ponytail: C400 已删除后端端点，此处只为保持 build 可用；C403 连页删除
 import type { AppWorkspaceId } from '../utils/appWorkspace'
 import { normalizeRouteAppId } from '../utils/appWorkspace'
 import { session } from '../utils/storage'
@@ -31,14 +31,13 @@ export function useCurrentApp() {
     return found?.name ?? ''
   }
 
-  // 幂等：已加载则跳过，避免每个调用页重复请求 tenantGameAppEntityListGet。
+  // 幂等桩：已加载则直接返回（原实现按需请求应用列表）。
   const loadApps = async (force = false) => {
-    if (loaded && !force) {
-      return appOptions.value
-    }
-    const res = await tenantGameAppEntityListGet()
-    appOptions.value = (res.data?.data ?? []) as unknown as AppOption[]
+    // ponytail: C400 已删除后端端点，此处只为保持 build 可用；C403 连页删除
+    // 不发请求、不伪造数据：应用列表恒为空，与接口 404 后的运行时可见行为一致。
+    void force
     loaded = true
+    appOptions.value = []
     return appOptions.value
   }
 

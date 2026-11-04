@@ -125,7 +125,10 @@ import {useRoute, useRouter} from 'vue-router';
 import {showError} from '../../../utils/message';
 import {feature} from '../../../utils/axiosUtils';
 import {t} from '../../../i18n/index';
-import {systemAuthRegisterByEmailPost, systemAuthSendRegisterEmailCodePost} from '../../../api/systemAuth';
+// ponytail: C400 已删除后端端点，此处只为保持 build 可用；C403 连页删除
+// 注册即建租户流已随 systemAuth 自助注册端点删除而退场：本地失败桩走 err 分支，不发请求、不伪造数据。
+const systemAuthSendRegisterEmailCodePost = (..._args: unknown[]): Promise<never> => Promise.reject(new Error('register-by-email retired'));
+const systemAuthRegisterByEmailPost = (..._args: unknown[]): Promise<never> => Promise.reject(new Error('register-by-email retired'));
 
 import InputText from 'primevue/inputtext';
 import Password from 'primevue/password';
