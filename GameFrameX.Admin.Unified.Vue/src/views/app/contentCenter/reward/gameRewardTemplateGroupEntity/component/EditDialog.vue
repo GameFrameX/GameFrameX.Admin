@@ -1,7 +1,7 @@
 <template>
   <BaseEditDialog ref="dialogRef" :title="props.title"
-                  :addApi="tenantGameRewardTemplateGroupEntityAddPost"
-                  :updateApi="tenantGameRewardTemplateGroupEntityUpdatePost"
+                  :addApi="gameRewardTemplateGroupAddPost"
+                  :updateApi="gameRewardTemplateGroupUpdatePost"
                   :rules="rules" :defaultForm="defaultForm"
                   :beforeOpen="beforeOpen"
                   @reloadTable="emit('reloadTable')">
@@ -25,7 +25,7 @@ import FormField from '@primevue/forms/formfield'
 import Message from 'primevue/message'
 import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import {TextField} from '../../../../../../components/crud-form-fields'
-import { tenantGameRewardTemplateGroupEntityAddPost, tenantGameRewardTemplateGroupEntityUpdatePost } from '../../../../../../api/tenantGameRewardTemplateGroupEntity'
+import { gameRewardTemplateGroupAddPost, gameRewardTemplateGroupUpdatePost } from '../../../../../../api/gameRewardTemplateGroup'
 import {isEnabled} from '../../../../../../utils/isEnabled.ts'
 import {normalizeAppId} from '../../../../../../utils/appWorkspace.ts'
 

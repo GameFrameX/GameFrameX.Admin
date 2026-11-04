@@ -45,7 +45,7 @@ import Button from 'primevue/button'
 import Tag from 'primevue/tag'
 import { t } from '../../../../../i18n/index.ts'
 import { useCurrentApp } from '../../../../../composables/useCurrentApp.ts'
-import { tenantGameAdvertisementRewardEntityDetailGet } from '../../../../../api/tenantGameAdvertisementRewardEntity'
+import { gameAdvertisementRewardDetailGet } from '../../../../../api/gameAdvertisementReward'
 import {
   ADVERTISEMENT_REWARD_STATUS_OPTIONS,
   adRewardStatusSeverity,
@@ -82,7 +82,7 @@ const openDialog = async (target: any) => {
   if (target?.id) {
     loading.value = true
     try {
-      const res: any = await tenantGameAdvertisementRewardEntityDetailGet({ id: target.id })
+      const res: any = await gameAdvertisementRewardDetailGet({ id: target.id })
       if (res.data?.data) {
         row.value = res.data.data
       }

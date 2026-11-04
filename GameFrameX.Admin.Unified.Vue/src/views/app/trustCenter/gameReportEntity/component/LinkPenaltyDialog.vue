@@ -22,7 +22,7 @@ import Dialog from 'primevue/dialog'
 import Button from 'primevue/button'
 import InputNumber from 'primevue/inputnumber'
 import FormLabel from '/@/components/form-label/index.vue'
-import { tenantGameReportEntityLinkPenaltyPost } from '../../../../../api/tenantGameReportEntity'
+import { gameReportLinkPenaltyPost } from '../../../../../api/gameReport'
 import { showSuccess } from '../../../../../utils/message.ts'
 import { REPORT_TYPE_OPTIONS, findEnumOption } from '../constants'
 
@@ -59,7 +59,7 @@ const confirm = async () => {
   invalid.value = false
   submitting.value = true
   try {
-    await tenantGameReportEntityLinkPenaltyPost({ id: row.value?.id, penaltyId: penaltyId.value })
+    await gameReportLinkPenaltyPost({ id: row.value?.id, penaltyId: penaltyId.value })
     showSuccess(t('message.gameBusiness.trustSafety.report.linkPenaltySuccess'))
     visible.value = false
     emit('reloadTable')

@@ -2,8 +2,8 @@
   <BaseEditDialog
     ref="dialogRef"
     :title="props.title"
-    :addApi="tenantGameAppDeviceAddPost"
-    :updateApi="tenantGameAppDeviceUpdatePost"
+    :addApi="gameAppDeviceAddPost"
+    :updateApi="gameAppDeviceUpdatePost"
     :rules="rules"
     :beforeOpen="beforeOpen"
     @reloadTable="emit('reloadTable')"
@@ -21,7 +21,7 @@
 import { ref } from 'vue'
 import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import {TextareaField, TextField} from '../../../../../../components/crud-form-fields'
-import { tenantGameAppDeviceAddPost, tenantGameAppDeviceUpdatePost } from '../../../../../../api/tenantGameAppDevice'
+import { gameAppDeviceAddPost, gameAppDeviceUpdatePost } from '../../../../../../api/gameAppDevice'
 import { useCurrentApp } from '../../../../../../composables/useCurrentApp.ts'
 
 const { appName } = useCurrentApp()

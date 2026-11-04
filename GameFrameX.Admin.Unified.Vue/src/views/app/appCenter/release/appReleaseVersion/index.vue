@@ -6,7 +6,7 @@
             v-model="queryParams"
             :fields="searchFields"
             :showAdd="true"
-            authPrefix="tenantGameAppReleaseVersion"
+            authPrefix="gameAppReleaseVersion"
             @query="onQuery"
             
             @add="openAddTenantGameAppReleaseVersion"
@@ -18,7 +18,7 @@
         <CrudDataTable :value="tableData" v-block-loading="loading" showGridlines stripedRows rowKey="id"
                        :totalRecords="tableParams.total" :rows="tableParams.pageSize"
                        :rowsPerPageOptions="[10, 20, 50, 100, 200, 500]"
-                       authPrefix="tenantGameAppReleaseVersion"
+                       authPrefix="gameAppReleaseVersion"
                        :actions="actions"
                        :columns="columns"
                        :exportQuery="queryParams"
@@ -43,13 +43,13 @@ import {useCrudTable} from '../../../../../composables/useCrudTable.ts'
 import {usePrimeTablePage, useRouteAppIdQuerySync} from '../../../../../composables'
 import {useCurrentApp} from '../../../../../composables/useCurrentApp.ts'
 import editDialog from '/@/views/app/appCenter/release/appReleaseVersion/component/EditDialog.vue'
-import { tenantGameAppReleaseVersionPagePost, tenantGameAppReleaseVersionDeletePost } from '../../../../../api/tenantGameAppReleaseVersion'
+import { gameAppReleaseVersionPagePost, gameAppReleaseVersionDeletePost } from '../../../../../api/gameAppReleaseVersion'
 
 import { globalPlatformSelectPost } from '../../../../../api/globalPlatform'
 import { globalLanguageSelectPost } from '../../../../../api/globalLanguage'
-import { tenantGameAppVersionDefinitionSelectPost } from '../../../../../api/tenantGameAppVersionDefinition'
-import { tenantGameAppPackageListGet } from '../../../../../api/tenantGameAppPackage'
-import { tenantChannelDefinitionAvailableGet } from '../../../../../api/tenantChannelDefinition'
+import { gameAppVersionDefinitionSelectPost } from '../../../../../api/gameAppVersionDefinition'
+import { gameAppPackageListGet } from '../../../../../api/gameAppPackage'
+import { channelDefinitionAvailableGet } from '../../../../../api/channelDefinition'
 import { mapAvailableChannelDefinitions } from '../../../../../utils/channelDefinition.ts'
 import {MAX_SELECT_SIZE} from '../../../../../constants/pagination.ts'
 
@@ -69,7 +69,7 @@ const {
   loading, tableData, queryParams, tableParams,
   onQuery, onDelete,
 } = useCrudTable({
-  api: {pageApi: tenantGameAppReleaseVersionPagePost, deleteApi: tenantGameAppReleaseVersionDeletePost},
+  api: {pageApi: gameAppReleaseVersionPagePost, deleteApi: gameAppReleaseVersionDeletePost},
   immediate: true,
 })
 
@@ -106,7 +106,7 @@ const onLanguageQuery = async () => {
 }
 
 const onChannelQuery = async () => {
-  const res = await tenantChannelDefinitionAvailableGet({pageSize: MAX_SELECT_SIZE})
+  const res = await channelDefinitionAvailableGet({pageSize: MAX_SELECT_SIZE})
   querySelections.value.channel = mapAvailableChannelDefinitions(res.data.data || [], 'code')
 }
 
@@ -117,12 +117,12 @@ const onPlatformQuery = async () => {
 
 const onVersionQuery = async (appId?: number | string) => {
   const id = appId
-  const res = await tenantGameAppVersionDefinitionSelectPost(id ? {appId: id, pageSize: MAX_SELECT_SIZE} : {pageSize: MAX_SELECT_SIZE})
+  const res = await gameAppVersionDefinitionSelectPost(id ? {appId: id, pageSize: MAX_SELECT_SIZE} : {pageSize: MAX_SELECT_SIZE})
   querySelections.value.version = res.data.data
   querySelections.value.oldVersion = res.data.data
 }
 
-// 包名候选按当前应用加载：tenantGameAppPackageListGet 已按应用过滤、默认包置顶；
+// 包名候选按当前应用加载：gameAppPackageListGet 已按应用过滤、默认包置顶；
 // 无应用或租户默认(appId=0)时只保留 default 应用默认选项，避免展示其它应用包名。
 const buildPackageOptions = (packages: any[]) => {
   const options: any[] = [{label: t('message.client.appDefaultPackage'), value: 'default'}]
@@ -146,7 +146,7 @@ const onPackageQuery = async (appId?: number | string) => {
     querySelections.value.package = buildPackageOptions([])
     return
   }
-  const res = await tenantGameAppPackageListGet({appId: id, pageSize: MAX_SELECT_SIZE})
+  const res = await gameAppPackageListGet({appId: id, pageSize: MAX_SELECT_SIZE})
   querySelections.value.package = buildPackageOptions(res.data?.data || [])
 }
 

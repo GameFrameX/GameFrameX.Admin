@@ -33,11 +33,11 @@ import Textarea from 'primevue/textarea'
 import { t } from '../../../../../i18n/index.ts'
 import { showSuccess } from '../../../../../utils/message.ts'
 import {
-  tenantGameAppOpenAccessRevokePost,
-  tenantGameAppOpenAccessEnablePost,
-  tenantGameAppOpenAccessDisablePost,
-  tenantGameAppOpenAccessRefreshPost,
-} from '../../../../../api/tenantGameAppOpenAccess'
+  gameAppOpenAccessRevokePost,
+  gameAppOpenAccessEnablePost,
+  gameAppOpenAccessDisablePost,
+  gameAppOpenAccessRefreshPost,
+} from '../../../../../api/gameAppOpenAccess'
 
 type ActionType = 'revoke' | 'enable' | 'disable' | 'refresh'
 
@@ -91,10 +91,10 @@ const warningClass = computed(() => {
 })
 
 const apiMap = {
-  revoke: tenantGameAppOpenAccessRevokePost,
-  enable: tenantGameAppOpenAccessEnablePost,
-  disable: tenantGameAppOpenAccessDisablePost,
-  refresh: tenantGameAppOpenAccessRefreshPost,
+  revoke: gameAppOpenAccessRevokePost,
+  enable: gameAppOpenAccessEnablePost,
+  disable: gameAppOpenAccessDisablePost,
+  refresh: gameAppOpenAccessRefreshPost,
 }
 
 const successMessageMap: Record<ActionType, string> = {

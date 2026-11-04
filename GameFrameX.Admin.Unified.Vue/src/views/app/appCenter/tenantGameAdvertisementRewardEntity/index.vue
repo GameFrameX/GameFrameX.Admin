@@ -6,7 +6,7 @@
             v-model="queryParams"
             :fields="searchFields"
             :labelWidth="'110px'"
-            authPrefix="tenantGameAdvertisementRewardEntity"
+            authPrefix="gameAdvertisementReward"
             @query="onQuery"
         />
       </template>
@@ -15,14 +15,14 @@
       <template #header>
         <div class="flex justify-content-between align-items-center w-full">
           <span>{{ t('message.gameBusiness.advertisementReward.listTitle') }}</span>
-          <Button v-auth="'tenantGameAdvertisementRewardEntity:export'" :label="t('message.gameBusiness.advertisementReward.export')" icon="fa-solid fa-file-export" severity="info" size="small" :loading="exporting" @click="onExport" />
+          <Button v-auth="'gameAdvertisementReward:export'" :label="t('message.gameBusiness.advertisementReward.export')" icon="fa-solid fa-file-export" severity="info" size="small" :loading="exporting" @click="onExport" />
         </div>
       </template>
       <template #content>
         <CrudDataTable :value="tableData" v-block-loading="loading" showGridlines stripedRows rowKey="id"
                        :totalRecords="tableParams.total" :rows="tableParams.pageSize"
                        :rowsPerPageOptions="[10, 20, 50, 100, 200, 500]"
-                       authPrefix="tenantGameAdvertisementRewardEntity"
+                       authPrefix="gameAdvertisementReward"
                        :columns="columns"
                        :exportQuery="queryParams"
                        @page="onPage" showIdColumn :idColumnHeader="t('message.gameBusiness.advertisementReward.entityId')" idColumnWidth="140px">
@@ -63,8 +63,8 @@ import Card from 'primevue/card'
 import SearchForm from '/@/components/search-form/index.vue'
 import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import { formatUnix } from '../../../../utils/formatTime.ts'
-import { tenantGameAdvertisementRewardEntityPagePost, tenantGameAdvertisementRewardEntityExportPost } from '../../../../api/tenantGameAdvertisementRewardEntity'
-import { tenantGameAreaEntitySelectStringPost } from '../../../../api/tenantGameAreaEntity'
+import { gameAdvertisementRewardPagePost, gameAdvertisementRewardExportPost } from '../../../../api/gameAdvertisementReward'
+import { gameAreaSelectStringPost } from '../../../../api/gameArea'
 import {MAX_SELECT_SIZE} from '../../../../constants/pagination.ts'
 import { useCrudTable } from '../../../../composables/useCrudTable.ts'
 import { usePrimeTablePage } from '../../../../composables'
@@ -113,7 +113,7 @@ const {
   onQuery,
 } = useCrudTable({
   api: {
-    pageApi: (params: any) => tenantGameAdvertisementRewardEntityPagePost(params),
+    pageApi: (params: any) => gameAdvertisementRewardPagePost(params),
   },
   immediate: false,
 })
@@ -158,7 +158,7 @@ const getAreaName = (areaId: number) => {
 
 const loadAreaList = async (appId?: number) => {
   try {
-    const res: any = await tenantGameAreaEntitySelectStringPost({ appId: appId, pageSize: MAX_SELECT_SIZE })
+    const res: any = await gameAreaSelectStringPost({ appId: appId, pageSize: MAX_SELECT_SIZE })
     areaList.value = res.data?.data ?? []
   } catch {
     areaList.value = []
@@ -171,7 +171,7 @@ const onExport = async () => {
   exporting.value = true
   try {
     const params = Object.assign({}, queryParams.value, tableParams.value)
-    const res: any = await tenantGameAdvertisementRewardEntityExportPost(params)
+    const res: any = await gameAdvertisementRewardExportPost(params)
     const list = res.data?.data ?? []
     if (!list.length) {
       showWarning(t('message.gameBusiness.advertisementReward.exportEmpty'))

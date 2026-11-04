@@ -38,7 +38,7 @@ import {useCrudTable} from '../../../../composables/useCrudTable.ts'
 import {usePrimeTablePage, useRouteAppIdQuerySync} from '../../../../composables'
 import {showConfirm} from '../../../../utils/message.ts'
 import editDialog from '/@/views/app/automationCenter/gameTimeJobEntity/component/EditDialog.vue'
-import { tenantGameTimeJobEntityPagePost, tenantGameTimeJobEntityDeletePost } from '../../../../api/tenantGameTimeJobEntity'
+import { gameTimeJobPagePost, gameTimeJobDeletePost } from '../../../../api/gameTimeJob'
 import {useCurrentApp} from '../../../../composables/useCurrentApp.ts'
 import type {CrudColumnConfig} from '../../../../components/crud-data-table/types.ts'
 
@@ -58,7 +58,7 @@ const {
   tableParams,
   onQuery,
 } = useCrudTable({
-  api: {pageApi: tenantGameTimeJobEntityPagePost, deleteApi: tenantGameTimeJobEntityDeletePost},
+  api: {pageApi: gameTimeJobPagePost, deleteApi: gameTimeJobDeletePost},
   immediate: false,
 })
 
@@ -90,7 +90,7 @@ const onDelete = async (row: any) => {
   )
   if (!confirmed) return
   // rowVersion 必传：BaseDeleteRequest 走乐观锁删除，缺版本会让后端以 null 比较版本列（Postgres bigint = text）500
-  await tenantGameTimeJobEntityDeletePost({id: row.id, rowVersion: row.rowVersion})
+  await gameTimeJobDeletePost({id: row.id, rowVersion: row.rowVersion})
   onQuery()
 }
 

@@ -2,8 +2,8 @@
   <BaseEditDialog
     ref="dialogRef"
     :title="props.title"
-    :addApi="tenantGameAppVersionDefinitionAddPost"
-    :updateApi="tenantGameAppVersionDefinitionUpdatePost"
+    :addApi="gameAppVersionDefinitionAddPost"
+    :updateApi="gameAppVersionDefinitionUpdatePost"
     :rules="rules"
     :beforeOpen="beforeOpen"
     @reloadTable="emit('reloadTable')"
@@ -19,7 +19,7 @@
 import {ref} from 'vue'
 import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import {TextField} from '../../../../../../components/crud-form-fields'
-import { tenantGameAppVersionDefinitionAddPost, tenantGameAppVersionDefinitionUpdatePost } from '../../../../../../api/tenantGameAppVersionDefinition'
+import { gameAppVersionDefinitionAddPost, gameAppVersionDefinitionUpdatePost } from '../../../../../../api/gameAppVersionDefinition'
 import {normalizeAppId} from '../../../../../../utils/appWorkspace.ts'
 
 const props = defineProps({

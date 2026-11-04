@@ -36,9 +36,9 @@
 <script lang="ts" setup="" name="gameRedeemCodeUseRecordEntity">
 import {ref, computed, watch, onMounted} from 'vue'
 import {useRoute} from 'vue-router'
-import { tenantGameRedeemCodeUseRecordEntityPagePost } from '../../../../api/tenantGameRedeemCodeUseRecordEntity'
-import { tenantGameRedeemCodeChannelEntitySelectStringPost } from '../../../../api/tenantGameRedeemCodeChannelEntity'
-import { tenantGameAreaEntitySelectStringPost } from '../../../../api/tenantGameAreaEntity'
+import { gameRedeemCodeUseRecordPagePost } from '../../../../api/gameRedeemCodeUseRecord'
+import { gameRedeemCodeChannelSelectStringPost } from '../../../../api/gameRedeemCodeChannel'
+import { gameAreaSelectStringPost } from '../../../../api/gameArea'
 import {MAX_SELECT_SIZE} from '../../../../constants/pagination.ts'
 import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import type { CrudColumnConfig } from '../../../../components/crud-data-table/types.ts'
@@ -65,7 +65,7 @@ const {
   onQuery,
 } = useCrudTable({
   api: {
-    pageApi: (params) => tenantGameRedeemCodeUseRecordEntityPagePost(params),
+    pageApi: (params) => gameRedeemCodeUseRecordPagePost(params),
   },
   immediate: true,
 })
@@ -94,7 +94,7 @@ const getAreaName = (areaId: number) => {
 }
 
 const loadAreaList = async (appId?: number) => {
-  const res = await tenantGameAreaEntitySelectStringPost({appId: appId, pageSize: MAX_SELECT_SIZE})
+  const res = await gameAreaSelectStringPost({appId: appId, pageSize: MAX_SELECT_SIZE})
   areaList.value = res.data.data ?? []
 }
 
@@ -114,7 +114,7 @@ const getRedeemCodeChannelName = (row: any) => {
   return t('message.gameBusiness.redeemcode.channelNotFound')
 }
 const loadChannelList = async (appId?: number) => {
-  const res = await tenantGameRedeemCodeChannelEntitySelectStringPost({appId: appId, pageSize: MAX_SELECT_SIZE})
+  const res = await gameRedeemCodeChannelSelectStringPost({appId: appId, pageSize: MAX_SELECT_SIZE})
   redeemCodeChannelList.value = res.data.data ?? []
 }
 

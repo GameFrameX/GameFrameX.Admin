@@ -1,7 +1,7 @@
 <template>
   <BaseEditDialog ref="dialogRef" :title="props.title"
-    :addApi="tenantGameAreaEntityAddPost"
-    :updateApi="tenantGameAreaEntityUpdatePost"
+    :addApi="gameAreaAddPost"
+    :updateApi="gameAreaUpdatePost"
     :rules="rules"
     :beforeOpen="beforeOpen" :beforeSubmit="beforeSubmit"
     scrollable @reloadTable="emit('reloadTable')">
@@ -96,14 +96,14 @@ import FormField from '@primevue/forms/formfield'
 import Message from 'primevue/message'
 import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import {TextField, TextareaField} from '../../../../../components/crud-form-fields'
-import { tenantGameAreaEntityAddPost, tenantGameAreaEntityUpdatePost } from '../../../../../api/tenantGameAreaEntity'
-import { tenantGameAreaClassifyEntitySelectPost } from '../../../../../api/tenantGameAreaClassifyEntity'
+import { gameAreaAddPost, gameAreaUpdatePost } from '../../../../../api/gameArea'
+import { gameAreaClassifySelectPost } from '../../../../../api/gameAreaClassify'
 import {systemEnumEnumDataListGet} from '../../../../../api/systemEnum';
-import { tenantChannelDefinitionAvailableGet } from '../../../../../api/tenantChannelDefinition'
+import { channelDefinitionAvailableGet } from '../../../../../api/channelDefinition'
 import { globalPlatformSelectPost } from '../../../../../api/globalPlatform'
-import { tenantGameAppPackagePagePost } from '../../../../../api/tenantGameAppPackage'
-import { tenantGameDockerTagEntitySelectPost } from '../../../../../api/tenantGameDockerTagEntity'
-import { tenantGameAppVersionDefinitionPagePost } from '../../../../../api/tenantGameAppVersionDefinition'
+import { gameAppPackagePagePost } from '../../../../../api/gameAppPackage'
+import { gameDockerTagSelectPost } from '../../../../../api/gameDockerTag'
+import { gameAppVersionDefinitionPagePost } from '../../../../../api/gameAppVersionDefinition'
 import {MAX_PAGE_SIZE, MAX_SELECT_SIZE} from '../../../../../constants/pagination.ts'
 import {isEnabled} from '../../../../../utils/isEnabled.ts'
 import {normalizeAppId} from '../../../../../utils/appWorkspace.ts'
@@ -200,10 +200,10 @@ const rules = {
 const loadScopedOptions = async (appId?: number) => {
   if (!appId) return
   const params = {page: 1, pageSize: MAX_PAGE_SIZE, appId}
-  getEnumPackageData.value = (await tenantGameAppPackagePagePost(params)).data.data?.items ?? []
-  getEnumDockerTag.value = (await tenantGameDockerTagEntitySelectPost({appId, pageSize: MAX_SELECT_SIZE})).data.data ?? []
-  getTenantGameAppVersionDefinitionData.value = (await tenantGameAppVersionDefinitionPagePost(params)).data.data?.items ?? []
-  const classifyList = await tenantGameAreaClassifyEntitySelectPost({searchKey: '', appId, pageSize: MAX_SELECT_SIZE})
+  getEnumPackageData.value = (await gameAppPackagePagePost(params)).data.data?.items ?? []
+  getEnumDockerTag.value = (await gameDockerTagSelectPost({appId, pageSize: MAX_SELECT_SIZE})).data.data ?? []
+  getTenantGameAppVersionDefinitionData.value = (await gameAppVersionDefinitionPagePost(params)).data.data?.items ?? []
+  const classifyList = await gameAreaClassifySelectPost({searchKey: '', appId, pageSize: MAX_SELECT_SIZE})
   gameAreaClassifyEntityClassifyIdDropdownList.value = classifyList.data.data ?? []
 }
 
@@ -257,7 +257,7 @@ const beforeSubmit = (form: any) => {
 onMounted(async () => {
   getEnumServerStatusData.value = (await systemEnumEnumDataListGet({ EnumName: 'GameServerStatus' })).data.data ?? []
   getEnumLanguageData.value = (await systemEnumEnumDataListGet({ EnumName: 'GameLanguage' })).data.data ?? []
-  getEnumChannelData.value = (await tenantChannelDefinitionAvailableGet({pageSize: MAX_SELECT_SIZE})).data.data || []
+  getEnumChannelData.value = (await channelDefinitionAvailableGet({pageSize: MAX_SELECT_SIZE})).data.data || []
   getEnumPlatformData.value = (await globalPlatformSelectPost({searchKey: '', pageSize: MAX_SELECT_SIZE})).data.data ?? []
 })
 

@@ -20,8 +20,8 @@ import {
   TenantUserBaseInfoPostData,
   TenantUserChangePwdPostData,
   TenantUserDeletePostData,
+  TenantUserEntity,
   TenantUserGrantRolePostData,
-  TenantUserOwnExtOrgListGetData,
   TenantUserOwnRoleListGetData,
   TenantUserPagePostData,
   TenantUserResetPwdPostData,
@@ -31,9 +31,6 @@ import {
   UserRequest,
   UserRoleRequest,
 } from "./types";
-import {
-  TenantUserEntity,
-} from "../_shared/data-contracts";
 import { ContentType, HttpClient, RequestParams } from "../_shared/http-client";
 import {getAPI} from "../../utils/axiosUtils";
 
@@ -158,21 +155,6 @@ export class TenantUser<SecurityDataType = unknown> {
    * No description
    *
    * @tags tenantUser
-   * @name TenantUserOwnExtOrgListGet
-   * @summary 获取用户扩展机构集合
-   * @request GET:/api/tenantUser/ownExtOrgList/{userId}
-   */
-  tenantUserOwnExtOrgListGet = (userId: number, params: RequestParams = {}) =>
-    this.http.request<TenantUserOwnExtOrgListGetData, any>({
-      path: `/api/tenantUser/ownExtOrgList/${userId}`,
-      method: "GET",
-      format: "json",
-      ...params,
-    });
-  /**
-   * No description
-   *
-   * @tags tenantUser
    * @name TenantUserOwnRoleListGet
    * @summary 获取用户拥有角色集合
    * @request GET:/api/tenantUser/ownRoleList/{userId}
@@ -265,7 +247,6 @@ export const tenantUserBaseInfoPost = (...args: Parameters<InstanceType<typeof T
 export const tenantUserChangePwdPost = (...args: Parameters<InstanceType<typeof TenantUser>['tenantUserChangePwdPost']>) => getAPI(TenantUser).tenantUserChangePwdPost(...args);
 export const tenantUserDeletePost = (...args: Parameters<InstanceType<typeof TenantUser>['tenantUserDeletePost']>) => getAPI(TenantUser).tenantUserDeletePost(...args);
 export const tenantUserGrantRolePost = (...args: Parameters<InstanceType<typeof TenantUser>['tenantUserGrantRolePost']>) => getAPI(TenantUser).tenantUserGrantRolePost(...args);
-export const tenantUserOwnExtOrgListGet = (...args: Parameters<InstanceType<typeof TenantUser>['tenantUserOwnExtOrgListGet']>) => getAPI(TenantUser).tenantUserOwnExtOrgListGet(...args);
 export const tenantUserOwnRoleListGet = (...args: Parameters<InstanceType<typeof TenantUser>['tenantUserOwnRoleListGet']>) => getAPI(TenantUser).tenantUserOwnRoleListGet(...args);
 export const tenantUserPagePost = (...args: Parameters<InstanceType<typeof TenantUser>['tenantUserPagePost']>) => getAPI(TenantUser).tenantUserPagePost(...args);
 export const tenantUserResetPwdPost = (...args: Parameters<InstanceType<typeof TenantUser>['tenantUserResetPwdPost']>) => getAPI(TenantUser).tenantUserResetPwdPost(...args);

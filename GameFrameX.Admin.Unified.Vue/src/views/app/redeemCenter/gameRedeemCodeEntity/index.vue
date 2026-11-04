@@ -54,9 +54,9 @@ import {useCrudTable} from '../../../../composables/useCrudTable.ts'
 import {usePrimeTablePage} from '../../../../composables'
 import {useCurrentApp} from '../../../../composables/useCurrentApp.ts'
 import editDialog from '/@/views/app/redeemCenter/gameRedeemCodeEntity/component/EditDialog.vue'
-import { tenantGameRedeemCodeEntityPagePost, tenantGameRedeemCodeEntityDeletePost } from '../../../../api/tenantGameRedeemCodeEntity'
-import { tenantGameRedeemCodeChannelEntitySelectStringPost } from '../../../../api/tenantGameRedeemCodeChannelEntity'
-import { tenantGameAreaEntitySelectStringPost } from '../../../../api/tenantGameAreaEntity'
+import { gameRedeemCodePagePost, gameRedeemCodeDeletePost } from '../../../../api/gameRedeemCode'
+import { gameRedeemCodeChannelSelectStringPost } from '../../../../api/gameRedeemCodeChannel'
+import { gameAreaSelectStringPost } from '../../../../api/gameArea'
 import {MAX_SELECT_SIZE} from '../../../../constants/pagination.ts'
 
 const route = useRoute()
@@ -80,7 +80,7 @@ const {
   onQuery,
   onDelete,
 } = useCrudTable({
-  api: {pageApi: tenantGameRedeemCodeEntityPagePost, deleteApi: tenantGameRedeemCodeEntityDeletePost},
+  api: {pageApi: gameRedeemCodePagePost, deleteApi: gameRedeemCodeDeletePost},
   immediate: true,
 })
 
@@ -124,7 +124,7 @@ const getAreaName = (areaId: number) => {
   return t('message.gameBusiness.redeemcode.allServer')
 }
 const getAreaList = async (appId?: number) => {
-  const res = await tenantGameAreaEntitySelectStringPost({appId: appId, pageSize: MAX_SELECT_SIZE})
+  const res = await gameAreaSelectStringPost({appId: appId, pageSize: MAX_SELECT_SIZE})
   areaList.value = res.data.data ?? []
 }
 
@@ -144,7 +144,7 @@ const getRedeemCodeChannelName = (areaId: number) => {
   return t('message.gameBusiness.redeemcode.channelNotFound')
 }
 const getRedeemCodeChannelList = async (appId?: number) => {
-  const res = await tenantGameRedeemCodeChannelEntitySelectStringPost({appId: appId, pageSize: MAX_SELECT_SIZE})
+  const res = await gameRedeemCodeChannelSelectStringPost({appId: appId, pageSize: MAX_SELECT_SIZE})
   redeemCodeChannelList.value = res.data.data ?? []
 }
 

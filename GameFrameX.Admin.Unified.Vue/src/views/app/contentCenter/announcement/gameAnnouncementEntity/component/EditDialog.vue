@@ -1,7 +1,7 @@
 <template>
   <BaseEditDialog ref="dialogRef" :title="props.title"
-    :addApi="(params: any) => tenantGameAnnouncementEntityAddPost(params)"
-    :updateApi="(params: any) => tenantGameAnnouncementEntityUpdatePost(params)"
+    :addApi="(params: any) => gameAnnouncementAddPost(params)"
+    :updateApi="(params: any) => gameAnnouncementUpdatePost(params)"
     :rules="rules" :beforeOpen="beforeOpen" :beforeSubmit="beforeSubmit" :defaultForm="defaultForm" scrollable @reloadTable="emit('reloadTable')">
     <template #default="{ ruleForm, isEditor }">
       <FormLabel name="language">{{ t('message.gameBusiness.language') }}</FormLabel>
@@ -43,8 +43,8 @@ import FormField from '@primevue/forms/formfield'
 import Message from 'primevue/message'
 import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import {TextField, TextareaField} from '../../../../../../components/crud-form-fields'
-import { tenantGameAnnouncementEntityAddPost, tenantGameAnnouncementEntityUpdatePost } from '../../../../../../api/tenantGameAnnouncementEntity'
-import { tenantGameAreaEntitySelectStringPost } from '../../../../../../api/tenantGameAreaEntity'
+import { gameAnnouncementAddPost, gameAnnouncementUpdatePost } from '../../../../../../api/gameAnnouncement'
+import { gameAreaSelectStringPost } from '../../../../../../api/gameArea'
 import { globalLanguageSelectPost } from '../../../../../../api/globalLanguage'
 import {normalizeAppId} from '../../../../../../utils/appWorkspace.ts'
 import {MAX_SELECT_SIZE} from '../../../../../../constants/pagination.ts'
@@ -77,7 +77,7 @@ const rules = {
 }
 
 const loadAreaOptions = async (appId?: number) => {
-  areaIdOptions.value = (await tenantGameAreaEntitySelectStringPost({appId: appId, pageSize: MAX_SELECT_SIZE})).data.data ?? []
+  areaIdOptions.value = (await gameAreaSelectStringPost({appId: appId, pageSize: MAX_SELECT_SIZE})).data.data ?? []
 }
 
 const beforeOpen = (form: any, isEditor: boolean) => {

@@ -20,7 +20,7 @@ import Dialog from 'primevue/dialog'
 import Button from 'primevue/button'
 import DatePicker from 'primevue/datepicker'
 import InputNumber from 'primevue/inputnumber'
-import { tenantSessionKeyEntityRotatePost } from '../../../../../api/tenantSessionKeyEntity'
+import { sessionKeyRotatePost } from '../../../../../api/sessionKey'
 
 const emit = defineEmits(['rotated'])
 
@@ -36,7 +36,7 @@ const open = (row: any) => {
 
 const confirm = async () => {
   const expireTimeLong = oldKeyExpireTime.value ? Math.floor(new Date(oldKeyExpireTime.value).getTime() / 1000) : null
-  const res = await tenantSessionKeyEntityRotatePost({ appId: String(appId.value), oldKeyExpireTime: expireTimeLong })
+  const res = await sessionKeyRotatePost({ appId: String(appId.value), oldKeyExpireTime: expireTimeLong })
   visible.value = false
   emit('rotated', res.data)
 }

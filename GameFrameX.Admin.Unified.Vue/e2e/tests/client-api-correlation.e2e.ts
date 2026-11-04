@@ -84,7 +84,7 @@ async function fetchDefaultApp(request: APIRequestContext, token: string): Promi
   let packageName = '';
   for (const row of rows) {
     const candidateId = Number(readString(row, ['Id']));
-    const pkgRes = await request.post(`${ADMIN_API}/api/tenantGameAppPackage/page`, {
+    const pkgRes = await request.post(`${ADMIN_API}/api/gameAppPackage/page`, {
       headers: { Authorization: `Bearer ${token}` },
       data: { appId: candidateId, page: 1, pageSize: 5 },
     });

@@ -51,9 +51,9 @@ import {usePrimeTablePage} from '../../../../../composables'
 import {useCurrentApp} from '../../../../../composables/useCurrentApp.ts'
 import {MAX_SELECT_SIZE} from '../../../../../constants/pagination.ts'
 import editDialog from '/@/views/app/contentCenter/reward/gameRewardTemplateEntity/component/EditDialog.vue'
-import { tenantGameRewardTemplateEntityCopySnapshotPost, tenantGameRewardTemplateEntityDeletePost, tenantGameRewardTemplateEntityPagePost } from '../../../../../api/tenantGameRewardTemplateEntity'
+import { gameRewardTemplateCopySnapshotPost, gameRewardTemplateDeletePost, gameRewardTemplatePagePost } from '../../../../../api/gameRewardTemplate'
 import {parseRewardItems} from '../../../../../components/reward-items-editor/rewardItems.ts'
-import { tenantGameRewardTemplateGroupEntitySelectPost } from '../../../../../api/tenantGameRewardTemplateGroupEntity'
+import { gameRewardTemplateGroupSelectPost } from '../../../../../api/gameRewardTemplateGroup'
 import {isEnabled} from '../../../../../utils/isEnabled.ts'
 import type {CrudAction, CrudColumnConfig} from '../../../../../components/crud-data-table/types.ts'
 import type {AppWorkspaceId} from '../../../../../utils/appWorkspace.ts'
@@ -79,8 +79,8 @@ const searchFields = computed(() => [
 
 const {loading, tableData, queryParams, tableParams, onQuery, onDelete} = useCrudTable({
   api: {
-    pageApi: (params) => params.appId ? tenantGameRewardTemplateEntityPagePost(params) : Promise.resolve(emptyPage),
-    deleteApi: (params) => tenantGameRewardTemplateEntityDeletePost(params),
+    pageApi: (params) => params.appId ? gameRewardTemplatePagePost(params) : Promise.resolve(emptyPage),
+    deleteApi: (params) => gameRewardTemplateDeletePost(params),
   },
   immediate: true,
 })
@@ -88,7 +88,7 @@ const {loading, tableData, queryParams, tableParams, onQuery, onDelete} = useCru
 queryParams.value.appId = resolveInitialAppId(route.query)
 
 const loadGroupList = async (appId?: AppWorkspaceId) => {
-  groupList.value = appId ? ((await tenantGameRewardTemplateGroupEntitySelectPost({appId, pageSize: MAX_SELECT_SIZE})).data.data ?? []) : []
+  groupList.value = appId ? ((await gameRewardTemplateGroupSelectPost({appId, pageSize: MAX_SELECT_SIZE})).data.data ?? []) : []
 }
 
 const rewardSummary = (value?: string) => {
@@ -124,7 +124,7 @@ const openEdit = (row: any) => {
 }
 
 const previewSnapshot = async (row: any) => {
-  const response = await tenantGameRewardTemplateEntityCopySnapshotPost({id: row.id, appId: queryParams.value.appId})
+  const response = await gameRewardTemplateCopySnapshotPost({id: row.id, appId: queryParams.value.appId})
   const snapshot = response.data.data
   snapshotJson.value = JSON.stringify(snapshot ? JSON.parse(snapshot.rewardItemsJson || '[]') : [], null, 2)
   snapshotVisible.value = true

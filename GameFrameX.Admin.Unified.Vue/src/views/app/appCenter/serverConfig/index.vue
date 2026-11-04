@@ -6,7 +6,7 @@
             v-model="queryParams"
             :fields="searchFields"
             :showAdd="true"
-            authPrefix="tenantGameAppServerConfig"
+            authPrefix="gameAppServerConfig"
             @query="runScopedQuery"
 
             @add="openAddTenantGameAppServerConfig"
@@ -18,7 +18,7 @@
         <CrudDataTable :value="tableData" style="width: 100%" v-block-loading="loading" showGridlines stripedRows
                    rowKey="id" :totalRecords="tableParams.total" :rows="tableParams.pageSize"
                    :rowsPerPageOptions="[10, 20, 50, 100, 200, 500]"
-                   authPrefix="tenantGameAppServerConfig"
+                   authPrefix="gameAppServerConfig"
                    :actions="actions"
                    :columns="columns"
                    :exportQuery="queryParams"
@@ -51,7 +51,7 @@ import {usePrimeTablePage} from '../../../../composables'
 import {useCurrentApp} from '../../../../composables/useCurrentApp.ts'
 import {formatUnix} from '../../../../utils/formatTime.ts'
 import editDialog from '/@/views/app/appCenter/serverConfig/component/EditDialog.vue'
-import { tenantGameAppServerConfigPagePost, tenantGameAppServerConfigDeletePost } from '../../../../api/tenantGameAppServerConfig'
+import { gameAppServerConfigPagePost, gameAppServerConfigDeletePost } from '../../../../api/gameAppServerConfig'
 import type {CrudColumnConfig} from '../../../../components/crud-data-table/types.ts'
 import {showWarning} from '../../../../utils/message.ts'
 import {normalizeAppId, normalizeRouteAppId, type AppWorkspaceId} from '../../../../utils/appWorkspace.ts'
@@ -66,7 +66,7 @@ const {
   loading, tableData, queryParams, tableParams,
   onQuery, onDelete,
 } = useCrudTable({
-  api: {pageApi: tenantGameAppServerConfigPagePost, deleteApi: tenantGameAppServerConfigDeletePost},
+  api: {pageApi: gameAppServerConfigPagePost, deleteApi: gameAppServerConfigDeletePost},
   immediate: false,
 })
 

@@ -2,8 +2,8 @@
   <BaseEditDialog
     ref="dialogRef"
     :title="props.title"
-    :addApi="tenantGameAppPackageAddPost"
-    :updateApi="tenantGameAppPackageUpdatePost"
+    :addApi="gameAppPackageAddPost"
+    :updateApi="gameAppPackageUpdatePost"
     :rules="rules"
     :defaultForm="defaultForm"
     :beforeOpen="beforeOpen"
@@ -50,9 +50,9 @@ import FormField from '@primevue/forms/formfield'
 import Message from 'primevue/message'
 import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import {TextField} from '../../../../../components/crud-form-fields'
-import { tenantGameAppPackageAddPost, tenantGameAppPackageUpdatePost, tenantGameAppPackagePagePost } from '../../../../../api/tenantGameAppPackage'
+import { gameAppPackageAddPost, gameAppPackageUpdatePost, gameAppPackagePagePost } from '../../../../../api/gameAppPackage'
 import { globalPlatformSelectPost } from '../../../../../api/globalPlatform'
-import { tenantChannelDefinitionAvailableGet } from '../../../../../api/tenantChannelDefinition'
+import { channelDefinitionAvailableGet } from '../../../../../api/channelDefinition'
 import { MAX_PAGE_SIZE, MAX_SELECT_SIZE } from '../../../../../constants/pagination.ts'
 import {normalizeAppId} from '../../../../../utils/appWorkspace.ts'
 import { mapAvailableChannelDefinitions } from '../../../../../utils/channelDefinition.ts'
@@ -119,8 +119,8 @@ const parentPackageOptions = (appId: any) => {
 const loadOptions = async () => {
   const [platforms, channels, packages] = await Promise.all([
     globalPlatformSelectPost({ page: 1, pageSize: MAX_SELECT_SIZE }),
-    tenantChannelDefinitionAvailableGet({pageSize: MAX_SELECT_SIZE}),
-    tenantGameAppPackagePagePost({ page: 1, pageSize: MAX_PAGE_SIZE, appId: normalizeAppId(props.appId) }),
+    channelDefinitionAvailableGet({pageSize: MAX_SELECT_SIZE}),
+    gameAppPackagePagePost({ page: 1, pageSize: MAX_PAGE_SIZE, appId: normalizeAppId(props.appId) }),
   ])
   platformOptions.value = platforms.data.data || []
   channelOptions.value = mapAvailableChannelDefinitions(channels.data.data || [], 'id')

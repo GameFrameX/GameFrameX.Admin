@@ -1,7 +1,61 @@
 /* eslint-disable */
 /* tslint:disable */
 
-import type { AccountTypeEnum, CardTypeEnum, CultureLevelEnum, GenderEnum, ResetPwdResponseHttpJsonResultData, TenantOrganizationEntity, TenantPositionEntity, TenantUserEntity, TenantUserResponse } from "../_shared/data-contracts";
+import type { AccountTypeEnum } from "../_shared/data-contracts";
+
+/** @format int32 */
+export enum GenderEnum {
+  /** 男 */
+  Male = 1,
+  /** 女 */
+  Female = 2,
+  /** 其他 */
+  Other = 3,
+}
+
+/** @format int32 */
+export enum CultureLevelEnum {
+  /** 其他 */
+  Level0 = 0,
+  /** 小学 */
+  Level1 = 1,
+  /** 初中 */
+  Level2 = 2,
+  /** 普通高中 */
+  Level3 = 3,
+  /** 技工学校 */
+  Level4 = 4,
+  /** 职业教育 */
+  Level5 = 5,
+  /** 职业高中 */
+  Level6 = 6,
+  /** 中等专科 */
+  Level7 = 7,
+  /** 大学专科 */
+  Level8 = 8,
+  /** 大学本科 */
+  Level9 = 9,
+  /** 硕士研究生 */
+  Level10 = 10,
+  /** 博士研究生 */
+  Level11 = 11,
+}
+
+/** @format int32 */
+export enum CardTypeEnum {
+  /** 身份证 */
+  IdCard = 0,
+  /** 护照 */
+  PassportCard = 1,
+  /** 出生证 */
+  BirthCard = 2,
+  /** 港澳台通行证 */
+  GatCard = 3,
+  /** 外国人居留证 */
+  ForeignCard = 4,
+  /** 营业执照 */
+  License = 5,
+}
 
 /**
  * 新增/编辑用户输入参数。
@@ -69,10 +123,6 @@ export interface AddUserRequest {
   /** 备注 */
   remark?: string | null;
   accountType?: AccountTypeEnum;
-  /** 直属机构Id */
-  organizationId?: string;
-  /** 职位Id */
-  posId?: string;
   /** 工号 */
   jobNum?: string | null;
   /**
@@ -82,8 +132,6 @@ export interface AddUserRequest {
   joinTime?: number | null;
   /** 角色集合 */
   roleIdList?: number[] | null;
-  /** 扩展机构集合 */
-  extOrganizationIdList?: TenantUserExtensionOrganizationEntity[] | null;
 }
 
 export interface ChangePwdRequest {
@@ -106,8 +154,6 @@ export interface DeleteUserRequest {
    * @max 9223372036854776000
    */
   id: string;
-  /** 机构Id */
-  organizationId?: string;
 }
 
 export interface PageUserRequest {
@@ -132,8 +178,26 @@ export interface PageUserRequest {
   realName?: string | null;
   /** 手机号 */
   phone?: string | null;
-  /** 查询时所选机构Id */
-  organizationId?: string;
+}
+
+/** 重置密码结果（平台用户与租户管理员重置共用） */
+export interface ResetPwdResponse {
+  /** 重置后的初始密码（取自系统密码配置；一次性明文返回，仅本次响应可见，禁止落日志/缓存） */
+  newPassword?: string | null;
+}
+
+export interface ResetPwdResponseHttpJsonResultData {
+  /** @format int32 */
+  code?: number;
+  message?: string | null;
+  /** 重置密码结果（平台用户与租户管理员重置共用） */
+  data?: ResetPwdResponse;
+  trackId?: string | null;
+  errorCode?: string | null;
+  type?: string | null;
+  /** @format int64 */
+  time?: number;
+  extras?: any | null;
 }
 
 export interface ResetPwdUserRequest {
@@ -144,7 +208,7 @@ export interface ResetPwdUserRequest {
   id: string;
 }
 
-export interface TenantUserExtensionOrganizationEntity {
+export interface TenantUserEntity {
   /** 主键Id */
   id: string;
   /** 创建人Id */
@@ -194,37 +258,140 @@ export interface TenantUserExtensionOrganizationEntity {
   rowVersion?: string | null;
   /** 是否启用,true:启用，false:禁用，null:未设置(启用) */
   isEnabled?: boolean | null;
-  userId?: string;
-  user?: TenantUserEntity;
-  organizationId?: string;
-  tenantOrganizationEntity?: TenantOrganizationEntity;
-  posId?: string;
-  tenantPositionEntity?: TenantPositionEntity;
+  account?: string | null;
+  realName?: string | null;
+  nickName?: string | null;
+  avatar?: string | null;
+  sex?: GenderEnum;
+  /** @format int32 */
+  age?: number;
+  /** @format int64 */
+  birthdayTime?: number | null;
+  nation?: string | null;
+  phone?: string | null;
+  cardType?: CardTypeEnum;
+  idCardNum?: string | null;
+  email?: string | null;
+  address?: string | null;
+  cultureLevel?: CultureLevelEnum;
+  politicalOutlook?: string | null;
+  college?: string | null;
+  officePhone?: string | null;
+  emergencyContact?: string | null;
+  emergencyPhone?: string | null;
+  emergencyAddress?: string | null;
+  introduction?: string | null;
+  /** @format int32 */
+  orderNo?: number;
+  remark?: string | null;
+  accountType?: AccountTypeEnum;
+  managerUserId?: string | null;
+  managerUser?: TenantUserEntity;
   jobNum?: string | null;
   posLevel?: string | null;
+  posTitle?: string | null;
+  expertise?: string | null;
+  officeZone?: string | null;
+  office?: string | null;
   /** @format int64 */
   joinTime?: number | null;
+  lastLoginIp?: string | null;
+  lastLoginAddress?: string | null;
+  /** @format int64 */
+  lastLoginTime?: number | null;
+  lastLoginDevice?: string | null;
+  signature?: string | null;
 }
 
-/** 系统用户扩展机构输出参数 */
-export interface TenantUserExtensionOrganizationResponse {
+/** 租户用户输出参数 */
+export interface TenantUserResponse {
   /** Id */
   id?: string;
-  /** 用户Id */
-  userId?: string;
-  /** 机构Id */
-  organizationId?: string;
-  /** 职位Id */
-  posId?: string;
+  /** 账号 */
+  account?: string | null;
+  /** 真实姓名 */
+  realName?: string | null;
+  /** 昵称 */
+  nickName?: string | null;
+  /** 头像 */
+  avatar?: string | null;
+  sex?: GenderEnum;
+  /**
+   * 年龄
+   * @format int32
+   */
+  age?: number;
+  /**
+   * 出生日期
+   * @format int64
+   */
+  birthdayTime?: number | null;
+  /** 民族 */
+  nation?: string | null;
+  /** 手机号码 */
+  phone?: string | null;
+  cardType?: CardTypeEnum;
+  /** 身份证号 */
+  idCardNum?: string | null;
+  /** 邮箱 */
+  email?: string | null;
+  /** 地址 */
+  address?: string | null;
+  cultureLevel?: CultureLevelEnum;
+  /** 政治面貌 */
+  politicalOutlook?: string | null;
+  /** 毕业院校 */
+  college?: string | null;
+  /** 办公电话 */
+  officePhone?: string | null;
+  /** 紧急联系人 */
+  emergencyContact?: string | null;
+  /** 紧急联系人电话 */
+  emergencyPhone?: string | null;
+  /** 紧急联系人地址 */
+  emergencyAddress?: string | null;
+  /** 个人简介 */
+  introduction?: string | null;
+  /**
+   * 排序
+   * @format int32
+   */
+  orderNo?: number;
+  /** 备注 */
+  remark?: string | null;
+  accountType?: AccountTypeEnum;
+  /** 直属主管Id */
+  managerUserId?: string | null;
   /** 工号 */
   jobNum?: string | null;
   /** 职级 */
   posLevel?: string | null;
+  /** 职称 */
+  posTitle?: string | null;
+  /** 擅长领域 */
+  expertise?: string | null;
+  /** 办公区域 */
+  officeZone?: string | null;
+  /** 办公室 */
+  office?: string | null;
   /**
    * 入职日期
    * @format int64
    */
   joinTime?: number | null;
+  /** 最新登录Ip */
+  lastLoginIp?: string | null;
+  /** 最新登录地点 */
+  lastLoginAddress?: string | null;
+  /**
+   * 最新登录时间
+   * @format int64
+   */
+  lastLoginTime?: number | null;
+  /** 最新登录设备 */
+  lastLoginDevice?: string | null;
+  /** 电子签名 */
+  signature?: string | null;
   /** 是否启用 */
   isEnabled?: boolean | null;
   /**
@@ -321,10 +488,6 @@ export interface UpdateUserRequest {
   /** 备注 */
   remark?: string | null;
   accountType?: AccountTypeEnum;
-  /** 直属机构Id */
-  organizationId?: string;
-  /** 职位Id */
-  posId?: string;
   /** 工号 */
   jobNum?: string | null;
   /**
@@ -334,8 +497,6 @@ export interface UpdateUserRequest {
   joinTime?: number | null;
   /** 角色集合 */
   roleIdList?: number[] | null;
-  /** 扩展机构集合 */
-  extOrganizationIdList?: TenantUserExtensionOrganizationEntity[] | null;
 }
 
 export interface UserRequest {
@@ -455,29 +616,6 @@ export interface TenantUserChangePwdPostData {
 export type TenantUserDeletePostData = any;
 
 export type TenantUserGrantRolePostData = any;
-
-export interface TenantUserOwnExtOrgListGetData {
-  /**
-   * 响应码，0 表示成功，失败时承载统一数字业务错误码（模块枚举 8 位数值，见 GameFrameX.Core/Enum/Errors 与 error-codes.json 码表）
-   * @format int32
-   */
-  code: number;
-  /** 错误或提示信息 */
-  message: string;
-  data: TenantUserExtensionOrganizationResponse[];
-  /** 链路追踪标识，未启用追踪时为 null */
-  trackId: string | null;
-  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
-  errorCode: string | null;
-  /** 响应类型（success/warning/error） */
-  type: string | null;
-  /**
-   * Unix 时间戳（秒）
-   * @format int64
-   */
-  time: number;
-  extras: object | null;
-}
 
 export interface TenantUserOwnRoleListGetData {
   /**

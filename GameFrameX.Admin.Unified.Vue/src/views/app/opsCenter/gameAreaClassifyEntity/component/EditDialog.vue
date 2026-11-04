@@ -1,5 +1,5 @@
 <template>
-  <BaseEditDialog ref="dialogRef" :title="props.title" scrollable scrollMaxHeight="65vh" :addApi="tenantGameAreaClassifyEntityAddPost" :updateApi="tenantGameAreaClassifyEntityUpdatePost" :rules="rules" :beforeOpen="beforeOpen" @reloadTable="emit('reloadTable')">
+  <BaseEditDialog ref="dialogRef" :title="props.title" scrollable scrollMaxHeight="65vh" :addApi="gameAreaClassifyAddPost" :updateApi="gameAreaClassifyUpdatePost" :rules="rules" :beforeOpen="beforeOpen" @reloadTable="emit('reloadTable')">
     <template #default="{ ruleForm, isEditor }">
       <TextField v-model="ruleForm.name" name="name" :label="t('message.gameBusiness.name')" :placeholder="t('message.gameBusiness.pleaseEnterName')" maxlength="64"/>
       <TextField v-model="ruleForm.description" name="description" :label="t('message.gameBusiness.description')" :placeholder="t('message.gameBusiness.pleaseEnterDescription')" maxlength="512"/>
@@ -22,7 +22,7 @@ import FormField from '@primevue/forms/formfield'
 import Message from 'primevue/message'
 import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import {TextField} from '../../../../../components/crud-form-fields'
-import { tenantGameAreaClassifyEntityAddPost, tenantGameAreaClassifyEntityUpdatePost } from '../../../../../api/tenantGameAreaClassifyEntity'
+import { gameAreaClassifyAddPost, gameAreaClassifyUpdatePost } from '../../../../../api/gameAreaClassify'
 import {normalizeAppId} from '../../../../../utils/appWorkspace.ts'
 
 const props = defineProps({

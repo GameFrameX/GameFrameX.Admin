@@ -25,7 +25,7 @@ import Button from 'primevue/button'
 import DatePicker from 'primevue/datepicker'
 import InputNumber from 'primevue/inputnumber'
 import InputText from 'primevue/inputtext'
-import { tenantAppSignatureKeyEntityAddPost } from '../../../../../api/tenantAppSignatureKeyEntity'
+import { appSignatureKeyAddPost } from '../../../../../api/appSignatureKey'
 
 const emit = defineEmits(['added'])
 
@@ -45,7 +45,7 @@ const open = () => {
 
 const confirm = async () => {
   const toLong = (value: any) => (value ? Math.floor(new Date(value).getTime() / 1000) : null)
-  const res = await tenantAppSignatureKeyEntityAddPost({
+  const res = await appSignatureKeyAddPost({
     appId: appId.value ?? undefined,
     notBeforeTime: toLong(notBeforeTime.value),
     expireTime: toLong(expireTime.value),

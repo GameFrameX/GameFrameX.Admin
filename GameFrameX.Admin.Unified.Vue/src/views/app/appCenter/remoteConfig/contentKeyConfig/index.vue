@@ -6,7 +6,7 @@
             v-model="queryParams"
             :fields="searchFields"
             :showAdd="true"
-            authPrefix="tenantGameAppRemoteConfigKey"
+            authPrefix="gameAppRemoteConfigKey"
             @query="onQuery"
 
             @add="openAdd"
@@ -17,7 +17,7 @@
       <template #content>
         <CrudDataTable :value="tableData" style="width: 100%" v-block-loading="loading" showGridlines stripedRows
                        rowKey="id" :showPagination="false"
-                       authPrefix="tenantGameAppRemoteConfigKey"
+                       authPrefix="gameAppRemoteConfigKey"
                        :actions="actions"
                        :columns="columns"
                        :exportQuery="queryParams">
@@ -46,7 +46,7 @@ import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import type {CrudColumnConfig} from '../../../../../components/crud-data-table/types.ts'
 import {useCrudTable} from '../../../../../composables/useCrudTable.ts'
 import editDialog from '/@/views/app/appCenter/remoteConfig/contentKeyConfig/component/EditDialog.vue'
-import {tenantGameAppRemoteConfigKeyPagePost, tenantGameAppRemoteConfigKeyDeletePost} from '../../../../../api/tenantGameAppRemoteConfigKey'
+import {gameAppRemoteConfigKeyPagePost, gameAppRemoteConfigKeyDeletePost} from '../../../../../api/gameAppRemoteConfigKey'
 import {isEnabled} from '../../../../../utils/isEnabled.ts'
 
 const editDialogRef = ref()
@@ -67,7 +67,7 @@ const {
   loading, tableData, queryParams,
   onQuery, onDelete,
 } = useCrudTable({
-  api: {pageApi: tenantGameAppRemoteConfigKeyPagePost, deleteApi: tenantGameAppRemoteConfigKeyDeletePost},
+  api: {pageApi: gameAppRemoteConfigKeyPagePost, deleteApi: gameAppRemoteConfigKeyDeletePost},
   immediate: true,
 })
 

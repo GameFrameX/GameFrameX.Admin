@@ -29,7 +29,7 @@ import Dialog from 'primevue/dialog'
 import Button from 'primevue/button'
 import { t } from '../../../../../../i18n/index.ts'
 import { showSuccess } from '../../../../../../utils/message.ts'
-import { tenantGameMailCampaignEntityPreviewPost, tenantGameMailCampaignEntityPublishPost } from '../../../../../../api/tenantGameMailCampaignEntity'
+import { gameMailCampaignPreviewPost, gameMailCampaignPublishPost } from '../../../../../../api/gameMailCampaign'
 import {
   MAIL_CAMPAIGN_MAIL_TYPE_OPTIONS,
   MAIL_CAMPAIGN_PUBLISH_STATUS_OPTIONS,
@@ -56,7 +56,7 @@ const loadPreview = async () => {
   if (!row.value?.id) return
   previewLoading.value = true
   try {
-    const res: any = await tenantGameMailCampaignEntityPreviewPost({ id: row.value.id })
+    const res: any = await gameMailCampaignPreviewPost({ id: row.value.id })
     const hit = res.data?.data?.estimatedHitCount
     hitCountText.value = hit === -1 || hit === undefined
       ? t('message.gameBusiness.mailCampaign.estimatedHitCountUnknown')
@@ -78,7 +78,7 @@ const confirm = async () => {
   if (!row.value?.id) return
   loading.value = true
   try {
-    await tenantGameMailCampaignEntityPublishPost({ id: row.value.id })
+    await gameMailCampaignPublishPost({ id: row.value.id })
     showSuccess(t('message.gameBusiness.mailCampaign.publishSuccess'))
     emit('done')
     close()

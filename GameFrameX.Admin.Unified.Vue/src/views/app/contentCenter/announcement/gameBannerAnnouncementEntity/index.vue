@@ -50,8 +50,8 @@ import { useCrudTable } from '../../../../../composables/useCrudTable.ts'
 import {usePrimeTablePage} from '../../../../../composables'
 import {useCurrentApp} from '../../../../../composables/useCurrentApp.ts'
 import editDialog from '/@/views/app/contentCenter/announcement/gameBannerAnnouncementEntity/component/EditDialog.vue'
-import { tenantGameBannerAnnouncementEntityPagePost, tenantGameBannerAnnouncementEntityDeletePost } from '../../../../../api/tenantGameBannerAnnouncementEntity'
-import { tenantGameAreaEntitySelectStringPost } from '../../../../../api/tenantGameAreaEntity'
+import { gameBannerAnnouncementPagePost, gameBannerAnnouncementDeletePost } from '../../../../../api/gameBannerAnnouncement'
+import { gameAreaSelectStringPost } from '../../../../../api/gameArea'
 import {MAX_SELECT_SIZE} from '../../../../../constants/pagination.ts'
 
 const route = useRoute()
@@ -74,7 +74,7 @@ const getAreaName = (areaId: number) => {
   return areaId
 }
 const loadAreaList = async (appId?: number) => {
-  const res = await tenantGameAreaEntitySelectStringPost({appId: appId, pageSize: MAX_SELECT_SIZE})
+  const res = await gameAreaSelectStringPost({appId: appId, pageSize: MAX_SELECT_SIZE})
   areaList.value = res.data.data ?? []
 }
 
@@ -94,7 +94,7 @@ const {
   onQuery,
   onDelete,
 } = useCrudTable({
-  api: { pageApi: tenantGameBannerAnnouncementEntityPagePost, deleteApi: tenantGameBannerAnnouncementEntityDeletePost },
+  api: { pageApi: gameBannerAnnouncementPagePost, deleteApi: gameBannerAnnouncementDeletePost },
   immediate: true,
 })
 

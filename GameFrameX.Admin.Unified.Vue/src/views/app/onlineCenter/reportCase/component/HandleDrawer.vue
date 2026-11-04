@@ -56,7 +56,7 @@
  * 举报案件处置抽屉（C342 / GFX-758，vault:C7 S6.10）。
  * 决策枚举 Dismiss/Warn/Mute/Ban/ForwardPenalty；理由必填（进审计）；
  * Mute/Ban 时 DurationMinutes 条件必填。提交前高危确认层（showConfirm）。
- * 服务端语义：Mute/Ban 先写 TenantGamePenaltyEntity 事实源再触发 Online 联动命令。
+ * 服务端语义：Mute/Ban 先写 GamePenalty 事实源再触发 Online 联动命令。
  */
 import { ref, computed } from 'vue'
 import Drawer from 'primevue/drawer'

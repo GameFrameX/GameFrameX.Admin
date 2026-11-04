@@ -2,8 +2,8 @@
   <BaseEditDialog
     ref="dialogRef"
     :title="props.title"
-    :addApi="(params: any) => tenantGameRedeemCodeChannelEntityAddPost(params)"
-    :updateApi="(params: any) => tenantGameRedeemCodeChannelEntityUpdatePost(params)"
+    :addApi="(params: any) => gameRedeemCodeChannelAddPost(params)"
+    :updateApi="(params: any) => gameRedeemCodeChannelUpdatePost(params)"
     :rules="rules"
     :beforeOpen="beforeOpen"
     @reloadTable="emit('reloadTable')"
@@ -29,7 +29,7 @@ import InputNumber from 'primevue/inputnumber'
 import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import FormHelpText from '/@/components/form-help-text/index.vue'
 import {TextField} from '../../../../../components/crud-form-fields'
-import { tenantGameRedeemCodeChannelEntityAddPost, tenantGameRedeemCodeChannelEntityUpdatePost } from '../../../../../api/tenantGameRedeemCodeChannelEntity'
+import { gameRedeemCodeChannelAddPost, gameRedeemCodeChannelUpdatePost } from '../../../../../api/gameRedeemCodeChannel'
 import {normalizeAppId} from '../../../../../utils/appWorkspace.ts'
 
 const props = defineProps({

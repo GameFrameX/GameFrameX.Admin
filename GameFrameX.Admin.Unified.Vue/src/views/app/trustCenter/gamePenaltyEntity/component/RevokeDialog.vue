@@ -22,7 +22,7 @@ import Dialog from 'primevue/dialog'
 import Button from 'primevue/button'
 import Textarea from 'primevue/textarea'
 import FormLabel from '/@/components/form-label/index.vue'
-import { tenantGamePenaltyEntityRevokePost } from '../../../../../api/tenantGamePenaltyEntity'
+import { gamePenaltyRevokePost } from '../../../../../api/gamePenalty'
 import { showSuccess } from '../../../../../utils/message.ts'
 import { PENALTY_ACTION_TYPE_OPTIONS, findEnumOption } from '../constants'
 
@@ -59,7 +59,7 @@ const confirm = async () => {
   invalid.value = false
   submitting.value = true
   try {
-    await tenantGamePenaltyEntityRevokePost({ id: row.value?.id, reason: reason.value.trim() })
+    await gamePenaltyRevokePost({ id: row.value?.id, reason: reason.value.trim() })
     showSuccess(t('message.gameBusiness.trustSafety.penalty.revokeSuccess'))
     visible.value = false
     emit('reloadTable')

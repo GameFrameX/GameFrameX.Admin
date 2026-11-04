@@ -6,7 +6,7 @@
             v-model="queryParams"
             :fields="searchFields"
             :showAdd="true"
-            authPrefix="tenantGameAppFeatureSwitch"
+            authPrefix="gameAppFeatureSwitch"
             @query="runScopedQuery"
 
             @add="openAddFeatureSwitch"
@@ -18,7 +18,7 @@
         <CrudDataTable :value="tableData" style="width: 100%" v-block-loading="loading" showGridlines stripedRows
                    rowKey="id" :totalRecords="tableParams.total" :rows="tableParams.pageSize"
                    :rowsPerPageOptions="[10, 20, 50, 100, 200, 500]"
-                   authPrefix="tenantGameAppFeatureSwitch"
+                   authPrefix="gameAppFeatureSwitch"
                    :actions="actions"
                    actionColumnWidth="160px"
                    :columns="columns"
@@ -55,7 +55,7 @@ import {useCrudTable} from '../../../../composables/useCrudTable.ts'
 import {usePrimeTablePage} from '../../../../composables'
 import {useCurrentApp} from '../../../../composables/useCurrentApp.ts'
 import editDialog from '/@/views/app/appCenter/featureSwitch/component/EditDialog.vue'
-import { tenantGameAppFeatureSwitchPagePost, tenantGameAppFeatureSwitchDeletePost } from '../../../../api/tenantGameAppFeatureSwitch'
+import { gameAppFeatureSwitchPagePost, gameAppFeatureSwitchDeletePost } from '../../../../api/gameAppFeatureSwitch'
 import type {CrudColumnConfig} from '../../../../components/crud-data-table/types.ts'
 import {showWarning} from '../../../../utils/message.ts'
 import {formatUnix} from '../../../../utils/formatTime.ts'
@@ -71,7 +71,7 @@ const {
   loading, tableData, queryParams, tableParams,
   onQuery, onDelete,
 } = useCrudTable({
-  api: {pageApi: tenantGameAppFeatureSwitchPagePost, deleteApi: tenantGameAppFeatureSwitchDeletePost},
+  api: {pageApi: gameAppFeatureSwitchPagePost, deleteApi: gameAppFeatureSwitchDeletePost},
   immediate: false,
   deleteConfirmLabelFields: ['switchKey', 'displayName', 'id'],
 })

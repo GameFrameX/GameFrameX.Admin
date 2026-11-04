@@ -4,7 +4,7 @@
 /**
  * 异常 Ticket 检索类别（Admin 侧自有检索枚举，vault 无此概念；change C341 §3 A0）。
  *
- * 定义在 Application.Game（非 Core.Enum），不触碰 EnumContractTests SHA-256 契约锁。
+ * 定义在 Application.Platform（非 Core.Enum），不触碰 EnumContractTests SHA-256 契约锁。
  * @format int32
  */
 export enum AbnormalKind {
@@ -117,12 +117,6 @@ export interface OnlineMatchFailureResponse {
 /** 异常 Ticket 分页查询输入参数（change C341 §3；按异常类别检索，Cursor 翻页透传 Online）。 */
 export interface PageOnlineMatchAbnormalTicketRequest {
   /**
-   * 应用作用域（必填，经 OnlineScopeContextFactory 校验租户归属）。
-   * @min 1
-   * @max 9223372036854776000
-   */
-  appId: string;
-  /**
    * 区服作用域（必填，经 OnlineScopeContextFactory 校验租户与应用归属）。
    * @min 1
    * @max 9223372036854776000
@@ -131,7 +125,7 @@ export interface PageOnlineMatchAbnormalTicketRequest {
   /**
    * 异常 Ticket 检索类别（Admin 侧自有检索枚举，vault 无此概念；change C341 §3 A0）。
    *
-   * 定义在 Application.Game（非 Core.Enum），不触碰 EnumContractTests SHA-256 契约锁。
+   * 定义在 Application.Platform（非 Core.Enum），不触碰 EnumContractTests SHA-256 契约锁。
    */
   abnormalKind: AbnormalKind;
   /** 游标（上一页返回的 NextCursor；首页不传）。 */
@@ -147,12 +141,6 @@ export interface PageOnlineMatchAbnormalTicketRequest {
 
 /** 匹配失败原因分页查询输入参数（change C341 §3；Cursor 翻页透传 Online）。 */
 export interface PageOnlineMatchFailureRequest {
-  /**
-   * 应用作用域（必填，经 OnlineScopeContextFactory 校验租户归属）。
-   * @min 1
-   * @max 9223372036854776000
-   */
-  appId: string;
   /**
    * 区服作用域（必填，经 OnlineScopeContextFactory 校验租户与应用归属）。
    * @min 1

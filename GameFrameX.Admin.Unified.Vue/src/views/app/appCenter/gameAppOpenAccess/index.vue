@@ -66,7 +66,7 @@ import { useCurrentApp } from '../../../../composables/useCurrentApp.ts'
 import { showConfirm, showSuccess } from '../../../../utils/message.ts'
 import { formatUnix } from '../../../../utils/formatTime.ts'
 import { t } from '../../../../i18n/index.ts'
-import { tenantGameAppOpenAccessPagePost, tenantGameAppOpenAccessDeletePost } from '../../../../api/tenantGameAppOpenAccess'
+import { gameAppOpenAccessPagePost, gameAppOpenAccessDeletePost } from '../../../../api/gameAppOpenAccess'
 import editDialog from './component/EditDialog.vue'
 import secretDialog from './component/SecretDialog.vue'
 import actionDialog from './component/ActionDialog.vue'
@@ -113,7 +113,7 @@ const {
   onQuery,
 } = useCrudTable({
   api: {
-    pageApi: (params: any) => tenantGameAppOpenAccessPagePost(params),
+    pageApi: (params: any) => gameAppOpenAccessPagePost(params),
   },
   immediate: false,
 })
@@ -161,7 +161,7 @@ const onDelete = async (row: any) => {
     t('message.common.message.tip'),
   )
   if (!confirmed) return
-  await tenantGameAppOpenAccessDeletePost({ id: row.id, appId: queryParams.value.appId, rowVersion: row.rowVersion })
+  await gameAppOpenAccessDeletePost({ id: row.id, appId: queryParams.value.appId, rowVersion: row.rowVersion })
   onQuery()
   showSuccess(t('message.gameBusiness.openAccess.deleteSuccess'))
 }

@@ -45,7 +45,7 @@ import {useCrudTable} from '../../../../../composables/useCrudTable.ts'
 import {usePrimeTablePage, useRouteAppIdQuerySync} from '../../../../../composables'
 import {useCurrentApp} from '../../../../../composables/useCurrentApp.ts'
 import editDialog from '/@/views/app/contentCenter/reward/gameRewardTemplateGroupEntity/component/EditDialog.vue'
-import { tenantGameRewardTemplateGroupEntityDeletePost, tenantGameRewardTemplateGroupEntityPagePost } from '../../../../../api/tenantGameRewardTemplateGroupEntity'
+import { gameRewardTemplateGroupDeletePost, gameRewardTemplateGroupPagePost } from '../../../../../api/gameRewardTemplateGroup'
 import {isEnabled} from '../../../../../utils/isEnabled.ts'
 
 const emptyPage = {data: {result: {items: [], total: 0}}}
@@ -65,8 +65,8 @@ const searchFields = computed(() => [
 
 const {loading, tableData, queryParams, tableParams, onQuery, onDelete} = useCrudTable({
   api: {
-    pageApi: (params) => params.appId ? tenantGameRewardTemplateGroupEntityPagePost(params) : Promise.resolve(emptyPage),
-    deleteApi: (params) => tenantGameRewardTemplateGroupEntityDeletePost(params),
+    pageApi: (params) => params.appId ? gameRewardTemplateGroupPagePost(params) : Promise.resolve(emptyPage),
+    deleteApi: (params) => gameRewardTemplateGroupDeletePost(params),
   },
   immediate: true,
 })

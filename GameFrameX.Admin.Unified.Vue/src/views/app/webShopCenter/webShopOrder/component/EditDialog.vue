@@ -14,7 +14,7 @@
 import {ref} from 'vue'
 import Dialog from 'primevue/dialog';
 import Button from 'primevue/button';
-import { tenantGameWebShopOrderEntityRedoPost } from '../../../../../api/tenantGameWebShopOrderEntity'
+import { gameWebShopOrderRedoPost } from '../../../../../api/gameWebShopOrder'
 
 var props = defineProps({
   title: {
@@ -37,7 +37,7 @@ const openDialog = (row: any) => {
 }
 
 const submit = async () => {
-  await tenantGameWebShopOrderEntityRedoPost({id: orderId.value})
+  await gameWebShopOrderRedoPost({id: orderId.value})
   emit('reloadTable')
   close()
 }

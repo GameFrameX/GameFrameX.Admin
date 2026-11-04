@@ -51,12 +51,6 @@ export interface OnlinePlayerTimelineEntryResponse {
 /** 玩家时间线查询输入参数（change C344 / vault:C9 S8.1；Cursor 翻页，vault:C2 S1.2）。 */
 export interface OnlinePlayerTimelineRequest {
   /**
-   * 应用作用域（必填，经 OnlineScopeContextFactory 校验租户归属）。
-   * @min 1
-   * @max 9223372036854776000
-   */
-  appId: string;
-  /**
    * 区服作用域（必填，经 OnlineScopeContextFactory 校验租户与应用归属）。
    * @min 1
    * @max 9223372036854776000

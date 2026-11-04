@@ -13,17 +13,13 @@ export enum MenuTypeEnum {
 
 /** @format int32 */
 export enum MenuAppScopeEnum {
-  /** 租户 */
-  Tenant = 0,
-  /** 平台 */
-  Platform = 1,
-  /** 应用 */
-  App = 2,
+  /** 控制台 */
+  Console = 0,
 }
 
 /**
  * 新增/编辑菜单输入参数。
- * 显式声明前端表单可填字段，不再继承 GameFrameX.Entity.Global.GlobalMenuEntity，避免种子安全元数据（SuperAdminOnly、SyncRoles、AllowTenantWhenSuperAdminOnly、Key）与子节点导航属性被前端批量赋值。
+ * 显式声明前端表单可填字段，不再继承 GameFrameX.Entity.Global.GlobalMenuEntity，避免种子安全元数据（SuperAdminOnly、AllowTenantWhenSuperAdminOnly、Key）与子节点导航属性被前端批量赋值。
  */
 export interface AddMenuRequest {
   /** 主键Id（新增为 0，编辑由前端回填） */
@@ -149,11 +145,6 @@ export interface GlobalMenuResponse {
   remark?: string | null;
   /** 是否仅超管可见（种子元数据，DB 驱动授权读取） */
   superAdminOnly?: boolean;
-  /**
-   * 租户默认角色同步标志（TenantMenuSyncRole 位枚举整数值）
-   * @format int32
-   */
-  syncRoles?: number;
   /** 超管专属菜单下允许租户只读访问 */
   allowTenantWhenSuperAdminOnly?: boolean;
   appScope?: MenuAppScopeEnum;
@@ -231,17 +222,9 @@ export interface SystemMenuMetaResponse {
   isKeepAlive?: boolean;
   /** 是否固定 */
   isAffix?: boolean;
-  /**
-   * 菜单上下文：tenantShell / appWorkspace。
-   *
-   * tenantShell 是默认菜单（平台域页面同在此上下文，侧边栏保持完整菜单）；appWorkspace 只在当前应用工作台中展示。
-   */
+  /** 菜单上下文：console。 */
   menuContext?: string | null;
-  /**
-   * 菜单应用作用域：platform / tenant / app。
-   *
-   * platform 只允许 SuperAdmin 平台能力；tenant 只在租户 Shell 下可见；app 必须绑定具体 AppId > 0。
-   */
+  /** 菜单作用域：console。 */
   appScope?: string | null;
 }
 

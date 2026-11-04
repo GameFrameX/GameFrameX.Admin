@@ -37,7 +37,7 @@
  * 举报案件处置页（C342 / GFX-758，vault:C7 S6.10）。
  * 案件队列证据链字段全渲染（举报人/被举报人/场景/MatchId/ChatMessageId/原因/证据/状态/处理结果）；
  * 处置经 HandleDrawer：决策枚举 + 理由必填 + Mute/Ban 时长条件必填 + 高危确认层。
- * 处置产生的处罚写 TenantGamePenaltyEntity 事实源后触发 Online 联动命令（服务端语义）。
+ * 处置产生的处罚写 GamePenalty 事实源后触发 Online 联动命令（服务端语义）。
  */
 import { ref, computed, watch, onMounted } from 'vue'
 import { useRoute } from 'vue-router'

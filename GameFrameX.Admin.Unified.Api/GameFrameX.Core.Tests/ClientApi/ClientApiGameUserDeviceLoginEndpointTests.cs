@@ -134,7 +134,7 @@ public sealed class ClientApiGameUserDeviceLoginEndpointTests
             CreateTokenIssuer(),
             new ClientApiSessionKeyIssuer(db.Repository<TenantSessionKeyEntity>()),
             db.Repository<TenantGameUserEmailEntity>(),
-            new FakeTenantGamePenaltyEnforcementService(),
+            new FakeGamePenaltyEnforcementService(),
             new GameUserPasswordService());
     }
 

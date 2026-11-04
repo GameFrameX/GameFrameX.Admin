@@ -75,7 +75,7 @@ import {
   visibleApps,
 } from '../../../../utils/appWorkspace.ts'
 import { globalPackageCurrentTenantPackageGet } from '../../../../api/globalPackage'
-import { tenantGameHomeEntityOverviewPost } from '../../../../api/tenantGameHomeEntity'
+import { gameHomeOverviewPost } from '../../../../api/gameHome'
 
 const route = useRoute()
 const router = useRouter()
@@ -106,7 +106,7 @@ const loadTenantSummary = async () => {
   }
   try {
     // #211 驾驶舱聚合：在线与今日订单一次拿
-    const res = await tenantGameHomeEntityOverviewPost()
+    const res = await gameHomeOverviewPost()
     onlineCount.value = res.data.data?.onlineCount ?? null
     summaryOrders.value = res.data.data?.todayOrderCount ?? 0
   } catch {

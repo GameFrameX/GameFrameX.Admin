@@ -6,7 +6,7 @@
             v-model="queryParams"
             :fields="searchFields"
             :showAdd="true"
-            authPrefix="tenantGameAppAssetPackageVersion"
+            authPrefix="gameAppAssetPackageVersion"
             :advancedLabel="t('message.client.advanced')"
             :hideLabel="t('message.client.hide')"
             :defaultSearchKey="false"
@@ -21,7 +21,7 @@
         <CrudDataTable :value="tableData" v-block-loading="loading" showGridlines stripedRows rowKey="id"
                        :totalRecords="tableParams.total" :rows="tableParams.pageSize"
                        :rowsPerPageOptions="[10, 20, 50, 100, 200, 500]"
-                       authPrefix="tenantGameAppAssetPackageVersion"
+                       authPrefix="gameAppAssetPackageVersion"
                        :actions="actions"
                        :customActions="customActions"
                        actionColumnWidth="200px"
@@ -60,13 +60,13 @@ import {usePrimeTablePage, useRouteAppIdQuerySync} from '../../../../../composab
 import {useCurrentApp} from '../../../../../composables/useCurrentApp.ts'
 import editDialog from '/@/views/app/appCenter/release/assetPackageVersion/component/EditDialog.vue'
 import updateHistoryDialog from '/@/views/app/appCenter/release/assetPackageVersion/component/UpdateHistory.vue'
-import { tenantGameAppAssetPackageVersionPagePost, tenantGameAppAssetPackageVersionDeletePost } from '../../../../../api/tenantGameAppAssetPackageVersion'
-import { tenantChannelDefinitionAvailableGet } from '../../../../../api/tenantChannelDefinition'
+import { gameAppAssetPackageVersionPagePost, gameAppAssetPackageVersionDeletePost } from '../../../../../api/gameAppAssetPackageVersion'
+import { channelDefinitionAvailableGet } from '../../../../../api/channelDefinition'
 import { globalPlatformSelectPost } from '../../../../../api/globalPlatform'
-import { tenantGameAppVersionDefinitionSelectPost } from '../../../../../api/tenantGameAppVersionDefinition'
-import { tenantGameAppPackageListGet, tenantGameAppPackagePagePost } from '../../../../../api/tenantGameAppPackage'
+import { gameAppVersionDefinitionSelectPost } from '../../../../../api/gameAppVersionDefinition'
+import { gameAppPackageListGet, gameAppPackagePagePost } from '../../../../../api/gameAppPackage'
 import { globalLanguageSelectPost } from '../../../../../api/globalLanguage'
-import { tenantGameAppAssetPackageSelectPost } from '../../../../../api/tenantGameAppAssetPackage'
+import { gameAppAssetPackageSelectPost } from '../../../../../api/gameAppAssetPackage'
 import {MAX_PAGE_SIZE, MAX_SELECT_SIZE} from '../../../../../constants/pagination.ts'
 import { mapAvailableChannelDefinitions } from '../../../../../utils/channelDefinition.ts'
 
@@ -88,7 +88,7 @@ const loadPackageInfo = async (appId?: number | string) => {
     if (id) {
       payload.appId = id
     }
-    const res = await tenantGameAppPackagePagePost(payload)
+    const res = await gameAppPackagePagePost(payload)
     const items = res.data.data?.items ?? []
     const map: Record<string, { isMaster: boolean; masterName?: string }> = {}
     items.forEach((p: any) => {
@@ -112,7 +112,7 @@ const {
   loading, tableData, queryParams, tableParams,
   onQuery, onDelete,
 } = useCrudTable({
-  api: {pageApi: tenantGameAppAssetPackageVersionPagePost, deleteApi: tenantGameAppAssetPackageVersionDeletePost},
+  api: {pageApi: gameAppAssetPackageVersionPagePost, deleteApi: gameAppAssetPackageVersionDeletePost},
   immediate: true,
 })
 
@@ -177,7 +177,7 @@ const customActions: CrudAction[] = [
 ]
 
 const onQuerySelectorChannel = async () => {
-  const res = await tenantChannelDefinitionAvailableGet({pageSize: MAX_SELECT_SIZE})
+  const res = await channelDefinitionAvailableGet({pageSize: MAX_SELECT_SIZE})
   querySelectorParams.value.channel = mapAvailableChannelDefinitions(res.data.data || [], 'code')
 }
 const onQuerySelectorPlatform = async () => {
@@ -186,10 +186,10 @@ const onQuerySelectorPlatform = async () => {
 }
 const onQuerySelectorAppVersion = async (appId?: number | string) => {
   const id = appId
-  const res = await tenantGameAppVersionDefinitionSelectPost(id ? {appId: id, pageSize: MAX_SELECT_SIZE} : {pageSize: MAX_SELECT_SIZE})
+  const res = await gameAppVersionDefinitionSelectPost(id ? {appId: id, pageSize: MAX_SELECT_SIZE} : {pageSize: MAX_SELECT_SIZE})
   querySelectorParams.value.appVersion = res.data.data
 }
-// 包名候选按当前应用加载：tenantGameAppPackageListGet 已按应用过滤、默认包置顶；
+// 包名候选按当前应用加载：gameAppPackageListGet 已按应用过滤、默认包置顶；
 // 无应用或租户默认(appId=0)时只保留 default 应用默认选项，避免展示其它应用包名。
 const buildPackageOptions = (packages: any[]) => {
   const options: any[] = [{label: t('message.client.appDefaultPackage'), value: 'default'}]
@@ -213,7 +213,7 @@ const onQuerySelectorPackage = async (appId?: number | string) => {
     querySelectorParams.value.package = buildPackageOptions([])
     return
   }
-  const res = await tenantGameAppPackageListGet({appId: id, pageSize: MAX_SELECT_SIZE})
+  const res = await gameAppPackageListGet({appId: id, pageSize: MAX_SELECT_SIZE})
   querySelectorParams.value.package = buildPackageOptions(res.data?.data || [])
 }
 const onQuerySelectorLanguage = async () => {
@@ -222,7 +222,7 @@ const onQuerySelectorLanguage = async () => {
 }
 const onQuerySelectorAssetPackageName = async (appId?: number | string) => {
   const id = appId
-  const res = await tenantGameAppAssetPackageSelectPost(id ? {appId: id, pageSize: MAX_SELECT_SIZE} : {pageSize: MAX_SELECT_SIZE})
+  const res = await gameAppAssetPackageSelectPost(id ? {appId: id, pageSize: MAX_SELECT_SIZE} : {pageSize: MAX_SELECT_SIZE})
   querySelectorParams.value.assetPackageName = res.data.data
 }
 

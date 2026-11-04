@@ -43,7 +43,7 @@ import {useCrudTable} from '../../../../composables/useCrudTable.ts'
 import {usePrimeTablePage, useRouteAppIdQuerySync} from '../../../../composables'
 import {useCurrentApp} from '../../../../composables/useCurrentApp.ts'
 import editDialog from '/@/views/app/redeemCenter/gameRedeemCodeChannelEntity/component/EditDialog.vue'
-import { tenantGameRedeemCodeChannelEntityPagePost, tenantGameRedeemCodeChannelEntityDeletePost } from '../../../../api/tenantGameRedeemCodeChannelEntity'
+import { gameRedeemCodeChannelPagePost, gameRedeemCodeChannelDeletePost } from '../../../../api/gameRedeemCodeChannel'
 
 const route = useRoute()
 const {resolveInitialAppId} = useCurrentApp()
@@ -64,8 +64,8 @@ const {
   onDelete,
 } = useCrudTable({
   api: {
-    pageApi: (params) => tenantGameRedeemCodeChannelEntityPagePost(params),
-    deleteApi: (params) => tenantGameRedeemCodeChannelEntityDeletePost(params),
+    pageApi: (params) => gameRedeemCodeChannelPagePost(params),
+    deleteApi: (params) => gameRedeemCodeChannelDeletePost(params),
   },
   immediate: true,
 })

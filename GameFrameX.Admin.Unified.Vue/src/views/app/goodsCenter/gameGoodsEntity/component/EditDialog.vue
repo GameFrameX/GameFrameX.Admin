@@ -1,5 +1,5 @@
 <template>
-  <BaseEditDialog ref="dialogRef" :title="props.title" :addApi="tenantGameGoodsEntityAddPost" :updateApi="tenantGameGoodsEntityUpdatePost" :rules="rules" :beforeOpen="beforeOpen" @reloadTable="emit('reloadTable')">
+  <BaseEditDialog ref="dialogRef" :title="props.title" :addApi="gameGoodsAddPost" :updateApi="gameGoodsUpdatePost" :rules="rules" :beforeOpen="beforeOpen" @reloadTable="emit('reloadTable')">
     <template #default="{ ruleForm, isEditor }">
       <FormLabel name="configId">{{ t('message.gameBusiness.goods.configId') }}</FormLabel>
       <FormField name="configId" v-slot="{ props: fProps, invalid, error }">
@@ -23,8 +23,8 @@ import FormField from '@primevue/forms/formfield'
 import Message from 'primevue/message'
 import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import {TextField} from '../../../../../components/crud-form-fields'
-import { tenantGameGoodsEntityAddPost, tenantGameGoodsEntityUpdatePost } from '../../../../../api/tenantGameGoodsEntity'
-import { tenantGameGoodsCatalogueEntitySelectPost } from '../../../../../api/tenantGameGoodsCatalogueEntity'
+import { gameGoodsAddPost, gameGoodsUpdatePost } from '../../../../../api/gameGoods'
+import { gameGoodsCatalogueSelectPost } from '../../../../../api/gameGoodsCatalogue'
 import {normalizeAppId} from '../../../../../utils/appWorkspace.ts'
 import {MAX_SELECT_SIZE} from '../../../../../constants/pagination.ts'
 
@@ -51,7 +51,7 @@ const filteredClassifyIdOptions = computed(() =>
 )
 
 const getGameGoodsCatalogueEntityClassifyIdDropdownList = async (appId?: number) => {
-  let list = await tenantGameGoodsCatalogueEntitySelectPost({appId: appId, pageSize: MAX_SELECT_SIZE});
+  let list = await gameGoodsCatalogueSelectPost({appId: appId, pageSize: MAX_SELECT_SIZE});
   gameGoodsCatalogueEntityClassifyIdDropdownList.value = list.data.data ?? [];
   filteredClassifyIdList.value = [...gameGoodsCatalogueEntityClassifyIdDropdownList.value];
 };

@@ -1,5 +1,5 @@
 <template>
-  <BaseEditDialog ref="dialogRef" :title="props.title" :addApi="tenantGameGoodsCatalogueEntityAddPost" :updateApi="tenantGameGoodsCatalogueEntityUpdatePost" :rules="rules" :beforeOpen="beforeOpen" :beforeSubmit="beforeSubmit" @reloadTable="emit('reloadTable')">
+  <BaseEditDialog ref="dialogRef" :title="props.title" :addApi="gameGoodsCatalogueAddPost" :updateApi="gameGoodsCatalogueUpdatePost" :rules="rules" :beforeOpen="beforeOpen" :beforeSubmit="beforeSubmit" @reloadTable="emit('reloadTable')">
     <template #default="{ ruleForm }">
       <TextField v-model="ruleForm.name" name="name" :label="t('message.gameBusiness.name')" :placeholder="t('message.gameBusiness.pleaseEnterName')" maxlength="64"/>
       <TextField v-model="ruleForm.description" name="description" :label="t('message.gameBusiness.description')" :placeholder="t('message.gameBusiness.pleaseEnterDescription')" maxlength="512"/>
@@ -11,7 +11,7 @@
 import {ref} from 'vue'
 import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import {TextField} from '../../../../../components/crud-form-fields'
-import { tenantGameGoodsCatalogueEntityAddPost, tenantGameGoodsCatalogueEntityUpdatePost } from '../../../../../api/tenantGameGoodsCatalogueEntity'
+import { gameGoodsCatalogueAddPost, gameGoodsCatalogueUpdatePost } from '../../../../../api/gameGoodsCatalogue'
 import {normalizeAppId} from '../../../../../utils/appWorkspace.ts'
 import {showError} from '../../../../../utils/message.ts'
 

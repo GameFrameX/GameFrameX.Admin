@@ -20,7 +20,7 @@ import Dialog from 'primevue/dialog'
 import Button from 'primevue/button'
 import DatePicker from 'primevue/datepicker'
 import InputText from 'primevue/inputtext'
-import { tenantSessionKeyEntityRenewPost } from '../../../../../api/tenantSessionKeyEntity'
+import { sessionKeyRenewPost } from '../../../../../api/sessionKey'
 
 const emit = defineEmits(['renewed'])
 
@@ -38,7 +38,7 @@ const open = (row: any) => {
 
 const confirm = async () => {
   const expireTimeLong = expireTime.value ? Math.floor(new Date(expireTime.value).getTime() / 1000) : null
-  await tenantSessionKeyEntityRenewPost({ id: id.value, expireTime: expireTimeLong })
+  await sessionKeyRenewPost({ id: id.value, expireTime: expireTimeLong })
   visible.value = false
   emit('renewed')
 }

@@ -105,8 +105,8 @@ import {showConfirm, showSuccess, showWarning} from '../../../../utils/message.t
 import {useCrudTable} from '../../../../composables/useCrudTable.ts'
 import {usePrimeTablePage} from '../../../../composables'
 import {formatUnix} from '../../../../utils/formatTime.ts'
-import { tenantGamePaymentConfigEntityPagePost, tenantGamePaymentConfigEntityDeletePost as deletePaymentConfigApi, tenantGamePaymentConfigEntityChannelsGet, tenantGamePaymentConfigEntityDetailGet } from '../../../../api/tenantGamePaymentConfigEntity'
-import { tenantGameAppPackageListGet } from '../../../../api/tenantGameAppPackage'
+import { gamePaymentConfigPagePost, gamePaymentConfigDeletePost as deletePaymentConfigApi, gamePaymentConfigChannelsGet, gamePaymentConfigDetailGet } from '../../../../api/gamePaymentConfig'
+import { gameAppPackageListGet } from '../../../../api/gameAppPackage'
 import {useCurrentApp} from '../../../../composables/useCurrentApp.ts'
 import {buildNotifyUrl} from './notifyUrl'
 import editDialog from './component/EditDialog.vue'
@@ -167,7 +167,7 @@ const {
   onQuery,
 } = useCrudTable({
   api: {
-    pageApi: (params) => tenantGamePaymentConfigEntityPagePost(params),
+    pageApi: (params) => gamePaymentConfigPagePost(params),
     deleteApi: (params) => deletePaymentConfigApi({id: params.id, rowVersion: params.rowVersion}),
   },
   immediate: false,
@@ -206,7 +206,7 @@ const openEditPaymentConfig = async (row: any) => {
   editTitle.value = '编辑支付配置'
   // 列表 configJson 被脱敏为 ******，编辑需拉 Detail 获取真实配置才能回填字段
   try {
-    const res: any = await tenantGamePaymentConfigEntityDetailGet({id: row.id})
+    const res: any = await gamePaymentConfigDetailGet({id: row.id})
     const detail = res.data.data
     if (detail && detail.configJson) {
       editDialogRef.value?.openDialog({...row, ...detail})
@@ -280,7 +280,7 @@ const loadPackageOptions = async (appId: AppWorkspaceId) => {
     return
   }
   try {
-    const res: any = await tenantGameAppPackageListGet({appId: id})
+    const res: any = await gameAppPackageListGet({appId: id})
     const list = res.data?.data ?? []
     packageOptions.value = (list || []).map((p: any) => {
       const pkgId = Number(p.id)
@@ -333,7 +333,7 @@ onMounted(async () => {
   selectedGameAppId.value = appId
 
   try {
-    const channelRes: any = await tenantGamePaymentConfigEntityChannelsGet()
+    const channelRes: any = await gamePaymentConfigChannelsGet()
     const channels = channelRes.data?.data ?? []
     channelOptions.value = (channels || []).map((item: any) => ({label: item.label, value: item.value}))
   } catch {

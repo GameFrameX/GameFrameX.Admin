@@ -4,12 +4,6 @@
 // 多 tag 共享类型 + barrel（re-export 各 tag 独占类型，保持统一入口；业务可按需从 <tag>/types 精确 import）
 
 /** @format int32 */
-export enum TenantTypeEnum {
-  /** 库隔离 */
-  Db = 1,
-}
-
-/** @format int32 */
 export enum PenaltyTargetTypeEnum {
   /** 账号 */
   Account = 1,
@@ -64,16 +58,6 @@ export enum LiveOpsSourceKind {
 }
 
 /** @format int32 */
-export enum GenderEnum {
-  /** 男 */
-  Male = 1,
-  /** 女 */
-  Female = 2,
-  /** 其他 */
-  Other = 3,
-}
-
-/** @format int32 */
 export enum GameMailType {
   /** 个人邮件 */
   PersonalMail = 1,
@@ -110,108 +94,6 @@ export enum GameMailStatus {
 }
 
 /** @format int32 */
-export enum DbType {
-  /** MySql */
-  MySql = 0,
-  /** SqlServer */
-  SqlServer = 1,
-  /** Sqlite */
-  Sqlite = 2,
-  /** Oracle */
-  Oracle = 3,
-  /** PostgreSQL */
-  PostgreSQL = 4,
-  /** Dm */
-  Dm = 5,
-  /** Kdbndp */
-  Kdbndp = 6,
-  /** Oscar */
-  Oscar = 7,
-  /** MySqlConnector */
-  MySqlConnector = 8,
-  /** Access */
-  Access = 9,
-  /** OpenGauss */
-  OpenGauss = 10,
-  /** QuestDB */
-  QuestDB = 11,
-  /** HG */
-  HG = 12,
-  /** ClickHouse */
-  ClickHouse = 13,
-  /** GBase */
-  GBase = 14,
-  /** Odbc */
-  Odbc = 15,
-  /** OceanBaseForOracle */
-  OceanBaseForOracle = 16,
-  /** TDengine */
-  TDengine = 17,
-  /** GaussDB */
-  GaussDB = 18,
-  /** OceanBase */
-  OceanBase = 19,
-  /** Tidb */
-  Tidb = 20,
-  /** Vastbase */
-  Vastbase = 21,
-  /** PolarDB */
-  PolarDB = 22,
-  /** Doris */
-  Doris = 23,
-  /** Xugu */
-  Xugu = 24,
-  /** GoldenDB */
-  GoldenDB = 25,
-  /** TDSQLForPGODBC */
-  TDSQLForPGODBC = 26,
-  /** TDSQLForOracleODBC */
-  TDSQLForOracleODBC = 27,
-  /** TDSQL */
-  TDSQL = 28,
-  /** HANA */
-  HANA = 29,
-  /** DB2 */
-  DB2 = 30,
-  /** GaussDBNative */
-  GaussDBNative = 31,
-  /** DuckDB */
-  DuckDB = 32,
-  /** MongoDb */
-  MongoDb = 33,
-  /** Custom */
-  Custom = 900,
-}
-
-/** @format int32 */
-export enum CultureLevelEnum {
-  /** 其他 */
-  Level0 = 0,
-  /** 小学 */
-  Level1 = 1,
-  /** 初中 */
-  Level2 = 2,
-  /** 普通高中 */
-  Level3 = 3,
-  /** 技工学校 */
-  Level4 = 4,
-  /** 职业教育 */
-  Level5 = 5,
-  /** 职业高中 */
-  Level6 = 6,
-  /** 中等专科 */
-  Level7 = 7,
-  /** 大学专科 */
-  Level8 = 8,
-  /** 大学本科 */
-  Level9 = 9,
-  /** 硕士研究生 */
-  Level10 = 10,
-  /** 博士研究生 */
-  Level11 = 11,
-}
-
-/** @format int32 */
 export enum ChannelTypeEnum {
   /** 官方 */
   Official = 1,
@@ -229,22 +111,6 @@ export enum ChannelScopeEnum {
   System = 1,
   /** 租户 */
   Tenant = 2,
-}
-
-/** @format int32 */
-export enum CardTypeEnum {
-  /** 身份证 */
-  IdCard = 0,
-  /** 护照 */
-  PassportCard = 1,
-  /** 出生证 */
-  BirthCard = 2,
-  /** 港澳台通行证 */
-  GatCard = 3,
-  /** 外国人居留证 */
-  ForeignCard = 4,
-  /** 营业执照 */
-  License = 5,
 }
 
 /** @format int32 */
@@ -309,7 +175,6 @@ export interface BaseIdRequest {
 
 export interface BaseSelectPageRequest {
   searchKey?: string | null;
-  appId?: string | null;
   /**
    * @format int32
    * @min 1
@@ -445,8 +310,6 @@ export interface GlobalDictionaryDataEntity {
   rowVersion?: string | null;
   /** 是否启用,true:启用，false:禁用，null:未设置(启用) */
   isEnabled?: boolean | null;
-  /** 租户Id */
-  tenantId?: string | null;
   dictionaryTypeId?: string;
   dictionaryType?: GlobalDictionaryTypeEntity;
   value?: string | null;
@@ -555,8 +418,6 @@ export interface GlobalDictionaryTypeEntity {
   rowVersion?: string | null;
   /** 是否启用,true:启用，false:禁用，null:未设置(启用) */
   isEnabled?: boolean | null;
-  /** 租户Id */
-  tenantId?: string | null;
   name?: string | null;
   code?: string | null;
   /** @format int32 */
@@ -615,7 +476,6 @@ export interface LogOperationFields {
   rowVersion?: string | null;
   /** 是否启用,true:启用，false:禁用，null:未设置(启用) */
   isEnabled?: boolean | null;
-  /** 租户Id */
   tenantId?: string | null;
   controllerName?: string | null;
   actionName?: string | null;
@@ -720,12 +580,6 @@ export interface OnlineLiveOpsSourceDispatchRequest {
    * @max 9223372036854776000
    */
   businessKey: number;
-  /**
-   * 目标应用Id（页面应用作用域上下文提供）。
-   * @min 1
-   * @max 9223372036854776000
-   */
-  appId: string;
   /**
    * 目标区服Id（Online 命令按区服路由到对应 Runtime）。
    * @min 1
@@ -836,366 +690,6 @@ export interface PageLogRequest {
   endTime?: number | null;
 }
 
-/** 重置密码结果（平台用户与租户管理员重置共用） */
-export interface ResetPwdResponse {
-  /** 重置后的初始密码（取自系统密码配置；一次性明文返回，仅本次响应可见，禁止落日志/缓存） */
-  newPassword?: string | null;
-}
-
-export interface ResetPwdResponseHttpJsonResultData {
-  /** @format int32 */
-  code?: number;
-  message?: string | null;
-  /** 重置密码结果（平台用户与租户管理员重置共用） */
-  data?: ResetPwdResponse;
-  trackId?: string | null;
-  errorCode?: string | null;
-  type?: string | null;
-  /** @format int64 */
-  time?: number;
-  extras?: any | null;
-}
-
-export interface TenantOrganizationEntity {
-  /** 主键Id */
-  id: string;
-  /** 创建人Id */
-  createdId?: string | null;
-  /**
-   * 创建时间
-   * @format int64
-   */
-  createdTime?: number;
-  /**
-   * 创建人姓名
-   * @maxLength 512
-   */
-  createdName?: string | null;
-  /**
-   * 更新次数
-   * @format int32
-   */
-  updateCount?: number | null;
-  /**
-   * 更新时间
-   * @format int64
-   */
-  updateTime?: number | null;
-  /** 更新人Id */
-  updatedId?: string | null;
-  /**
-   * 更新人姓名
-   * @maxLength 512
-   */
-  updatedName?: string | null;
-  /** 软删除标记,true:删除,false:未删除,null:未设置(未删除) */
-  isDeleted?: boolean | null;
-  /**
-   * 删除时间
-   * @format int64
-   */
-  deleteTime?: number | null;
-  /** 删除人Id */
-  deletedId?: string | null;
-  /**
-   * 删除人姓名
-   * @maxLength 512
-   */
-  deletedName?: string | null;
-  /** 行版本号（用于乐观锁） */
-  rowVersion?: string | null;
-  /** 是否启用,true:启用，false:禁用，null:未设置(启用) */
-  isEnabled?: boolean | null;
-  /** 租户Id */
-  tenantId?: string | null;
-  pid?: string;
-  name?: string | null;
-  code?: string | null;
-  /** @format int32 */
-  level?: number | null;
-  type?: string | null;
-  directorId?: string | null;
-  director?: TenantUserEntity;
-  /** @format int32 */
-  orderNo?: number;
-  remark?: string | null;
-  children?: TenantOrganizationEntity[] | null;
-  disabled?: boolean;
-}
-
-export interface TenantPositionEntity {
-  /** 主键Id */
-  id: string;
-  /** 创建人Id */
-  createdId?: string | null;
-  /**
-   * 创建时间
-   * @format int64
-   */
-  createdTime?: number;
-  /**
-   * 创建人姓名
-   * @maxLength 512
-   */
-  createdName?: string | null;
-  /**
-   * 更新次数
-   * @format int32
-   */
-  updateCount?: number | null;
-  /**
-   * 更新时间
-   * @format int64
-   */
-  updateTime?: number | null;
-  /** 更新人Id */
-  updatedId?: string | null;
-  /**
-   * 更新人姓名
-   * @maxLength 512
-   */
-  updatedName?: string | null;
-  /** 软删除标记,true:删除,false:未删除,null:未设置(未删除) */
-  isDeleted?: boolean | null;
-  /**
-   * 删除时间
-   * @format int64
-   */
-  deleteTime?: number | null;
-  /** 删除人Id */
-  deletedId?: string | null;
-  /**
-   * 删除人姓名
-   * @maxLength 512
-   */
-  deletedName?: string | null;
-  /** 行版本号（用于乐观锁） */
-  rowVersion?: string | null;
-  /** 是否启用,true:启用，false:禁用，null:未设置(启用) */
-  isEnabled?: boolean | null;
-  /** 租户Id */
-  tenantId?: string | null;
-  name?: string | null;
-  code?: string | null;
-  /** @format int32 */
-  orderNo?: number;
-  remark?: string | null;
-}
-
-export interface TenantUserEntity {
-  /** 主键Id */
-  id: string;
-  /** 创建人Id */
-  createdId?: string | null;
-  /**
-   * 创建时间
-   * @format int64
-   */
-  createdTime?: number;
-  /**
-   * 创建人姓名
-   * @maxLength 512
-   */
-  createdName?: string | null;
-  /**
-   * 更新次数
-   * @format int32
-   */
-  updateCount?: number | null;
-  /**
-   * 更新时间
-   * @format int64
-   */
-  updateTime?: number | null;
-  /** 更新人Id */
-  updatedId?: string | null;
-  /**
-   * 更新人姓名
-   * @maxLength 512
-   */
-  updatedName?: string | null;
-  /** 软删除标记,true:删除,false:未删除,null:未设置(未删除) */
-  isDeleted?: boolean | null;
-  /**
-   * 删除时间
-   * @format int64
-   */
-  deleteTime?: number | null;
-  /** 删除人Id */
-  deletedId?: string | null;
-  /**
-   * 删除人姓名
-   * @maxLength 512
-   */
-  deletedName?: string | null;
-  /** 行版本号（用于乐观锁） */
-  rowVersion?: string | null;
-  /** 是否启用,true:启用，false:禁用，null:未设置(启用) */
-  isEnabled?: boolean | null;
-  /** 租户Id */
-  tenantId?: string | null;
-  account?: string | null;
-  realName?: string | null;
-  nickName?: string | null;
-  avatar?: string | null;
-  sex?: GenderEnum;
-  /** @format int32 */
-  age?: number;
-  /** @format int64 */
-  birthdayTime?: number | null;
-  nation?: string | null;
-  phone?: string | null;
-  cardType?: CardTypeEnum;
-  idCardNum?: string | null;
-  email?: string | null;
-  address?: string | null;
-  cultureLevel?: CultureLevelEnum;
-  politicalOutlook?: string | null;
-  college?: string | null;
-  officePhone?: string | null;
-  emergencyContact?: string | null;
-  emergencyPhone?: string | null;
-  emergencyAddress?: string | null;
-  introduction?: string | null;
-  /** @format int32 */
-  orderNo?: number;
-  remark?: string | null;
-  accountType?: AccountTypeEnum;
-  organizationId?: string;
-  tenantOrganizationEntity?: TenantOrganizationEntity;
-  managerUserId?: string | null;
-  managerUser?: TenantUserEntity;
-  posId?: string;
-  tenantPositionEntity?: TenantPositionEntity;
-  jobNum?: string | null;
-  posLevel?: string | null;
-  posTitle?: string | null;
-  expertise?: string | null;
-  officeZone?: string | null;
-  office?: string | null;
-  /** @format int64 */
-  joinTime?: number | null;
-  lastLoginIp?: string | null;
-  lastLoginAddress?: string | null;
-  /** @format int64 */
-  lastLoginTime?: number | null;
-  lastLoginDevice?: string | null;
-  signature?: string | null;
-}
-
-/** 租户用户输出参数 */
-export interface TenantUserResponse {
-  /** Id */
-  id?: string;
-  /** 账号 */
-  account?: string | null;
-  /** 真实姓名 */
-  realName?: string | null;
-  /** 昵称 */
-  nickName?: string | null;
-  /** 头像 */
-  avatar?: string | null;
-  sex?: GenderEnum;
-  /**
-   * 年龄
-   * @format int32
-   */
-  age?: number;
-  /**
-   * 出生日期
-   * @format int64
-   */
-  birthdayTime?: number | null;
-  /** 民族 */
-  nation?: string | null;
-  /** 手机号码 */
-  phone?: string | null;
-  cardType?: CardTypeEnum;
-  /** 身份证号 */
-  idCardNum?: string | null;
-  /** 邮箱 */
-  email?: string | null;
-  /** 地址 */
-  address?: string | null;
-  cultureLevel?: CultureLevelEnum;
-  /** 政治面貌 */
-  politicalOutlook?: string | null;
-  /** 毕业院校 */
-  college?: string | null;
-  /** 办公电话 */
-  officePhone?: string | null;
-  /** 紧急联系人 */
-  emergencyContact?: string | null;
-  /** 紧急联系人电话 */
-  emergencyPhone?: string | null;
-  /** 紧急联系人地址 */
-  emergencyAddress?: string | null;
-  /** 个人简介 */
-  introduction?: string | null;
-  /**
-   * 排序
-   * @format int32
-   */
-  orderNo?: number;
-  /** 备注 */
-  remark?: string | null;
-  accountType?: AccountTypeEnum;
-  /** 直属机构Id */
-  organizationId?: string;
-  /** 直属主管Id */
-  managerUserId?: string | null;
-  /** 职位Id */
-  posId?: string;
-  /** 工号 */
-  jobNum?: string | null;
-  /** 职级 */
-  posLevel?: string | null;
-  /** 职称 */
-  posTitle?: string | null;
-  /** 擅长领域 */
-  expertise?: string | null;
-  /** 办公区域 */
-  officeZone?: string | null;
-  /** 办公室 */
-  office?: string | null;
-  /**
-   * 入职日期
-   * @format int64
-   */
-  joinTime?: number | null;
-  /** 最新登录Ip */
-  lastLoginIp?: string | null;
-  /** 最新登录地点 */
-  lastLoginAddress?: string | null;
-  /**
-   * 最新登录时间
-   * @format int64
-   */
-  lastLoginTime?: number | null;
-  /** 最新登录设备 */
-  lastLoginDevice?: string | null;
-  /** 电子签名 */
-  signature?: string | null;
-  /** 是否启用 */
-  isEnabled?: boolean | null;
-  /**
-   * 创建时间
-   * @format int64
-   */
-  createdTime?: number;
-  /** 创建人 */
-  createdName?: string | null;
-  /**
-   * 更新时间
-   * @format int64
-   */
-  updateTime?: number | null;
-  /** 更新人 */
-  updatedName?: string | null;
-  /** 行版本号（乐观锁） */
-  rowVersion?: string | null;
-}
-
 /** 渠道更新输入参数 */
 export interface UpdateChannelDefinitionRequest {
   /**
@@ -1230,17 +724,69 @@ export interface UpdateChannelDefinitionRequest {
   isEnabled?: boolean | null;
 }
 
+export * from "../advertisementCallbackConfig/types";
+export * from "../appSignatureKey/types";
+export * from "../channelDefinition/types";
+export * from "../clientApiPolicy/types";
+export * from "../deviceGroup/types";
+export * from "../gameAdvertisementReward/types";
+export * from "../gameAnnouncement/types";
+export * from "../gameAntiCheatEvent/types";
+export * from "../gameAppAssetPackage/types";
+export * from "../gameAppAssetPackageVersion/types";
+export * from "../gameAppAssetPackageVersionHistory/types";
+export * from "../gameAppDevice/types";
+export * from "../gameAppFeatureSwitch/types";
+export * from "../gameAppOpenAccess/types";
+export * from "../gameAppPackage/types";
+export * from "../gameAppReleaseVersion/types";
+export * from "../gameAppRemoteConfig/types";
+export * from "../gameAppRemoteConfigKey/types";
+export * from "../gameAppRemoteConfigMode/types";
+export * from "../gameAppServerConfig/types";
+export * from "../gameAppVersionDefinition/types";
+export * from "../gameArea/types";
+export * from "../gameAreaClassify/types";
+export * from "../gameBannerAnnouncement/types";
+export * from "../gameCommodity/types";
+export * from "../gameDockerTag/types";
+export * from "../gameGoods/types";
+export * from "../gameGoodsCatalogue/types";
+export * from "../gameHome/types";
+export * from "../gameLoginTicketKey/types";
+export * from "../gameMail/types";
+export * from "../gameMailCampaign/types";
+export * from "../gameMailTemplate/types";
+export * from "../gameMailTemplateCategory/types";
+export * from "../gameOnlineConfigRollout/types";
+export * from "../gameOnlinePlayerSegment/types";
+export * from "../gameOrder/types";
+export * from "../gameOrderFulfillment/types";
+export * from "../gamePaymentConfig/types";
+export * from "../gamePenalty/types";
+export * from "../gamePenaltyAppeal/types";
+export * from "../gameRedeemCode/types";
+export * from "../gameRedeemCodeChannel/types";
+export * from "../gameRedeemCodeUseRecord/types";
+export * from "../gameReport/types";
+export * from "../gameRewardTemplate/types";
+export * from "../gameRewardTemplateGroup/types";
+export * from "../gameRole/types";
+export * from "../gameTimeJob/types";
+export * from "../gameUser/types";
+export * from "../gameWebShop/types";
+export * from "../gameWebShopOrder/types";
 export * from "../globalChannelDefinition/types";
 export * from "../globalDictionaryData/types";
 export * from "../globalDictionaryType/types";
 export * from "../globalLanguage/types";
 export * from "../globalMenu/types";
-export * from "../globalPackage/types";
 export * from "../globalPlatform/types";
 export * from "../logDiff/types";
 export * from "../logException/types";
 export * from "../logOperation/types";
 export * from "../logVisit/types";
+export * from "../objectStorageConfig/types";
 export * from "../onlineAssetAuditQuery/types";
 export * from "../onlineAssetGrantCommand/types";
 export * from "../onlineAssetLedgerQuery/types";
@@ -1260,7 +806,9 @@ export * from "../platformJwtConfig/types";
 export * from "../platformLoggingConfig/types";
 export * from "../platformPasswordPolicyConfig/types";
 export * from "../platformRateLimitConfig/types";
+export * from "../sessionKey/types";
 export * from "../systemAuth/types";
+export * from "../systemCache/types";
 export * from "../systemConfig/types";
 export * from "../systemConst/types";
 export * from "../systemDatabase/types";
@@ -1269,66 +817,6 @@ export * from "../systemEnum/types";
 export * from "../systemJob/types";
 export * from "../systemMessage/types";
 export * from "../systemOpenAccess/types";
-export * from "../systemTenant/types";
-export * from "../tenantAdvertisementCallbackConfigEntity/types";
-export * from "../tenantAppSignatureKeyEntity/types";
-export * from "../tenantChannelDefinition/types";
-export * from "../tenantClientApiPolicyEntity/types";
-export * from "../tenantDeviceGroup/types";
 export * from "../tenantFile/types";
-export * from "../tenantGameAdvertisementRewardEntity/types";
-export * from "../tenantGameAnnouncementEntity/types";
-export * from "../tenantGameAntiCheatEventEntity/types";
-export * from "../tenantGameAppAssetPackage/types";
-export * from "../tenantGameAppAssetPackageVersion/types";
-export * from "../tenantGameAppAssetPackageVersionHistory/types";
-export * from "../tenantGameAppDevice/types";
-export * from "../tenantGameAppEntity/types";
-export * from "../tenantGameAppFeatureSwitch/types";
-export * from "../tenantGameAppOpenAccess/types";
-export * from "../tenantGameAppPackage/types";
-export * from "../tenantGameAppReleaseVersion/types";
-export * from "../tenantGameAppRemoteConfig/types";
-export * from "../tenantGameAppRemoteConfigKey/types";
-export * from "../tenantGameAppRemoteConfigMode/types";
-export * from "../tenantGameAppServerConfig/types";
-export * from "../tenantGameAppVersionDefinition/types";
-export * from "../tenantGameAreaClassifyEntity/types";
-export * from "../tenantGameAreaEntity/types";
-export * from "../tenantGameBannerAnnouncementEntity/types";
-export * from "../tenantGameCommodityEntity/types";
-export * from "../tenantGameDockerTagEntity/types";
-export * from "../tenantGameGoodsCatalogueEntity/types";
-export * from "../tenantGameGoodsEntity/types";
-export * from "../tenantGameHomeEntity/types";
-export * from "../tenantGameLoginTicketKeyEntity/types";
-export * from "../tenantGameMailCampaignEntity/types";
-export * from "../tenantGameMailEntity/types";
-export * from "../tenantGameMailTemplateCategoryEntity/types";
-export * from "../tenantGameMailTemplateEntity/types";
-export * from "../tenantGameOnlineConfigRollout/types";
-export * from "../tenantGameOnlinePlayerSegment/types";
-export * from "../tenantGameOrderEntity/types";
-export * from "../tenantGameOrderFulfillmentEntity/types";
-export * from "../tenantGamePaymentConfigEntity/types";
-export * from "../tenantGamePenaltyAppealEntity/types";
-export * from "../tenantGamePenaltyEntity/types";
-export * from "../tenantGameRedeemCodeChannelEntity/types";
-export * from "../tenantGameRedeemCodeEntity/types";
-export * from "../tenantGameRedeemCodeUseRecordEntity/types";
-export * from "../tenantGameReportEntity/types";
-export * from "../tenantGameRewardTemplateEntity/types";
-export * from "../tenantGameRewardTemplateGroupEntity/types";
-export * from "../tenantGameRoleEntity/types";
-export * from "../tenantGameTimeJobEntity/types";
-export * from "../tenantGameUserEntity/types";
-export * from "../tenantGameWebShopEntity/types";
-export * from "../tenantGameWebShopOrderEntity/types";
-export * from "../tenantMenuSync/types";
-export * from "../tenantNotice/types";
-export * from "../tenantObjectStorageConfigEntity/types";
-export * from "../tenantOrganization/types";
-export * from "../tenantPosition/types";
 export * from "../tenantRole/types";
-export * from "../tenantSessionKeyEntity/types";
 export * from "../tenantUser/types";

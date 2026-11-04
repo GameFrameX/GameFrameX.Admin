@@ -65,10 +65,10 @@ import {usePrimeTablePage} from '../../../../../composables'
 import {useCurrentApp} from '../../../../../composables/useCurrentApp.ts'
 import editDialog from '/@/views/app/contentCenter/mail/gameMailEntity/component/EditDialog.vue'
 import infoDrawer from '/@/views/app/contentCenter/mail/gameMailEntity/component/InfoDrawer.vue'
-import { tenantGameMailEntityPagePost, tenantGameMailEntityDeletePost, tenantGameMailEntitySendPost } from '../../../../../api/tenantGameMailEntity'
+import { gameMailPagePost, gameMailDeletePost, gameMailSendPost } from '../../../../../api/gameMail'
 import {systemEnumEnumDataListGet} from '../../../../../api/systemEnum';
 import commonFunction from '../../../../../utils/commonFunction.ts'
-import { tenantGameAreaEntitySelectStringPost } from '../../../../../api/tenantGameAreaEntity'
+import { gameAreaSelectStringPost } from '../../../../../api/gameArea'
 import {MAX_SELECT_SIZE} from '../../../../../constants/pagination.ts'
 
 const route = useRoute()
@@ -96,7 +96,7 @@ const getAreaName = (areaId: number) => {
   return areaId
 }
 const getAreaList = async (appId?: number) => {
-  const res = await tenantGameAreaEntitySelectStringPost({appId: appId, pageSize: MAX_SELECT_SIZE})
+  const res = await gameAreaSelectStringPost({appId: appId, pageSize: MAX_SELECT_SIZE})
   areaList.value = res.data.data ?? []
 }
 
@@ -114,7 +114,7 @@ const {
   onQuery,
   onDelete
 } = useCrudTable({
-  api: {pageApi: tenantGameMailEntityPagePost, deleteApi: tenantGameMailEntityDeletePost},
+  api: {pageApi: gameMailPagePost, deleteApi: gameMailDeletePost},
   immediate: true,
 })
 
@@ -150,7 +150,7 @@ const getGameMailEntity = (row: any) => {
 const onSendGameMailEntity = async (row: any) => {
   const confirmed = await showConfirm(t('message.gameBusiness.mail.confirmSendMail'), t('message.common.message.tip'))
   if (!confirmed) return
-  await tenantGameMailEntitySendPost(row)
+  await gameMailSendPost(row)
   onQuery()
   showSuccess(t('message.common.message.success'))
 }

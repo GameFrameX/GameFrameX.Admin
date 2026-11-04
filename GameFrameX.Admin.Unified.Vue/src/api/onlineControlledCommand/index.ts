@@ -28,7 +28,7 @@ export class OnlineControlledCommand<SecurityDataType = unknown> {
    *
    * @tags onlineControlledCommand
    * @name OnlineControlledCommandExecutePost
-   * @summary 执行受控操作命令（高危端点）：四值命令路由 + 目标/方向校验 + 双人复核字段必填。 幂等语义（vault:C9 VC-8.4 / vault:C2 S1.5）：每次调用按 M:GameFrameX.Application.Game.Online.Console.OnlineControlledCommandService.BuildIdempotencyKey(System.String,System.Nullable{GameFrameX.Application.Game.Online.Console.Dto.ControlledCommandDirection},System.String,System.Int64) 规则派生 Online IdempotencyKey 下发——同一（命令, 方向, 目标, 区服） 组合的重复调用携带相同幂等键，Online 侧按契约返回首次执行结果，不产生第二次副作用； 因此网络重试 / 运营重复点击天然安全，失败可直接重试。
+   * @summary 执行受控操作命令（高危端点）：四值命令路由 + 目标/方向校验 + 双人复核字段必填。 幂等语义（vault:C9 VC-8.4 / vault:C2 S1.5）：每次调用按 M:GameFrameX.Application.GmCenter.Console.OnlineControlledCommandService.BuildIdempotencyKey(System.String,System.Nullable{GameFrameX.Application.GmCenter.Console.Dto.ControlledCommandDirection},System.String,System.Int64) 规则派生 Online IdempotencyKey 下发——同一（命令, 方向, 目标, 区服） 组合的重复调用携带相同幂等键，Online 侧按契约返回首次执行结果，不产生第二次副作用； 因此网络重试 / 运营重复点击天然安全，失败可直接重试。
    * @request POST:/api/onlineControlledCommand/execute
    */
   onlineControlledCommandExecutePost = (

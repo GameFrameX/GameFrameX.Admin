@@ -20,7 +20,7 @@ import Dialog from 'primevue/dialog'
 import Button from 'primevue/button'
 import DatePicker from 'primevue/datepicker'
 import InputText from 'primevue/inputtext'
-import { tenantAppSignatureKeyEntityRenewPost } from '../../../../../api/tenantAppSignatureKeyEntity'
+import { appSignatureKeyRenewPost } from '../../../../../api/appSignatureKey'
 
 const emit = defineEmits(['renewed'])
 
@@ -38,7 +38,7 @@ const open = (row: any) => {
 
 const confirm = async () => {
   const expireTimeLong = expireTime.value ? Math.floor(new Date(expireTime.value).getTime() / 1000) : null
-  await tenantAppSignatureKeyEntityRenewPost({ id: id.value, expireTime: expireTimeLong })
+  await appSignatureKeyRenewPost({ id: id.value, expireTime: expireTimeLong })
   visible.value = false
   emit('renewed')
 }

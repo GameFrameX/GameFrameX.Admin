@@ -114,13 +114,13 @@ import { formatUnix } from '../../../../utils/formatTime.ts'
 import { createAction } from '../../../../components/crud-data-table'
 import {parseRewardItems} from '../../../../components/reward-items-editor/rewardItems.ts'
 import editDialog from '/@/views/app/playerCenter/gameOrderEntity/component/EditDialog.vue'
-import { tenantGameOrderEntityPagePost, tenantGameOrderEntitySendPost, tenantGameOrderEntitySummaryPost } from '../../../../api/tenantGameOrderEntity'
+import { gameOrderPagePost, gameOrderSendPost, gameOrderSummaryPost } from '../../../../api/gameOrder'
 import { systemEnumEnumDataListGet } from '../../../../api/systemEnum';
 import commonFunction from '../../../../utils/commonFunction.ts'
-import { tenantGameAreaEntitySelectStringPost } from '../../../../api/tenantGameAreaEntity'
+import { gameAreaSelectStringPost } from '../../../../api/gameArea'
 import {MAX_SELECT_SIZE} from '../../../../constants/pagination.ts'
 import { globalPlatformSelectPost } from '../../../../api/globalPlatform'
-import { tenantChannelDefinitionAvailableGet } from '../../../../api/tenantChannelDefinition'
+import { channelDefinitionAvailableGet } from '../../../../api/channelDefinition'
 import { useCrudTable } from '../../../../composables/useCrudTable.ts'
 import { usePrimeTablePage } from '../../../../composables'
 import { useCurrentApp } from '../../../../composables/useCurrentApp.ts'
@@ -176,7 +176,7 @@ const {
   onReset
 } = useCrudTable({
   api: {
-    pageApi: (params) => tenantGameOrderEntityPagePost(params),
+    pageApi: (params) => gameOrderPagePost(params),
   },
   immediate: false,
 })
@@ -197,7 +197,7 @@ const summaryData = ref<any>({
 const fetchSummary = async () => {
   try {
     const params = Object.assign({}, queryParams.value, tableParams.value)
-    const res = await tenantGameOrderEntitySummaryPost(params)
+    const res = await gameOrderSummaryPost(params)
     summaryData.value = res.data?.data ?? summaryData.value
   } catch {
     // Non-critical
@@ -228,7 +228,7 @@ const onQuery = async () => {
 const onSendGameOrderEntity = async (row: any) => {
   const confirmed = await showConfirm(t('message.gameBusiness.order.confirmDelivery'), t('message.common.message.tip'))
   if (!confirmed) return
-  await tenantGameOrderEntitySendPost(row)
+  await gameOrderSendPost(row)
   onQuery()
   showSuccess(t('message.common.message.success'))
 }
@@ -285,7 +285,7 @@ const getAreaName = (areaId: number) => {
 }
 
 const loadAreaList = async (appId?: number) => {
-  const res = await tenantGameAreaEntitySelectStringPost({ appId: appId, pageSize: MAX_SELECT_SIZE })
+  const res = await gameAreaSelectStringPost({ appId: appId, pageSize: MAX_SELECT_SIZE })
   areaList.value = res.data.data ?? []
 }
 
@@ -299,7 +299,7 @@ watch(() => queryParams.value.appId, (newVal) => {
   queryParams.value.areaId = undefined
   loadAreaList(newVal)
   // channel/platform are tenant/global scope; reload dropdown candidates for consistency
-  tenantChannelDefinitionAvailableGet({pageSize: MAX_SELECT_SIZE}).then((res: any) => {
+  channelDefinitionAvailableGet({pageSize: MAX_SELECT_SIZE}).then((res: any) => {
     getEnumChannelData.value = mapAvailableChannelDefinitions((res.data.data || []), 'code')
   })
 })
@@ -312,7 +312,7 @@ watch(() => route.query.appId, async () => {
 
 onMounted(async () => {
   await loadAreaList(queryParams.value.appId)
-  getEnumChannelData.value = mapAvailableChannelDefinitions((await tenantChannelDefinitionAvailableGet({pageSize: MAX_SELECT_SIZE})).data.data || [], 'code')
+  getEnumChannelData.value = mapAvailableChannelDefinitions((await channelDefinitionAvailableGet({pageSize: MAX_SELECT_SIZE})).data.data || [], 'code')
   getEnumPlatformData.value = (await globalPlatformSelectPost({pageSize: MAX_SELECT_SIZE})).data.data ?? []
   onQuery()
 })

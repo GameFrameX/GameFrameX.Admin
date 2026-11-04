@@ -1,7 +1,7 @@
 <template>
   <BaseEditDialog ref="dialogRef" :title="props.title"
-    :addApi="tenantGamePenaltyAppealEntityAddPost"
-    :updateApi="tenantGamePenaltyAppealEntityAddPost"
+    :addApi="gamePenaltyAppealAddPost"
+    :updateApi="gamePenaltyAppealAddPost"
     :rules="rules"
     :beforeSubmit="beforeSubmit"
     scrollable @reloadTable="emit('reloadTable')">
@@ -29,7 +29,7 @@ import InputNumber from 'primevue/inputnumber'
 import Textarea from 'primevue/textarea'
 import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import {TextareaField} from '../../../../../components/crud-form-fields'
-import { tenantGamePenaltyAppealEntityAddPost } from '../../../../../api/tenantGamePenaltyAppealEntity'
+import { gamePenaltyAppealAddPost } from '../../../../../api/gamePenaltyAppeal'
 
 const props = defineProps({
   title: { type: String, default: '' },

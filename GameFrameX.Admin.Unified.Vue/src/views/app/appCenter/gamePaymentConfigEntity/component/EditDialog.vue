@@ -5,8 +5,8 @@
     width="min(860px, calc(100vw - 32px))"
     scrollable
     :defaultForm="defaultForm"
-    :addApi="tenantGamePaymentConfigEntityAddPost"
-    :updateApi="tenantGamePaymentConfigEntityUpdatePost"
+    :addApi="gamePaymentConfigAddPost"
+    :updateApi="gamePaymentConfigUpdatePost"
     :rules="rules"
     :beforeOpen="beforeOpen"
     :beforeSubmit="beforeSubmit"
@@ -120,7 +120,7 @@ import Message from 'primevue/message'
 import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import {TextareaField} from '../../../../../components/crud-form-fields'
 import {showError} from '../../../../../utils/message.ts'
-import { tenantGamePaymentConfigEntityAddPost, tenantGamePaymentConfigEntityChannelsGet, tenantGamePaymentConfigEntitySchemaGet, tenantGamePaymentConfigEntityUpdatePost } from '../../../../../api/tenantGamePaymentConfigEntity'
+import { gamePaymentConfigAddPost, gamePaymentConfigChannelsGet, gamePaymentConfigSchemaGet, gamePaymentConfigUpdatePost } from '../../../../../api/gamePaymentConfig'
 import {normalizeAppId} from '../../../../../utils/appWorkspace.ts'
 
 interface PaymentFieldOption {
@@ -227,7 +227,7 @@ const loadSchema = async (channel: string): Promise<PaymentSchema | null> => {
     return null
   }
   try {
-    const res: any = await tenantGamePaymentConfigEntitySchemaGet({payChannel: normalized})
+    const res: any = await gamePaymentConfigSchemaGet({payChannel: normalized})
     const data = res.data.data
     schema.value = data ?? null
     return data ?? null
@@ -325,7 +325,7 @@ const beforeSubmit = (form: any) => {
 
 onMounted(async () => {
   try {
-    const res: any = await tenantGamePaymentConfigEntityChannelsGet()
+    const res: any = await gamePaymentConfigChannelsGet()
     const list = res.data?.data ?? []
     channelOptions.value = (list || []).map((item: any) => ({value: item.value, label: item.label}))
   } catch {

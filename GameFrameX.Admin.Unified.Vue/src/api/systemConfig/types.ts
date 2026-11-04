@@ -70,8 +70,6 @@ export interface AddConfigRequest {
   rowVersion?: string | null;
   /** 是否启用,true:启用，false:禁用，null:未设置(启用) */
   isEnabled?: boolean | null;
-  /** 租户Id */
-  tenantId?: string | null;
   name?: string | null;
   code?: string | null;
   value?: string | null;
@@ -218,8 +216,6 @@ export interface UpdateConfigRequest {
   rowVersion?: string | null;
   /** 是否启用,true:启用，false:禁用，null:未设置(启用) */
   isEnabled?: boolean | null;
-  /** 租户Id */
-  tenantId?: string | null;
   name?: string | null;
   code?: string | null;
   value?: string | null;

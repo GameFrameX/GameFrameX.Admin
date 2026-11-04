@@ -7,7 +7,7 @@
             :fields="searchFields"
             :defaultSearchKey="false"
             :showAdd="false"
-            authPrefix="tenantGameLoginTicketKeyEntity"
+            authPrefix="gameLoginTicketKey"
             @query="onQuery"
         />
       </template>
@@ -17,7 +17,7 @@
         <CrudDataTable :value="tableData" v-block-loading="loading" showGridlines stripedRows rowKey="id"
                        :totalRecords="tableParams.total" :rows="tableParams.pageSize"
                        :rowsPerPageOptions="[10, 20, 50, 100]"
-                       authPrefix="tenantGameLoginTicketKeyEntity"
+                       authPrefix="gameLoginTicketKey"
                        :customActions="customActions"
                        actionColumnWidth="230px"
                        showIdColumn
@@ -60,7 +60,7 @@ import type {CrudColumnConfig} from '../../../../components/crud-data-table/type
 import {useCrudTable} from '../../../../composables/useCrudTable.ts'
 import {usePrimeTablePage} from '../../../../composables'
 import {formatUnix} from '../../../../utils/formatTime.ts'
-import { tenantGameLoginTicketKeyEntityPagePost, tenantGameLoginTicketKeyEntityRotatePost, tenantGameLoginTicketKeyEntityEnablePost, tenantGameLoginTicketKeyEntityDisablePost } from '../../../../api/tenantGameLoginTicketKeyEntity'
+import { gameLoginTicketKeyPagePost, gameLoginTicketKeyRotatePost, gameLoginTicketKeyEnablePost, gameLoginTicketKeyDisablePost } from '../../../../api/gameLoginTicketKey'
 import rotateDialog from './component/RotateDialog.vue'
 
 const searchFields = computed(() => [])
@@ -73,7 +73,7 @@ const {
   onQuery,
 } = useCrudTable({
   api: {
-    pageApi: tenantGameLoginTicketKeyEntityPagePost,
+    pageApi: gameLoginTicketKeyPagePost,
   },
   immediate: true,
 })
@@ -87,13 +87,13 @@ const onRotateSubmit = async (payload: { appId: number, expireTime: number | nul
   if (!confirmed) {
     return
   }
-  await tenantGameLoginTicketKeyEntityRotatePost({appId: payload.appId, expireTime: payload.expireTime})
+  await gameLoginTicketKeyRotatePost({appId: payload.appId, expireTime: payload.expireTime})
   onQuery()
   showSuccess('签名密钥已轮换')
 }
 
 const onEnable = async (row: any) => {
-  await tenantGameLoginTicketKeyEntityEnablePost({id: row.id})
+  await gameLoginTicketKeyEnablePost({id: row.id})
   onQuery()
   showSuccess('已启用')
 }
@@ -103,7 +103,7 @@ const onDisable = async (row: any) => {
   if (!confirmed) {
     return
   }
-  await tenantGameLoginTicketKeyEntityDisablePost({id: row.id})
+  await gameLoginTicketKeyDisablePost({id: row.id})
   onQuery()
   showSuccess('已禁用')
 }

@@ -46,7 +46,7 @@ import Message from 'primevue/message'
 import {buildFormResolver} from '../../../../../utils/formResolver.ts'
 import {useRequiredFields} from '../../../../../composables/useRequiredFields.ts'
 import type {FormRules} from '../../../../../composables/types/crud.ts'
-import { tenantGameUserEntityAddByMailPost } from '../../../../../api/tenantGameUserEntity'
+import { gameUserAddByMailPost } from '../../../../../api/gameUser'
 import {systemEnumEnumDataListGet} from '../../../../../api/systemEnum';
 
 const getEnumStatusData = ref<any>([])
@@ -81,7 +81,7 @@ const resolver = buildFormResolver(rules)
 
 const onFormSubmit = async ({valid}: { valid: boolean }) => {
   if (!valid) return
-  await tenantGameUserEntityAddByMailPost(ruleForm.value)
+  await gameUserAddByMailPost(ruleForm.value)
   closeDialog()
 }
 

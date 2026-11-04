@@ -1,5 +1,5 @@
 <template>
-  <BaseEditDialog ref="dialogRef" class="server-config-edit-dialog" :title="props.title" :addApi="tenantGameAppServerConfigAddPost" :updateApi="tenantGameAppServerConfigUpdatePost" :rules="rules" :beforeSubmit="beforeSubmit" scrollable @reloadTable="emit('reloadTable')">
+  <BaseEditDialog ref="dialogRef" class="server-config-edit-dialog" :title="props.title" :addApi="gameAppServerConfigAddPost" :updateApi="gameAppServerConfigUpdatePost" :rules="rules" :beforeSubmit="beforeSubmit" scrollable @reloadTable="emit('reloadTable')">
     <template #default="{ ruleForm, isEditor }">
       <div class="server-config-edit-dialog-content">
       <FormLabel name="appId">{{ t('message.gameBusiness.app.appId') }}</FormLabel>
@@ -38,7 +38,7 @@ import Textarea from 'primevue/textarea'
 import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import {TextField, TextareaField} from '../../../../../components/crud-form-fields'
 import {showError} from '../../../../../utils/message.ts'
-import { tenantGameAppServerConfigAddPost, tenantGameAppServerConfigUpdatePost } from '../../../../../api/tenantGameAppServerConfig'
+import { gameAppServerConfigAddPost, gameAppServerConfigUpdatePost } from '../../../../../api/gameAppServerConfig'
 import { tenantGameAppEntityListGet } from '../../../../../api/tenantGameAppEntity'
 import {normalizeAppId} from '../../../../../utils/appWorkspace.ts'
 

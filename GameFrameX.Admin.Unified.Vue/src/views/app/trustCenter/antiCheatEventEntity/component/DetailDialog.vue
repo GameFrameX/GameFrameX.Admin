@@ -36,7 +36,7 @@
 import {ref} from 'vue'
 import {useCurrentApp} from '../../../../../composables/useCurrentApp.ts'
 import {formatUnix} from '../../../../../utils/formatTime.ts'
-import { tenantGameAntiCheatEventEntityDetailGet } from '../../../../../api/tenantGameAntiCheatEventEntity'
+import { gameAntiCheatEventDetailGet } from '../../../../../api/gameAntiCheatEvent'
 import {
     ANTI_CHEAT_PROVIDER_OPTIONS,
     ANTI_CHEAT_SUGGESTED_ACTION_OPTIONS,
@@ -68,7 +68,7 @@ const open = async (id: number) => {
     loading.value = true
     detail.value = {}
     try {
-        const res = await tenantGameAntiCheatEventEntityDetailGet({id: id})
+        const res = await gameAntiCheatEventDetailGet({id: id})
         detail.value = res.data?.data ?? {}
     } finally {
         loading.value = false

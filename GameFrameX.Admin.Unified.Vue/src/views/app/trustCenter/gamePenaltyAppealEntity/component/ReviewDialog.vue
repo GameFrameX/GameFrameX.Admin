@@ -24,7 +24,7 @@ import Button from 'primevue/button'
 import Select from 'primevue/select'
 import Textarea from 'primevue/textarea'
 import FormLabel from '/@/components/form-label/index.vue'
-import { tenantGamePenaltyAppealEntityReviewPost } from '../../../../../api/tenantGamePenaltyAppealEntity'
+import { gamePenaltyAppealReviewPost } from '../../../../../api/gamePenaltyAppeal'
 import { showSuccess } from '../../../../../utils/message.ts'
 
 const emit = defineEmits(['reloadTable'])
@@ -55,7 +55,7 @@ const cancel = () => {
 const confirm = async () => {
   submitting.value = true
   try {
-    await tenantGamePenaltyAppealEntityReviewPost({
+    await gamePenaltyAppealReviewPost({
       id: row.value?.id,
       approve: approve.value,
       remark: remark.value?.trim() || undefined,

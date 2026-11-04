@@ -34,7 +34,7 @@ import {usePrimeTablePage, useRouteAppIdQuerySync} from '../../../../../composab
 import {useCurrentApp} from '../../../../../composables/useCurrentApp.ts'
 import {descriptionColumn, nameColumn} from '../../../../../utils/crudConfig.ts'
 import editDialog from '/@/views/app/appCenter/device/group/component/EditDialog.vue'
-import { tenantDeviceGroupPagePost, tenantDeviceGroupDeletePost } from '../../../../../api/tenantDeviceGroup'
+import { deviceGroupPagePost, deviceGroupDeletePost } from '../../../../../api/deviceGroup'
 
 const route = useRoute()
 const editDialogRef = ref()
@@ -48,7 +48,7 @@ const {
   loading, tableData, queryParams, tableParams,
   onQuery, onDelete,
 } = useCrudTable({
-  api: {pageApi: tenantDeviceGroupPagePost, deleteApi: tenantDeviceGroupDeletePost},
+  api: {pageApi: deviceGroupPagePost, deleteApi: deviceGroupDeletePost},
   immediate: false,
 })
 

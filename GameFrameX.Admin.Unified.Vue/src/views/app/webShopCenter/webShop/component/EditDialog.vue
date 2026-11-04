@@ -5,8 +5,8 @@
       width="min(860px, calc(100vw - 32px))"
       scrollable
       :defaultForm="defaultForm"
-      :addApi="tenantGameWebShopEntityAddPost"
-      :updateApi="tenantGameWebShopEntityUpdatePost"
+      :addApi="gameWebShopAddPost"
+      :updateApi="gameWebShopUpdatePost"
       :beforeOpen="beforeOpen"
       :beforeSubmit="beforeSubmit"
       @reloadTable="emit('reloadTable')"
@@ -87,8 +87,8 @@ import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import {TextField} from '../../../../../components/crud-form-fields'
 import {faTrash} from '../../../../../utils/icons.ts'
-import { tenantGameGoodsEntitySelectStringPost } from '../../../../../api/tenantGameGoodsEntity'
-import { tenantGameWebShopEntityAddPost, tenantGameWebShopEntityUpdatePost } from '../../../../../api/tenantGameWebShopEntity'
+import { gameGoodsSelectStringPost } from '../../../../../api/gameGoods'
+import { gameWebShopAddPost, gameWebShopUpdatePost } from '../../../../../api/gameWebShop'
 import {normalizeAppId} from '../../../../../utils/appWorkspace.ts'
 import {MAX_SELECT_SIZE} from '../../../../../constants/pagination.ts'
 
@@ -144,7 +144,7 @@ const beforeSubmit = (form: any) => {
 }
 
 const loadGoods = async (appId?: number) => {
-  getGoodsList.value = (await tenantGameGoodsEntitySelectStringPost({appId: appId, pageSize: MAX_SELECT_SIZE})).data.data ?? []
+  getGoodsList.value = (await gameGoodsSelectStringPost({appId: appId, pageSize: MAX_SELECT_SIZE})).data.data ?? []
 }
 
 const addOneItem = () => {

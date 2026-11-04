@@ -2,8 +2,8 @@
   <BaseEditDialog
     ref="dialogRef"
     :title="props.title"
-    :addApi="tenantGameAppAssetPackageAddPost"
-    :updateApi="tenantGameAppAssetPackageUpdatePost"
+    :addApi="gameAppAssetPackageAddPost"
+    :updateApi="gameAppAssetPackageUpdatePost"
     :rules="rules"
     :beforeOpen="beforeOpen"
     :beforeSubmit="beforeSubmit"
@@ -20,7 +20,7 @@
 import { ref } from 'vue'
 import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import {TextField} from '../../../../../../components/crud-form-fields'
-import { tenantGameAppAssetPackageAddPost, tenantGameAppAssetPackageUpdatePost } from '../../../../../../api/tenantGameAppAssetPackage'
+import { gameAppAssetPackageAddPost, gameAppAssetPackageUpdatePost } from '../../../../../../api/gameAppAssetPackage'
 import {normalizeAppId} from '../../../../../../utils/appWorkspace.ts'
 
 const props = defineProps({

@@ -74,7 +74,7 @@ import Button from 'primevue/button'
 import Card from 'primevue/card'
 import Select from 'primevue/select'
 import Tag from 'primevue/tag'
-import { tenantGameAppPackageListGet } from '../../../../api/tenantGameAppPackage'
+import { gameAppPackageListGet } from '../../../../api/gameAppPackage'
 import { useCurrentApp } from '../../../../composables/useCurrentApp.ts'
 import {
   APP_MANAGE_PATH,
@@ -118,7 +118,7 @@ const loadPackageSummary = async (appId: AppWorkspaceId | undefined) => {
   if (appId === undefined) {
     return
   }
-  const res = await tenantGameAppPackageListGet({ appId: appId })
+  const res = await gameAppPackageListGet({ appId: appId })
   const rows = (res.data?.data ?? []) as any[]
   packageTotal.value = rows.length
   packageEnabled.value = rows.filter((row) => row.isEnabled !== false).length

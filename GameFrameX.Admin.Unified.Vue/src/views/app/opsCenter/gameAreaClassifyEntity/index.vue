@@ -41,7 +41,7 @@ import {useCrudTable} from '../../../../composables/useCrudTable.ts'
 import {usePrimeTablePage, useRouteAppIdQuerySync} from '../../../../composables'
 import {useCurrentApp} from '../../../../composables/useCurrentApp.ts'
 import editDialog from '/@/views/app/opsCenter/gameAreaClassifyEntity/component/EditDialog.vue'
-import { tenantGameAreaClassifyEntityPagePost, tenantGameAreaClassifyEntityDeletePost } from '../../../../api/tenantGameAreaClassifyEntity'
+import { gameAreaClassifyPagePost, gameAreaClassifyDeletePost } from '../../../../api/gameAreaClassify'
 import {formatUnix} from '../../../../utils/formatTime.ts'
 import type {CrudColumnConfig} from '../../../../components/crud-data-table/types.ts'
 
@@ -64,8 +64,8 @@ const {
   onDelete,
 } = useCrudTable({
   api: {
-    pageApi: (params) => tenantGameAreaClassifyEntityPagePost(params),
-    deleteApi: (params) => tenantGameAreaClassifyEntityDeletePost(params),
+    pageApi: (params) => gameAreaClassifyPagePost(params),
+    deleteApi: (params) => gameAreaClassifyDeletePost(params),
   },
   immediate: true,
 })

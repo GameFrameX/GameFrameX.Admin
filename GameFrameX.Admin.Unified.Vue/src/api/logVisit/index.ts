@@ -31,7 +31,7 @@ export class LogVisit<SecurityDataType = unknown> {
    *
    * @tags logVisit
    * @name LogVisitClearPost
-   * @summary 清空日志。平台上下文清空主库平台日志，租户上下文清空当前租户库的租户日志。
+   * @summary 清空主库新日志和历史日志。
    * @request POST:/api/logVisit/clear
    */
   logVisitClearPost = (params: RequestParams = {}) =>

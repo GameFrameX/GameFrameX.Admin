@@ -82,7 +82,7 @@ import editDialog from '/@/views/app/contentCenter/mail/mailCampaignEntity/compo
 import detailDialog from '/@/views/app/contentCenter/mail/mailCampaignEntity/component/DetailDialog.vue'
 import publishConfirmDialog from '/@/views/app/contentCenter/mail/mailCampaignEntity/component/PublishConfirmDialog.vue'
 import revokeDialog from '/@/views/app/contentCenter/mail/mailCampaignEntity/component/RevokeDialog.vue'
-import { tenantGameMailCampaignEntityPagePost, tenantGameMailCampaignEntityDeletePost, tenantGameMailCampaignEntityPreviewPost } from '../../../../../api/tenantGameMailCampaignEntity'
+import { gameMailCampaignPagePost, gameMailCampaignDeletePost, gameMailCampaignPreviewPost } from '../../../../../api/gameMailCampaign'
 import {
   MAIL_CAMPAIGN_MAIL_TYPE_OPTIONS,
   MAIL_CAMPAIGN_PUBLISH_STATUS_OPTIONS,
@@ -128,7 +128,7 @@ const {
   onQuery,
   onDelete,
 } = useCrudTable({
-  api: { pageApi: tenantGameMailCampaignEntityPagePost, deleteApi: tenantGameMailCampaignEntityDeletePost },
+  api: { pageApi: gameMailCampaignPagePost, deleteApi: gameMailCampaignDeletePost },
   immediate: true,
 })
 
@@ -157,7 +157,7 @@ const openDetail = (row: any) => {
 
 const onPreview = async (row: any) => {
   try {
-    const res: any = await tenantGameMailCampaignEntityPreviewPost({ id: row.id })
+    const res: any = await gameMailCampaignPreviewPost({ id: row.id })
     const hit = res.data?.data?.estimatedHitCount
     const msg = hit === -1 || hit === undefined
       ? t('message.gameBusiness.mailCampaign.estimatedHitCountUnknown')

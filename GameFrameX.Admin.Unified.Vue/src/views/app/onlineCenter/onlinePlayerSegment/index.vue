@@ -65,8 +65,8 @@ import { usePrimeTablePage, useRouteAppIdQuerySync } from '../../../../composabl
 import { useCurrentApp } from '../../../../composables/useCurrentApp.ts'
 import editDialog from '/@/views/app/onlineCenter/onlinePlayerSegment/component/EditDialog.vue'
 import syncOnlineDialog from '/@/views/app/onlineCenter/onlinePlayerSegment/component/SyncOnlineDialog.vue'
-import { tenantGameOnlinePlayerSegmentPagePost, tenantGameOnlinePlayerSegmentDeletePost } from '../../../../api/tenantGameOnlinePlayerSegment'
-import { OnlinePlayerSegmentSyncStatus } from '../../../../api/tenantGameOnlinePlayerSegment/types'
+import { gameOnlinePlayerSegmentPagePost, gameOnlinePlayerSegmentDeletePost } from '../../../../api/gameOnlinePlayerSegment'
+import { OnlinePlayerSegmentSyncStatus } from '../../../../api/gameOnlinePlayerSegment/types'
 import { ONLINE_SEGMENT_FIELD_OPTIONS, ONLINE_SEGMENT_OP_OPTIONS } from './constants'
 
 const route = useRoute()
@@ -133,7 +133,7 @@ const {
   onQuery,
   onDelete,
 } = useCrudTable({
-  api: { pageApi: tenantGameOnlinePlayerSegmentPagePost, deleteApi: tenantGameOnlinePlayerSegmentDeletePost },
+  api: { pageApi: gameOnlinePlayerSegmentPagePost, deleteApi: gameOnlinePlayerSegmentDeletePost },
   immediate: true,
 })
 

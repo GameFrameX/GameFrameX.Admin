@@ -51,7 +51,7 @@ import InputText from 'primevue/inputtext'
 import InputNumber from 'primevue/inputnumber'
 import Textarea from 'primevue/textarea'
 import { showSuccess } from '../../../../../utils/message.ts'
-import { tenantGameOnlineConfigRolloutRollbackPost } from '../../../../../api/tenantGameOnlineConfigRollout'
+import { gameOnlineConfigRolloutRollbackPost } from '../../../../../api/gameOnlineConfigRollout'
 import { ONLINE_CONFIG_ROLLOUT_KIND_OPTIONS } from '../constants'
 
 const props = withDefaults(defineProps<{
@@ -106,7 +106,7 @@ const confirm = async () => {
   }
   loading.value = true
   try {
-    await tenantGameOnlineConfigRolloutRollbackPost({
+    await gameOnlineConfigRolloutRollbackPost({
       appId: props.appId as string | number,
       serverId: row.value.serverId,
       configKind: row.value.configKind,

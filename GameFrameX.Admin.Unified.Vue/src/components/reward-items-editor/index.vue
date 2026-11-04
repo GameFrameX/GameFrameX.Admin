@@ -21,8 +21,8 @@
 <script setup lang="ts">
 import {computed, ref, watch} from 'vue'
 import {faMinus, faPlus} from '../../utils/icons'
-import { tenantGameGoodsEntityPagePost } from '../../api/tenantGameGoodsEntity'
-import { tenantGameGoodsCatalogueEntitySelectPost } from '../../api/tenantGameGoodsCatalogueEntity'
+import { gameGoodsPagePost } from '../../api/gameGoods'
+import { gameGoodsCatalogueSelectPost } from '../../api/gameGoodsCatalogue'
 import {MAX_SELECT_SIZE} from '../../constants/pagination'
 import {normalizeAppId, type AppWorkspaceId} from '../../utils/appWorkspace'
 import type {RewardItem} from './rewardItems'
@@ -60,8 +60,8 @@ const loadOptions = async (scopedAppId?: AppWorkspaceId) => {
   // 物品选项走 page 接口：selectString 按基类声明类型序列化会裁剪派生字段 classifyId（后端问题 26），
   // 而目录过滤依赖 classifyId，故改用含完整字段的 page 响应映射 {id, label: name, classifyId}。
   const [goodsRes, catalogueRes] = await Promise.all([
-    tenantGameGoodsEntityPagePost({page: 1, pageSize: MAX_SELECT_SIZE, appId: scopedAppId}),
-    tenantGameGoodsCatalogueEntitySelectPost({appId: scopedAppId, pageSize: MAX_SELECT_SIZE}),
+    gameGoodsPagePost({page: 1, pageSize: MAX_SELECT_SIZE, appId: scopedAppId}),
+    gameGoodsCatalogueSelectPost({appId: scopedAppId, pageSize: MAX_SELECT_SIZE}),
   ])
   goodsOptions.value = (goodsRes.data.data?.items ?? []).map((item: any) => ({
     id: item.id,

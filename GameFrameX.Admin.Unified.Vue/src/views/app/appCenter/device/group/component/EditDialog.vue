@@ -1,5 +1,5 @@
 <template>
-  <BaseEditDialog ref="dialogRef" :title="props.title" :addApi="tenantDeviceGroupAddPost" :updateApi="tenantDeviceGroupUpdatePost" :beforeOpen="beforeOpen" :beforeSubmit="beforeSubmit" @reloadTable="emit('reloadTable')">
+  <BaseEditDialog ref="dialogRef" :title="props.title" :addApi="deviceGroupAddPost" :updateApi="deviceGroupUpdatePost" :beforeOpen="beforeOpen" :beforeSubmit="beforeSubmit" @reloadTable="emit('reloadTable')">
     <template #default="{ ruleForm, isEditor }">
       <TextField v-if="isEditor" :modelValue="appName(ruleForm.appId)" name="_appDisplay" :label="t('message.gameBusiness.appContext.gameApp')" disabled/>
       <TextField v-model="ruleForm.name" name="name" :label="t('message.client.groupName')" :placeholder="t('message.client.groupName')" maxlength="128"/>
@@ -18,8 +18,8 @@ import FormField from '@primevue/forms/formfield'
 import Message from 'primevue/message'
 import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import {TextareaField, TextField} from '../../../../../../components/crud-form-fields'
-import { tenantDeviceGroupAddPost, tenantDeviceGroupUpdatePost } from '../../../../../../api/tenantDeviceGroup'
-import { tenantGameAppDeviceSelectPost } from '../../../../../../api/tenantGameAppDevice'
+import { deviceGroupAddPost, deviceGroupUpdatePost } from '../../../../../../api/deviceGroup'
+import { gameAppDeviceSelectPost } from '../../../../../../api/gameAppDevice'
 import { useCurrentApp } from '../../../../../../composables/useCurrentApp.ts'
 import {MAX_SELECT_SIZE} from '../../../../../../constants/pagination.ts'
 
@@ -48,7 +48,7 @@ const loadDevices = async (appId?: number | string) => {
     return
   }
   try {
-    deviceList.value = (await tenantGameAppDeviceSelectPost({appId: appId, pageSize: MAX_SELECT_SIZE})).data.data ?? []
+    deviceList.value = (await gameAppDeviceSelectPost({appId: appId, pageSize: MAX_SELECT_SIZE})).data.data ?? []
   } catch {
     deviceList.value = []
   }

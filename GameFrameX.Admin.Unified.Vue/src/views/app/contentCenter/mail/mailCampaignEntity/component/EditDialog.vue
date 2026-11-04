@@ -1,7 +1,7 @@
 <template>
   <BaseEditDialog ref="dialogRef" :title="props.title" :width="'min(960px, calc(100vw - 32px))'"
-    :addApi="(params: any) => tenantGameMailCampaignEntityAddPost(params)"
-    :updateApi="(params: any) => tenantGameMailCampaignEntityUpdatePost(params)"
+    :addApi="(params: any) => gameMailCampaignAddPost(params)"
+    :updateApi="(params: any) => gameMailCampaignUpdatePost(params)"
     :rules="rules" :defaultForm="defaultForm"
     :beforeOpen="beforeOpen" :beforeSubmit="beforeSubmit"
     scrollable @reloadTable="emit('reloadTable')">
@@ -138,8 +138,8 @@ import FormField from '@primevue/forms/formfield'
 import Message from 'primevue/message'
 import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import { t } from '../../../../../../i18n/index.ts'
-import { tenantGameMailCampaignEntityAddPost, tenantGameMailCampaignEntityUpdatePost } from '../../../../../../api/tenantGameMailCampaignEntity'
-import { tenantGameAreaEntitySelectStringPost } from '../../../../../../api/tenantGameAreaEntity'
+import { gameMailCampaignAddPost, gameMailCampaignUpdatePost } from '../../../../../../api/gameMailCampaign'
+import { gameAreaSelectStringPost } from '../../../../../../api/gameArea'
 import { faMinus, faPlus } from '../../../../../../utils/icons.ts'
 import {normalizeAppId} from '../../../../../../utils/appWorkspace.ts'
 import {MAX_SELECT_SIZE} from '../../../../../../constants/pagination.ts'
@@ -197,7 +197,7 @@ const loadAreaOptions = async (appId?: number) => {
     areaIdOptions.value = []
     return
   }
-  areaIdOptions.value = (await tenantGameAreaEntitySelectStringPost({ appId: appId, pageSize: MAX_SELECT_SIZE })).data.data ?? []
+  areaIdOptions.value = (await gameAreaSelectStringPost({ appId: appId, pageSize: MAX_SELECT_SIZE })).data.data ?? []
 }
 
 // JSON 字符串 → 数组

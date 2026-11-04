@@ -43,8 +43,8 @@ import {formatUnix} from '../../../../../utils/formatTime.ts'
 import {ref, computed, watch, onMounted} from 'vue'
 import {useRoute} from 'vue-router'
 import editDialog from '/@/views/app/contentCenter/mail/gameMailTemplateEntity/component/EditDialog.vue'
-import { tenantGameMailTemplateEntityPagePost, tenantGameMailTemplateEntityDeletePost } from '../../../../../api/tenantGameMailTemplateEntity'
-import { tenantGameMailTemplateCategoryEntitySelectPost } from '../../../../../api/tenantGameMailTemplateCategoryEntity'
+import { gameMailTemplatePagePost, gameMailTemplateDeletePost } from '../../../../../api/gameMailTemplate'
+import { gameMailTemplateCategorySelectPost } from '../../../../../api/gameMailTemplateCategory'
 import {useCrudTable} from '../../../../../composables/useCrudTable.ts'
 import {usePrimeTablePage} from '../../../../../composables'
 import {useCurrentApp} from '../../../../../composables/useCurrentApp.ts'
@@ -77,8 +77,8 @@ const {
   onDelete,
 } = useCrudTable({
   api: {
-    pageApi: (params) => tenantGameMailTemplateEntityPagePost(params),
-    deleteApi: (params) => tenantGameMailTemplateEntityDeletePost(params),
+    pageApi: (params) => gameMailTemplatePagePost(params),
+    deleteApi: (params) => gameMailTemplateDeletePost(params),
   },
   immediate: true,
 })
@@ -86,7 +86,7 @@ const {
 queryParams.value.appId = resolveInitialAppId(route.query)
 
 const loadCategoryList = async (appId?: number) => {
-  const res = await tenantGameMailTemplateCategoryEntitySelectPost({appId: appId, pageSize: MAX_SELECT_SIZE})
+  const res = await gameMailTemplateCategorySelectPost({appId: appId, pageSize: MAX_SELECT_SIZE})
   categoryList.value = res.data.data ?? []
 }
 

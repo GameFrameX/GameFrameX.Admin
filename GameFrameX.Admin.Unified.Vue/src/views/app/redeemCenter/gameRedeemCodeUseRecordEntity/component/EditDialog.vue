@@ -2,8 +2,8 @@
   <BaseEditDialog
     ref="dialogRef"
     :title="props.title"
-    :addApi="(params: any) => tenantGameRedeemCodeUseRecordEntityAddPost(params)"
-    :updateApi="(params: any) => tenantGameRedeemCodeUseRecordEntityUpdatePost(params)"
+    :addApi="(params: any) => gameRedeemCodeUseRecordAddPost(params)"
+    :updateApi="(params: any) => gameRedeemCodeUseRecordUpdatePost(params)"
     @reloadTable="emit('reloadTable')"
   >
     <template #default="{ ruleForm }">
@@ -14,7 +14,7 @@
 <script lang="ts" setup>
 import {ref} from 'vue'
 import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
-import { tenantGameRedeemCodeUseRecordEntityAddPost, tenantGameRedeemCodeUseRecordEntityUpdatePost } from '../../../../../api/tenantGameRedeemCodeUseRecordEntity'
+import { gameRedeemCodeUseRecordAddPost, gameRedeemCodeUseRecordUpdatePost } from '../../../../../api/gameRedeemCodeUseRecord'
 
 const props = defineProps({title: {type: String, default: ''}})
 const emit = defineEmits(['reloadTable'])

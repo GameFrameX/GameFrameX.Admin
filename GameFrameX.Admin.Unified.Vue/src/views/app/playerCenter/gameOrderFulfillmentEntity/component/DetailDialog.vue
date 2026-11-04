@@ -52,7 +52,7 @@ import Button from 'primevue/button'
 import Tag from 'primevue/tag'
 import { t } from '../../../../../i18n/index.ts'
 import { useCurrentApp } from '../../../../../composables/useCurrentApp.ts'
-import { tenantGameOrderFulfillmentEntityDetailGet } from '../../../../../api/tenantGameOrderFulfillmentEntity'
+import { gameOrderFulfillmentDetailGet } from '../../../../../api/gameOrderFulfillment'
 import {parseRewardItems} from '../../../../../components/reward-items-editor/rewardItems.ts'
 import {
   FULFILLMENT_TYPE_OPTIONS,
@@ -105,7 +105,7 @@ const openDialog = async (target: any) => {
   if (target?.id) {
     loading.value = true
     try {
-      const res = await tenantGameOrderFulfillmentEntityDetailGet({ id: target.id })
+      const res = await gameOrderFulfillmentDetailGet({ id: target.id })
       if (res.data?.data) {
         row.value = res.data.data
       }

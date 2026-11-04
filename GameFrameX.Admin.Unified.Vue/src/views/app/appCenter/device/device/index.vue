@@ -33,8 +33,8 @@ import {useCrudTable} from '../../../../../composables/useCrudTable.ts'
 import {usePrimeTablePage, useRouteAppIdQuerySync} from '../../../../../composables'
 import {useCurrentApp} from '../../../../../composables/useCurrentApp.ts'
 import editDialog from '/@/views/app/appCenter/device/device/component/EditDialog.vue'
-import { tenantGameAppDevicePagePost, tenantGameAppDeviceDeletePost } from '../../../../../api/tenantGameAppDevice'
-import { tenantDeviceGroupSelectPost } from '../../../../../api/tenantDeviceGroup'
+import { gameAppDevicePagePost, gameAppDeviceDeletePost } from '../../../../../api/gameAppDevice'
+import { deviceGroupSelectPost } from '../../../../../api/deviceGroup'
 import {descriptionColumn, nameColumn} from '../../../../../utils/crudConfig.ts'
 
 const route = useRoute()
@@ -49,7 +49,7 @@ const loadGroups = async () => {
     groupOptions.value = []
     return
   }
-  const res = await tenantDeviceGroupSelectPost({appId: queryParams.value.appId})
+  const res = await deviceGroupSelectPost({appId: queryParams.value.appId})
   groupOptions.value = res.data.data ?? []
 }
 
@@ -62,7 +62,7 @@ const {
   loading, tableData, queryParams, tableParams,
   onQuery, onDelete,
 } = useCrudTable({
-  api: {pageApi: tenantGameAppDevicePagePost, deleteApi: tenantGameAppDeviceDeletePost},
+  api: {pageApi: gameAppDevicePagePost, deleteApi: gameAppDeviceDeletePost},
   immediate: false,
 })
 

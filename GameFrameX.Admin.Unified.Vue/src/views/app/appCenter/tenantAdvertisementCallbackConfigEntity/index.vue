@@ -7,7 +7,7 @@
             :fields="searchFields"
             :defaultSearchKey="true"
             :showAdd="true"
-            authPrefix="tenantAdvertisementCallbackConfigEntity"
+            authPrefix="advertisementCallbackConfig"
             @query="onQuery"
             @add="openAdd"
         />
@@ -18,7 +18,7 @@
         <CrudDataTable :value="tableData" v-block-loading="loading" showGridlines stripedRows rowKey="id"
                        :totalRecords="tableParams.total" :rows="tableParams.pageSize"
                        :rowsPerPageOptions="[10, 20, 50, 100]"
-                       authPrefix="tenantAdvertisementCallbackConfigEntity"
+                       authPrefix="advertisementCallbackConfig"
                        :actions="actions"
                        :columns="columns"
                        :exportQuery="queryParams"
@@ -59,7 +59,7 @@ import {usePrimeTablePage} from '../../../../composables'
 import {formatUnix} from '../../../../utils/formatTime.ts'
 import {useConfigAppScope} from '../../../../composables/useConfigAppScope.ts'
 import editDialog from './component/EditDialog.vue'
-import { tenantAdvertisementCallbackConfigEntityPagePost, tenantAdvertisementCallbackConfigEntityDeletePost, tenantAdvertisementCallbackConfigEntityDetailGet, tenantAdvertisementCallbackConfigEntityProvidersGet } from '../../../../api/tenantAdvertisementCallbackConfigEntity'
+import { advertisementCallbackConfigPagePost, advertisementCallbackConfigDeletePost, advertisementCallbackConfigDetailGet, advertisementCallbackConfigProvidersGet } from '../../../../api/advertisementCallbackConfig'
 
 const editDialogRef = ref()
 const editTitle = ref('')
@@ -99,8 +99,8 @@ const {
   onDelete,
 } = useCrudTable({
   api: {
-    pageApi: tenantAdvertisementCallbackConfigEntityPagePost,
-    deleteApi: tenantAdvertisementCallbackConfigEntityDeletePost,
+    pageApi: advertisementCallbackConfigPagePost,
+    deleteApi: advertisementCallbackConfigDeletePost,
   },
   immediate: true,
 })
@@ -115,7 +115,7 @@ const openAdd = () => {
 const openEdit = async (row: any) => {
   editTitle.value = '编辑广告回调配置'
   try {
-    const res: any = await tenantAdvertisementCallbackConfigEntityDetailGet({id: row.id})
+    const res: any = await advertisementCallbackConfigDetailGet({id: row.id})
     const detail = res.data.data
     if (detail) {
       editDialogRef.value.openDialog({...row, ...detail})
@@ -138,7 +138,7 @@ const hasSecret = (value: any) => !!String(value ?? '').trim()
 onMounted(async () => {
   loadApps()
   try {
-    const res: any = await tenantAdvertisementCallbackConfigEntityProvidersGet()
+    const res: any = await advertisementCallbackConfigProvidersGet()
     const list = res.data?.data ?? []
     providerOptions.value = (list || []).map((item: any) => ({label: item.label, value: item.value}))
   } catch {

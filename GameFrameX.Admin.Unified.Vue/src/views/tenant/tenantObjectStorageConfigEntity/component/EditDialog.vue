@@ -135,7 +135,7 @@ import Message from 'primevue/message'
 import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import {TextField, TextareaField} from '../../../../components/crud-form-fields'
 import {showError} from '../../../../utils/message'
-import {tenantObjectStorageConfigEntityProvidersGet, tenantObjectStorageConfigEntitySchemaGet, tenantObjectStorageConfigEntityAddPost, tenantObjectStorageConfigEntityUpdatePost} from '../../../../api/tenantObjectStorageConfigEntity';
+import {objectStorageConfigProvidersGet, objectStorageConfigSchemaGet, objectStorageConfigAddPost, objectStorageConfigUpdatePost} from '../../../../api/objectStorageConfig';
 import type {AddTenantObjectStorageConfigInput, UpdateTenantObjectStorageConfigInput} from '../../../../api/_shared/data-contracts'
 import {isEnabled} from '../../../../utils/isEnabled'
 import {readRowVersion} from '../../../../utils/rowVersion'
@@ -203,7 +203,7 @@ const normalizeProviders = (list: any[]): ProviderOption[] =>
   })).filter((item) => item.value)
 
 const loadProviders = async () => {
-  const res = await tenantObjectStorageConfigEntityProvidersGet()
+  const res = await objectStorageConfigProvidersGet()
   providerOptions.value = normalizeProviders(readResult(res) ?? [])
 }
 
@@ -299,7 +299,7 @@ const loadSchema = async (provider: string): Promise<StorageSchema | null> => {
     return null
   }
   try {
-    const res = await tenantObjectStorageConfigEntitySchemaGet(normalized)
+    const res = await objectStorageConfigSchemaGet(normalized)
     const next = normalizeSchema(readResult(res))
     schema.value = next
     return next
@@ -416,8 +416,8 @@ const toUpdateInput = (form: any): UpdateTenantObjectStorageConfigInput => ({
   ...toAddInput(form),
 })
 
-const addStorageConfig = (form: any) => tenantObjectStorageConfigEntityAddPost(toAddInput(form))
-const updateStorageConfig = (form: any) => tenantObjectStorageConfigEntityUpdatePost(toUpdateInput(form))
+const addStorageConfig = (form: any) => objectStorageConfigAddPost(toAddInput(form))
+const updateStorageConfig = (form: any) => objectStorageConfigUpdatePost(toUpdateInput(form))
 
 onMounted(async () => {
   await loadProviders()

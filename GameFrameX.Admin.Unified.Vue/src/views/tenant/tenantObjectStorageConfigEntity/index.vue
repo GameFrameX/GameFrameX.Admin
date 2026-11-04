@@ -6,7 +6,7 @@
           v-model="queryParams"
           :fields="searchFields"
           :defaultSearchKey="true"
-          authPrefix="tenantObjectStorageConfigEntity"
+          authPrefix="objectStorageConfig"
           :showAdd="true"
           @query="onQuery"
           @add="openAddStorageConfig"
@@ -25,7 +25,7 @@
           :totalRecords="tableParams.total"
           :rows="tableParams.pageSize"
           :rowsPerPageOptions="[10, 20, 50, 100]"
-          authPrefix="tenantObjectStorageConfigEntity"
+          authPrefix="objectStorageConfig"
           :actions="actions"
           :customActions="customActions"
           :columns="columns"
@@ -65,7 +65,7 @@ import {useCrudTable} from '../../../composables/useCrudTable.js'
 import {usePrimeTablePage} from '../../../composables'
 import {showConfirm, showError, showSuccess} from '../../../utils/message.js'
 import {formatUnix} from '../../../utils/formatTime.js'
-import {tenantObjectStorageConfigEntityPagePost, tenantObjectStorageConfigEntityDeletePost, tenantObjectStorageConfigEntityDetailGet, tenantObjectStorageConfigEntityTestConnectionGet, tenantObjectStorageConfigEntityUpdatePost, tenantObjectStorageConfigEntityProvidersGet} from '../../../api/tenantObjectStorageConfigEntity'
+import {objectStorageConfigPagePost, objectStorageConfigDeletePost, objectStorageConfigDetailGet, objectStorageConfigTestConnectionGet, objectStorageConfigUpdatePost, objectStorageConfigProvidersGet} from '../../../api/objectStorageConfig'
 import type {UpdateTenantObjectStorageConfigInput} from '../../../api/_shared/data-contracts'
 import {computed, onMounted, ref} from 'vue'
 import editDialog from './component/EditDialog.vue'
@@ -115,7 +115,7 @@ const normalizeProviders = (list: any[]): StorageProviderOption[] =>
   })).filter((item) => item.value)
 
 const pageStorageConfigs = async (params: any) => {
-  const res = await tenantObjectStorageConfigEntityPagePost({
+  const res = await objectStorageConfigPagePost({
     searchKey: params.searchKey,
     page: params.page,
     pageSize: params.pageSize,
@@ -137,7 +137,7 @@ const pageStorageConfigs = async (params: any) => {
   }
 }
 
-const deleteStorageConfig = (row: any) => tenantObjectStorageConfigEntityDeletePost({id: toApiId(row.id), rowVersion: row.rowVersion})
+const deleteStorageConfig = (row: any) => objectStorageConfigDeletePost({id: toApiId(row.id), rowVersion: row.rowVersion})
 
 const {
   loading,
@@ -192,7 +192,7 @@ const openAddStorageConfig = () => {
 
 const openEditStorageConfig = async (row: any) => {
   editTitle.value = t('system.objectStorage.editConfig')
-  const res = await tenantObjectStorageConfigEntityDetailGet(toApiId(row.id))
+  const res = await objectStorageConfigDetailGet(toApiId(row.id))
   editDialogRef.value?.openDialog(normalizeRow(readResult(res)))
 }
 
@@ -203,14 +203,14 @@ const onDeleteStorageConfig = async (row: any) => {
     {type: 'danger'},
   )
   if (!confirmed) return
-  const res = await tenantObjectStorageConfigEntityDetailGet(toApiId(row.id))
+  const res = await objectStorageConfigDetailGet(toApiId(row.id))
   await deleteStorageConfig(normalizeRow(readResult(res)))
   showSuccess(t('message.common.message.deleteSuccess'))
   onQuery()
 }
 
 const testConnection = async (row: any) => {
-  const res = await tenantObjectStorageConfigEntityTestConnectionGet(toApiId(row.id))
+  const res = await objectStorageConfigTestConnectionGet(toApiId(row.id))
   if (readResult(res) !== true) {
     showError(t('system.objectStorage.testConnectionFailed'))
     return
@@ -226,7 +226,7 @@ const toggleEnabled = async (row: any) => {
   )
   if (!confirmed) return
 
-  const res = await tenantObjectStorageConfigEntityDetailGet(toApiId(row.id))
+  const res = await objectStorageConfigDetailGet(toApiId(row.id))
   const detail = normalizeRow(readResult(res))
   const input: UpdateTenantObjectStorageConfigInput = {
     id: toApiId(detail.id),
@@ -240,7 +240,7 @@ const toggleEnabled = async (row: any) => {
     isEnabled: nextEnabled,
     remark: detail.remark,
   }
-  await tenantObjectStorageConfigEntityUpdatePost(input)
+  await objectStorageConfigUpdatePost(input)
   showSuccess(nextEnabled ? t('system.objectStorage.enableSuccess') : t('system.objectStorage.disableSuccess'))
   onQuery()
 }
@@ -279,7 +279,7 @@ const customActions: CrudAction[] = [
 const onPage = usePrimeTablePage(tableParams, onQuery)
 
 onMounted(async () => {
-  const res = await tenantObjectStorageConfigEntityProvidersGet()
+  const res = await objectStorageConfigProvidersGet()
   providerOptions.value = normalizeProviders(readResult(res) ?? [])
 })
 </script>

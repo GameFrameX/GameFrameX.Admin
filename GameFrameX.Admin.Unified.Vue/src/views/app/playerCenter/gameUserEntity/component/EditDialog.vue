@@ -1,5 +1,5 @@
 <template>
-  <BaseEditDialog ref="dialogRef" :title="props.title" :addApi="tenantGameUserEntityUpdatePost" :updateApi="tenantGameUserEntityUpdatePost" :rules="rules" @reloadTable="emit('reloadTable')">
+  <BaseEditDialog ref="dialogRef" :title="props.title" :addApi="gameUserUpdatePost" :updateApi="gameUserUpdatePost" :rules="rules" @reloadTable="emit('reloadTable')">
     <template #default="{ ruleForm }">
       <FormLabel name="status">{{ t('message.gameBusiness.area.status') }}</FormLabel>
       <FormField name="status" v-slot="{ props: fProps, invalid, error }">
@@ -18,7 +18,7 @@ import FormField from '@primevue/forms/formfield'
 import Message from 'primevue/message'
 import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import {TextField} from '../../../../../components/crud-form-fields'
-import { tenantGameUserEntityUpdatePost } from '../../../../../api/tenantGameUserEntity'
+import { gameUserUpdatePost } from '../../../../../api/gameUser'
 import {systemEnumEnumDataListGet} from '../../../../../api/systemEnum';
 
 const props = defineProps({title: {type: String, default: ''}})

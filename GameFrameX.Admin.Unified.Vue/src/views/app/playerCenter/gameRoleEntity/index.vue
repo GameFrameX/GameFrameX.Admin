@@ -62,9 +62,9 @@ import { useCrudTable } from '../../../../composables/useCrudTable.ts'
 import {usePrimeTablePage} from '../../../../composables'
 import { useCurrentApp } from '../../../../composables/useCurrentApp.ts'
 import editDialog from '/@/views/app/playerCenter/gameRoleEntity/component/EditDialog.vue'
-import { tenantGameRoleEntityPagePost, tenantGameRoleEntitySyncPost, tenantGameRoleEntityUpdateToSandBoxPost, tenantGameRoleEntityUpdateToUnSandBoxPost } from '../../../../api/tenantGameRoleEntity'
-import { tenantGameRoleEntitySelectStringPost } from '../../../../api/tenantGameRoleEntity'
-import { tenantGameAreaEntitySelectStringPost } from '../../../../api/tenantGameAreaEntity'
+import { gameRolePagePost, gameRoleSyncPost, gameRoleUpdateToSandBoxPost, gameRoleUpdateToUnSandBoxPost } from '../../../../api/gameRole'
+import { gameRoleSelectStringPost } from '../../../../api/gameRole'
+import { gameAreaSelectStringPost } from '../../../../api/gameArea'
 import {MAX_SELECT_SIZE} from '../../../../constants/pagination.ts'
 
 const route = useRoute()
@@ -91,7 +91,7 @@ const {
   tableParams,
   onQuery,
 } = useCrudTable({
-  api: { pageApi: tenantGameRoleEntityPagePost },
+  api: { pageApi: gameRolePagePost },
   immediate: true,
 })
 
@@ -113,7 +113,7 @@ const openEditGameRoleEntity = (row: any) => {
 const onSandBoxGameRoleEntity = async (row: any) => {
   const confirmed = await showConfirm(t('message.gameBusiness.role.confirmSetSandbox'), t('message.common.message.tip'))
   if (!confirmed) return
-  await tenantGameRoleEntityUpdateToSandBoxPost(row)
+  await gameRoleUpdateToSandBoxPost(row)
   onQuery()
   showSuccess(t('message.common.message.success'))
 }
@@ -122,7 +122,7 @@ const onSandBoxGameRoleEntity = async (row: any) => {
 const onUnSandBoxGameRoleEntity = async (row: any) => {
   const confirmed = await showConfirm(t('message.gameBusiness.role.confirmUnsetSandbox'), t('message.common.message.tip'))
   if (!confirmed) return
-  await tenantGameRoleEntityUpdateToUnSandBoxPost(row)
+  await gameRoleUpdateToUnSandBoxPost(row)
   onQuery()
   showSuccess(t('message.common.message.success'))
 }
@@ -131,7 +131,7 @@ const onUnSandBoxGameRoleEntity = async (row: any) => {
 const onSyncGameRoleEntity = async (row: any) => {
   const confirmed = await showConfirm(t('message.gameBusiness.role.confirmSyncFromServer'), t('message.common.message.tip'))
   if (!confirmed) return
-  await tenantGameRoleEntitySyncPost(row)
+  await gameRoleSyncPost(row)
   onQuery()
   showSuccess(t('message.gameBusiness.role.syncSuccess'))
 }
@@ -178,7 +178,7 @@ const customActions: CrudAction[] = [
 const userList = ref<any>([])
 const onUserSearch = async (query: string) => {
   if (query) {
-    const res = await tenantGameRoleEntitySelectStringPost({ searchKey: query, pageSize: MAX_SELECT_SIZE })
+    const res = await gameRoleSelectStringPost({ searchKey: query, pageSize: MAX_SELECT_SIZE })
     userList.value = res.data.data ?? []
   } else {
     userList.value = []
@@ -200,7 +200,7 @@ const getAreaName = (areaId: number) => {
 }
 
 const getAreaList = async (appId?: number) => {
-  const res = await tenantGameAreaEntitySelectStringPost({ appId: appId, pageSize: MAX_SELECT_SIZE })
+  const res = await gameAreaSelectStringPost({ appId: appId, pageSize: MAX_SELECT_SIZE })
   areaList.value = res.data.data ?? []
 }
 

@@ -69,10 +69,6 @@ export interface LoginRequest {
   codeId?: string;
   /** 验证码 */
   code?: string | null;
-  /** 租户Id。普通租户登录时使用，平台 SuperAdmin 可不传。 */
-  tenantId?: string | null;
-  /** 租户主机名。普通租户登录时可用 Host 解析租户。 */
-  tenantHost?: string | null;
 }
 
 /** 用户登录结果 */
@@ -100,14 +96,6 @@ export interface LoginUserResponse {
   address?: string | null;
   /** 电子签名 */
   signature?: string | null;
-  /** 机构Id */
-  organizationId?: string;
-  /** 机构名称 */
-  organizationName?: string | null;
-  /** 机构类型 */
-  organizationType?: string | null;
-  /** 职位名称 */
-  posName?: string | null;
   /** 按钮权限集合 */
   buttons?: string[] | null;
 }
@@ -130,46 +118,6 @@ export interface RefreshTokenResponseHttpJsonResultData {
   /** @format int64 */
   time?: number;
   extras?: any | null;
-}
-
-/** 邮箱自助注册参数 */
-export interface RegisterByEmailRequest {
-  /**
-   * 注册邮箱（同时作为租管账号）
-   * @format email
-   * @minLength 1
-   * @example "admin@example.com"
-   */
-  email: string;
-  /**
-   * 邮箱验证码
-   * @minLength 6
-   * @example "123456"
-   */
-  code: string;
-  /**
-   * 登录密码
-   * @minLength 6
-   * @example "123456"
-   */
-  password: string;
-  /**
-   * 租户名称
-   * @minLength 2
-   * @example "我的租户"
-   */
-  tenantName: string;
-}
-
-/** 发送邮箱自助注册验证码参数 */
-export interface SendRegisterEmailCodeRequest {
-  /**
-   * 注册邮箱（同时作为租管账号）
-   * @format email
-   * @minLength 1
-   * @example "admin@example.com"
-   */
-  email: string;
 }
 
 /** 平台超管首装密码初始化参数 */
@@ -241,32 +189,6 @@ export type SystemAuthLogoutPostData = any;
 
 export type SystemAuthRefreshTokenGetData =
   RefreshTokenResponseHttpJsonResultData;
-
-export interface SystemAuthRegisterByEmailPostData {
-  /**
-   * 响应码，0 表示成功，失败时承载统一数字业务错误码（模块枚举 8 位数值，见 GameFrameX.Core/Enum/Errors 与 error-codes.json 码表）
-   * @format int32
-   */
-  code: number;
-  /** 错误或提示信息 */
-  message: string;
-  /** 用户登录结果 */
-  data: LoginResponse;
-  /** 链路追踪标识，未启用追踪时为 null */
-  trackId: string | null;
-  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
-  errorCode: string | null;
-  /** 响应类型（success/warning/error） */
-  type: string | null;
-  /**
-   * Unix 时间戳（秒）
-   * @format int64
-   */
-  time: number;
-  extras: object | null;
-}
-
-export type SystemAuthSendRegisterEmailCodePostData = any;
 
 export interface SystemAuthSetupSuperAdminPasswordPostData {
   /**

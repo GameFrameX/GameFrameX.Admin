@@ -1,8 +1,6 @@
 /* eslint-disable */
 /* tslint:disable */
 
-import type { DbType, TenantTypeEnum } from "../_shared/data-contracts";
-
 export interface AddOpenAccessRequest {
   /** 主键Id */
   id: string;
@@ -53,10 +51,6 @@ export interface AddOpenAccessRequest {
   rowVersion?: string | null;
   /** 是否启用,true:启用，false:禁用，null:未设置(启用) */
   isEnabled?: boolean | null;
-  /** 租户Id */
-  tenantId?: string | null;
-  bindTenantId?: string;
-  bindTenant?: SystemTenantEntity;
   /**
    * 身份标识
    * @minLength 1
@@ -85,14 +79,10 @@ export interface OpenAccessResponse {
   id?: string;
   /** 身份标识 */
   accessKey?: string | null;
-  /** 绑定租户Id */
-  bindTenantId?: string;
   /** 绑定用户Id */
   bindUserId?: string;
   /** 绑定用户账号 */
   bindUserAccount?: string | null;
-  /** 绑定租户名称 */
-  bindTenantName?: string | null;
   /** 是否启用 */
   isEnabled?: boolean | null;
   /**
@@ -172,73 +162,6 @@ export interface SecretCreateResponseHttpJsonResultData {
   extras?: any | null;
 }
 
-export interface SystemTenantEntity {
-  /** 主键Id */
-  id: string;
-  /** 创建人Id */
-  createdId?: string | null;
-  /**
-   * 创建时间
-   * @format int64
-   */
-  createdTime?: number;
-  /**
-   * 创建人姓名
-   * @maxLength 512
-   */
-  createdName?: string | null;
-  /**
-   * 更新次数
-   * @format int32
-   */
-  updateCount?: number | null;
-  /**
-   * 更新时间
-   * @format int64
-   */
-  updateTime?: number | null;
-  /** 更新人Id */
-  updatedId?: string | null;
-  /**
-   * 更新人姓名
-   * @maxLength 512
-   */
-  updatedName?: string | null;
-  /** 软删除标记,true:删除,false:未删除,null:未设置(未删除) */
-  isDeleted?: boolean | null;
-  /**
-   * 删除时间
-   * @format int64
-   */
-  deleteTime?: number | null;
-  /** 删除人Id */
-  deletedId?: string | null;
-  /**
-   * 删除人姓名
-   * @maxLength 512
-   */
-  deletedName?: string | null;
-  /** 行版本号（用于乐观锁） */
-  rowVersion?: string | null;
-  /** 是否启用,true:启用，false:禁用，null:未设置(启用) */
-  isEnabled?: boolean | null;
-  /** 租户Id */
-  tenantId?: string | null;
-  userId?: string;
-  organizationId?: string;
-  host?: string | null;
-  tenantType?: TenantTypeEnum;
-  dbType?: DbType;
-  connection?: string | null;
-  configId?: string | null;
-  remark?: string | null;
-  packageId?: string | null;
-  /** @format int64 */
-  expireTime?: number | null;
-  /** @format int32 */
-  gracePeriodDays?: number | null;
-}
-
 export interface UpdateOpenAccessRequest {
   /** 主键Id */
   id: string;
@@ -289,10 +212,6 @@ export interface UpdateOpenAccessRequest {
   rowVersion?: string | null;
   /** 是否启用,true:启用，false:禁用，null:未设置(启用) */
   isEnabled?: boolean | null;
-  /** 租户Id */
-  tenantId?: string | null;
-  bindTenantId?: string;
-  bindTenant?: SystemTenantEntity;
   /**
    * 身份标识
    * @minLength 1

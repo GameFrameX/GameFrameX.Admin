@@ -29,7 +29,7 @@ import Button from 'primevue/button'
 import Textarea from 'primevue/textarea'
 import { t } from '../../../../../i18n/index.ts'
 import { showSuccess } from '../../../../../utils/message.ts'
-import { tenantGameOrderFulfillmentEntityRefundPost, tenantGameOrderFulfillmentEntityCompensatePost, tenantGameOrderFulfillmentEntityResendPost } from '../../../../../api/tenantGameOrderFulfillmentEntity'
+import { gameOrderFulfillmentRefundPost, gameOrderFulfillmentCompensatePost, gameOrderFulfillmentResendPost } from '../../../../../api/gameOrderFulfillment'
 import { useCurrentApp } from '../../../../../composables/useCurrentApp.ts'
 import { FULFILLMENT_TYPE_OPTIONS, FULFILLMENT_STATUS_OPTIONS } from '../constants'
 
@@ -74,9 +74,9 @@ const statusDesc = (v: number) => {
 }
 
 const apiMap = {
-  refund: tenantGameOrderFulfillmentEntityRefundPost,
-  compensate: tenantGameOrderFulfillmentEntityCompensatePost,
-  resend: tenantGameOrderFulfillmentEntityResendPost,
+  refund: gameOrderFulfillmentRefundPost,
+  compensate: gameOrderFulfillmentCompensatePost,
+  resend: gameOrderFulfillmentResendPost,
 }
 
 const close = () => {

@@ -51,8 +51,8 @@ import {useCrudTable} from '../../../../composables/useCrudTable.ts'
 import {usePrimeTablePage, useRouteAppIdQuerySync} from '../../../../composables'
 import {useCurrentApp} from '../../../../composables/useCurrentApp.ts'
 import editDialog from '/@/views/app/webShopCenter/webShopOrder/component/EditDialog.vue'
-import { tenantGameWebShopOrderEntityPagePost, tenantGameWebShopOrderEntityDeletePost } from '../../../../api/tenantGameWebShopOrderEntity'
-import { tenantGameWebShopEntitySelectPost } from '../../../../api/tenantGameWebShopEntity'
+import { gameWebShopOrderPagePost, gameWebShopOrderDeletePost } from '../../../../api/gameWebShopOrder'
+import { gameWebShopSelectPost } from '../../../../api/gameWebShop'
 import {MAX_SELECT_SIZE} from '../../../../constants/pagination.ts'
 
 const route = useRoute()
@@ -72,7 +72,7 @@ const {
   onQuery,
   onDelete
 } = useCrudTable({
-  api: {pageApi: tenantGameWebShopOrderEntityPagePost, deleteApi: tenantGameWebShopOrderEntityDeletePost},
+  api: {pageApi: gameWebShopOrderPagePost, deleteApi: gameWebShopOrderDeletePost},
   immediate: true,
 })
 
@@ -115,7 +115,7 @@ const customActions: CrudAction[] = [
 // WebShop list for display
 const wenShopListData = ref<Array<{ id: number; logo: string; name: string }>>([])
 const getListWebShop = async (appId?: number) => {
-  var res = await tenantGameWebShopEntitySelectPost({appId: appId, pageSize: MAX_SELECT_SIZE})
+  var res = await gameWebShopSelectPost({appId: appId, pageSize: MAX_SELECT_SIZE})
   wenShopListData.value = res.data.data ?? []
 }
 const getWebShopInfo = (id: any) => {

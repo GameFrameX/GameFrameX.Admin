@@ -1,5 +1,5 @@
 <template>
-  <BaseEditDialog ref="dialogRef" class="feature-switch-edit-dialog" :title="props.title" :addApi="tenantGameAppFeatureSwitchAddPost" :updateApi="tenantGameAppFeatureSwitchUpdatePost" :rules="rules" :defaultForm="defaultForm" :beforeOpen="beforeOpen" :beforeSubmit="beforeSubmit" scrollable @reloadTable="emit('reloadTable')">
+  <BaseEditDialog ref="dialogRef" class="feature-switch-edit-dialog" :title="props.title" :addApi="gameAppFeatureSwitchAddPost" :updateApi="gameAppFeatureSwitchUpdatePost" :rules="rules" :defaultForm="defaultForm" :beforeOpen="beforeOpen" :beforeSubmit="beforeSubmit" scrollable @reloadTable="emit('reloadTable')">
     <template #default="{ ruleForm }">
       <div v-block-loading="loading" class="feature-switch-edit-dialog-content">
       <TextField v-model="ruleForm.switchKey" name="switchKey" :label="t('message.featureSwitch.switchKey')" :placeholder="t('message.featureSwitch.switchKeyPlaceholder')" maxlength="128"/>
@@ -58,11 +58,11 @@ import Message from 'primevue/message'
 import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import {TextField, TextareaField} from '../../../../../components/crud-form-fields'
 import {showError} from '../../../../../utils/message.ts'
-import { tenantGameAppFeatureSwitchAddPost, tenantGameAppFeatureSwitchUpdatePost } from '../../../../../api/tenantGameAppFeatureSwitch'
+import { gameAppFeatureSwitchAddPost, gameAppFeatureSwitchUpdatePost } from '../../../../../api/gameAppFeatureSwitch'
 import { globalPlatformSelectPost } from '../../../../../api/globalPlatform'
 import { globalLanguageSelectPost } from '../../../../../api/globalLanguage'
-import { tenantChannelDefinitionAvailableGet } from '../../../../../api/tenantChannelDefinition'
-import { tenantGameAppPackageListGet } from '../../../../../api/tenantGameAppPackage'
+import { channelDefinitionAvailableGet } from '../../../../../api/channelDefinition'
+import { gameAppPackageListGet } from '../../../../../api/gameAppPackage'
 import {normalizeAppId, type AppWorkspaceId} from '../../../../../utils/appWorkspace.ts'
 import { mapAvailableChannelDefinitions } from '../../../../../utils/channelDefinition.ts'
 import {MAX_SELECT_SIZE} from '../../../../../constants/pagination.ts'
@@ -149,7 +149,7 @@ const onLanguageQuery = async () => {
 }
 
 const onChannelQuery = async () => {
-  const res = await tenantChannelDefinitionAvailableGet({pageSize: MAX_SELECT_SIZE})
+  const res = await channelDefinitionAvailableGet({pageSize: MAX_SELECT_SIZE})
   scopeOptions.value.channel = [unlimitedOption(), ...mapAvailableChannelDefinitions(res.data.data || [], 'code')]
 }
 
@@ -160,7 +160,7 @@ const onPackageQuery = async (appId?: AppWorkspaceId) => {
     scopeOptions.value.package = [unlimitedOption()]
     return
   }
-  const res = await tenantGameAppPackageListGet({appId: id})
+  const res = await gameAppPackageListGet({appId: id})
   const packages = res.data?.data || []
   const options: any[] = [unlimitedOption()]
   for (const p of packages) {

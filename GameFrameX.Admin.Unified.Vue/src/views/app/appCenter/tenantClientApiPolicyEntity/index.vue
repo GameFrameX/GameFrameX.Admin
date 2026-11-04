@@ -7,7 +7,7 @@
             :fields="searchFields"
             :defaultSearchKey="true"
             :showAdd="true"
-            authPrefix="tenantClientApiPolicyEntity"
+            authPrefix="clientApiPolicy"
             @query="onQuery"
             @add="openAdd"
         />
@@ -18,7 +18,7 @@
         <CrudDataTable :value="tableData" v-block-loading="loading" showGridlines stripedRows rowKey="id"
                        :totalRecords="tableParams.total" :rows="tableParams.pageSize"
                        :rowsPerPageOptions="[10, 20, 50, 100]"
-                       authPrefix="tenantClientApiPolicyEntity"
+                       authPrefix="clientApiPolicy"
                        :actions="actions"
                        :customActions="customActions"
                        :columns="columns"
@@ -68,7 +68,7 @@ import {visibleApps} from '../../../../utils/appWorkspace.ts'
 import {formatUnix} from '../../../../utils/formatTime.ts'
 import {showConfirm, showSuccess} from '../../../../utils/message.ts'
 import editDialog from './component/EditDialog.vue'
-import { tenantClientApiPolicyEntityPagePost, tenantClientApiPolicyEntityDeletePost, tenantClientApiPolicyEntityDetailGet, tenantClientApiPolicyEntityRotatePost } from '../../../../api/tenantClientApiPolicyEntity'
+import { clientApiPolicyPagePost, clientApiPolicyDeletePost, clientApiPolicyDetailGet, clientApiPolicyRotatePost } from '../../../../api/clientApiPolicy'
 
 const route = useRoute()
 const editDialogRef = ref()
@@ -114,8 +114,8 @@ const {
   onDelete,
 } = useCrudTable({
   api: {
-    pageApi: tenantClientApiPolicyEntityPagePost,
-    deleteApi: tenantClientApiPolicyEntityDeletePost,
+    pageApi: clientApiPolicyPagePost,
+    deleteApi: clientApiPolicyDeletePost,
   },
   immediate: false,
 })
@@ -133,7 +133,7 @@ const openAdd = () => {
 const openEdit = async (row: any) => {
   editTitle.value = t('message.client.clientApiPolicyEditTitle')
   try {
-    const res: any = await tenantClientApiPolicyEntityDetailGet({id: row.id})
+    const res: any = await clientApiPolicyDetailGet({id: row.id})
     const detail = res.data.data
     if (detail) {
       editDialogRef.value.openDialog({...row, ...detail})
@@ -154,7 +154,7 @@ const onRotate = async (row: any) => {
   if (!confirmed) {
     return
   }
-  await tenantClientApiPolicyEntityRotatePost({id: row.id})
+  await clientApiPolicyRotatePost({id: row.id})
   showSuccess(t('message.client.clientApiPolicyRotateSuccess'))
   onQuery()
 }

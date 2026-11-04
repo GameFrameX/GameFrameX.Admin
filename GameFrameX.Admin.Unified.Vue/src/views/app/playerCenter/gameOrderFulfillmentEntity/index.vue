@@ -75,8 +75,8 @@ import { createAction } from '../../../../components/crud-data-table'
 import {parseRewardItems} from '../../../../components/reward-items-editor/rewardItems.ts'
 import detailDialog from '/@/views/app/playerCenter/gameOrderFulfillmentEntity/component/DetailDialog.vue'
 import actionDialog from '/@/views/app/playerCenter/gameOrderFulfillmentEntity/component/ActionDialog.vue'
-import { tenantGameOrderFulfillmentEntityPagePost, tenantGameOrderFulfillmentEntityExportPost } from '../../../../api/tenantGameOrderFulfillmentEntity'
-import { tenantGameAreaEntitySelectStringPost } from '../../../../api/tenantGameAreaEntity'
+import { gameOrderFulfillmentPagePost, gameOrderFulfillmentExportPost } from '../../../../api/gameOrderFulfillment'
+import { gameAreaSelectStringPost } from '../../../../api/gameArea'
 import {MAX_SELECT_SIZE} from '../../../../constants/pagination.ts'
 import { useCrudTable } from '../../../../composables/useCrudTable.ts'
 import { usePrimeTablePage } from '../../../../composables'
@@ -146,7 +146,7 @@ const {
   onQuery,
 } = useCrudTable({
   api: {
-    pageApi: (params) => tenantGameOrderFulfillmentEntityPagePost(params),
+    pageApi: (params) => gameOrderFulfillmentPagePost(params),
   },
   immediate: false,
 })
@@ -230,7 +230,7 @@ const getAreaName = (areaId: number) => {
 }
 
 const loadAreaList = async (appId?: number) => {
-  const res = await tenantGameAreaEntitySelectStringPost({ appId: appId, pageSize: MAX_SELECT_SIZE })
+  const res = await gameAreaSelectStringPost({ appId: appId, pageSize: MAX_SELECT_SIZE })
   areaList.value = res.data.data ?? []
 }
 
@@ -251,7 +251,7 @@ const onExport = async () => {
   exporting.value = true
   try {
     const params = Object.assign({}, queryParams.value, tableParams.value)
-    const res = await tenantGameOrderFulfillmentEntityExportPost(params)
+    const res = await gameOrderFulfillmentExportPost(params)
     const list = res.data?.data ?? []
     if (!list.length) {
       showWarning(t('message.gameBusiness.orderFulfillment.exportEmpty'))
