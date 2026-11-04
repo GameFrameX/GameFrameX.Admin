@@ -83,6 +83,12 @@ public abstract class BaseLogService<TSystemLog, TTenantLog, TDto> : IAdminApiCo
         var property = typeof(TDto).GetProperties().FirstOrDefault(candidate =>
             candidate.Name.Equals(input.OrderBy, StringComparison.OrdinalIgnoreCase));
         var propertyName = property?.Name ?? "Id";
+        // PostgreSQL provider 默认将 SELECT 投影别名转为小写。
+        if (SystemLogRepository.Context.CurrentConnectionConfig.DbType == DbType.PostgreSQL)
+        {
+            propertyName = propertyName.ToLowerInvariant();
+        }
+
         var descending = property == null || input.IsDescending;
         var quotedName = SystemLogRepository.Context.CurrentConnectionConfig.DbType == DbType.MySql
             ? $"`{propertyName}`" : $"\"{propertyName}\"";
