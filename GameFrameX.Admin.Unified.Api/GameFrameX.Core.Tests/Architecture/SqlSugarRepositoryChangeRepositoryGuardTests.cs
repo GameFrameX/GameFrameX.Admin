@@ -2,11 +2,8 @@ using System.Text.RegularExpressions;
 
 namespace GameFrameX.Core.Tests.Architecture;
 
-// C276（GFX-682）守护测试：生产代码禁止调用 SimpleClient.ChangeRepository<T>() 无参重载解析
-// SqlSugarRepository<T>。SqlSugar 5.1.4.216 该重载对带参构造仓储必抛 MissingMethodException
-// （详见 SqlSugarRepositoryDiResolutionTests 根因锁定），替代路径是
-// IServiceProvider.GetRequiredService<SqlSugarRepository<T>>() 走 DI open generic 解析。
-// 零例外：C276 已全量替换 8 处调用点，新增调用一律不允许（带 IServiceProvider 参数的 DI 重载如需启用须先更新本测试）。
+// 生产仓储必须经依赖注入解析，避免无参 ChangeRepository 绕过作用域和连接上下文约束。
+// 替代路径为 IServiceProvider.GetRequiredService<SqlSugarRepository<T>>()。
 public sealed class SqlSugarRepositoryChangeRepositoryGuardTests
 {
     private static readonly string RepositoryRoot = GetRepositoryRoot();
@@ -54,7 +51,7 @@ public sealed class SqlSugarRepositoryChangeRepositoryGuardTests
         }
 
         Assert.True(offenders.Count == 0,
-                    "生产代码发现 ChangeRepository<SqlSugarRepository<...> 调用（SqlSugar 5.1.4.216 无参重载必抛 MissingMethodException，GFX-682）。"
+                    "生产代码发现 ChangeRepository<SqlSugarRepository<...> 调用（禁止绕过依赖注入和连接上下文约束）。"
                     + "请改用 _serviceProvider.GetRequiredService<SqlSugarRepository<T>>()（先例：GlobalMenuService）。命中文件："
                     + string.Join(", ", offenders));
     }

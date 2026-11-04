@@ -72,8 +72,16 @@ internal static class SingleMainMigration
                 }
 
                 // 目标业务表按当前实体创建；已退场实体不在程序集清单，不搬运。
-                target.CodeFirst.InitTables(entityType);
-                CopyTable(source, target, tableName, riskMigration);
+                try
+                {
+                    target.CodeFirst.InitTables(entityType);
+                    CopyTable(source, target, tableName, riskMigration);
+                }
+                catch (Exception exception)
+                {
+                    exception.Data["MigrationTable"] = tableName;
+                    throw;
+                }
                 copiedTables.Add(tableName);
             }
 

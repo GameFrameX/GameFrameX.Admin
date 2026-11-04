@@ -48,7 +48,15 @@ internal static class ScopeColumnRetirement
             foreach (var column in removedColumns)
             {
                 // PostgreSQL 同时移除依赖该列的旧索引；不使用 CASCADE 删除其他对象。
-                target.Ado.ExecuteCommand($"ALTER TABLE {Quote(entity.DbTableName)} DROP COLUMN {Quote(column)}");
+                try
+                {
+                    target.Ado.ExecuteCommand($"ALTER TABLE {Quote(entity.DbTableName)} DROP COLUMN {Quote(column)}");
+                }
+                catch (Exception exception)
+                {
+                    exception.Data["MigrationTable"] = entity.DbTableName;
+                    throw;
+                }
                 Console.WriteLine($"删除退场列：{entity.DbTableName}.{column}");
             }
 
