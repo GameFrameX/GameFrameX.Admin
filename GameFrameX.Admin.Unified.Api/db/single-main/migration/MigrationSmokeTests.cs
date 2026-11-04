@@ -52,6 +52,8 @@ internal static class MigrationSmokeTests
                 Require(target.DbMaintenance.GetColumnInfosByTableName("system_user_entity", false).Any(column => column.DbColumnName == "tenant_id"), "dry-run 系统表删列必须回滚");
                 SingleMainMigration.Run(source, target, false, types);
                 SingleMainMigration.Run(source, target, false, types);
+
+                LogCredentialCleanupSmokeTests.Run(source, target);
                 Require(target.Queryable<TenantGameHomeOnlineSampleEntity>().Count() == 1, "重复迁移必须幂等");
                 Require(!target.DbMaintenance.GetColumnInfosByTableName("tenant_game_home_online_sample_entity", false).Any(column => column.DbColumnName is "tenant_id" or "app_id"), "业务作用域列必须删除");
                 Require(!target.DbMaintenance.GetColumnInfosByTableName("system_user_entity", false).Any(column => column.DbColumnName == "tenant_id"), "系统表作用域列必须删除");

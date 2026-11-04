@@ -4,6 +4,7 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="../../../GameFrameX.Core/Logging/SensitiveLogRedactor.cs" Link="SensitiveLogRedactor.cs" />
     <ProjectReference Include="../../../GameFrameX.Core.SqlSugar/GameFrameX.Core.SqlSugar.csproj" />
   </ItemGroup>
 </Project>

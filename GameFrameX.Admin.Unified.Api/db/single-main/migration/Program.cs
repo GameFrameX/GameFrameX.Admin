@@ -20,9 +20,30 @@ internal static class Program
                 return 0;
             }
 
+            if (arguments.Length == 1 && arguments[0] is "--redact-logs-dry-run" or "--redact-logs")
+            {
+                var cleanupType = Enum.Parse<DbType>(RequiredEnvironment("GFX_MIGRATION_DATABASE_TYPE"), true);
+                using (var database = SingleMainMigration.Connect(cleanupType, RequiredEnvironment("GFX_MIGRATION_TARGET")))
+                {
+                    database.Ado.BeginTran();
+                    try
+                    {
+                        LogCredentialCleanup.Apply(database, arguments[0] == "--redact-logs-dry-run");
+                        database.Ado.CommitTran();
+                    }
+                    catch
+                    {
+                        database.Ado.RollbackTran();
+                        throw;
+                    }
+                }
+
+                return 0;
+            }
+
             if (arguments.Length != 1 || (arguments[0] != "--dry-run" && arguments[0] != "--execute"))
             {
-                Console.Error.WriteLine("用法：--dry-run | --execute | --self-test | --self-test-postgres；连接通过 GFX_MIGRATION_SOURCE / GFX_MIGRATION_TARGET，类型通过 GFX_MIGRATION_DATABASE_TYPE 指定。");
+                Console.Error.WriteLine("用法：--dry-run | --execute | --self-test | --self-test-postgres | --redact-logs-dry-run | --redact-logs；连接通过 GFX_MIGRATION_SOURCE / GFX_MIGRATION_TARGET，类型通过 GFX_MIGRATION_DATABASE_TYPE 指定。");
                 return 64;
             }
 

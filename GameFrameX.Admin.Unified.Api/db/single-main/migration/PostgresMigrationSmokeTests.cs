@@ -41,6 +41,8 @@ internal static class PostgresMigrationSmokeTests
                     Require(!target.DbMaintenance.IsAnyTable("tenant_game_home_online_sample_entity", false), "PostgreSQL dry-run 建表/复制必须全部回滚");
                     SingleMainMigration.Run(source, target, false, types);
                     SingleMainMigration.Run(source, target, false, types);
+
+                    LogCredentialCleanupSmokeTests.Run(source, target);
                     Require(target.Ado.GetInt("SELECT COUNT(*) FROM tenant_game_home_online_sample_entity WHERE online_count = 42 AND update_time IS NULL AND deleted_id IS NULL") == 1, "PostgreSQL 非文本NULL必须保真复制且重跑幂等");
                     Require(target.Ado.GetInt("SELECT COUNT(*) FROM tenant_client_api_policy_entity WHERE signature_required = true AND device_proof_required = false AND risk_policy IS NULL") == 1, "PostgreSQL 风险三字段必须保真");
                     Require(source.Ado.GetInt("SELECT COUNT(*) FROM tenant_game_home_online_sample_entity WHERE tenant_id = 1300000000001 AND app_id = 100") == 1, "PostgreSQL 源库保持不变");

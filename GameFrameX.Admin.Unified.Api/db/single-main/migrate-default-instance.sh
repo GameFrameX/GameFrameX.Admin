@@ -7,6 +7,7 @@
 # 已有同主键且相同的记录跳过；不同则整体回滚，不覆盖。源/目标退场表打印残留清单，不自动 DROP。
 # 确认迁移与备份、重复执行完成后可手动 DROP；system_tenant_entity 可能含加密的旧连接串，按敏感凭据处理。
 # --self-test-postgres：使用显式 GFX_TEST_PG_CONNECTION_STRING，创建并删除临时源/目标库验证真实 PostgreSQL。
+# --redact-logs-dry-run / --redact-logs：仅需目标连接；预览受影响行数 / 事务清理主库既有日志，重跑幂等。
 # --self-test：仅临时 SQLite 文件，验证回滚、保真、幂等、冲突和多租户拒绝。
 set -euo pipefail
 SCRIPT_DIRECTORY="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

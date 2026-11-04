@@ -60,6 +60,7 @@ internal static class SingleMainMigration
             ScopeColumnRetirement.Apply(target, currentTypes);
             riskMigration?.CompleteLegacyTarget(target);
             NormalizeMenuScope(target);
+            LogCredentialCleanup.Apply(target, false);
             var types = currentTypes.Where(SqlSugarEntityBoundary.IsTenantTable).ToArray();
             var sourceTables = source.DbMaintenance.GetTableInfoList(false).Select(table => table.Name).ToHashSet(StringComparer.OrdinalIgnoreCase);
             var copiedTables = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -201,6 +202,7 @@ internal static class SingleMainMigration
         var inserted = 0;
         foreach (DataRow row in rows.Rows)
         {
+            LogCredentialCleanup.RedactRow(tableName, row);
             var existing = target.Ado.GetDataTable($"SELECT {columnList} FROM {Quote(tableName)} WHERE id = @identity", new SugarParameter("@identity", row["id"]));
             if (existing.Rows.Count != 0)
             {
