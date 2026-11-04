@@ -25,7 +25,7 @@ import Dialog from 'primevue/dialog'
 import Button from 'primevue/button'
 import { t } from '../../../../../../i18n/index.ts'
 import { showSuccess } from '../../../../../../utils/message.ts'
-import { tenantGameMailCampaignEntityRevokePost } from '../../../../../../api/tenantGameMailCampaignEntity'
+import { gameMailCampaignRevokePost } from '../../../../../../api/gameMailCampaign'
 import {
   MAIL_CAMPAIGN_PUBLISH_STATUS_OPTIONS,
 } from '../constants'
@@ -56,7 +56,7 @@ const confirm = async () => {
   if (!row.value?.id) return
   loading.value = true
   try {
-    await tenantGameMailCampaignEntityRevokePost({ id: row.value.id })
+    await gameMailCampaignRevokePost({ id: row.value.id })
     showSuccess(t('message.gameBusiness.mailCampaign.revokeSuccess'))
     emit('done')
     close()

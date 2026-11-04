@@ -48,7 +48,7 @@ import { useCurrentApp } from '../../../../composables/useCurrentApp.ts'
 import {formatUnix} from '../../../../utils/formatTime.ts'
 import addDialog from '/@/views/app/trustCenter/gamePenaltyAppealEntity/component/AddDialog.vue'
 import reviewDialog from '/@/views/app/trustCenter/gamePenaltyAppealEntity/component/ReviewDialog.vue'
-import { tenantGamePenaltyAppealEntityPagePost } from '../../../../api/tenantGamePenaltyAppealEntity'
+import { gamePenaltyAppealPagePost } from '../../../../api/gamePenaltyAppeal'
 import {
   APPEAL_STATUS_OPTIONS,
   findEnumOption,
@@ -86,7 +86,7 @@ const {
   tableParams,
   onQuery,
 } = useCrudTable({
-  api: { pageApi: tenantGamePenaltyAppealEntityPagePost },
+  api: { pageApi: gamePenaltyAppealPagePost },
   immediate: true,
 })
 

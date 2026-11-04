@@ -3,8 +3,8 @@
     ref="dialogRef"
     :title="props.title"
     width="min(760px, calc(100vw - 32px))"
-    :addApi="tenantClientApiPolicyEntityAddPost"
-    :updateApi="tenantClientApiPolicyEntityUpdatePost"
+    :addApi="clientApiPolicyAddPost"
+    :updateApi="clientApiPolicyUpdatePost"
     :rules="rules"
     :beforeOpen="beforeOpen"
     :beforeSubmit="beforeSubmit"
@@ -88,7 +88,7 @@ import Textarea from 'primevue/textarea'
 import Message from 'primevue/message'
 import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import BaseEditFieldGroup from '/@/components/base-edit-dialog/FieldGroup.vue'
-import { tenantClientApiPolicyEntityAddPost, tenantClientApiPolicyEntityUpdatePost } from '../../../../../api/tenantClientApiPolicyEntity'
+import { clientApiPolicyAddPost, clientApiPolicyUpdatePost } from '../../../../../api/clientApiPolicy'
 import {showError} from '../../../../../utils/message.ts'
 
 const props = defineProps({

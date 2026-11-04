@@ -40,12 +40,6 @@ export interface OnlineAssetGrantItemRequest {
  */
 export interface OnlineAssetGrantRequest {
   /**
-   * 应用作用域（必填，经 OnlineScopeContextFactory 校验租户归属）。
-   * @min 1
-   * @max 9223372036854776000
-   */
-  appId: string;
-  /**
    * 区服作用域（必填，经 OnlineScopeContextFactory 校验租户与应用归属）。
    * @min 1
    * @max 9223372036854776000
@@ -73,17 +67,11 @@ export interface OnlineAssetGrantRequest {
 }
 
 /**
- * Online 资产人工撤销输入参数（高危；与 GameFrameX.Application.Game.Online.Asset.Dto.OnlineAssetGrantRequest 同构 + 目标 TransactionId）。
+ * Online 资产人工撤销输入参数（高危；与 GameFrameX.Application.GmCenter.Asset.Dto.OnlineAssetGrantRequest 同构 + 目标 TransactionId）。
  *
  * 撤销的是一笔已生效交易的资产变更，经 Online Grant/Transaction API 执行，Admin 侧零直写。
  */
 export interface OnlineAssetRevokeRequest {
-  /**
-   * 应用作用域（必填，经 OnlineScopeContextFactory 校验租户归属）。
-   * @min 1
-   * @max 9223372036854776000
-   */
-  appId: string;
   /**
    * 区服作用域（必填，经 OnlineScopeContextFactory 校验租户与应用归属）。
    * @min 1

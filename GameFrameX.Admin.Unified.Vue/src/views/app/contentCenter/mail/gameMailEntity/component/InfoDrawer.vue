@@ -62,8 +62,8 @@
 import {ref, onMounted} from "vue";
 
 import {systemEnumEnumDataListGet} from '../../../../../../api/systemEnum';
-import { tenantGameAreaEntitySelectStringPost } from "../../../../../../api/tenantGameAreaEntity";
-import { tenantGameGoodsEntitySelectStringPost } from "../../../../../../api/tenantGameGoodsEntity";
+import { gameAreaSelectStringPost } from "../../../../../../api/gameArea";
+import { gameGoodsSelectStringPost } from "../../../../../../api/gameGoods";
 import commonFunction from "../../../../../../utils/commonFunction.ts";
 import {formatUnix} from "../../../../../../utils/formatTime.ts";
 import {normalizeAppId} from "../../../../../../utils/appWorkspace.ts";
@@ -116,12 +116,12 @@ const resolveAppId = (row: any) => {
 }
 
 const getAreaList = async (appId?: number) => {
-  const res = await tenantGameAreaEntitySelectStringPost({appId, pageSize: MAX_SELECT_SIZE});
+  const res = await gameAreaSelectStringPost({appId, pageSize: MAX_SELECT_SIZE});
   areaList.value = res.data.data ?? [];
 };
 
 const loadGoodsList = async (appId?: number) => {
-  getGoodsList.value = (await tenantGameGoodsEntitySelectStringPost({appId, pageSize: MAX_SELECT_SIZE})).data.data ?? [];
+  getGoodsList.value = (await gameGoodsSelectStringPost({appId, pageSize: MAX_SELECT_SIZE})).data.data ?? [];
 }
 
 // Cancel

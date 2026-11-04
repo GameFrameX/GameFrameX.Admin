@@ -2,8 +2,8 @@
   <BaseEditDialog
     ref="dialogRef"
     :title="props.title"
-    :addApi="(params: any) => tenantGameTimeJobEntityAddPost(params)"
-    :updateApi="(params: any) => tenantGameTimeJobEntityUpdatePost(params)"
+    :addApi="(params: any) => gameTimeJobAddPost(params)"
+    :updateApi="(params: any) => gameTimeJobUpdatePost(params)"
     :rules="rules"
     :beforeOpen="beforeOpen"
     @reloadTable="emit('reloadTable')"
@@ -22,7 +22,7 @@
 import {ref} from 'vue'
 import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import {TextField} from '../../../../../components/crud-form-fields'
-import { tenantGameTimeJobEntityAddPost, tenantGameTimeJobEntityUpdatePost } from '../../../../../api/tenantGameTimeJobEntity'
+import { gameTimeJobAddPost, gameTimeJobUpdatePost } from '../../../../../api/gameTimeJob'
 import {normalizeAppId} from '../../../../../utils/appWorkspace.ts'
 import ToggleSwitch from 'primevue/toggleswitch';
 

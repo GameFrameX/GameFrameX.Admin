@@ -60,7 +60,7 @@ import {useCurrentApp} from '../../../../composables/useCurrentApp.ts'
 import {formatUnix} from '../../../../utils/formatTime.ts'
 import detailDialog from '/@/views/app/trustCenter/antiCheatEventEntity/component/DetailDialog.vue'
 import reviewDialog from '/@/views/app/trustCenter/antiCheatEventEntity/component/ReviewDialog.vue'
-import { tenantGameAntiCheatEventEntityPagePost } from '../../../../api/tenantGameAntiCheatEventEntity'
+import { gameAntiCheatEventPagePost } from '../../../../api/gameAntiCheatEvent'
 import {
     ANTI_CHEAT_PROVIDER_OPTIONS,
     ANTI_CHEAT_SUGGESTED_ACTION_OPTIONS,
@@ -104,7 +104,7 @@ const {
     tableParams,
     onQuery,
 } = useCrudTable({
-    api: {pageApi: tenantGameAntiCheatEventEntityPagePost},
+    api: {pageApi: gameAntiCheatEventPagePost},
     immediate: false,
 })
 

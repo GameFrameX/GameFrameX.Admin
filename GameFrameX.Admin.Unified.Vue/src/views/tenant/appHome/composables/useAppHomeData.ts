@@ -3,7 +3,7 @@
 // （应用维度拆分待 Unified.Api#209 后续）；onlineTrend 为最近 24 个整点桶，
 // 无采样桶 OnlineCount 为 null（趋势图断点）。公告走 tenantNotice。
 import {onMounted, reactive} from 'vue';
-import {tenantGameHomeEntityOverviewPost, tenantGameHomeEntityOnlineTrendPost} from '/@/api/tenantGameHomeEntity';
+import {gameHomeOverviewPost, gameHomeOnlineTrendPost} from '/@/api/gameHome';
 import {tenantNoticePageReceivedGet} from '/@/api/tenantNotice';
 import type {HomeNoticeItem} from '/@/views/tenant/home/composables/usePlatformHomeData';
 
@@ -37,7 +37,7 @@ export function useAppHomeData() {
 
   const loadOverview = async () => {
     try {
-      const res = await tenantGameHomeEntityOverviewPost();
+      const res = await gameHomeOverviewPost();
       const d = res.data.data;
       if (d) {
         state.onlineCount = d.onlineCount ?? 0;
@@ -60,7 +60,7 @@ export function useAppHomeData() {
 
   const loadTrend = async () => {
     try {
-      const res = await tenantGameHomeEntityOnlineTrendPost();
+      const res = await gameHomeOnlineTrendPost();
       const points = res.data.data?.points ?? [];
       state.trend = points.map((p) => (p.onlineCount == null ? null : Number(p.onlineCount)));
       state.trendLabels = points.map((p) => {

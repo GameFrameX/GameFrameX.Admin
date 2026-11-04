@@ -1,5 +1,5 @@
 <template>
-  <BaseEditDialog ref="dialogRef" :title="props.title" :addApi="tenantGameCommodityEntityAddPost" :updateApi="tenantGameCommodityEntityUpdatePost" :rules="rules" :beforeOpen="beforeOpen" @reloadTable="emit('reloadTable')">
+  <BaseEditDialog ref="dialogRef" :title="props.title" :addApi="gameCommodityAddPost" :updateApi="gameCommodityUpdatePost" :rules="rules" :beforeOpen="beforeOpen" @reloadTable="emit('reloadTable')">
     <template #default="{ ruleForm, isEditor }">
       <TextField v-model="ruleForm.status" name="status" :label="t('message.gameBusiness.area.status')" :placeholder="t('message.gameBusiness.user.pleaseSelectStatus')" maxlength="64" :disabled="isEditor"/>
       <FormLabel name="categoryId">{{ t('message.gameBusiness.commodity.category') }}</FormLabel>
@@ -21,8 +21,8 @@ import Message from 'primevue/message'
 import CascadeSelect from 'primevue/cascadeselect'
 import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import {TextField} from '../../../../../components/crud-form-fields'
-import { tenantGameCommodityEntityAddPost, tenantGameCommodityEntityUpdatePost } from '../../../../../api/tenantGameCommodityEntity'
-import { tenantGameGoodsCatalogueEntitySelectPost } from '../../../../../api/tenantGameGoodsCatalogueEntity'
+import { gameCommodityAddPost, gameCommodityUpdatePost } from '../../../../../api/gameCommodity'
+import { gameGoodsCatalogueSelectPost } from '../../../../../api/gameGoodsCatalogue'
 import {normalizeAppId} from '../../../../../utils/appWorkspace.ts'
 import {MAX_SELECT_SIZE} from '../../../../../constants/pagination.ts'
 
@@ -50,7 +50,7 @@ const gameGoodsCatalogueEntityTreeData = ref<any>([])
 const cascadeOptions = computed(() => convertTreeToCascade(gameGoodsCatalogueEntityTreeData.value))
 
 const getGameGoodsCatalogueEntityTreeData = async (appId?: number) => {
-  let list = await tenantGameGoodsCatalogueEntitySelectPost({appId: appId, pageSize: MAX_SELECT_SIZE});
+  let list = await gameGoodsCatalogueSelectPost({appId: appId, pageSize: MAX_SELECT_SIZE});
   gameGoodsCatalogueEntityTreeData.value = list.data.data ?? [];
 };
 

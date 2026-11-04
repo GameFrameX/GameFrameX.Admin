@@ -1,7 +1,7 @@
 <template>
   <BaseEditDialog ref="dialogRef" :title="props.title"
-    :addApi="tenantGameRedeemCodeEntityAddPost"
-    :updateApi="tenantGameRedeemCodeEntityUpdatePost"
+    :addApi="gameRedeemCodeAddPost"
+    :updateApi="gameRedeemCodeUpdatePost"
     :rules="rules"
     :beforeOpen="beforeOpen" :beforeSubmit="beforeSubmit"
     scrollable @reloadTable="emit('reloadTable')">
@@ -61,11 +61,11 @@ import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import RewardItemsEditor from '/@/components/reward-items-editor/index.vue'
 import {TextField} from '../../../../../components/crud-form-fields'
 import {parseRewardItems, toRewardItemsJson} from '../../../../../components/reward-items-editor/rewardItems.ts'
-import { tenantGameRedeemCodeEntityAddPost, tenantGameRedeemCodeEntityUpdatePost } from '../../../../../api/tenantGameRedeemCodeEntity'
-import { tenantGameAreaEntitySelectStringPost } from '../../../../../api/tenantGameAreaEntity'
-import { tenantGameRedeemCodeChannelEntitySelectStringPost } from '../../../../../api/tenantGameRedeemCodeChannelEntity'
+import { gameRedeemCodeAddPost, gameRedeemCodeUpdatePost } from '../../../../../api/gameRedeemCode'
+import { gameAreaSelectStringPost } from '../../../../../api/gameArea'
+import { gameRedeemCodeChannelSelectStringPost } from '../../../../../api/gameRedeemCodeChannel'
 import {MAX_SELECT_SIZE} from '../../../../../constants/pagination.ts'
-import { tenantGameRewardTemplateEntityCopySnapshotPost, tenantGameRewardTemplateEntitySelectPost } from '../../../../../api/tenantGameRewardTemplateEntity'
+import { gameRewardTemplateCopySnapshotPost, gameRewardTemplateSelectPost } from '../../../../../api/gameRewardTemplate'
 import {normalizeAppId, type AppWorkspaceId} from '../../../../../utils/appWorkspace.ts'
 
 interface ListItem {
@@ -125,15 +125,15 @@ const rules = {
 }
 
 const loadAreaOptions = async (appId?: AppWorkspaceId) => {
-  areaIdOptions.value = (await tenantGameAreaEntitySelectStringPost({appId: appId, pageSize: MAX_SELECT_SIZE})).data.data ?? []
+  areaIdOptions.value = (await gameAreaSelectStringPost({appId: appId, pageSize: MAX_SELECT_SIZE})).data.data ?? []
 }
 
 const loadChannelOptions = async (appId?: AppWorkspaceId) => {
-  redeemCodeChannelOptions.value = (await tenantGameRedeemCodeChannelEntitySelectStringPost({appId: appId, pageSize: MAX_SELECT_SIZE})).data.data ?? []
+  redeemCodeChannelOptions.value = (await gameRedeemCodeChannelSelectStringPost({appId: appId, pageSize: MAX_SELECT_SIZE})).data.data ?? []
 }
 
 const loadRewardTemplateOptions = async (appId?: AppWorkspaceId) => {
-  rewardTemplateList.value = appId ? ((await tenantGameRewardTemplateEntitySelectPost({appId, pageSize: MAX_SELECT_SIZE})).data.data ?? []) : []
+  rewardTemplateList.value = appId ? ((await gameRewardTemplateSelectPost({appId, pageSize: MAX_SELECT_SIZE})).data.data ?? []) : []
 }
 
 const loadScopedOptions = async (appId?: AppWorkspaceId) => {
@@ -152,7 +152,7 @@ const onRewardTemplateChange = async (event?: any) => {
   const templateId = resolveRewardTemplateId(event?.value ?? selectedRewardTemplateId.value)
   selectedRewardTemplateId.value = Number.isFinite(templateId) ? templateId : undefined
   if (!templateId || !ruleForm?.appId) return
-  const response = await tenantGameRewardTemplateEntityCopySnapshotPost({id: templateId, appId: ruleForm.appId})
+  const response = await gameRewardTemplateCopySnapshotPost({id: templateId, appId: ruleForm.appId})
   const snapshot = response.data.data
   ruleForm.contents = parseRewardItems(snapshot?.rewardItemsJson)
 }

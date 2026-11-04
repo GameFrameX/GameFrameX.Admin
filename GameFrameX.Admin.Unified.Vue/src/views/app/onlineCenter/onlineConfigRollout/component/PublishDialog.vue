@@ -54,9 +54,9 @@ import InputNumber from 'primevue/inputnumber'
 import Select from 'primevue/select'
 import Textarea from 'primevue/textarea'
 import { showSuccess } from '../../../../../utils/message.ts'
-import { tenantGameOnlineConfigRolloutPublishPost } from '../../../../../api/tenantGameOnlineConfigRollout'
-import { tenantGameOnlinePlayerSegmentPagePost } from '../../../../../api/tenantGameOnlinePlayerSegment'
-import { OnlinePlayerSegmentSyncStatus } from '../../../../../api/tenantGameOnlinePlayerSegment/types'
+import { gameOnlineConfigRolloutPublishPost } from '../../../../../api/gameOnlineConfigRollout'
+import { gameOnlinePlayerSegmentPagePost } from '../../../../../api/gameOnlinePlayerSegment'
+import { OnlinePlayerSegmentSyncStatus } from '../../../../../api/gameOnlinePlayerSegment/types'
 import { ONLINE_CONFIG_ROLLOUT_KIND_OPTIONS } from '../constants'
 
 const props = withDefaults(defineProps<{
@@ -97,7 +97,7 @@ const reset = () => {
 const loadSyncedSegments = async () => {
   segmentLoading.value = true
   try {
-    const res: any = await tenantGameOnlinePlayerSegmentPagePost({
+    const res: any = await gameOnlinePlayerSegmentPagePost({
       appId: props.appId as string | number,
       syncStatus: OnlinePlayerSegmentSyncStatus.Synced,
       page: 1,
@@ -140,7 +140,7 @@ const confirm = async () => {
   }
   loading.value = true
   try {
-    const res: any = await tenantGameOnlineConfigRolloutPublishPost({
+    const res: any = await gameOnlineConfigRolloutPublishPost({
       appId: props.appId as string | number,
       serverId: serverId.value as number,
       configKind: configKind.value as number,

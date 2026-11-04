@@ -6,7 +6,7 @@
             v-model="queryParams"
             :fields="searchFields"
             :showAdd="true"
-            authPrefix="tenantGameAppAssetPackage"
+            authPrefix="gameAppAssetPackage"
             :defaultSearchKey="false"
             @query="onQuery"
             
@@ -19,7 +19,7 @@
         <CrudDataTable :value="tableData" v-block-loading="loading" showGridlines stripedRows rowKey="id"
                        :totalRecords="tableParams.total" :rows="tableParams.pageSize"
                        :rowsPerPageOptions="[10, 20, 50, 100, 200, 500]"
-                       authPrefix="tenantGameAppAssetPackage"
+                       authPrefix="gameAppAssetPackage"
                        :actions="actions"
                        :columns="columns"
                        :exportQuery="queryParams"
@@ -40,7 +40,7 @@ import {useCrudTable} from '../../../../../composables/useCrudTable.ts'
 import {usePrimeTablePage, useRouteAppIdQuerySync} from '../../../../../composables'
 import {useCurrentApp} from '../../../../../composables/useCurrentApp.ts'
 import editDialog from '/@/views/app/appCenter/resource/assetPackage/component/EditDialog.vue'
-import { tenantGameAppAssetPackageDeletePost, tenantGameAppAssetPackagePagePost } from '../../../../../api/tenantGameAppAssetPackage'
+import { gameAppAssetPackageDeletePost, gameAppAssetPackagePagePost } from '../../../../../api/gameAppAssetPackage'
 import {createdNameColumn, descriptionColumn, nameColumn, nameSearchField} from '../../../../../utils/crudConfig.ts'
 
 const route = useRoute()
@@ -56,7 +56,7 @@ const {
   loading, tableData, queryParams, tableParams,
   onQuery, onDelete,
 } = useCrudTable({
-  api: {pageApi: tenantGameAppAssetPackagePagePost, deleteApi: tenantGameAppAssetPackageDeletePost},
+  api: {pageApi: gameAppAssetPackagePagePost, deleteApi: gameAppAssetPackageDeletePost},
   immediate: true,
 })
 

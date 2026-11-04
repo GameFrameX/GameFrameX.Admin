@@ -77,7 +77,7 @@ export interface TenantFileResponse {
   /** 提供者 */
   provider?: string | null;
   /**
-   * 关联的租户对象存储配置 ID（TenantObjectStorageConfigEntity.Id）。
+   * 关联的租户对象存储配置 ID（ObjectStorageConfig.Id）。
    * 新上传文件必填，用于按精确配置解析下载/删除路径；历史记录为 null 时按本地 legacy 行为兜底。
    */
   storageConfigId?: string | null;

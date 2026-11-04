@@ -5,8 +5,8 @@
     width="min(900px, calc(100vw - 32px))"
     scrollable
     :defaultForm="defaultForm"
-    :addApi="tenantAdvertisementCallbackConfigEntityAddPost"
-    :updateApi="tenantAdvertisementCallbackConfigEntityUpdatePost"
+    :addApi="advertisementCallbackConfigAddPost"
+    :updateApi="advertisementCallbackConfigUpdatePost"
     :rules="rules"
     :beforeOpen="beforeOpen"
     :beforeSubmit="beforeSubmit"
@@ -124,7 +124,7 @@ import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import {TextareaField} from '../../../../../components/crud-form-fields'
 import ConfigAppScopePicker from '/@/components/config-app-scope-picker/index.vue'
 import {showError} from '../../../../../utils/message.ts'
-import { tenantAdvertisementCallbackConfigEntityAddPost, tenantAdvertisementCallbackConfigEntityProvidersGet, tenantAdvertisementCallbackConfigEntitySchemaGet, tenantAdvertisementCallbackConfigEntityUpdatePost } from '../../../../../api/tenantAdvertisementCallbackConfigEntity'
+import { advertisementCallbackConfigAddPost, advertisementCallbackConfigProvidersGet, advertisementCallbackConfigSchemaGet, advertisementCallbackConfigUpdatePost } from '../../../../../api/advertisementCallbackConfig'
 import {isEnabled} from '../../../../../utils/isEnabled.ts'
 
 interface AdCallbackFieldOption {
@@ -200,7 +200,7 @@ const loadSchema = async (provider: string): Promise<AdCallbackSchema | null> =>
     return null
   }
   try {
-    const res: any = await tenantAdvertisementCallbackConfigEntitySchemaGet({provider: normalized})
+    const res: any = await advertisementCallbackConfigSchemaGet({provider: normalized})
     const data = res.data.data
     schema.value = data ?? null
     return data ?? null
@@ -303,7 +303,7 @@ const beforeSubmit = (form: any, isEditor: boolean) => {
 
 onMounted(async () => {
   try {
-    const res: any = await tenantAdvertisementCallbackConfigEntityProvidersGet()
+    const res: any = await advertisementCallbackConfigProvidersGet()
     const list = res.data?.data ?? []
     providerOptions.value = (list || []).map((item: any) => ({value: item.value, label: item.label}))
   } catch {

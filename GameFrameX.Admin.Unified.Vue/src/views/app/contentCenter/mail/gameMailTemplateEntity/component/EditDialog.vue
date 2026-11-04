@@ -1,7 +1,7 @@
 <template>
   <BaseEditDialog ref="dialogRef" :title="props.title"
-    :addApi="(params: any) => tenantGameMailTemplateEntityAddPost(params)"
-    :updateApi="(params: any) => tenantGameMailTemplateEntityUpdatePost(params)"
+    :addApi="(params: any) => gameMailTemplateAddPost(params)"
+    :updateApi="(params: any) => gameMailTemplateUpdatePost(params)"
     :rules="rules" :defaultForm="defaultForm"
     :beforeOpen="beforeOpen" :beforeSubmit="beforeSubmit"
     scrollable @reloadTable="emit('reloadTable')">
@@ -55,8 +55,8 @@ import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import {TextField, TextareaField} from '../../../../../../components/crud-form-fields'
 import RewardItemsEditor from '/@/components/reward-items-editor/index.vue'
 import {parseRewardItems, toRewardItemsJson} from '../../../../../../components/reward-items-editor/rewardItems.ts'
-import { tenantGameMailTemplateEntityAddPost, tenantGameMailTemplateEntityUpdatePost } from '../../../../../../api/tenantGameMailTemplateEntity'
-import { tenantGameMailTemplateCategoryEntitySelectPost } from '../../../../../../api/tenantGameMailTemplateCategoryEntity'
+import { gameMailTemplateAddPost, gameMailTemplateUpdatePost } from '../../../../../../api/gameMailTemplate'
+import { gameMailTemplateCategorySelectPost } from '../../../../../../api/gameMailTemplateCategory'
 import {systemEnumEnumDataListGet} from '../../../../../../api/systemEnum';
 import {extractVariablesFromAll, toVariableLabels} from '../../../../../../utils/templateUtils.ts'
 import {isEnabled} from '../../../../../../utils/isEnabled.ts'
@@ -71,7 +71,7 @@ const categoryList = ref<any[]>([])
 const getEnumMailTypeData = ref<any>([])
 
 const loadCategoryList = async (appId?: AppWorkspaceId) => {
-  const catRes = await tenantGameMailTemplateCategoryEntitySelectPost({appId: appId, pageSize: MAX_SELECT_SIZE})
+  const catRes = await gameMailTemplateCategorySelectPost({appId: appId, pageSize: MAX_SELECT_SIZE})
   categoryList.value = catRes.data.data ?? []
 }
 

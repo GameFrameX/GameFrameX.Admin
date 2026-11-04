@@ -1,7 +1,7 @@
 <template>
   <BaseEditDialog ref="dialogRef" :title="props.title"
-                  :addApi="tenantGameRewardTemplateEntityAddPost"
-                  :updateApi="tenantGameRewardTemplateEntityUpdatePost"
+                  :addApi="gameRewardTemplateAddPost"
+                  :updateApi="gameRewardTemplateUpdatePost"
                   :rules="rules" :defaultForm="defaultForm"
                   :beforeOpen="beforeOpen" :beforeSubmit="beforeSubmit"
                   scrollable @reloadTable="emit('reloadTable')">
@@ -34,8 +34,8 @@ import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import RewardItemsEditor from '/@/components/reward-items-editor/index.vue'
 import {TextField} from '../../../../../../components/crud-form-fields'
 import {parseRewardItems, toRewardItemsJson} from '../../../../../../components/reward-items-editor/rewardItems.ts'
-import { tenantGameRewardTemplateEntityAddPost, tenantGameRewardTemplateEntityUpdatePost } from '../../../../../../api/tenantGameRewardTemplateEntity'
-import { tenantGameRewardTemplateGroupEntitySelectPost } from '../../../../../../api/tenantGameRewardTemplateGroupEntity'
+import { gameRewardTemplateAddPost, gameRewardTemplateUpdatePost } from '../../../../../../api/gameRewardTemplate'
+import { gameRewardTemplateGroupSelectPost } from '../../../../../../api/gameRewardTemplateGroup'
 import {isEnabled} from '../../../../../../utils/isEnabled.ts'
 import {normalizeAppId, type AppWorkspaceId} from '../../../../../../utils/appWorkspace.ts'
 import {MAX_SELECT_SIZE} from '../../../../../../constants/pagination.ts'
@@ -54,7 +54,7 @@ const rules = {
 const defaultForm = () => ({isEnabled: true, sort: 100, rewardItemsJson: [], snapshotSchemaVersion: 1} as any)
 
 const loadGroupList = async (appId?: AppWorkspaceId) => {
-  groupList.value = appId ? ((await tenantGameRewardTemplateGroupEntitySelectPost({appId, pageSize: MAX_SELECT_SIZE})).data.data ?? []) : []
+  groupList.value = appId ? ((await gameRewardTemplateGroupSelectPost({appId, pageSize: MAX_SELECT_SIZE})).data.data ?? []) : []
 }
 
 const beforeOpen = (form: any, isEditor: boolean) => {

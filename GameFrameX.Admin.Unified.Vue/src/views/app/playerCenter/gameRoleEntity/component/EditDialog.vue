@@ -1,5 +1,5 @@
 <template>
-  <BaseEditDialog ref="dialogRef" :title="props.title" :addApi="tenantGameRoleEntityAddPost" :updateApi="tenantGameRoleEntityUpdatePost" :rules="rules" :beforeOpen="beforeOpen" @reloadTable="emit('reloadTable')">
+  <BaseEditDialog ref="dialogRef" :title="props.title" :addApi="gameRoleAddPost" :updateApi="gameRoleUpdatePost" :rules="rules" :beforeOpen="beforeOpen" @reloadTable="emit('reloadTable')">
     <template #default="{ ruleForm, isEditor }">
       <TextField v-model="ruleForm.description" name="description" :label="t('message.gameBusiness.description')" :placeholder="t('message.gameBusiness.pleaseEnterDescription')" maxlength="512"/>
     </template>
@@ -10,7 +10,7 @@
 import {ref} from 'vue'
 import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import {TextField} from '../../../../../components/crud-form-fields'
-import { tenantGameRoleEntityAddPost, tenantGameRoleEntityUpdatePost } from '../../../../../api/tenantGameRoleEntity'
+import { gameRoleAddPost, gameRoleUpdatePost } from '../../../../../api/gameRole'
 import {normalizeAppId} from '../../../../../utils/appWorkspace.ts'
 
 const props = defineProps({

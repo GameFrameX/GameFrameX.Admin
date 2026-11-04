@@ -53,7 +53,6 @@ export interface LogVisitFields {
   rowVersion?: string | null;
   /** 是否启用,true:启用，false:禁用，null:未设置(启用) */
   isEnabled?: boolean | null;
-  /** 租户Id */
   tenantId?: string | null;
   controllerName?: string | null;
   actionName?: string | null;

@@ -31,7 +31,7 @@
 <script lang="ts" setup="" name="antiCheatReviewDialog">
 import {ref} from 'vue'
 import {showConfirm, showSuccess} from '../../../../../utils/message.ts'
-import { tenantGameAntiCheatEventEntityReviewPost } from '../../../../../api/tenantGameAntiCheatEventEntity'
+import { gameAntiCheatEventReviewPost } from '../../../../../api/gameAntiCheatEvent'
 import {
     ANTI_CHEAT_SUGGESTED_ACTION_OPTIONS,
     REVIEW_TARGET_OPTIONS,
@@ -71,7 +71,7 @@ const submit = async () => {
     }
     submitting.value = true
     try {
-        await tenantGameAntiCheatEventEntityReviewPost({
+        await gameAntiCheatEventReviewPost({
             id: row.value.id,
             rowVersion: row.value.rowVersion,
             manualReviewState: form.value.manualReviewState,

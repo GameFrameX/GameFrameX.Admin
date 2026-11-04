@@ -225,7 +225,7 @@ public sealed class ClientApiRoleEndpointTests
         ClientApiRecordingHttpHandler? handler = null,
         ClientApiTokenIssuer? issuer = null,
         GameLoginTicketIssuer? ticketIssuer = null,
-        FakeTenantGamePenaltyEnforcementService? penaltyEnforcement = null)
+        FakeGamePenaltyEnforcementService? penaltyEnforcement = null)
     {
         db.InitTenantTables(typeof(TenantGameRoleEntity), typeof(TenantGameAreaEntity), typeof(TenantGameUserEntity));
         return new GameRoleController(
@@ -234,7 +234,7 @@ public sealed class ClientApiRoleEndpointTests
             db.Repository<TenantGameAreaEntity>(),
             issuer ?? new ClientApiTokenIssuer(FakeOptionsProvider.WithTokenPolicy("unit-test-signing-key", 60)),
             ticketIssuer ?? new GameLoginTicketIssuer(TestGameLoginTicketKeyResolver.Create(), FakeOptionsProvider.WithTicketPolicy(DateTimeOffset.UtcNow.ToUnixTimeSeconds() + 60)),
-            penaltyEnforcement ?? new FakeTenantGamePenaltyEnforcementService());
+            penaltyEnforcement ?? new FakeGamePenaltyEnforcementService());
     }
 
     private sealed class TestGameLoginTicketKeyResolver : IGameLoginTicketKeyResolver

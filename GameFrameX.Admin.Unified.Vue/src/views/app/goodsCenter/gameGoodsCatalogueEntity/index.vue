@@ -44,7 +44,7 @@ import {useCrudTable} from '../../../../composables/useCrudTable.ts'
 import {usePrimeTablePage, useRouteAppIdQuerySync} from '../../../../composables'
 import {useCurrentApp} from '../../../../composables/useCurrentApp.ts'
 import editDialog from '/@/views/app/goodsCenter/gameGoodsCatalogueEntity/component/EditDialog.vue'
-import { tenantGameGoodsCatalogueEntityPagePost, tenantGameGoodsCatalogueEntityDeletePost } from '../../../../api/tenantGameGoodsCatalogueEntity';
+import { gameGoodsCataloguePagePost, gameGoodsCatalogueDeletePost } from '../../../../api/gameGoodsCatalogue';
 
 const route = useRoute()
 const {resolveInitialAppId} = useCurrentApp()
@@ -64,7 +64,7 @@ const {
   onQuery,
   onDelete
 } = useCrudTable({
-  api: {pageApi: tenantGameGoodsCatalogueEntityPagePost, deleteApi: tenantGameGoodsCatalogueEntityDeletePost},
+  api: {pageApi: gameGoodsCataloguePagePost, deleteApi: gameGoodsCatalogueDeletePost},
   immediate: true,
 })
 

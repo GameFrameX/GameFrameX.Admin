@@ -1,5 +1,5 @@
 <template>
-  <BaseEditDialog ref="dialogRef" :title="props.title" :addApi="tenantGameAppReleaseVersionAddPost" :updateApi="tenantGameAppReleaseVersionUpdatePost" :rules="rules" :defaultForm="() => ({ isForce: false })" :beforeOpen="beforeOpen" scrollable @reloadTable="emit('reloadTable')">
+  <BaseEditDialog ref="dialogRef" :title="props.title" :addApi="gameAppReleaseVersionAddPost" :updateApi="gameAppReleaseVersionUpdatePost" :rules="rules" :defaultForm="() => ({ isForce: false })" :beforeOpen="beforeOpen" scrollable @reloadTable="emit('reloadTable')">
     <template #default="{ ruleForm, isEditor }">
       <FormLabel name="channel">{{ t('message.client.channelName') }}</FormLabel>
       <FormField name="channel" v-slot="{ props: fProps, invalid, error }">
@@ -46,12 +46,12 @@ import FormField from '@primevue/forms/formfield'
 import Message from 'primevue/message'
 import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import {TextField, TextareaField} from '../../../../../../components/crud-form-fields'
-import { tenantGameAppReleaseVersionAddPost, tenantGameAppReleaseVersionUpdatePost } from '../../../../../../api/tenantGameAppReleaseVersion'
+import { gameAppReleaseVersionAddPost, gameAppReleaseVersionUpdatePost } from '../../../../../../api/gameAppReleaseVersion'
 import { globalPlatformSelectPost } from '../../../../../../api/globalPlatform'
 import { globalLanguageSelectPost } from '../../../../../../api/globalLanguage'
-import { tenantGameAppVersionDefinitionSelectPost } from '../../../../../../api/tenantGameAppVersionDefinition'
-import { tenantGameAppPackageListGet } from '../../../../../../api/tenantGameAppPackage'
-import { tenantChannelDefinitionAvailableGet } from '../../../../../../api/tenantChannelDefinition'
+import { gameAppVersionDefinitionSelectPost } from '../../../../../../api/gameAppVersionDefinition'
+import { gameAppPackageListGet } from '../../../../../../api/gameAppPackage'
+import { channelDefinitionAvailableGet } from '../../../../../../api/channelDefinition'
 import { mapAvailableChannelDefinitions } from '../../../../../../utils/channelDefinition.ts'
 import {MAX_SELECT_SIZE} from '../../../../../../constants/pagination.ts'
 
@@ -104,7 +104,7 @@ const onLanguageQuery = async () => {
 }
 
 const onChannelQuery = async () => {
-  const res = await tenantChannelDefinitionAvailableGet({pageSize: MAX_SELECT_SIZE})
+  const res = await channelDefinitionAvailableGet({pageSize: MAX_SELECT_SIZE})
   querySelections.value.channel = mapAvailableChannelDefinitions(res.data.data || [], 'code')
 }
 
@@ -115,7 +115,7 @@ const onPlatformQuery = async () => {
 
 const onVersionQuery = async (appId?: number | string) => {
   const id = appId
-  const res = await tenantGameAppVersionDefinitionSelectPost(id ? {appId: id, pageSize: MAX_SELECT_SIZE} : {pageSize: MAX_SELECT_SIZE})
+  const res = await gameAppVersionDefinitionSelectPost(id ? {appId: id, pageSize: MAX_SELECT_SIZE} : {pageSize: MAX_SELECT_SIZE})
   querySelections.value.version = res.data.data
   querySelections.value.oldVersion = res.data.data
 }
@@ -143,7 +143,7 @@ const onPackageQuery = async (appId?: number | string) => {
     querySelections.value.package = buildPackageOptions([])
     return
   }
-  const res = await tenantGameAppPackageListGet({appId: id, pageSize: MAX_SELECT_SIZE})
+  const res = await gameAppPackageListGet({appId: id, pageSize: MAX_SELECT_SIZE})
   querySelections.value.package = buildPackageOptions(res.data?.data || [])
 }
 

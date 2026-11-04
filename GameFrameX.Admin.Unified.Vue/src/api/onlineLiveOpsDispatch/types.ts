@@ -6,7 +6,7 @@ import type { LiveOpsSourceKind, OnlineLiveOpsDispatchResponse } from "../_share
 /**
  * LiveOps 统一下发输入（来源 change C343 / vault:C8 S7.7）。
  *
- * 五类来源硬枚举 + 业务主键 + Online 作用域三元组的 AppId/ServerId（TenantId 由鉴权上下文强制注入）；
+ * 五类来源硬枚举 + 业务主键 + 目标区服 ServerId；
  * `Reason` 必填进审计；`SegmentId` 可选定向分群。越枚举值 / 越作用域在入口即拒绝。
  */
 export interface OnlineLiveOpsDispatchRequest {
@@ -19,13 +19,7 @@ export interface OnlineLiveOpsDispatchRequest {
    */
   businessKey: number;
   /**
-   * 目标应用Id（经 Online 作用域三元组租户归属校验）。
-   * @min 1
-   * @max 9223372036854776000
-   */
-  appId: string;
-  /**
-   * 目标区服Id（经 Online 作用域三元组租户归属校验；Online 命令按区服路由到对应 Runtime）。
+   * 目标区服Id（Online 命令按区服路由到对应 Runtime）。
    * @min 1
    * @max 9223372036854776000
    */

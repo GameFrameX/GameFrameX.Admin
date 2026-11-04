@@ -53,8 +53,6 @@ export interface AddDictionaryDataRequest {
   rowVersion?: string | null;
   /** 是否启用,true:启用，false:禁用，null:未设置(启用) */
   isEnabled?: boolean | null;
-  /** 租户Id */
-  tenantId?: string | null;
   dictionaryTypeId?: string;
   dictionaryType?: GlobalDictionaryTypeEntity;
   value?: string | null;
@@ -174,8 +172,6 @@ export interface UpdateDictionaryDataRequest {
   rowVersion?: string | null;
   /** 是否启用,true:启用，false:禁用，null:未设置(启用) */
   isEnabled?: boolean | null;
-  /** 租户Id */
-  tenantId?: string | null;
   dictionaryTypeId?: string;
   dictionaryType?: GlobalDictionaryTypeEntity;
   value?: string | null;

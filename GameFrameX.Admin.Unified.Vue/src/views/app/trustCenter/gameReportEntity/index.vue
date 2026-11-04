@@ -53,7 +53,7 @@ import { useCurrentApp } from '../../../../composables/useCurrentApp.ts'
 import {formatUnix} from '../../../../utils/formatTime.ts'
 import addDialog from '/@/views/app/trustCenter/gameReportEntity/component/AddDialog.vue'
 import linkPenaltyDialog from '/@/views/app/trustCenter/gameReportEntity/component/LinkPenaltyDialog.vue'
-import { tenantGameReportEntityPagePost } from '../../../../api/tenantGameReportEntity'
+import { gameReportPagePost } from '../../../../api/gameReport'
 import {
   REPORT_TYPE_OPTIONS,
   REPORT_STATUS_OPTIONS,
@@ -104,7 +104,7 @@ const {
   tableParams,
   onQuery,
 } = useCrudTable({
-  api: { pageApi: tenantGameReportEntityPagePost },
+  api: { pageApi: gameReportPagePost },
   immediate: true,
 })
 

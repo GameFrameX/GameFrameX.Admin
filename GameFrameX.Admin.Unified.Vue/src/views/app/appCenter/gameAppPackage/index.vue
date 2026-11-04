@@ -3,7 +3,7 @@
     <Card>
       <template #content>
         <SearchForm v-model="queryParams" :fields="searchFields" :defaultSearchKey="false"
-                    authPrefix="tenantGameAppPackage" :showAdd="true" @query="onQuery" @add="openAddPackage">
+                    authPrefix="gameAppPackage" :showAdd="true" @query="onQuery" @add="openAddPackage">
         </SearchForm>
       </template>
     </Card>
@@ -12,7 +12,7 @@
       <template #content>
         <CrudDataTable :value="tableData" v-block-loading="loading" showGridlines stripedRows style="width: 100%"
                        :totalRecords="tableParams.total" :rows="tableParams.pageSize" :rowsPerPageOptions="[10, 20, 50, 100]"
-                       authPrefix="tenantGameAppPackage"
+                       authPrefix="gameAppPackage"
                        :actions="actions"
                        :customActions="customActions"
                        actionColumnWidth="260px"
@@ -51,7 +51,7 @@ import {usePrimeTablePage, useRouteAppIdQuerySync } from '../../../../composable
 import { showConfirm, showSuccess } from '../../../../utils/message.ts'
 import { formatUnix } from '../../../../utils/formatTime.ts'
 import { faCircleCheck, faPowerOff, faToggleOn } from '../../../../utils/icons.ts'
-import { tenantGameAppPackageDeletePost, tenantGameAppPackagePagePost, tenantGameAppPackageSetDefaultPost, tenantGameAppPackageSetStatusPost } from '../../../../api/tenantGameAppPackage'
+import { gameAppPackageDeletePost, gameAppPackagePagePost, gameAppPackageSetDefaultPost, gameAppPackageSetStatusPost } from '../../../../api/gameAppPackage'
 import { useCurrentApp } from '../../../../composables/useCurrentApp.ts'
 import editDialog from './component/EditDialog.vue'
 
@@ -87,8 +87,8 @@ const {
   onQuery,
 } = useCrudTable({
   api: {
-    pageApi: (params) => tenantGameAppPackagePagePost({ ...params, appId: params.appId }),
-    deleteApi: (params) => tenantGameAppPackageDeletePost({ id: params.id, rowVersion: params.rowVersion }),
+    pageApi: (params) => gameAppPackagePagePost({ ...params, appId: params.appId }),
+    deleteApi: (params) => gameAppPackageDeletePost({ id: params.id, rowVersion: params.rowVersion }),
   },
   immediate: true,
 })
@@ -118,19 +118,19 @@ const openEditPackage = (row: any) => {
 const onDeletePackage = async (row: any) => {
   const confirmed = await showConfirm(`${t('gameBusiness.package.deleteConfirm')}：【${row.name}】?`, t('common.message.tip'), {type: 'danger'})
   if (!confirmed) return
-  await tenantGameAppPackageDeletePost({ id: row.id, rowVersion: row.rowVersion })
+  await gameAppPackageDeletePost({ id: row.id, rowVersion: row.rowVersion })
   onQuery()
   showSuccess(t('gameBusiness.app.deleteSuccess'))
 }
 
 const onSetDefault = async (row: any) => {
-  await tenantGameAppPackageSetDefaultPost({ id: row.id })
+  await gameAppPackageSetDefaultPost({ id: row.id })
   onQuery()
   showSuccess(t('gameBusiness.package.setDefaultSuccess'))
 }
 
 const onToggleStatus = async (row: any) => {
-  await tenantGameAppPackageSetStatusPost({ id: row.id, isEnabled: row.isEnabled === false })
+  await gameAppPackageSetStatusPost({ id: row.id, isEnabled: row.isEnabled === false })
   onQuery()
 }
 

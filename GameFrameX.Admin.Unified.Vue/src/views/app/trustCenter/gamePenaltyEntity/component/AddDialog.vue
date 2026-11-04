@@ -1,7 +1,7 @@
 <template>
   <BaseEditDialog ref="dialogRef" :title="props.title"
-    :addApi="tenantGamePenaltyEntityAddPost"
-    :updateApi="tenantGamePenaltyEntityAddPost"
+    :addApi="gamePenaltyAddPost"
+    :updateApi="gamePenaltyAddPost"
     :rules="rules"
     :beforeOpen="beforeOpen" :beforeSubmit="beforeSubmit"
     scrollable @reloadTable="emit('reloadTable')">
@@ -60,9 +60,9 @@ import Select from 'primevue/select'
 import DatePicker from 'primevue/datepicker'
 import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import ConfigAppScopePicker from '/@/components/config-app-scope-picker/index.vue'
-import { tenantGamePenaltyEntityAddPost } from '../../../../../api/tenantGamePenaltyEntity'
+import { gamePenaltyAddPost } from '../../../../../api/gamePenalty'
 import { tenantGameAppEntityListGet } from '../../../../../api/tenantGameAppEntity'
-import { tenantGameAreaEntitySelectStringPost } from '../../../../../api/tenantGameAreaEntity'
+import { gameAreaSelectStringPost } from '../../../../../api/gameArea'
 import {MAX_SELECT_SIZE} from '../../../../../constants/pagination.ts'
 import {
   PENALTY_TARGET_TYPE_OPTIONS,
@@ -94,7 +94,7 @@ const loadAreaOptions = async (appId?: number) => {
     areaIdOptions.value = []
     return
   }
-  areaIdOptions.value = (await tenantGameAreaEntitySelectStringPost({ appId: appId, pageSize: MAX_SELECT_SIZE })).data.data ?? []
+  areaIdOptions.value = (await gameAreaSelectStringPost({ appId: appId, pageSize: MAX_SELECT_SIZE })).data.data ?? []
 }
 
 const onAppChange = (form: any, appId?: number | string) => {

@@ -65,7 +65,7 @@ import {useCrudTable} from '../../../../composables/useCrudTable.ts'
 import {usePrimeTablePage, useRouteAppIdQuerySync} from '../../../../composables'
 import editDialog from '/@/views/app/opsCenter/gameAreaEntity/component/EditDialog.vue'
 import {isEnabled} from '../../../../utils/isEnabled.ts'
-import { tenantGameAreaEntityDisableDeletePost, tenantGameAreaEntityOpenPost, tenantGameAreaEntityPagePost, tenantGameAreaEntityRestartPost, tenantGameAreaEntityStopPost } from '../../../../api/tenantGameAreaEntity'
+import { gameAreaDisableDeletePost, gameAreaOpenPost, gameAreaPagePost, gameAreaRestartPost, gameAreaStopPost } from '../../../../api/gameArea'
 import {useCurrentApp} from '../../../../composables/useCurrentApp.ts'
 import {systemEnumEnumDataListGet} from '../../../../api/systemEnum';
 import commonFunction from '../../../../utils/commonFunction.ts'
@@ -103,7 +103,7 @@ const {
   onQuery,
   onDelete,
 } = useCrudTable({
-  api: {pageApi: tenantGameAreaEntityPagePost, deleteApi: tenantGameAreaEntityDisableDeletePost},
+  api: {pageApi: gameAreaPagePost, deleteApi: gameAreaDisableDeletePost},
   immediate: true,
 })
 
@@ -133,14 +133,14 @@ const openEditGameAreaEntity = (row: any) => {
 
 // Open game area
 const onOpenGameAreaEntity = async (row: any) => {
-  await tenantGameAreaEntityOpenPost({id: row.id})
+  await gameAreaOpenPost({id: row.id})
 }
 
 // Stop game area
 const stopGameAreaEntity = async (row: any) => {
   const confirmed = await showConfirm(t('message.gameBusiness.area.confirmStopServer'), t('message.common.message.tip'))
   if (!confirmed) return
-  await tenantGameAreaEntityStopPost(row)
+  await gameAreaStopPost(row)
   onQuery()
   showSuccess(t('message.gameBusiness.area.stopSuccess'))
 }
@@ -149,7 +149,7 @@ const stopGameAreaEntity = async (row: any) => {
 const restartGameAreaEntity = async (row: any) => {
   const confirmed = await showConfirm(t('message.gameBusiness.area.confirmRestartServer'), t('message.common.message.tip'))
   if (!confirmed) return
-  await tenantGameAreaEntityRestartPost(row)
+  await gameAreaRestartPost(row)
   onQuery()
   showSuccess(t('message.gameBusiness.area.restartSuccess'))
 }

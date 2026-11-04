@@ -52,8 +52,8 @@ import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import type {CrudColumnConfig} from '../../../../../components/crud-data-table/types.ts'
 import {formatUnix} from '../../../../../utils/formatTime.ts'
 import editDialog from '/@/views/app/contentCenter/announcement/gameAnnouncementEntity/component/EditDialog.vue'
-import { tenantGameAnnouncementEntityPagePost, tenantGameAnnouncementEntityDeletePost } from '../../../../../api/tenantGameAnnouncementEntity'
-import { tenantGameAreaEntitySelectStringPost } from '../../../../../api/tenantGameAreaEntity'
+import { gameAnnouncementPagePost, gameAnnouncementDeletePost } from '../../../../../api/gameAnnouncement'
+import { gameAreaSelectStringPost } from '../../../../../api/gameArea'
 import { globalLanguageSelectPost } from '../../../../../api/globalLanguage'
 import {MAX_SELECT_SIZE} from '../../../../../constants/pagination.ts'
 import { useCrudTable } from '../../../../../composables/useCrudTable.ts'
@@ -81,8 +81,8 @@ const {
   onDelete,
 } = useCrudTable({
   api: {
-    pageApi: (params) => tenantGameAnnouncementEntityPagePost(params),
-    deleteApi: (params) => tenantGameAnnouncementEntityDeletePost(params),
+    pageApi: (params) => gameAnnouncementPagePost(params),
+    deleteApi: (params) => gameAnnouncementDeletePost(params),
   },
   immediate: true,
 })
@@ -150,7 +150,7 @@ const getAreaName = (areaId?: number) => {
 const getLanguageName = (language?: string) => languageMap.value[language || 'default'] || language || 'default'
 
 const loadAreaList = async (appId?: number) => {
-  const res = await tenantGameAreaEntitySelectStringPost({appId: appId, pageSize: MAX_SELECT_SIZE})
+  const res = await gameAreaSelectStringPost({appId: appId, pageSize: MAX_SELECT_SIZE})
   areaList.value = res.data.data ?? []
 }
 const loadLanguageList = async () => {

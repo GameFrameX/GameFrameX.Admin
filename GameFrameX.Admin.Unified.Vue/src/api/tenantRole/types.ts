@@ -65,8 +65,6 @@ export interface AddRoleRequest {
   rowVersion?: string | null;
   /** 是否启用,true:启用，false:禁用，null:未设置(启用) */
   isEnabled?: boolean | null;
-  /** 租户Id */
-  tenantId?: string | null;
   code?: string | null;
   /** @format int32 */
   orderNo?: number;
@@ -120,22 +118,6 @@ export interface RoleMenuRequest {
   id: string;
   /** 菜单Id集合 */
   menuIdList?: number[] | null;
-}
-
-/** 授权角色机构 */
-export interface RoleOrganizationRequest {
-  /**
-   * @min 1
-   * @max 9223372036854776000
-   */
-  id: string;
-  /**
-   * 数据范围
-   * @format int32
-   */
-  dataScope?: number;
-  /** 机构Id集合 */
-  organizationIdList?: number[] | null;
 }
 
 export interface RoleRequest {
@@ -258,8 +240,6 @@ export interface UpdateRoleRequest {
   rowVersion?: string | null;
   /** 是否启用,true:启用，false:禁用，null:未设置(启用) */
   isEnabled?: boolean | null;
-  /** 租户Id */
-  tenantId?: string | null;
   code?: string | null;
   /** @format int32 */
   orderNo?: number;
@@ -277,8 +257,6 @@ export interface UpdateRoleRequest {
 export type TenantRoleAddPostData = any;
 
 export type TenantRoleDeletePostData = any;
-
-export type TenantRoleGrantDataScopePostData = any;
 
 export type TenantRoleGrantMenuPostData = any;
 
@@ -306,29 +284,6 @@ export interface TenantRoleListGetData {
 }
 
 export interface TenantRoleOwnMenuListGetData {
-  /**
-   * 响应码，0 表示成功，失败时承载统一数字业务错误码（模块枚举 8 位数值，见 GameFrameX.Core/Enum/Errors 与 error-codes.json 码表）
-   * @format int32
-   */
-  code: number;
-  /** 错误或提示信息 */
-  message: string;
-  data: number[];
-  /** 链路追踪标识，未启用追踪时为 null */
-  trackId: string | null;
-  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
-  errorCode: string | null;
-  /** 响应类型（success/warning/error） */
-  type: string | null;
-  /**
-   * Unix 时间戳（秒）
-   * @format int64
-   */
-  time: number;
-  extras: object | null;
-}
-
-export interface TenantRoleOwnOrgListGetData {
   /**
    * 响应码，0 表示成功，失败时承载统一数字业务错误码（模块枚举 8 位数值，见 GameFrameX.Core/Enum/Errors 与 error-codes.json 码表）
    * @format int32

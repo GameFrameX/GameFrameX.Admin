@@ -4,8 +4,8 @@
 
                   scrollable
                   scrollMaxHeight="65vh"
-                  :addApi="tenantGameMailEntityAddPost"
-                  :updateApi="tenantGameMailEntityUpdatePost"
+                  :addApi="gameMailAddPost"
+                  :updateApi="gameMailUpdatePost"
                   :rules="rules"
                   :defaultForm="() => ({attachmentsJson: []} as any)"
                   :beforeOpen="onBeforeOpen"
@@ -88,13 +88,13 @@ import {parseRewardItems, toRewardItemsJson} from '../../../../../../components/
 import FormField from '@primevue/forms/formfield'
 import Message from 'primevue/message'
 import MultiSelect from 'primevue/multiselect'
-import { tenantGameMailEntityAddPost, tenantGameMailEntityUpdatePost } from '../../../../../../api/tenantGameMailEntity'
-import { tenantGameRoleEntityPagePost } from '../../../../../../api/tenantGameRoleEntity'
-import { tenantGameMailTemplateEntityPagePost } from '../../../../../../api/tenantGameMailTemplateEntity'
+import { gameMailAddPost, gameMailUpdatePost } from '../../../../../../api/gameMail'
+import { gameRolePagePost } from '../../../../../../api/gameRole'
+import { gameMailTemplatePagePost } from '../../../../../../api/gameMailTemplate'
 import {systemEnumEnumDataListGet} from '../../../../../../api/systemEnum';
-import { tenantGameAreaEntitySelectStringPost } from '../../../../../../api/tenantGameAreaEntity'
+import { gameAreaSelectStringPost } from '../../../../../../api/gameArea'
 import {extractVariablesFromAll, renderTemplate} from '../../../../../../utils/templateUtils.ts'
-import { tenantGameRewardTemplateEntityCopySnapshotPost, tenantGameRewardTemplateEntitySelectPost } from '../../../../../../api/tenantGameRewardTemplateEntity'
+import { gameRewardTemplateCopySnapshotPost, gameRewardTemplateSelectPost } from '../../../../../../api/gameRewardTemplate'
 import {normalizeAppId, type AppWorkspaceId} from '../../../../../../utils/appWorkspace.ts'
 import {MAX_PAGE_SIZE, MAX_SELECT_SIZE} from '../../../../../../constants/pagination.ts'
 
@@ -171,7 +171,7 @@ const onRewardTemplateChange = async (event?: any) => {
   const templateId = resolveRewardTemplateId(event?.value ?? selectedRewardTemplateId.value)
   selectedRewardTemplateId.value = Number.isFinite(templateId) ? templateId : undefined
   if (!templateId || !ruleForm.value.appId) return
-  const response = await tenantGameRewardTemplateEntityCopySnapshotPost({id: templateId, appId: ruleForm.value.appId})
+  const response = await gameRewardTemplateCopySnapshotPost({id: templateId, appId: ruleForm.value.appId})
   const snapshot = response.data.data
   ruleForm.value.attachmentsJson = parseRewardItems(snapshot?.rewardItemsJson)
 }
@@ -207,7 +207,7 @@ const rules = {
 }
 
 const loadAreaOptions = async (appId?: AppWorkspaceId) => {
-  areaIdOptions.value = (await tenantGameAreaEntitySelectStringPost({appId: appId, pageSize: MAX_SELECT_SIZE})).data.data ?? []
+  areaIdOptions.value = (await gameAreaSelectStringPost({appId: appId, pageSize: MAX_SELECT_SIZE})).data.data ?? []
 }
 
 // 玩家选项来自角色表（后端契约：playerIdList 与角色 Id 匹配），按区服过滤
@@ -216,7 +216,7 @@ const loadPlayerOptions = async (appId?: AppWorkspaceId, areaId?: number) => {
     playerOptions.value = []
     return
   }
-  const res = await tenantGameRoleEntityPagePost({appId, areaId, page: 1, pageSize: 100})
+  const res = await gameRolePagePost({appId, areaId, page: 1, pageSize: 100})
   playerOptions.value = (res.data.data?.items ?? []).map((item: any) => ({id: String(item.id), label: item.name ?? String(item.id)}))
 }
 
@@ -229,7 +229,7 @@ const onAreaChange = async (event?: any) => {
 const loadTemplateOptions = async (appId?: AppWorkspaceId) => {
   // 模板下拉需取全字段（titleTemplate/bodyTemplate/defaultMailType/defaultExpirationDays/defaultAttachmentsJson）：
   // select 接口只有 id/value/label，onTemplateChange 取不到模板字段会清空表单而非填充
-  const tplRes = await tenantGameMailTemplateEntityPagePost({appId, page: 1, pageSize: MAX_PAGE_SIZE})
+  const tplRes = await gameMailTemplatePagePost({appId, page: 1, pageSize: MAX_PAGE_SIZE})
   templateList.value = (tplRes.data.data?.items ?? []).map((item: any) => ({
     ...item,
     name: item.name || item.label || item.value || item.titleTemplate || String(item.id ?? ''),
@@ -237,7 +237,7 @@ const loadTemplateOptions = async (appId?: AppWorkspaceId) => {
 }
 
 const loadRewardTemplateOptions = async (appId?: AppWorkspaceId) => {
-  rewardTemplateList.value = appId ? ((await tenantGameRewardTemplateEntitySelectPost({appId, pageSize: MAX_SELECT_SIZE})).data.data ?? []) : []
+  rewardTemplateList.value = appId ? ((await gameRewardTemplateSelectPost({appId, pageSize: MAX_SELECT_SIZE})).data.data ?? []) : []
 }
 
 const resolveAppId = async (form: any) => {

@@ -203,7 +203,7 @@ public sealed class ClientApiAccountEndpointTests
             issuer ?? CreateTokenIssuer(),
             new ClientApiSessionKeyIssuer(db.Repository<TenantSessionKeyEntity>()),
             db.Repository<TenantGameUserEmailEntity>(),
-            new FakeTenantGamePenaltyEnforcementService(),
+            new FakeGamePenaltyEnforcementService(),
             new GameUserPasswordService());
     }
 

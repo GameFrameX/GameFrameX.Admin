@@ -46,8 +46,8 @@ import {useCrudTable} from '../../../../composables/useCrudTable.ts'
 import {usePrimeTablePage} from '../../../../composables'
 import {useCurrentApp} from '../../../../composables/useCurrentApp.ts'
 import editDialog from '/@/views/app/goodsCenter/gameGoodsEntity/component/EditDialog.vue'
-import { tenantGameGoodsEntityPagePost, tenantGameGoodsEntityDeletePost } from '../../../../api/tenantGameGoodsEntity';
-import { tenantGameGoodsCatalogueEntitySelectPost } from '../../../../api/tenantGameGoodsCatalogueEntity';
+import { gameGoodsPagePost, gameGoodsDeletePost } from '../../../../api/gameGoods';
+import { gameGoodsCatalogueSelectPost } from '../../../../api/gameGoodsCatalogue';
 import {MAX_SELECT_SIZE} from '../../../../constants/pagination.ts';
 
 const route = useRoute()
@@ -68,7 +68,7 @@ const {
   onQuery,
   onDelete
 } = useCrudTable({
-  api: {pageApi: tenantGameGoodsEntityPagePost, deleteApi: tenantGameGoodsEntityDeletePost},
+  api: {pageApi: gameGoodsPagePost, deleteApi: gameGoodsDeletePost},
   immediate: true,
 })
 
@@ -113,7 +113,7 @@ const getClassifyName = (areaId: number) => {
   return areaId;
 };
 const getGameGoodsCatalogueEntityClassifyIdDropdownList = async (appId?: number) => {
-  let list = await tenantGameGoodsCatalogueEntitySelectPost({appId: appId, pageSize: MAX_SELECT_SIZE});
+  let list = await gameGoodsCatalogueSelectPost({appId: appId, pageSize: MAX_SELECT_SIZE});
   gameGoodsCatalogueEntityClassifyIdDropdownList.value = list.data.data ?? [];
 };
 

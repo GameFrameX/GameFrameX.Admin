@@ -7,7 +7,7 @@
             :fields="searchFields"
             :defaultSearchKey="false"
             :showAdd="false"
-            authPrefix="tenantSessionKeyEntity"
+            authPrefix="sessionKey"
             @query="onQuery"
         />
       </template>
@@ -17,7 +17,7 @@
         <CrudDataTable :value="tableData" v-block-loading="loading" showGridlines stripedRows rowKey="id"
                        :totalRecords="tableParams.total" :rows="tableParams.pageSize"
                        :rowsPerPageOptions="[10, 20, 50, 100]"
-                       authPrefix="tenantSessionKeyEntity"
+                       authPrefix="sessionKey"
                        :customActions="customActions"
                        actionColumnWidth="280px"
                        showIdColumn
@@ -72,7 +72,7 @@ import type { CrudColumnConfig } from '../../../../components/crud-data-table/ty
 import { useCrudTable } from '../../../../composables/useCrudTable.ts'
 import { usePrimeTablePage } from '../../../../composables'
 import { formatUnix } from '../../../../utils/formatTime.ts'
-import { tenantSessionKeyEntityPagePost, tenantSessionKeyEntityEnablePost, tenantSessionKeyEntityDisablePost } from '../../../../api/tenantSessionKeyEntity'
+import { sessionKeyPagePost, sessionKeyEnablePost, sessionKeyDisablePost } from '../../../../api/sessionKey'
 import addDialog from './component/AddDialog.vue'
 import rotateDialog from './component/RotateDialog.vue'
 import renewDialog from './component/RenewDialog.vue'
@@ -97,7 +97,7 @@ const {
   onQuery,
 } = useCrudTable({
   api: {
-    pageApi: tenantSessionKeyEntityPagePost,
+    pageApi: sessionKeyPagePost,
   },
   immediate: true,
 })
@@ -116,7 +116,7 @@ const onReveal = async (data: any) => {
 }
 
 const onEnable = async (row: any) => {
-  await tenantSessionKeyEntityEnablePost({ id: row.id })
+  await sessionKeyEnablePost({ id: row.id })
   onQuery()
   showSuccess('已启用')
 }
@@ -126,7 +126,7 @@ const onDisable = async (row: any) => {
   if (!confirmed) {
     return
   }
-  await tenantSessionKeyEntityDisablePost({ id: row.id })
+  await sessionKeyDisablePost({ id: row.id })
   onQuery()
   showSuccess('已禁用')
 }

@@ -12,10 +12,10 @@
             <Column field="oldVersion" :header="t('message.client.oldAssetVersion')" style="min-width: 160px"/>
             <Column field="resourceVersion" :header="t('message.client.newAssetVersion')" style="min-width: 160px"/>
             <Column :header="t('message.common.table.action')" style="width: 140px" align="center"
-                    v-if="auth('tenantGameAppAssetPackageVersion:restore')">
+                    v-if="auth('gameAppAssetPackageVersion:restore')">
               <template #body="{ data }">
                 <Button link @click="restoreTenantGameAppAssetPackageVersionHistory(data)"
-                        v-auth="'tenantGameAppAssetPackageVersion:restore'">
+                        v-auth="'gameAppAssetPackageVersion:restore'">
                   <i :class="faPenToSquare.className" class="mr-1"></i>{{ t('message.client.restore') }}
                 </Button>
               </template>
@@ -37,8 +37,8 @@ import {showConfirm, showSuccess} from '../../../../../../utils/message.ts';
 import {auth} from '../../../../../../utils/authFunction.ts';
 import CrudDataTable from '/@/components/crud-data-table/index.vue'
 
-import { tenantGameAppAssetPackageVersionHistoryPagePost } from '../../../../../../api/tenantGameAppAssetPackageVersionHistory';
-import { tenantGameAppAssetPackageVersionUpdatePost, tenantGameAppAssetPackageVersionReturnPost } from "../../../../../../api/tenantGameAppAssetPackageVersion";
+import { gameAppAssetPackageVersionHistoryPagePost } from '../../../../../../api/gameAppAssetPackageVersionHistory';
+import { gameAppAssetPackageVersionUpdatePost, gameAppAssetPackageVersionReturnPost } from "../../../../../../api/gameAppAssetPackageVersion";
 import {usePrimeTablePage} from '../../../../../../composables';
 
 const emit = defineEmits(["reloadTable"]);
@@ -70,7 +70,7 @@ const cancel = () => {
 // 查询操作
 const onQuery = async () => {
   loading.value = true;
-  let res = await tenantGameAppAssetPackageVersionHistoryPagePost(Object.assign({versionId: queryParams.value.id}, tableParams.value));
+  let res = await gameAppAssetPackageVersionHistoryPagePost(Object.assign({versionId: queryParams.value.id}, tableParams.value));
   tableData.value = res.data.data?.items ?? [];
   tableParams.value.total = res.data.data?.total;
   loading.value = false;
@@ -85,7 +85,7 @@ const restoreTenantGameAppAssetPackageVersionHistory = async (row: any) => {
   let values = returnVersionPackage.value;
   values.id = row.versionId;
   values.resourceVersionHistoryId = row.id
-  await tenantGameAppAssetPackageVersionReturnPost(values);
+  await gameAppAssetPackageVersionReturnPost(values);
   setTimeout(() => {
     onQuery();
   }, 1000);

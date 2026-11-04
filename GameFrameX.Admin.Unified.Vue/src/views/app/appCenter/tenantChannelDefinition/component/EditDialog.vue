@@ -2,8 +2,8 @@
   <BaseEditDialog
     ref="dialogRef"
     :title="props.title"
-    :addApi="tenantChannelDefinitionAddPost"
-    :updateApi="tenantChannelDefinitionUpdatePost"
+    :addApi="channelDefinitionAddPost"
+    :updateApi="channelDefinitionUpdatePost"
     :rules="rules"
     @reloadTable="emit('reloadTable')"
   >
@@ -31,7 +31,7 @@ import FormField from '@primevue/forms/formfield'
 import Message from 'primevue/message'
 import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import {TextField} from '../../../../../components/crud-form-fields'
-import { tenantChannelDefinitionAddPost, tenantChannelDefinitionUpdatePost } from '../../../../../api/tenantChannelDefinition'
+import { channelDefinitionAddPost, channelDefinitionUpdatePost } from '../../../../../api/channelDefinition'
 
 const props = defineProps({
   title: {

@@ -42,7 +42,7 @@ import InputText from 'primevue/inputtext'
 import InputNumber from 'primevue/inputnumber'
 import Textarea from 'primevue/textarea'
 import { showSuccess } from '../../../../../utils/message.ts'
-import { tenantGameOnlinePlayerSegmentSyncOnlinePost } from '../../../../../api/tenantGameOnlinePlayerSegment'
+import { gameOnlinePlayerSegmentSyncOnlinePost } from '../../../../../api/gameOnlinePlayerSegment'
 
 const visible = ref(false)
 const loading = ref(false)
@@ -87,7 +87,7 @@ const confirm = async () => {
   }
   loading.value = true
   try {
-    const res: any = await tenantGameOnlinePlayerSegmentSyncOnlinePost({
+    const res: any = await gameOnlinePlayerSegmentSyncOnlinePost({
       id: segmentId.value as number | string,
       serverId: serverId.value as number,
       reason: reason.value.trim(),

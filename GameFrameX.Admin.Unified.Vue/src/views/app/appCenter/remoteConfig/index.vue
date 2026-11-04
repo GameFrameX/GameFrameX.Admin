@@ -6,7 +6,7 @@
             v-model="queryParams"
             :fields="searchFields"
             :showAdd="true"
-            authPrefix="tenantGameAppRemoteConfig"
+            authPrefix="gameAppRemoteConfig"
             @query="runScopedQuery"
             
             @add="openAddTenantGameAppRemoteConfig"
@@ -18,7 +18,7 @@
         <CrudDataTable :value="tableData" style="width: 100%" v-block-loading="loading" showGridlines stripedRows
                    rowKey="id" :totalRecords="tableParams.total" :rows="tableParams.pageSize"
                    :rowsPerPageOptions="[10, 20, 50, 100, 200, 500]"
-                   authPrefix="tenantGameAppRemoteConfig"
+                   authPrefix="gameAppRemoteConfig"
                    :actions="actions"
                    :customActions="customActions"
                    actionColumnWidth="220px"
@@ -62,13 +62,13 @@ import {usePrimeTablePage} from '../../../../composables'
 import {useCurrentApp} from '../../../../composables/useCurrentApp.ts'
 import editDialog from '/@/views/app/appCenter/remoteConfig/component/EditDialog.vue'
 import contentEditDialog from '/@/views/app/appCenter/remoteConfig/component/ContentEditDialog.vue'
-import { tenantGameAppRemoteConfigPagePost, tenantGameAppRemoteConfigDeletePost } from '../../../../api/tenantGameAppRemoteConfig'
-import {tenantGameAppRemoteConfigModePagePost} from '../../../../api/tenantGameAppRemoteConfigMode'
+import { gameAppRemoteConfigPagePost, gameAppRemoteConfigDeletePost } from '../../../../api/gameAppRemoteConfig'
+import {gameAppRemoteConfigModePagePost} from '../../../../api/gameAppRemoteConfigMode'
 import { globalLanguageSelectPost } from '../../../../api/globalLanguage'
-import { tenantChannelDefinitionAvailableGet } from '../../../../api/tenantChannelDefinition'
+import { channelDefinitionAvailableGet } from '../../../../api/channelDefinition'
 import { globalPlatformSelectPost } from '../../../../api/globalPlatform'
-import { tenantGameAppVersionDefinitionSelectPost } from '../../../../api/tenantGameAppVersionDefinition'
-import { tenantGameAppPackageListGet } from '../../../../api/tenantGameAppPackage'
+import { gameAppVersionDefinitionSelectPost } from '../../../../api/gameAppVersionDefinition'
+import { gameAppPackageListGet } from '../../../../api/gameAppPackage'
 import {MAX_PAGE_SIZE, MAX_SELECT_SIZE} from '../../../../constants/pagination.ts'
 import type {CrudAction} from '../../../../components/crud-data-table/types.ts'
 import type {CrudColumnConfig} from '../../../../components/crud-data-table/types.ts'
@@ -94,7 +94,7 @@ const {
   loading, tableData, queryParams, tableParams,
   onQuery, onDelete,
 } = useCrudTable({
-  api: {pageApi: tenantGameAppRemoteConfigPagePost, deleteApi: tenantGameAppRemoteConfigDeletePost},
+  api: {pageApi: gameAppRemoteConfigPagePost, deleteApi: gameAppRemoteConfigDeletePost},
   immediate: false,
 })
 
@@ -166,7 +166,7 @@ const getAppScopeSeverity = (appId: any) => {
 }
 
 const loadModeDefs = async () => {
-  const res = await tenantGameAppRemoteConfigModePagePost({
+  const res = await gameAppRemoteConfigModePagePost({
     page: 1,
     pageSize: MAX_PAGE_SIZE,
     isEnabled: true,
@@ -186,7 +186,7 @@ const onLanguageQuery = async () => {
 }
 
 const onChannelQuery = async () => {
-  const res = await tenantChannelDefinitionAvailableGet({pageSize: MAX_SELECT_SIZE})
+  const res = await channelDefinitionAvailableGet({pageSize: MAX_SELECT_SIZE})
   querySelections.value.channel = mapAvailableChannelDefinitions(res.data.data || [], 'code')
 }
 
@@ -202,12 +202,12 @@ const onVersionQuery = async (appId?: AppWorkspaceId) => {
     querySelections.value.oldVersion = []
     return
   }
-  const res = await tenantGameAppVersionDefinitionSelectPost({appId: id, pageSize: MAX_SELECT_SIZE})
+  const res = await gameAppVersionDefinitionSelectPost({appId: id, pageSize: MAX_SELECT_SIZE})
   querySelections.value.version = res.data.data
   querySelections.value.oldVersion = res.data.data
 }
 
-// 包名候选按当前应用加载：tenantGameAppPackageListGet 已按应用过滤、默认包置顶。
+// 包名候选按当前应用加载：gameAppPackageListGet 已按应用过滤、默认包置顶。
 // 当前应用未确认时不展示候选，避免展示其它应用包名。
 const buildPackageOptions = (packages: any[]) => {
   const options: any[] = [{label: t('message.client.appDefaultPackage'), value: 'default'}]
@@ -231,7 +231,7 @@ const onPackageQuery = async (appId?: AppWorkspaceId) => {
     querySelections.value.package = []
     return
   }
-  const res = await tenantGameAppPackageListGet({appId: id})
+  const res = await gameAppPackageListGet({appId: id})
   querySelections.value.package = buildPackageOptions(res.data?.data || [])
 }
 

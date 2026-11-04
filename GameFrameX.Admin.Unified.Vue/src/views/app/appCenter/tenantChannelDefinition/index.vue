@@ -6,7 +6,7 @@
             v-model="queryParams"
             :fields="searchFields"
             :showAdd="true"
-            authPrefix="tenantChannelDefinition"
+            authPrefix="channelDefinition"
             @query="onQuery"
             
             @add="openAddTenantChannelDefinition"
@@ -18,7 +18,7 @@
         <CrudDataTable :value="tableData" v-block-loading="loading" showGridlines stripedRows rowKey="id"
                        :totalRecords="tableParams.total" :rows="tableParams.pageSize"
                        :rowsPerPageOptions="[10, 20, 50, 100, 200, 500]"
-                       authPrefix="tenantChannelDefinition"
+                       authPrefix="channelDefinition"
                        :actions="actions"
                        :columns="columns"
                        showExport
@@ -53,7 +53,7 @@ import {useCrudTable} from '../../../../composables/useCrudTable.ts'
 import {usePrimeTablePage} from '../../../../composables'
 import {createdNameColumn, descriptionColumn, nameColumn, updatedNameColumn} from '../../../../utils/crudConfig.ts'
 import editDialog from '/@/views/app/appCenter/tenantChannelDefinition/component/EditDialog.vue'
-import { tenantChannelDefinitionPagePost, tenantChannelDefinitionDeletePost } from '../../../../api/tenantChannelDefinition'
+import { channelDefinitionPagePost, channelDefinitionDeletePost } from '../../../../api/channelDefinition'
 import type {CrudColumnConfig} from '../../../../components/crud-data-table/types.ts'
 
 const editDialogRef = ref()
@@ -70,8 +70,8 @@ const {
   onDelete,
 } = useCrudTable({
   api: {
-    pageApi: tenantChannelDefinitionPagePost,
-    deleteApi: tenantChannelDefinitionDeletePost,
+    pageApi: channelDefinitionPagePost,
+    deleteApi: channelDefinitionDeletePost,
   },
   immediate: true,
 })

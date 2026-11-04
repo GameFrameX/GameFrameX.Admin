@@ -49,7 +49,7 @@ import {useCrudTable} from '../../../../../composables/useCrudTable.ts'
 import {usePrimeTablePage, useRouteAppIdQuerySync} from '../../../../../composables'
 import {useCurrentApp} from '../../../../../composables/useCurrentApp.ts'
 import editDialog from '/@/views/app/contentCenter/mail/gameMailTemplateCategoryEntity/component/EditDialog.vue'
-import { tenantGameMailTemplateCategoryEntityPagePost, tenantGameMailTemplateCategoryEntityDeletePost } from '../../../../../api/tenantGameMailTemplateCategoryEntity'
+import { gameMailTemplateCategoryPagePost, gameMailTemplateCategoryDeletePost } from '../../../../../api/gameMailTemplateCategory'
 import {isEnabled} from '../../../../../utils/isEnabled.ts'
 
 const route = useRoute()
@@ -77,8 +77,8 @@ const {
   onDelete,
 } = useCrudTable({
   api: {
-    pageApi: (params) => tenantGameMailTemplateCategoryEntityPagePost(params),
-    deleteApi: (params) => tenantGameMailTemplateCategoryEntityDeletePost(params),
+    pageApi: (params) => gameMailTemplateCategoryPagePost(params),
+    deleteApi: (params) => gameMailTemplateCategoryDeletePost(params),
   },
   immediate: true,
 })

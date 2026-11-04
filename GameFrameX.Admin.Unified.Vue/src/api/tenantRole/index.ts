@@ -14,15 +14,12 @@ import {
   DeleteRoleRequest,
   PageRoleRequest,
   RoleMenuRequest,
-  RoleOrganizationRequest,
   RoleRequest,
   TenantRoleAddPostData,
   TenantRoleDeletePostData,
-  TenantRoleGrantDataScopePostData,
   TenantRoleGrantMenuPostData,
   TenantRoleListGetData,
   TenantRoleOwnMenuListGetData,
-  TenantRoleOwnOrgListGetData,
   TenantRolePagePostData,
   TenantRoleSetStatusPostData,
   TenantRoleUpdatePostData,
@@ -68,25 +65,6 @@ export class TenantRole<SecurityDataType = unknown> {
   ) =>
     this.http.request<TenantRoleDeletePostData, any>({
       path: `/api/tenantRole/delete`,
-      method: "POST",
-      body: data,
-      type: ContentType.Json,
-      ...params,
-    });
-  /**
-   * No description
-   *
-   * @tags tenantRole
-   * @name TenantRoleGrantDataScopePost
-   * @summary 授权角色数据范围
-   * @request POST:/api/tenantRole/grantDataScope
-   */
-  tenantRoleGrantDataScopePost = (
-    data: RoleOrganizationRequest,
-    params: RequestParams = {},
-  ) =>
-    this.http.request<TenantRoleGrantDataScopePostData, any>({
-      path: `/api/tenantRole/grantDataScope`,
       method: "POST",
       body: data,
       type: ContentType.Json,
@@ -158,34 +136,6 @@ export class TenantRole<SecurityDataType = unknown> {
    * No description
    *
    * @tags tenantRole
-   * @name TenantRoleOwnOrgListGet
-   * @summary 根据角色Id获取机构Id集合
-   * @request GET:/api/tenantRole/ownOrgList
-   */
-  tenantRoleOwnOrgListGet = (
-    query: {
-      /** 是否启用 */
-      isEnabled?: boolean;
-      /**
-       * @format int64
-       * @min 1
-       * @max 9223372036854776000
-       */
-      id: number;
-    },
-    params: RequestParams = {},
-  ) =>
-    this.http.request<TenantRoleOwnOrgListGetData, any>({
-      path: `/api/tenantRole/ownOrgList`,
-      method: "GET",
-      query: query,
-      format: "json",
-      ...params,
-    });
-  /**
-   * No description
-   *
-   * @tags tenantRole
    * @name TenantRolePagePost
    * @summary 获取角色分页列表
    * @request POST:/api/tenantRole/page
@@ -239,11 +189,9 @@ export class TenantRole<SecurityDataType = unknown> {
 
 export const tenantRoleAddPost = (...args: Parameters<InstanceType<typeof TenantRole>['tenantRoleAddPost']>) => getAPI(TenantRole).tenantRoleAddPost(...args);
 export const tenantRoleDeletePost = (...args: Parameters<InstanceType<typeof TenantRole>['tenantRoleDeletePost']>) => getAPI(TenantRole).tenantRoleDeletePost(...args);
-export const tenantRoleGrantDataScopePost = (...args: Parameters<InstanceType<typeof TenantRole>['tenantRoleGrantDataScopePost']>) => getAPI(TenantRole).tenantRoleGrantDataScopePost(...args);
 export const tenantRoleGrantMenuPost = (...args: Parameters<InstanceType<typeof TenantRole>['tenantRoleGrantMenuPost']>) => getAPI(TenantRole).tenantRoleGrantMenuPost(...args);
 export const tenantRoleListGet = (...args: Parameters<InstanceType<typeof TenantRole>['tenantRoleListGet']>) => getAPI(TenantRole).tenantRoleListGet(...args);
 export const tenantRoleOwnMenuListGet = (...args: Parameters<InstanceType<typeof TenantRole>['tenantRoleOwnMenuListGet']>) => getAPI(TenantRole).tenantRoleOwnMenuListGet(...args);
-export const tenantRoleOwnOrgListGet = (...args: Parameters<InstanceType<typeof TenantRole>['tenantRoleOwnOrgListGet']>) => getAPI(TenantRole).tenantRoleOwnOrgListGet(...args);
 export const tenantRolePagePost = (...args: Parameters<InstanceType<typeof TenantRole>['tenantRolePagePost']>) => getAPI(TenantRole).tenantRolePagePost(...args);
 export const tenantRoleSetStatusPost = (...args: Parameters<InstanceType<typeof TenantRole>['tenantRoleSetStatusPost']>) => getAPI(TenantRole).tenantRoleSetStatusPost(...args);
 export const tenantRoleUpdatePost = (...args: Parameters<InstanceType<typeof TenantRole>['tenantRoleUpdatePost']>) => getAPI(TenantRole).tenantRoleUpdatePost(...args);

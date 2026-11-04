@@ -1,5 +1,5 @@
 <template>
-  <BaseEditDialog ref="dialogRef" :title="props.title" :addApi="tenantGameMailTemplateCategoryEntityAddPost" :updateApi="tenantGameMailTemplateCategoryEntityUpdatePost" :rules="rules" :defaultForm="defaultForm" :beforeOpen="beforeOpen" @reloadTable="emit('reloadTable')">
+  <BaseEditDialog ref="dialogRef" :title="props.title" :addApi="gameMailTemplateCategoryAddPost" :updateApi="gameMailTemplateCategoryUpdatePost" :rules="rules" :defaultForm="defaultForm" :beforeOpen="beforeOpen" @reloadTable="emit('reloadTable')">
     <template #default="{ ruleForm, isEditor }">
       <TextField v-model="ruleForm.name" name="name" :label="t('message.gameBusiness.name')" :placeholder="t('message.gameBusiness.pleaseEnterName')" maxlength="32"/>
       <TextField v-model="ruleForm.icon" name="icon" :label="t('message.gameBusiness.goods.icon')" :placeholder="t('message.gameBusiness.goods.pleaseEnterIcon')" maxlength="256"/>
@@ -22,7 +22,7 @@ import Message from 'primevue/message'
 import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import {TextField} from '../../../../../../components/crud-form-fields'
 import {normalizeAppId} from '../../../../../../utils/appWorkspace.ts'
-import { tenantGameMailTemplateCategoryEntityAddPost, tenantGameMailTemplateCategoryEntityUpdatePost } from '../../../../../../api/tenantGameMailTemplateCategoryEntity'
+import { gameMailTemplateCategoryAddPost, gameMailTemplateCategoryUpdatePost } from '../../../../../../api/gameMailTemplateCategory'
 import {isEnabled} from '../../../../../../utils/isEnabled.ts'
 
 const props = defineProps({

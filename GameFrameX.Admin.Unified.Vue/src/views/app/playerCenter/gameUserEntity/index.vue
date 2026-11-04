@@ -47,7 +47,7 @@ import {useRoute} from 'vue-router'
 import {showConfirm, showSuccess} from '../../../../utils/message.ts'
 import mailDialog from '/@/views/app/playerCenter/gameUserEntity/component/MailDialog.vue'
 import editDialog from '/@/views/app/playerCenter/gameUserEntity/component/EditDialog.vue'
-import { tenantGameUserEntityPagePost, tenantGameUserEntityBanPost, tenantGameUserEntityUnsealPost } from '../../../../api/tenantGameUserEntity'
+import { gameUserPagePost, gameUserBanPost, gameUserUnsealPost } from '../../../../api/gameUser'
 import {systemEnumEnumDataListGet} from '../../../../api/systemEnum';
 import commonFunction from '../../../../utils/commonFunction.ts'
 import {useCrudTable} from '../../../../composables/useCrudTable.ts'
@@ -86,7 +86,7 @@ const {
   onQuery: doQuery,
 } = useCrudTable({
   api: {
-    pageApi: (params) => tenantGameUserEntityPagePost(params),
+    pageApi: (params) => gameUserPagePost(params),
   },
   immediate: false,
 })
@@ -105,7 +105,7 @@ const onAddGameUserEntity = () => {
 const onBanGameRoleEntity = async (row: any) => {
   const confirmed = await showConfirm(t('message.gameBusiness.user.confirmBan'), t('message.common.message.tip'))
   if (!confirmed) return
-  await tenantGameUserEntityBanPost({id: row.id, appId: queryParams.value.appId})
+  await gameUserBanPost({id: row.id, appId: queryParams.value.appId})
   onQuery()
   showSuccess(t('message.gameBusiness.user.banSuccess'))
 }
@@ -113,7 +113,7 @@ const onBanGameRoleEntity = async (row: any) => {
 const onUnsealGameRoleEntity = async (row: any) => {
   const confirmed = await showConfirm(t('message.gameBusiness.user.confirmUnban'), t('message.common.message.tip'))
   if (!confirmed) return
-  await tenantGameUserEntityUnsealPost({id: row.id, appId: queryParams.value.appId})
+  await gameUserUnsealPost({id: row.id, appId: queryParams.value.appId})
   onQuery()
   showSuccess(t('message.gameBusiness.user.unbanSuccess'))
 }

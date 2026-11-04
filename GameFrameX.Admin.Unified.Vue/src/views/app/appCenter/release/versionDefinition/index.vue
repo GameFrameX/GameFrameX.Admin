@@ -6,7 +6,7 @@
             v-model="queryParams"
             :fields="searchFields"
             :showAdd="true"
-            authPrefix="tenantGameAppVersionDefinition"
+            authPrefix="gameAppVersionDefinition"
             @query="onQuery"
 
             @add="openAddTenantGameAppVersionDefinition"
@@ -18,7 +18,7 @@
         <CrudDataTable :value="tableData" style="width: 100%" v-block-loading="loading" showGridlines stripedRows
                    rowKeys="id" :totalRecords="tableParams.total" :rows="tableParams.pageSize"
                    :rowsPerPageOptions="[10, 20, 50, 100, 200, 500]"
-                   authPrefix="tenantGameAppVersionDefinition"
+                   authPrefix="gameAppVersionDefinition"
                    :actions="actions"
                    :columns="columns"
                    :exportQuery="queryParams"
@@ -44,7 +44,7 @@ import {useCrudTable} from '../../../../../composables/useCrudTable.ts'
 import {usePrimeTablePage, useRouteAppIdQuerySync} from '../../../../../composables'
 import {useCurrentApp} from '../../../../../composables/useCurrentApp.ts'
 import editDialog from '/@/views/app/appCenter/release/versionDefinition/component/EditDialog.vue'
-import { tenantGameAppVersionDefinitionPagePost, tenantGameAppVersionDefinitionDeletePost } from '../../../../../api/tenantGameAppVersionDefinition'
+import { gameAppVersionDefinitionPagePost, gameAppVersionDefinitionDeletePost } from '../../../../../api/gameAppVersionDefinition'
 import {createdNameColumn, descriptionColumn, nameColumn, updatedNameColumn} from '../../../../../utils/crudConfig.ts'
 
 const route = useRoute()
@@ -67,7 +67,7 @@ const {
   loading, tableData, queryParams, tableParams,
   onQuery, onDelete,
 } = useCrudTable({
-  api: {pageApi: tenantGameAppVersionDefinitionPagePost, deleteApi: tenantGameAppVersionDefinitionDeletePost},
+  api: {pageApi: gameAppVersionDefinitionPagePost, deleteApi: gameAppVersionDefinitionDeletePost},
   immediate: true,
 })
 

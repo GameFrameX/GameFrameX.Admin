@@ -7,7 +7,7 @@
             :fields="searchFields"
             :defaultSearchKey="false"
             :showAdd="false"
-            authPrefix="tenantAppSignatureKeyEntity"
+            authPrefix="appSignatureKey"
             @query="onQuery"
         />
       </template>
@@ -17,7 +17,7 @@
         <CrudDataTable :value="tableData" v-block-loading="loading" showGridlines stripedRows rowKey="id"
                        :totalRecords="tableParams.total" :rows="tableParams.pageSize"
                        :rowsPerPageOptions="[10, 20, 50, 100]"
-                       authPrefix="tenantAppSignatureKeyEntity"
+                       authPrefix="appSignatureKey"
                        :customActions="customActions"
                        actionColumnWidth="280px"
                        showIdColumn
@@ -71,7 +71,7 @@ import type { CrudColumnConfig } from '../../../../components/crud-data-table/ty
 import { useCrudTable } from '../../../../composables/useCrudTable.ts'
 import { usePrimeTablePage } from '../../../../composables'
 import { formatUnix } from '../../../../utils/formatTime.ts'
-import { tenantAppSignatureKeyEntityPagePost, tenantAppSignatureKeyEntityEnablePost, tenantAppSignatureKeyEntityDisablePost } from '../../../../api/tenantAppSignatureKeyEntity'
+import { appSignatureKeyPagePost, appSignatureKeyEnablePost, appSignatureKeyDisablePost } from '../../../../api/appSignatureKey'
 import addDialog from './component/AddDialog.vue'
 import rotateDialog from './component/RotateDialog.vue'
 import renewDialog from './component/RenewDialog.vue'
@@ -96,7 +96,7 @@ const {
   onQuery,
 } = useCrudTable({
   api: {
-    pageApi: tenantAppSignatureKeyEntityPagePost,
+    pageApi: appSignatureKeyPagePost,
   },
   immediate: true,
 })
@@ -115,7 +115,7 @@ const onReveal = async (data: any) => {
 }
 
 const onEnable = async (row: any) => {
-  await tenantAppSignatureKeyEntityEnablePost({ id: row.id })
+  await appSignatureKeyEnablePost({ id: row.id })
   onQuery()
   showSuccess('已启用')
 }
@@ -125,7 +125,7 @@ const onDisable = async (row: any) => {
   if (!confirmed) {
     return
   }
-  await tenantAppSignatureKeyEntityDisablePost({ id: row.id })
+  await appSignatureKeyDisablePost({ id: row.id })
   onQuery()
   showSuccess('已禁用')
 }

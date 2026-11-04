@@ -49,8 +49,8 @@ import { useCrudTable } from '../../../../composables/useCrudTable.ts'
 import {usePrimeTablePage, useRouteAppIdQuerySync} from '../../../../composables'
 import {useCurrentApp} from '../../../../composables/useCurrentApp.ts'
 import editDialog from '/@/views/app/goodsCenter/gameCommodityEntity/component/EditDialog.vue'
-import { tenantGameCommodityEntityPagePost, tenantGameCommodityEntityDeletePost } from '../../../../api/tenantGameCommodityEntity'
-import { tenantGameGoodsCatalogueEntitySelectPost } from '../../../../api/tenantGameGoodsCatalogueEntity'
+import { gameCommodityPagePost, gameCommodityDeletePost } from '../../../../api/gameCommodity'
+import { gameGoodsCatalogueSelectPost } from '../../../../api/gameGoodsCatalogue'
 import {MAX_SELECT_SIZE} from '../../../../constants/pagination.ts'
 
 const route = useRoute()
@@ -66,7 +66,7 @@ const getCategoryName = (categoryId: any) => {
   return found ? found.value : categoryId
 }
 const loadCatalogueOptions = async (appId?: number | string) => {
-  const list = await tenantGameGoodsCatalogueEntitySelectPost({appId: appId, pageSize: MAX_SELECT_SIZE})
+  const list = await gameGoodsCatalogueSelectPost({appId: appId, pageSize: MAX_SELECT_SIZE})
   catalogueOptions.value = list.data.data ?? []
 }
 
@@ -83,7 +83,7 @@ const {
   onQuery,
   onDelete,
 } = useCrudTable({
-  api: { pageApi: tenantGameCommodityEntityPagePost, deleteApi: tenantGameCommodityEntityDeletePost },
+  api: { pageApi: gameCommodityPagePost, deleteApi: gameCommodityDeletePost },
   immediate: true,
 })
 

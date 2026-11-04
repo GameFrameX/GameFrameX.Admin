@@ -37,7 +37,7 @@ import {useRoute} from 'vue-router'
 import SearchForm from '/@/components/search-form/index.vue'
 import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import editDialog from '/@/views/app/opsCenter/gameDockerTagEntity/component/EditDialog.vue'
-import { tenantGameDockerTagEntityPagePost, tenantGameDockerTagEntityDeletePost } from '../../../../api/tenantGameDockerTagEntity'
+import { gameDockerTagPagePost, gameDockerTagDeletePost } from '../../../../api/gameDockerTag'
 import {systemEnumEnumDataListGet} from '../../../../api/systemEnum';
 import {useCrudTable} from '../../../../composables/useCrudTable.ts'
 import {usePrimeTablePage, useRouteAppIdQuerySync} from '../../../../composables'
@@ -67,8 +67,8 @@ const {
   onDelete
 } = useCrudTable({
   api: {
-    pageApi: (params) => tenantGameDockerTagEntityPagePost(params),
-    deleteApi: (params) => tenantGameDockerTagEntityDeletePost(params),
+    pageApi: (params) => gameDockerTagPagePost(params),
+    deleteApi: (params) => gameDockerTagDeletePost(params),
   },
   immediate: false,
 })

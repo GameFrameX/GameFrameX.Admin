@@ -48,8 +48,8 @@ import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
 import Select from 'primevue/select'
 import { showSuccess } from '../../../../../utils/message.ts'
-import { tenantGameOnlinePlayerSegmentAddPost, tenantGameOnlinePlayerSegmentUpdatePost } from '../../../../../api/tenantGameOnlinePlayerSegment'
-import type { UpdateTenantGameOnlinePlayerSegmentRequest } from '../../../../../api/tenantGameOnlinePlayerSegment/types'
+import { gameOnlinePlayerSegmentAddPost, gameOnlinePlayerSegmentUpdatePost } from '../../../../../api/gameOnlinePlayerSegment'
+import type { UpdateTenantGameOnlinePlayerSegmentRequest } from '../../../../../api/gameOnlinePlayerSegment/types'
 import { ONLINE_SEGMENT_FIELD_OPTIONS, ONLINE_SEGMENT_OP_OPTIONS } from '../constants'
 
 const props = withDefaults(defineProps<{
@@ -128,10 +128,10 @@ const confirm = async () => {
         description: form.value.description.trim() || undefined,
         conditionsJson: buildConditionsJson(),
       }
-      await tenantGameOnlinePlayerSegmentUpdatePost(input)
+      await gameOnlinePlayerSegmentUpdatePost(input)
       showSuccess(t('message.onlineCenter.playerSegment.updateSuccess'))
     } else {
-      await tenantGameOnlinePlayerSegmentAddPost({
+      await gameOnlinePlayerSegmentAddPost({
         appId: props.appId as string | number,
         name: form.value.name.trim(),
         description: form.value.description.trim() || undefined,

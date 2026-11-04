@@ -33,13 +33,6 @@ export class OnlineAssetTransactionQuery<SecurityDataType = unknown> {
   onlineAssetTransactionQueryDetailGet = (
     query: {
       /**
-       * 应用作用域（必填，经 OnlineScopeContextFactory 校验租户归属）。
-       * @format int64
-       * @min 1
-       * @max 9223372036854776000
-       */
-      appId: number;
-      /**
        * 区服作用域（必填，经 OnlineScopeContextFactory 校验租户与应用归属）。
        * @format int64
        * @min 1

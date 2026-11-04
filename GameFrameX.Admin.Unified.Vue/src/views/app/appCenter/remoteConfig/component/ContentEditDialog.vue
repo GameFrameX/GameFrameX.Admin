@@ -3,8 +3,8 @@
     ref="dialogRef"
     class="global-info-content-edit-dialog"
     :title="props.title"
-    :addApi="tenantGameAppRemoteConfigAddPost"
-    :updateApi="tenantGameAppRemoteConfigUpdatePost"
+    :addApi="gameAppRemoteConfigAddPost"
+    :updateApi="gameAppRemoteConfigUpdatePost"
     :beforeSubmit="beforeSubmit"
     width="min(920px, calc(100vw - 32px))"
     scrollable
@@ -34,9 +34,9 @@
 import {computed, ref} from 'vue'
 import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import ModeContentEditor from './ModeContentEditor.vue'
-import { tenantGameAppRemoteConfigAddPost, tenantGameAppRemoteConfigUpdatePost } from '../../../../../api/tenantGameAppRemoteConfig'
-import {tenantGameAppRemoteConfigKeyPagePost} from '../../../../../api/tenantGameAppRemoteConfigKey'
-import {tenantGameAppRemoteConfigModePagePost} from '../../../../../api/tenantGameAppRemoteConfigMode'
+import { gameAppRemoteConfigAddPost, gameAppRemoteConfigUpdatePost } from '../../../../../api/gameAppRemoteConfig'
+import {gameAppRemoteConfigKeyPagePost} from '../../../../../api/gameAppRemoteConfigKey'
+import {gameAppRemoteConfigModePagePost} from '../../../../../api/gameAppRemoteConfigMode'
 import {MAX_PAGE_SIZE} from '../../../../../constants/pagination.ts'
 import {showError} from '../../../../../utils/message.ts'
 import {normalizeAppId} from '../../../../../utils/appWorkspace.ts'
@@ -82,7 +82,7 @@ const currentModeLongValueErrors = computed(() => {
 })
 
 const loadContentKeyDefs = async () => {
-  const res = await tenantGameAppRemoteConfigKeyPagePost({
+  const res = await gameAppRemoteConfigKeyPagePost({
     page: 1,
     pageSize: MAX_PAGE_SIZE,
     isEnabled: true,
@@ -110,7 +110,7 @@ const loadContentKeyDefs = async () => {
 }
 
 const loadModeDefs = async () => {
-  const res = await tenantGameAppRemoteConfigModePagePost({
+  const res = await gameAppRemoteConfigModePagePost({
     page: 1,
     pageSize: MAX_PAGE_SIZE,
     isEnabled: true,

@@ -20,7 +20,7 @@
         <CrudDataTable :value="tableData" style="width: 100%" v-block-loading="loading" showGridlines stripedRows
                        rowKey="id" :totalRecords="tableParams.total" :rows="tableParams.pageSize"
                        :rowsPerPageOptions="[10, 20, 50, 100, 200, 500]"
-                       authPrefix="tenantGamePenaltyEntity"
+                       authPrefix="gamePenalty"
                        :customActions="customActions"
                        :columns="columns"
                        :exportQuery="queryParams"
@@ -61,8 +61,8 @@ import {formatUnix} from '../../../../utils/formatTime.ts'
 import addDialog from '/@/views/app/trustCenter/gamePenaltyEntity/component/AddDialog.vue'
 import revokeDialog from '/@/views/app/trustCenter/gamePenaltyEntity/component/RevokeDialog.vue'
 import syncOnlineResultDialog from '/@/views/app/trustCenter/gamePenaltyEntity/component/SyncOnlineResultDialog.vue'
-import { tenantGamePenaltyEntityPagePost, tenantGamePenaltyEntitySyncOnlineRuntimePost } from '../../../../api/tenantGamePenaltyEntity'
-import { tenantGameAreaEntitySelectStringPost } from '../../../../api/tenantGameAreaEntity'
+import { gamePenaltyPagePost, gamePenaltySyncOnlineRuntimePost } from '../../../../api/gamePenalty'
+import { gameAreaSelectStringPost } from '../../../../api/gameArea'
 import { showConfirm, showSuccess, showError } from '../../../../utils/message.ts'
 import {MAX_SELECT_SIZE} from '../../../../constants/pagination.ts'
 import {
@@ -108,7 +108,7 @@ const {
   tableParams,
   onQuery,
 } = useCrudTable({
-  api: { pageApi: tenantGamePenaltyEntityPagePost },
+  api: { pageApi: gamePenaltyPagePost },
   immediate: true,
 })
 
@@ -130,7 +130,7 @@ const getAreaName = (areaId: number | null | undefined) => {
   return String(areaId)
 }
 const loadAreaList = async (appId?: number) => {
-  const res = await tenantGameAreaEntitySelectStringPost({ appId: appId, pageSize: MAX_SELECT_SIZE })
+  const res = await gameAreaSelectStringPost({ appId: appId, pageSize: MAX_SELECT_SIZE })
   areaList.value = res.data.data ?? []
 }
 
@@ -161,7 +161,7 @@ const onSyncOnline = async (row: any) => {
     return
   }
   try {
-    const res: any = await tenantGamePenaltyEntitySyncOnlineRuntimePost({ id: row.id })
+    const res: any = await gamePenaltySyncOnlineRuntimePost({ id: row.id })
     const link: any = res.data?.data
     if (!link) {
       showError(t('message.gameBusiness.trustSafety.penalty.syncFailed'))

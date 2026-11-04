@@ -71,8 +71,8 @@ import { usePrimeTablePage } from '../../../../composables'
 import { useCurrentApp } from '../../../../composables/useCurrentApp.ts'
 import publishDialog from '/@/views/app/onlineCenter/onlineConfigRollout/component/PublishDialog.vue'
 import rollbackDialog from '/@/views/app/onlineCenter/onlineConfigRollout/component/RollbackDialog.vue'
-import { tenantGameOnlineConfigRolloutPagePost } from '../../../../api/tenantGameOnlineConfigRollout'
-import { OnlineConfigRolloutStatus } from '../../../../api/tenantGameOnlineConfigRollout/types'
+import { gameOnlineConfigRolloutPagePost } from '../../../../api/gameOnlineConfigRollout'
+import { OnlineConfigRolloutStatus } from '../../../../api/gameOnlineConfigRollout/types'
 import { ONLINE_CONFIG_ROLLOUT_KIND_OPTIONS } from './constants'
 
 const route = useRoute()
@@ -112,7 +112,7 @@ const {
   tableParams,
   onQuery,
 } = useCrudTable({
-  api: { pageApi: tenantGameOnlineConfigRolloutPagePost },
+  api: { pageApi: gameOnlineConfigRolloutPagePost },
   // 灰度版本行是应用级事实数据（AppId 必填，EnsureFactAppId）：immediate 首查不带 appId 必 500，
   // 改为 onMounted 解析当前应用后经 guardedQuery 发起（同设备页 C211 先例）。
   immediate: false,

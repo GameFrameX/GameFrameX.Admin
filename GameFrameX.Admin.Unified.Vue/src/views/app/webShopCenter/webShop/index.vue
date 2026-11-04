@@ -52,7 +52,7 @@ import {useCrudTable} from '../../../../composables/useCrudTable.ts'
 import {usePrimeTablePage, useRouteAppIdQuerySync} from '../../../../composables'
 import {useCurrentApp} from '../../../../composables/useCurrentApp.ts'
 import editDialog from '/@/views/app/webShopCenter/webShop/component/EditDialog.vue'
-import { tenantGameWebShopEntityPagePost, tenantGameWebShopEntityDeletePost } from '../../../../api/tenantGameWebShopEntity'
+import { gameWebShopPagePost, gameWebShopDeletePost } from '../../../../api/gameWebShop'
 
 const route = useRoute()
 const {resolveInitialAppId} = useCurrentApp()
@@ -71,7 +71,7 @@ const {
   onQuery,
   onDelete
 } = useCrudTable({
-  api: {pageApi: tenantGameWebShopEntityPagePost, deleteApi: tenantGameWebShopEntityDeletePost},
+  api: {pageApi: gameWebShopPagePost, deleteApi: gameWebShopDeletePost},
   immediate: true,
 })
 

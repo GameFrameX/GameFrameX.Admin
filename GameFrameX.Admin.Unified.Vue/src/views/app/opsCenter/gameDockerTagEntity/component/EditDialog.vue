@@ -1,5 +1,5 @@
 <template>
-  <BaseEditDialog ref="dialogRef" :title="props.title" scrollable :addApi="tenantGameDockerTagEntityAddPost" :updateApi="tenantGameDockerTagEntityUpdatePost" :rules="rules" :beforeOpen="beforeOpen" @reloadTable="emit('reloadTable')">
+  <BaseEditDialog ref="dialogRef" :title="props.title" scrollable :addApi="gameDockerTagAddPost" :updateApi="gameDockerTagUpdatePost" :rules="rules" :beforeOpen="beforeOpen" @reloadTable="emit('reloadTable')">
     <template #default="{ ruleForm, isEditor }">
       <TextField v-model="ruleForm.name" name="name" :label="t('message.gameBusiness.name')" :placeholder="t('message.gameBusiness.pleaseEnterName')" maxlength="64"/>
       <TextareaField v-model="ruleForm.serverVersion" name="serverVersion" :label="t('message.gameBusiness.area.tag')" :placeholder="t('message.gameBusiness.pleaseEnterDescription')" maxlength="512" :autoResize="true" rows="3"/>
@@ -12,7 +12,7 @@
 import {ref} from 'vue'
 import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import {TextField, TextareaField} from '../../../../../components/crud-form-fields'
-import { tenantGameDockerTagEntityUpdatePost, tenantGameDockerTagEntityAddPost } from '../../../../../api/tenantGameDockerTagEntity'
+import { gameDockerTagUpdatePost, gameDockerTagAddPost } from '../../../../../api/gameDockerTag'
 import {normalizeAppId} from '../../../../../utils/appWorkspace.ts'
 
 const props = defineProps({

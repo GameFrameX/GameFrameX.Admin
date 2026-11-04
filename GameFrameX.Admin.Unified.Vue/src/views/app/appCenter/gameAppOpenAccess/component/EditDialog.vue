@@ -56,7 +56,7 @@ import MultiSelect from 'primevue/multiselect'
 import DatePicker from 'primevue/datepicker'
 import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import {TextField, TextareaField} from '../../../../../components/crud-form-fields'
-import { tenantGameAppOpenAccessAddPost, tenantGameAppOpenAccessUpdatePost } from '../../../../../api/tenantGameAppOpenAccess'
+import { gameAppOpenAccessAddPost, gameAppOpenAccessUpdatePost } from '../../../../../api/gameAppOpenAccess'
 import { tenantUserPagePost } from '../../../../../api/tenantUser'
 import { useCurrentApp } from '../../../../../composables/useCurrentApp.ts'
 import { MAX_PAGE_SIZE } from '../../../../../constants/pagination.ts'
@@ -142,7 +142,7 @@ const beforeSubmit = (form: any) => {
 
 // ---- wrappedAddApi：捕获 SecretResult ----
 const wrappedAddApi = async (payload: any) => {
-  const res = await tenantGameAppOpenAccessAddPost(payload)
+  const res = await gameAppOpenAccessAddPost(payload)
   const secret = res?.data?.data
   if (secret) {
     emit('secret', secret)
@@ -151,7 +151,7 @@ const wrappedAddApi = async (payload: any) => {
 
 // ---- wrappedUpdateApi ----
 const wrappedUpdateApi = async (payload: any) => {
-  await tenantGameAppOpenAccessUpdatePost(payload)
+  await gameAppOpenAccessUpdatePost(payload)
 }
 
 // ---- 加载租户用户列表 ----

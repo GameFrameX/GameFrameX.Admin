@@ -1,14 +1,8 @@
 /* eslint-disable */
 /* tslint:disable */
 
-/** 匹配队列总览查询输入参数（change C341 §3；AppId/ServerId 为 C339 作用域三元组硬前置）。 */
+/** 匹配队列总览查询输入参数，ServerId 为调用前置条件。 */
 export interface OnlineMatchOverviewRequest {
-  /**
-   * 应用作用域（必填，经 OnlineScopeContextFactory 校验租户归属）。
-   * @min 1
-   * @max 9223372036854776000
-   */
-  appId: string;
   /**
    * 区服作用域（必填，经 OnlineScopeContextFactory 校验租户与应用归属）。
    * @min 1

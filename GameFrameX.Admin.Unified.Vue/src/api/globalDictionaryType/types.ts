@@ -53,8 +53,6 @@ export interface AddDictionaryTypeRequest {
   rowVersion?: string | null;
   /** 是否启用,true:启用，false:禁用，null:未设置(启用) */
   isEnabled?: boolean | null;
-  /** 租户Id */
-  tenantId?: string | null;
   name?: string | null;
   code?: string | null;
   /** @format int32 */
@@ -204,8 +202,6 @@ export interface UpdateDictionaryTypeRequest {
   rowVersion?: string | null;
   /** 是否启用,true:启用，false:禁用，null:未设置(启用) */
   isEnabled?: boolean | null;
-  /** 租户Id */
-  tenantId?: string | null;
   name?: string | null;
   code?: string | null;
   /** @format int32 */

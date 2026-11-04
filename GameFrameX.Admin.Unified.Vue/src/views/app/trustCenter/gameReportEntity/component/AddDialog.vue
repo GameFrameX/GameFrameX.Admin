@@ -1,7 +1,7 @@
 <template>
   <BaseEditDialog ref="dialogRef" :title="props.title"
-    :addApi="tenantGameReportEntityAddPost"
-    :updateApi="tenantGameReportEntityAddPost"
+    :addApi="gameReportAddPost"
+    :updateApi="gameReportAddPost"
     :rules="rules"
     :beforeOpen="beforeOpen" :beforeSubmit="beforeSubmit"
     scrollable @reloadTable="emit('reloadTable')">
@@ -54,7 +54,7 @@ import Textarea from 'primevue/textarea'
 import Select from 'primevue/select'
 import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import ConfigAppScopePicker from '/@/components/config-app-scope-picker/index.vue'
-import { tenantGameReportEntityAddPost } from '../../../../../api/tenantGameReportEntity'
+import { gameReportAddPost } from '../../../../../api/gameReport'
 import { tenantGameAppEntityListGet } from '../../../../../api/tenantGameAppEntity'
 import {
   PENALTY_TARGET_TYPE_OPTIONS,

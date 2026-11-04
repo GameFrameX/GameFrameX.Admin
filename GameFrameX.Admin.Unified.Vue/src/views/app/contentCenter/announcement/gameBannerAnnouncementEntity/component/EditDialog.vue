@@ -1,7 +1,7 @@
 <template>
   <BaseEditDialog ref="dialogRef" :title="props.title"
-    :addApi="tenantGameBannerAnnouncementEntityAddPost"
-    :updateApi="tenantGameBannerAnnouncementEntityUpdatePost"
+    :addApi="gameBannerAnnouncementAddPost"
+    :updateApi="gameBannerAnnouncementUpdatePost"
     :rules="rules" scrollable :beforeOpen="beforeOpen" :beforeSubmit="beforeSubmit" @reloadTable="emit('reloadTable')">
     <template #default="{ ruleForm, isEditor }">
       <FormLabel name="areaId">{{ t('message.gameBusiness.mail.areaId') }}</FormLabel>
@@ -48,8 +48,8 @@ import Message from 'primevue/message'
 import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import {TextareaField} from '../../../../../../components/crud-form-fields'
 import {normalizeAppId} from '../../../../../../utils/appWorkspace.ts'
-import { tenantGameBannerAnnouncementEntityAddPost, tenantGameBannerAnnouncementEntityUpdatePost } from '../../../../../../api/tenantGameBannerAnnouncementEntity'
-import { tenantGameAreaEntitySelectStringPost } from '../../../../../../api/tenantGameAreaEntity'
+import { gameBannerAnnouncementAddPost, gameBannerAnnouncementUpdatePost } from '../../../../../../api/gameBannerAnnouncement'
+import { gameAreaSelectStringPost } from '../../../../../../api/gameArea'
 import {MAX_SELECT_SIZE} from '../../../../../../constants/pagination.ts'
 
 const props = defineProps({title: {type: String, default: ''}, appId: {type: [Number, String], default: undefined}})
@@ -73,7 +73,7 @@ const rules = {
 }
 
 const loadAreaList = async (appId?: number) => {
-  areaIdOptions.value = (await tenantGameAreaEntitySelectStringPost({appId: appId, pageSize: MAX_SELECT_SIZE})).data.data ?? []
+  areaIdOptions.value = (await gameAreaSelectStringPost({appId: appId, pageSize: MAX_SELECT_SIZE})).data.data ?? []
 }
 
 const beforeOpen = (form: any, isEditor: boolean) => {

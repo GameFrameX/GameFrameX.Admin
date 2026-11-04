@@ -1,6 +1,6 @@
 <template>
   <BaseEditDialog ref="dialogRef" :title="props.title" scrollable scrollMaxHeight="65vh"
-                  :addApi="tenantGameOrderEntityAddPost" :updateApi="tenantGameOrderEntityUpdatePost" :rules="rules"
+                  :addApi="gameOrderAddPost" :updateApi="gameOrderUpdatePost" :rules="rules"
                   :beforeOpen="beforeOpen" @reloadTable="emit('reloadTable')">
     <template #default="{ ruleForm, isEditor }">
       <FormLabel name="status">{{ t('message.gameBusiness.order.orderStatus') }}</FormLabel>
@@ -36,7 +36,7 @@ import FormField from '@primevue/forms/formfield'
 import Message from 'primevue/message'
 import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import {TextField} from '../../../../../components/crud-form-fields'
-import { tenantGameOrderEntityAddPost, tenantGameOrderEntityUpdatePost } from '../../../../../api/tenantGameOrderEntity'
+import { gameOrderAddPost, gameOrderUpdatePost } from '../../../../../api/gameOrder'
 import {systemEnumEnumDataListGet} from '../../../../../api/systemEnum';
 import {normalizeAppId} from '../../../../../utils/appWorkspace.ts'
 

@@ -2,8 +2,8 @@
   <BaseEditDialog
     ref="dialogRef"
     :title="props.title"
-    :addApi="tenantGameAppRemoteConfigKeyAddPost"
-    :updateApi="tenantGameAppRemoteConfigKeyUpdatePost"
+    :addApi="gameAppRemoteConfigKeyAddPost"
+    :updateApi="gameAppRemoteConfigKeyUpdatePost"
     :rules="rules"
     :defaultForm="defaultForm"
     :beforeOpen="beforeOpen"
@@ -38,7 +38,7 @@ import FormField from '@primevue/forms/formfield'
 import Message from 'primevue/message'
 import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import {TextField, TextareaField} from '../../../../../../components/crud-form-fields'
-import {tenantGameAppRemoteConfigKeyAddPost, tenantGameAppRemoteConfigKeyUpdatePost} from '../../../../../../api/tenantGameAppRemoteConfigKey'
+import {gameAppRemoteConfigKeyAddPost, gameAppRemoteConfigKeyUpdatePost} from '../../../../../../api/gameAppRemoteConfigKey'
 
 const props = defineProps({
   title: {

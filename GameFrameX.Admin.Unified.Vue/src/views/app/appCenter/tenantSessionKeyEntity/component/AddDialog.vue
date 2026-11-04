@@ -25,7 +25,7 @@ import Button from 'primevue/button'
 import DatePicker from 'primevue/datepicker'
 import InputNumber from 'primevue/inputnumber'
 import InputText from 'primevue/inputtext'
-import { tenantSessionKeyEntityAddPost } from '../../../../../api/tenantSessionKeyEntity'
+import { sessionKeyAddPost } from '../../../../../api/sessionKey'
 
 const emit = defineEmits(['added'])
 
@@ -45,7 +45,7 @@ const open = () => {
 
 const confirm = async () => {
   const toLong = (value: any) => (value ? Math.floor(new Date(value).getTime() / 1000) : null)
-  const res = await tenantSessionKeyEntityAddPost({
+  const res = await sessionKeyAddPost({
     appId: appId.value != null ? String(appId.value) : undefined,
     notBeforeTime: toLong(notBeforeTime.value),
     expireTime: toLong(expireTime.value),

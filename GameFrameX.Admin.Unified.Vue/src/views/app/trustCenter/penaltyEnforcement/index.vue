@@ -10,7 +10,7 @@
             v-model="queryParams"
             :fields="searchFields"
             :showAdd="false"
-            authPrefix="tenantGamePenaltyEntity"
+            authPrefix="gamePenaltyEntity"
             @query="onQuery"
         />
       </template>
@@ -20,7 +20,7 @@
         <CrudDataTable :value="tableData" style="width: 100%" v-block-loading="loading" showGridlines stripedRows
                        rowKey="id" :totalRecords="tableParams.total" :rows="tableParams.pageSize"
                        :rowsPerPageOptions="[10, 20, 50, 100, 200, 500]"
-                       authPrefix="tenantGamePenaltyEntity"
+                       authPrefix="gamePenaltyEntity"
                        :customActions="customActions"
                        :columns="columns"
                        :exportQuery="queryParams"
@@ -64,8 +64,8 @@ import {useCrudTable} from '../../../../composables/useCrudTable.ts'
 import {usePrimeTablePage} from '../../../../composables'
 import {useCurrentApp} from '../../../../composables/useCurrentApp.ts'
 import {formatUnix} from '../../../../utils/formatTime.ts'
-import { tenantGamePenaltyEntityPagePost } from '../../../../api/tenantGamePenaltyEntity'
-import { tenantGameAreaEntitySelectStringPost } from '../../../../api/tenantGameAreaEntity'
+import { gamePenaltyPagePost } from '../../../../api/gamePenalty'
+import { gameAreaSelectStringPost } from '../../../../api/gameArea'
 import {MAX_SELECT_SIZE} from '../../../../constants/pagination.ts'
 import {showWarning} from '../../../../utils/message.ts'
 import {
@@ -114,7 +114,7 @@ const {
     tableParams,
     onQuery,
 } = useCrudTable({
-    api: {pageApi: tenantGamePenaltyEntityPagePost},
+    api: {pageApi: gamePenaltyPagePost},
     immediate: false,
 })
 
@@ -132,7 +132,7 @@ const getAreaName = (areaId: number | null | undefined) => {
     return item ? item.label : String(areaId)
 }
 const loadAreaList = async (appId?: number) => {
-    const res = await tenantGameAreaEntitySelectStringPost({appId: appId, pageSize: MAX_SELECT_SIZE})
+    const res = await gameAreaSelectStringPost({appId: appId, pageSize: MAX_SELECT_SIZE})
     areaList.value = res.data?.data ?? []
 }
 
