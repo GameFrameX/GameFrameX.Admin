@@ -14,6 +14,12 @@ internal static class Program
                 return 0;
             }
 
+            if (arguments.SequenceEqual(new[] { "--self-test-postgres" }))
+            {
+                PostgresMigrationSmokeTests.Run(RequiredEnvironment("GFX_TEST_PG_CONNECTION_STRING"));
+                return 0;
+            }
+
             if (arguments.Length != 1 || (arguments[0] != "--dry-run" && arguments[0] != "--execute"))
             {
                 Console.Error.WriteLine("用法：--dry-run | --execute | --self-test；连接通过 GFX_MIGRATION_SOURCE / GFX_MIGRATION_TARGET，类型通过 GFX_MIGRATION_DATABASE_TYPE 指定。");

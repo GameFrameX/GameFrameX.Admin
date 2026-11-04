@@ -184,7 +184,7 @@ internal static class SingleMainMigration
                 continue;
             }
 
-            var parameters = columns.Select((column, index) => new SugarParameter($"@value{index}", row[column])).ToArray();
+            var parameters = columns.Select((column, index) => new SugarParameter($"@value{index}", row[column], rows.Columns[column]!.DataType)).ToArray();
             target.Ado.ExecuteCommand($"INSERT INTO {Quote(tableName)} ({columnList}) VALUES ({string.Join(", ", parameters.Select(parameter => parameter.ParameterName))})", parameters);
             inserted++;
         }
