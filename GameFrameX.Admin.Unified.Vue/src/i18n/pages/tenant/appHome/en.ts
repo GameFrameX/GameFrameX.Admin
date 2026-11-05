@@ -1,8 +1,6 @@
 // Defined content (APP cockpit = tenant home after selecting an app)
 export default {
     appHome: {
-        pageTitle: 'App Cockpit',
-        workbenchSub: 'GameFrameX App Cockpit',
         kpiOnline: 'Online · THIS APP',
         kpiOnlineFoot: 'Live sample',
         kpiOrders: 'Orders Today · ORDERS',

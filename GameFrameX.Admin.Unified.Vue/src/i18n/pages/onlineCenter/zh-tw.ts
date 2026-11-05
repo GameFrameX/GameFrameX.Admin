@@ -34,7 +34,6 @@ export default {
                 currencyOrItemType: '貨幣/道具類型',
                 timeRange: '時間範圍',
                 startTime: '開始時間',
-                pleaseEnterServerId: '請輸入區服 ID',
                 pleaseEnterPlayerId: '請輸入玩家 ID',
                 pleaseEnterCurrencyOrItemType: '請輸入貨幣或道具類型',
             },
@@ -53,8 +52,6 @@ export default {
             detailTitle: '交易詳情',
             transactionId: '交易號',
             pleaseEnterTransactionId: '請輸入交易號',
-            serverId: '區服 ID',
-            pleaseEnterServerId: '請輸入區服 ID',
             status: '狀態',
             source: '來源',
             reason: '原因',
@@ -73,8 +70,6 @@ export default {
         assetAudit: {
             listTitle: '資產稽核',
             search: {
-                serverId: '區服 ID',
-                pleaseEnterServerId: '請輸入區服 ID',
                 operatorId: '操作者 ID',
                 pleaseEnterOperatorId: '請輸入操作者 ID',
                 playerId: '玩家 ID',
@@ -96,10 +91,7 @@ export default {
         dashboard: {
             snapshotTitle: '線上總覽快照',
             serverTime: 'Online 伺服器時間',
-            search: {
-                serverId: '區服 ID',
-                pleaseEnterServerId: '請輸入區服 ID',
-            },
+
             metrics: {
                 onlinePlayerCount: '線上玩家數',
                 sessionCount: 'Session 數',
@@ -133,8 +125,6 @@ export default {
             search: {
                 playerId: '玩家 ID',
                 pleaseEnterPlayerId: '請輸入玩家 ID',
-                serverId: '區服 ID',
-                pleaseEnterServerId: '請輸入區服 ID',
                 timeRange: '時間範圍',
                 startTime: '開始時間',
             },
@@ -153,8 +143,6 @@ export default {
                 pleaseEnterTargetPlayerId: '請輸入目標玩家 ID',
                 commandKind: '命令類型',
                 pleaseEnterCommandKind: '請輸入命令類型',
-                serverId: '區服 ID',
-                pleaseEnterServerId: '請輸入區服 ID（可選）',
                 timeRange: '時間範圍',
                 startTime: '開始時間',
             },
@@ -162,7 +150,6 @@ export default {
                 source: '來源',
                 operatorIdentifier: '操作者',
                 commandType: '命令類型',
-                appId: 'App',
                 serverId: '區服',
                 targetPlayerIdentifier: '目標玩家',
                 summary: '摘要',
@@ -177,8 +164,6 @@ export default {
             commandKind: '命令類型',
             pleaseSelectCommand: '請選擇命令',
             commandKindRequired: '請選擇命令類型',
-            serverId: '區服 ID',
-            pleaseEnterServerId: '請輸入區服 ID（可選）',
             ticketId: 'Ticket ID',
             pleaseEnterTicketId: '請輸入要取消的 Ticket ID',
             matchId: 'Match ID',
@@ -217,8 +202,6 @@ export default {
         messageAudit: {
             listTitle: '訊息稽核',
             search: {
-                serverId: '區服 ID',
-                pleaseEnterServerId: '請輸入區服 ID',
                 participantPlayerId: '參與者玩家 ID',
                 pleaseEnterParticipantPlayerId: '請輸入參與者玩家 ID',
                 keyword: '關鍵詞',
@@ -265,8 +248,6 @@ export default {
                 rejected: '已駁回',
             },
             search: {
-                serverId: '區服 ID',
-                pleaseEnterServerId: '請輸入區服 ID',
                 status: '案件狀態',
                 pleaseSelectStatus: '請選擇案件狀態',
                 reporterPlayerId: '舉報人玩家 ID',
@@ -300,8 +281,6 @@ export default {
             notLoaded: '請先查詢',
             pollStoppedByRateLimit: 'Online 端限流（7xxx 鏡像碼），已停止自動輪詢；可稍後手動重新整理',
             search: {
-                serverId: '區服 ID',
-                pleaseEnterServerId: '請輸入區服 ID',
                 mode: '匹配模式',
                 pleaseEnterMode: '請輸入匹配模式',
                 region: '區域',
@@ -311,8 +290,6 @@ export default {
         matchFailureReason: {
             listTitle: '匹配失敗原因',
             search: {
-                serverId: '區服 ID',
-                pleaseEnterServerId: '請輸入區服 ID',
                 reasonCode: '失敗原因',
                 pleaseSelectReasonCode: '請選擇失敗原因',
                 timeRange: '時間範圍',
@@ -336,8 +313,6 @@ export default {
             search: {
                 abnormalKind: '異常類型',
                 pleaseSelectKind: '請選擇異常類型',
-                serverId: '區服 ID',
-                pleaseEnterServerId: '請輸入區服 ID',
             },
             columns: {
                 ticketId: '工單號',
@@ -384,7 +359,6 @@ export default {
             syncDialogTitle: '同步分群到 Online',
             syncHint: '定義快照經統一下發入口送達 Online，Online 分配分群標識回寫本行；理由必填進稽核。',
             syncServerId: '區服 ID',
-            syncServerIdPlaceholder: '請輸入目標區服 ID',
             reasonLabel: '理由（必填，進稽核）',
             reasonPlaceholder: '請填寫操作理由，≤500 字',
             reasonRequired: '理由不能為空',
@@ -423,7 +397,6 @@ export default {
             publishDialogTitle: '發佈配置灰度版本',
             publishHint: '發佈 = 新版本行下發 Online；分群須已同步；理由必填進稽核。',
             serverId: '區服 ID',
-            serverIdPlaceholder: '請輸入目標區服 ID',
             reasonLabel: '理由（必填，進稽核）',
             reasonPlaceholder: '請填寫下發理由，≤500 字',
             reasonRequired: '理由不能為空',

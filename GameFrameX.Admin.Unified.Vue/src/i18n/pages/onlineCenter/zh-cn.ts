@@ -34,7 +34,6 @@ export default {
                 currencyOrItemType: '货币/道具类型',
                 timeRange: '时间范围',
                 startTime: '开始时间',
-                pleaseEnterServerId: '请输入区服 ID',
                 pleaseEnterPlayerId: '请输入玩家 ID',
                 pleaseEnterCurrencyOrItemType: '请输入货币或道具类型',
             },
@@ -53,8 +52,6 @@ export default {
             detailTitle: '交易详情',
             transactionId: '交易号',
             pleaseEnterTransactionId: '请输入交易号',
-            serverId: '区服 ID',
-            pleaseEnterServerId: '请输入区服 ID',
             status: '状态',
             source: '来源',
             reason: '原因',
@@ -73,8 +70,6 @@ export default {
         assetAudit: {
             listTitle: '资产审计',
             search: {
-                serverId: '区服 ID',
-                pleaseEnterServerId: '请输入区服 ID',
                 operatorId: '操作者 ID',
                 pleaseEnterOperatorId: '请输入操作者 ID',
                 playerId: '玩家 ID',
@@ -96,10 +91,7 @@ export default {
         dashboard: {
             snapshotTitle: '在线总览快照',
             serverTime: 'Online 服务器时间',
-            search: {
-                serverId: '区服 ID',
-                pleaseEnterServerId: '请输入区服 ID',
-            },
+
             metrics: {
                 onlinePlayerCount: '在线玩家数',
                 sessionCount: 'Session 数',
@@ -133,8 +125,6 @@ export default {
             search: {
                 playerId: '玩家 ID',
                 pleaseEnterPlayerId: '请输入玩家 ID',
-                serverId: '区服 ID',
-                pleaseEnterServerId: '请输入区服 ID',
                 timeRange: '时间范围',
                 startTime: '开始时间',
             },
@@ -153,8 +143,6 @@ export default {
                 pleaseEnterTargetPlayerId: '请输入目标玩家 ID',
                 commandKind: '命令类型',
                 pleaseEnterCommandKind: '请输入命令类型',
-                serverId: '区服 ID',
-                pleaseEnterServerId: '请输入区服 ID（可选）',
                 timeRange: '时间范围',
                 startTime: '开始时间',
             },
@@ -162,7 +150,6 @@ export default {
                 source: '来源',
                 operatorIdentifier: '操作者',
                 commandType: '命令类型',
-                appId: 'App',
                 serverId: '区服',
                 targetPlayerIdentifier: '目标玩家',
                 summary: '摘要',
@@ -177,8 +164,6 @@ export default {
             commandKind: '命令类型',
             pleaseSelectCommand: '请选择命令',
             commandKindRequired: '请选择命令类型',
-            serverId: '区服 ID',
-            pleaseEnterServerId: '请输入区服 ID（可选）',
             ticketId: 'Ticket ID',
             pleaseEnterTicketId: '请输入要取消的 Ticket ID',
             matchId: 'Match ID',
@@ -217,8 +202,6 @@ export default {
         messageAudit: {
             listTitle: '消息审计',
             search: {
-                serverId: '区服 ID',
-                pleaseEnterServerId: '请输入区服 ID',
                 participantPlayerId: '参与者玩家 ID',
                 pleaseEnterParticipantPlayerId: '请输入参与者玩家 ID',
                 keyword: '关键词',
@@ -265,8 +248,6 @@ export default {
                 rejected: '已驳回',
             },
             search: {
-                serverId: '区服 ID',
-                pleaseEnterServerId: '请输入区服 ID',
                 status: '案件状态',
                 pleaseSelectStatus: '请选择案件状态',
                 reporterPlayerId: '举报人玩家 ID',
@@ -300,8 +281,6 @@ export default {
             notLoaded: '请先查询',
             pollStoppedByRateLimit: 'Online 侧限流（7xxx 镜像码），已停止自动轮询；可稍后手动刷新',
             search: {
-                serverId: '区服 ID',
-                pleaseEnterServerId: '请输入区服 ID',
                 mode: '匹配模式',
                 pleaseEnterMode: '请输入匹配模式',
                 region: '区域',
@@ -311,8 +290,6 @@ export default {
         matchFailureReason: {
             listTitle: '匹配失败原因',
             search: {
-                serverId: '区服 ID',
-                pleaseEnterServerId: '请输入区服 ID',
                 reasonCode: '失败原因',
                 pleaseSelectReasonCode: '请选择失败原因',
                 timeRange: '时间范围',
@@ -336,8 +313,6 @@ export default {
             search: {
                 abnormalKind: '异常类型',
                 pleaseSelectKind: '请选择异常类型',
-                serverId: '区服 ID',
-                pleaseEnterServerId: '请输入区服 ID',
             },
             columns: {
                 ticketId: '工单号',
@@ -384,7 +359,6 @@ export default {
             syncDialogTitle: '同步分群到 Online',
             syncHint: '定义快照经统一下发入口送达 Online，Online 分配分群标识回写本行；理由必填进审计。',
             syncServerId: '区服 ID',
-            syncServerIdPlaceholder: '请输入目标区服 ID',
             reasonLabel: '理由（必填，进审计）',
             reasonPlaceholder: '请填写操作理由，≤500 字',
             reasonRequired: '理由不能为空',
@@ -423,7 +397,6 @@ export default {
             publishDialogTitle: '发布配置灰度版本',
             publishHint: '发布 = 新版本行下发 Online；分群须已同步；理由必填进审计。',
             serverId: '区服 ID',
-            serverIdPlaceholder: '请输入目标区服 ID',
             reasonLabel: '理由（必填，进审计）',
             reasonPlaceholder: '请填写下发理由，≤500 字',
             reasonRequired: '理由不能为空',

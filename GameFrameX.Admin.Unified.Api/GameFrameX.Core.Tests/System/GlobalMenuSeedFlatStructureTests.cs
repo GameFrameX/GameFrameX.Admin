@@ -48,7 +48,7 @@ public class GlobalMenuSeedFlatStructureTests
         }
     }
 
-    [Fact(Skip = "C403 集成轮启用")]
+    [Fact]
     public void FinalNavigation_UsesNineOrderedRootsAndFlatViewPrefixes()
     {
         var menus = GlobalMenuSeedData.BuildData();

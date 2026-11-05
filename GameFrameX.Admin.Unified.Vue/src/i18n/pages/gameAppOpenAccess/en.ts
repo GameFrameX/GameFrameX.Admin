@@ -2,9 +2,6 @@ export default {
   gameBusiness: {
     openAccess: {
       listTitle: 'App Open Access Credential',
-      entityId: 'Credential ID',
-
-      appId: 'App',
       bindUser: 'Bound User',
       bindUserId: 'Bound User',
       scenario: 'Scenario',
@@ -15,8 +12,6 @@ export default {
       isEnabled: 'Status',
       expiresTime: 'Expires',
       revokedTime: 'Revoked At',
-      revokeReason: 'Revoke Reason',
-      createdTime: 'Created At',
       noExpiry: 'Never',
 
       enabled: 'Enabled',
@@ -25,7 +20,6 @@ export default {
 
       issueTitle: 'Issue Credential',
       editTitle: 'Edit Credential',
-      issueHint: 'AccessSecret is shown only once after issuance. Save it immediately.',
       pleaseSelectBindUser: 'Select a bound user',
       pleaseEnterScenario: 'Enter scenario code',
       pleaseEnterPurpose: 'Enter purpose',
@@ -40,14 +34,10 @@ export default {
       scopesRequired: 'Please select at least one scope',
 
       scopePackageReport: 'Package Report (package-report)',
-
-      issue: 'Issue',
-      edit: 'Edit',
       revoke: 'Revoke',
       enable: 'Enable',
       disable: 'Disable',
       refresh: 'Rotate Secret',
-      delete: 'Delete',
 
       revokeTitle: 'Revoke Credential',
       enableTitle: 'Enable Credential',
@@ -59,11 +49,8 @@ export default {
       reasonTooLong: 'Reason must not exceed 256 characters',
       revokeWarning: 'Revocation is immediate and irreversible. Continue?',
       refreshWarning: 'The current AccessSecret becomes invalid immediately. The new secret is shown only once.',
-      actionRowLabel: 'Operating Credential',
 
       deleteConfirm: 'Delete this credential?',
-      enableConfirm: 'Enable this credential?',
-      disableConfirm: 'Disable this credential?',
 
       secretTitle: 'Credential Secret (Shown Only Once)',
       secretWarning: 'AccessSecret is shown only once and cannot be retrieved later. Copy and save it now!',
@@ -72,9 +59,6 @@ export default {
       copySuccess: 'Copied to clipboard',
       copyFailed: 'Copy failed, please select and copy manually',
       iHaveSaved: 'I have saved it, close',
-
-      issueSuccess: 'Issued successfully',
-      updateSuccess: 'Updated successfully',
       deleteSuccess: 'Deleted successfully',
       revokeSuccess: 'Revoked successfully',
       enableSuccess: 'Enabled successfully',

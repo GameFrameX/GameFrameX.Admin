@@ -868,15 +868,15 @@ function selfTest() {
     assert(additionDiff.additions.length === 1 && additionDiff.additions[0] === 'src/b/Two.vue', 'unregistered frozen entry should be flagged as addition')
     assert(diffFrozenAgainstSnapshot(['src/a/One.vue'], ['src/a/One.vue', 'src/c/Gone.vue']).stale.length === 1, 'shrunk entry should surface as stale snapshot hint, not a failure')
     // GFX-734 守卫：views 顶层白名单 + 静态路由 appScope↔文件首段（先红后绿构造样本）
-    assert(viewsTopLevelViolation('tenant') === null, 'audience segment dir should pass views whitelist')
+    assert(viewsTopLevelViolation('tenant') !== null, 'retired audience segment should fail views whitelist')
     assert(viewsTopLevelViolation('system') === null, 'flat system directory should pass views whitelist')
     assert(viewsTopLevelViolation('unknownCenter') !== null, 'unknown directory should violate views whitelist')
     assert(staticRouteScopeViolation('dashboard/home/index.vue', null) === null, 'flat dashboard needs no audience scope')
-    assert(staticRouteScopeViolation('gmCenter/onlineDashboard/index.vue', 'app') === null, 'flat directory accepts transitional scope metadata')
-    assert(staticRouteScopeViolation('app/appCenter/appWorkspace/index.vue', 'app') === null, 'appScope=app with app/ first segment should pass')
+    assert(staticRouteScopeViolation('gmCenter/onlineDashboard/index.vue', 'app') !== null, 'flat directory rejects retired scope metadata')
+    assert(staticRouteScopeViolation('app/appCenter/appWorkspace/index.vue', 'app') !== null, 'appScope=app with app/ first segment should pass')
     assert(staticRouteScopeViolation('tenant/appCenter/appEntry/index.vue', 'app') !== null, 'appScope=app with tenant/ first segment should violate')
-    assert(staticRouteScopeViolation('tenant/appHome/AppHomeBoard.vue', 'tenant') === null, 'appScope=tenant with tenant/ first segment should pass')
-    assert(staticRouteScopeViolation('platform/global/platformJwtConfig/index.vue', null) === null, 'scopeless platform page should pass shared whitelist')
+    assert(staticRouteScopeViolation('tenant/appHome/AppHomeBoard.vue', 'tenant') !== null, 'appScope=tenant with tenant/ first segment should pass')
+    assert(staticRouteScopeViolation('platform/global/platformJwtConfig/index.vue', null) !== null, 'scopeless platform page should pass shared whitelist')
     assert(staticRouteScopeViolation('login/index.vue', null) === null, 'scopeless shared page should pass shared whitelist')
     assert(staticRouteScopeViolation('global/platform/index.vue', null) !== null, 'scopeless page outside shared whitelist should violate')
     console.log('[self-test] pass')
@@ -884,13 +884,13 @@ function selfTest() {
 }
 
 // ── views 受众三段布局守护（GFX-734 / C325）──────────────────────────────────
-// 迁移期同时接纳既有受众目录与明确列出的运营中心，未知目录仍拒绝。
+// 仅接纳九个运营中心与登录、错误页，旧受众目录拒绝。
 const OPERATION_CENTER_DIRECTORIES = ['dashboard', 'serverCenter', 'noticeCenter', 'gmCenter', 'playerCenter', 'commerceCenter', 'clientDelivery', 'audit', 'system']
-const VIEWS_TOP_LEVEL_ALLOWED = new Set(['platform', 'tenant', 'app', 'login', 'personal', 'error', 'chart', ...OPERATION_CENTER_DIRECTORIES])
+const VIEWS_TOP_LEVEL_ALLOWED = new Set(['login', 'error', ...OPERATION_CENTER_DIRECTORIES])
 
 function viewsTopLevelViolation(name) {
     if (VIEWS_TOP_LEVEL_ALLOWED.has(name)) return null
-    return `src/views/${name}: 顶层目录超出受众白名单 [${[...VIEWS_TOP_LEVEL_ALLOWED].join(', ')}]（业务页须落于已登记的运营中心或迁移期受众目录）`
+    return `src/views/${name}: 顶层目录超出受众白名单 [${[...VIEWS_TOP_LEVEL_ALLOWED].join(', ')}]（业务页须落于已登记的运营中心）`
 }
 
 function checkViewsLayout() {
@@ -910,18 +910,12 @@ function checkViewsLayout() {
 // ── 静态路由 appScope ↔ 文件首段一致性守护（GFX-734 / C325）────────────────────
 // route.ts / appWorkspaceRoutes.ts 中静态路由的 meta.appScope
 // 必须与 component 文件路径首段一致：app→app、tenant→tenant、无 appScope⇒platform 或共享目录。
-const STATIC_ROUTE_SCOPE_FILES = ['src/router/route.ts', 'src/router/appWorkspaceRoutes.ts']
-const SHARED_ROUTE_FIRST_SEGMENTS = new Set(['platform', 'login', 'personal', 'error', 'chart', ...OPERATION_CENTER_DIRECTORIES])
+const STATIC_ROUTE_SCOPE_FILES = ['src/router/route.ts']
+const SHARED_ROUTE_FIRST_SEGMENTS = new Set(['login', 'error', ...OPERATION_CENTER_DIRECTORIES])
 
 function staticRouteScopeViolation(viewPath, appScope) {
     const firstSegment = viewPath.split('/')[0]
-    if (OPERATION_CENTER_DIRECTORIES.includes(firstSegment)) return null
-    if (appScope === 'app' || appScope === 'tenant') {
-        if (firstSegment !== appScope) {
-            return `appScope=${appScope} 但 component 文件首段为 "${firstSegment}"（/@/views/${viewPath}）`
-        }
-        return null
-    }
+    if (appScope != null) return `退役的 appScope 元数据仍存在：${appScope}`
     if (!SHARED_ROUTE_FIRST_SEGMENTS.has(firstSegment)) {
         return `无 appScope（平台/共享页）但 component 文件首段 "${firstSegment}" 不在共享白名单 [${[...SHARED_ROUTE_FIRST_SEGMENTS].join(', ')}]（/@/views/${viewPath}）`
     }
@@ -933,7 +927,6 @@ function checkStaticRouteScopes() {
     const checked = []
     for (const relFile of STATIC_ROUTE_SCOPE_FILES) {
         // 应用工作台路由随壳层退场后可不存在，主路由文件仍必须存在。
-        if (relFile === 'src/router/appWorkspaceRoutes.ts' && !existsSync(join(ROOT, relFile))) continue
         const text = readText(join(ROOT, relFile))
         // 每个 route 块从一行 path: 开始，到下一个 path: 行或文件尾结束；块内含其 component 与 meta
         const chunks = text.split(/\n(?=\s*path:)/)

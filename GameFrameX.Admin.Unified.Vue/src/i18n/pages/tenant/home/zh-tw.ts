@@ -1,6 +1,7 @@
 // 定義內容（PLATFORM-駕駛艙=超管平台首頁；greeting 供 appHome 複用；notice 段為通知管理頁使用）
 export default {
     home: {
+        loadingSummary: '載入中',
         serverHealth: '區服健康',
         serverHealthDescription: '區服登記的運行狀態，不代表即時探活結果。',
         // 版頭
@@ -9,42 +10,11 @@ export default {
         greetingAfternoon: '下午好',
         greetingEvening: '晚上好',
         greetingNight: '夜深了',
-        platformSub: 'GameFrameX 平台駕駛艙',
-        // 平台指標帶
-        kpiTenants: '租戶總數 · TENANTS',
-        kpiTenantsFoot: '含停用與到期租戶',
-        kpiApps: '應用總數 · APPS',
-        kpiAppsFoot: '全部租戶累計',
-        kpiExpiring: '到期預警 · EXPIRING',
-        kpiExpiringFoot: '30 天內到期的租戶',
-        kpiPackages: '套餐數 · PACKAGES',
-        kpiPackagesFoot: '可分配的租戶套餐',
         // 快捷入口
         quickNav: '平台快捷入口',
         quickEmpty: '暫无可用的平台入口',
         quickMenus: '選單管理',
         quickConfigs: '參數配置',
         quickDicts: '字典管理',
-        // 公告卡
-        noticeTitle: '公告',
-        noticeEmpty: '暫無公告',
-        // 通知頁面
-        title: '標題',
-        type: '類型',
-        notice: '通知',
-        announcement: '公告',
-        query: '查詢',
-        reset: '重置',
-        content: '內容',
-        createdTime: '創建時間',
-        readStatus: '閱讀狀態',
-        read: '已讀',
-        unread: '未讀',
-        publisher: '發佈者',
-        publishTime: '發佈時間',
-        operation: '操作',
-        detail: '詳情',
-        messageDetail: '消息詳情',
-        confirm: '確認',
     },
 };

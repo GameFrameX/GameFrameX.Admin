@@ -12,16 +12,8 @@ export default {
             accountType_member: '会员',
             roleSet: '角色集合',
             age: '年龄',
-            orgSection: '运营组织',
-            belongOrg: '所属组织',
-            position: '职位',
             jobNum: '工号',
             joinDate: '入职日期',
-            extOrgSection: '附属组织',
-            addExtOrg: '增加附属组织',
-            extOrgDataPermission: '具有相应组织的数据权限',
-            orgPlaceholder: '运营组织',
-            posName: '职位名称',
             archiveInfo: '档案信息',
             cardType: '证件类型',
             idCard: '身份证',
@@ -55,7 +47,6 @@ export default {
             addAccount: '添加账号',
             editAccount: '编辑账号',
             deleteAccountConfirm: '确定删除账号',
-            deleteAccount: '删除账号',
             resetPwd: '重置密码',
             resetPwdConfirm: '确定重置密码',
             resetPwdSuccess: '密码重置成功为',
@@ -74,11 +65,7 @@ export default {
             menuPermission: '菜单权限',
             addRole: '添加角色',
             editRole: '编辑角色',
-            deleteRole: '删除角色',
             deleteRoleConfirm: '确定删角色',
-            grantDataScope: '授权数据范围',
-            grantDataScopeTitle: '授权数据范围',
-            orgList: '组织列表',
         },
         // ===== Menu module =====
         menu: {
@@ -113,8 +100,6 @@ export default {
             iframe: '内嵌',
             notIframe: '不内嵌',
             permission: '权限标识',
-            isEnable: '是否启用',
-            notEnable: '不启用',
             addMenu: '添加菜单',
             editMenu: '编辑菜单',
             deleteMenuConfirm: '确定删除菜单',
@@ -140,13 +125,7 @@ export default {
             deleteDictDataConfirm: '确定删除字典值',
         },
         // ===== Org module =====
-        org: {
-            orgName: '组织名称',
-            expandAll: '全部展开',
-            collapseAll: '全部折叠',
-            rootNode: '根节点',
-            filterByOrgTree: '按组织筛选',
-        },
+
         // ===== Log module =====
         log: {
             startTime: '开始时间',
@@ -161,7 +140,6 @@ export default {
             httpMethod: '请求方式',
             requestUrl: '请求地址',
             requestParam: '请求参数',
-            returnResult: '返回结果',
             logLevel: '级别',
             logLevel_debug: '调试',
             logLevel_info: '消息',
@@ -179,35 +157,19 @@ export default {
             elapsed: '耗时(ms)',
             logDateTime: '日志时间',
             logDetail: '日志详情',
-            today: '今天',
-            yesterday: '昨天',
-            lastWeek: '上周',
             opSuccess: '成功',
             opFail: '失败',
             // diff log
             differenceTable: '差异对比表',
             differenceField: '差异字段',
-            differenceValue: '差异值',
             differenceBefore: '变更前',
             differenceAfter: '变更后',
-            diffLogDetail: '差异日志详情',
             // ex log
             exceptionMsg: '异常信息',
-            exceptionType: '异常类型',
-            exceptionSource: '异常来源',
-            stackTrace: '堆栈跟踪',
-            exceptionLogDetail: '异常日志详情',
-            // vis log
-            loginName: '登录名称',
-            loginTime: '登录时间',
-            loginType: '登录操作',
         },
         // ===== Database module =====
         database: {
             dbName: '库名',
-            dbLocator: '库定位器',
-            dbType: '库类型',
-            dbAddress: '库地址',
             tableName: '表名',
             tableDescription: '表名称',
             fieldName: '字段名',
@@ -266,7 +228,6 @@ export default {
             batchDelete: '批量删除',
             deleteConfigConfirm: '确定删除配置',
             batchDeleteConfirm: '确定批量删除',
-            exportFileName: '系统参数',
         },
         // ===== File module =====
         file: {
@@ -279,7 +240,6 @@ export default {
             storageLocation: '存储位置',
             storageConfigId: '存储配置ID',
             storageId: '存储标识',
-            uploaderId: '上传者Id',
 
             uploader: '上传者',
             uploadFile: '上传文件',
@@ -366,25 +326,18 @@ export default {
             resetRunCountTip: '是否在启动时重置最大触发次数等于一次的作业<br/>解决因持久化数据已完成一次触发但启动时不再执行的问题',
             // dashboard
             jobDashboard: '作业大盘',
-            runningJobCount: '运行中作业数',
-            jobRunStatistics: '作业执行统计',
-            total: '合计',
             running: '运行中',
             paused: '已暂停',
-            completed: '已完成',
             blocked: '阻塞',
             // cluster
             jobCluster: '作业集群',
             clusterId: '集群Id',
-            status: '状态',
-            updateStatus: '更新状态',
             args: '参数',
             lastRunTime: '最近运行时间',
             nextRunTime: '下一次运行时间',
             numberOfRuns: '触发次数',
             numberOfErrors: '出错次数',
             retryTimeout: '重试间隔ms',
-            updatedTime: '更新时间',
             // trigger status
             triggerRunning: '正在运行',
             triggerPaused: '暂停',
@@ -438,22 +391,15 @@ export default {
         // ===== OpenAccess module =====
         openAccess: {
             accessName: '接口名称',
-            accessUrl: '接口地址',
             authToken: '认证Token',
-            addOpenAccess: '添加开放接口',
-            editOpenAccess: '编辑开放接口',
-            deleteOpenAccessConfirm: '确定删除开放接口',
             helpView: '帮助说明',
             accessSecret: '密钥',
             bindUserAccount: '绑定用户账号',
             bindTenantName: '绑定租户名称',
-            bindTenant: '绑定租户',
             bindUser: '绑定用户',
         },
         // ===== Server module =====
-        server: {
-            serverInfo: '服务器信息',
-        },
+
         // ===== App Management =====
         // ===== User Center =====
         userCenter: {

@@ -34,7 +34,6 @@ export default {
                 currencyOrItemType: 'Currency / Item Type',
                 timeRange: 'Time Range',
                 startTime: 'Start Time',
-                pleaseEnterServerId: 'Please enter the server id',
                 pleaseEnterPlayerId: 'Please enter the player id',
                 pleaseEnterCurrencyOrItemType: 'Please enter a currency or item type',
             },
@@ -53,8 +52,6 @@ export default {
             detailTitle: 'Transaction Detail',
             transactionId: 'Transaction Id',
             pleaseEnterTransactionId: 'Please enter the transaction id',
-            serverId: 'Server ID',
-            pleaseEnterServerId: 'Please enter the server ID',
             status: 'Status',
             source: 'Source',
             reason: 'Reason',
@@ -73,8 +70,6 @@ export default {
         assetAudit: {
             listTitle: 'Asset Audit',
             search: {
-                serverId: 'Server ID',
-                pleaseEnterServerId: 'Enter server ID',
                 operatorId: 'Operator Id',
                 pleaseEnterOperatorId: 'Please enter the operator id',
                 playerId: 'Player Id',
@@ -96,10 +91,7 @@ export default {
         dashboard: {
             snapshotTitle: 'Online Overview Snapshot',
             serverTime: 'Online server time',
-            search: {
-                serverId: 'Server ID',
-                pleaseEnterServerId: 'Enter server ID',
-            },
+
             metrics: {
                 onlinePlayerCount: 'Online Players',
                 sessionCount: 'Sessions',
@@ -133,8 +125,6 @@ export default {
             search: {
                 playerId: 'Player ID',
                 pleaseEnterPlayerId: 'Enter player ID',
-                serverId: 'Server ID',
-                pleaseEnterServerId: 'Enter server ID',
                 timeRange: 'Time range',
                 startTime: 'Start time',
             },
@@ -153,8 +143,6 @@ export default {
                 pleaseEnterTargetPlayerId: 'Enter target player ID',
                 commandKind: 'Command kind',
                 pleaseEnterCommandKind: 'Enter command kind',
-                serverId: 'Server ID',
-                pleaseEnterServerId: 'Enter server ID (optional)',
                 timeRange: 'Time range',
                 startTime: 'Start time',
             },
@@ -162,7 +150,6 @@ export default {
                 source: 'Source',
                 operatorIdentifier: 'Operator',
                 commandType: 'Command type',
-                appId: 'App',
                 serverId: 'Server',
                 targetPlayerIdentifier: 'Target player',
                 summary: 'Summary',
@@ -177,8 +164,6 @@ export default {
             commandKind: 'Command kind',
             pleaseSelectCommand: 'Select a command',
             commandKindRequired: 'Please select a command kind',
-            serverId: 'Server ID',
-            pleaseEnterServerId: 'Enter server ID (optional)',
             ticketId: 'Ticket ID',
             pleaseEnterTicketId: 'Enter the ticket ID to cancel',
             matchId: 'Match ID',
@@ -217,8 +202,6 @@ export default {
         messageAudit: {
             listTitle: 'Message Audit',
             search: {
-                serverId: 'Server ID',
-                pleaseEnterServerId: 'Enter server ID',
                 participantPlayerId: 'Participant player ID',
                 pleaseEnterParticipantPlayerId: 'Enter participant player ID',
                 keyword: 'Keyword',
@@ -265,8 +248,6 @@ export default {
                 rejected: 'Rejected',
             },
             search: {
-                serverId: 'Server ID',
-                pleaseEnterServerId: 'Enter server ID',
                 status: 'Status',
                 pleaseSelectStatus: 'Select status',
                 reporterPlayerId: 'Reporter player ID',
@@ -300,8 +281,6 @@ export default {
             notLoaded: 'Query first',
             pollStoppedByRateLimit: 'Online rate limit (7xxx mirror code) detected, auto polling stopped; refresh manually later',
             search: {
-                serverId: 'Server ID',
-                pleaseEnterServerId: 'Enter server ID',
                 mode: 'Match Mode',
                 pleaseEnterMode: 'Enter match mode',
                 region: 'Region',
@@ -311,8 +290,6 @@ export default {
         matchFailureReason: {
             listTitle: 'Match Failure Reasons',
             search: {
-                serverId: 'Server ID',
-                pleaseEnterServerId: 'Enter server ID',
                 reasonCode: 'Failure Reason',
                 pleaseSelectReasonCode: 'Select failure reason',
                 timeRange: 'Time Range',
@@ -336,8 +313,6 @@ export default {
             search: {
                 abnormalKind: 'Abnormal Kind',
                 pleaseSelectKind: 'Select abnormal kind',
-                serverId: 'Server ID',
-                pleaseEnterServerId: 'Enter server ID',
             },
             columns: {
                 ticketId: 'Ticket ID',
@@ -384,7 +359,6 @@ export default {
             syncDialogTitle: 'Sync Segment to Online',
             syncHint: 'The definition snapshot is delivered to Online via the unified dispatch entry; Online assigns and writes back the segment id. Reason is required for audit.',
             syncServerId: 'Server Id',
-            syncServerIdPlaceholder: 'Enter the target server id',
             reasonLabel: 'Reason (required, audited)',
             reasonPlaceholder: 'Enter the reason, up to 500 characters',
             reasonRequired: 'Reason is required',
@@ -423,7 +397,6 @@ export default {
             publishDialogTitle: 'Publish Config Rollout Version',
             publishHint: 'Publishing dispatches a new version row to Online; the segment must be synced; reason is required for audit.',
             serverId: 'Server Id',
-            serverIdPlaceholder: 'Enter the target server id',
             reasonLabel: 'Reason (required, audited)',
             reasonPlaceholder: 'Enter the dispatch reason, up to 500 characters',
             reasonRequired: 'Reason is required',

@@ -5,31 +5,25 @@
   "utils/authFunction.ts": [
     "x:update"
   ],
-  "views/app/onlineCenter/controlledOperation/index.vue": [
-    "onlineControlledCommand:execute"
-  ],
-  "views/app/appCenter/tenantGameAdvertisementRewardEntity/index.vue": [
+  "views/clientDelivery/tenantGameAdvertisementRewardEntity/index.vue": [
     "gameAdvertisementReward:export"
   ],
-  "views/platform/global/platformLoggingConfig/index.vue": [
+  "views/system/platformLoggingConfig/index.vue": [
     "platformLoggingConfig:update"
   ],
-  "views/platform/global/platformPasswordPolicyConfig/index.vue": [
+  "views/system/platformPasswordPolicyConfig/index.vue": [
     "platformPasswordPolicyConfig:update"
   ],
-  "views/platform/system/config/index.vue": [
+  "views/system/config/index.vue": [
     "systemConfig:batchDelete"
   ],
-  "views/platform/system/database/index.vue": [
+  "views/system/database/index.vue": [
     "systemDatabase:updatetable",
     "systemDatabase:deletetable"
   ],
-  "views/platform/system/dict/index.vue": [
+  "views/system/dict/index.vue": [
     "systemDictType:update",
     "systemDictType:page",
     "systemDictType:delete"
-  ],
-  "views/tenant/system/role/index.vue": [
-    "systemRole:grantDataScope"
   ]
 }

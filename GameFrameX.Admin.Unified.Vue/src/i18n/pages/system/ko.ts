@@ -12,16 +12,8 @@ export default {
             accountType_member: '회원',
             roleSet: '역할',
             age: '나이',
-            orgSection: '조직',
-            belongOrg: '조직',
-            position: '직위',
             jobNum: '사번',
             joinDate: '입사일',
-            extOrgSection: '추가 조직',
-            addExtOrg: '추가 조직 추가',
-            extOrgDataPermission: '해당 조직의 데이터 권한 보유',
-            orgPlaceholder: '조직',
-            posName: '직위 이름',
             archiveInfo: '프로필',
             cardType: '신분증 유형',
             idCard: '신분증',
@@ -55,7 +47,6 @@ export default {
             addAccount: '계정 추가',
             editAccount: '계정 수정',
             deleteAccountConfirm: '계정 삭제 확인',
-            deleteAccount: '계정 삭제',
             resetPwd: '비밀번호 초기화',
             resetPwdConfirm: '비밀번호 초기화 확인',
             resetPwdSuccess: '비밀번호가 초기화되었습니다',
@@ -74,11 +65,7 @@ export default {
             menuPermission: '메뉴 권한',
             addRole: '역할 추가',
             editRole: '역할 수정',
-            deleteRole: '역할 삭제',
             deleteRoleConfirm: '역할 삭제 확인',
-            grantDataScope: '데이터 범위 부여',
-            grantDataScopeTitle: '데이터 범위 부여',
-            orgList: '조직 목록',
         },
         // ===== 메뉴 모듈 =====
         menu: {
@@ -113,8 +100,6 @@ export default {
             iframe: 'Iframe',
             notIframe: 'Iframe 아님',
             permission: '권한',
-            isEnable: '사용',
-            notEnable: '사용 안함',
             addMenu: '메뉴 추가',
             editMenu: '메뉴 수정',
             deleteMenuConfirm: '메뉴 삭제 확인',
@@ -140,13 +125,7 @@ export default {
             deleteDictDataConfirm: '사전 값 삭제 확인',
         },
         // ===== 조직 모듈 =====
-        org: {
-            orgName: '조직 이름',
-            expandAll: '모두 펼치기',
-            collapseAll: '모두 접기',
-            rootNode: '루트 노드',
-            filterByOrgTree: '조직별 필터',
-        },
+
         // ===== 로그 모듈 =====
         log: {
             startTime: '시작 시간',
@@ -161,7 +140,6 @@ export default {
             httpMethod: 'HTTP 메서드',
             requestUrl: '요청 URL',
             requestParam: '요청 매개변수',
-            returnResult: '응답',
             logLevel: '레벨',
             logLevel_debug: '디버그',
             logLevel_info: '정보',
@@ -179,35 +157,19 @@ export default {
             elapsed: '소요 시간 (ms)',
             logDateTime: '로그 시간',
             logDetail: '로그 상세',
-            today: '오늘',
-            yesterday: '어제',
-            lastWeek: '지난주',
             opSuccess: '성공',
             opFail: '실패',
             // diff 로그
             differenceTable: '차이 테이블',
             differenceField: '차이 필드',
-            differenceValue: '차이 값',
             differenceBefore: '변경 전',
             differenceAfter: '변경 후',
-            diffLogDetail: '차이 로그 상세',
             // 예외 로그
             exceptionMsg: '예외 메시지',
-            exceptionType: '예외 유형',
-            exceptionSource: '예외 소스',
-            stackTrace: '스택 추적',
-            exceptionLogDetail: '예외 로그 상세',
-            // 접속 로그
-            loginName: '로그인 이름',
-            loginTime: '로그인 시간',
-            loginType: '로그인 동작',
         },
         // ===== 데이터베이스 모듈 =====
         database: {
             dbName: '데이터베이스',
-            dbLocator: 'DB 로케이터',
-            dbType: 'DB 유형',
-            dbAddress: 'DB 주소',
             tableName: '테이블 이름',
             tableDescription: '테이블 이름',
             fieldName: '필드 이름',
@@ -266,7 +228,6 @@ export default {
             batchDelete: '일괄 삭제',
             deleteConfigConfirm: '설정 삭제 확인',
             batchDeleteConfirm: '일괄 삭제 확인',
-            exportFileName: '시스템 설정',
         },
         // ===== 파일 모듈 =====
         file: {
@@ -279,7 +240,6 @@ export default {
             storageLocation: '저장 위치',
             storageConfigId: '저장소 설정 ID',
             storageId: '저장소 ID',
-            uploaderId: '업로더 ID',
 
             uploader: '업로더',
             uploadFile: '파일 업로드',
@@ -364,24 +324,17 @@ export default {
             resetRunCount: '실행 횟수 초기화',
             resetRunCountTip: '시작 시 최대 실행 횟수를 초기화할지 여부<br/>지속된 데이터에서 하나의 트리거가 완료되었지만 시작 시 실행되지 않는 문제를 해결합니다',
             jobDashboard: '작업 대시보드',
-            runningJobCount: '실행 중인 작업',
-            jobRunStatistics: '작업 통계',
-            total: '전체',
             running: '실행 중',
             paused: '일시 정지',
-            completed: '완료',
             blocked: '차단됨',
             jobCluster: '작업 클러스터',
             clusterId: '클러스터 ID',
-            status: '상태',
-            updateStatus: '상태 업데이트',
             args: '인수',
             lastRunTime: '마지막 실행 시간',
             nextRunTime: '다음 실행 시간',
             numberOfRuns: '트리거 횟수',
             numberOfErrors: '오류 횟수',
             retryTimeout: '재시도 간격 (ms)',
-            updatedTime: '수정 시간',
             // trigger status
             triggerRunning: '실행 중',
             triggerPaused: '일시 정지',
@@ -435,22 +388,15 @@ export default {
         // ===== 오픈 액세스 모듈 =====
         openAccess: {
             accessName: 'API 이름',
-            accessUrl: 'API URL',
             authToken: '인증 토큰',
-            addOpenAccess: '오픈 API 추가',
-            editOpenAccess: '오픈 API 수정',
-            deleteOpenAccessConfirm: '오픈 API 삭제 확인',
             helpView: '도움말',
             accessSecret: '시크릿 키',
             bindUserAccount: '바인딩된 사용자 계정',
             bindTenantName: '바인딩된 테넌트 이름',
-            bindTenant: '테넌트 바인딩',
             bindUser: '사용자 바인딩',
         },
         // ===== 서버 모듈 =====
-        server: {
-            serverInfo: '서버 정보',
-        },
+
         // ===== 사용자 센터 =====
         userCenter: {
             basicInfo: '기본 정보',

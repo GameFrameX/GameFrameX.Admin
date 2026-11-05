@@ -130,6 +130,30 @@ function extractAllPaths(obj, prefix = '') {
   return paths;
 }
 
+/** 纳入配置中的完整键、动态前缀与后端菜单 TitleCode，避免误删运行时键。 */
+function scanRuntimeKeys(baseKeys) {
+  const used = new Set();
+  const stripPrefix = (key) => key.replace(/^message\./, '');
+  const files = collectSourceFiles(SRC_ROOT, ['.vue', '.ts', '.js'])
+    .filter((file) => !file.startsWith(I18N_ROOT + '/') && !file.endsWith('.test.ts'));
+  const seedRoot = join(__dirname, '..', '..', 'GameFrameX.Admin.Unified.Api', 'GameFrameX.Application', 'SeedData', 'System');
+  files.push(...collectSourceFiles(seedRoot, ['.cs']));
+  for (const file of files) {
+    const content = readFileSync(file, 'utf8');
+    for (const match of content.matchAll(/['"]((?:message\.)?[a-zA-Z][a-zA-Z0-9_.]+)['"]/g)) {
+      const key = stripPrefix(match[1]);
+      if (baseKeys.has(key)) used.add(key);
+      // errors.codes. 等运行时拼接前缀必须保留其下全部有效值。
+      if (key.endsWith('.')) for (const candidate of baseKeys) if (candidate.startsWith(key)) used.add(candidate);
+    }
+    for (const match of content.matchAll(/(?:\$t|\bt)\(\s*`([^`$]+)\$\{/g)) {
+      const prefix = stripPrefix(match[1]);
+      for (const key of baseKeys) if (key.startsWith(prefix)) used.add(key);
+    }
+  }
+  return used;
+}
+
 // ---------------------------------------------------------------------------
 // 主逻辑
 // ---------------------------------------------------------------------------
@@ -276,7 +300,12 @@ function main() {
   // -------------------------------------------------------------------------
 
   const usedKeys = new Set([...refs.keys()].map(stripMessagePrefix));
+  for (const key of scanRuntimeKeys(localeKeys[BASE_LOCALE])) usedKeys.add(key);
   const unused = [...localeKeys[BASE_LOCALE]].filter((k) => !usedKeys.has(k));
+
+  if (process.argv.includes('--unused-json')) {
+    console.log('UNUSED_KEYS_JSON=' + JSON.stringify(unused));
+  }
 
   // 按 namespace 分组
   const unusedByNs = {};
@@ -287,10 +316,10 @@ function main() {
     }
   }
 
-  console.log(`🔍 Unused key 检测 (字面量引用扫描)\n`);
+  console.log(`🔍 Unused key 检测 (字面量、动态前缀和菜单种子扫描)\n`);
 
   if (unused.length === 0) {
-    console.log(`  ✅ 未发现 unused key — 全部 ${baseCount} 个 key 均有字面量引用。\n`);
+    console.log(`  ✅ 未发现 unused key — 全部 ${baseCount} 个 key 均有静态或运行时引用。\n`);
     return;
   }
 
