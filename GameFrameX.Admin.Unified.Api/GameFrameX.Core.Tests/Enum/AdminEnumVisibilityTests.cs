@@ -58,6 +58,7 @@ public class AdminEnumVisibilityTests
         "GameFrameX.Core.Enum.Errors.AreaErrorCode",
         "GameFrameX.Core.Enum.Errors.ArchiveErrorCode",
         "GameFrameX.Core.Enum.Errors.GameHomeErrorCode",
+        "GameFrameX.Core.Enum.Errors.AreaProvisionErrorCode",
         "GameFrameX.Core.Enum.Errors.OrderErrorCode",
         "GameFrameX.Core.Enum.Errors.RedeemCodeErrorCode",
         "GameFrameX.Core.Enum.Errors.PaymentErrorCode",

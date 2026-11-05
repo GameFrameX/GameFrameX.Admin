@@ -117,6 +117,11 @@ gameAreaEntity:delete
 gameAreaEntity:detail
 gameAreaEntity:page
 gameAreaEntity:update
+gameAreaProvision:create
+gameAreaProvision:execute
+gameAreaProvision:preview
+gameAreaProvision:status
+gameAreaProvision:templates
 gameBannerAnnouncementEntity:add
 gameBannerAnnouncementEntity:delete
 gameBannerAnnouncementEntity:detail

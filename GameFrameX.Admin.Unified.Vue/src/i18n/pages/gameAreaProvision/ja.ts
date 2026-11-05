@@ -1,0 +1,51 @@
+export default {
+  "menu": {
+    "gameAreaProvision": "サーバー開設ウィザード"
+  },
+  "gameAreaProvision": {
+    "title": "サーバー開設ウィザード",
+    "hint": "テンプレートを選び、新サーバーの設定を入力します。登録成功後に有効化されます。失敗原因を解決してから再試行してください。既存のサーバー番号で状態を確認できます。",
+    "template": "テンプレートサーバー",
+    "cloneTitle": "テンプレートからコピーする設定",
+    "resetHint": "デフォルト指定、推奨、クライアントデバッグは無効です。イベント、負荷、コンテナー識別子、保守日時は引き継ぎません。",
+    "start": "作成して開設",
+    "retry": "未完了の手順を再試行",
+    "query": "状態を確認",
+    "newServer": "別のサーバーを開設",
+    "record": "サーバーレコード",
+    "container": "ゲームコンテナー",
+    "registration": "開設登録",
+    "enabled": "サーバーを有効化",
+    "complete": "完了",
+    "pending": "未完了",
+    "success": "開設完了。新サーバーが有効になりました。",
+    "failed": "操作に失敗しました。状態を確認して再試行してください。",
+    "invalidIdentifier": "有効な正の整数のサーバー番号を入力してください。",
+    "fields": {
+      "ServerId": "新サーバー番号",
+      "Name": "新サーバー名",
+      "HttpManageUrl": "ゲームサーバー HTTP 管理 URL",
+      "TcpSocketUrl": "TCP 接続先",
+      "WebSocketUrl": "WebSocket 接続先",
+      "ServerParameters": "コンテナー環境変数の上書き（JSON 文字列辞書）",
+      "Description": "説明",
+      "ClassifyId": "サーバーカテゴリー",
+      "Capacity": "収容人数",
+      "ServerVersion": "サーバーバージョン",
+      "ServerType": "サーバー種別",
+      "LocalizationKey": "翻訳キー",
+      "Language": "言語",
+      "AllowedPlayerProfile": "プレイヤー参加ポリシー",
+      "AccessControls": "アクセス制御",
+      "ChannelId": "チャンネル番号",
+      "PlatformId": "プラットフォーム番号",
+      "PackageId": "パッケージ番号",
+      "AppVersion": "クライアントバージョン",
+      "ClientDispatchApiPrefix": "クライアント転送プレフィックス",
+      "FulfillmentApiPrefix": "履行プレフィックス",
+      "GmApiPrefix": "GM プレフィックス",
+      "ControlApiPrefix": "制御プレフィックス",
+      "OnlineAdminApiPrefix": "Online 管理プレフィックス"
+    }
+  }
+};

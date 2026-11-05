@@ -12,8 +12,12 @@ public sealed class OnlineScopeContext
     /// <summary>请求摘要，供审计与幂等上下文使用。</summary>
     public string RequestSummary { get; }
 
-    internal OnlineScopeContext(long serverId, string requestSummary)
+    /// <summary>仅开服流程允许访问尚未启用的区服。</summary>
+    internal bool AllowDisabledServer { get; }
+
+    internal OnlineScopeContext(long serverId, string requestSummary, bool allowDisabledServer = false)
     {
+        AllowDisabledServer = allowDisabledServer;
         ServerId = serverId;
         RequestSummary = requestSummary ?? string.Empty;
     }

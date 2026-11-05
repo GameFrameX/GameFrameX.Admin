@@ -1,0 +1,11 @@
+{
+  "60600001": "Invalid provisioning parameters",
+  "60600002": "Template server not found",
+  "60600003": "Server identifier is occupied or retry parameters differ",
+  "60600004": "Container creation failed; check the container manager and retry",
+  "60600005": "Opening registration failed; wait for the game server and retry",
+  "60600006": "Opening status query failed; retry later",
+  "60600007": "Provisioning data could not be saved; query status and retry",
+  "60600008": "Provisioning server not found",
+  "60600009": "Server has been disabled or merged; provisioning cannot enable it again"
+}

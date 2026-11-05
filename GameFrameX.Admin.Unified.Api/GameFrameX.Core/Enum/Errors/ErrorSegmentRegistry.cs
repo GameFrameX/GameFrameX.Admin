@@ -44,6 +44,7 @@ public static class ErrorSegmentRegistry
         new(327, ErrorDomain.AdminBusiness, "OnlineTransient", nameof(OnlineErrorCode), false, "Online 镜像：临时失败与可重试（vault 8xxx）"),
         new(601, ErrorDomain.GameData, "Account", nameof(AccountErrorCode), false, "游戏数据域：账号"),
         new(602, ErrorDomain.GameData, "GameRole", nameof(GameRoleErrorCode), false, "游戏数据域：角色"),
+        new(606, ErrorDomain.GameData, "AreaProvision", nameof(AreaProvisionErrorCode), false, "开服向导"),
         new(603, ErrorDomain.GameData, "Area", nameof(AreaErrorCode), false, "游戏数据域：区服"),
         new(604, ErrorDomain.GameData, "Archive", nameof(ArchiveErrorCode), false, "游戏数据域：存档"),
         new(605, ErrorDomain.GameData, "GameHome", nameof(GameHomeErrorCode), false, "游戏数据域：首页运营驾驶舱"),

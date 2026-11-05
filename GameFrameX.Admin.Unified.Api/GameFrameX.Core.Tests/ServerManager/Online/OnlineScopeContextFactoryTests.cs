@@ -1,3 +1,4 @@
+using GameFrameX.Core.Extension;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Security.Claims;
@@ -119,6 +120,22 @@ public sealed class OnlineScopeContextFactoryTests : IDisposable
 
         Assert.Contains("Online 作用域越界", persistedMessage); // ErrorLocalizer 本地化文案完整落库往返
         Assert.Contains("9999", persistedMessage); // errors JSON 透出的越界 appId 可检索
+    }
+
+    [Fact]
+    public async Task ProvisioningScope_AllowsDisabledButRejectsDeleted_OrdinaryScopeStaysClosed()
+    {
+        await SeedAsync();
+        SqlSugarUnifiedConfig.ConfigureClientFilters(_db);
+        await _db.Updateable<TenantGameAreaEntity>().SetColumns(area => area.IsEnabled == false)
+            .Where(area => area.Id == Area1001).ExecuteCommandAsync();
+        var factory = new OnlineScopeContextFactory(Repository<TenantGameAreaEntity>());
+        await Assert.ThrowsAsync<BusinessException>(() => factory.CreateAsync(Area1001));
+        Assert.Equal(Area1001, (await factory.CreateForProvisioningAsync(Area1001)).ServerId);
+        var deleted = await _db.Queryable<TenantGameAreaEntity>().Filter(null, true).FirstAsync(area => area.Id == Area1001);
+        deleted.IsDeleted = true;
+        await _db.Updateable(deleted).AS().ExecuteCommandAsync();
+        await Assert.ThrowsAsync<BusinessException>(() => factory.CreateForProvisioningAsync(Area1001));
     }
 
     private SqlSugarRepository<T> Repository<T>() where T : EntityBase, new()
