@@ -7,7 +7,6 @@ using GameFrameX.Application.ServerCenter.Online;
 using GameFrameX.Core.Const;
 using GameFrameX.Core.Service.User;
 using GameFrameX.Core.SqlSugar;
-using GameFrameX.Entity.Game;
 using GameFrameX.Entity.Tenant.Game;
 using GameFrameX.Foundation.Http.Normalization;
 using GameFrameX.Foundation.Json;
@@ -34,7 +33,7 @@ internal sealed class GameAreaMergeTestContext : IDisposable
         _owner = new SqlSugarScope(new List<ConnectionConfig> { configuration });
         Database = _owner.GetConnectionScope("game-area-merge-tests");
         SqlSugarUnifiedConfig.ConfigureBaseFilters(Database);
-        Database.CodeFirst.InitTables(typeof(GameAreaMergePlanEntity), typeof(TenantGameAreaEntity), typeof(TenantGameAreaClassifyEntity));
+        Database.CodeFirst.InitTables(typeof(TenantGameAreaMergePlanEntity), typeof(TenantGameAreaEntity), typeof(TenantGameAreaClassifyEntity));
         Database.Insertable(new TenantGameAreaClassifyEntity { Id = 10, Name = "合服测试分类", LocalizationKey = "area", DockerRegister = "", ImageName = "", DockerUserName = "", DockerPassword = "", ContainerNetName = "", ContainerSubnet = "", ContainerGateway = "", IsEnabled = true, IsDeleted = false }).ExecuteCommand();
         foreach (var identifier in new long[] { 101, 102, 103, 104 })
         {
@@ -51,7 +50,7 @@ internal sealed class GameAreaMergeTestContext : IDisposable
         _httpClient = new HttpClient(Handler);
         var client = new GameAreaMergeClient(_httpClient, new OnlineServerEndpointResolver(), Repository<TenantGameAreaEntity>(),
             new OnlineScopeContextFactory(Repository<TenantGameAreaEntity>()));
-        Service = new GameAreaMergeService(Repository<GameAreaMergePlanEntity>(), Repository<TenantGameAreaEntity>(), client, new CurrentUserContext(Accessor));
+        Service = new GameAreaMergeService(Repository<TenantGameAreaMergePlanEntity>(), Repository<TenantGameAreaEntity>(), client, new CurrentUserContext(Accessor));
     }
 
     public SqlSugarRepository<T> Repository<T>() where T : EntityBase, new() => new() { Context = Database };

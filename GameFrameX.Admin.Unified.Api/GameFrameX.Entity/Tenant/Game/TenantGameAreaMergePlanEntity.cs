@@ -1,13 +1,13 @@
 using GameFrameX.Entity.Base;
 using GameFrameX.Entity.Enum;
 
-namespace GameFrameX.Entity.Game;
+namespace GameFrameX.Entity.Tenant.Game;
 
 /// <summary>主库合服计划及阶段报告。</summary>
 [SugarTable(null, "合服计划")]
 [TenantTable]
 [IncrementTable]
-public class GameAreaMergePlanEntity : EntityBasic
+public class TenantGameAreaMergePlanEntity : EntityBasic
 {
     /// <summary>目标服。</summary>
     [SugarColumn(ColumnDescription = "目标服", DefaultValue = "0")]

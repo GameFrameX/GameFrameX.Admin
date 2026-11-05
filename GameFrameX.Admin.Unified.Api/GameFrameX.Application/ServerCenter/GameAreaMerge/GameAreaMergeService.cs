@@ -1,9 +1,9 @@
+using GameFrameX.Entity.Tenant.Game;
 using System.Globalization;
 using System.Threading;
 using GameFrameX.Application.ServerCenter.GameAreaMerge.Dto;
 using GameFrameX.Core.Service.User;
 using GameFrameX.Entity.Enum;
-using GameFrameX.Entity.Game;
 
 namespace GameFrameX.Application.ServerCenter.GameAreaMerge;
 
@@ -13,12 +13,12 @@ public class GameAreaMergeService : IAdminApiController
 {
     // 本宿主串行预留区服，执行仍通过持久化状态比较防重复触发。
     private static readonly SemaphoreSlim PlanGate = new(1, 1);
-    private readonly SqlSugarRepository<GameAreaMergePlanEntity> _repository;
+    private readonly SqlSugarRepository<TenantGameAreaMergePlanEntity> _repository;
     private readonly SqlSugarRepository<TenantGameAreaEntity> _areaRepository;
     private readonly GameAreaMergeClient _client;
     private readonly CurrentUserContext _currentUser;
 
-    public GameAreaMergeService(SqlSugarRepository<GameAreaMergePlanEntity> repository,
+    public GameAreaMergeService(SqlSugarRepository<TenantGameAreaMergePlanEntity> repository,
         SqlSugarRepository<TenantGameAreaEntity> areaRepository, GameAreaMergeClient client, CurrentUserContext currentUser)
     {
         _repository = repository;
@@ -72,7 +72,7 @@ public class GameAreaMergeService : IAdminApiController
             {
                 throw BusinessError.Oh(AreaMergeErrorCode.SourceReserved);
             }
-            var entity = new GameAreaMergePlanEntity
+            var entity = new TenantGameAreaMergePlanEntity
             {
                 TargetServerId = input.TargetServerId,
                 SourceServerIds = string.Join(",", input.SourceServerIds.OrderBy(identifier => identifier)),
@@ -192,8 +192,8 @@ public class GameAreaMergeService : IAdminApiController
         entity.BackupIdentifier = input.BackupIdentifier.Trim();
         entity.BackupConfirmed = true;
         entity.ExecutionStartedTime = Now();
-        var claimed = await _repository.Context.Updateable<GameAreaMergePlanEntity>()
-            .SetColumns(plan => new GameAreaMergePlanEntity
+        var claimed = await _repository.Context.Updateable<TenantGameAreaMergePlanEntity>()
+            .SetColumns(plan => new TenantGameAreaMergePlanEntity
             {
                 Status = GameAreaMergePlanStatus.Executing,
                 BackupIdentifier = entity.BackupIdentifier,
@@ -246,18 +246,18 @@ public class GameAreaMergeService : IAdminApiController
         return entity.Adapt<GameAreaMergePlanResponse>();
     }
 
-    private async Task<GameAreaMergePlanEntity> FindAsync(long identifier)
+    private async Task<TenantGameAreaMergePlanEntity> FindAsync(long identifier)
     {
         return await _repository.GetFirstAsync(plan => plan.Id == identifier)
             ?? throw BusinessError.Oh(AreaMergeErrorCode.PlanNotFound);
     }
 
-    private Task<int> PersistAsync(GameAreaMergePlanEntity entity)
+    private Task<int> PersistAsync(TenantGameAreaMergePlanEntity entity)
     {
         return _repository.Context.Updateable(entity).ExecuteCommandAsync();
     }
 
-    private async Task FailAsync(GameAreaMergePlanEntity entity)
+    private async Task FailAsync(TenantGameAreaMergePlanEntity entity)
     {
         entity.Status = GameAreaMergePlanStatus.Failed;
         entity.FailedTime = Now();
@@ -284,9 +284,9 @@ public class GameAreaMergeService : IAdminApiController
 
     private static long Now() => DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
-    private static long[] Sources(GameAreaMergePlanEntity entity) => entity.SourceServerIds.Split(',').Select(value => long.Parse(value, CultureInfo.InvariantCulture)).ToArray();
+    private static long[] Sources(TenantGameAreaMergePlanEntity entity) => entity.SourceServerIds.Split(',').Select(value => long.Parse(value, CultureInfo.InvariantCulture)).ToArray();
 
-    private static void EnsureState(GameAreaMergePlanEntity entity, params GameAreaMergePlanStatus[] allowed)
+    private static void EnsureState(TenantGameAreaMergePlanEntity entity, params GameAreaMergePlanStatus[] allowed)
     {
         if (!allowed.Contains(entity.Status))
         {
@@ -294,7 +294,7 @@ public class GameAreaMergeService : IAdminApiController
         }
     }
 
-    private static void ValidateReport(GameAreaMergePlanEntity entity, GameAreaMergeReportResponse report, bool requirePlan)
+    private static void ValidateReport(TenantGameAreaMergePlanEntity entity, GameAreaMergeReportResponse report, bool requirePlan)
     {
         if (string.IsNullOrWhiteSpace(report.PlanId) || report.TargetServerId != entity.TargetServerId
             || report.SourceServerIds == null || !report.SourceServerIds.OrderBy(identifier => identifier).SequenceEqual(Sources(entity))
