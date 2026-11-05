@@ -59,7 +59,35 @@ public sealed class ProjectSchedulerHostedService : BackgroundService
             return;
         }
 
+        await PersistRegisteredJobsAsync(stoppingToken);
         await RunTriggerLoopAsync(stoppingToken);
+    }
+
+    /// <summary>
+    /// 注册期持久化（C404 §9.8）：内置作业 upsert 进 SystemJob 表，使其在「任务调度」页可见、
+    /// 触发器运行态可写回。失败只告警不阻断调度。
+    /// </summary>
+    private async Task PersistRegisteredJobsAsync(CancellationToken stoppingToken)
+    {
+        if (_schedulerFactory is not ProjectSchedulerFactory factory)
+        {
+            return;
+        }
+
+        foreach (var scheduler in factory.GetJobSnapshot())
+        {
+            foreach (var persistence in _persistences)
+            {
+                try
+                {
+                    await persistence.PersistRegisteredAsync(scheduler.GetJobBuilder().Detail, scheduler.GetTriggerSnapshot(), stoppingToken);
+                }
+                catch (Exception exception)
+                {
+                    _logger?.LogError(exception, "作业 {JobId} 注册期持久化失败", scheduler.JobId);
+                }
+            }
+        }
     }
 
     /// <summary>
@@ -205,6 +233,7 @@ public sealed class ProjectSchedulerHostedService : BackgroundService
             finally
             {
                 scheduler.EndExecution();
+                await scheduler.PersistTriggerRuntimeAsync(trigger);
             }
         });
     }
