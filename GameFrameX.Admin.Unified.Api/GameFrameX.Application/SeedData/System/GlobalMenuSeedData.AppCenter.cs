@@ -2946,7 +2946,7 @@ public partial class GlobalMenuSeedData
             },
             new()
             {
-                // A4: 支付配置 Schema 查询按钮权限。原先缺失该 Button 种子，/api/tenantGamePaymentConfigEntity/schema 无显式绑定 → 租户 403。
+                // A4: 支付配置 Schema 查询按钮权限。原先缺失该 Button 种子，/api/gamePaymentConfig/schema 无显式绑定 → 租户 403。
                 // 页面加载需要读取配置 schema。
                 Id = StableSeedId.Menu("gamePaymentConfigEntity:schema"),
                 Key = "gamePaymentConfigEntity:schema",
@@ -3892,7 +3892,7 @@ public partial class GlobalMenuSeedData
             },
             new()
             {
-                // 同 tenantAppSignatureKeyEntity:update 口径：轮换/续租/启停共用 update；delete 不种（服务端拒删）。
+                // 同 appSignatureKey:update 口径：轮换/续租/启停共用 update；delete 不种（服务端拒删）。
                 Id = StableSeedId.Menu("sessionKey:update"),
                 Key = "sessionKey:update",
                 Pid = StableSeedId.Menu("route:tenantSessionKeyEntity"),

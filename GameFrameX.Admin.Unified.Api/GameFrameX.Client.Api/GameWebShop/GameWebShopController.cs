@@ -36,7 +36,7 @@ public class GameWebShopController : BaseController<TenantGameWebShopEntity>
     private const string WebShopNotifyCallbackRoute = "api/GameWebShop/NotifyWebShop";
 
     /// <summary>
-    /// 回调发货按订单主键加进程内信号量串行化（同 TenantGameOrderShipService 的订单锁约定），
+    /// 回调发货按订单主键加进程内信号量串行化（同 GameOrderShipService 的订单锁约定），
     /// 避免同订单并发重复回调重复发送邮件。
     /// </summary>
     private static readonly ConcurrentDictionary<long, SemaphoreSlim> NotifyOrderLocks = new();
@@ -241,7 +241,7 @@ public class GameWebShopController : BaseController<TenantGameWebShopEntity>
             return GameApiResult.Error<BaseOperationAckResponse>(OrderErrorCode.NotifyOrderNotFound, "回调订单不存在");
         }
 
-        // 同订单回调按订单主键加进程内信号量串行化（同 TenantGameOrderShipService 的订单锁约定），
+        // 同订单回调按订单主键加进程内信号量串行化（同 GameOrderShipService 的订单锁约定），
         // 避免并发重复回调重复发送邮件；锁内重读订单后按状态守卫推进。
         var orderLock = NotifyOrderLocks.GetOrAdd(order.Id, _ => new SemaphoreSlim(1, 1));
         await orderLock.WaitAsync();
@@ -252,7 +252,7 @@ public class GameWebShopController : BaseController<TenantGameWebShopEntity>
             // 状态守卫：仅 Unpaid（待认领）与 NotShipped（认领后待发货 / 失败重试）可进入发货；
             // 其余状态（Shipped 已发货、InitiateRefund/RefundAgreement 退款中、Refunded 已退款、
             // Voided 已作废、Completed 已完成等）按既定口径幂等返回成功，不发邮件、不累充
-            //（同 TenantGameOrderShipService 对 Refunded/Voided 等终态订单的守卫处理）。
+            //（同 GameOrderShipService 对 Refunded/Voided 等终态订单的守卫处理）。
             if (order.Status is not (OrderStatusEnum.Unpaid or OrderStatusEnum.NotShipped))
             {
                 return HttpJsonResultData<BaseOperationAckResponse>.Success();
