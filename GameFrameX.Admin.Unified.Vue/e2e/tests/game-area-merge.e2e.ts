@@ -77,7 +77,13 @@ test('合服向导：真实登录、预演、双人复核、执行与源服退�
     await reviewer.keyboard.press('Escape');
     await shot(reviewer, 'merge-sources-removed-from-selector');
     await navigateByMenu(reviewer, '游戏区服', '区服');
-    // 全量套件中区服行数超过一页，按源服名检索后再断言（管理查询保留禁用行并显示已合服）。
+    // 全量套件中区服行数超过一页，按源服名检索后再断言（管理查询保留禁用行并显示已合服）；
+    // 名称输入在「高级」折叠区，先展开。
+    const advancedToggle = reviewer.locator('role=button[name=/高级/]').first();
+    if (await advancedToggle.isVisible().catch(() => false)) {
+      await advancedToggle.click();
+      await reviewer.waitForTimeout(400);
+    }
     const areaSearch = reviewer.locator('.search-form input:visible').first();
     for (const source of sourceNames) {
       await areaSearch.fill(source);
