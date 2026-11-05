@@ -59,6 +59,8 @@ public class Startup
 
         // 配置选项
         services.AddProjectOptions();
+        // C404 / GFX-1216 R3：审计留存配置（Configuration/AuditRetention.json，默认值在 AuditRetentionOptions）
+        services.Configure<GameFrameX.Application.Audit.Retention.AuditRetentionOptions>(configuration.GetSection(GameFrameX.Application.Audit.Retention.AuditRetentionOptions.ConfigurationSectionName));
         services.AddProjectDependencyInjection();
         // 密码哈希统一 Argon2id（C214），无需启动期密钥注入；密码强度策略由 PlatformPasswordPolicyConfigProvider 快照驱动。
 
