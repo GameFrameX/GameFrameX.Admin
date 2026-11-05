@@ -16,9 +16,9 @@ public partial class GlobalMenuSeedData
     {
         return new[]
         {
-            Menu("route:rewardTemplate", "route:content", "rewardTemplate", "/contentCenter/reward", null, "奖励模板", "message.menu.rewardTemplate", "fa-solid fa-gift", 300, MenuAppScopeEnum.Console),
-            Menu("route:gameRewardTemplateGroupEntity", "route:rewardTemplate", "gameRewardTemplateGroupEntity", "/app/contentCenter/reward/gameRewardTemplateGroupEntity", "/app/contentCenter/reward/gameRewardTemplateGroupEntity/index", "奖励模板分组", "message.menu.gameRewardTemplateGroupEntity", "fa-solid fa-folder-open", 100, MenuAppScopeEnum.Console),
-            Menu("route:gameRewardTemplateEntity", "route:rewardTemplate", "gameRewardTemplateEntity", "/app/contentCenter/reward/gameRewardTemplateEntity", "/app/contentCenter/reward/gameRewardTemplateEntity/index", "奖励模板", "message.menu.gameRewardTemplateEntity", "fa-solid fa-gift", 200, MenuAppScopeEnum.Console),
+            Menu("route:rewardTemplate", "route:noticeCenter", "rewardTemplate", "/noticeCenter/reward", null, "奖励模板", "message.menu.rewardTemplate", "fa-solid fa-gift", 300, MenuAppScopeEnum.Console),
+            Menu("route:gameRewardTemplateGroupEntity", "route:rewardTemplate", "gameRewardTemplateGroupEntity", "/noticeCenter/reward/gameRewardTemplateGroupEntity", "/noticeCenter/reward/gameRewardTemplateGroupEntity/index", "奖励模板分组", "message.menu.gameRewardTemplateGroupEntity", "fa-solid fa-folder-open", 100, MenuAppScopeEnum.Console),
+            Menu("route:gameRewardTemplateEntity", "route:rewardTemplate", "gameRewardTemplateEntity", "/noticeCenter/reward/gameRewardTemplateEntity", "/noticeCenter/reward/gameRewardTemplateEntity/index", "奖励模板", "message.menu.gameRewardTemplateEntity", "fa-solid fa-gift", 200, MenuAppScopeEnum.Console),
             Button("gameRewardTemplateGroupEntity:page", "route:gameRewardTemplateGroupEntity", "gameRewardTemplateGroup:page", "查询", 100),
             Button("gameRewardTemplateGroupEntity:detail", "route:gameRewardTemplateGroupEntity", "gameRewardTemplateGroup:detail", "详情", 110),
             Button("gameRewardTemplateGroupEntity:Select", "route:gameRewardTemplateGroupEntity", "gameRewardTemplateGroup:Select", "选择", 115),
