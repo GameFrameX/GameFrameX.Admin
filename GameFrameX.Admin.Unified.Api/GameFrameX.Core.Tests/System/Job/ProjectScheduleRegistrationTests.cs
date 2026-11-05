@@ -94,5 +94,10 @@ public sealed class ProjectScheduleRegistrationTests
         {
             return Task.CompletedTask;
         }
+
+        public Task PersistRegisteredAsync(JobDetail jobDetail, IReadOnlyList<Trigger> triggers, CancellationToken stoppingToken)
+        {
+            return Task.CompletedTask;
+        }
     }
 }
