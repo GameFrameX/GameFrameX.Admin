@@ -87,7 +87,7 @@ test('合服向导：真实登录、预演、双人复核、执行与源服退�
     const areaSearch = reviewer.locator('.search-form input:visible').first();
     for (const source of sourceNames) {
       await areaSearch.fill(source);
-      await reviewer.getByRole('button', { name: '搜索' }).first().click();
+      await reviewer.getByRole('button', { name: '查询' }).first().click();
       await reviewer.waitForTimeout(1200);
       const row = reviewer.getByRole('row').filter({ hasText: source });
       await expect(row).toContainText('已合服');
