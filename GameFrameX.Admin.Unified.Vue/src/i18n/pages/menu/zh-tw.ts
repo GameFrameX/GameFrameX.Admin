@@ -1,7 +1,16 @@
 // 定義內容
 export default {
     menu: {
-        dashboard: '工作台',
+        dashboard: '總覽',
+        serverCenter: '區服',
+        noticeCenter: '內容營運',
+        gmCenter: '線上維運',
+        commerceCenter: '商業化',
+        clientDelivery: 'C 端交付',
+        audit: '稽核',
+        selectServer: '選擇區服',
+        noServersAvailable: '暫無可用區服',
+        loadServersFailed: '載入區服失敗，請重試',
         system: '系統管理',
         gameApp: '應用管理',
         platform: '平臺管理',

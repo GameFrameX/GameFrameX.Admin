@@ -1,7 +1,16 @@
 // 콘텐츠 정의
 export default {
     menu: {
-        dashboard: '대시보드',
+        dashboard: '개요',
+        serverCenter: '서버',
+        noticeCenter: '콘텐츠 운영',
+        gmCenter: '온라인 운영',
+        commerceCenter: '수익화',
+        clientDelivery: '클라이언트 배포',
+        audit: '감사',
+        selectServer: '서버 선택',
+        noServersAvailable: '사용 가능한 서버 없음',
+        loadServersFailed: '서버를 불러올 수 없습니다. 다시 시도하세요.',
         system: '시스템 관리',
         gameApp: '앱 관리',
         platform: '플랫폼 관리',

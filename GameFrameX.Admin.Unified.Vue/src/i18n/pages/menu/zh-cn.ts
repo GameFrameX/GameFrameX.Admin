@@ -1,7 +1,16 @@
 // 定义内容
 export default {
     menu: {
-        dashboard: '工作台',
+        dashboard: '总览',
+        serverCenter: '区服',
+        noticeCenter: '内容运营',
+        gmCenter: '在线运维',
+        commerceCenter: '商业化',
+        clientDelivery: 'C 端交付',
+        audit: '审计',
+        selectServer: '选择区服',
+        noServersAvailable: '暂无可用区服',
+        loadServersFailed: '加载区服失败，请重试',
         system: '系统管理',
         gameApp: '应用管理',
         platform: '平台管理',

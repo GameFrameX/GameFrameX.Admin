@@ -30,6 +30,7 @@ public partial class GlobalMenuSeedData : ISqlSugarEntitySeedData<GlobalMenuEnti
     {
         var menus = new List<GlobalMenuEntity>();
         menus.AddRange(DashboardMenus());
+        menus.AddRange(OperationsRootMenus());
         menus.AddRange(SystemMenus());
         menus.AddRange(PlatformMenus());
         menus.AddRange(GlobalConfigMenus());

@@ -1,7 +1,16 @@
 // Define content
 export default {
     menu: {
-        dashboard: 'Dashboard',
+        dashboard: 'Overview',
+        serverCenter: 'Servers',
+        noticeCenter: 'Content Operations',
+        gmCenter: 'Live Operations',
+        commerceCenter: 'Commerce',
+        clientDelivery: 'Client Delivery',
+        audit: 'Audit',
+        selectServer: 'Select server',
+        noServersAvailable: 'No servers available',
+        loadServersFailed: 'Unable to load servers. Please retry.',
         system: 'System Management',
         gameApp: 'App Management',
         platform: 'Platform Management',

@@ -28,7 +28,7 @@ public partial class GlobalMenuSeedData
                 Component = "Layout",
                 Redirect = null,
                 Permission = null,
-                Title = "工作台",
+                Title = "总览",
                 TitleCode = "message.menu.dashboard",
                 Icon = "fa-solid fa-house",
                 OutLink = null,

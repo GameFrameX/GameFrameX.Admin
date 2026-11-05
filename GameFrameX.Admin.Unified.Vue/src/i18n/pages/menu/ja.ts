@@ -1,7 +1,16 @@
 // コンテンツを定義
 export default {
     menu: {
-        dashboard: 'ダッシュボード',
+        dashboard: '概要',
+        serverCenter: 'サーバー',
+        noticeCenter: 'コンテンツ運営',
+        gmCenter: 'オンライン運用',
+        commerceCenter: '収益化',
+        clientDelivery: 'クライアント配信',
+        audit: '監査',
+        selectServer: 'サーバーを選択',
+        noServersAvailable: '利用可能なサーバーはありません',
+        loadServersFailed: 'サーバーを読み込めません。再試行してください。',
         system: 'システム管理',
         gameApp: 'アプリ管理',
         platform: 'プラットフォーム管理',
