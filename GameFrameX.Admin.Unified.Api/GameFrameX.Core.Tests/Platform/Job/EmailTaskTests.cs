@@ -168,12 +168,12 @@ public sealed class EmailTaskTests : IDisposable
     /// </summary>
     private sealed class CapturingHttpMessageHandler : HttpMessageHandler
     {
-        public List<(Uri? RequestUri, string? Body)> Requests { get; } = new();
+        public List<CapturedRequest> Requests { get; } = new();
 
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var body = request.Content == null ? null : request.Content.ReadAsStringAsync(cancellationToken).GetAwaiter().GetResult();
-            Requests.Add((request.RequestUri, body));
+            Requests.Add(new CapturedRequest(request.RequestUri, body));
             var envelope = HttpJsonResultData<string>.Success(JsonHelper.Serialize(new PostMailResponse()));
             var response = new HttpResponseMessage(HttpStatusCode.OK)
             {
@@ -182,4 +182,9 @@ public sealed class EmailTaskTests : IDisposable
             return Task.FromResult(response);
         }
     }
+
+    /// <summary>
+    /// 捕获的 HTTP 请求（测试断言用；C# 元组语法在后端禁用，见 NoTupleSyntaxTests）。
+    /// </summary>
+    private sealed record CapturedRequest(Uri? RequestUri, string? Body);
 }
