@@ -719,6 +719,10 @@ export type GroupSweepOptions = {
   shotLabel?: string;
   // 开启行级动作层（搜索规则 payload + 详情/编辑回显/删除取消 + 下拉交互）
   actions?: boolean;
+  // 跳过通用 CRUD 探针的叶子（C404：开服/合服向导是流程页，无 SearchForm/CrudDataTable 与行级 CRUD 动作，
+  // 通用探针不适用；写路径由专属用例 game-area-provision / game-area-merge 以真实流程覆盖。
+  // 跳过的叶子仍计入叶子数下限断言，并在 annotations 中标记 skipped 供审计）
+  skipLeaves?: string[];
 };
 
 // 单叶子交互探测：404 三点采样（挂载时序）+ 搜索/重置按钮真实点击 + 新增对话框开/关；
@@ -790,12 +794,18 @@ export async function sweepGroup(
   if (!entry) {
     throw new Error(`当前侧边栏未找到模块组「${groupName}」；现有组：${groups.map((g) => g.group).join('、')}`);
   }
-  const { minLeaves = 1, shotLabel = groupName, actions = false } = options;
+  const { minLeaves = 1, shotLabel = groupName, actions = false, skipLeaves = [] } = options;
   expect(entry.leaves.length, `模块「${groupName}」叶子数`).toBeGreaterThanOrEqual(minLeaves);
 
   const issues: string[] = [];
   const reports: LeafReport[] = [];
   for (const leaf of entry.leaves) {
+    if (skipLeaves.includes(leaf)) {
+      const skippedReport = emptyReport(leaf);
+      (skippedReport as LeafReport & { skipped?: boolean }).skipped = true;
+      reports.push(skippedReport);
+      continue;
+    }
     reports.push(await sweepLeaf(page, leaf, issues, { actions, rootGroup: groupName }));
   }
 
