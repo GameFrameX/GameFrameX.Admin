@@ -76,13 +76,25 @@ public sealed class ProjectSchedulerHostedService : BackgroundService
             {
                 EvaluateAndFire(DateTime.Now);
             }
+            catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+            {
+                break;
+            }
             catch (Exception exception)
             {
                 // 单轮评估异常不终止循环（与旧引擎"任务执行异常仅记录"的口径一致）。
                 _logger?.LogError(exception, "作业触发循环单轮评估异常");
             }
 
-            await Task.Delay(TriggerLoopTickMilliseconds, stoppingToken);
+            try
+            {
+                await Task.Delay(TriggerLoopTickMilliseconds, stoppingToken);
+            }
+            catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+            {
+                // 停机取消：静默退出循环，不让 BackgroundService 以未处理异常收场。
+                break;
+            }
         }
     }
 
