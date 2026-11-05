@@ -11,13 +11,13 @@ using Microsoft.Extensions.Options;
 using SqlSugar;
 
 namespace GameFrameX.Core.Tests.Platform.Job;
-
 /// <summary>
 /// 业务定时任务扫描派发作业（GameTimeJobDispatchJob）语义测试——调度合一后的行为契约：
 /// cron 到期执行、IsOnce 只执行一次且删行、增删改后调度随之更新、任务名解析失败不空转。
 /// <para>时钟与类型解析器均经 internal 钩子替换，测试内直接调用 ExecuteAsync（引擎侧由
-/// SchedulerTriggerLoopTests 覆盖）。</para>
+/// SchedulerTriggerLoopTests 覆盖）。与 BusinessJobTypeResolutionTests 共享静态钩子，同 Collection 禁止并行。</para>
 /// </summary>
+[Collection(nameof(GameTimeJobDispatchJobTests))]
 public sealed class GameTimeJobDispatchJobTests : IDisposable
 {
     private readonly ClientApiTestDb _database = new();
@@ -50,8 +50,7 @@ public sealed class GameTimeJobDispatchJobTests : IDisposable
 
     public void Dispose()
     {
-        GameTimeJobDispatchJob.BusinessJobTypeResolver = null!;
-        GameTimeJobDispatchJob.Clock = null!;
+        GameTimeJobDispatchJob.ResetRuntimeHooksForTests();
         GameTimeJobDispatchJob.ResetTrackingForTests();
         _provider.Dispose();
         _database.Dispose();

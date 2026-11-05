@@ -216,14 +216,18 @@ public class GameTimeJobDispatchJob : IJob
         return $"{row.Name}|{row.Cron}|{row.IsOnce}|{row.MailId}";
     }
 
-    private static Type? DefaultBusinessJobTypeResolver(string name)
-    {
-        return Type.GetType($"GameFrameX.Application.Platform.Job.{name}");
-    }
-
     private static DateTime DefaultClock()
     {
         return DateTime.Now;
+    }
+
+    /// <summary>
+    /// 恢复默认时钟与类型解析器（单测隔离用）。
+    /// </summary>
+    internal static void ResetRuntimeHooksForTests()
+    {
+        BusinessJobTypeResolver = DefaultBusinessJobTypeResolver;
+        Clock = DefaultClock;
     }
 
     /// <summary>
@@ -232,6 +236,17 @@ public class GameTimeJobDispatchJob : IJob
     internal static void ResetTrackingForTests()
     {
         TrackedTasks.Clear();
+    }
+
+    private static Type? DefaultBusinessJobTypeResolver(string name)
+    {
+        // 旧引擎用 Type.GetType("GameFrameX.Application.Platform.Job.{name}") 无程序集限定解析，
+        // 实测解析不到（探针测试为证）——业务定时任务在合一前从未真正执行过。
+        // 改为按项目类型目录解析：先精确匹配带命名空间前缀的 FullName，再按类名匹配本命名空间下的实现。
+        var fullName = $"GameFrameX.Application.Platform.Job.{name}";
+        return ProjectTypeCatalog.EffectiveTypes.FirstOrDefault(type =>
+                         (type.FullName == fullName || (type.Name == name && type.Namespace == "GameFrameX.Application.Platform.Job"))
+                         && typeof(IScheduleJob).IsAssignableFrom(type));
     }
 
     /// <summary>
