@@ -148,11 +148,10 @@ public class Startup
         {
             services.AddAdminSchedule(true);
             services.AddGameSchedule();
-            services.AddSingleton<ScheduledTaskHostedService>();
-            services.AddHostedService(sp => sp.GetRequiredService<ScheduledTaskHostedService>());
         }
         else
         {
+            // GFX_DISABLE_SCHEDULE=1：仅注册调度服务占位，不启用持久化与触发循环（既有开关语义）。
             services.AddAdminSchedule(false);
             services.AddGameSchedule();
         }
