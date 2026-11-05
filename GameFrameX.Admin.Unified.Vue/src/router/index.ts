@@ -13,15 +13,6 @@ import {initBackEndControlRoutes} from './backEnd';
 import {clearTokens} from '../utils/http/shared';
 import {showWarning} from '../utils/message';
 import {t} from '../i18n/index';
-import {useUserInfoStore} from '../stores/userInfo';
-import {useCurrentApp} from '../composables/useCurrentApp';
-import {
-    APP_WORKSPACE_PATH,
-    decideTenantAppEntry,
-    isAppScopedRoute,
-    isAppWorkspaceRoutePath,
-    normalizeAppId,
-} from '../utils/appWorkspace';
 
 /**
  * 1、前端控制路由时：isRequestRoutes 为 false，需要写 roles，需要走 setFilterRoute 方法。
@@ -35,83 +26,6 @@ import {
 // 注意：不能在此处（模块初始化期）useThemeConfigStore——当前模块参与了一条 store 循环依赖，
 // 此时 persistedstate 插件尚未注册（实测 _p=0），顶层创建 store 会使其持久化静默失效。
 // isRequestRoutes 仅路由守卫（运行期）使用，改为守卫内惰性读取。
-
-const shouldSkipAppWorkspace = (path: string) => {
-    return path === '/login' || path === '/401' || path.startsWith('/platform/')
-}
-
-const resolveTenantAppRedirect = async (to: any) => {
-    if (shouldSkipAppWorkspace(to.path)) {
-        return undefined
-    }
-    const storesUserInfo = useUserInfoStore(pinia)
-    if (storesUserInfo.isSuperAdmin) {
-        if (to.path.startsWith('/platform/')) {
-            return undefined
-        }
-        if (to.path === '/tenant/dashboard/home') {
-            return undefined
-        }
-        if (to.path.startsWith('/app/') || to.path.startsWith('/appCenter/')) {
-            return '/tenant/dashboard/home'
-        }
-        return undefined
-    }
-
-    const { appOptions, loadApps, setCurrentApp, currentAppId } = useCurrentApp()
-    let apps: any[] = []
-    try {
-        apps = await loadApps()
-    } catch {
-        return undefined
-    }
-    const queryAppId = normalizeAppId(to.query?.appId)
-    if (queryAppId !== undefined) {
-        const queryAppVisible = appOptions.value.some((app) => String(app.id) === String(queryAppId) && app.isEnabled !== false)
-        if (queryAppVisible) {
-            setCurrentApp(queryAppId)
-            return undefined
-        }
-        showWarning(t('gameBusiness.appWorkspace.appUnavailable'))
-        if (isAppScopedRoute(to) || to.path === APP_WORKSPACE_PATH) {
-            return decideTenantAppEntry(apps)
-        }
-        return undefined
-    }
-
-    if (to.path === '/' || to.path === '/tenant/dashboard/home') {
-        // 三层驾驶舱（2026-08-31 拍板）：/tenant/dashboard/home 是超管平台驾驶舱；
-        // 租户访问导流——已选有效应用去应用驾驶舱 appHome，未选去应用选择器
-        const currentAppVisible = appOptions.value.some(
-            (app) => String(app.id) === String(currentAppId.value) && app.isEnabled !== false,
-        )
-        if (currentAppId.value !== undefined && currentAppVisible) {
-            return {path: '/dashboard/appHome'}
-        }
-        return decideTenantAppEntry(apps)
-    }
-
-    if (to.path === '/dashboard/appHome') {
-        // 应用驾驶舱要求已选有效应用，否则回到选择器
-        const currentAppVisible = appOptions.value.some(
-            (app) => String(app.id) === String(currentAppId.value) && app.isEnabled !== false,
-        )
-        if (currentAppId.value === undefined || !currentAppVisible) {
-            return decideTenantAppEntry(apps)
-        }
-        return undefined
-    }
-
-    if (isAppWorkspaceRoutePath(to.path)) {
-        return undefined
-    }
-
-    if (isAppScopedRoute(to)) {
-        showWarning(t('gameBusiness.appWorkspace.appIdRequired'))
-        return decideTenantAppEntry(apps)
-    }
-    return undefined
-}
 
 /**
  * 创建一个可以被 Vue 应用程序使用的路由实例
@@ -203,7 +117,7 @@ router.beforeEach(async (to, from) => {
     }
     if (to.path === '/login') {
         NProgress.done();
-        return '/tenant/dashboard/home';
+        return '/dashboard/home';
     }
     const storesRoutesList = useRoutesListStore(pinia);
     const {routesList} = storeToRefs(storesRoutesList);
@@ -215,22 +129,10 @@ router.beforeEach(async (to, from) => {
                 showWarning(t('message.login.account.noPermission'));
                 return '/login';
             }
-            const appRedirect = await resolveTenantAppRedirect(to);
-            if (appRedirect) {
-                return appRedirect;
-            }
             return {path: to.path, query: to.query};
         }
         await initFrontEndControlRoutes();
-        const appRedirect = await resolveTenantAppRedirect(to);
-        if (appRedirect) {
-            return appRedirect;
-        }
         return {path: to.path, query: to.query};
-    }
-    const appRedirect = await resolveTenantAppRedirect(to);
-    if (appRedirect) {
-        return appRedirect;
     }
     return true;
 });

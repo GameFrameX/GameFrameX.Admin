@@ -1,12 +1,8 @@
-// APP-驾驶舱（/dashboard/appHome）数据编排。
-// KPI 与趋势走 #211（GFX-730）真实聚合接口：overview 为租户级聚合
-// （应用维度拆分待 Unified.Api#209 后续）；onlineTrend 为最近 24 个整点桶，
-// 无采样桶 OnlineCount 为 null（趋势图断点）。公告区已随 tenantNotice 退场置空（C400/C403）。
+// 全服运营聚合；只在普通管理员的业务卡片挂载时加载。
 import {onMounted, reactive} from 'vue';
-import {gameHomeOverviewPost, gameHomeOnlineTrendPost} from '/@/api/gameHome';
-import type {HomeNoticeItem} from '/@/views/tenant/home/composables/usePlatformHomeData';
+import {gameHomeOverviewPost, gameHomeOnlineTrendPost} from '../../../../api/gameHome';
 
-export function useAppHomeData() {
+export function useDashboardData() {
   const state = reactive({
     overviewLoaded: false,
     overviewFailed: false,
@@ -22,7 +18,6 @@ export function useAppHomeData() {
     // 趋势：最近 24 个整点桶；labels 为对应整点文案，与数据同长
     trend: [] as Array<number | null>,
     trendLabels: [] as string[],
-    notices: [] as HomeNoticeItem[],
   });
 
   const loadOverview = async () => {
@@ -62,16 +57,9 @@ export function useAppHomeData() {
     }
   };
 
-  const loadNotices = async () => {
-    // ponytail: C400 已删除后端端点，此处只为保持 build 可用；C403 连页删除
-    // tenantNotice 已删：公告列表恒为空，不发请求、不伪造数据。
-    state.notices = [];
-  };
-
   onMounted(() => {
     loadOverview();
     loadTrend();
-    loadNotices();
   });
 
   return {state};

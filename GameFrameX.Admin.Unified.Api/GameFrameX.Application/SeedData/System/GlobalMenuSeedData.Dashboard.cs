@@ -8,7 +8,7 @@ using GameFrameX.Core.Api;
 namespace GameFrameX.Application.SeedData.System;
 
 /// <summary>
-/// 工作台 域菜单种子（partial；由 <see cref="GlobalMenuSeedData.BuildData"/> 聚合）。
+/// 总览域菜单种子（partial；由 <see cref="GlobalMenuSeedData.BuildData"/> 聚合）。
 /// </summary>
 public partial class GlobalMenuSeedData
 {
@@ -52,9 +52,9 @@ public partial class GlobalMenuSeedData
                 Pid = StableSeedId.Menu("route:dashboard"),
                 Type = MenuTypeEnum.Menu,
                 Name = "home",
-                Path = "/tenant/dashboard/home",
+                Path = "/dashboard/home",
                 AppScope = MenuAppScopeEnum.Console,
-                Component = "/tenant/home/index",
+                Component = "/dashboard/home/index",
                 Redirect = null,
                 Permission = null,
                 Title = "工作台",
@@ -66,35 +66,6 @@ public partial class GlobalMenuSeedData
                 IsKeepAlive = true,
                 IsAffix = true,
                 OrderNo = 100,
-                IsEnabled = true,
-                Remark = null,
-                CreatedTime = 1706499485,
-                UpdateTime = 1706793684,
-                SuperAdminOnly = false,
-                AllowTenantWhenSuperAdminOnly = false,
-                IsDeleted = false,
-            },
-            new()
-            {
-                Id = StableSeedId.Menu("route:notice"),
-                Key = "route:notice",
-                Pid = StableSeedId.Menu("route:dashboard"),
-                Type = MenuTypeEnum.Menu,
-                Name = "notice",
-                Path = "/tenant/dashboard/notice",
-                AppScope = MenuAppScopeEnum.Console,
-                Component = "/tenant/home/notice/index",
-                Redirect = null,
-                Permission = null,
-                Title = "站内信",
-                TitleCode = "message.menu.notice",
-                Icon = "fa-solid fa-bell",
-                OutLink = null,
-                IsIframe = false,
-                IsHide = false,
-                IsKeepAlive = true,
-                IsAffix = false,
-                OrderNo = 101,
                 IsEnabled = true,
                 Remark = null,
                 CreatedTime = 1706499485,

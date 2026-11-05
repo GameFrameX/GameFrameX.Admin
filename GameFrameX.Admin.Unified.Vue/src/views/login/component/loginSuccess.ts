@@ -1,6 +1,5 @@
-// 登录/注册成功后的统一落地：存 token、初始化后端路由、按 redirect 跳转、问候 toast。
-// 登录面与注册面共用；注册面传 welcomeText 区分问候语（「欢迎回来」vs「开通成功」）。
-import type {RouteLocationNormalizedLoaded, Router} from 'vue-router';
+// 登录成功后保存凭据、初始化菜单并进入唯一总览首页。
+import type {Router} from 'vue-router';
 import {local, session} from '../../../utils/storage';
 import {ACCESS_TOKEN_KEY, clearTokens} from '../../../utils/axiosUtils';
 import {initBackEndControlRoutes} from '../../../router/backEnd';
@@ -11,7 +10,6 @@ import {t} from '../../../i18n/index';
 
 export const completeSignIn = async (
     accessToken: string | any,
-    route: RouteLocationNormalizedLoaded,
     router: Router,
     welcomeText?: string,
 ): Promise<void> => {
@@ -25,14 +23,7 @@ export const completeSignIn = async (
     return;
   }
 
-  if (route.query?.redirect) {
-    await router.push({
-      path: <string>route.query?.redirect,
-      query: Object.keys(<string>route.query?.params).length > 0 ? JSON.parse(<string>route.query?.params) : '',
-    });
-  } else {
-    await router.push('/');
-  }
+  await router.push('/dashboard/home');
 
   const greeting = t(`message.login.greeting.${formatAxis(new Date())}`);
   showSuccess(`${greeting}，${welcomeText ?? t('message.login.signInText')}`);

@@ -41,7 +41,6 @@
     "gameMailCampaign:update": "C135/GFX-142 mail campaign admin UI landed ahead of backend menu/permission seed; C134 follow-up"
   },
   "queryGetRequests": {
-    "src/views/tenant/home/notice/index.vue:generated:apiTenantNoticePageReceivedGet": "legacy generated GET query form; migrate to POST page contract in a separate behavior change",
     "src/views/platform/system/menu/index.vue:generated:apiGlobalMenuListGet": "legacy generated GET query form; migrate to POST page contract in a separate behavior change"
   },
   "i18nTextExceptions": {
@@ -78,7 +77,6 @@
     "src/layout/logo/index.vue": "C296 convention exemption: directory-style index.vue component",
     "src/layout/navigationBars/topBar/index.vue": "C296 convention exemption: directory-style index.vue component",
     "src/layout/upgrade/index.vue": "C296 convention exemption: directory-style index.vue component",
-    "src/views/app/appCenter/appWorkspace/index.vue": "C296 convention exemption: directory-style index.vue component",
     "src/views/app/appCenter/device/device/index.vue": "C296 convention exemption: directory-style index.vue component",
     "src/views/app/appCenter/device/group/index.vue": "C296 convention exemption: directory-style index.vue component",
     "src/views/app/appCenter/featureSwitch/index.vue": "C346 convention exemption: directory-style index.vue component",
@@ -144,10 +142,6 @@
     "src/views/platform/system/menu/index.vue": "C296 convention exemption: directory-style index.vue component",
     "src/views/platform/system/openAccess/index.vue": "C296 convention exemption: directory-style index.vue component",
     "src/views/platform/system/systemEmailProvider/index.vue": "C296 convention exemption: directory-style index.vue component",
-    "src/views/tenant/appCenter/appEntry/index.vue": "C296 convention exemption: directory-style index.vue component",
-    "src/views/tenant/appCenter/gameAppEntity/index.vue": "C296 convention exemption: directory-style index.vue component",
-    "src/views/tenant/home/index.vue": "C296 convention exemption: directory-style index.vue component",
-    "src/views/tenant/home/notice/index.vue": "C296 convention exemption: directory-style index.vue component",
     "src/views/tenant/system/file/index.vue": "C296 convention exemption: directory-style index.vue component",
     "src/views/tenant/system/log/logDiff/index.vue": "C296 convention exemption: directory-style index.vue component",
     "src/views/tenant/system/log/logException/index.vue": "C296 convention exemption: directory-style index.vue component",
