@@ -3,7 +3,6 @@ import { anonPage } from './helpers';
 
 // 登录失败路径：错误密码 → 停留在登录页，登录按钮 loading 态清除（响应已被应用处理）
 const ACCOUNT = process.env.E2E_ACCOUNT ?? 'admin';
-const TENANT_ID = process.env.E2E_TENANT_ID ?? '1300000000001';
 const WRONG_PASSWORD = process.env.E2E_WRONG_PASSWORD ?? 'wrong-password';
 
 test('错误密码登录失败并停留在登录页', async ({ browser }) => {
@@ -11,7 +10,7 @@ test('错误密码登录失败并停留在登录页', async ({ browser }) => {
   const page = await anonPage(browser);
   await page.goto('/#/login');
 
-  await page.locator('#login-account').fill(`${ACCOUNT}@${TENANT_ID}`);
+  await page.locator('#login-account').fill(ACCOUNT);
   await page.locator('#login-password').fill(WRONG_PASSWORD);
 
   let loginPosted = false;

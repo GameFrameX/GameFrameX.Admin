@@ -1,23 +1,41 @@
 import { test, expect } from '@playwright/test';
-import { shot, superadminPage } from './helpers';
+import { ADMIN_ROOTS, SUPERADMIN_ROOTS, SUPERADMIN_GROUPS, SUPERADMIN_LEAVES,
+  expectOverview, menuRoot, shot, superadminPage } from './helpers';
+import { renderedMenuGroups } from './module-coverage';
 
-// AGENTS 产品规则的回归：`全局配置` 是 SuperAdmin-only，
-// 租户管理员的菜单树/侧边栏不得出现该组（租户边界，P1 清单遗留项）。
-test.describe('全局配置租户边界', () => {
-  test('SuperAdmin 可见全局配置菜单', async ({ browser }) => {
-    const page = await superadminPage(browser);
+test.describe('单 shell 双向菜单边界', () => {
+  test('普通管理员可见九根但系统不含超管组和超管叶子', async ({ page }) => {
     await page.goto('/');
-    await expect(page.locator('role=button[name="全局配置"] >> nth=0')).toBeVisible();
-    await shot(page, 'boundary-superadmin-global-config');
-    await page.close();
+    await expectOverview(page);
+    expect((await renderedMenuGroups(page)).map(group => group.group)).toEqual([...ADMIN_ROOTS]);
+    const system = menuRoot(page, '系统');
+    await expect(system).toBeVisible();
+    // 检查整个 DOM（包括折叠子树），不是只看当前展开状态。
+    for (const title of [...SUPERADMIN_GROUPS, ...SUPERADMIN_LEAVES]) {
+      await expect(page.locator('.p-panelmenu .menu-label').filter({ hasText: new RegExp(`^${title}$`) })).toHaveCount(0);
+    }
+    for (const title of ['账号管理', '角色管理', '文件管理', '定时任务']) {
+      await expect(system.locator('a.menu-nav-item').filter({ has: page.getByText(title, { exact: true }) })).toHaveCount(1);
+    }
+    await shot(page, 'boundary-admin-system');
   });
 
-  test('租户管理员不可见全局配置菜单', async ({ page }) => {
-    await page.goto('/');
-    // 先等通用菜单组渲染完成（菜单树异步加载），再断言全局配置缺席
-    await expect(page.locator('role=button[name="系统管理"] >> nth=0')).toBeVisible();
-    const count = await page.locator('text=全局配置').count();
-    expect(count).toBe(0);
-    await shot(page, 'boundary-tenant-admin-no-global-config');
+  test('超管仅见总览系统且系统包含全部超管组和叶子', async ({ browser }) => {
+    const page = await superadminPage(browser);
+    try {
+      await page.goto('/');
+      await expectOverview(page);
+      const groups = await renderedMenuGroups(page);
+      expect(groups.map(group => group.group)).toEqual([...SUPERADMIN_ROOTS]);
+      const system = menuRoot(page, '系统');
+      await expect(system).toBeVisible();
+      for (const title of SUPERADMIN_GROUPS) {
+        await expect(system.locator('.menu-label').filter({ hasText: new RegExp(`^${title}$`) })).toHaveCount(1);
+      }
+      expect(groups.find(group => group.group === '系统')?.leaves.sort()).toEqual([...SUPERADMIN_LEAVES].sort());
+      await shot(page, 'boundary-superadmin-system');
+    } finally {
+      await page.context().close();
+    }
   });
 });

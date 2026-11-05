@@ -1,10 +1,10 @@
 import { test, expect, type Page } from '@playwright/test';
-import { anonPage, sleep } from './helpers';
+import { anonPage, expectOverview, sleep } from './helpers';
 
 // 外观功能回归：深色模式切换（html.dark 类翻转）+ 登录页语言切换（i18n 重渲染）。
 test('顶栏深色模式开关翻转 html.dark', async ({ page }) => {
   await page.goto('/');
-  await expect(page.locator('role=button[name="系统管理"] >> nth=0')).toBeVisible();
+  await expectOverview(page);
 
   const darkBefore = await readDarkClass(page);
   await page.locator('role=button[name="深色模式"]').click();

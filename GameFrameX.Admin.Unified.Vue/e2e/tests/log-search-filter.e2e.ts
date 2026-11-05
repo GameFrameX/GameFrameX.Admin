@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { shot } from './helpers';
+import { shot, navigateByMenu, expectOverview } from './helpers';
 
 // 搜索过滤链路（menu-contract 脚本搜索维度的回归化收敛）：
 // 操作日志页填入模糊搜索关键词 → 回车触发查询 →
@@ -8,14 +8,17 @@ test('操作日志搜索关键词随查询请求发出', async ({ page }) => {
   let pageRequested = false;
   let requestBody = '';
   await page.route(/\/api\/logOperation\/page/, async (route) => {
-    pageRequested = true;
-    requestBody = route.request().postData() ?? '';
+    if (route.request().method() === 'POST') {
+      pageRequested = true;
+      requestBody = route.request().postData() ?? '';
+    }
     await route.continue();
   });
 
   await page.goto('/');
-  await page.locator('role=button[name="日志管理"] >> nth=0').click();
-  await page.locator('text=操作日志').first().click();
+  await expectOverview(page);
+  await navigateByMenu(page, '操作日志', '审计');
+  await expect(page).toHaveURL(/#\/audit\//);
   await expect(page.locator('.p-datatable-tbody')).toContainText('admin', { timeout: 20_000 });
 
   // 清空捕获（页面加载已触发过一次分页），再由回车触发带关键词的查询

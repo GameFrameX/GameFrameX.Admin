@@ -31,7 +31,7 @@ export async function installApiRecorder(page: Page): Promise<void> {
     const bodySnapshot = (raw: unknown): string | undefined => {
       if (raw == null) return undefined;
       const text = typeof raw === 'string' ? raw : String(raw);
-      return text.length > 400 ? text.slice(0, 400) : text;
+      return text.length > 16_384 ? text.slice(0, 16_384) : text;
     };
     const push = (entry: ApiEntry): void => {
       scope.__e2eApi?.push(entry);
@@ -132,7 +132,7 @@ export async function renderedMenuGroups(page: Page): Promise<MenuGroup[]> {
         );
         return { group, leaves };
       })
-      .filter((entry) => entry.group && entry.leaves.length > 0);
+      .filter((entry) => entry.group);
   });
 }
 
@@ -411,7 +411,7 @@ async function probeSearchRules(
   // （DatePicker 输入框 readonly 天然排除；PrimeVue Select 的可编辑输入框是下拉过滤，不是查询字段）
   const pickInput = () =>
     page.evaluate(() => {
-      const inputs = Array.from(document.querySelectorAll('.search-form input'));
+      const inputs = Array.from(document.querySelectorAll<HTMLInputElement>('.search-form input'));
       const target = inputs.find(
         (el) =>
           el.getBoundingClientRect().height > 0 &&
@@ -720,10 +720,10 @@ async function sweepLeaf(
   page: Page,
   leaf: string,
   issues: string[],
-  options: { actions: boolean },
+  options: { actions: boolean; rootGroup: string },
 ): Promise<LeafReport> {
   const report = emptyReport(leaf);
-  await navigateByMenu(page, leaf);
+  await navigateByMenu(page, leaf, options.rootGroup);
 
   const marker = page.locator('text=找不到此页面').first();
   for (const delay of [100, 250, 450]) {
@@ -735,12 +735,12 @@ async function sweepLeaf(
     }
   }
 
-  let recordsMark = (await readApiRecords(page)).length;
+  const recordsMark = (await readApiRecords(page)).length;
   if (options.actions) {
     // 检索区按钮全量探针先跑（新表单态）；其中破坏类按钮会被取消，不改变数据
     await probeSearchAreaButtons(page, report, issues);
     await dismissStrayMask(page);
-    recordsMark = await probeSearchRules(page, report, issues, recordsMark);
+    await probeSearchRules(page, report, issues, recordsMark);
     // 重置重查断言：重置点击后应发出新的列表请求
     if (report.hasSearchForm && (await visibleButton(page, /^重置$/))) {
       const beforeReset = (await readApiRecords(page)).length;
@@ -789,7 +789,7 @@ export async function sweepGroup(
   const issues: string[] = [];
   const reports: LeafReport[] = [];
   for (const leaf of entry.leaves) {
-    reports.push(await sweepLeaf(page, leaf, issues, { actions }));
+    reports.push(await sweepLeaf(page, leaf, issues, { actions, rootGroup: groupName }));
   }
 
   test.info().annotations.push({

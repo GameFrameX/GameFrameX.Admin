@@ -1,4 +1,4 @@
-import { test, type Browser, type Page } from '@playwright/test';
+import { expect, test, type Browser, type Page } from '@playwright/test';
 
 // 会话态文件由 setup 项目（auth.setup / superadmin.setup）真实登录后写入。
 export const ADMIN_STATE = 'e2e/.e2e/state/admin.json';
@@ -34,9 +34,7 @@ export async function anonPage(browser: Browser): Promise<Page> {
 }
 
 export const sleep = (ms: number): Promise<void> => {
-  const { promise, resolve } = Promise.withResolvers<void>();
-  setTimeout(resolve, ms);
-  return promise;
+  return new Promise(resolve => setTimeout(resolve, ms));
 };
 
 // —— DatePicker(showTime) 真实面板演练（2026-10-21 补齐：此前仅 fill+Escape，面板交互零覆盖）——
@@ -65,7 +63,7 @@ export async function pickDateTime(page: Page, comboboxIndex: number, dayOrdinal
 //   根节点 → .p-panelmenu-panel（.p-panelmenu-header 内 span.menu-nav-item[role=button] 开合，
 //            折叠时 .p-panelmenu-content-container display:none，子树仍在 DOM）
 //   子分组 → li.p-panelmenu-item[aria-expanded]（span.menu-nav-item[role=button] 开合）
-//   叶子   → a.menu-nav-item（.menu-label 为标题；router-link href 自带 appId query）
+//   叶子   → a.menu-nav-item（.menu-label 为标题；router-link href 对应单 shell 内路径）
 
 // 读取渲染后侧边栏的全部叶子标题（折叠容器内的叶子也在 DOM 中，去重保序）
 export async function renderedMenuLeaves(page: Page): Promise<string[]> {
@@ -82,20 +80,12 @@ export async function renderedMenuLeaves(page: Page): Promise<string[]> {
   });
 }
 
-// 当前侧边栏是否包含某叶子（含折叠容器内）
-async function sidebarHasLeaf(page: Page, title: string): Promise<boolean> {
-  return page.evaluate((leafTitle) => {
-    return Array.from(document.querySelectorAll('.p-panelmenu a.menu-nav-item .menu-label')).some(
-      (el) => (el.textContent ?? '').trim() === leafTitle,
-    );
-  }, title);
-}
-
 // 侧边栏叶子链接的文本定位器（menu-label 精确匹配；Vue 重渲染后自动重新解析，
 // 比打 data 标记再点击稳——标记元素会被 PanelMenu 重渲染替换导致 detached）
-function menuLeafLink(page: Page, title: string) {
-  return page
-    .locator('.p-panelmenu a.menu-nav-item')
+function menuLeafLink(page: Page, title: string, rootGroup?: string) {
+  const scope = rootGroup ? menuRoot(page, rootGroup) : page.locator('.p-panelmenu');
+  return scope
+    .locator('a.menu-nav-item')
     .filter({ has: page.getByText(title, { exact: true }) })
     .first();
 }
@@ -109,9 +99,13 @@ type MenuAction =
 // evaluate 侧：定位目标叶子，返回下一步动作——可见则 ready；
 // 否则给出最外层折叠祖先的开关（分组名 + 层级），由真实 click 展开后重试。
 // 注意：evaluate 函数体序列化后丢失模块闭包，工具逻辑必须函数内定义。
-async function nextMenuAction(page: Page, title: string): Promise<MenuAction> {
-  return page.evaluate((leafTitle) => {
-    const links = Array.from(document.querySelectorAll('.p-panelmenu a.menu-nav-item'));
+async function nextMenuAction(page: Page, title: string, rootGroup?: string): Promise<MenuAction> {
+  return page.evaluate(({ leafTitle, rootGroup }) => {
+    const panel = rootGroup
+      ? Array.from(document.querySelectorAll('.p-panelmenu-panel')).find((element) =>
+        element.querySelector(':scope > .p-panelmenu-header .menu-label')?.textContent?.trim() === rootGroup)
+      : document;
+    const links = Array.from(panel?.querySelectorAll('a.menu-nav-item') ?? []);
     const target = links.find((a) => (a.querySelector('.menu-label')?.textContent ?? '').trim() === leafTitle);
     if (!target) return { kind: 'missing' };
     if (target.getBoundingClientRect().height > 0) return { kind: 'ready' };
@@ -140,16 +134,16 @@ async function nextMenuAction(page: Page, title: string): Promise<MenuAction> {
     }
     if (collapsed.length === 0) return { kind: 'stuck' };
     return { kind: 'expand', ...collapsed[collapsed.length - 1] };
-  }, title);
+  }, { leafTitle: title, rootGroup });
 }
 
 // 真实点击导航到侧边栏叶子：逐层真实 click 展开折叠祖先，再真实 click 叶子链接。
 // 「找不到叶子」不立即判死：dev server 整页 reload（vite 依赖再优化、HMR 等）期间
 // PanelMenu 会短暂整体卸载，先有限等待侧边栏重挂载（真缺失超时后仍会失败）。
-export async function navigateByMenu(page: Page, leafTitle: string): Promise<void> {
+export async function navigateByMenu(page: Page, leafTitle: string, rootGroup?: string): Promise<void> {
   const missingDeadline = Date.now() + 5_000;
   for (let round = 0; round < 10; round += 1) {
-    const action = await nextMenuAction(page, leafTitle);
+    const action = await nextMenuAction(page, leafTitle, rootGroup);
     if (action.kind === 'missing') {
       if (Date.now() >= missingDeadline) throw new Error(`当前侧边栏未找到菜单「${leafTitle}」`);
       await sleep(300);
@@ -170,35 +164,57 @@ export async function navigateByMenu(page: Page, leafTitle: string): Promise<voi
       .click();
     await sleep(250);
   }
-  await menuLeafLink(page, leafTitle).click();
+  await menuLeafLink(page, leafTitle, rootGroup).click();
   await sleep(250);
 }
 
-// 回到应用选择页（真实用户路径组合）：
-// - 全局侧边栏页面：点「工作台」叶子——未选应用被守卫导流回 appSelector；已选应用落应用驾驶舱
-// - 应用工作台深层页：侧边栏无出口，重载落地应用驾驶舱（守卫真实路径）
-// - 应用驾驶舱：点「返回应用列表」正门出口（C333 后唯一出口）
-export async function gotoAppSelector(page: Page): Promise<void> {
-  if (!page.url().includes('appCenter/appSelector')) {
-    if (await sidebarHasLeaf(page, '工作台')) {
-      await navigateByMenu(page, '工作台');
-      await sleep(600);
-    } else {
-      await page.goto('/');
-      await sleep(900);
-    }
-  }
-  if (!page.url().includes('appCenter/appSelector')) {
-    await page.locator('.back-to-app-list').click();
-    await sleep(600);
-  }
-  await page.locator('role=button[name*="默认应用"] >> nth=0').waitFor({ state: 'visible', timeout: 15_000 });
+
+export const ADMIN_ROOTS = ['总览', '区服', '内容运营', '在线运维', '玩家', '商业化', 'C 端交付', '审计', '系统'] as const;
+export const SUPERADMIN_ROOTS = ['总览', '系统'] as const;
+export const SUPERADMIN_GROUPS = ['开发工具', '帮助文档', '全局配置'] as const;
+export const SUPERADMIN_LEAVES = [
+  '菜单管理', '参数配置', '字典管理', '任务调度', '开放接口身份', '图形验证码配置', '平台系统邮件',
+  '库表管理', '后台接口', 'SqlSugar', 'JWT配置', '限流配置', '日志配置', '密码策略配置', '全局渠道定义',
+] as const;
+
+export function menuRoot(page: Page, title: string) {
+  return page.locator('.p-panelmenu-panel').filter({
+    has: page.locator('.p-panelmenu-header').getByText(title, { exact: true }),
+  });
 }
 
-// 进入应用工作台（真实点击默认应用卡；菜单链接的 href 自带 appId query）
-export async function enterWorkspace(page: Page): Promise<void> {
-  await gotoAppSelector(page);
-  await page.locator('role=button[name*="默认应用"] >> nth=0').click();
-  await page.waitForURL(/\/#\/(?!appCenter\/appSelector)/, { timeout: 20_000 });
-  await sleep(900);
+export async function expectOverview(page: Page): Promise<void> {
+  await expect(page).toHaveURL(/#\/dashboard\/home(?:[/?]|$)/);
+  await expect(menuRoot(page, '总览')).toBeVisible();
+}
+
+export function userMenuButton(page: Page) {
+  return page.locator('button[aria-haspopup="menu"]').filter({
+    has: page.locator('.layout-navbars-breadcrumb-user-link-photo'),
+  });
+}
+
+export async function logoutByMenu(page: Page): Promise<void> {
+  await userMenuButton(page).click();
+  await page.locator('.p-menu-overlay').getByText('退出登录', { exact: true }).click();
+  await page.getByRole('button', { name: '确定', exact: true }).click();
+  await expect(page).toHaveURL(/#\/login/);
+}
+
+// C400 单实例账号不再拼接 @tenantId；身份与菜单必须由真实表单登录建立。
+export async function signIn(page: Page, account: string, password: string): Promise<string> {
+  await page.goto('/#/login');
+  await page.locator('#login-account').fill(account);
+  await page.locator('#login-password').fill(password);
+  const responsePromise = page.waitForResponse(response =>
+    /\/api\/systemAuth\/login(?:\?|$)/.test(response.url()) && response.request().method() === 'POST');
+  await page.locator('.login-submit').click();
+  const response = await responsePromise;
+  expect(response.ok(), '真实登录 POST 成功').toBe(true);
+  const envelope = await response.json();
+  expect(envelope.code).toBe(0);
+  const token: unknown = envelope.data?.accessToken ?? envelope.data?.AccessToken;
+  expect(typeof token).toBe('string');
+  await expectOverview(page);
+  return token as string;
 }
