@@ -15,10 +15,11 @@ test('合服向导：取消计划释放区服并允许同范围再次建计划',
   expect(sourceNames.length, '请准备至少两个隔离源区服').toBeGreaterThanOrEqual(2);
   const page = await anonPage(browser);
   try {
+    await installApiRecorder(page);
     await signIn(page, process.env.E2E_ACCOUNT ?? 'admin', process.env.E2E_PASSWORD ?? '123456');
     await page.context().storageState({ path: ADMIN_STATE });
     await navigateByMenu(page, '合服', '区服');
-    for (const cancellationReason of ['取消错误范围', '再次取消演练']) {
+    for (const [round, cancellationReason] of ['取消错误范围', '再次取消演练'].entries()) {
       await page.getByRole('button', { name: '新建计划', exact: true }).click();
       const mergeDialog = page.locator('.p-dialog:visible').first();
       await mergeDialog.getByRole('combobox').nth(0).click();
@@ -43,7 +44,12 @@ test('合服向导：取消计划释放区服并允许同范围再次建计划',
       await page.getByRole('button', { name: '确定', exact: true }).click();
       await expect(page.getByTestId('merge-status')).toHaveText('已取消');
       await expect(page.getByText(cancellationReason, { exact: true })).toBeVisible();
+      await shot(page, `merge-cancelled-round-${round + 1}`);
       await page.getByRole('dialog').getByRole('button', { name: /close|关闭/i }).click();
+    }
+    const records = await readApiRecords(page);
+    for (const endpoint of ['add', 'cancel']) {
+      expect(records.some(record => record.url.includes(`/api/gameAreaMerge/${endpoint}`)), `页面真实请求 ${endpoint}`).toBe(true);
     }
   } finally {
     await page.context().storageState({ path: ADMIN_STATE });
