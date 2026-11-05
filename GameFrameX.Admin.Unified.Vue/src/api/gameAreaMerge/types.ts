@@ -19,13 +19,6 @@ export enum GameAreaMergePlanStatus {
   Cancelled = 6,
 }
 
-/** 取消合服计划请求。 */
-export interface CancelGameAreaMergePlanRequest {
-  id?: string;
-  /** @minLength 1 */
-  reason: string;
-}
-
 /** 合服流程数据。 */
 export interface ApproveGameAreaMergePlanRequest {
   id?: string;
@@ -50,6 +43,13 @@ export interface BasePageRequest {
   pageSize?: number;
   orderBy?: string | null;
   isDescending?: boolean;
+}
+
+/** 取消合服计划请求。 */
+export interface CancelGameAreaMergePlanRequest {
+  id?: string;
+  /** @minLength 1 */
+  reason: string;
 }
 
 /** 合服流程数据。 */
@@ -97,6 +97,7 @@ export interface GameAreaMergePlanResponse {
   failedTime?: number | null;
   failureMessage?: string | null;
   cancelledByOperatorId?: string | null;
+  /** @format int64 */
   cancelledTime?: number | null;
   cancellationReason?: string | null;
   cancellable?: boolean;
@@ -166,16 +167,25 @@ export interface GameAreaMergeApprovePostData {
 }
 
 export interface GameAreaMergeCancelPostData {
-  /** @format int32 */
+  /**
+   * 响应码，0 表示成功，失败时承载统一数字业务错误码（模块枚举 8 位数值，见 GameFrameX.Core/Enum/Errors 与 error-codes.json 码表）
+   * @format int32
+   */
   code: number;
   /** 错误或提示信息 */
   message: string;
   /** 合服计划详情，包含阶段报告快照。 */
   data: GameAreaMergePlanResponse;
+  /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
+  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
+  /** 响应类型（success/warning/error） */
   type: string | null;
-  /** @format int64 */
+  /**
+   * Unix 时间戳（秒）
+   * @format int64
+   */
   time: number;
   extras: object | null;
 }
