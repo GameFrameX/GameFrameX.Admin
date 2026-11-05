@@ -2,6 +2,13 @@
   <div class="onlineAssetAudit-container">
     <Card>
       <template #content>
+        <div class="flex align-items-center gap-2 mb-3">
+          <ServerSelector mode="local" v-model="serverIdOverride" />
+          <button v-if="serverIdOverride !== undefined" type="button" class="p-button p-button-text" @click="serverIdOverride = undefined">
+            {{ t('message.common.button.reset') }}
+          </button>
+        </div>
+        <p v-if="!canQueryServer" role="status">{{ t(serverStateMessage) }}</p>
         <SearchForm v-model="queryParams" :fields="searchFields" :labelWidth="'110px'"
                     authPrefix="onlineAssetAudit" @query="onQuery" />
       </template>
@@ -11,7 +18,7 @@
         <span>{{ t('message.onlineCenter.assetAudit.listTitle') }}</span>
       </template>
       <template #content>
-        <OnlineCursorList ref="listRef" :request="auditRequest" :columns="columns" :pageSize="20">
+        <OnlineCursorList v-if="canQueryServer" :key="`${serverSelectionVersion}:${listQueryVersion}`" ref="listRef" :request="auditRequest" :columns="columns" :pageSize="20">
           <template #body-occurredAt="{ data }">{{ formatUnix(data.occurredAt) }}</template>
         </OnlineCursorList>
       </template>
@@ -24,24 +31,23 @@
  * 资产审计查询页（C349 / GFX-756）。
  * 审计只读：操作者 / 命令类型 / 作用域 / 时间 + 目标玩家，无写路径。
  */
-import { ref, computed, watch, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref, computed, watch, onMounted, nextTick } from 'vue'
+import ServerSelector from '/@/components/server-selector/ServerSelector.vue'
+import { usePageServer } from '../components/usePageServer'
 import Card from 'primevue/card'
 import SearchForm from '/@/components/search-form/index.vue'
 import OnlineCursorList from '/@/components/OnlineCursorList/index.vue'
 import { formatUnix } from '../../../utils/formatTime.ts'
-import { useCurrentApp } from '../../../composables/useCurrentApp.ts'
 import { onlineAssetAuditQueryPagePost } from '../../../api/onlineAssetAuditQuery'
 import type { OnlineCursorListParams } from '/@/components/OnlineCursorList/types'
 
-const route = useRoute()
-const { currentAppId, resolveInitialAppId } = useCurrentApp()
+const { serverIdOverride, effectiveServerId, canQueryServer, serverStateMessage, serverSelectionVersion, beginServerRequest } = usePageServer()
 
 const queryParams = ref<Record<string, any>>({})
 const listRef = ref()
+const listQueryVersion = ref(0)
 
 const searchFields = computed(() => [
-  { key: 'serverId', label: t('message.onlineCenter.assetAudit.search.serverId'), type: 'input', placeholder: t('message.onlineCenter.assetAudit.search.pleaseEnterServerId') },
   { key: 'operatorId', label: t('message.onlineCenter.assetAudit.search.operatorId'), type: 'input', placeholder: t('message.onlineCenter.assetAudit.search.pleaseEnterOperatorId') },
   { key: 'playerId', label: t('message.onlineCenter.assetAudit.search.playerId'), type: 'input', placeholder: t('message.onlineCenter.assetAudit.search.pleaseEnterPlayerId') },
   { key: 'commandType', label: t('message.onlineCenter.assetAudit.search.commandType'), type: 'input', placeholder: t('message.onlineCenter.assetAudit.search.pleaseEnterCommandType'), advanced: true },
@@ -68,8 +74,8 @@ function toUnixSeconds(value: unknown): unknown {
 }
 
 function buildAuditParams() {
-  const { timeRange, appId, ...rest } = queryParams.value
-  const base: Record<string, any> = { ...rest, appId: appId ?? currentAppId.value }
+  const { timeRange, ...rest } = queryParams.value
+  const base: Record<string, any> = { ...rest, serverId: effectiveServerId.value }
   if (Array.isArray(timeRange) && timeRange.length === 2) {
     const [start, end] = toUnixSeconds(timeRange) as [number | null, number | null]
     if (start) {
@@ -83,30 +89,25 @@ function buildAuditParams() {
 }
 
 const auditRequest = async (p: OnlineCursorListParams) => {
+  const request = beginServerRequest()
+  if (!request) return { items: [], hasMore: false }
   const res: any = await onlineAssetAuditQueryPagePost({ ...buildAuditParams(), ...p })
+  if (!request.isCurrent()) return { items: [], hasMore: false }
   return res.data?.data ?? { items: [], hasMore: false }
 }
 
-// Online 作用域三元组（AppId+ServerId）后端硬校验（vault C2 S1.7）：ServerId 未定时分页请求必被
-// 32200005「Online 作用域缺失」拒绝，不空发，列表保持未加载态（issue #4）。
+// 区服选择经过列表验证后才允许请求。
 const onQuery = async () => {
-  if (!queryParams.value.serverId) {
+  if (!canQueryServer.value) {
     return
   }
+  listQueryVersion.value += 1
+  await nextTick()
   await listRef.value?.reload()
 }
 
-watch(() => route.query.appId, async () => {
-  currentAppId.value = resolveInitialAppId(route.query)
-  queryParams.value.appId = currentAppId.value
+watch(serverSelectionVersion, async () => {
   await onQuery()
-})
-
-onMounted(async () => {
-  if (!currentAppId.value) {
-    currentAppId.value = resolveInitialAppId(route.query)
-  }
-  queryParams.value.appId = currentAppId.value
-  await onQuery()
-})
+}, { flush: 'post' })
+onMounted(onQuery)
 </script>

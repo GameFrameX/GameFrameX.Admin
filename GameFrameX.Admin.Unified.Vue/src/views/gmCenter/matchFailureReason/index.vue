@@ -2,6 +2,13 @@
   <div class="onlineMatchFailureReason-container">
     <Card>
       <template #content>
+        <div class="flex align-items-center gap-2 mb-3">
+          <ServerSelector mode="local" v-model="serverIdOverride" />
+          <button v-if="serverIdOverride !== undefined" type="button" class="p-button p-button-text" @click="serverIdOverride = undefined">
+            {{ t('message.common.button.reset') }}
+          </button>
+        </div>
+        <p v-if="!canQueryServer" role="status">{{ t(serverStateMessage) }}</p>
         <SearchForm v-model="queryParams" :fields="searchFields" :labelWidth="'110px'"
                     :queryAuth="'onlineMatchFailureReason:failurePage'" @query="onQuery" />
       </template>
@@ -17,7 +24,7 @@
                :value="`${displayReason(item.reasonCode, item.reasonDisplayKey)} × ${item.count}`"
                severity="warn" rounded />
         </div>
-        <OnlineCursorList ref="listRef" :request="failureRequest" :columns="columns" :pageSize="20">
+        <OnlineCursorList v-if="canQueryServer" :key="`${serverSelectionVersion}:${listQueryVersion}`" ref="listRef" :request="failureRequest" :columns="columns" :pageSize="20">
           <template #body-reasonCode="{ data }">{{ displayReason(data.reasonCode, data.reasonDisplayKey) }}</template>
           <template #body-occurredAt="{ data }">{{ formatUnix(data.occurredAt) }}</template>
         </OnlineCursorList>
@@ -32,24 +39,24 @@
  * 原因码聚合（ReasonSummary[]）+ 下钻明细（按原因码过滤游标列表）；
  * 展示走 displayKey 映射（onlineMatch.failureReason.*），禁止按 ReasonText 文案判断。
  */
-import { ref, computed, watch, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref, computed, watch, onMounted, nextTick } from 'vue'
+import ServerSelector from '/@/components/server-selector/ServerSelector.vue'
+import { usePageServer } from '../components/usePageServer'
 import Card from 'primevue/card'
 import Tag from 'primevue/tag'
 import SearchForm from '/@/components/search-form/index.vue'
 import OnlineCursorList from '/@/components/OnlineCursorList/index.vue'
 import { formatUnix } from '../../../utils/formatTime.ts'
-import { useCurrentApp } from '../../../composables/useCurrentApp.ts'
 import { onlineMatchTicketQueryFailurePagePost } from '../../../api/onlineMatchTicketQuery'
 import type { OnlineMatchFailureReasonSummaryResponse } from '../../../api/onlineMatchTicketQuery/types'
 import { te as hasKey, t as translate } from '../../../i18n/index'
 import type { OnlineCursorListParams } from '/@/components/OnlineCursorList/types'
 
-const route = useRoute()
-const { currentAppId, resolveInitialAppId } = useCurrentApp()
+const { serverIdOverride, effectiveServerId, canQueryServer, serverStateMessage, serverSelectionVersion, beginServerRequest } = usePageServer()
 
 const queryParams = ref<Record<string, any>>({})
 const listRef = ref()
+const listQueryVersion = ref(0)
 const reasonSummary = ref<OnlineMatchFailureReasonSummaryResponse[]>([])
 
 // 失败原因 Online 原值穷举（change.md §3 A0：Timeout/CancelRace/RateLimited/DuplicateTicket）
@@ -61,7 +68,6 @@ const reasonOptions = computed(() => [
 ])
 
 const searchFields = computed(() => [
-  { key: 'serverId', label: t('message.onlineCenter.matchFailureReason.search.serverId'), type: 'input', placeholder: t('message.onlineCenter.matchFailureReason.search.pleaseEnterServerId') },
   { key: 'reasonCode', label: t('message.onlineCenter.matchFailureReason.search.reasonCode'), type: 'select', options: reasonOptions.value, placeholder: t('message.onlineCenter.matchFailureReason.search.pleaseSelectReasonCode'), advanced: true },
   { key: 'timeRange', label: t('message.onlineCenter.matchFailureReason.search.timeRange'), type: 'dateRange', placeholder: t('message.onlineCenter.matchFailureReason.search.startTime'), advanced: true },
 ])
@@ -91,8 +97,8 @@ function toUnixSeconds(value: unknown): unknown {
 }
 
 function buildFailureParams() {
-  const { timeRange, appId, ...rest } = queryParams.value
-  const base: Record<string, any> = { ...rest, appId: appId ?? currentAppId.value }
+  const { timeRange, ...rest } = queryParams.value
+  const base: Record<string, any> = { ...rest, serverId: effectiveServerId.value }
   if (Array.isArray(timeRange) && timeRange.length === 2) {
     const [start, end] = toUnixSeconds(timeRange) as [number | null, number | null]
     if (start) {
@@ -106,32 +112,28 @@ function buildFailureParams() {
 }
 
 const failureRequest = async (p: OnlineCursorListParams) => {
+  const request = beginServerRequest()
+  if (!request) return { items: [], hasMore: false }
   const res: any = await onlineMatchTicketQueryFailurePagePost({ ...buildFailureParams(), ...p })
+  if (!request.isCurrent()) return { items: [], hasMore: false }
   const page = res.data?.data
   reasonSummary.value = page?.reasonSummary ?? []
   return page ?? { items: [], hasMore: false }
 }
 
-// Online 作用域三元组（AppId+ServerId）后端硬校验（vault C2 S1.7）：ServerId 未定时分页请求必被
-// 32200005「Online 作用域缺失」拒绝，不空发，列表保持未加载态（issue #4）。
+// 区服选择经过列表验证后才允许请求。
 const onQuery = async () => {
-  if (!queryParams.value.serverId) {
+  if (!canQueryServer.value) {
     return
   }
+  listQueryVersion.value += 1
+  await nextTick()
   await listRef.value?.reload()
 }
 
-watch(() => route.query.appId, async () => {
-  currentAppId.value = resolveInitialAppId(route.query)
-  queryParams.value.appId = currentAppId.value
+watch(serverSelectionVersion, async () => {
+  reasonSummary.value = []
   await onQuery()
-})
-
-onMounted(async () => {
-  if (!currentAppId.value) {
-    currentAppId.value = resolveInitialAppId(route.query)
-  }
-  queryParams.value.appId = currentAppId.value
-  await onQuery()
-})
+}, { flush: 'post' })
+onMounted(onQuery)
 </script>

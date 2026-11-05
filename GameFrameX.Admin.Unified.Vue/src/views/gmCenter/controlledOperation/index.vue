@@ -5,6 +5,13 @@
         <span>{{ t('message.onlineCenter.controlledOperation.title') }}</span>
       </template>
       <template #content>
+        <div class="flex align-items-center gap-2 mb-3">
+          <ServerSelector mode="local" v-model="serverIdOverride" />
+          <button v-if="serverIdOverride !== undefined" type="button" class="p-button p-button-text" @click="serverIdOverride = undefined">
+            {{ t('message.common.button.reset') }}
+          </button>
+        </div>
+        <p v-if="!canQueryServer" role="status">{{ t(serverStateMessage) }}</p>
         <div class="font-medium text-color-secondary mb-3">
           {{ t('message.onlineCenter.controlledOperation.hint') }}
         </div>
@@ -22,10 +29,6 @@
             />
             <small v-if="errors.commandKind" class="text-red-500">{{ t('message.onlineCenter.controlledOperation.commandKindRequired') }}</small>
           </div>
-
-          <label>{{ t('message.onlineCenter.controlledOperation.serverId') }}</label>
-          <InputText v-model="form.serverId"
-                     :placeholder="t('message.onlineCenter.controlledOperation.pleaseEnterServerId')" />
 
           <template v-if="targetField === 'ticketId'">
             <label>{{ t('message.onlineCenter.controlledOperation.ticketId') }}</label>
@@ -97,6 +100,7 @@
                   icon="fa-solid fa-triangle-exclamation"
                   :severity="highRisk ? 'danger' : 'warn'"
                   :loading="loading"
+                  :disabled="!canQueryServer"
                   @click="confirmExecute" />
         </div>
       </template>
@@ -139,6 +143,8 @@
  */
 import { ref, computed, watch, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
+import ServerSelector from '/@/components/server-selector/ServerSelector.vue'
+import { usePageServer } from '../components/usePageServer'
 import Card from 'primevue/card'
 import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
@@ -147,7 +153,6 @@ import Select from 'primevue/select'
 import Message from 'primevue/message'
 import { formatUnix } from '../../../utils/formatTime.ts'
 import { auth } from '../../../utils/authFunction.ts'
-import { useCurrentApp } from '../../../composables/useCurrentApp.ts'
 import { showSuccess, showConfirm } from '../../../utils/message.ts'
 import { onlineControlledCommandExecutePost } from '../../../api/onlineControlledCommand'
 import type { OnlineControlledCommandAckResponse } from '../../../api/onlineControlledCommand/types'
@@ -160,7 +165,8 @@ import {
 } from './commandForm.ts'
 
 const route = useRoute()
-const { currentAppId, resolveInitialAppId } = useCurrentApp()
+
+const { serverIdOverride, effectiveServerId, canQueryServer, serverStateMessage, serverSelectionVersion, beginServerRequest } = usePageServer()
 
 const form = ref(createControlledCommandForm())
 const errors = ref<Record<string, boolean>>({})
@@ -191,50 +197,52 @@ watch(() => form.value.commandKind, () => {
 })
 
 const resetForm = () => {
-  form.value = createControlledCommandForm({ playerId: form.value.playerId, serverId: form.value.serverId })
+  form.value = createControlledCommandForm({ playerId: form.value.playerId, serverId: effectiveServerId.value })
   errors.value = {}
   lastResult.value = null
 }
 
-const confirmExecute = async () => {
-  const validation = validateControlledCommandForm({ ...form.value, appId: currentAppId.value ?? form.value.appId })
+const buildControlledCommandRequestAfterValidation = () => {
+  const validation = validateControlledCommandForm({ ...form.value, serverId: effectiveServerId.value })
   errors.value = validation
   if (Object.keys(validation).length > 0) {
-    return
+    return undefined
   }
+  return buildControlledCommandRequest({ ...form.value, serverId: effectiveServerId.value })
+}
+
+const confirmExecute = async () => {
+  const operation = beginServerRequest()
+  if (!operation) return
+  const request = buildControlledCommandRequestAfterValidation()
+  if (!request) return
   if (highRisk.value) {
     const ok = await showConfirm(t('message.onlineCenter.controlledOperation.highRiskConfirm'))
-    if (!ok) {
+    if (!ok || !operation.isCurrent()) {
       return
     }
   }
   loading.value = true
   try {
-    const request = buildControlledCommandRequest({ ...form.value, appId: currentAppId.value ?? form.value.appId })
     const res: any = await onlineControlledCommandExecutePost(request)
+    if (!operation.isCurrent()) return
     lastResult.value = res.data?.data ?? null
     if (lastResult.value) {
       showSuccess(t('message.onlineCenter.controlledOperation.executed'))
     }
   } finally {
-    loading.value = false
+    if (operation.isCurrent()) loading.value = false
   }
 }
 
-watch(() => route.query.appId, () => {
-  currentAppId.value = resolveInitialAppId(route.query)
+watch(serverSelectionVersion, () => {
+  errors.value = {}
+  lastResult.value = null
+  loading.value = false
 })
-
 onMounted(() => {
-  if (!currentAppId.value) {
-    currentAppId.value = resolveInitialAppId(route.query)
-  }
-  form.value.appId = currentAppId.value ?? ''
-  if (typeof route.query.playerId === 'string' && route.query.playerId) {
-    form.value.playerId = route.query.playerId
-  }
-  if (typeof route.query.serverId === 'string' && route.query.serverId) {
-    form.value.serverId = route.query.serverId
-  }
+  if (typeof route.query.playerId === 'string') form.value.playerId = route.query.playerId
+  // 显式跳转目标作为页内覆盖，仍须经过区服列表验证。
+  if (typeof route.query.serverId === 'string') serverIdOverride.value = route.query.serverId
 })
 </script>

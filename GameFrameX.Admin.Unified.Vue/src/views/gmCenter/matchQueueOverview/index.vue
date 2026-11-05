@@ -2,6 +2,13 @@
   <div class="onlineMatchQueueOverview-container">
     <Card>
       <template #content>
+        <div class="flex align-items-center gap-2 mb-3">
+          <ServerSelector mode="local" v-model="serverIdOverride" />
+          <button v-if="serverIdOverride !== undefined" type="button" class="p-button p-button-text" @click="serverIdOverride = undefined">
+            {{ t('message.common.button.reset') }}
+          </button>
+        </div>
+        <p v-if="!canQueryServer" role="status">{{ t(serverStateMessage) }}</p>
         <SearchForm v-model="queryParams" :fields="searchFields" :labelWidth="'110px'"
                     :queryAuth="'onlineMatchQueueOverview:overview'" @query="onQuery" />
       </template>
@@ -57,19 +64,18 @@
  * 不缓存为权威状态——每次轮询即拉即弃（vault S4.9 只读观测方）。
  */
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
-import { useRoute } from 'vue-router'
+import ServerSelector from '/@/components/server-selector/ServerSelector.vue'
+import { usePageServer } from '../components/usePageServer'
 import Card from 'primevue/card'
 import Button from 'primevue/button'
 import Tag from 'primevue/tag'
 import SearchForm from '/@/components/search-form/index.vue'
 import { formatUnix } from '../../../utils/formatTime.ts'
-import { useCurrentApp } from '../../../composables/useCurrentApp.ts'
 import { onlineMatchQueueQueryOverviewPost } from '../../../api/onlineMatchQueueQuery'
 import type { OnlineMatchOverviewResponse } from '../../../api/onlineMatchQueueQuery/types'
 import { startOnlineMatchPolling, type OnlineMatchPollingHandle } from './polling'
 
-const route = useRoute()
-const { currentAppId, resolveInitialAppId } = useCurrentApp()
+const { serverIdOverride, canQueryServer, serverStateMessage, serverSelectionVersion, beginServerRequest } = usePageServer()
 
 const queryParams = ref<Record<string, any>>({})
 const overview = ref<OnlineMatchOverviewResponse | null>(null)
@@ -78,7 +84,6 @@ const loading = ref(false)
 let polling: OnlineMatchPollingHandle | null = null
 
 const searchFields = computed(() => [
-  { key: 'serverId', label: t('message.onlineCenter.matchQueueOverview.search.serverId'), type: 'input', placeholder: t('message.onlineCenter.matchQueueOverview.search.pleaseEnterServerId') },
   { key: 'mode', label: t('message.onlineCenter.matchQueueOverview.search.mode'), type: 'input', placeholder: t('message.onlineCenter.matchQueueOverview.search.pleaseEnterMode') },
   { key: 'region', label: t('message.onlineCenter.matchQueueOverview.search.region'), type: 'input', placeholder: t('message.onlineCenter.matchQueueOverview.search.pleaseEnterRegion') },
 ])
@@ -86,18 +91,17 @@ const searchFields = computed(() => [
 const queues = computed(() => overview.value?.queues ?? [])
 
 const fetchOverview = async () => {
+  const request = beginServerRequest()
+  if (!request) return
   loading.value = true
   try {
-    const { appId, ...rest } = queryParams.value
-    const res: any = await onlineMatchQueueQueryOverviewPost({ ...rest, appId: appId ?? currentAppId.value })
-    overview.value = res.data?.data ?? null
-  } catch (error) {
-    // 错误 toast 已由拦截器透出；此处保留上一份快照后 rethrow，
-    // 让 startOnlineMatchPolling 感知失败并停轮询（7xxx 镜像段退避的触发条件）
-    throw error
+    const res = await onlineMatchQueueQueryOverviewPost({ ...queryParams.value, serverId: request.serverId })
+    if (request.isCurrent()) overview.value = res.data?.data ?? null
   } finally {
-    loading.value = false
-    loaded.value = true
+    if (request.isCurrent()) {
+      loading.value = false
+      loaded.value = true
+    }
   }
 }
 
@@ -106,34 +110,17 @@ const stopPolling = () => {
   polling = null
 }
 
-/** 重启轮询（首查 + 定时）；查询条件或应用变化后调用。ServerId 未定时只停不发（Online 作用域缺失 32200005，issue #4）。 */
-const restartPolling = () => {
-  stopPolling()
-  if (!queryParams.value.serverId) {
-    return
-  }
-  polling = startOnlineMatchPolling(fetchOverview)
-}
-
 const onQuery = () => {
-  restartPolling()
+  stopPolling()
+  if (canQueryServer.value) polling = startOnlineMatchPolling(fetchOverview)
 }
 
-watch(() => route.query.appId, () => {
-  currentAppId.value = resolveInitialAppId(route.query)
-  queryParams.value.appId = currentAppId.value
+watch(serverSelectionVersion, () => {
+  overview.value = null
+  loaded.value = false
+  loading.value = false
   onQuery()
 })
-
-onMounted(() => {
-  if (!currentAppId.value) {
-    currentAppId.value = resolveInitialAppId(route.query)
-  }
-  queryParams.value.appId = currentAppId.value
-  restartPolling()
-})
-
-onUnmounted(() => {
-  stopPolling()
-})
+onMounted(onQuery)
+onUnmounted(stopPolling)
 </script>

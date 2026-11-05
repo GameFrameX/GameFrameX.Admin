@@ -2,7 +2,14 @@
   <div class="onlinePlayerSegment-container">
     <Card>
       <template #content>
-        <SearchForm v-model="queryParams" :fields="searchFields" :showAdd="true"
+        <div class="flex align-items-center gap-2 mb-3">
+          <ServerSelector mode="local" v-model="serverIdOverride" />
+          <button v-if="serverIdOverride !== undefined" type="button" class="p-button p-button-text" @click="serverIdOverride = undefined">
+            {{ t('message.common.button.reset') }}
+          </button>
+        </div>
+        <p v-if="!canQueryServer" role="status">{{ t(serverStateMessage) }}</p>
+        <SearchForm v-model="queryParams" :fields="searchFields" :showAdd="canQueryServer"
                     authPrefix="onlinePlayerSegment" :defaultSearchKey="false"
                     @query="onQuery" @add="openAdd" />
       </template>
@@ -38,8 +45,8 @@
           </template>
           <template #body-createdTime="{ data }">{{ formatUnix(data.createdTime) }}</template>
         </CrudDataTable>
-        <editDialog ref="editDialogRef" :title="editTitle" :appId="queryParams.appId" @reloadTable="onQuery" />
-        <syncOnlineDialog ref="syncDialogRef" @done="onQuery" />
+        <editDialog v-if="canQueryServer" :key="'editDialog-' + serverSelectionVersion" ref="editDialogRef" :title="editTitle" @reloadTable="onQuery" />
+        <syncOnlineDialog v-if="canQueryServer" :key="'syncOnlineDialog-' + serverSelectionVersion" :serverId="effectiveServerId" ref="syncDialogRef" @done="onQuery" />
       </template>
     </Card>
   </div>
@@ -52,25 +59,24 @@
  * 定义生效须经 syncOnline 弹层显式同步（高危：理由必填进审计）。
  * authPrefix 用菜单 Key 前缀 onlinePlayerSegment（与后端 seed 按钮 Key 逐字一致）。
  */
-import { ref, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref, computed, watch, onMounted } from 'vue'
+import ServerSelector from '/@/components/server-selector/ServerSelector.vue'
+import { usePageServer } from '../components/usePageServer'
 import Card from 'primevue/card'
 import Tag from 'primevue/tag'
 import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import SearchForm from '/@/components/search-form/index.vue'
 import type { CrudAction, CrudColumnConfig } from '../../../components/crud-data-table/types.ts'
 import { formatUnix } from '../../../utils/formatTime.ts'
-import { useCrudTable } from '../../../composables/useCrudTable.ts'
-import { usePrimeTablePage, useRouteAppIdQuerySync } from '../../../composables'
-import { useCurrentApp } from '../../../composables/useCurrentApp.ts'
+import { showConfirm, showSuccess } from '../../../utils/message'
+import { DEFAULT_PAGE_SIZE } from '../../../constants/pagination'
+import { normalizeRowVersion } from '../../../utils/rowVersion'
+import { usePrimeTablePage } from '../../../composables'
 import editDialog from '/@/views/gmCenter/onlinePlayerSegment/component/EditDialog.vue'
 import syncOnlineDialog from '/@/views/gmCenter/onlinePlayerSegment/component/SyncOnlineDialog.vue'
 import { gameOnlinePlayerSegmentPagePost, gameOnlinePlayerSegmentDeletePost } from '../../../api/gameOnlinePlayerSegment'
 import { OnlinePlayerSegmentSyncStatus } from '../../../api/gameOnlinePlayerSegment/types'
 import { ONLINE_SEGMENT_FIELD_OPTIONS, ONLINE_SEGMENT_OP_OPTIONS } from './constants'
-
-const route = useRoute()
-const { resolveInitialAppId } = useCurrentApp()
 
 const editDialogRef = ref()
 const syncDialogRef = ref()
@@ -125,28 +131,30 @@ const buildSyncStatusOptions = () => ([
   { value: OnlinePlayerSegmentSyncStatus.Failed, label: t('message.onlineCenter.playerSegment.syncStatusFailed') },
 ])
 
-const {
-  loading,
-  tableData,
-  queryParams,
-  tableParams,
-  onQuery,
-  onDelete,
-} = useCrudTable({
-  api: { pageApi: gameOnlinePlayerSegmentPagePost, deleteApi: gameOnlinePlayerSegmentDeletePost },
-  immediate: true,
-})
+const { serverIdOverride, effectiveServerId, canQueryServer, serverStateMessage, serverSelectionVersion, beginServerRequest } = usePageServer()
+const loading = ref(false)
+const tableData = ref<any[]>([])
+const queryParams = ref<Record<string, any>>({})
+const tableParams = ref({ page: 1, pageSize: DEFAULT_PAGE_SIZE, total: 0 })
+
+const onQuery = async () => {
+  const request = beginServerRequest()
+  if (!request) return
+  loading.value = true
+  try {
+    const response = await gameOnlinePlayerSegmentPagePost({ ...queryParams.value, ...tableParams.value })
+    if (!request.isCurrent()) return
+    tableData.value = (response.data?.data?.items ?? []).map(item => normalizeRowVersion(item))
+    tableParams.value.total = response.data?.data?.total ?? 0
+  } finally {
+    if (request.isCurrent()) loading.value = false
+  }
+}
 
 const onPage = usePrimeTablePage(tableParams, onQuery)
 
-useRouteAppIdQuerySync({
-  route,
-  queryParams,
-  resolveAppId: resolveInitialAppId,
-  onQuery,
-})
-
 const openAdd = () => {
+  if (!canQueryServer.value) return
   editTitle.value = t('message.onlineCenter.playerSegment.add')
   editDialogRef.value.openDialog({})
 }
@@ -158,6 +166,27 @@ const openEdit = (row: any) => {
 
 const onSyncOnline = (row: any) => {
   syncDialogRef.value.openDialog(row)
+}
+
+const onDelete = async (row: any) => {
+  if (!canQueryServer.value) return
+  const selectedVersion = serverSelectionVersion.value
+  let deleted = false
+  const confirmed = await showConfirm(
+    t('message.common.message.deleteConfirmWithName', { name: row.name || row.id }),
+    t('message.common.message.tip'),
+    {
+      type: 'danger',
+      onAccept: async () => {
+        if (!canQueryServer.value || selectedVersion !== serverSelectionVersion.value) return
+        await gameOnlinePlayerSegmentDeletePost(row)
+        deleted = true
+      },
+    },
+  )
+  if (!confirmed || !deleted || selectedVersion !== serverSelectionVersion.value) return
+  showSuccess(t('message.common.message.deleteSuccess'))
+  await onQuery()
 }
 
 const actions = {
@@ -185,4 +214,12 @@ const columns = computed<CrudColumnConfig[]>(() => [
   { field: 'lastServerMessage', header: t('message.onlineCenter.playerSegment.lastServerMessage'), width: '200px', bodyKey: 'lastServerMessage' },
   { field: 'createdTime', header: t('common.label.createTime'), width: '170px', bodyKey: 'createdTime' },
 ])
+watch(serverSelectionVersion, () => {
+  tableParams.value.page = 1
+  tableParams.value.total = 0
+  tableData.value = []
+  loading.value = false
+  return onQuery()
+})
+onMounted(onQuery)
 </script>

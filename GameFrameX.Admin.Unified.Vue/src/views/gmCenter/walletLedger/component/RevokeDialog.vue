@@ -7,7 +7,7 @@
       </div>
       <div class="form-grid">
         <label>{{ t('message.onlineCenter.walletLedger.search.serverId') }}</label>
-        <InputText v-model="serverId" :placeholder="t('message.onlineCenter.walletLedger.search.pleaseEnterServerId')" />
+        <InputText :modelValue="effectiveServerId" disabled />
         <label>{{ t('message.onlineCenter.walletLedger.search.playerId') }}</label>
         <InputText v-model="playerId" :placeholder="t('message.onlineCenter.walletLedger.search.pleaseEnterPlayerId')" />
         <label>{{ t('message.onlineCenter.walletLedger.transactionIdLabel') }}</label>
@@ -41,6 +41,7 @@
  * 理由必填（≤500 字）进审计。
  */
 import { ref } from 'vue'
+import { usePageServer } from '../../components/usePageServer'
 import Dialog from 'primevue/dialog'
 import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
@@ -48,15 +49,14 @@ import Textarea from 'primevue/textarea'
 import { showSuccess } from '../../../../utils/message.ts'
 import { onlineAssetGrantCommandRevokePost } from '../../../../api/onlineAssetGrantCommand'
 
-const props = withDefaults(defineProps<{
-  appId?: string | number
-}>(), { appId: undefined })
+const props = defineProps<{ serverId: string }>()
+
+const { effectiveServerId, canQueryServer, beginServerRequest } = usePageServer(() => props.serverId)
 
 const visible = ref(false)
 const loading = ref(false)
 const reason = ref('')
 const reasonError = ref('')
-const serverId = ref('')
 const playerId = ref('')
 const transactionId = ref('')
 const businessOrderNumber = ref('')
@@ -70,13 +70,13 @@ const close = () => {
 const reset = () => {
   reason.value = ''
   reasonError.value = ''
-  serverId.value = ''
   playerId.value = ''
   transactionId.value = ''
   businessOrderNumber.value = ''
 }
 
 const validate = () => {
+  if (!canQueryServer.value) return false
   reasonError.value = ''
   const trimmed = reason.value.trim()
   if (!trimmed) {
@@ -87,33 +87,35 @@ const validate = () => {
     reasonError.value = t('message.onlineCenter.walletLedger.reasonTooLong')
     return false
   }
-  if (!serverId.value.trim() || !playerId.value.trim() || !transactionId.value.trim()) {
+  if (!effectiveServerId.value || !playerId.value.trim() || !transactionId.value.trim()) {
     return false
   }
   return true
 }
 
 const confirm = async () => {
+  const operation = beginServerRequest()
+  if (!operation) return
   if (!validate()) {
     return
   }
   loading.value = true
   try {
     await onlineAssetGrantCommandRevokePost({
-      appId: props.appId as any,
-      serverId: serverId.value.trim(),
+      serverId: operation.serverId,
       playerId: playerId.value.trim(),
       transactionId: transactionId.value.trim(),
       reason: reason.value.trim(),
       businessOrderNumber: businessOrderNumber.value.trim() || undefined,
     })
+    if (!operation.isCurrent()) return
     showSuccess(t('message.onlineCenter.walletLedger.revokeSuccess'))
     emit('done')
     close()
   } catch {
     // 全局拦截器已弹错误提示
   } finally {
-    loading.value = false
+    if (operation.isCurrent()) loading.value = false
   }
 }
 

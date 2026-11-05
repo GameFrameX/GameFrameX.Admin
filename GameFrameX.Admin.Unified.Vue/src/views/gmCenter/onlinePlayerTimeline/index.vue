@@ -2,6 +2,13 @@
   <div class="onlinePlayerTimeline-container">
     <Card>
       <template #content>
+        <div class="flex align-items-center gap-2 mb-3">
+          <ServerSelector mode="local" v-model="serverIdOverride" />
+          <button v-if="serverIdOverride !== undefined" type="button" class="p-button p-button-text" @click="serverIdOverride = undefined">
+            {{ t('message.common.button.reset') }}
+          </button>
+        </div>
+        <p v-if="!canQueryServer" role="status">{{ t(serverStateMessage) }}</p>
         <SearchForm v-model="queryParams" :fields="searchFields" :labelWidth="'110px'"
                     queryAuth="onlinePlayerTimeline:query" @query="onQuery" />
       </template>
@@ -104,13 +111,14 @@
  */
 import { reactive, ref, computed, watch, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import ServerSelector from '/@/components/server-selector/ServerSelector.vue'
+import { usePageServer } from '../components/usePageServer'
 import Card from 'primevue/card'
 import Button from 'primevue/button'
 import Select from 'primevue/select'
 import SearchForm from '/@/components/search-form/index.vue'
 import { formatUnix } from '../../../utils/formatTime.ts'
 import { auth } from '../../../utils/authFunction.ts'
-import { useCurrentApp } from '../../../composables/useCurrentApp.ts'
 import { onlinePlayerTimelineQueryQueryPost } from '../../../api/onlinePlayerTimelineQuery'
 import { OnlinePlayerTimelineEventGroup, type OnlinePlayerTimelineEntryResponse } from '../../../api/onlinePlayerTimelineQuery/types'
 import {
@@ -130,7 +138,8 @@ const ONLINE_TIMELINE_EVENT_GROUPS = Object.keys(OnlinePlayerTimelineEventGroup)
 
 const route = useRoute()
 const router = useRouter()
-const { currentAppId, resolveInitialAppId } = useCurrentApp()
+
+const { serverIdOverride, effectiveServerId, canQueryServer, serverStateMessage, serverSelectionVersion, beginServerRequest } = usePageServer()
 
 const queryParams = ref<Record<string, any>>({})
 // 后端 eventGroup 只收单值（缺省 = 全部分组），多选过滤不存在
@@ -144,7 +153,6 @@ const groupOptions = computed(() =>
 
 const searchFields = computed(() => [
   { key: 'playerId', label: t('message.onlineCenter.playerTimeline.search.playerId'), type: 'input', placeholder: t('message.onlineCenter.playerTimeline.search.pleaseEnterPlayerId') },
-  { key: 'serverId', label: t('message.onlineCenter.playerTimeline.search.serverId'), type: 'input', placeholder: t('message.onlineCenter.playerTimeline.search.pleaseEnterServerId') },
   { key: 'timeRange', label: t('message.onlineCenter.playerTimeline.search.timeRange'), type: 'dateRange', placeholder: t('message.onlineCenter.playerTimeline.search.startTime'), advanced: true },
 ])
 
@@ -164,8 +172,8 @@ function toUnixSeconds(value: unknown): unknown {
 }
 
 function buildTimelineParams() {
-  const { timeRange, appId, ...rest } = queryParams.value
-  const base: Record<string, any> = { ...rest, appId: appId ?? currentAppId.value }
+  const { timeRange, ...rest } = queryParams.value
+  const base: Record<string, any> = { ...rest, serverId: effectiveServerId.value }
   if (selectedGroup.value) {
     base.eventGroup = OnlinePlayerTimelineEventGroup[selectedGroup.value]
   }
@@ -181,8 +189,8 @@ function buildTimelineParams() {
   return base
 }
 
-const loadPage = async (params: { cursor?: string; pageSize?: number }) => {
-  const res: any = await onlinePlayerTimelineQueryQueryPost({ ...buildTimelineParams(), ...params })
+const loadPage = async (params: { cursor?: string; pageSize?: number }, serverId: string) => {
+  const res: any = await onlinePlayerTimelineQueryQueryPost({ ...buildTimelineParams(), ...params, serverId })
   return res.data?.data ?? { events: [], hasMore: false }
 }
 
@@ -190,15 +198,18 @@ const onQuery = async () => {
   timelineForm.value.playerId = String(queryParams.value.playerId ?? '')
   const fresh = createCursorPagerState<OnlinePlayerTimelineEntryResponse>()
   Object.assign(state, fresh)
-  if (!timelineForm.value.playerId) {
+  if (!timelineForm.value.playerId || !canQueryServer.value) {
     return
   }
+  const request = beginServerRequest()
+  if (!request) return
   beginLoad(state)
   try {
-    const page = await loadPage(buildRequestParams(state, 20))
+    const page = await loadPage(buildRequestParams(state, 20), request.serverId)
+    if (!request.isCurrent()) return
     applyFirstPage(state, { ...page, items: page.events ?? [] })
   } catch {
-    failLoad(state)
+    if (request.isCurrent()) failLoad(state)
   }
 }
 
@@ -206,43 +217,37 @@ const loadMore = async () => {
   if (state.loading || !state.hasMore) {
     return
   }
+  const request = beginServerRequest()
+  if (!request) return
   beginLoad(state)
   try {
-    const page = await loadPage(buildRequestParams(state, 20))
+    const page = await loadPage(buildRequestParams(state, 20), request.serverId)
+    if (!request.isCurrent()) return
     appendPage(state, { ...page, items: page.events ?? [] })
   } catch {
-    failLoad(state)
+    if (request.isCurrent()) failLoad(state)
   }
 }
 
 // 受控操作入口：携带当前 PlayerId / ServerId 预填（独立页承载，C344 交付清单四页面）
 const goControlledOperation = () => {
-  const query: Record<string, string> = { appId: String(currentAppId.value ?? '') }
+  const query: Record<string, string> = {}
   if (timelineForm.value.playerId) {
     query.playerId = timelineForm.value.playerId
   }
-  if (queryParams.value.serverId) {
-    query.serverId = String(queryParams.value.serverId)
+  if (canQueryServer.value) {
+    query.serverId = effectiveServerId.value
   }
   router.push({ path: '/gmCenter/controlledOperation', query })
 }
 
-watch(() => route.query.appId, async () => {
-  currentAppId.value = resolveInitialAppId(route.query)
-  queryParams.value.appId = currentAppId.value
+watch(serverSelectionVersion, () => {
+  Object.assign(state, createCursorPagerState<OnlinePlayerTimelineEntryResponse>())
+  return onQuery()
 })
-
 onMounted(() => {
-  if (!currentAppId.value) {
-    currentAppId.value = resolveInitialAppId(route.query)
-  }
-  queryParams.value.appId = currentAppId.value
-  if (typeof route.query.playerId === 'string' && route.query.playerId) {
-    queryParams.value.playerId = route.query.playerId
-  }
-  if (typeof route.query.serverId === 'string' && route.query.serverId) {
-    queryParams.value.serverId = route.query.serverId
-  }
+  if (typeof route.query.playerId === 'string') queryParams.value.playerId = route.query.playerId
+  return onQuery()
 })
 </script>
 

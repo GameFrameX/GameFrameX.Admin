@@ -52,10 +52,9 @@ import { gameOnlinePlayerSegmentAddPost, gameOnlinePlayerSegmentUpdatePost } fro
 import type { UpdateTenantGameOnlinePlayerSegmentRequest } from '../../../../api/gameOnlinePlayerSegment/types'
 import { ONLINE_SEGMENT_FIELD_OPTIONS, ONLINE_SEGMENT_OP_OPTIONS } from '../constants'
 
-const props = withDefaults(defineProps<{
+withDefaults(defineProps<{
   title?: string
-  appId?: string | number
-}>(), { title: '', appId: undefined })
+}>(), { title: '' })
 
 const visible = ref(false)
 const loading = ref(false)
@@ -123,7 +122,7 @@ const confirm = async () => {
       const input: UpdateTenantGameOnlinePlayerSegmentRequest = {
         id: editId.value as number | string,
         rowVersion: editRowVersion.value,
-        appId: props.appId as string | number,
+
         name: form.value.name.trim(),
         description: form.value.description.trim() || undefined,
         conditionsJson: buildConditionsJson(),
@@ -132,7 +131,6 @@ const confirm = async () => {
       showSuccess(t('message.onlineCenter.playerSegment.updateSuccess'))
     } else {
       await gameOnlinePlayerSegmentAddPost({
-        appId: props.appId as string | number,
         name: form.value.name.trim(),
         description: form.value.description.trim() || undefined,
         conditionsJson: buildConditionsJson(),

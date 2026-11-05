@@ -2,6 +2,13 @@
   <div class="onlineConfigRollout-container">
     <Card>
       <template #content>
+        <div class="flex align-items-center gap-2 mb-3">
+          <ServerSelector mode="local" v-model="serverIdOverride" />
+          <button v-if="serverIdOverride !== undefined" type="button" class="p-button p-button-text" @click="serverIdOverride = undefined">
+            {{ t('message.common.button.reset') }}
+          </button>
+        </div>
+        <p v-if="!canQueryServer" role="status">{{ t(serverStateMessage) }}</p>
         <SearchForm v-model="queryParams" :fields="searchFields" :showAdd="false"
                     authPrefix="onlineConfigRollout" :defaultSearchKey="false"
                     @query="onQuery" />
@@ -14,7 +21,7 @@
           <div class="flex gap-2">
             <Button class="onlineConfigRollout-publish-btn" v-auth="'onlineConfigRollout:publish'"
                     :label="t('message.onlineCenter.configRollout.publish')" icon="fa-solid fa-paper-plane"
-                    severity="warn" size="small" @click="publishDialogRef?.openDialog()" />
+                    severity="warn" size="small" :disabled="!canQueryServer" @click="publishDialogRef?.openDialog()" />
           </div>
         </div>
       </template>
@@ -43,8 +50,8 @@
           <template #body-percent="{ data }">{{ data.percent }}%</template>
           <template #body-publishedTime="{ data }">{{ formatUnix(data.publishedTime) }}</template>
         </CrudDataTable>
-        <publishDialog ref="publishDialogRef" :appId="currentAppId" @done="onQuery" />
-        <rollbackDialog ref="rollbackDialogRef" :appId="currentAppId" @done="onQuery" />
+        <publishDialog v-if="canQueryServer" :key="'publishDialog-' + serverSelectionVersion" :serverId="effectiveServerId" ref="publishDialogRef" @done="onQuery" />
+        <rollbackDialog v-if="canQueryServer" :key="'rollbackDialog-' + serverSelectionVersion" :serverId="effectiveServerId" ref="rollbackDialogRef" @done="onQuery" />
       </template>
     </Card>
   </div>
@@ -58,7 +65,8 @@
  * Admin 只编排（SegmentId + Percent 1-100），不解释分群命中与百分比桶（Online 侧语义）。
  */
 import { ref, computed, watch, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import ServerSelector from '/@/components/server-selector/ServerSelector.vue'
+import { usePageServer } from '../components/usePageServer'
 import Card from 'primevue/card'
 import Button from 'primevue/button'
 import Tag from 'primevue/tag'
@@ -66,17 +74,14 @@ import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import SearchForm from '/@/components/search-form/index.vue'
 import type { CrudAction, CrudColumnConfig } from '../../../components/crud-data-table/types.ts'
 import { formatUnix } from '../../../utils/formatTime.ts'
-import { useCrudTable } from '../../../composables/useCrudTable.ts'
+import { DEFAULT_PAGE_SIZE } from '../../../constants/pagination'
+import { normalizeRowVersion } from '../../../utils/rowVersion'
 import { usePrimeTablePage } from '../../../composables'
-import { useCurrentApp } from '../../../composables/useCurrentApp.ts'
 import publishDialog from '/@/views/gmCenter/onlineConfigRollout/component/PublishDialog.vue'
 import rollbackDialog from '/@/views/gmCenter/onlineConfigRollout/component/RollbackDialog.vue'
 import { gameOnlineConfigRolloutPagePost } from '../../../api/gameOnlineConfigRollout'
 import { OnlineConfigRolloutStatus } from '../../../api/gameOnlineConfigRollout/types'
 import { ONLINE_CONFIG_ROLLOUT_KIND_OPTIONS } from './constants'
-
-const route = useRoute()
-const { currentAppId, resolveInitialAppId } = useCurrentApp()
 
 const publishDialogRef = ref()
 const rollbackDialogRef = ref()
@@ -105,32 +110,27 @@ const buildStatusOptions = () => ([
   { value: OnlineConfigRolloutStatus.RolledBack, label: t('message.onlineCenter.configRollout.statusRolledBack') },
 ])
 
-const {
-  loading,
-  tableData,
-  queryParams,
-  tableParams,
-  onQuery,
-} = useCrudTable({
-  api: { pageApi: gameOnlineConfigRolloutPagePost },
-  // 灰度版本行是应用级事实数据（AppId 必填，EnsureFactAppId）：immediate 首查不带 appId 必 500，
-  // 改为 onMounted 解析当前应用后经 guardedQuery 发起（同设备页 C211 先例）。
-  immediate: false,
-})
+const { serverIdOverride, effectiveServerId, canQueryServer, serverStateMessage, serverSelectionVersion, beginServerRequest } = usePageServer()
+const loading = ref(false)
+const tableData = ref<any[]>([])
+const queryParams = ref<Record<string, any>>({})
+const tableParams = ref({ page: 1, pageSize: DEFAULT_PAGE_SIZE, total: 0 })
 
-// 未选应用时不请求、清空列表，避免后端「应用Id必须大于0」500。
-const hasApp = computed(() => !!queryParams.value.appId && queryParams.value.appId !== '0')
-
-const guardedQuery = async () => {
-  if (!hasApp.value) {
-    tableData.value = []
-    tableParams.value.total = 0
-    return
+const onQuery = async () => {
+  const request = beginServerRequest()
+  if (!request) return
+  loading.value = true
+  try {
+    const response = await gameOnlineConfigRolloutPagePost({ ...queryParams.value, ...tableParams.value, serverId: request.serverId })
+    if (!request.isCurrent()) return
+    tableData.value = (response.data?.data?.items ?? []).map(item => normalizeRowVersion(item))
+    tableParams.value.total = response.data?.data?.total ?? 0
+  } finally {
+    if (request.isCurrent()) loading.value = false
   }
-  await onQuery()
 }
 
-const onPage = usePrimeTablePage(tableParams, guardedQuery)
+const onPage = usePrimeTablePage(tableParams, onQuery)
 
 const onRollback = (row: any) => {
   rollbackDialogRef.value.openDialog(row)
@@ -164,17 +164,12 @@ const columns = computed<CrudColumnConfig[]>(() => [
   { field: 'publishedTime', header: t('message.onlineCenter.configRollout.publishedTime'), width: '170px', bodyKey: 'publishedTime' },
 ])
 
-watch(() => route.query.appId, async () => {
-  currentAppId.value = resolveInitialAppId(route.query)
-  queryParams.value.appId = currentAppId.value
-  await guardedQuery()
+watch(serverSelectionVersion, () => {
+  tableParams.value.page = 1
+  tableParams.value.total = 0
+  tableData.value = []
+  loading.value = false
+  return onQuery()
 })
-
-onMounted(async () => {
-  if (!currentAppId.value) {
-    currentAppId.value = resolveInitialAppId(route.query)
-  }
-  queryParams.value.appId = currentAppId.value
-  await guardedQuery()
-})
+onMounted(onQuery)
 </script>

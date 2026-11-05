@@ -7,7 +7,7 @@
       </div>
       <div class="form-grid">
         <label>{{ t('message.onlineCenter.walletLedger.search.serverId') }}</label>
-        <InputText v-model="serverId" :placeholder="t('message.onlineCenter.walletLedger.search.pleaseEnterServerId')" />
+        <InputText :modelValue="effectiveServerId" disabled />
         <label>{{ t('message.onlineCenter.walletLedger.search.playerId') }}</label>
         <InputText v-model="playerId" :placeholder="t('message.onlineCenter.walletLedger.search.pleaseEnterPlayerId')" />
         <label>{{ t('message.onlineCenter.walletLedger.businessOrderNumber') }}</label>
@@ -52,6 +52,7 @@
  * 理由必填（≤500 字），幂等键 = businessOrderNumber（缺省时服务端生成）。
  */
 import { ref } from 'vue'
+import { usePageServer } from '../../components/usePageServer'
 import Dialog from 'primevue/dialog'
 import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
@@ -60,15 +61,14 @@ import Textarea from 'primevue/textarea'
 import { showSuccess } from '../../../../utils/message.ts'
 import { onlineAssetGrantCommandGrantPost } from '../../../../api/onlineAssetGrantCommand'
 
-const props = withDefaults(defineProps<{
-  appId?: string | number
-}>(), { appId: undefined })
+const props = defineProps<{ serverId: string }>()
+
+const { effectiveServerId, canQueryServer, beginServerRequest } = usePageServer(() => props.serverId)
 
 const visible = ref(false)
 const loading = ref(false)
 const reason = ref('')
 const reasonError = ref('')
-const serverId = ref('')
 const playerId = ref('')
 const businessOrderNumber = ref('')
 const items = ref<Array<{ itemOrCurrencyType: string; quantity: number | string }>>([
@@ -84,7 +84,6 @@ const close = () => {
 const reset = () => {
   reason.value = ''
   reasonError.value = ''
-  serverId.value = ''
   playerId.value = ''
   businessOrderNumber.value = ''
   items.value = [{ itemOrCurrencyType: '', quantity: '' }]
@@ -102,6 +101,7 @@ const removeItem = (idx: number) => {
 }
 
 const validate = () => {
+  if (!canQueryServer.value) return false
   reasonError.value = ''
   const trimmed = reason.value.trim()
   if (!trimmed) {
@@ -112,7 +112,7 @@ const validate = () => {
     reasonError.value = t('message.onlineCenter.walletLedger.reasonTooLong')
     return false
   }
-  if (!serverId.value.trim() || !playerId.value.trim()) {
+  if (!effectiveServerId.value || !playerId.value.trim()) {
     return false
   }
   for (const item of items.value) {
@@ -127,14 +127,15 @@ const validate = () => {
 }
 
 const confirm = async () => {
+  const operation = beginServerRequest()
+  if (!operation) return
   if (!validate()) {
     return
   }
   loading.value = true
   try {
     await onlineAssetGrantCommandGrantPost({
-      appId: props.appId as any,
-      serverId: serverId.value.trim(),
+      serverId: operation.serverId,
       playerId: playerId.value.trim(),
       grantItems: items.value.map((i) => ({
         itemOrCurrencyType: i.itemOrCurrencyType.trim(),
@@ -143,13 +144,14 @@ const confirm = async () => {
       reason: reason.value.trim(),
       businessOrderNumber: businessOrderNumber.value.trim() || undefined,
     })
+    if (!operation.isCurrent()) return
     showSuccess(t('message.onlineCenter.walletLedger.grantSuccess'))
     emit('done')
     close()
   } catch {
     // 全局拦截器已弹错误提示
   } finally {
-    loading.value = false
+    if (operation.isCurrent()) loading.value = false
   }
 }
 

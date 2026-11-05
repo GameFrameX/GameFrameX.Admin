@@ -2,6 +2,13 @@
   <div class="onlineMatchAbnormalTicket-container">
     <Card>
       <template #content>
+        <div class="flex align-items-center gap-2 mb-3">
+          <ServerSelector mode="local" v-model="serverIdOverride" />
+          <button v-if="serverIdOverride !== undefined" type="button" class="p-button p-button-text" @click="serverIdOverride = undefined">
+            {{ t('message.common.button.reset') }}
+          </button>
+        </div>
+        <p v-if="!canQueryServer" role="status">{{ t(serverStateMessage) }}</p>
         <SearchForm v-model="queryParams" :fields="searchFields" :labelWidth="'110px'"
                     :queryAuth="'onlineMatchAbnormalTicket:abnormalPage'" @query="onQuery" />
       </template>
@@ -11,7 +18,7 @@
         <span>{{ t('message.onlineCenter.matchAbnormalTicket.listTitle') }}</span>
       </template>
       <template #content>
-        <OnlineCursorList ref="listRef" :request="abnormalRequest" :columns="columns" :pageSize="20">
+        <OnlineCursorList v-if="canQueryServer" :key="`${serverSelectionVersion}:${listQueryVersion}`" ref="listRef" :request="abnormalRequest" :columns="columns" :pageSize="20">
           <template #body-status="{ data }">{{ displayStatus(data.status, data.statusDisplayKey) }}</template>
           <template #body-createdAt="{ data }">{{ formatUnix(data.createdAt) }}</template>
           <template #body-expiresAt="{ data }">{{ data.expiresAt ? formatUnix(data.expiresAt) : '-' }}</template>
@@ -27,23 +34,23 @@
  * 三类检索（Admin 自有枚举 AbnormalKind：LongWaiting/RepeatedCancel/Orphan）+ 游标翻页；
  * 状态展示走 displayKey 映射（onlineMatch.ticketStatus.*），Admin 不复制 Ticket 状态机语义。
  */
-import { ref, computed, watch, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref, computed, watch, onMounted, nextTick } from 'vue'
+import ServerSelector from '/@/components/server-selector/ServerSelector.vue'
+import { usePageServer } from '../components/usePageServer'
 import Card from 'primevue/card'
 import SearchForm from '/@/components/search-form/index.vue'
 import OnlineCursorList from '/@/components/OnlineCursorList/index.vue'
 import { formatUnix } from '../../../utils/formatTime.ts'
-import { useCurrentApp } from '../../../composables/useCurrentApp.ts'
 import { onlineMatchTicketQueryAbnormalPagePost } from '../../../api/onlineMatchTicketQuery'
 import { AbnormalKind } from '../../../api/onlineMatchTicketQuery/types'
 import { te as hasKey, t as translate } from '../../../i18n/index'
 import type { OnlineCursorListParams } from '/@/components/OnlineCursorList/types'
 
-const route = useRoute()
-const { currentAppId, resolveInitialAppId } = useCurrentApp()
+const { serverIdOverride, effectiveServerId, canQueryServer, serverStateMessage, serverSelectionVersion, beginServerRequest } = usePageServer()
 
 const queryParams = ref<Record<string, any>>({ abnormalKind: AbnormalKind.LongWaiting })
 const listRef = ref()
+const listQueryVersion = ref(0)
 
 // AbnormalKind 三值（change.md §3 A0：Admin 侧自有检索枚举，vault 无此概念；线缆为数字枚举）
 const kindOptions = computed(() => [
@@ -54,7 +61,6 @@ const kindOptions = computed(() => [
 
 const searchFields = computed(() => [
   { key: 'abnormalKind', label: t('message.onlineCenter.matchAbnormalTicket.search.abnormalKind'), type: 'select', options: kindOptions.value, placeholder: t('message.onlineCenter.matchAbnormalTicket.search.pleaseSelectKind') },
-  { key: 'serverId', label: t('message.onlineCenter.matchAbnormalTicket.search.serverId'), type: 'input', placeholder: t('message.onlineCenter.matchAbnormalTicket.search.pleaseEnterServerId') },
 ])
 
 const columns = computed(() => [
@@ -76,37 +82,32 @@ const displayStatus = (status: string, displayKey?: string | null): string => {
 }
 
 function buildAbnormalParams() {
-  const { appId, ...rest } = queryParams.value
+  const { ...rest } = queryParams.value
   const kind = rest.abnormalKind ?? AbnormalKind.LongWaiting
-  return { ...rest, abnormalKind: kind, appId: appId ?? currentAppId.value }
+  return { ...rest, abnormalKind: kind, serverId: effectiveServerId.value }
 }
 
 const abnormalRequest = async (p: OnlineCursorListParams) => {
+  const request = beginServerRequest()
+  if (!request) return { items: [], hasMore: false }
   const res: any = await onlineMatchTicketQueryAbnormalPagePost({ ...buildAbnormalParams(), ...p })
+  if (!request.isCurrent()) return { items: [], hasMore: false }
   const page = res.data?.data
   return page ?? { items: [], hasMore: false }
 }
 
-// Online 作用域三元组（AppId+ServerId）后端硬校验（vault C2 S1.7）：ServerId 未定时分页请求必被
-// 32200005「Online 作用域缺失」拒绝，不空发，列表保持未加载态（issue #4）。
+// 区服选择经过列表验证后才允许请求。
 const onQuery = async () => {
-  if (!queryParams.value.serverId) {
+  if (!canQueryServer.value) {
     return
   }
+  listQueryVersion.value += 1
+  await nextTick()
   await listRef.value?.reload()
 }
 
-watch(() => route.query.appId, async () => {
-  currentAppId.value = resolveInitialAppId(route.query)
-  queryParams.value.appId = currentAppId.value
+watch(serverSelectionVersion, async () => {
   await onQuery()
-})
-
-onMounted(async () => {
-  if (!currentAppId.value) {
-    currentAppId.value = resolveInitialAppId(route.query)
-  }
-  queryParams.value.appId = currentAppId.value
-  await onQuery()
-})
+}, { flush: 'post' })
+onMounted(onQuery)
 </script>

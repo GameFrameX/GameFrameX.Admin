@@ -2,6 +2,13 @@
   <div class="onlineTransactionDetail-container">
     <Card>
       <template #content>
+        <div class="flex align-items-center gap-2 mb-3">
+          <ServerSelector mode="local" v-model="serverIdOverride" />
+          <button v-if="serverIdOverride !== undefined" type="button" class="p-button p-button-text" @click="serverIdOverride = undefined">
+            {{ t('message.common.button.reset') }}
+          </button>
+        </div>
+        <p v-if="!canQueryServer" role="status">{{ t(serverStateMessage) }}</p>
         <SearchForm v-model="queryParams" :fields="searchFields" :labelWidth="'110px'"
                     :queryAuth="'onlineTransactionDetail:detail'" @query="onQuery" />
       </template>
@@ -45,17 +52,19 @@
  */
 import { ref, computed, watch, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
+import ServerSelector from '/@/components/server-selector/ServerSelector.vue'
+import { usePageServer } from '../components/usePageServer'
 import Card from 'primevue/card'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import SearchForm from '/@/components/search-form/index.vue'
 import { formatUnix } from '../../../utils/formatTime.ts'
-import { useCurrentApp } from '../../../composables/useCurrentApp.ts'
 import { onlineAssetTransactionQueryDetailGet } from '../../../api/onlineAssetTransactionQuery'
 import type { OnlineAssetTransactionDetailResponse } from '../../../api/onlineAssetTransactionQuery/types'
 
-const { currentAppId, resolveInitialAppId } = useCurrentApp()
 const route = useRoute()
+
+const { serverIdOverride, canQueryServer, serverStateMessage, serverSelectionVersion, beginServerRequest } = usePageServer()
 
 const queryParams = ref<Record<string, any>>({})
 const detail = ref<OnlineAssetTransactionDetailResponse | null>(null)
@@ -68,41 +77,30 @@ const searchFields = computed(() => [
     type: 'input',
     placeholder: t('message.onlineCenter.transactionDetail.pleaseEnterTransactionId'),
   },
-  {
-    key: 'serverId',
-    label: t('message.onlineCenter.transactionDetail.serverId'),
-    type: 'input',
-    placeholder: t('message.onlineCenter.transactionDetail.pleaseEnterServerId'),
-  },
 ])
 
 const onQuery = async () => {
   const transactionId = (queryParams.value.transactionId ?? '').trim()
-  const serverId = (queryParams.value.serverId ?? '').trim()
-  if (!transactionId || !serverId) {
-    return
-  }
+  const request = beginServerRequest()
+  if (!transactionId || !request) return
   try {
-    // 作用域必填：后端按 appId/serverId 定位区服 HttpManageUrl（C356 联调实测）
-    const res: any = await onlineAssetTransactionQueryDetailGet({ appId: Number(currentAppId.value), serverId: Number(serverId), transactionId })
-    detail.value = res.data?.data ?? null
+    // 生成层将 GET 参数标为 number；这里只调整静态类型，线缆仍保留完整 string Id。
+    const res = await onlineAssetTransactionQueryDetailGet({ serverId: request.serverId as unknown as number, transactionId })
+    if (request.isCurrent()) detail.value = res.data?.data ?? null
   } catch {
-    detail.value = null
+    if (request.isCurrent()) detail.value = null
   } finally {
-    loaded.value = true
+    if (request.isCurrent()) loaded.value = true
   }
 }
 
-watch(() => route.query.appId, () => {
-  currentAppId.value = resolveInitialAppId(route.query)
+watch(serverSelectionVersion, () => {
+  detail.value = null
+  loaded.value = false
+  return onQuery()
 })
-
 onMounted(() => {
-  if (!currentAppId.value) {
-    currentAppId.value = resolveInitialAppId(route.query)
-  }
-  if (typeof route.query.serverId === 'string' && route.query.serverId) {
-    queryParams.value.serverId = route.query.serverId
-  }
+  if (typeof route.query.transactionId === 'string') queryParams.value.transactionId = route.query.transactionId
+  return onQuery()
 })
 </script>

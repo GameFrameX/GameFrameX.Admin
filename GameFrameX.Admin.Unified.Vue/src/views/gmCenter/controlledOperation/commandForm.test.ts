@@ -139,3 +139,12 @@ test('createControlledCommandForm：空表单初值 + query 预填 playerId/serv
   expect(prefilled.playerId).toBe('player-9')
   expect(prefilled.serverId).toBe('srv-2')
 })
+
+
+test('区服为空或显式清空时拒绝执行，string Id 保留全部位数', () => {
+  expect(validateControlledCommandForm(f({ serverId: '' })).serverId).toBe(true)
+  expect(validateControlledCommandForm(f({ serverId: '   ' })).serverId).toBe(true)
+  expect(() => buildControlledCommandRequest(f({ serverId: '' }))).toThrow()
+  const serverId = '9223372036854775806'
+  expect(buildControlledCommandRequest(f({ serverId })).serverId).toBe(serverId)
+})

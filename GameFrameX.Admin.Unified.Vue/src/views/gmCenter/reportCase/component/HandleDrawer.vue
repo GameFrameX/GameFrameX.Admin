@@ -59,6 +59,7 @@
  * 服务端语义：Mute/Ban 先写 GamePenalty 事实源再触发 Online 联动命令。
  */
 import { ref, computed } from 'vue'
+import { usePageServer } from '../../components/usePageServer'
 import Drawer from 'primevue/drawer'
 import Button from 'primevue/button'
 import Select from 'primevue/select'
@@ -67,12 +68,11 @@ import Textarea from 'primevue/textarea'
 import { showConfirm, showSuccess } from '../../../../utils/message.ts'
 import { onlineReportCaseHandlePost } from '../../../../api/onlineReportCase'
 
-const props = withDefaults(defineProps<{
-  appId?: string | number
-  serverId?: string | number
-}>(), { appId: undefined, serverId: undefined })
+const props = defineProps<{ serverId: string }>()
 
 const emit = defineEmits(['done'])
+
+const { canQueryServer, beginServerRequest } = usePageServer(() => props.serverId)
 
 const visible = ref(false)
 const loading = ref(false)
@@ -114,6 +114,7 @@ const reset = () => {
 }
 
 const validate = () => {
+  if (!canQueryServer.value) return false
   decisionError.value = ''
   reasonError.value = ''
   durationError.value = ''
@@ -138,6 +139,8 @@ const validate = () => {
 }
 
 const confirm = async () => {
+  const operation = beginServerRequest()
+  if (!operation) return
   if (!validate()) {
     return
   }
@@ -146,14 +149,13 @@ const confirm = async () => {
     t('message.onlineCenter.reportCase.handleConfirmTitle'),
     { type: 'danger' },
   )
-  if (!confirmed) {
+  if (!confirmed || !operation.isCurrent()) {
     return
   }
   loading.value = true
   try {
     await onlineReportCaseHandlePost({
-      appId: props.appId as any,
-      serverId: (caseRow.value?.serverId ?? props.serverId) as any,
+      serverId: operation.serverId,
       caseId: caseRow.value.caseId,
       reportedPlayerId: caseRow.value.reportedPlayerId,
       // 线缆契约：后端 OnlineReportDecisionKind 数字枚举（无字符串枚举转换器）
@@ -161,13 +163,14 @@ const confirm = async () => {
       reason: reason.value.trim(),
       durationMinutes: needsDuration.value ? (durationMinutes.value as number) : undefined,
     })
+    if (!operation.isCurrent()) return
     showSuccess(t('message.onlineCenter.reportCase.handleSuccess'))
     emit('done')
     close()
   } catch {
     // 全局拦截器已弹错误提示
   } finally {
-    loading.value = false
+    if (operation.isCurrent()) loading.value = false
   }
 }
 

@@ -2,6 +2,13 @@
   <div class="onlineDashboard-container">
     <Card>
       <template #content>
+        <div class="flex align-items-center gap-2 mb-3">
+          <ServerSelector mode="local" v-model="serverIdOverride" />
+          <button v-if="serverIdOverride !== undefined" type="button" class="p-button p-button-text" @click="serverIdOverride = undefined">
+            {{ t('message.common.button.reset') }}
+          </button>
+        </div>
+        <p v-if="!canQueryServer" role="status">{{ t(serverStateMessage) }}</p>
         <SearchForm v-model="queryParams" :fields="searchFields" :labelWidth="'110px'"
                     queryAuth="onlineDashboard:snapshot" @query="onQuery" />
       </template>
@@ -90,25 +97,23 @@
  * OnlineUserHub / TenantOnlineUserService / GameHomeOnlineCounter 数据一律不计入。
  */
 import { ref, computed, watch, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import ServerSelector from '/@/components/server-selector/ServerSelector.vue'
+import { usePageServer } from '../components/usePageServer'
 import Card from 'primevue/card'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import SearchForm from '/@/components/search-form/index.vue'
 import { formatUnix } from '../../../utils/formatTime.ts'
-import { useCurrentApp } from '../../../composables/useCurrentApp.ts'
 import { onlineOverviewQuerySnapshotPost } from '../../../api/onlineOverviewQuery'
 import type { OnlineOverviewResponse } from '../../../api/onlineOverviewQuery/types'
 
-const route = useRoute()
-const { currentAppId, resolveInitialAppId } = useCurrentApp()
+const { serverIdOverride, canQueryServer, serverStateMessage, serverSelectionVersion, beginServerRequest } = usePageServer()
 
 const queryParams = ref<Record<string, any>>({})
 const loading = ref(false)
 const overview = ref<OnlineOverviewResponse | null>(null)
 
 const searchFields = computed(() => [
-  { key: 'serverId', label: t('message.onlineCenter.dashboard.search.serverId'), type: 'input', placeholder: t('message.onlineCenter.dashboard.search.pleaseEnterServerId') },
 ])
 
 const formatServerTime = (value: number | string) => (typeof value === 'number' ? formatUnix(value) : String(value))
@@ -121,33 +126,22 @@ const formatRate = (value: number | undefined | null) => {
   return `${(value * 100).toFixed(2)}%`
 }
 
-// Online 作用域三元组（AppId+ServerId）后端硬校验（vault C2 S1.7）：ServerId 未定时快照请求必被
-// 32200005「Online 作用域缺失」拒绝，不空发（issue #4）。
 const onQuery = async () => {
-  if (!currentAppId.value || !queryParams.value.serverId) {
-    return
-  }
+  const request = beginServerRequest()
+  if (!request) return
   loading.value = true
   try {
-    const res: any = await onlineOverviewQuerySnapshotPost({
-      appId: currentAppId.value,
-      serverId: queryParams.value.serverId || undefined,
-    })
-    overview.value = res.data?.data ?? null
+    const res = await onlineOverviewQuerySnapshotPost({ serverId: request.serverId })
+    if (request.isCurrent()) overview.value = res.data?.data ?? null
   } finally {
-    loading.value = false
+    if (request.isCurrent()) loading.value = false
   }
 }
 
-watch(() => route.query.appId, async () => {
-  currentAppId.value = resolveInitialAppId(route.query)
-  await onQuery()
+watch(serverSelectionVersion, () => {
+  overview.value = null
+  loading.value = false
+  return onQuery()
 })
-
-onMounted(async () => {
-  if (!currentAppId.value) {
-    currentAppId.value = resolveInitialAppId(route.query)
-  }
-  await onQuery()
-})
+onMounted(onQuery)
 </script>

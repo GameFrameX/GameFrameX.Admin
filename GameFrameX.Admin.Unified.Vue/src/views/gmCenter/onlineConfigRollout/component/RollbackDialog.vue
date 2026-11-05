@@ -45,6 +45,7 @@
  * ServerId 取发布行原值（同配置维度），不可在回滚时改目标作用域。
  */
 import { ref, computed } from 'vue'
+import { usePageServer } from '../../components/usePageServer'
 import Dialog from 'primevue/dialog'
 import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
@@ -54,9 +55,9 @@ import { showSuccess } from '../../../../utils/message.ts'
 import { gameOnlineConfigRolloutRollbackPost } from '../../../../api/gameOnlineConfigRollout'
 import { ONLINE_CONFIG_ROLLOUT_KIND_OPTIONS } from '../constants'
 
-const props = withDefaults(defineProps<{
-  appId?: string | number
-}>(), { appId: undefined })
+const props = defineProps<{ serverId: string }>()
+
+const { canQueryServer, beginServerRequest } = usePageServer(() => props.serverId)
 
 const visible = ref(false)
 const loading = ref(false)
@@ -84,6 +85,7 @@ const reset = () => {
 }
 
 const validate = () => {
+  if (!canQueryServer.value) return false
   reasonError.value = ''
   const trimmed = reason.value.trim()
   if (!trimmed) {
@@ -101,26 +103,28 @@ const validate = () => {
 }
 
 const confirm = async () => {
-  if (!validate() || !row.value) {
+  const operation = beginServerRequest()
+  if (!operation) return
+  if (!validate() || !row.value || row.value.serverId !== operation.serverId) {
     return
   }
   loading.value = true
   try {
     await gameOnlineConfigRolloutRollbackPost({
-      appId: props.appId as string | number,
-      serverId: row.value.serverId,
+      serverId: operation.serverId,
       configKind: row.value.configKind,
       configKey: row.value.configKey,
       targetVersion: targetVersion.value as number,
       reason: reason.value.trim(),
     })
+    if (!operation.isCurrent()) return
     showSuccess(t('message.onlineCenter.configRollout.rollbackSuccess'))
     emit('done')
     close()
   } catch {
     // 全局拦截器已弹错误提示
   } finally {
-    loading.value = false
+    if (operation.isCurrent()) loading.value = false
   }
 }
 

@@ -9,8 +9,7 @@
         <label>{{ t('message.onlineCenter.playerSegment.name') }}</label>
         <InputText :modelValue="segmentName" disabled />
         <label>{{ t('message.onlineCenter.playerSegment.syncServerId') }}</label>
-        <InputNumber v-model="serverId" :placeholder="t('message.onlineCenter.playerSegment.syncServerIdPlaceholder')"
-                     :useGrouping="false" />
+        <InputText :modelValue="effectiveServerId" disabled />
       </div>
       <div>
         <label class="font-medium text-color-secondary">
@@ -36,19 +35,22 @@
  * 理由必填（≤500 字）进审计；成功 toast 回显 Online 确认版本。
  */
 import { ref } from 'vue'
+import { usePageServer } from '../../components/usePageServer'
 import Dialog from 'primevue/dialog'
 import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
-import InputNumber from 'primevue/inputnumber'
 import Textarea from 'primevue/textarea'
 import { showSuccess } from '../../../../utils/message.ts'
 import { gameOnlinePlayerSegmentSyncOnlinePost } from '../../../../api/gameOnlinePlayerSegment'
+
+const props = defineProps<{ serverId: string }>()
+
+const { effectiveServerId, canQueryServer, beginServerRequest } = usePageServer(() => props.serverId)
 
 const visible = ref(false)
 const loading = ref(false)
 const reason = ref('')
 const reasonError = ref('')
-const serverId = ref<number | null>(null)
 const segmentId = ref<number | string>()
 const segmentName = ref('')
 const emit = defineEmits(['done'])
@@ -61,10 +63,10 @@ const close = () => {
 const reset = () => {
   reason.value = ''
   reasonError.value = ''
-  serverId.value = null
 }
 
 const validate = () => {
+  if (!canQueryServer.value) return false
   reasonError.value = ''
   const trimmed = reason.value.trim()
   if (!trimmed) {
@@ -75,13 +77,15 @@ const validate = () => {
     reasonError.value = t('message.onlineCenter.playerSegment.reasonTooLong')
     return false
   }
-  if (!serverId.value || serverId.value <= 0) {
+  if (!canQueryServer.value) {
     return false
   }
   return true
 }
 
 const confirm = async () => {
+  const operation = beginServerRequest()
+  if (!operation) return
   if (!validate()) {
     return
   }
@@ -89,10 +93,12 @@ const confirm = async () => {
   try {
     const res: any = await gameOnlinePlayerSegmentSyncOnlinePost({
       id: segmentId.value as number | string,
-      serverId: serverId.value as number,
+      serverId: operation.serverId,
       reason: reason.value.trim(),
     })
+    if (!operation.isCurrent()) return
     const confirmVersion = res.data?.data?.confirmVersion
+    if (!operation.isCurrent()) return
     showSuccess(confirmVersion
       ? `${t('message.onlineCenter.playerSegment.syncSuccess')}（${t('message.onlineCenter.playerSegment.confirmVersion')}: ${confirmVersion}）`
       : t('message.onlineCenter.playerSegment.syncSuccess'))
@@ -101,7 +107,7 @@ const confirm = async () => {
   } catch {
     // 全局拦截器已弹错误提示（同步失败态由后端落库，列表 LastServerMessage 可见）
   } finally {
-    loading.value = false
+    if (operation.isCurrent()) loading.value = false
   }
 }
 

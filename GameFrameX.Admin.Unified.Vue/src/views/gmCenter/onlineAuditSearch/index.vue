@@ -2,6 +2,13 @@
   <div class="onlineAuditSearch-container">
     <Card>
       <template #content>
+        <div class="flex align-items-center gap-2 mb-3">
+          <ServerSelector mode="local" v-model="serverIdOverride" />
+          <button v-if="serverIdOverride !== undefined" type="button" class="p-button p-button-text" @click="serverIdOverride = undefined">
+            {{ t('message.common.button.reset') }}
+          </button>
+        </div>
+        <p v-if="!canQueryServer" role="status">{{ t(serverStateMessage) }}</p>
         <SearchForm v-model="queryParams" :fields="searchFields" :labelWidth="'110px'"
                     authPrefix="onlineAuditSearch" @query="onQuery" />
       </template>
@@ -11,7 +18,7 @@
         <span>{{ t('message.onlineCenter.auditSearch.listTitle') }}</span>
       </template>
       <template #content>
-        <OnlineCursorList ref="listRef" :request="auditRequest" :columns="columns" :pageSize="20">
+        <OnlineCursorList v-if="canQueryServer" :key="`${serverSelectionVersion}:${listQueryVersion}`" ref="listRef" :request="auditRequest" :columns="columns" :pageSize="20">
           <template #body-source="{ data }">
             <Tag :value="sourceLabel(data.source)" :severity="sourceSeverity(data.source)" />
           </template>
@@ -28,29 +35,28 @@
  * 三来源（Admin 操作日志 / Online 审计事件 / 各域命令记录）经后端
  * OnlineAuditSourceMap 五维统一映射后透传：source 列为数字枚举（1=管理操作 2=Online 事件 3=域命令）；本页只读，无写路径。
  */
-import { ref, computed, watch, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref, computed, watch, onMounted, nextTick } from 'vue'
+import ServerSelector from '/@/components/server-selector/ServerSelector.vue'
+import { usePageServer } from '../components/usePageServer'
 import Card from 'primevue/card'
 import Tag from 'primevue/tag'
 import SearchForm from '/@/components/search-form/index.vue'
 import OnlineCursorList from '/@/components/OnlineCursorList/index.vue'
 import { formatUnix } from '../../../utils/formatTime.ts'
-import { useCurrentApp } from '../../../composables/useCurrentApp.ts'
 import { onlineAuditSearchPagePost } from '../../../api/onlineAuditSearch'
 import type { OnlineCursorListParams } from '/@/components/OnlineCursorList/types'
 
-const route = useRoute()
-const { currentAppId, resolveInitialAppId } = useCurrentApp()
+const { serverIdOverride, effectiveServerId, canQueryServer, serverStateMessage, serverSelectionVersion, beginServerRequest } = usePageServer()
 
 const queryParams = ref<Record<string, any>>({})
 const listRef = ref()
+const listQueryVersion = ref(0)
 
-// 五维过滤：Operator / 对象（目标玩家）/ 时间 / 作用域（App+区服）/ 命令类型
+// 五维过滤：Operator / 对象（目标玩家）/ 时间 / 作用域（区服）/ 命令类型
 const searchFields = computed(() => [
   { key: 'operator', label: t('message.onlineCenter.auditSearch.search.operatorId'), type: 'input', placeholder: t('message.onlineCenter.auditSearch.search.pleaseEnterOperatorId') },
   { key: 'targetPlayerId', label: t('message.onlineCenter.auditSearch.search.targetPlayerId'), type: 'input', placeholder: t('message.onlineCenter.auditSearch.search.pleaseEnterTargetPlayerId') },
   { key: 'commandKind', label: t('message.onlineCenter.auditSearch.search.commandKind'), type: 'input', placeholder: t('message.onlineCenter.auditSearch.search.pleaseEnterCommandKind') },
-  { key: 'serverId', label: t('message.onlineCenter.auditSearch.search.serverId'), type: 'input', placeholder: t('message.onlineCenter.auditSearch.search.pleaseEnterServerId'), advanced: true },
   { key: 'timeRange', label: t('message.onlineCenter.auditSearch.search.timeRange'), type: 'dateRange', placeholder: t('message.onlineCenter.auditSearch.search.startTime'), advanced: true },
 ])
 
@@ -77,7 +83,6 @@ const columns = computed(() => [
   { field: 'source', header: t('message.onlineCenter.auditSearch.columns.source'), width: '140px' },
   { field: 'operatorIdentifier', header: t('message.onlineCenter.auditSearch.columns.operatorIdentifier'), width: '160px', sensitive: true },
   { field: 'commandType', header: t('message.onlineCenter.auditSearch.columns.commandType'), width: '160px' },
-  { field: 'appId', header: t('message.onlineCenter.auditSearch.columns.appId'), width: '110px' },
   { field: 'serverId', header: t('message.onlineCenter.auditSearch.columns.serverId'), width: '120px' },
   { field: 'targetPlayerIdentifier', header: t('message.onlineCenter.auditSearch.columns.targetPlayerIdentifier'), width: '150px', sensitive: true },
   { field: 'summary', header: t('message.onlineCenter.auditSearch.columns.summary'), width: '200px' },
@@ -96,8 +101,8 @@ function toUnixSeconds(value: unknown): unknown {
 }
 
 function buildAuditParams() {
-  const { timeRange, appId, ...rest } = queryParams.value
-  const base: Record<string, any> = { ...rest, appId: appId ?? currentAppId.value }
+  const { timeRange, ...rest } = queryParams.value
+  const base: Record<string, any> = { ...rest, serverId: effectiveServerId.value }
   if (Array.isArray(timeRange) && timeRange.length === 2) {
     const [start, end] = toUnixSeconds(timeRange) as [number | null, number | null]
     if (start) {
@@ -111,25 +116,22 @@ function buildAuditParams() {
 }
 
 const auditRequest = async (p: OnlineCursorListParams) => {
+  const request = beginServerRequest()
+  if (!request) return { items: [], hasMore: false }
   const res: any = await onlineAuditSearchPagePost({ ...buildAuditParams(), ...p })
+  if (!request.isCurrent()) return { items: [], hasMore: false }
   return res.data?.data ?? { items: [], hasMore: false }
 }
 
 const onQuery = async () => {
+  if (!canQueryServer.value) return
+  listQueryVersion.value += 1
+  await nextTick()
   await listRef.value?.reload()
 }
 
-watch(() => route.query.appId, async () => {
-  currentAppId.value = resolveInitialAppId(route.query)
-  queryParams.value.appId = currentAppId.value
+watch(serverSelectionVersion, async () => {
   await onQuery()
-})
-
-onMounted(async () => {
-  if (!currentAppId.value) {
-    currentAppId.value = resolveInitialAppId(route.query)
-  }
-  queryParams.value.appId = currentAppId.value
-  await onQuery()
-})
+}, { flush: 'post' })
+onMounted(onQuery)
 </script>

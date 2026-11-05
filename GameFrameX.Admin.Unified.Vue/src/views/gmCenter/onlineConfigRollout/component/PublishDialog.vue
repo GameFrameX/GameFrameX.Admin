@@ -16,8 +16,7 @@
         <Select v-model="segmentId" :options="segmentOptions" optionLabel="label" optionValue="value"
                 :loading="segmentLoading" :placeholder="t('message.onlineCenter.configRollout.segmentPlaceholder')" />
         <label>{{ t('message.onlineCenter.configRollout.serverId') }}</label>
-        <InputNumber v-model="serverId" :useGrouping="false"
-                     :placeholder="t('message.onlineCenter.configRollout.serverIdPlaceholder')" />
+        <InputText :modelValue="effectiveServerId" disabled />
         <label>{{ t('message.onlineCenter.configRollout.percent') }}</label>
         <InputNumber v-model="percent" :min="1" :max="100" :useGrouping="false"
                      :placeholder="t('message.onlineCenter.configRollout.percentPlaceholder')" />
@@ -48,8 +47,10 @@
  * 理由必填（≤500 字）进审计；成功 toast 回显 Online 确认版本（VC-7.12 Admin 半边）。
  */
 import { ref } from 'vue'
+import { usePageServer } from '../../components/usePageServer'
 import Dialog from 'primevue/dialog'
 import Button from 'primevue/button'
+import InputText from 'primevue/inputtext'
 import InputNumber from 'primevue/inputnumber'
 import Select from 'primevue/select'
 import Textarea from 'primevue/textarea'
@@ -59,9 +60,9 @@ import { gameOnlinePlayerSegmentPagePost } from '../../../../api/gameOnlinePlaye
 import { OnlinePlayerSegmentSyncStatus } from '../../../../api/gameOnlinePlayerSegment/types'
 import { ONLINE_CONFIG_ROLLOUT_KIND_OPTIONS } from '../constants'
 
-const props = withDefaults(defineProps<{
-  appId?: string | number
-}>(), { appId: undefined })
+const props = defineProps<{ serverId: string }>()
+
+const { effectiveServerId, canQueryServer, beginServerRequest } = usePageServer(() => props.serverId)
 
 const visible = ref(false)
 const loading = ref(false)
@@ -70,7 +71,6 @@ const reasonError = ref('')
 const configKind = ref<number | null>(null)
 const configKey = ref<number | null>(null)
 const segmentId = ref<number | string | null>(null)
-const serverId = ref<number | null>(null)
 const percent = ref<number | null>(null)
 const segmentOptions = ref<Array<{ value: number | string; label: string }>>([])
 const segmentLoading = ref(false)
@@ -89,32 +89,34 @@ const reset = () => {
   configKind.value = null
   configKey.value = null
   segmentId.value = null
-  serverId.value = null
   percent.value = null
 }
 
 /** 拉取已同步分群（SyncStatus=Synced 才可被灰度引用——后端 EnsureSegmentSyncedAsync 同口径） */
 const loadSyncedSegments = async () => {
+  const request = beginServerRequest()
+  if (!request) return
   segmentLoading.value = true
   try {
     const res: any = await gameOnlinePlayerSegmentPagePost({
-      appId: props.appId as string | number,
       syncStatus: OnlinePlayerSegmentSyncStatus.Synced,
       page: 1,
       pageSize: 200,
     })
+    if (!request.isCurrent()) return
     segmentOptions.value = (res.data?.data?.items ?? []).map((item: any) => ({
       value: item.id,
       label: item.name,
     }))
   } catch {
-    segmentOptions.value = []
+    if (request.isCurrent()) segmentOptions.value = []
   } finally {
-    segmentLoading.value = false
+    if (request.isCurrent()) segmentLoading.value = false
   }
 }
 
 const validate = () => {
+  if (!canQueryServer.value) return false
   reasonError.value = ''
   const trimmed = reason.value.trim()
   if (!trimmed) {
@@ -125,7 +127,7 @@ const validate = () => {
     reasonError.value = t('message.onlineCenter.configRollout.reasonTooLong')
     return false
   }
-  if (!configKind.value || !configKey.value || configKey.value <= 0 || !segmentId.value || !serverId.value || serverId.value <= 0) {
+  if (!configKind.value || !configKey.value || configKey.value <= 0 || !segmentId.value || !canQueryServer.value) {
     return false
   }
   if (!percent.value || percent.value < 1 || percent.value > 100) {
@@ -135,21 +137,24 @@ const validate = () => {
 }
 
 const confirm = async () => {
+  const operation = beginServerRequest()
+  if (!operation) return
   if (!validate()) {
     return
   }
   loading.value = true
   try {
     const res: any = await gameOnlineConfigRolloutPublishPost({
-      appId: props.appId as string | number,
-      serverId: serverId.value as number,
+      serverId: operation.serverId,
       configKind: configKind.value as number,
       configKey: String(configKey.value),
       segmentId: segmentId.value as number | string,
       percent: percent.value as number,
       reason: reason.value.trim(),
     })
+    if (!operation.isCurrent()) return
     const confirmVersion = res.data?.data?.onlineConfirmVersion
+    if (!operation.isCurrent()) return
     showSuccess(confirmVersion
       ? `${t('message.onlineCenter.configRollout.publishSuccess')}（${t('message.onlineCenter.configRollout.onlineConfirmVersion')}: ${confirmVersion}）`
       : t('message.onlineCenter.configRollout.publishSuccess'))
@@ -158,7 +163,7 @@ const confirm = async () => {
   } catch {
     // 全局拦截器已弹错误提示（下发失败后端不留半生效版本行，可整重试）
   } finally {
-    loading.value = false
+    if (operation.isCurrent()) loading.value = false
   }
 }
 

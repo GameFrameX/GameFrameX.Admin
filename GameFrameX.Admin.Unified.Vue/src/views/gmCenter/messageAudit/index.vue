@@ -2,6 +2,13 @@
   <div class="onlineMessageAudit-container">
     <Card>
       <template #content>
+        <div class="flex align-items-center gap-2 mb-3">
+          <ServerSelector mode="local" v-model="serverIdOverride" />
+          <button v-if="serverIdOverride !== undefined" type="button" class="p-button p-button-text" @click="serverIdOverride = undefined">
+            {{ t('message.common.button.reset') }}
+          </button>
+        </div>
+        <p v-if="!canQueryServer" role="status">{{ t(serverStateMessage) }}</p>
         <SearchForm v-model="queryParams" :fields="searchFields" :labelWidth="'110px'"
                     authPrefix="messageAudit" @query="onQuery" />
       </template>
@@ -11,7 +18,7 @@
         <span>{{ t('message.onlineCenter.messageAudit.listTitle') }}</span>
       </template>
       <template #content>
-        <OnlineCursorList ref="listRef" :request="auditRequest" :columns="columns" :pageSize="20">
+        <OnlineCursorList v-if="canQueryServer" :key="`${serverSelectionVersion}:${listQueryVersion}`" ref="listRef" :request="auditRequest" :columns="columns" :pageSize="20">
           <template #body-participantPlayerIds="{ data }">
             {{ data.participantPlayerIds?.join(', ') || '-' }}
           </template>
@@ -28,24 +35,23 @@
  * 脱敏内容展示——Content 列 sensitive 遮蔽，与 Online 事件脱敏规则一致（Admin 侧兜底脱敏双保险）；
  * 只读，无写路径。查询实时透传 Online，Admin 不落消息镜像。
  */
-import { ref, computed, watch, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref, computed, watch, onMounted, nextTick } from 'vue'
+import ServerSelector from '/@/components/server-selector/ServerSelector.vue'
+import { usePageServer } from '../components/usePageServer'
 import Card from 'primevue/card'
 import SearchForm from '/@/components/search-form/index.vue'
 import OnlineCursorList from '/@/components/OnlineCursorList/index.vue'
 import { formatUnix } from '../../../utils/formatTime.ts'
-import { useCurrentApp } from '../../../composables/useCurrentApp.ts'
 import { onlineMessageAuditQueryPagePost } from '../../../api/onlineMessageAuditQuery'
 import type { OnlineCursorListParams } from '/@/components/OnlineCursorList/types'
 
-const route = useRoute()
-const { currentAppId, resolveInitialAppId } = useCurrentApp()
+const { serverIdOverride, effectiveServerId, canQueryServer, serverStateMessage, serverSelectionVersion, beginServerRequest } = usePageServer()
 
 const queryParams = ref<Record<string, any>>({})
 const listRef = ref()
+const listQueryVersion = ref(0)
 
 const searchFields = computed(() => [
-  { key: 'serverId', label: t('message.onlineCenter.messageAudit.search.serverId'), type: 'input', placeholder: t('message.onlineCenter.messageAudit.search.pleaseEnterServerId') },
   { key: 'participantPlayerId', label: t('message.onlineCenter.messageAudit.search.participantPlayerId'), type: 'input', placeholder: t('message.onlineCenter.messageAudit.search.pleaseEnterParticipantPlayerId') },
   { key: 'keyword', label: t('message.onlineCenter.messageAudit.search.keyword'), type: 'input', placeholder: t('message.onlineCenter.messageAudit.search.pleaseEnterKeyword'), advanced: true },
   { key: 'timeRange', label: t('message.onlineCenter.messageAudit.search.timeRange'), type: 'dateRange', placeholder: t('message.onlineCenter.messageAudit.search.startTime'), advanced: true },
@@ -70,8 +76,8 @@ function toUnixSeconds(value: unknown): unknown {
 }
 
 function buildAuditParams() {
-  const { timeRange, appId, ...rest } = queryParams.value
-  const base: Record<string, any> = { ...rest, appId: appId ?? currentAppId.value }
+  const { timeRange, ...rest } = queryParams.value
+  const base: Record<string, any> = { ...rest, serverId: effectiveServerId.value }
   if (Array.isArray(timeRange) && timeRange.length === 2) {
     const [start, end] = toUnixSeconds(timeRange) as [number | null, number | null]
     if (start) {
@@ -85,30 +91,25 @@ function buildAuditParams() {
 }
 
 const auditRequest = async (p: OnlineCursorListParams) => {
+  const request = beginServerRequest()
+  if (!request) return { items: [], hasMore: false }
   const res: any = await onlineMessageAuditQueryPagePost({ ...buildAuditParams(), ...p })
+  if (!request.isCurrent()) return { items: [], hasMore: false }
   return res.data?.data ?? { items: [], hasMore: false }
 }
 
-// Online 作用域三元组（AppId+ServerId）后端硬校验（vault C2 S1.7）：ServerId 未定时分页请求必被
-// 32200005「Online 作用域缺失」拒绝，不空发，列表保持未加载态（issue #4）。
+// 区服选择经过列表验证后才允许请求。
 const onQuery = async () => {
-  if (!queryParams.value.serverId) {
+  if (!canQueryServer.value) {
     return
   }
+  listQueryVersion.value += 1
+  await nextTick()
   await listRef.value?.reload()
 }
 
-watch(() => route.query.appId, async () => {
-  currentAppId.value = resolveInitialAppId(route.query)
-  queryParams.value.appId = currentAppId.value
+watch(serverSelectionVersion, async () => {
   await onQuery()
-})
-
-onMounted(async () => {
-  if (!currentAppId.value) {
-    currentAppId.value = resolveInitialAppId(route.query)
-  }
-  queryParams.value.appId = currentAppId.value
-  await onQuery()
-})
+}, { flush: 'post' })
+onMounted(onQuery)
 </script>

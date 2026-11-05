@@ -40,7 +40,6 @@ export const REASON_MAX_LENGTH = 500
 
 export interface ControlledCommandFormState {
     commandKind: OnlineControlledCommandKind | ''
-    appId?: string | number
     serverId: string
     ticketId: string
     matchId: string
@@ -54,7 +53,6 @@ export interface ControlledCommandFormState {
 export function createControlledCommandForm(prefill: { playerId?: string; serverId?: string } = {}): ControlledCommandFormState {
     return {
         commandKind: '',
-        appId: '',
         serverId: prefill.serverId ?? '',
         ticketId: '',
         matchId: '',
@@ -73,6 +71,9 @@ const trim = (value: string): string => value.trim()
  */
 export function validateControlledCommandForm(form: ControlledCommandFormState): Record<string, boolean> {
     const errors: Record<string, boolean> = {}
+    if (!trim(form.serverId)) {
+        errors.serverId = true
+    }
     const kind = form.commandKind
     const meta = kind ? CONTROLLED_COMMAND_META[kind] : undefined
     if (!meta) {
@@ -108,6 +109,9 @@ export function validateControlledCommandForm(form: ControlledCommandFormState):
  * reviewerOperatorId 全命令必填（validate 已保证非空）。
  */
 export function buildControlledCommandRequest(form: ControlledCommandFormState): OnlineControlledCommandRequest {
+    if (!trim(form.serverId)) {
+        throw new Error('controlled command server is required (validate before build)')
+    }
     const kind = form.commandKind
     if (!kind) {
         throw new Error('controlled command kind is required (validate before build)')
