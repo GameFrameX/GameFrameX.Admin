@@ -43,7 +43,7 @@ test('合服向导：取消计划释放区服并允许同范围再次建计划',
       await expect(page.getByText('确认取消此合服计划？取消后参与区服可重新建计划。')).toBeVisible();
       await page.getByRole('button', { name: '确定', exact: true }).click();
       await expect(page.getByTestId('merge-status')).toHaveText('已取消');
-      await expect(page.getByText(cancellationReason, { exact: true })).toBeVisible();
+      await expect(page.getByTestId('merge-detail')).toContainText(cancellationReason);
       await shot(page, `merge-cancelled-round-${round + 1}`);
       await page.getByRole('dialog').getByRole('button', { name: /close|关闭/i }).click();
     }
@@ -106,7 +106,8 @@ test('合服向导：真实登录、预演、双人复核、执行与源服退�
     await installApiRecorder(reviewer);
     await signIn(reviewer, reviewerAccount!, reviewerPassword!);
     await navigateByMenu(reviewer, '合服', '区服');
-    await reviewer.getByRole('row').filter({ hasText: planId }).getByRole('button', { name: '详情', exact: true }).click();
+    // planId 由目标/源服确定，取消用例留下的已取消行与其同 planId：排除已取消行后定位。
+    await reviewer.getByRole('row').filter({ hasText: planId }).filter({ hasNotText: '已取消' }).getByRole('button', { name: '详情', exact: true }).click();
     await reviewer.locator('#merge-review-reason').fill('已核查零全局域写入');
     await reviewer.getByRole('button', { name: '批准', exact: true }).click();
     await expect(reviewer.getByTestId('merge-status')).toHaveText('已批准');
