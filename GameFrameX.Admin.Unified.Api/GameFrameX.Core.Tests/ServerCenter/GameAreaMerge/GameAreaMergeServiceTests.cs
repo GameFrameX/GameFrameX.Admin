@@ -94,7 +94,7 @@ public sealed class GameAreaMergeServiceTests
             Assert.Equal(GameAreaMergePlanStatus.Completed, completed.Status);
             Assert.Contains("\"AlreadyExecuted\":true", completed.ExecutionReportSnapshot);
             await context.Service.ExecuteAsync(new() { Id = plan.Id });
-            Assert.Single(context.Handler.Actions.Where(action => action == "execute_server_merge"));
+            Assert.Single(context.Handler.Actions, action => action == "execute_server_merge");
         }
     }
 

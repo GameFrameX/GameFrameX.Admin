@@ -29,7 +29,7 @@ public sealed class GameAreaMergeRehearsalTests
             var page = await management.PageAsync(new PageTenantGameAreaEntityRequest());
             foreach (var identifier in new long[] { 102, 103 })
             {
-                var source = Assert.Single(page.Items.Where(area => area.Id == identifier));
+                var source = Assert.Single(page.Items, area => area.Id == identifier);
                 Assert.Equal(GameServerStatus.Merged, source.ServerStatus);
                 Assert.Equal(101, source.MergedIntoServerId);
                 Assert.False(source.IsEnabled);
