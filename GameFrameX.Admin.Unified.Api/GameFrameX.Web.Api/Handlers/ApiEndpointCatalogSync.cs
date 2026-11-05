@@ -347,7 +347,7 @@ public sealed class ApiEndpointCatalogSync : IHostedService
             {
                 // controller 改名兜底（GFX-709 等「加前缀」式改名后按钮 permission 前缀仍是旧名）：
                 // 直译路由未命中时，尝试「controller 以旧名为后缀 + action 相同」的端点，
-                // 如 gameAppOpenAccess:page → api/tenantGameAppOpenAccess/page。
+                // 如 gameAppOpenAccess:page → api/gameAppOpenAccess/page。
                 // 非后缀式改名（如 Dict→Dictionary）不在此列，保持孤立按钮不动。
                 matchedEndpoints = MatchRenamedControllerEndpoints(routePath, endpoints);
             }
@@ -661,7 +661,7 @@ public sealed class ApiEndpointCatalogSync : IHostedService
 
     private static long ResolveAutoMenuPid(string routePath, Dictionary<string, long> controllerPidMap)
     {
-        // routePath 形如 api/tenantGameAppPackage/detail（controller 段全小写），与 permission 前缀忽略大小写对齐。
+        // routePath 形如 api/gameAppPackage/detail（controller 段全小写），与 permission 前缀忽略大小写对齐。
         var segments = routePath.Split('/');
         var controller = segments.Length >= 2 ? segments[1] : string.Empty;
         return controllerPidMap.TryGetValue(controller, out var pid) ? pid : 0;
