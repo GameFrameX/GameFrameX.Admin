@@ -61,7 +61,7 @@ import InputText from 'primevue/inputtext'
 import Message from 'primevue/message'
 import ToggleSwitch from 'primevue/toggleswitch'
 import { platformPasswordPolicyConfigDetailPost, platformPasswordPolicyConfigUpdatePost } from '../../../api/platformPasswordPolicyConfig'
-import type {PlatformPasswordPolicyConfigUpdateInput} from '../../api/global/platformPasswordPolicyConfig'
+import type {PlatformPasswordPolicyConfigUpdateRequest} from '../../../api/platformPasswordPolicyConfig/types'
 import {formatUnix} from '../../../utils/formatTime.ts'
 import {showError, showSuccess} from '../../../utils/message.ts'
 
@@ -113,7 +113,7 @@ const validateForm = () => {
   return true
 }
 
-const buildUpdatePayload = (): PlatformPasswordPolicyConfigUpdateInput => {
+const buildUpdatePayload = (): PlatformPasswordPolicyConfigUpdateRequest => {
   return {
     strongPassword: form.strongPassword,
     passwordStrengthValidation: form.passwordStrengthValidation,

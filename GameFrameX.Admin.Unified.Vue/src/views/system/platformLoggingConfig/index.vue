@@ -141,7 +141,7 @@ import Tag from 'primevue/tag'
 import Textarea from 'primevue/textarea'
 import ToggleSwitch from 'primevue/toggleswitch'
 import { platformLoggingConfigDetailPost, platformLoggingConfigUpdatePost } from '../../../api/platformLoggingConfig'
-import type {PlatformLoggingConfigUpdateInput} from '../../api/global/platformLoggingConfig'
+import type {PlatformLoggingConfigUpdateRequest} from '../../../api/platformLoggingConfig/types'
 import {formatUnix} from '../../../utils/formatTime.ts'
 import {showError, showSuccess} from '../../../utils/message.ts'
 
@@ -236,7 +236,7 @@ const validateForm = () => {
   return true
 }
 
-const buildUpdatePayload = (): PlatformLoggingConfigUpdateInput => {
+const buildUpdatePayload = (): PlatformLoggingConfigUpdateRequest => {
   const trimmed = esServerUrisInput.value.trim()
   // 留空 → 保留掩码占位，后端识别全 "***" 为未变更；非空 → 解析为新 URI 数组替换。
   const serverUris = trimmed
