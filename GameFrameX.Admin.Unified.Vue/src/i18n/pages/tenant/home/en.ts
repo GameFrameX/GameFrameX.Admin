@@ -1,6 +1,8 @@
 // Defined content (PLATFORM cockpit = SuperAdmin platform home; greeting reused by appHome; notice section used by the notice page)
 export default {
     home: {
+        serverHealth: 'Server health',
+        serverHealthDescription: 'Registered server operating states; these are not live health checks.',
         // Sheet head
         greetingMorning: 'Good morning',
         greetingNoon: 'Good noon',

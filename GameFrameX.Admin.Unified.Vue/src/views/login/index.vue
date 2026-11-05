@@ -6,7 +6,6 @@
     STORY: 访客认出「这是给做游戏的人做的工具」，填卡，滑块验证盖「已验证」章，进门回到 token 化后台。
     FIRST VIEWPORT: 左制图桌（logo+副题，三张叠放墨线图纸为主视觉）；右 420px 竖卡：mono 卡号行 → 标题 → 字段 → 验证 → 油墨蓝提交；聚焦字段收四角注册标记。
     FORM: 桌游原型纸感剧作卡（自选清单第 6 位，骰子指派）· seed 0b4f57a4
-    REGISTER FACE (2026-08-30 B佬需求): 同一张卡的背面——邮箱验证码自助开通工作室（注册即建租户）。入口仅当服务端 emailRegisterEnabled === true 时露出；沿用同一字段词汇与动效纪律（盖章仍是唯一动效时刻），无弹窗、无新装饰。
     FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance.
   -->
   <div class="login-container" data-design-contract="impeccable 0b4f57a4">
@@ -52,12 +51,7 @@
           </div>
           <h1 class="login-card-title">{{ cardTitleText }}</h1>
           <Account v-if="mode === 'signin' && loginConfig" :config="loginConfig"/>
-          <LoginRegister v-else-if="mode === 'register'" @switch="switchMode('signin')"/>
           <LoginSetupPassword v-else-if="mode === 'setup'" @switch="switchMode('signin')"/>
-          <p v-if="mode === 'signin' && loginConfig && emailRegisterEnabled" class="login-card-alt">
-            {{ t('message.login.register.entryHint') }}
-            <button type="button" class="login-alt-link" @click="switchMode('register')">{{ t('message.login.register.entryLink') }}</button>
-          </p>
           <p v-if="mode === 'signin' && loginConfig && superAdminNeedsSetup" class="login-card-alt">
             {{ t('message.login.setup.entryHint') }}
             <button type="button" class="login-alt-link" @click="switchMode('setup')">{{ t('message.login.setup.entryLink') }}</button>
@@ -85,8 +79,6 @@ import IllustDevices from '/@/views/login/component/IllustDevices.vue';
 
 // eslint-disable-next-line @typescript-eslint/naming-convention -- Vue 组件占位变量（defineAsyncComponent/defineComponent 绑定），按 Vue 风格指南保持 PascalCase
 const Account = defineAsyncComponent(() => import('/@/views/login/component/LoginAccount.vue'));
-// eslint-disable-next-line @typescript-eslint/naming-convention -- 同上
-const LoginRegister = defineAsyncComponent(() => import('/@/views/login/component/LoginRegister.vue'));
 // eslint-disable-next-line @typescript-eslint/naming-convention -- 同上
 const LoginSetupPassword = defineAsyncComponent(() => import('/@/views/login/component/LoginSetupPassword.vue'));
 
@@ -121,9 +113,9 @@ const deskDate = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, 
 const rollNo = () => `${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
 const cardNo = ref(rollNo());
 
-// 同一张卡的多面：正面登录、背面自助开通、专用面首装初始化超管密码（切换时换表号，制图世界的一张表一个号）
-const mode = ref<'signin' | 'register' | 'setup'>('signin');
-const switchMode = (next: 'signin' | 'register' | 'setup') => {
+// 同一张卡的多面：正面登录、专用面首装初始化超管密码（切换时换表号，制图世界的一张表一个号）
+const mode = ref<'signin' | 'setup'>('signin');
+const switchMode = (next: 'signin' | 'setup') => {
   if (mode.value === next) {
     return;
   }
@@ -131,13 +123,12 @@ const switchMode = (next: 'signin' | 'register' | 'setup') => {
   cardNo.value = rollNo();
 };
 
-// 卡头数据边际按面切换：登录表 / 注册登记 / 初始化设置
-const cardNoPrefix = computed(() => (mode.value === 'signin' ? 'FORM NO.' : mode.value === 'register' ? 'REG. NO.' : 'INIT NO.'));
-const cardTitleText = computed(() => (mode.value === 'signin' ? t('message.login.cardTitle') : mode.value === 'register' ? t('message.login.register.cardTitle') : t('message.login.setup.cardTitle')));
+// 卡头数据边际按面切换：登录表 / 初始化设置
+const cardNoPrefix = computed(() => (mode.value === 'signin' ? 'FORM NO.' : 'INIT NO.'));
+const cardTitleText = computed(() => (mode.value === 'signin' ? t('message.login.cardTitle') : t('message.login.setup.cardTitle')));
 
 // 登录配置上提统一拉取：严格跟随服务端（=== true 才开启），失败保持全关不兜底
 const loginConfig = ref<{ secondVerEnabled: boolean; captchaEnabled: boolean } | null>(null);
-const emailRegisterEnabled = ref(false);
 // 首装状态：服务端明确上报 false 才需要初始化向导（旧后端/字段缺失 → undefined → 不进向导，安全默认）
 const superAdminNeedsSetup = ref(false);
 
@@ -149,7 +140,6 @@ onMounted(async () => {
       secondVerEnabled: res?.data?.data?.secondVerEnabled === true,
       captchaEnabled: res?.data?.data?.captchaEnabled === true,
     };
-    emailRegisterEnabled.value = res?.data?.data?.emailRegisterEnabled === true;
     superAdminNeedsSetup.value = res?.data?.data?.superAdminPasswordConfigured === false;
     // 首装零门槛：超管密码未初始化时直接落到初始化面（租户用户可点「返回登录」正常登录）
     if (superAdminNeedsSetup.value) {
@@ -379,7 +369,7 @@ onMounted(async () => {
       color: var(--p-text-color);
     }
 
-    // 自助开通入口：卡片级 footer，仅服务端开启时存在
+    // 首装初始化入口：仅服务端明确需要初始化时存在
     .login-card-alt {
       display: flex;
       align-items: baseline;

@@ -15,7 +15,7 @@
 </template>
 
 <script setup lang="ts" name="HomeQuickNav">
-// HOME-001 快捷入口：入口集由父级传入（三层驾驶舱各喂各的路由），
+// 快捷入口由总览按会话身份传入，
 // 本组件只负责渲染与可达性过滤（router.resolve 检查，未注册路由自动隐藏）。
 import {computed, type Component} from 'vue';
 import {useRouter} from 'vue-router';

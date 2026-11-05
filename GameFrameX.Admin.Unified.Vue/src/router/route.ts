@@ -1,5 +1,4 @@
 import type {RouteRecordRaw} from 'vue-router';
-import type {MenuContext, RouteScope} from '../utils/appWorkspace';
 
 /**
  * 建议：路由 path 路径与文件夹名称相同，找文件可浏览器地址找，方便定位文件位置
@@ -28,8 +27,6 @@ declare module 'vue-router' {
         isIframe?: boolean;
         roles?: string[];
         icon?: string;
-        menuContext?: MenuContext;
-        appScope?: RouteScope;
     }
 }
 
@@ -45,14 +42,14 @@ export const dynamicRoutes: Array<RouteRecordRaw> = [
         path: '/',
         name: '/',
         component: () => import('/@/layout/index.vue'),
-        redirect: '/tenant/dashboard/home',
+        redirect: '/dashboard/home',
         meta: {
             isKeepAlive: true,
         },
         children: [],
     },
     {
-        path: '/platform/job/dashboard',
+        path: '/system/job/dashboard',
         name: 'jobDashboard',
         component: () => import('/@/views/platform/system/job/JobDashboard.vue'),
         meta: {

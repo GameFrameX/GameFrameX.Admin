@@ -22,23 +22,6 @@
             :aria-label="t('message.layout.fourIsDark')" @click="onDarkModeToggle">
       <i :class="themeConfig.isIsDark ? 'fa-solid fa-sun' : 'fa-solid fa-moon'" style="font-size: 16px"></i>
     </button>
-    <button type="button" class="layout-navbars-breadcrumb-user-icon"
-            :title="t('message.user.title4')" :aria-label="t('message.user.title4')"
-            :aria-haspopup="'dialog'" @click="noticePopoverRef.toggle($event)">
-      <OverlayBadge severity="danger" v-if="hasUnreadNotice">
-        <i class="fa-solid fa-bell" style="font-size: 16px"></i>
-      </OverlayBadge>
-      <template v-else>
-        <i class="fa-solid fa-bell" style="font-size: 16px"></i>
-      </template>
-    </button>
-    <Popover ref="noticePopoverRef">
-      <template #container="{ closeCallback }">
-        <div class="notice-popover-content" style="width: 300px">
-          <UserNews :noticeList="state.noticeList"/>
-        </div>
-      </template>
-    </Popover>
     <button type="button" class="layout-navbars-breadcrumb-user-icon user-tool-secondary"
             :title="state.isScreenfull ? t('message.user.title6') : t('message.user.title5')"
             :aria-label="state.isScreenfull ? t('message.user.title6') : t('message.user.title5')"
@@ -98,22 +81,18 @@
 <script setup lang="ts" name="layoutBreadcrumbUser">
 import {defineAsyncComponent, ref, computed, reactive, onMounted} from 'vue';
 import {useRouter} from 'vue-router';
-import {showConfirm, showSuccess, showWarning, showMessage} from '../../../utils/message';
+import {showConfirm, showSuccess, showWarning} from '../../../utils/message';
 import screenfull from 'screenfull';
 import {storeToRefs} from 'pinia';
 import {useUserInfoStore} from '../../../stores/userInfo';
 import {useThemeConfigStore} from '../../../stores/themeConfig';
+import {useServerStore} from '../../../stores/server';
 import other from '../../../utils/other';
 
 import {clearAccessTokens} from '../../../utils/axiosUtils';
 import {systemAuthLogoutPost} from '../../../api/systemAuth';
-import {tenantNoticeUnReadListGet} from '../../../api/tenantNotice';
-
-import {startConnection} from '../../../utils/onlineUserSignalR';
 
 import Menu from 'primevue/menu';
-import Popover from 'primevue/popover';
-import OverlayBadge from 'primevue/overlaybadge';
 import Dialog from 'primevue/dialog';
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
@@ -125,8 +104,6 @@ import {
 } from '../../../utils/targetTenant';
 
 // 引入组件
-// eslint-disable-next-line @typescript-eslint/naming-convention -- Vue 组件占位变量（defineAsyncComponent/defineComponent 绑定），按 Vue 风格指南保持 PascalCase
-const UserNews = defineAsyncComponent(() => import('/@/layout/navigationBars/topBar/UserNews.vue'));
 // eslint-disable-next-line @typescript-eslint/naming-convention -- Vue 组件占位变量（defineAsyncComponent/defineComponent 绑定），按 Vue 风格指南保持 PascalCase
 const Search = defineAsyncComponent(() => import('/@/layout/navigationBars/topBar/GlobalSearch.vue'));
 
@@ -141,7 +118,6 @@ const searchRef = ref();
 const sizeMenuRef = ref();
 const langMenuRef = ref();
 const userMenuRef = ref();
-const noticePopoverRef = ref();
 const targetTenantDialogVisible = ref(false);
 const targetTenantId = ref(getTargetTenantId());
 const targetTenantInput = ref(targetTenantId.value);
@@ -149,7 +125,6 @@ const state = reactive({
   isScreenfull: false,
   disabledI18n: 'zh-cn',
   disabledSize: 'large',
-  noticeList: [] as any,
 });
 
 const sizeMenuItems = computed(() => [
@@ -186,7 +161,7 @@ const userMenuLabel = computed(() => {
 
 const userMenuItems = computed(() => {
   const items = [
-    {label: t('message.user.dropdown2'), command: () => router.push('/tenant/system/userCenter')},
+    {label: t('message.user.dropdown2'), command: () => router.push('/system/userCenter')},
   ];
 
   if (isSuperAdmin.value) {
@@ -209,10 +184,6 @@ const userMenuItems = computed(() => {
   return items;
 });
 
-// 是否有未读消息
-const hasUnreadNotice = computed(() => {
-  return state.noticeList.some((r: any) => r.readStatus == undefined || r.readStatus == 0);
-});
 // 全屏点击时
 const onScreenfullClick = () => {
   if (!screenfull.isEnabled) {
@@ -230,8 +201,14 @@ const onHandleCommandClick = async (path: string) => {
   if (path === 'logOut') {
     const confirmed = await showConfirm(t('message.user.logOutMessage'), t('message.user.logOutTitle'));
     if (confirmed) {
-      await systemAuthLogoutPost();
-      clearAccessTokens();
+      try {
+        await systemAuthLogoutPost();
+      } catch {
+        // 远端退出失败也必须清除本地凭据与区服上下文。
+      } finally {
+        useServerStore().resetServers();
+        clearAccessTokens();
+      }
     }
   } else {
     router.push(path);
@@ -295,24 +272,10 @@ const initI18nOrSize = (value: string, attr: string) => {
   (<any>state)[attr] = (<any>themeConfig.value)[value];
 };
 // 页面加载时
-onMounted(async () => {
+onMounted(() => {
   initI18nOrSize('globalComponentSize', 'disabledSize');
   initI18nOrSize('globalI18n', 'disabledI18n');
-
-  // 加载未读的站内信
-  var res = await tenantNoticeUnReadListGet();
-  state.noticeList = res.data.data ?? [];
-
-  // 接收站内信
-  const conn = await startConnection();
-  conn.on('PublicNotice', receiveNotice);
 });
-
-const receiveNotice = (msg: any) => {
-  state.noticeList.unshift(msg);
-
-  showMessage(t('message.layout.user.notificationMessage'), 'info');
-};
 </script>
 
 <style scoped lang="scss">

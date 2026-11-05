@@ -1,6 +1,8 @@
 // 定義內容（PLATFORM-駕駛艙=超管平台首頁；greeting 供 appHome 複用；notice 段為通知管理頁使用）
 export default {
     home: {
+        serverHealth: '區服健康',
+        serverHealthDescription: '區服登記的運行狀態，不代表即時探活結果。',
         // 版頭
         greetingMorning: '早上好',
         greetingNoon: '中午好',

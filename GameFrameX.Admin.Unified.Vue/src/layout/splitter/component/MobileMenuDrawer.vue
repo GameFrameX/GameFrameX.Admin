@@ -23,7 +23,6 @@ import { storeToRefs } from 'pinia'
 import { useRoute } from 'vue-router'
 import { useThemeConfigStore } from '../../../stores/themeConfig'
 import { useRoutesListStore } from '../../../stores/routesList'
-import { filterRoutesByMenuContext, resolveMenuContext } from '../../../utils/appWorkspace'
 
 // eslint-disable-next-line @typescript-eslint/naming-convention -- Vue 组件占位变量（defineAsyncComponent/defineComponent 绑定），按 Vue 风格指南保持 PascalCase
 const Logo = defineAsyncComponent(() => import('/@/layout/logo/index.vue'))
@@ -34,7 +33,7 @@ const storesThemeConfig = useThemeConfigStore()
 const storesRoutesList = useRoutesListStore()
 const { themeConfig } = storeToRefs(storesThemeConfig)
 const { routesList } = storeToRefs(storesRoutesList)
-const menuList = computed(() => filterRoutesByMenuContext(routesList.value, resolveMenuContext(route)))
+const menuList = computed(() => routesList.value)
 
 const route = useRoute()
 

@@ -6,7 +6,7 @@
         multiple
     >
       <template #item="{ item, active, hasSubmenu }">
-        <router-link v-if="item.route" v-slot="{ href, navigate, isExactActive }" :to="resolveMenuRoute(item.route)" custom>
+        <router-link v-if="item.route" v-slot="{ href, navigate, isExactActive }" :to="item.route" custom>
           <a v-ripple class="flex align-items-center cursor-pointer menu-nav-item" :class="{ 'menu-item-active': isExactActive }" :href="href" @click="navigate">
             <SvgIcon v-if="item.icon" :name="item.icon" class="mr-2"/>
             <span class="menu-label">{{ item.label }}</span>
@@ -42,7 +42,7 @@
     <Popover ref="flyoutRef" class="menu-flyout" @mouseenter="onFlyoutEnter" @mouseleave="onFlyoutLeave">
       <div class="flyout-menu">
         <template v-for="child in flyoutChildren" :key="child.key">
-          <router-link v-if="child.route" :to="resolveMenuRoute(child.route)" custom v-slot="{ href, navigate, isExactActive }">
+          <router-link v-if="child.route" :to="child.route" custom v-slot="{ href, navigate, isExactActive }">
             <a class="flyout-item" :class="{ 'flyout-item-active': isExactActive }" :href="href" @click="navigate(); closeFlyout()">
               <SvgIcon v-if="child.icon" :name="child.icon" class="mr-2"/>
               <span>{{ child.label }}</span>
@@ -64,7 +64,7 @@
 
 <script setup lang="ts" name="navigationMenuVertical">
 import { reactive, computed, ref, onMounted, onUnmounted, watch } from 'vue';
-import { useRoute, useRouter, onBeforeRouteUpdate, RouteRecordRaw } from 'vue-router';
+import { useRoute, onBeforeRouteUpdate, RouteRecordRaw } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { useThemeConfigStore } from '../../stores/themeConfig';
 import PanelMenu from 'primevue/panelmenu';
@@ -72,8 +72,6 @@ import Popover from 'primevue/popover';
 import SvgIcon from '/@/components/svg-icon/index.vue';
 import { convertRoutesToMenuItems, computeExpandedKeys } from './menuConverter';
 import type { NavMenuItem } from './menuConverter';
-import { useCurrentApp } from '../../composables/useCurrentApp';
-import { normalizeAppId, shouldCarryAppId } from '../../utils/appWorkspace';
 
 const props = defineProps({
   menuList: {
@@ -85,8 +83,6 @@ const props = defineProps({
 const storesThemeConfig = useThemeConfigStore();
 const { themeConfig } = storeToRefs(storesThemeConfig);
 const route = useRoute();
-const router = useRouter();
-const { currentAppId } = useCurrentApp();
 
 const state = reactive({
   isCollapse: false,
@@ -98,13 +94,6 @@ const menuItems = computed(() => {
   return convertRoutesToMenuItems(<RouteItems>props.menuList, t);
 });
 
-const resolveMenuRoute = (path: string) => {
-  const appId = normalizeAppId(route.query.appId) ?? normalizeAppId(currentAppId.value);
-  if (appId === undefined || !shouldCarryAppId(router.resolve(path))) {
-    return path;
-  }
-  return { path, query: { appId: appId } };
-};
 
 watch(
     () => themeConfig.value.isCollapse,
