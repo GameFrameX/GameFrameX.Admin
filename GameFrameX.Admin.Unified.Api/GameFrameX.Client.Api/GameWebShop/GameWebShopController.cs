@@ -1,4 +1,5 @@
 using GameFrameX.Client.Api.Services.PublicCallback;
+using System.Collections.Concurrent;
 using System.Globalization;
 using System.Net;
 using System.Security.Cryptography;
@@ -28,6 +29,17 @@ public class GameWebShopController : BaseController<TenantGameWebShopEntity>
     private readonly Repository<TenantGameWebShopOrderEntity> _webShopOrderService;
     private readonly Repository<TenantGameOrderEntity> _gameOrderEntity;
     private readonly Repository<SystemConfigEntity> _systemConfigService;
+
+    /// <summary>
+    /// 网页商城回调端点路由段（公开回调 {packageId} 可选路由模板，不含分包段）。
+    /// </summary>
+    private const string WebShopNotifyCallbackRoute = "api/GameWebShop/NotifyWebShop";
+
+    /// <summary>
+    /// 回调发货按订单主键加进程内信号量串行化（同 TenantGameOrderShipService 的订单锁约定），
+    /// 避免同订单并发重复回调重复发送邮件。
+    /// </summary>
+    private static readonly ConcurrentDictionary<long, SemaphoreSlim> NotifyOrderLocks = new();
 
     /// <summary>
     /// </summary>
@@ -136,10 +148,12 @@ public class GameWebShopController : BaseController<TenantGameWebShopEntity>
             postParams["pid"] = systemConfigParams.Pid;
             postParams["type"] = input.Type;
             postParams["out_trade_no"] = outTradeNo;
-            var notifyUrl = BuildWebShopNotifyUrl(systemConfigParams.NotifyUrl);
-            if (string.IsNullOrWhiteSpace(notifyUrl))
+            // 下单前把配置地址规范化为能命中回调路由的完整地址：站点根地址自动补路由段（含当前分包段）、
+            // 旧三段地址自动去段重建、无法识别的路径直接拒绝下单，避免网关回调打在无法命中的地址上导致不发货。
+            var notifyUrl = PublicCallbackNotifyUrlBuilder.Build(systemConfigParams.NotifyUrl, WebShopNotifyCallbackRoute, PaymentOptionSettingProvider.GetCurrentPackageId(HttpContext));
+            if (notifyUrl == null)
             {
-                return GameApiResult.Error<TenantGameWebShopEntityBuyResponse>(AreaErrorCode.AreaCannotBuy, "无法构造完整支付回调路由，请完成回调路由升级后重试");
+                return GameApiResult.Error<TenantGameWebShopEntityBuyResponse>(AreaErrorCode.AreaCannotBuy, "支付回调地址配置无效，无法构造完整支付回调路由");
             }
 
             postParams["notify_url"] = notifyUrl;
@@ -184,9 +198,12 @@ public class GameWebShopController : BaseController<TenantGameWebShopEntity>
     }
 
     /// <summary>
-    /// 支付网关回调（zlpay notify）。信任链固定为：① 验签（VerifySignMode log/enforce 灰度）→ ② 按 out_trade_no 幂等查单
-    /// → ③ 金额比对 → ④ Unpaid→Shipped 迁移发货。业务参数（RoleId/AreaId/ShopId/实付金额）不取自回调，
+    /// 支付网关回调（zlpay notify）。信任链固定为：① 强制验签（签名不匹配一律拒绝且不发货）→ ② 按 out_trade_no 幂等查单
+    /// → ③ 金额比对 → ④ 按订单快照（order.Content）解出发货商品 → ⑤ Unpaid→NotShipped 认领 → ⑥ 区服校验
+    /// → ⑦ 邮件发货 → ⑧ 发货成功后迁移 Shipped 并累充。业务参数（RoleId/AreaId/ShopId/实付金额）不取自回调，
     /// 一律回读 Buy 预创建的订单快照；param 回显不解析（不可信输入不参与解析）。
+    /// 仅 Unpaid / NotShipped 可进入发货，其余状态（已发货、退款中、已退款、已作废等）幂等返回成功；
+    /// 发货失败（区服离线 / 邮件失败等）订单保留 NotShipped 可重试状态，后续回调可再次尝试发货。
     /// </summary>
     /// <returns></returns>
     [PublicCallbackEndpoint("webshop", "payment")]
@@ -206,17 +223,14 @@ public class GameWebShopController : BaseController<TenantGameWebShopEntity>
             return GameApiResult.Error<BaseOperationAckResponse>(AreaErrorCode.AreaCannotBuy, "当前状态不能购买,联系管理员进行补发");
         }
 
-        // ① 验签：以回传业务参数重建字典重算 MD5（key 复用 web_shop_params.Sign）。
-        // log 模式仅记录 expected/received 不拒绝（灰度观测 zlpay notify 签名口径）；enforce 模式验签失败直接拒发。
+        // ① 验签（强制）：以回传业务参数重建字典重算 MD5（key 复用 web_shop_params.Sign）。
+        // 签名不匹配一律拒绝回调且不发货（公开回调可被任意调用，伪造签名不得换货）；expected/received 落日志便于排障。
         var expectedSign = CreateMd5Sign(BuildNotifySignParameters(data), systemConfigParams.Sign);
-        if (!string.Equals(expectedSign, data.Sign, StringComparison.OrdinalIgnoreCase))
+        if (!FixedTimeEqualsIgnoreCase(expectedSign, data.Sign))
         {
             LogHelper.Warning($"网页商城回调验签不匹配：out_trade_no={data.OutTradeNo} expected={expectedSign} received={data.Sign}");
-            if (IsEnforceVerifySignMode(systemConfigParams))
-            {
-                await InsertFailedWebShopOrderAsync(data.OutTradeNo, 0, 0, 0, "验签失败");
-                return GameApiResult.Error<BaseOperationAckResponse>(AuthErrorCode.SignatureVerifyFailed, "签名验证失败");
-            }
+            await InsertFailedWebShopOrderAsync(data.OutTradeNo, 0, 0, 0, "验签失败");
+            return GameApiResult.Error<BaseOperationAckResponse>(AuthErrorCode.SignatureVerifyFailed, "签名验证失败");
         }
 
         // ② 幂等查单：out_trade_no 是 Buy 预创建订单的全局幂等键（雪花 ID），查无此单视为伪造/异常回调
@@ -227,138 +241,157 @@ public class GameWebShopController : BaseController<TenantGameWebShopEntity>
             return GameApiResult.Error<BaseOperationAckResponse>(OrderErrorCode.NotifyOrderNotFound, "回调订单不存在");
         }
 
-        if (order.Status == OrderStatusEnum.Shipped)
-        {
-            return HttpJsonResultData<BaseOperationAckResponse>.Success();
-        }
-
-        // ③ 金额比对：回传金额（分）必须与预创建实付金额一致，少付/多付/非正数均拒绝发货。
-        // 用 decimal 直接比较（uint 隐式提升），避免不可信金额经 decimal→uint 强转溢出抛异常。
-        if (data.Money <= 0 || data.Money * 100 != order.Amount)
-        {
-            await InsertFailedWebShopOrderAsync(data.OutTradeNo, long.TryParse(order.RoleId, out var snapshotRoleId) ? snapshotRoleId : 0, order.AreaId, order.Sku, "金额不符");
-            return GameApiResult.Error<BaseOperationAckResponse>(OrderErrorCode.NotifyAmountMismatch, "支付金额与订单不符");
-        }
-
-        // ④ Unpaid→Shipped 状态迁移并执行现有发货链路；同单重复回调在上方幂等检查直接返回，仅发货一次
-        var roleId = long.TryParse(order.RoleId, out var parsedRoleId) ? parsedRoleId : 0;
-        var areaId = order.AreaId;
-        var shopId = order.Sku;
-        var entity = new TenantGameWebShopOrderEntity
-        {
-            RoleId = roleId,
-            AreaId = areaId,
-            OrderId = data.OutTradeNo,
-            GameShopId = shopId,
-            Name = "",
-            Reason = "",
-            Description = "",
-        };
-        var role = await _roleService.GetByIdAsync(roleId);
-        //角色不存在
-        if (role == null)
-        {
-            //添加一个失败订单到网页商城
-            entity.Reason = "角色不存在";
-            await _webShopOrderService.InsertAsync(entity);
-            return GameApiResult.Error<BaseOperationAckResponse>(GameRoleErrorCode.RoleNotFound, "角色不存在");
-        }
-
-        var shop = await PRepository.GetAsync(g => g.Id == shopId && g.IsUp);
-
-        if (shop == null)
-        {
-            //添加一个失败订单到网页商城
-
-            entity.Reason = "商品不存在或下架";
-            await _webShopOrderService.InsertAsync(entity);
-            return GameApiResult.Error<BaseOperationAckResponse>(OrderErrorCode.WebShopNotFound, "商品不存在");
-        }
-
-        var list = JsonHelper.Deserialize<List<PropertyItemResponse>>(shop.ItemJson);
-        var newList = new List<PropertyItemResponse>();
-        foreach (var propertyItem in list)
-        {
-            var gameGoodsEntity = await PRepository.AsSugarClient().Queryable<TenantGameGoodsEntity>().SingleAsync(m => m.Id == propertyItem.Id);
-            if (gameGoodsEntity != null)
-            {
-                propertyItem.Id = gameGoodsEntity.ConfigId;
-                newList.Add(propertyItem);
-            }
-        }
-
-        // 收款确认后原子迁移 Unpaid→Shipped：条件更新（仅 Unpaid 可迁），并发重复回调在此串行化，
-        // 抢不到迁移权（影响行数!=1）说明另一请求已处理，按幂等直接返回 success；发货链路继续使用上方回读的订单快照。
-        var shippedRows = await _gameOrderEntity.AsUpdateable()
-                                                .SetColumns(u => u.Status == OrderStatusEnum.Shipped)
-                                                .Where(u => u.OrderId == data.OutTradeNo && u.Status == OrderStatusEnum.Unpaid)
-                                                .ExecuteCommandAsync();
-        if (shippedRows != 1)
-        {
-            return HttpJsonResultData<BaseOperationAckResponse>.Success();
-        }
-
-        // 数据库侧原子累加，避免并发下单时读改写丢失。
-        var rechargeAmount = (int)order.Amount;
-        await _roleService.AsUpdateable()
-                          .SetColumns(u => u.AllRecharge == (u.AllRecharge ?? 0) + rechargeAmount)
-                          .Where(u => u.Id == role.Id)
-                          .ExecuteCommandAsync();
-        //区服不一致
-        if (role.AreaId != areaId)
-        {
-            //添加一个失败订单到网页商城
-
-            entity.Reason = "区服不一致";
-            await _webShopOrderService.InsertAsync(entity);
-            return GameApiResult.Error<BaseOperationAckResponse>(AreaErrorCode.AreaNotFound, "区服不一致");
-        }
-
-        //获取区服
-        var gameAreaEntity = await _areaService.AsQueryable().Filter(null, true).Where(u => u.IsDeleted == false).FirstAsync(u => u.Id == areaId);
-        if (gameAreaEntity.IsNull()
-            || gameAreaEntity.ServerStatus == GameServerStatus.Unknown
-            || gameAreaEntity.ServerStatus == GameServerStatus.Offline
-            || gameAreaEntity.ServerStatus == GameServerStatus.Maintenance)
-        {
-            //添加一个失败订单到网页商城
-
-            entity.Reason = "服务器状态不在线";
-            await _webShopOrderService.InsertAsync(entity);
-            return GameApiResult.Error<BaseOperationAckResponse>(AreaErrorCode.AreaCannotBuy, "当前状态不能购买,联系管理员进行补发");
-        }
-        //发送商品到邮件
-
+        // 同订单回调按订单主键加进程内信号量串行化（同 TenantGameOrderShipService 的订单锁约定），
+        // 避免并发重复回调重复发送邮件；锁内重读订单后按状态守卫推进。
+        var orderLock = NotifyOrderLocks.GetOrAdd(order.Id, _ => new SemaphoreSlim(1, 1));
+        await orderLock.WaitAsync();
         try
         {
-            var reqPostMailRequest = new GameWebShpBuySendMailRequest
-            {
-                Roles = new List<long> { roleId, },
-                Title = systemConfigParams.WebShopTitle,
-                SubTitle = systemConfigParams.WebShopSubTitle,
-                Content = systemConfigParams.WebShopContent,
-                PostType = false,
-                ExpirationTime = TimerHelper.UnixTimeSeconds() + 30 * 24 * 60 * 60,
-                IsTranslate = true,
-                Items = newList,
-            };
-            var result = await _httpClientFactory.PostJsonToStringAsync(GameServerEndpointUrlBuilder.Build(gameAreaEntity, GameServerEndpointKindEnum.Fulfillment, "post_mail"), reqPostMailRequest);
-            var resultData = result.ToHttpJsonResult<GameWebShpBuySendMailResponse>();
-            if (!resultData.IsSuccess)
-            {
-                entity.Reason = JsonHelper.SerializeFormat(resultData);
-                await _webShopOrderService.InsertAsync(entity);
-            }
-        }
-        catch (Exception e)
-        {
-            //添加一个失败订单到网页商城
-            entity.Reason = "游戏服务参数解析错误" + e.Message;
-            await _webShopOrderService.InsertAsync(entity);
-            return GameApiResult.Error<BaseOperationAckResponse>(AreaErrorCode.AreaCannotBuy, "当前状态不能购买,联系管理员进行补发");
-        }
+            order = await _gameOrderEntity.GetAsync(g => g.OrderId == data.OutTradeNo);
 
-        return HttpJsonResultData<BaseOperationAckResponse>.Success();
+            // 状态守卫：仅 Unpaid（待认领）与 NotShipped（认领后待发货 / 失败重试）可进入发货；
+            // 其余状态（Shipped 已发货、InitiateRefund/RefundAgreement 退款中、Refunded 已退款、
+            // Voided 已作废、Completed 已完成等）按既定口径幂等返回成功，不发邮件、不累充
+            //（同 TenantGameOrderShipService 对 Refunded/Voided 等终态订单的守卫处理）。
+            if (order.Status is not (OrderStatusEnum.Unpaid or OrderStatusEnum.NotShipped))
+            {
+                return HttpJsonResultData<BaseOperationAckResponse>.Success();
+            }
+
+            // ③ 金额比对：回传金额（分）必须与预创建实付金额一致，少付/多付/非正数均拒绝发货。
+            // 用 decimal 直接比较（uint 隐式提升），避免不可信金额经 decimal→uint 强转溢出抛异常。
+            if (data.Money <= 0 || data.Money * 100 != order.Amount)
+            {
+                await InsertFailedWebShopOrderAsync(data.OutTradeNo, long.TryParse(order.RoleId, out var snapshotRoleId) ? snapshotRoleId : 0, order.AreaId, order.Sku, "金额不符");
+                return GameApiResult.Error<BaseOperationAckResponse>(OrderErrorCode.NotifyAmountMismatch, "支付金额与订单不符");
+            }
+
+            // ④ 发货商品一律取 Buy 预创建的订单快照（order.Content.RewardsItem），不回读商城商品当前状态：
+            // 付款期间商品被修改或下架都不改变本单应发内容，下架也不再阻断发货。
+            var roleId = long.TryParse(order.RoleId, out var parsedRoleId) ? parsedRoleId : 0;
+            var areaId = order.AreaId;
+            var orderSnapshot = string.IsNullOrWhiteSpace(order.Content) ? null : JsonHelper.Deserialize<PlayerCreateOrderResponse>(order.Content);
+            var snapshotItems = orderSnapshot?.RewardsItem ?? new List<PropertyItemResponse>();
+            var newList = new List<PropertyItemResponse>();
+            foreach (var propertyItem in snapshotItems)
+            {
+                var gameGoodsEntity = await PRepository.AsSugarClient().Queryable<TenantGameGoodsEntity>().SingleAsync(m => m.Id == propertyItem.Id);
+                if (gameGoodsEntity != null)
+                {
+                    propertyItem.Id = gameGoodsEntity.ConfigId;
+                    newList.Add(propertyItem);
+                }
+            }
+
+            var entity = new TenantGameWebShopOrderEntity
+            {
+                RoleId = roleId,
+                AreaId = areaId,
+                OrderId = data.OutTradeNo,
+                GameShopId = order.Sku,
+                Name = "",
+                Reason = "",
+                Description = "",
+            };
+            var role = await _roleService.GetByIdAsync(roleId);
+            //角色不存在
+            if (role == null)
+            {
+                //添加一个失败订单到网页商城
+                entity.Reason = "角色不存在";
+                await _webShopOrderService.InsertAsync(entity);
+                return GameApiResult.Error<BaseOperationAckResponse>(GameRoleErrorCode.RoleNotFound, "角色不存在");
+            }
+
+            // ⑤ 首次收款确认：仅首个回调完成 Unpaid→NotShipped 认领（条件更新，并发重复回调在此幂等返回）。
+            // 认领后进入发货链路；此前发货失败的订单停留在 NotShipped，后续回调跳过认领直接重试发货。
+            if (order.Status == OrderStatusEnum.Unpaid)
+            {
+                var claimedRows = await _gameOrderEntity.AsUpdateable()
+                                                        .SetColumns(u => u.Status == OrderStatusEnum.NotShipped)
+                                                        .Where(u => u.OrderId == data.OutTradeNo && u.Status == OrderStatusEnum.Unpaid)
+                                                        .ExecuteCommandAsync();
+                if (claimedRows != 1)
+                {
+                    return HttpJsonResultData<BaseOperationAckResponse>.Success();
+                }
+            }
+
+            // ⑥ 区服一致性 / 在线校验：失败保留 NotShipped 可重试状态并返回错误（等待网关重试）
+            if (role.AreaId != areaId)
+            {
+                //添加一个失败订单到网页商城
+                entity.Reason = "区服不一致";
+                await _webShopOrderService.InsertAsync(entity);
+                return GameApiResult.Error<BaseOperationAckResponse>(AreaErrorCode.AreaNotFound, "区服不一致");
+            }
+
+            //获取区服
+            var gameAreaEntity = await _areaService.AsQueryable().Filter(null, true).Where(u => u.IsDeleted == false).FirstAsync(u => u.Id == areaId);
+            if (gameAreaEntity.IsNull()
+                || gameAreaEntity.ServerStatus == GameServerStatus.Unknown
+                || gameAreaEntity.ServerStatus == GameServerStatus.Offline
+                || gameAreaEntity.ServerStatus == GameServerStatus.Maintenance)
+            {
+                //添加一个失败订单到网页商城
+                entity.Reason = "服务器状态不在线";
+                await _webShopOrderService.InsertAsync(entity);
+                return GameApiResult.Error<BaseOperationAckResponse>(AreaErrorCode.AreaCannotBuy, "当前状态不能购买,联系管理员进行补发");
+            }
+
+            // ⑦ 发送商品到邮件：失败落失败单并返回错误，订单保留 NotShipped（网关重试时重新发货，无需人工补发）
+            try
+            {
+                var reqPostMailRequest = new GameWebShpBuySendMailRequest
+                {
+                    Roles = new List<long> { roleId, },
+                    Title = systemConfigParams.WebShopTitle,
+                    SubTitle = systemConfigParams.WebShopSubTitle,
+                    Content = systemConfigParams.WebShopContent,
+                    PostType = false,
+                    ExpirationTime = TimerHelper.UnixTimeSeconds() + 30 * 24 * 60 * 60,
+                    IsTranslate = true,
+                    Items = newList,
+                };
+                var result = await _httpClientFactory.PostJsonToStringAsync(GameServerEndpointUrlBuilder.Build(gameAreaEntity, GameServerEndpointKindEnum.Fulfillment, "post_mail"), reqPostMailRequest);
+                var resultData = result.ToHttpJsonResult<GameWebShpBuySendMailResponse>();
+                if (!resultData.IsSuccess)
+                {
+                    entity.Reason = JsonHelper.SerializeFormat(resultData);
+                    await _webShopOrderService.InsertAsync(entity);
+                    return GameApiResult.Error<BaseOperationAckResponse>(AreaErrorCode.AreaCannotBuy, "当前状态不能购买,联系管理员进行补发");
+                }
+            }
+            catch (Exception e)
+            {
+                //添加一个失败订单到网页商城
+                entity.Reason = "游戏服务参数解析错误" + e.Message;
+                await _webShopOrderService.InsertAsync(entity);
+                return GameApiResult.Error<BaseOperationAckResponse>(AreaErrorCode.AreaCannotBuy, "当前状态不能购买,联系管理员进行补发");
+            }
+
+            // ⑧ 发货成功后完成状态迁移：NotShipped→Shipped 条件更新恰一迁移，累充随迁移恰一累加
+            //（并发 / 重试下只有完成迁移的一方累充，已 Shipped 的订单在锁内幂等短路，不重复累充）。
+            var shippedRows = await _gameOrderEntity.AsUpdateable()
+                                                    .SetColumns(u => u.Status == OrderStatusEnum.Shipped)
+                                                    .Where(u => u.OrderId == data.OutTradeNo && u.Status == OrderStatusEnum.NotShipped)
+                                                    .ExecuteCommandAsync();
+            if (shippedRows == 1)
+            {
+                // 数据库侧原子累加，避免并发下单时读改写丢失。
+                var rechargeAmount = (int)order.Amount;
+                await _roleService.AsUpdateable()
+                                  .SetColumns(u => u.AllRecharge == (u.AllRecharge ?? 0) + rechargeAmount)
+                                  .Where(u => u.Id == role.Id)
+                                  .ExecuteCommandAsync();
+            }
+
+            return HttpJsonResultData<BaseOperationAckResponse>.Success();
+        }
+        finally
+        {
+            orderLock.Release();
+        }
     }
 
     /// <summary>
@@ -385,6 +418,22 @@ public class GameWebShopController : BaseController<TenantGameWebShopEntity>
             var hash = md5.ComputeHash(Encoding.UTF8.GetBytes(raw));
             return BitConverter.ToString(hash).Replace("-", "").ToLower();
         }
+    }
+
+    /// <summary>
+    /// 常量时间比较两个十六进制签名（忽略大小写）：统一小写转字节后用
+    /// <see cref="CryptographicOperations.FixedTimeEquals"/> 比较，避免短路字符串比较
+    /// 向定时攻击泄露匹配前缀长度；长度不等直接返回 false（仅泄露长度差异）。
+    /// </summary>
+    /// <param name="expectedSign">本地重算的期望签名（小写十六进制）。</param>
+    /// <param name="receivedSign">回调回传签名，可为 null。</param>
+    /// <returns>是否一致。</returns>
+    private static bool FixedTimeEqualsIgnoreCase(string expectedSign, string? receivedSign)
+    {
+        var expectedBytes = Encoding.UTF8.GetBytes(expectedSign.ToLowerInvariant());
+        var receivedBytes = Encoding.UTF8.GetBytes((receivedSign ?? string.Empty).ToLowerInvariant());
+        return expectedBytes.Length == receivedBytes.Length
+               && CryptographicOperations.FixedTimeEquals(expectedBytes, receivedBytes);
     }
 
     /// <summary>
@@ -448,17 +497,6 @@ public class GameWebShopController : BaseController<TenantGameWebShopEntity>
     }
 
     /// <summary>
-    /// 验签灰度模式判定：仅 enforce 白名单值返回 true，其余（缺省 log / 非白名单取值）一律按 log 灰度处理，
-    /// 避免口径未确认时误拒真实收款。
-    /// </summary>
-    /// <param name="config">网页商城配置。</param>
-    /// <returns>是否为 enforce 强制验签模式。</returns>
-    private static bool IsEnforceVerifySignMode(GameWebConfig config)
-    {
-        return string.Equals(config.VerifySignMode, "enforce", StringComparison.OrdinalIgnoreCase);
-    }
-
-    /// <summary>
     /// 落网页商城失败单（保留排障语义）：验签失败/查无订单时无预创建快照可回读，RoleId/AreaId/GameShopId 以 0 填充。
     /// </summary>
     /// <param name="outTradeNo">回传订单号。</param>
@@ -479,16 +517,4 @@ public class GameWebShopController : BaseController<TenantGameWebShopEntity>
             Description = "",
         });
     }
-
-    private string? BuildWebShopNotifyUrl(string notifyUrl)
-    {
-        if (!Uri.TryCreate(notifyUrl, UriKind.Absolute, out var callbackUri)
-            || (callbackUri.Scheme != Uri.UriSchemeHttp && callbackUri.Scheme != Uri.UriSchemeHttps))
-        {
-            return null;
-        }
-
-        return callbackUri.ToString().TrimEnd('/');
-    }
-
 }

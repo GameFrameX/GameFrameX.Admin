@@ -46,9 +46,10 @@ public class WechatPayOptionSetting : IPaymentOptionSetting
     public string WechatPayCertificatePrivateKey { get; set; } = null!;
 
     /// <summary>
-    /// 支付结果回调通知地址。运行期由 PaymentOptionSettingProvider 自动追加租户 / 应用 / 分包路由段
-    /// （公开回调端点格式），配置时只需填写站点根地址。
+    /// 支付结果回调通知地址。运行期由 PaymentOptionSettingProvider 按当前公开回调端点
+    /// （api/GameOrder/NotifyWeChatPay/{packageId}）自动补全路由段：配置时只需填写站点根地址；
+    /// 完整新路由地址与旧「租户/应用/分包」三段地址会自动规范化，无法识别的地址下单时拒绝。
     /// </summary>
-    [PaymentField(Label = "回调通知地址", Required = true, Help = "填写站点根地址即可，系统自动追加租户路由段")]
+    [PaymentField(Label = "回调通知地址", Required = true, Help = "填写站点根地址即可，系统自动追加回调路由段（含分包标识）")]
     public string WechatPayNotifyUrl { get; set; } = null!;
 }
