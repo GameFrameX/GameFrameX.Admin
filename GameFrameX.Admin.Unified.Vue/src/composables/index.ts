@@ -1,5 +1,5 @@
 export {useCrudTable} from './useCrudTable'
-export {usePrimeTablePage, useRouteAppIdQuerySync} from './useCrudPageHelpers'
+export {usePrimeTablePage} from './useCrudPageHelpers'
 export {useEditDialog} from './useEditDialog'
 export {useTableColumnPersistence} from './useTableColumnPersistence'
 export {useMediaQueryMatch} from './useMediaQueryMatch'

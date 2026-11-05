@@ -1,0 +1,44 @@
+<template>
+  <BaseEditDialog
+    ref="dialogRef"
+    :title="props.title"
+    :addApi="(params: any) => gameTimeJobAddPost(params)"
+    :updateApi="(params: any) => gameTimeJobUpdatePost(params)"
+    :rules="rules"
+    @reloadTable="emit('reloadTable')"
+  >
+    <template #default="{ ruleForm }">
+      <TextField v-model="ruleForm.name" name="name" :label="t('message.gameBusiness.name')" :placeholder="t('message.gameBusiness.pleaseEnterName')"/>
+      <TextField v-model="ruleForm.description" name="description" :label="t('message.gameBusiness.redeemcode.description')" :placeholder="t('message.gameBusiness.pleaseEnterDescription')"/>
+      <TextField v-model="ruleForm.cron" name="cron" :label="t('message.gameBusiness.timeJob.cron')" placeholder="0 0/5 * * * ?"/>
+      <FormLabel>{{ t('message.gameBusiness.isOnce') }}</FormLabel>
+      <div><ToggleSwitch v-model="ruleForm.isOnce"/></div>
+    </template>
+  </BaseEditDialog>
+</template>
+
+<script lang="ts" setup>
+import {ref} from 'vue'
+import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
+import {TextField} from '../../../../components/crud-form-fields'
+import { gameTimeJobAddPost, gameTimeJobUpdatePost } from '../../../../api/gameTimeJob'
+
+import ToggleSwitch from 'primevue/toggleswitch';
+
+var props = defineProps({
+  title: {type: String, default: ''},
+})
+const emit = defineEmits(['reloadTable'])
+const dialogRef = ref()
+
+const rules = {
+  name: [{required: true, message: t('message.gameBusiness.pleaseEnterName'), trigger: 'blur'}],
+  cron: [{required: true, message: t('message.gameBusiness.timeJob.cron'), trigger: 'blur'}],
+}
+
+defineExpose({
+  openDialog: (row: any) => dialogRef.value?.openDialog(row),
+  get isEditor() { return dialogRef.value?.isEditor },
+  set isEditor(val) { if (dialogRef.value) dialogRef.value.isEditor = val },
+})
+</script>

@@ -2,9 +2,6 @@ export default {
   gameBusiness: {
     openAccess: {
       listTitle: '應用開放訪問憑證',
-      entityId: '憑證ID',
-
-      appId: '應用',
       bindUser: '綁定用戶',
       bindUserId: '綁定用戶',
       scenario: '責任場景',
@@ -15,8 +12,6 @@ export default {
       isEnabled: '狀態',
       expiresTime: '過期時間',
       revokedTime: '撤銷時間',
-      revokeReason: '撤銷原因',
-      createdTime: '建立時間',
       noExpiry: '不過期',
 
       enabled: '已啟用',
@@ -25,7 +20,6 @@ export default {
 
       issueTitle: '簽發憑證',
       editTitle: '編輯憑證',
-      issueHint: '簽發成功後 AccessSecret 僅展示一次，請立即保存。',
       pleaseSelectBindUser: '請選擇綁定用戶',
       pleaseEnterScenario: '請輸入責任場景編碼',
       pleaseEnterPurpose: '請輸入使用目的',
@@ -40,14 +34,10 @@ export default {
       scopesRequired: '請至少選擇一個接口範圍',
 
       scopePackageReport: '分包上報 (package-report)',
-
-      issue: '簽發',
-      edit: '編輯',
       revoke: '吊銷',
       enable: '啟用',
       disable: '禁用',
       refresh: '輪換密鑰',
-      delete: '刪除',
 
       revokeTitle: '吊銷憑證',
       enableTitle: '啟用憑證',
@@ -59,11 +49,8 @@ export default {
       reasonTooLong: '操作原因不能超過 256 字',
       revokeWarning: '吊銷後憑證將立即失效且不可恢復，確定繼續？',
       refreshWarning: '輪換後原 AccessSecret 立即失效，新 Secret 僅展示一次。',
-      actionRowLabel: '操作憑證',
 
       deleteConfirm: '確定刪除該憑證嗎',
-      enableConfirm: '確定啟用該憑證嗎',
-      disableConfirm: '確定禁用該憑證嗎',
 
       secretTitle: '憑證密鑰（僅此一次展示）',
       secretWarning: 'AccessSecret 僅此一次展示，關閉後不可再查，請立即複製保存！',
@@ -72,9 +59,6 @@ export default {
       copySuccess: '已複製到剪貼簿',
       copyFailed: '複製失敗，請手動選擇複製',
       iHaveSaved: '我已保存，關閉',
-
-      issueSuccess: '簽發成功',
-      updateSuccess: '更新成功',
       deleteSuccess: '刪除成功',
       revokeSuccess: '吊銷成功',
       enableSuccess: '啟用成功',

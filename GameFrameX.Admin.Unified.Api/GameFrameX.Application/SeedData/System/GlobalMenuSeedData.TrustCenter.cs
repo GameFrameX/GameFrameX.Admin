@@ -11,17 +11,11 @@ using GameFrameX.Core.Api;
 namespace GameFrameX.Application.SeedData.System;
 
 /// <summary>
-/// 信任与安全中心 域菜单种子（partial；由 <see cref="GlobalMenuSeedData.BuildData"/> 聚合）。
+/// 玩家中心的举报、处罚、申诉、反作弊事件与处罚生效状态菜单。
 /// <para>
-/// 落地 C123（GFX-113）/ C124（GFX-115）前端先行时显式欠账的后端菜单 seed + 权限码 seed：
-/// 前端 <c>src/views/app/trustCenter/</c> 五页（举报管理 / 处罚管理 / 申诉管理 / 反作弊事件 / 处罚生效状态）
-/// 自 #157 起即存在，但端点全部靠 <c>permission:auto:*</c> 挂根兜底（pid=0，非超管调用必 403）。
-/// 本文件补齐：顶层根 <c>route:trustCenter</c> + 四个新页面行 + 显式按钮（Key=前端权限码，Permission=现役路由名）。
-/// </para>
-/// <para>
-/// 处罚管理 <c>route:gamePenaltyEntity</c> 自 Player partial 迁入（#157 views 三段重组后组件路径
-/// 已从 playerCenter 移至 trustCenter，原 Component 指向死路径）；Key/Id 不变，存量租户 role-menu 绑定无感。
-/// 其余未显式绑定的端点（update/detail/delete 等）经 controllerPidMap 挂到所属页面，随页面授权隐式放行。
+/// 前端页面位于 <c>src/views/playerCenter/</c>，统一挂在 <c>route:player</c> 根下。
+/// 页面和按钮保留稳定 Key/Id，Permission 对应现役路由名；未显式绑定的端点由
+/// controllerPidMap 挂到所属页面，随页面授权放行。
 /// </para>
 /// </summary>
 public partial class GlobalMenuSeedData
@@ -34,43 +28,14 @@ public partial class GlobalMenuSeedData
         {
             new()
             {
-                Id = StableSeedId.Menu("route:trustCenter"),
-                Key = "route:trustCenter",
-                Pid = 0,
-                Type = MenuTypeEnum.Dir,
-                Name = "trustCenter",
-                Path = "/trustCenter",
-                AppScope = MenuAppScopeEnum.Console,
-                Component = null,
-                Redirect = null,
-                Permission = null,
-                Title = "信任与安全中心",
-                TitleCode = "message.menu.trustSafety",
-                Icon = "fa-solid fa-shield-halved",
-                OutLink = null,
-                IsIframe = false,
-                IsHide = false,
-                IsKeepAlive = true,
-                IsAffix = false,
-                OrderNo = 210,
-                IsEnabled = true,
-                Remark = null,
-                CreatedTime = createdTime,
-                UpdateTime = createdTime,
-                SuperAdminOnly = false,
-                AllowTenantWhenSuperAdminOnly = false,
-                IsDeleted = false,
-            },
-            new()
-            {
                 Id = StableSeedId.Menu("route:gameReportEntity"),
                 Key = "route:gameReportEntity",
-                Pid = StableSeedId.Menu("route:trustCenter"),
+                Pid = StableSeedId.Menu("route:player"),
                 Type = MenuTypeEnum.Menu,
                 Name = "gameReportEntity",
-                Path = "/app/trustCenter/gameReportEntity",
+                Path = "/playerCenter/gameReportEntity",
                 AppScope = MenuAppScopeEnum.Console,
-                Component = "/app/trustCenter/gameReportEntity/index",
+                Component = "/playerCenter/gameReportEntity/index",
                 Redirect = null,
                 Permission = null,
                 Title = "举报管理",
@@ -81,7 +46,7 @@ public partial class GlobalMenuSeedData
                 IsHide = false,
                 IsKeepAlive = true,
                 IsAffix = false,
-                OrderNo = 1000,
+                OrderNo = 500,
                 IsEnabled = true,
                 Remark = null,
                 CreatedTime = createdTime,
@@ -179,12 +144,12 @@ public partial class GlobalMenuSeedData
                 // 自 Player partial 迁入（#157 views 重组后组件路径移至 trustCenter）；Id/Key 不变保住 role-menu 绑定。
                 Id = StableSeedId.Menu("route:gamePenaltyEntity"),
                 Key = "route:gamePenaltyEntity",
-                Pid = StableSeedId.Menu("route:trustCenter"),
+                Pid = StableSeedId.Menu("route:player"),
                 Type = MenuTypeEnum.Menu,
                 Name = "gamePenaltyEntity",
-                Path = "/app/trustCenter/gamePenaltyEntity",
+                Path = "/playerCenter/gamePenaltyEntity",
                 AppScope = MenuAppScopeEnum.Console,
-                Component = "/app/trustCenter/gamePenaltyEntity/index",
+                Component = "/playerCenter/gamePenaltyEntity/index",
                 Redirect = null,
                 Permission = null,
                 Title = "处罚管理",
@@ -195,7 +160,7 @@ public partial class GlobalMenuSeedData
                 IsHide = false,
                 IsKeepAlive = true,
                 IsAffix = false,
-                OrderNo = 2000,
+                OrderNo = 300,
                 IsEnabled = true,
                 Remark = null,
                 CreatedTime = 1783612800,
@@ -376,12 +341,12 @@ public partial class GlobalMenuSeedData
             {
                 Id = StableSeedId.Menu("route:gamePenaltyAppealEntity"),
                 Key = "route:gamePenaltyAppealEntity",
-                Pid = StableSeedId.Menu("route:trustCenter"),
+                Pid = StableSeedId.Menu("route:player"),
                 Type = MenuTypeEnum.Menu,
                 Name = "gamePenaltyAppealEntity",
-                Path = "/app/trustCenter/gamePenaltyAppealEntity",
+                Path = "/playerCenter/gamePenaltyAppealEntity",
                 AppScope = MenuAppScopeEnum.Console,
-                Component = "/app/trustCenter/gamePenaltyAppealEntity/index",
+                Component = "/playerCenter/gamePenaltyAppealEntity/index",
                 Redirect = null,
                 Permission = null,
                 Title = "申诉管理",
@@ -392,7 +357,7 @@ public partial class GlobalMenuSeedData
                 IsHide = false,
                 IsKeepAlive = true,
                 IsAffix = false,
-                OrderNo = 3000,
+                OrderNo = 400,
                 IsEnabled = true,
                 Remark = null,
                 CreatedTime = createdTime,
@@ -489,12 +454,12 @@ public partial class GlobalMenuSeedData
             {
                 Id = StableSeedId.Menu("route:antiCheatEventEntity"),
                 Key = "route:antiCheatEventEntity",
-                Pid = StableSeedId.Menu("route:trustCenter"),
+                Pid = StableSeedId.Menu("route:player"),
                 Type = MenuTypeEnum.Menu,
                 Name = "antiCheatEventEntity",
-                Path = "/app/trustCenter/antiCheatEventEntity",
+                Path = "/playerCenter/antiCheatEventEntity",
                 AppScope = MenuAppScopeEnum.Console,
-                Component = "/app/trustCenter/antiCheatEventEntity/index",
+                Component = "/playerCenter/antiCheatEventEntity/index",
                 Redirect = null,
                 Permission = null,
                 Title = "反作弊事件",
@@ -505,7 +470,7 @@ public partial class GlobalMenuSeedData
                 IsHide = false,
                 IsKeepAlive = true,
                 IsAffix = false,
-                OrderNo = 4000,
+                OrderNo = 600,
                 IsEnabled = true,
                 Remark = null,
                 CreatedTime = createdTime,
@@ -632,12 +597,12 @@ public partial class GlobalMenuSeedData
                 // 访问该页端点要求同时持有处罚管理按钮授权。
                 Id = StableSeedId.Menu("route:penaltyEnforcement"),
                 Key = "route:penaltyEnforcement",
-                Pid = StableSeedId.Menu("route:trustCenter"),
+                Pid = StableSeedId.Menu("route:player"),
                 Type = MenuTypeEnum.Menu,
                 Name = "penaltyEnforcement",
-                Path = "/app/trustCenter/penaltyEnforcement",
+                Path = "/playerCenter/penaltyEnforcement",
                 AppScope = MenuAppScopeEnum.Console,
-                Component = "/app/trustCenter/penaltyEnforcement/index",
+                Component = "/playerCenter/penaltyEnforcement/index",
                 Redirect = null,
                 Permission = null,
                 Title = "处罚生效状态",
@@ -648,7 +613,7 @@ public partial class GlobalMenuSeedData
                 IsHide = false,
                 IsKeepAlive = true,
                 IsAffix = false,
-                OrderNo = 5000,
+                OrderNo = 700,
                 IsEnabled = true,
                 Remark = null,
                 CreatedTime = createdTime,

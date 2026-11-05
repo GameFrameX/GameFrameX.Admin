@@ -1,8 +1,6 @@
 // 定義内容（APP-コックピット=テナントがアプリ選択後の運用ホーム）
 export default {
     appHome: {
-        pageTitle: 'アプリ コックピット',
-        workbenchSub: 'GameFrameX アプリ コックピット',
         kpiOnline: 'アプリオンライン · ONLINE',
         kpiOnlineFoot: 'リアルタイムサンプル',
         kpiOrders: '本日の注文 · ORDERS',

@@ -1,4 +1,5 @@
 using GameFrameX.Core.Service.Base;
+using GameFrameX.Core.Service.Cache;
 using GameFrameX.Core.Service.Role.Dto;
 using GameFrameX.Core.Service.User;
 using GameFrameX.Entity.Enum;
@@ -126,6 +127,9 @@ public class TenantRoleService : BaseSystemService
                             .IgnoreColumns(u => new { u.DataScope, }).ExecuteCommandWithOptLockAsync(true);
 
         await UpdateRoleMenuAsync(input);
+        var cache = _serviceProvider.GetRequiredService<SystemCacheService>();
+        cache.RemoveByPrefixKey(CacheConst.KeyUserMenu);
+        cache.RemoveByPrefixKey(CacheConst.KeyUserButton);
     }
 
     /// <summary>
@@ -188,9 +192,21 @@ public class TenantRoleService : BaseSystemService
     [ApiDescriptionSettings(Name = "SetStatus")]
     public async Task<int> SetStatusAsync(RoleRequest input)
     {
-        return await _systemRoleRepository.AsUpdateable()
-                                   .SetColumns(u => u.IsEnabled == input.IsEnabled)
-                                   .Where(u => u.Id == input.Id)
-                                   .ExecuteCommandAsync();
+        // 状态切换必须能找到禁用角色，同时仍排除已删除记录。
+        var role = await _systemRoleRepository.AsQueryable().Filter(null, true)
+                                             .Where(u => u.IsDeleted == false)
+                                             .FirstAsync(u => u.Id == input.Id);
+        if (role == null)
+        {
+            return 0;
+        }
+        role.IsEnabled = input.IsEnabled;
+        var affected = await _systemRoleRepository.AsUpdateable(role)
+                                                 .UpdateColumns(u => u.IsEnabled)
+                                                 .ExecuteCommandAsync();
+        var cache = _serviceProvider.GetRequiredService<SystemCacheService>();
+        cache.RemoveByPrefixKey(CacheConst.KeyUserMenu);
+        cache.RemoveByPrefixKey(CacheConst.KeyUserButton);
+        return affected;
     }
 }

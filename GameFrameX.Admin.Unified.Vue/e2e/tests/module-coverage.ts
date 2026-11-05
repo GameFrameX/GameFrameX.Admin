@@ -31,7 +31,7 @@ export async function installApiRecorder(page: Page): Promise<void> {
     const bodySnapshot = (raw: unknown): string | undefined => {
       if (raw == null) return undefined;
       const text = typeof raw === 'string' ? raw : String(raw);
-      return text.length > 400 ? text.slice(0, 400) : text;
+      return text.length > 16_384 ? text.slice(0, 16_384) : text;
     };
     const push = (entry: ApiEntry): void => {
       scope.__e2eApi?.push(entry);
@@ -132,7 +132,7 @@ export async function renderedMenuGroups(page: Page): Promise<MenuGroup[]> {
         );
         return { group, leaves };
       })
-      .filter((entry) => entry.group && entry.leaves.length > 0);
+      .filter((entry) => entry.group);
   });
 }
 
@@ -238,7 +238,7 @@ async function probeAddDialog(page: Page, report: LeafReport, issues: string[]):
   // 若清空后仍有默认值残留（InputNumber 预填/程序回填，属合法默认提交路径）则跳过拦截断言 ——
   const requiredMarkers = await dialog.locator('.form-label-required').count();
   if (requiredMarkers > 0) {
-    const editable = dialog.locator('input:visible:not([type="checkbox"]):not([type="hidden"]), textarea:visible');
+    const editable = dialog.locator('input:visible:not([type="checkbox"]):not([type="hidden"]):not([readonly]):not(:disabled), textarea:visible:not([readonly]):not(:disabled)');
     const editableCount = await editable.count();
     for (let i = 0; i < editableCount; i += 1) {
       await editable.nth(i).fill('', { timeout: 1500 }).catch(() => undefined);
@@ -304,7 +304,7 @@ async function probeEditFormValidation(page: Page, report: LeafReport, issues: s
     return boxes.map((node) => (node as HTMLInputElement).value);
   });
   if (originals.length === 0) return false;
-  const boxes = dialog.locator('input:visible:not([type="checkbox"]):not([type="hidden"]), textarea:visible');
+  const boxes = dialog.locator('input:visible:not([type="checkbox"]):not([type="hidden"]):not([readonly]):not(:disabled), textarea:visible:not([readonly]):not(:disabled)');
   for (let i = 0; i < originals.length; i += 1) {
     await boxes.nth(i).fill('', { timeout: 2000 }).catch(() => undefined);
   }
@@ -374,6 +374,13 @@ async function closeDialog(page: Page): Promise<void> {
 // 打开的面板会吞掉页脚按钮的点击（outside-click 先吃掉 mousedown），必须先收起才能关弹窗；
 // 视口角落落在遮罩上——PrimeVue Dialog 默认 dismissableMask=false，不会误关宿主弹窗。
 async function collapseSelectOverlay(page: Page): Promise<void> {
+  // 日期输入在清空时会打开浮层；从它自己的输入框按 Escape，避免时间面板挡住取消按钮。
+  const expandedDateInputs = page.locator('.p-datepicker input[aria-expanded="true"]:visible');
+  // 关闭一个浮层会改变动态 locator 的索引；每次重新取当前首个展开输入。
+  for (let attempt = 0; attempt < 10 && await expandedDateInputs.count() > 0; attempt += 1) {
+    await expandedDateInputs.first().press('Escape');
+    await sleep(80);
+  }
   await page.mouse.click(5, 5);
   await sleep(250);
 }
@@ -411,7 +418,7 @@ async function probeSearchRules(
   // （DatePicker 输入框 readonly 天然排除；PrimeVue Select 的可编辑输入框是下拉过滤，不是查询字段）
   const pickInput = () =>
     page.evaluate(() => {
-      const inputs = Array.from(document.querySelectorAll('.search-form input'));
+      const inputs = Array.from(document.querySelectorAll<HTMLInputElement>('.search-form input'));
       const target = inputs.find(
         (el) =>
           el.getBoundingClientRect().height > 0 &&
@@ -720,10 +727,10 @@ async function sweepLeaf(
   page: Page,
   leaf: string,
   issues: string[],
-  options: { actions: boolean },
+  options: { actions: boolean; rootGroup: string },
 ): Promise<LeafReport> {
   const report = emptyReport(leaf);
-  await navigateByMenu(page, leaf);
+  await navigateByMenu(page, leaf, options.rootGroup);
 
   const marker = page.locator('text=找不到此页面').first();
   for (const delay of [100, 250, 450]) {
@@ -735,12 +742,12 @@ async function sweepLeaf(
     }
   }
 
-  let recordsMark = (await readApiRecords(page)).length;
+  const recordsMark = (await readApiRecords(page)).length;
   if (options.actions) {
     // 检索区按钮全量探针先跑（新表单态）；其中破坏类按钮会被取消，不改变数据
     await probeSearchAreaButtons(page, report, issues);
     await dismissStrayMask(page);
-    recordsMark = await probeSearchRules(page, report, issues, recordsMark);
+    await probeSearchRules(page, report, issues, recordsMark);
     // 重置重查断言：重置点击后应发出新的列表请求
     if (report.hasSearchForm && (await visibleButton(page, /^重置$/))) {
       const beforeReset = (await readApiRecords(page)).length;
@@ -789,7 +796,7 @@ export async function sweepGroup(
   const issues: string[] = [];
   const reports: LeafReport[] = [];
   for (const leaf of entry.leaves) {
-    reports.push(await sweepLeaf(page, leaf, issues, { actions }));
+    reports.push(await sweepLeaf(page, leaf, issues, { actions, rootGroup: groupName }));
   }
 
   test.info().annotations.push({

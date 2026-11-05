@@ -8,7 +8,6 @@ import {dynamicRoutes, NOT_FOUND_AND_NO_POWER} from './route';
 import {formatTwoStageRoutes, formatFlatteningRoutes, router} from './index';
 import {useRoutesListStore} from '../stores/routesList';
 import {useTagsViewRoutesStore} from '../stores/tagsViewRoutes';
-import {registerAppWorkspaceRoutes} from './appWorkspaceRoutes';
 
 import {getAPI} from '../utils/axiosUtils';
 import {GlobalMenu} from '../api/globalMenu';
@@ -50,7 +49,6 @@ export async function initBackEndControlRoutes() {
     dynamicRoutes[0].children = await backEndComponent(res);
     // 添加动态路由
     await setAddRoute();
-    registerAppWorkspaceRoutes(router);
     // 设置路由到 pinia routesList 中（已处理成多级嵌套路由）及缓存多级嵌套数组处理后的一维数组
     setFilterMenuAndCacheTagsViewRoutes();
 }

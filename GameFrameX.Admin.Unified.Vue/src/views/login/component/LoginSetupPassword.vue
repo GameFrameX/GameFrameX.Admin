@@ -57,7 +57,7 @@
 
 <script lang="ts" setup name="loginSetupPassword">
 import {reactive, ref} from 'vue';
-import {useRoute, useRouter} from 'vue-router';
+import {useRouter} from 'vue-router';
 import {t} from '../../../i18n/index';
 import {feature} from '../../../utils/axiosUtils';
 import {showError} from '../../../utils/message';
@@ -69,7 +69,6 @@ import {completeSignIn} from '/@/views/login/component/loginSuccess';
 
 const emit = defineEmits<{ (e: 'switch'): void }>();
 
-const route = useRoute();
 const router = useRouter();
 
 const passwordRef = ref<any>(null);
@@ -134,7 +133,7 @@ const setup = async () => {
       return;
     }
     // 设置成功即自动登录（首装零门槛：不回登录页再登一次）
-    await completeSignIn(res.data.data?.accessToken, route, router);
+    await completeSignIn(res.data.data?.accessToken, router);
   } finally {
     state.loading.setup = false;
   }

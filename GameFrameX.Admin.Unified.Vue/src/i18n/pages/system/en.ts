@@ -12,16 +12,8 @@ export default {
             accountType_member: 'Member',
             roleSet: 'Roles',
             age: 'Age',
-            orgSection: 'Operations Organization',
-            belongOrg: 'Organization',
-            position: 'Position',
             jobNum: 'Job Number',
             joinDate: 'Join Date',
-            extOrgSection: 'Extra Organizations',
-            addExtOrg: 'Add Extra Organization',
-            extOrgDataPermission: 'Has data permission for corresponding organizations',
-            orgPlaceholder: 'Operations Organization',
-            posName: 'Position Name',
             archiveInfo: 'Profile',
             cardType: 'ID Type',
             idCard: 'ID Card',
@@ -55,7 +47,6 @@ export default {
             addAccount: 'Add Account',
             editAccount: 'Edit Account',
             deleteAccountConfirm: 'Confirm delete account',
-            deleteAccount: 'Delete Account',
             resetPwd: 'Reset Password',
             resetPwdConfirm: 'Confirm reset password',
             resetPwdSuccess: 'Password reset to',
@@ -74,11 +65,7 @@ export default {
             menuPermission: 'Menu Permission',
             addRole: 'Add Role',
             editRole: 'Edit Role',
-            deleteRole: 'Delete Role',
             deleteRoleConfirm: 'Confirm delete role',
-            grantDataScope: 'Grant Data Scope',
-            grantDataScopeTitle: 'Grant Data Scope',
-            orgList: 'Organization List',
         },
         // ===== Menu module =====
         menu: {
@@ -113,8 +100,6 @@ export default {
             iframe: 'Iframe',
             notIframe: 'Not Iframe',
             permission: 'Permission',
-            isEnable: 'Enable',
-            notEnable: 'Disabled',
             addMenu: 'Add Menu',
             editMenu: 'Edit Menu',
             deleteMenuConfirm: 'Confirm delete menu',
@@ -140,13 +125,7 @@ export default {
             deleteDictDataConfirm: 'Confirm delete dict value',
         },
         // ===== Org module =====
-        org: {
-            orgName: 'Organization Name',
-            expandAll: 'Expand All',
-            collapseAll: 'Collapse All',
-            rootNode: 'Root Node',
-            filterByOrgTree: 'Filter by organization',
-        },
+
         // ===== Log module =====
         log: {
             startTime: 'Start Time',
@@ -161,7 +140,6 @@ export default {
             httpMethod: 'HTTP Method',
             requestUrl: 'Request URL',
             requestParam: 'Request Params',
-            returnResult: 'Response',
             logLevel: 'Level',
             logLevel_debug: 'Debug',
             logLevel_info: 'Info',
@@ -179,35 +157,19 @@ export default {
             elapsed: 'Elapsed (ms)',
             logDateTime: 'Log Time',
             logDetail: 'Log Detail',
-            today: 'Today',
-            yesterday: 'Yesterday',
-            lastWeek: 'Last Week',
             opSuccess: 'Success',
             opFail: 'Failed',
             // diff log
             differenceTable: 'Diff Table',
             differenceField: 'Diff Field',
-            differenceValue: 'Diff Value',
             differenceBefore: 'Before',
             differenceAfter: 'After',
-            diffLogDetail: 'Diff Log Detail',
             // ex log
             exceptionMsg: 'Exception Message',
-            exceptionType: 'Exception Type',
-            exceptionSource: 'Exception Source',
-            stackTrace: 'Stack Trace',
-            exceptionLogDetail: 'Exception Log Detail',
-            // vis log
-            loginName: 'Login Name',
-            loginTime: 'Login Time',
-            loginType: 'Login Action',
         },
         // ===== Database module =====
         database: {
             dbName: 'Database',
-            dbLocator: 'DB Locator',
-            dbType: 'DB Type',
-            dbAddress: 'DB Address',
             tableName: 'Table Name',
             tableDescription: 'Table Name',
             fieldName: 'Field Name',
@@ -266,7 +228,6 @@ export default {
             batchDelete: 'Batch Delete',
             deleteConfigConfirm: 'Confirm delete config',
             batchDeleteConfirm: 'Confirm batch delete',
-            exportFileName: 'System Config',
         },
         // ===== File module =====
         file: {
@@ -279,7 +240,6 @@ export default {
             storageLocation: 'Storage Location',
             storageConfigId: 'Storage Config ID',
             storageId: 'Storage ID',
-            uploaderId: 'Uploader ID',
 
             uploader: 'Uploader',
             uploadFile: 'Upload File',
@@ -366,25 +326,18 @@ export default {
             resetRunCountTip: 'Whether to reset the max run count on startup<br/>Solves the issue where persisted data has completed one trigger but does not execute on startup',
             // dashboard
             jobDashboard: 'Job Dashboard',
-            runningJobCount: 'Running Jobs',
-            jobRunStatistics: 'Job Statistics',
-            total: 'Total',
             running: 'Running',
             paused: 'Paused',
-            completed: 'Completed',
             blocked: 'Blocked',
             // cluster
             jobCluster: 'Job Cluster',
             clusterId: 'Cluster ID',
-            status: 'Status',
-            updateStatus: 'Update Status',
             args: 'Args',
             lastRunTime: 'Last Run Time',
             nextRunTime: 'Next Run Time',
             numberOfRuns: 'Trigger Count',
             numberOfErrors: 'Error Count',
             retryTimeout: 'Retry Interval (ms)',
-            updatedTime: 'Updated Time',
             // trigger status
             triggerRunning: 'Running',
             triggerPaused: 'Paused',
@@ -438,22 +391,15 @@ export default {
         // ===== OpenAccess module =====
         openAccess: {
             accessName: 'API Name',
-            accessUrl: 'API URL',
             authToken: 'Auth Token',
-            addOpenAccess: 'Add Open API',
-            editOpenAccess: 'Edit Open API',
-            deleteOpenAccessConfirm: 'Confirm delete open API',
             helpView: 'Help',
             accessSecret: 'Secret Key',
             bindUserAccount: 'Bound User Account',
             bindTenantName: 'Bound Tenant Name',
-            bindTenant: 'Bind Tenant',
             bindUser: 'Bind User',
         },
         // ===== Server module =====
-        server: {
-            serverInfo: 'Server Info',
-        },
+
         // ===== App Management =====
         // ===== User Center =====
         userCenter: {

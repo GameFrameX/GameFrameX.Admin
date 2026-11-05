@@ -12,16 +12,8 @@ export default {
             accountType_member: '會員',
             roleSet: '角色集合',
             age: '年齡',
-            orgSection: '營運組織',
-            belongOrg: '所屬組織',
-            position: '職位',
             jobNum: '工號',
             joinDate: '入職日期',
-            extOrgSection: '附屬組織',
-            addExtOrg: '增加附屬組織',
-            extOrgDataPermission: '具有相應組織的數據權限',
-            orgPlaceholder: '營運組織',
-            posName: '職位名稱',
             archiveInfo: '檔案資訊',
             cardType: '證件類型',
             idCard: '身份證',
@@ -55,7 +47,6 @@ export default {
             addAccount: '添加帳號',
             editAccount: '編輯帳號',
             deleteAccountConfirm: '確定刪除帳號',
-            deleteAccount: '刪除帳號',
             resetPwd: '重置密碼',
             resetPwdConfirm: '確定重置密碼',
             resetPwdSuccess: '密碼重置成功為',
@@ -74,11 +65,7 @@ export default {
             menuPermission: '選單權限',
             addRole: '添加角色',
             editRole: '編輯角色',
-            deleteRole: '刪除角色',
             deleteRoleConfirm: '確定刪除角色',
-            grantDataScope: '授權數據範圍',
-            grantDataScopeTitle: '授權數據範圍',
-            orgList: '組織列表',
         },
         // ===== Menu module =====
         menu: {
@@ -113,8 +100,6 @@ export default {
             iframe: '內嵌',
             notIframe: '不內嵌',
             permission: '權限標識',
-            isEnable: '是否啟用',
-            notEnable: '不啟用',
             addMenu: '添加選單',
             editMenu: '編輯選單',
             deleteMenuConfirm: '確定刪除選單',
@@ -140,13 +125,7 @@ export default {
             deleteDictDataConfirm: '確定刪除字典值',
         },
         // ===== Org module =====
-        org: {
-            orgName: '組織名稱',
-            expandAll: '全部展開',
-            collapseAll: '全部摺疊',
-            rootNode: '根節點',
-            filterByOrgTree: '按組織篩選',
-        },
+
         // ===== Log module =====
         log: {
             startTime: '開始時間',
@@ -161,7 +140,6 @@ export default {
             httpMethod: '請求方式',
             requestUrl: '請求地址',
             requestParam: '請求參數',
-            returnResult: '返回結果',
             logLevel: '級別',
             logLevel_debug: '調試',
             logLevel_info: '消息',
@@ -179,35 +157,19 @@ export default {
             elapsed: '耗時(ms)',
             logDateTime: '日誌時間',
             logDetail: '日誌詳情',
-            today: '今天',
-            yesterday: '昨天',
-            lastWeek: '上週',
             opSuccess: '成功',
             opFail: '失敗',
             // diff log
             differenceTable: '差異對比表',
             differenceField: '差異欄位',
-            differenceValue: '差異值',
             differenceBefore: '變更前',
             differenceAfter: '變更後',
-            diffLogDetail: '差異日誌詳情',
             // ex log
             exceptionMsg: '異常信息',
-            exceptionType: '異常類型',
-            exceptionSource: '異常來源',
-            stackTrace: '堆疊追蹤',
-            exceptionLogDetail: '異常日誌詳情',
-            // vis log
-            loginName: '登入名稱',
-            loginTime: '登入時間',
-            loginType: '登入操作',
         },
         // ===== Database module =====
         database: {
             dbName: '庫名',
-            dbLocator: '庫定位器',
-            dbType: '庫類型',
-            dbAddress: '庫地址',
             tableName: '表名',
             tableDescription: '表名稱',
             fieldName: '欄位名',
@@ -266,7 +228,6 @@ export default {
             batchDelete: '批量刪除',
             deleteConfigConfirm: '確定刪除配置',
             batchDeleteConfirm: '確定批量刪除',
-            exportFileName: '系統參數',
         },
         // ===== File module =====
         file: {
@@ -279,7 +240,6 @@ export default {
             storageLocation: '儲存位置',
             storageConfigId: '儲存配置ID',
             storageId: '儲存標識',
-            uploaderId: '上傳者Id',
 
             uploader: '上傳者',
             uploadFile: '上傳文件',
@@ -366,25 +326,18 @@ export default {
             resetRunCountTip: '是否在啟動時重置最大觸發次數等於一次的作業<br/>解決因持久化數據已完成一次觸發但啟動時不再執行的問題',
             // dashboard
             jobDashboard: '作業大盤',
-            runningJobCount: '運行中作業數',
-            jobRunStatistics: '作業執行統計',
-            total: '合計',
             running: '運行中',
             paused: '已暫停',
-            completed: '已完成',
             blocked: '阻塞',
             // cluster
             jobCluster: '作業集群',
             clusterId: '集群Id',
-            status: '狀態',
-            updateStatus: '更新狀態',
             args: '參數',
             lastRunTime: '最近運行時間',
             nextRunTime: '下一次運行時間',
             numberOfRuns: '觸發次數',
             numberOfErrors: '出錯次數',
             retryTimeout: '重試間隔ms',
-            updatedTime: '更新時間',
             // trigger status
             triggerRunning: '正在運行',
             triggerPaused: '暫停',
@@ -438,22 +391,15 @@ export default {
         // ===== OpenAccess module =====
         openAccess: {
             accessName: '接口名稱',
-            accessUrl: '接口地址',
             authToken: '認證Token',
-            addOpenAccess: '添加開放接口',
-            editOpenAccess: '編輯開放接口',
-            deleteOpenAccessConfirm: '確定刪除開放接口',
             helpView: '幫助說明',
             accessSecret: '密鑰',
             bindUserAccount: '綁定用戶帳號',
             bindTenantName: '綁定租戶名稱',
-            bindTenant: '綁定租戶',
             bindUser: '綁定用戶',
         },
         // ===== Server module =====
-        server: {
-            serverInfo: '伺服器資訊',
-        },
+
         // ===== App Management =====
         // ===== User Center =====
         userCenter: {

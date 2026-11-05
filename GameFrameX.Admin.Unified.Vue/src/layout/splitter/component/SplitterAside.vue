@@ -27,8 +27,6 @@ import { defineAsyncComponent } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useRoutesListStore } from '../../../stores/routesList'
 import { useThemeConfigStore } from '../../../stores/themeConfig'
-import { filterRoutesByMenuContext, resolveMenuContext } from '../../../utils/appWorkspace'
-import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import SvgIcon from '/@/components/svg-icon/index.vue'
 import Tooltip from 'primevue/tooltip'
@@ -43,14 +41,13 @@ const VerticalMenu = defineAsyncComponent(() => import('/@/layout/navigationMenu
 
 const storesRoutesList = useRoutesListStore()
 const storesThemeConfig = useThemeConfigStore()
-const route = useRoute()
 const { routesList } = storeToRefs(storesRoutesList)
 const { themeConfig } = storeToRefs(storesThemeConfig)
 const { t } = useI18n()
 
 const isCollapse = computed(() => themeConfig.value.isCollapse)
 const showLogo = computed(() => true)
-const menuList = computed(() => filterRoutesByMenuContext(routesList.value, resolveMenuContext(route)))
+const menuList = computed(() => routesList.value)
 
 // 装订扣切换目录折叠（替代原 Logo 点击折叠的隐性入口）
 const onToggleCollapse = () => {

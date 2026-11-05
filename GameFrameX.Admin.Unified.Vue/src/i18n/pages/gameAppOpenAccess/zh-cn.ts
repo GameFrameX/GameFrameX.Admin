@@ -3,10 +3,6 @@ export default {
     openAccess: {
       // 列表标题 / 菜单
       listTitle: '应用开放访问凭证',
-      entityId: '凭证ID',
-
-      // 字段标签
-      appId: '应用',
       bindUser: '绑定用户',
       bindUserId: '绑定用户',
       scenario: '责任场景',
@@ -17,8 +13,6 @@ export default {
       isEnabled: '状态',
       expiresTime: '过期时间',
       revokedTime: '撤销时间',
-      revokeReason: '撤销原因',
-      createdTime: '创建时间',
       noExpiry: '不过期',
 
       // 状态
@@ -29,7 +23,6 @@ export default {
       // 签发弹窗
       issueTitle: '签发凭证',
       editTitle: '编辑凭证',
-      issueHint: '签发成功后 AccessSecret 仅展示一次，请立即保存。',
       pleaseSelectBindUser: '请选择绑定用户',
       pleaseEnterScenario: '请输入责任场景编码',
       pleaseEnterPurpose: '请输入使用目的',
@@ -46,15 +39,10 @@ export default {
 
       // Scopes 选项
       scopePackageReport: '分包上报 (package-report)',
-
-      // 操作按钮
-      issue: '签发',
-      edit: '编辑',
       revoke: '吊销',
       enable: '启用',
       disable: '禁用',
       refresh: '轮换密钥',
-      delete: '删除',
 
       // 操作弹窗
       revokeTitle: '吊销凭证',
@@ -67,12 +55,9 @@ export default {
       reasonTooLong: '操作原因不能超过 256 字',
       revokeWarning: '吊销后凭证将立即失效且不可恢复，确定继续？',
       refreshWarning: '轮换后原 AccessSecret 立即失效，新 Secret 仅展示一次。',
-      actionRowLabel: '操作凭证',
 
       // 二次确认
       deleteConfirm: '确定删除该凭证吗',
-      enableConfirm: '确定启用该凭证吗',
-      disableConfirm: '确定禁用该凭证吗',
 
       // Secret 一次性展示弹窗
       secretTitle: '凭证密钥（仅此一次展示）',
@@ -82,10 +67,6 @@ export default {
       copySuccess: '已复制到剪贴板',
       copyFailed: '复制失败，请手动选择复制',
       iHaveSaved: '我已保存，关闭',
-
-      // 操作结果
-      issueSuccess: '签发成功',
-      updateSuccess: '更新成功',
       deleteSuccess: '删除成功',
       revokeSuccess: '吊销成功',
       enableSuccess: '启用成功',

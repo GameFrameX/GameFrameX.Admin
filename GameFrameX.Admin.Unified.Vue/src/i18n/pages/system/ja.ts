@@ -12,16 +12,8 @@ export default {
             accountType_member: 'メンバー',
             roleSet: 'ロール',
             age: '年齢',
-            orgSection: '組織',
-            belongOrg: '組織',
-            position: '役職',
             jobNum: '社員番号',
             joinDate: '入社日',
-            extOrgSection: '追加組織',
-            addExtOrg: '追加組織を追加',
-            extOrgDataPermission: '対応組織のデータ権限を保有',
-            orgPlaceholder: '組織',
-            posName: '役職名',
             archiveInfo: 'プロフィール',
             cardType: '身分証タイプ',
             idCard: '身分証明書',
@@ -55,7 +47,6 @@ export default {
             addAccount: 'アカウント追加',
             editAccount: 'アカウント編集',
             deleteAccountConfirm: 'アカウント削除確認',
-            deleteAccount: 'アカウント削除',
             resetPwd: 'パスワードリセット',
             resetPwdConfirm: 'パスワードリセット確認',
             resetPwdSuccess: 'パスワードがリセットされました',
@@ -74,11 +65,7 @@ export default {
             menuPermission: 'メニュー権限',
             addRole: 'ロール追加',
             editRole: 'ロール編集',
-            deleteRole: 'ロール削除',
             deleteRoleConfirm: 'ロール削除確認',
-            grantDataScope: 'データスコープ付与',
-            grantDataScopeTitle: 'データスコープ付与',
-            orgList: '組織リスト',
         },
         // ===== メニューモジュール =====
         menu: {
@@ -113,8 +100,6 @@ export default {
             iframe: 'Iframe',
             notIframe: 'Iframeなし',
             permission: '権限',
-            isEnable: '有効',
-            notEnable: '無効',
             addMenu: 'メニュー追加',
             editMenu: 'メニュー編集',
             deleteMenuConfirm: 'メニュー削除確認',
@@ -140,13 +125,7 @@ export default {
             deleteDictDataConfirm: '辞書値削除確認',
         },
         // ===== 組織モジュール =====
-        org: {
-            orgName: '組織名',
-            expandAll: 'すべて展開',
-            collapseAll: 'すべて折りたたむ',
-            rootNode: 'ルートノード',
-            filterByOrgTree: '組織で絞り込み',
-        },
+
         // ===== ログモジュール =====
         log: {
             startTime: '開始時間',
@@ -161,7 +140,6 @@ export default {
             httpMethod: 'HTTPメソッド',
             requestUrl: 'リクエストURL',
             requestParam: 'リクエストパラメータ',
-            returnResult: 'レスポンス',
             logLevel: 'レベル',
             logLevel_debug: 'デバッグ',
             logLevel_info: '情報',
@@ -179,35 +157,19 @@ export default {
             elapsed: '所要時間 (ms)',
             logDateTime: 'ログ時間',
             logDetail: 'ログ詳細',
-            today: '今日',
-            yesterday: '昨日',
-            lastWeek: '先週',
             opSuccess: '成功',
             opFail: '失敗',
             // diffログ
             differenceTable: '差分テーブル',
             differenceField: '差分フィールド',
-            differenceValue: '差分値',
             differenceBefore: '変更前',
             differenceAfter: '変更後',
-            diffLogDetail: '差分ログ詳細',
             // 例外ログ
             exceptionMsg: '例外メッセージ',
-            exceptionType: '例外タイプ',
-            exceptionSource: '例外ソース',
-            stackTrace: 'スタックトレース',
-            exceptionLogDetail: '例外ログ詳細',
-            // アクセスログ
-            loginName: 'ログイン名',
-            loginTime: 'ログイン時間',
-            loginType: 'ログインアクション',
         },
         // ===== データベースモジュール =====
         database: {
             dbName: 'データベース',
-            dbLocator: 'DBロケーター',
-            dbType: 'DBタイプ',
-            dbAddress: 'DBアドレス',
             tableName: 'テーブル名',
             tableDescription: 'テーブル名',
             fieldName: 'フィールド名',
@@ -266,7 +228,6 @@ export default {
             batchDelete: '一括削除',
             deleteConfigConfirm: '設定削除確認',
             batchDeleteConfirm: '一括削除確認',
-            exportFileName: 'システム設定',
         },
         // ===== ファイルモジュール =====
         file: {
@@ -279,7 +240,6 @@ export default {
             storageLocation: '保存場所',
             storageConfigId: 'ストレージ設定ID',
             storageId: 'ストレージID',
-            uploaderId: 'アップローダーID',
 
             uploader: 'アップローダー',
             uploadFile: 'ファイルアップロード',
@@ -364,24 +324,17 @@ export default {
             resetRunCount: '実行回数リセット',
             resetRunCountTip: '起動時に最大実行回数をリセットするかどうか<br/>永続化されたデータで1つのトリガーが完了しても起動時に実行されない問題を解決します',
             jobDashboard: 'ジョブダッシュボード',
-            runningJobCount: '実行中のジョブ',
-            jobRunStatistics: 'ジョブ統計',
-            total: '合計',
             running: '実行中',
             paused: '一時停止',
-            completed: '完了',
             blocked: 'ブロック中',
             jobCluster: 'ジョブクラスター',
             clusterId: 'クラスターID',
-            status: 'ステータス',
-            updateStatus: 'ステータス更新',
             args: '引数',
             lastRunTime: '最終実行時間',
             nextRunTime: '次回実行時間',
             numberOfRuns: 'トリガー回数',
             numberOfErrors: 'エラー回数',
             retryTimeout: 'リトライ間隔 (ms)',
-            updatedTime: '更新時間',
             // trigger status
             triggerRunning: '実行中',
             triggerPaused: '一時停止',
@@ -435,22 +388,15 @@ export default {
         // ===== オープンアクセスモジュール =====
         openAccess: {
             accessName: 'API名',
-            accessUrl: 'API URL',
             authToken: '認証トークン',
-            addOpenAccess: 'オープンAPI追加',
-            editOpenAccess: 'オープンAPI編集',
-            deleteOpenAccessConfirm: 'オープンAPI削除確認',
             helpView: 'ヘルプ',
             accessSecret: 'シークレットキー',
             bindUserAccount: 'バインドされたユーザーアカウント',
             bindTenantName: 'バインドされたテナント名',
-            bindTenant: 'テナントバインド',
             bindUser: 'ユーザーバインド',
         },
         // ===== サーバーモジュール =====
-        server: {
-            serverInfo: 'サーバー情報',
-        },
+
         // ===== ユーザーセンター =====
         userCenter: {
             basicInfo: '基本情報',

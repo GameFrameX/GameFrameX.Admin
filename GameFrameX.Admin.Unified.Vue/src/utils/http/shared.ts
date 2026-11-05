@@ -3,7 +3,8 @@ import {local, session} from '../storage';
 import {formatDate} from '../formatTime';
 import {showError} from '../message';
 import {t, te} from '../../i18n/index';
-import {clearTargetTenantId, getTargetTenantId, TARGET_TENANT_ID_HEADER} from '../targetTenant';
+import {getActivePinia} from 'pinia';
+import {useServerStore} from '../../stores/server';
 
 // ── Token 常量 ──────────────────────────────────────────────
 
@@ -19,7 +20,7 @@ export const getToken = (): string | null => {
 export const clearTokens = (): void => {
     local.remove(ACCESS_TOKEN_KEY);
     local.remove(REFRESH_ACCESS_TOKEN_KEY);
-    clearTargetTenantId();
+    if (getActivePinia()) useServerStore().resetServers();
     session.clear();
 };
 
@@ -217,12 +218,6 @@ export function createRequestInterceptor(options: RequestInterceptorOptions = {}
             }
         }
 
-        const targetTenantId = getTargetTenantId();
-        if (targetTenantId) {
-            config.headers[TARGET_TENANT_ID_HEADER] = targetTenantId;
-        } else {
-            delete config.headers[TARGET_TENANT_ID_HEADER];
-        }
 
         if (options.onAfterToken) {
             config = options.onAfterToken(config);

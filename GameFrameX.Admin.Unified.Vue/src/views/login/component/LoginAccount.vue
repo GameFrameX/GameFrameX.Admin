@@ -98,8 +98,8 @@ const props = defineProps<{
   config: { secondVerEnabled: boolean; captchaEnabled: boolean };
 }>();
 
-const route = useRoute();
 const router = useRouter();
+const route = useRoute();
 
 const accountRef = ref<any>(null);
 const passwordRef = ref<any>(null);
@@ -233,9 +233,9 @@ const signIn = async () => {
   }
 };
 
-// 落地流程（存 token → 初始化路由 → redirect → 问候）与注册面共用 loginSuccess.completeSignIn
+// 登录与首装初始化共用总览落地流程。
 const saveTokenAndInitRoutes = async (accessToken: string | any) => {
-  await completeSignIn(accessToken, route, router);
+  await completeSignIn(accessToken, router);
 };
 
 const onSignIn = () => {

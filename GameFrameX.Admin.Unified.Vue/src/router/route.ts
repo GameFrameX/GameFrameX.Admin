@@ -1,5 +1,4 @@
 import type {RouteRecordRaw} from 'vue-router';
-import type {MenuContext, RouteScope} from '../utils/appWorkspace';
 
 /**
  * 建议：路由 path 路径与文件夹名称相同，找文件可浏览器地址找，方便定位文件位置
@@ -28,8 +27,6 @@ declare module 'vue-router' {
         isIframe?: boolean;
         roles?: string[];
         icon?: string;
-        menuContext?: MenuContext;
-        appScope?: RouteScope;
     }
 }
 
@@ -37,7 +34,7 @@ declare module 'vue-router' {
  * 定义动态路由
  * 前端添加路由，请在顶级节点的 `children 数组` 里添加
  * @description 未开启 isRequestRoutes 为 true 时使用（前端控制路由），开启时第一个顶级 children 的路由将被替换成接口请求回来的路由数据
- * @description 各字段请查看 `/@/views/platform/system/menu/component/addMenu.vue 下的 ruleForm`
+ * @description 各字段请查看 `/@/views/system/menu/component/addMenu.vue 下的 ruleForm`
  * @returns 返回路由菜单数据
  */
 export const dynamicRoutes: Array<RouteRecordRaw> = [
@@ -45,16 +42,16 @@ export const dynamicRoutes: Array<RouteRecordRaw> = [
         path: '/',
         name: '/',
         component: () => import('/@/layout/index.vue'),
-        redirect: '/tenant/dashboard/home',
+        redirect: '/dashboard/home',
         meta: {
             isKeepAlive: true,
         },
         children: [],
     },
     {
-        path: '/platform/job/dashboard',
+        path: '/system/job/dashboard',
         name: 'jobDashboard',
-        component: () => import('/@/views/platform/system/job/JobDashboard.vue'),
+        component: () => import('/@/views/system/job/JobDashboard.vue'),
         meta: {
             title: 'message.router.jobDashboard',
             isLink: window.__env__.VITE_API_URL + '/schedule',

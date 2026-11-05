@@ -1,8 +1,6 @@
 // 定义内容（APP-驾驶舱=租户选定应用后的运营首页）
 export default {
     appHome: {
-        pageTitle: '应用驾驶舱',
-        workbenchSub: 'GameFrameX 应用驾驶舱',
         kpiOnline: '应用在线 · ONLINE',
         kpiOnlineFoot: '实时采样',
         kpiOrders: '今日订单 · ORDERS',

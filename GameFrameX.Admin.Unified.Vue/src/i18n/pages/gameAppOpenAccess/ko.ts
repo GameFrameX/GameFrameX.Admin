@@ -2,9 +2,6 @@ export default {
   gameBusiness: {
     openAccess: {
       listTitle: '앱 오픈 액세스 자격 증명',
-      entityId: '자격 증명 ID',
-
-      appId: '앱',
       bindUser: '바인딩 사용자',
       bindUserId: '바인딩 사용자',
       scenario: '시나리오',
@@ -15,8 +12,6 @@ export default {
       isEnabled: '상태',
       expiresTime: '만료 시간',
       revokedTime: '취소 시간',
-      revokeReason: '취소 사유',
-      createdTime: '생성 시간',
       noExpiry: '만료 없음',
 
       enabled: '활성화됨',
@@ -25,7 +20,6 @@ export default {
 
       issueTitle: '자격 증명 발급',
       editTitle: '자격 증명 편집',
-      issueHint: '발급 성공 후 AccessSecret은 한 번만 표시됩니다. 즉시 저장하세요.',
       pleaseSelectBindUser: '바인딩 사용자 선택',
       pleaseEnterScenario: '시나리오 코드 입력',
       pleaseEnterPurpose: '용도 입력',
@@ -40,14 +34,10 @@ export default {
       scopesRequired: '최소한 하나의 스코프를 선택하세요',
 
       scopePackageReport: '패키지 리포트 (package-report)',
-
-      issue: '발급',
-      edit: '편집',
       revoke: '취소',
       enable: '활성화',
       disable: '비활성화',
       refresh: '시크릿 교체',
-      delete: '삭제',
 
       revokeTitle: '자격 증명 취소',
       enableTitle: '자격 증명 활성화',
@@ -59,11 +49,8 @@ export default {
       reasonTooLong: '작업 사유는 256자 이내여야 합니다',
       revokeWarning: '취소는 즉시 적용되며 되돌릴 수 없습니다. 계속하시겠습니까?',
       refreshWarning: '교체 후 현재 AccessSecret이 즉시 무효화됩니다. 새 시크릿은 한 번만 표시됩니다.',
-      actionRowLabel: '작업 대상 자격 증명',
 
       deleteConfirm: '이 자격 증명을 삭제하시겠습니까?',
-      enableConfirm: '이 자격 증명을 활성화하시겠습니까?',
-      disableConfirm: '이 자격 증명을 비활성화하시겠습니까?',
 
       secretTitle: '자격 증명 시크릿 (한 번만 표시)',
       secretWarning: 'AccessSecret은 한 번만 표시되며 나중에 다시 조회할 수 없습니다. 지금 복사하여 저장하세요!',
@@ -72,9 +59,6 @@ export default {
       copySuccess: '클립보드에 복사되었습니다',
       copyFailed: '복사 실패, 수동으로 선택하여 복사하세요',
       iHaveSaved: '저장했습니다, 닫기',
-
-      issueSuccess: '발급 성공',
-      updateSuccess: '업데이트 성공',
       deleteSuccess: '삭제 성공',
       revokeSuccess: '취소 성공',
       enableSuccess: '활성화 성공',

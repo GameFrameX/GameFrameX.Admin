@@ -1,36 +1,26 @@
 import { test, expect } from '@playwright/test';
-import { enterWorkspace, gotoAppSelector, navigateByMenu, pickDateTime, shot, sleep, superadminPage } from './helpers';
+import { expectOverview, navigateByMenu, pickDateTime, shot, sleep, superadminPage } from './helpers';
 
-// L3 功能闭环（数据驱动）：首批 6 个应用域实体的
-// 真实新增 → 表格回显 → 删除 → 行消失，全程真实 web 交互、真实数据、结束即清理。
-// 路由不硬编码：2026-10-20 起全面真实点击化——菜单标题在渲染后的侧边栏 DOM 中解析，
-// 逐层真实展开分组后真实点击叶子链接（不读菜单树接口、不 hash 直达；appId 由菜单链接 href 自带）。
-// 全量推进记录（2026-10-18，42 个带 Edit 组件的叶子页盘点后）：
-// 已闭环 12 页（本矩阵）；例外 9 页——
-//   权限类：游戏角色/应用管理的新增按钮 v-auth `<prefix>:add` 对租管不渲染（权限矩阵现实）；
-//   字典管理超管按钮不渲染已修复（v-auth 超管短路，已入矩阵）；
-//   引擎能力：支付配置 token 锚点落在列表不可见的 remark 列；
-//   数据依赖：游戏内横幅公告与邮件的区服下拉当前环境"无选项/联动禁用"（需先存在可用区服数据）；
-//     游戏区服自身必填 8 项含 serverVersion/appVersion 联动下拉，闭环三轮校验未过（表单验证失败，
-//     疑 select 数据源按 appId 过滤后无匹配），待专项排查数据链；
-//     邮件另叠加 Vue#198 的两处漏 import（已修复，待合入）；
-//   缺陷阻塞（issue 跟踪）：渠道列表显示软删行（Api#287）、邮件新增前端 ReferenceError（Vue#198）；
-//   结构/语义例外：游戏订单（三卡片多表页，锚点歧义）；
-//     游戏运营配置（config 必填合法 JSON，引擎文本值语义不匹配）；
-//   级联/联动交互（交互器 v2 待建）：游戏内商品的级联选择存在
-//     "点目录=展开而非选中"语义（'未选择任何项'），需按叶子标记定位；
-//     运营邮件 Campaign 的 areaId 下拉联动禁用；活动功能开关多 select 联动必填；
-//   自举依赖：邮件模板的必填分类下拉取自模板分类数据（闭环用例建完即删，常态为空；
-//     解锁需引擎支持"用例内自举前置数据"）；
-//   DatePicker 必填已由 date 填充器解决（游戏公告已闭环）；
-//   待专项：角色管理删除走行上下文菜单（⋯）+ 动态权限。
-// 其余 21 页含 Password/DatePicker/CascadeSelect/RewardItemsEditor/依赖链 select 等复杂控件，需引擎扩展后分批纳入。
+// 单 shell 数据闭环：20 个保留实体，按根组 + 叶子标题真实导航，不读取菜单树或直接跳 hash。
+// 菜单归属和控件序列按终态对账，保留新增→编辑回显→删除的动作强度。
+// 例外与既有风险（集成轮核验，不以迁移宣称已修）：
+// - 应用管理已按 C400/C403 删除，不再作为 CRUD 例外或入口。
+// - 游戏角色：历史新增权限问题；本轮 admin 显式授权后应复核，仍未加入此矩阵。
+// - 游戏内横幅/邮件/区服/邮件模板：区服与分类等前置数据、联动选择器尚需专项夹具。
+// - 游戏订单/发货账本：商业化中心的多表业务页，不是通用 CRUD 对话框。
+// - 支付配置：列表锚点；游戏内商品：级联与绑定（Api#291）；角色管理：上下文菜单动作。
+// - 分包管理、游戏公告、奖励模板/兑换码、物品目录、资源包、游戏运营配置：
+//   保留历史失败的闭环回归，不删除/跳过；隔离夹具提供语言/平台只读授权及奖励分组/物品。
+//   控件序列按终态核验，C402 失败原因与集成实际结果逐项见 C403 notes.md。
+// - 渠道软删问题 Api#287、邮件 Vue#198 等历史项不能因标题迁移直接视为修复。
 
 // 2026-10-20 补编辑半边：闭环升级为 新增 → 行回显 → 编辑提交（回显断言 + 改值）→ 行回显新值 → 删除 → 行消失。
 // update 路由按约定由 create 路由派生（xxx/add → xxx/update，C18 权限码对齐约定），不逐实体重复登记。
 type EntitySpec = {
   name: string;
   menuTitle: string;
+  menuRoot: string;
+  fields: ('text' | 'select' | 'number' | 'date' | 'json' | 'editor' | 'cascade' | 'reward-items' | 'unique-number' | 'skip-text' | 'skip-number' | 'skip-select' | 'skip')[];
   session?: 'admin' | 'superadmin';
   // 行内无「编辑」按钮的页（如兑换码：编辑复用新增弹窗、动作列只挂删除）不跑编辑半边
   rowEdit?: boolean;
@@ -42,6 +32,7 @@ const ENTITIES: EntitySpec[] = [
   {
     name: '版本定义',
     menuTitle: '版本定义',
+    menuRoot: 'C 端交付',
     fields: ['text', 'text'],
     createApi: /gameAppVersionDefinition\/add/,
     deleteApi: /gameAppVersionDefinition\/delete/,
@@ -51,6 +42,7 @@ const ENTITIES: EntitySpec[] = [
     // menuTitle 必须是侧边栏渲染后的 i18n 标签（用户所见），不是种子菜单树的 Meta.Title：
     // gameAppAssetPackage 的 zh-cn 标签是「资源包」，与树 Title「资源包定义」已漂移
     menuTitle: '资源包',
+    menuRoot: 'C 端交付',
     fields: ['text', 'text'],
     createApi: /gameAppAssetPackage\/add/,
     deleteApi: /gameAppAssetPackage\/delete/,
@@ -58,6 +50,7 @@ const ENTITIES: EntitySpec[] = [
   {
     name: '配置字段定义',
     menuTitle: '内容元数据', // configKey 的 zh-cn 渲染标签（树 Title「配置字段定义」已漂移）
+    menuRoot: 'C 端交付',
     fields: ['text', 'text', 'select'],
     createApi: /gameAppRemoteConfigKey\/add/,
     deleteApi: /gameAppRemoteConfigKey\/delete/,
@@ -65,6 +58,7 @@ const ENTITIES: EntitySpec[] = [
   {
     name: '配置模式定义',
     menuTitle: '模式配置', // configMode 的 zh-cn 渲染标签（树 Title「配置模式定义」已漂移）
+    menuRoot: 'C 端交付',
     fields: ['text', 'text'],
     createApi: /gameAppRemoteConfigMode\/add/,
     deleteApi: /gameAppRemoteConfigMode\/delete/,
@@ -72,6 +66,7 @@ const ENTITIES: EntitySpec[] = [
   {
     name: '设备定义',
     menuTitle: '设备', // tenantDevice 的 zh-cn 渲染标签（树 Title「设备定义」已漂移）
+    menuRoot: 'C 端交付',
     fields: ['text', 'text', 'text'],
     createApi: /gameAppDevice\/add/,
     deleteApi: /gameAppDevice\/delete/,
@@ -79,6 +74,7 @@ const ENTITIES: EntitySpec[] = [
   {
     name: '邮件模板分类',
     menuTitle: '模板分类',
+    menuRoot: '内容运营',
     fields: ['text'],
     createApi: /gameMailTemplateCategory\/add/,
     deleteApi: /gameMailTemplateCategory\/delete/,
@@ -86,6 +82,7 @@ const ENTITIES: EntitySpec[] = [
   {
     name: '物品目录',
     menuTitle: '物品目录',
+    menuRoot: '商业化',
     fields: ['text', 'text'],
     createApi: /gameGoodsCatalogue\/add/,
     deleteApi: /gameGoodsCatalogue\/delete/,
@@ -93,6 +90,7 @@ const ENTITIES: EntitySpec[] = [
   {
     name: '游区分类',
     menuTitle: '游区分类',
+    menuRoot: '区服',
     fields: ['text', 'text'],
     createApi: /gameAreaClassify\/add/,
     deleteApi: /gameAreaClassify\/delete/,
@@ -100,6 +98,7 @@ const ENTITIES: EntitySpec[] = [
   {
     name: '兑换码渠道',
     menuTitle: '兑换码渠道',
+    menuRoot: '商业化',
     fields: ['text', 'text', 'number'],
     createApi: /gameRedeemCodeChannel\/add/,
     deleteApi: /gameRedeemCodeChannel\/delete/,
@@ -107,6 +106,7 @@ const ENTITIES: EntitySpec[] = [
   {
     name: '定时任务',
     menuTitle: '定时任务',
+    menuRoot: '系统',
     fields: ['text', 'text', 'text'],
     createApi: /gameTimeJob\/add/,
     deleteApi: /gameTimeJob\/delete/,
@@ -114,6 +114,7 @@ const ENTITIES: EntitySpec[] = [
   {
     name: '奖励模板分组',
     menuTitle: '奖励模板分组',
+    menuRoot: '内容运营',
     fields: ['text'],
     createApi: /gameRewardTemplateGroup\/add/,
     deleteApi: /gameRewardTemplateGroup\/delete/,
@@ -121,6 +122,7 @@ const ENTITIES: EntitySpec[] = [
   {
     name: '游戏公告',
     menuTitle: '游戏公告',
+    menuRoot: '内容运营',
     fields: ['select', 'select', 'date', 'date', 'number', 'text', 'text'],
     createApi: /gameAnnouncement\/add/,
     deleteApi: /gameAnnouncement\/delete/,
@@ -128,6 +130,7 @@ const ENTITIES: EntitySpec[] = [
   {
     name: '游戏物品',
     menuTitle: '游戏物品',
+    menuRoot: '商业化',
     fields: ['unique-number', 'select', 'text', 'text'],
     createApi: /gameGoods\/add/,
     deleteApi: /gameGoods\/delete/,
@@ -135,20 +138,23 @@ const ENTITIES: EntitySpec[] = [
   {
     name: '游戏运营配置',
     menuTitle: '游戏运营配置',
-    fields: ['select', 'text', 'json', 'text'],
+    menuRoot: 'C 端交付',
+    fields: ['text', 'json', 'text'],
     createApi: /gameAppServerConfig\/add/,
     deleteApi: /gameAppServerConfig\/delete/,
   },
   {
     name: '分包管理',
     menuTitle: '分包管理',
-    fields: ['select', 'text', 'select', 'select', 'text', 'text'],
+    menuRoot: 'C 端交付',
+    fields: ['skip-select', 'text', 'select', 'select', 'text', 'text'],
     createApi: /gameAppPackage\/add/,
     deleteApi: /gameAppPackage\/delete/,
   },
   {
     name: '渠道定义',
     menuTitle: '渠道定义',
+    menuRoot: 'C 端交付',
     fields: ['text', 'text', 'text', 'select', 'text'],
     createApi: /channelDefinition\/add/,
     deleteApi: /channelDefinition\/delete/,
@@ -156,6 +162,7 @@ const ENTITIES: EntitySpec[] = [
   {
     name: '奖励模板',
     menuTitle: '奖励模板',
+    menuRoot: '内容运营',
     fields: ['text', 'select', 'number', 'reward-items', 'text'],
     createApi: /gameRewardTemplate\/add/,
     deleteApi: /gameRewardTemplate\/delete/,
@@ -164,6 +171,7 @@ const ENTITIES: EntitySpec[] = [
     name: '兑换码',
     rowEdit: false, // 动作列仅删除（C130 盘点同源）；编辑复用新增弹窗
     menuTitle: '兑换码',
+    menuRoot: '商业化',
     fields: ['select', 'text', 'date', 'select', 'text', 'number', 'date', 'skip-select', 'reward-items'],
     createApi: /gameRedeemCode\/add/,
     deleteApi: /gameRedeemCode\/delete/,
@@ -175,6 +183,7 @@ const ENTITIES: EntitySpec[] = [
   {
     name: '字典管理',
     menuTitle: '字典管理',
+    menuRoot: '系统',
     session: 'superadmin',
     fields: ['text', 'text'],
     createApi: /globalDictionaryType\/add/,
@@ -183,6 +192,7 @@ const ENTITIES: EntitySpec[] = [
   {
     name: '参数配置',
     menuTitle: '参数配置',
+    menuRoot: '系统',
     session: 'superadmin',
     fields: ['text', 'text', 'text', 'text'],
     createApi: /systemConfig\/add/,
@@ -215,23 +225,9 @@ test.describe('CRUD 功能闭环（首批）', () => {
         await route.continue();
       });
 
-      // 真实菜单导航：等守卫弹回落地后，先在当前侧边栏找目标菜单；
-      // 租户域菜单分布在两个真实表面——应用选择页全局侧边栏与应用工作台侧边栏，
-      // 当前表面没有时切换到另一个表面（全部真实点击）再试
       await page.goto('/');
-      await sleep(900);
-      await page.locator('.p-panelmenu').waitFor({ timeout: 15_000 });
-      try {
-        await navigateByMenu(page, entity.menuTitle);
-      } catch {
-        if (entity.session === 'superadmin') throw new Error(`平台侧边栏未找到「${entity.menuTitle}」`);
-        if (page.url().includes('appSelector')) {
-          await enterWorkspace(page);
-        } else {
-          await gotoAppSelector(page);
-        }
-        await navigateByMenu(page, entity.menuTitle);
-      }
+      await expectOverview(page);
+      await navigateByMenu(page, entity.menuTitle, entity.menuRoot);
       await expect(page.locator('.p-datatable-tbody')).toBeVisible({ timeout: 20_000 });
 
       await page.locator('role=button[name="新增"]').first().click();

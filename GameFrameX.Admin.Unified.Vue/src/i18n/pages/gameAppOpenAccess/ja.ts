@@ -2,9 +2,6 @@ export default {
   gameBusiness: {
     openAccess: {
       listTitle: 'アプリオープンアクセス認証情報',
-      entityId: '認証情報ID',
-
-      appId: 'アプリ',
       bindUser: 'バインドユーザー',
       bindUserId: 'バインドユーザー',
       scenario: 'シナリオ',
@@ -15,8 +12,6 @@ export default {
       isEnabled: 'ステータス',
       expiresTime: '有効期限',
       revokedTime: '失効日時',
-      revokeReason: '失効理由',
-      createdTime: '作成日時',
       noExpiry: '無期限',
 
       enabled: '有効',
@@ -25,7 +20,6 @@ export default {
 
       issueTitle: '認証情報発行',
       editTitle: '認証情報編集',
-      issueHint: '発行成功後、AccessSecret は一度だけ表示されます。すぐに保存してください。',
       pleaseSelectBindUser: 'バインドユーザーを選択',
       pleaseEnterScenario: 'シナリオコードを入力',
       pleaseEnterPurpose: '用途を入力',
@@ -40,14 +34,10 @@ export default {
       scopesRequired: '少なくとも1つのスコープを選択してください',
 
       scopePackageReport: 'パッケージレポート (package-report)',
-
-      issue: '発行',
-      edit: '編集',
       revoke: '失効',
       enable: '有効化',
       disable: '無効化',
       refresh: 'シークレットローテーション',
-      delete: '削除',
 
       revokeTitle: '認証情報を失効',
       enableTitle: '認証情報を有効化',
@@ -59,11 +49,8 @@ export default {
       reasonTooLong: '操作理由は256文字以内で入力してください',
       revokeWarning: '失効は即時かつ取り消せません。続行しますか？',
       refreshWarning: 'ローテーション後、現在の AccessSecret は即時無効化されます。新しいシークレットは一度だけ表示されます。',
-      actionRowLabel: '操作対象認証情報',
 
       deleteConfirm: 'この認証情報を削除しますか？',
-      enableConfirm: 'この認証情報を有効化しますか？',
-      disableConfirm: 'この認証情報を無効化しますか？',
 
       secretTitle: '認証情報シークレット（一度限り表示）',
       secretWarning: 'AccessSecret は一度だけ表示され、後で再表示できません。今すぐコピーして保存してください！',
@@ -72,9 +59,6 @@ export default {
       copySuccess: 'クリップボードにコピーしました',
       copyFailed: 'コピー失敗、手動で選択してコピーしてください',
       iHaveSaved: '保存しました、閉じる',
-
-      issueSuccess: '発行成功',
-      updateSuccess: '更新成功',
       deleteSuccess: '削除成功',
       revokeSuccess: '失効成功',
       enableSuccess: '有効化成功',

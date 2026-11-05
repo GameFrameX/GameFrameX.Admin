@@ -10,11 +10,7 @@ namespace GameFrameX.Application.SeedData.System;
 
 /// <summary>
 /// Online 社交治理 域菜单种子（partial；由 <see cref="GlobalMenuSeedData.BuildData"/> 聚合；change C350 / GFX-754）。
-/// <para>
-/// 容器 route:onlineCenter 由 C340 的 <see cref="GlobalMenuSeedData.OnlineMenus"/>（GlobalMenuSeedData.Online.cs）正式提供；
-/// 本文件原按 C340 A0 冻结契约预置的容器在合并 main 时移除（两容器 Icon/时间戳形态不同，同 Id 双行会破坏 seed upsert 幂等），
-/// messageAudit / reportCase 叶子直接挂载正式容器之下。
-/// </para>
+/// <para>消息审计与举报处置挂载在线运维根目录 route:gmCenter。</para>
 /// </summary>
 public partial class GlobalMenuSeedData
 {
@@ -26,12 +22,12 @@ public partial class GlobalMenuSeedData
             {
                 Id = StableSeedId.Menu("route:messageAudit"),
                 Key = "route:messageAudit",
-                Pid = StableSeedId.Menu("route:onlineCenter"),
+                Pid = StableSeedId.Menu("route:gmCenter"),
                 Type = MenuTypeEnum.Menu,
                 Name = "messageAudit",
-                Path = "/app/onlineCenter/messageAudit",
+                Path = "/gmCenter/messageAudit",
                 AppScope = MenuAppScopeEnum.Console,
-                Component = "/app/onlineCenter/messageAudit/index",
+                Component = "/gmCenter/messageAudit/index",
                 Redirect = null,
                 Permission = null,
                 Title = "消息审计",
@@ -42,7 +38,7 @@ public partial class GlobalMenuSeedData
                 IsHide = false,
                 IsKeepAlive = true,
                 IsAffix = false,
-                OrderNo = 100,
+                OrderNo = 700,
                 IsEnabled = true,
                 Remark = null,
                 CreatedTime = 1783612800,
@@ -55,12 +51,12 @@ public partial class GlobalMenuSeedData
             {
                 Id = StableSeedId.Menu("route:reportCase"),
                 Key = "route:reportCase",
-                Pid = StableSeedId.Menu("route:onlineCenter"),
+                Pid = StableSeedId.Menu("route:gmCenter"),
                 Type = MenuTypeEnum.Menu,
                 Name = "reportCase",
-                Path = "/app/onlineCenter/reportCase",
+                Path = "/gmCenter/reportCase",
                 AppScope = MenuAppScopeEnum.Console,
-                Component = "/app/onlineCenter/reportCase/index",
+                Component = "/gmCenter/reportCase/index",
                 Redirect = null,
                 Permission = null,
                 Title = "举报处置",
@@ -71,7 +67,7 @@ public partial class GlobalMenuSeedData
                 IsHide = false,
                 IsKeepAlive = true,
                 IsAffix = false,
-                OrderNo = 200,
+                OrderNo = 800,
                 IsEnabled = true,
                 Remark = null,
                 CreatedTime = 1783612800,

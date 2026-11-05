@@ -34,7 +34,6 @@ export default {
                 currencyOrItemType: '재화/아이템 유형',
                 timeRange: '기간',
                 startTime: '시작 시각',
-                pleaseEnterServerId: '서버 ID를 입력하세요',
                 pleaseEnterPlayerId: '플레이어 ID를 입력하세요',
                 pleaseEnterCurrencyOrItemType: '재화 또는 아이템 유형을 입력하세요',
             },
@@ -53,8 +52,6 @@ export default {
             detailTitle: '거래 상세',
             transactionId: '거래 번호',
             pleaseEnterTransactionId: '거래 번호를 입력하세요',
-            serverId: '서버 ID',
-            pleaseEnterServerId: '서버 ID를 입력하세요',
             status: '상태',
             source: '소스',
             reason: '사유',
@@ -73,8 +70,6 @@ export default {
         assetAudit: {
             listTitle: '자산 감사',
             search: {
-                serverId: '서버 ID',
-                pleaseEnterServerId: '서버 ID를 입력하세요',
                 operatorId: '작업자 ID',
                 pleaseEnterOperatorId: '작업자 ID를 입력하세요',
                 playerId: '플레이어 ID',
@@ -96,10 +91,7 @@ export default {
         dashboard: {
             snapshotTitle: '온라인 개요 스냅샷',
             serverTime: 'Online 서버 시간',
-            search: {
-                serverId: '서버 ID',
-                pleaseEnterServerId: '서버 ID를 입력하세요',
-            },
+
             metrics: {
                 onlinePlayerCount: '온라인 플레이어 수',
                 sessionCount: '세션 수',
@@ -133,8 +125,6 @@ export default {
             search: {
                 playerId: '플레이어 ID',
                 pleaseEnterPlayerId: '플레이어 ID 입력',
-                serverId: '서버 ID',
-                pleaseEnterServerId: '서버 ID를 입력하세요',
                 timeRange: '기간',
                 startTime: '시작 시각',
             },
@@ -153,8 +143,6 @@ export default {
                 pleaseEnterTargetPlayerId: '대상 플레이어 ID 입력',
                 commandKind: '명령 종류',
                 pleaseEnterCommandKind: '명령 종류 입력',
-                serverId: '서버 ID',
-                pleaseEnterServerId: '서버 ID 입력(선택)',
                 timeRange: '기간',
                 startTime: '시작 시각',
             },
@@ -162,7 +150,6 @@ export default {
                 source: '출처',
                 operatorIdentifier: '운영자',
                 commandType: '명령 유형',
-                appId: 'App',
                 serverId: '서버',
                 targetPlayerIdentifier: '대상 플레이어',
                 summary: '요약',
@@ -177,8 +164,6 @@ export default {
             commandKind: '명령 종류',
             pleaseSelectCommand: '명령 선택',
             commandKindRequired: '명령 종류를 선택하세요',
-            serverId: '서버 ID',
-            pleaseEnterServerId: '서버 ID 입력(선택)',
             ticketId: 'Ticket ID',
             pleaseEnterTicketId: '취소할 Ticket ID 입력',
             matchId: 'Match ID',
@@ -217,8 +202,6 @@ export default {
         messageAudit: {
             listTitle: '메시지 감사',
             search: {
-                serverId: '서버 ID',
-                pleaseEnterServerId: '서버 ID 입력',
                 participantPlayerId: '참여자 플레이어 ID',
                 pleaseEnterParticipantPlayerId: '참여자 플레이어 ID 입력',
                 keyword: '키워드',
@@ -265,8 +248,6 @@ export default {
                 rejected: '기각됨',
             },
             search: {
-                serverId: '서버 ID',
-                pleaseEnterServerId: '서버 ID 입력',
                 status: '상태',
                 pleaseSelectStatus: '상태 선택',
                 reporterPlayerId: '신고자 플레이어 ID',
@@ -300,8 +281,6 @@ export default {
             notLoaded: '먼저 조회하세요',
             pollStoppedByRateLimit: 'Online 측 속도 제한(7xxx 미러 코드) 감지, 자동 폴링이 중지되었습니다. 잠시 후 수동 새로고침하세요',
             search: {
-                serverId: '서버 ID',
-                pleaseEnterServerId: '서버 ID 입력',
                 mode: '매치 모드',
                 pleaseEnterMode: '매치 모드 입력',
                 region: '리전',
@@ -311,8 +290,6 @@ export default {
         matchFailureReason: {
             listTitle: '매치 실패 사유',
             search: {
-                serverId: '서버 ID',
-                pleaseEnterServerId: '서버 ID 입력',
                 reasonCode: '실패 사유',
                 pleaseSelectReasonCode: '실패 사유 선택',
                 timeRange: '시간 범위',
@@ -336,8 +313,6 @@ export default {
             search: {
                 abnormalKind: '비정상 유형',
                 pleaseSelectKind: '비정상 유형 선택',
-                serverId: '서버 ID',
-                pleaseEnterServerId: '서버 ID 입력',
             },
             columns: {
                 ticketId: '티켓 ID',
@@ -384,7 +359,6 @@ export default {
             syncDialogTitle: '세그먼트를 Online에 동기화',
             syncHint: '정의 스냅샷을 통합 배포 경로로 Online에 전송하며 Online이 세그먼트 ID를 할당해 되돌려 씁니다. 사유는 감사를 위해 필수입니다.',
             syncServerId: '서버 ID',
-            syncServerIdPlaceholder: '대상 서버 ID를 입력하세요',
             reasonLabel: '사유 (필수, 감사 대상)',
             reasonPlaceholder: '사유를 입력하세요, 500자 이내',
             reasonRequired: '사유는 필수입니다',
@@ -423,7 +397,6 @@ export default {
             publishDialogTitle: '구성 롤아웃 버전 게시',
             publishHint: '게시 = 새 버전 행을 Online에 배포합니다. 세그먼트는 동기화되어야 하며 사유는 감사를 위해 필수입니다.',
             serverId: '서버 ID',
-            serverIdPlaceholder: '대상 서버 ID를 입력하세요',
             reasonLabel: '사유 (필수, 감사 대상)',
             reasonPlaceholder: '배포 사유를 입력하세요, 500자 이내',
             reasonRequired: '사유는 필수입니다',

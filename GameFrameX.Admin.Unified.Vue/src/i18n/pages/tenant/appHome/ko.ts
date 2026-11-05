@@ -1,8 +1,6 @@
 // 정의 내용 (APP-콕핏=테넌트가 앱 선택 후의 운영 홈)
 export default {
     appHome: {
-        pageTitle: '앱 콕핏',
-        workbenchSub: 'GameFrameX 앱 콕핏',
         kpiOnline: '앱 온라인 · ONLINE',
         kpiOnlineFoot: '실시간 샘플',
         kpiOrders: '오늘 주문 · ORDERS',

@@ -228,7 +228,6 @@ const hideLabel = computed(() => props.hideLabel || t('message.gameBusiness.hide
 const onReset = () => {
   if (props.modelValue) {
     // 只清空表单声明字段（含默认关键字）：modelValue 还承载页面注入的上下文键
-    // （如应用维度页面的 appId，来自 URL query），一并清掉会让后端必填校验 500。
     const fieldKeys = new Set(props.fields.map((f) => f.key))
     if (props.defaultSearchKey) {
       fieldKeys.add('searchKey')

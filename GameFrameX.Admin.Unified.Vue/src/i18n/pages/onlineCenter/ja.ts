@@ -34,7 +34,6 @@ export default {
                 currencyOrItemType: '通貨/アイテム種別',
                 timeRange: '期間',
                 startTime: '開始時刻',
-                pleaseEnterServerId: 'サーバー ID を入力',
                 pleaseEnterPlayerId: 'プレイヤー ID を入力',
                 pleaseEnterCurrencyOrItemType: '通貨またはアイテム種別を入力',
             },
@@ -53,8 +52,6 @@ export default {
             detailTitle: '取引詳細',
             transactionId: '取引番号',
             pleaseEnterTransactionId: '取引番号を入力してください',
-            serverId: 'サーバー ID',
-            pleaseEnterServerId: 'サーバー ID を入力してください',
             status: 'ステータス',
             source: 'ソース',
             reason: '理由',
@@ -73,8 +70,6 @@ export default {
         assetAudit: {
             listTitle: '資産監査',
             search: {
-                serverId: 'サーバー ID',
-                pleaseEnterServerId: 'サーバー ID を入力',
                 operatorId: '実行者 ID',
                 pleaseEnterOperatorId: '実行者 ID を入力',
                 playerId: 'プレイヤー ID',
@@ -96,10 +91,7 @@ export default {
         dashboard: {
             snapshotTitle: 'オンライン概要スナップショット',
             serverTime: 'Online サーバー時刻',
-            search: {
-                serverId: 'サーバー ID',
-                pleaseEnterServerId: 'サーバー ID を入力',
-            },
+
             metrics: {
                 onlinePlayerCount: 'オンラインプレイヤー数',
                 sessionCount: 'セッション数',
@@ -133,8 +125,6 @@ export default {
             search: {
                 playerId: 'プレイヤー ID',
                 pleaseEnterPlayerId: 'プレイヤー ID を入力',
-                serverId: 'サーバー ID',
-                pleaseEnterServerId: 'サーバー ID を入力',
                 timeRange: '期間',
                 startTime: '開始時刻',
             },
@@ -153,8 +143,6 @@ export default {
                 pleaseEnterTargetPlayerId: '対象プレイヤー ID を入力',
                 commandKind: 'コマンド種別',
                 pleaseEnterCommandKind: 'コマンド種別を入力',
-                serverId: 'サーバー ID',
-                pleaseEnterServerId: 'サーバー ID を入力（任意）',
                 timeRange: '期間',
                 startTime: '開始時刻',
             },
@@ -162,7 +150,6 @@ export default {
                 source: 'ソース',
                 operatorIdentifier: '操作者',
                 commandType: 'コマンド種別',
-                appId: 'App',
                 serverId: 'サーバー',
                 targetPlayerIdentifier: '対象プレイヤー',
                 summary: '概要',
@@ -177,8 +164,6 @@ export default {
             commandKind: 'コマンド種別',
             pleaseSelectCommand: 'コマンドを選択',
             commandKindRequired: 'コマンド種別を選択してください',
-            serverId: 'サーバー ID',
-            pleaseEnterServerId: 'サーバー ID を入力（任意）',
             ticketId: 'Ticket ID',
             pleaseEnterTicketId: 'キャンセルする Ticket ID を入力',
             matchId: 'Match ID',
@@ -217,8 +202,6 @@ export default {
         messageAudit: {
             listTitle: 'メッセージ監査',
             search: {
-                serverId: 'サーバー ID',
-                pleaseEnterServerId: 'サーバー ID を入力',
                 participantPlayerId: '参加者プレイヤー ID',
                 pleaseEnterParticipantPlayerId: '参加者プレイヤー ID を入力',
                 keyword: 'キーワード',
@@ -265,8 +248,6 @@ export default {
                 rejected: '却下済み',
             },
             search: {
-                serverId: 'サーバー ID',
-                pleaseEnterServerId: 'サーバー ID を入力',
                 status: 'ステータス',
                 pleaseSelectStatus: 'ステータスを選択',
                 reporterPlayerId: '通報者プレイヤー ID',
@@ -300,8 +281,6 @@ export default {
             notLoaded: '先に検索してください',
             pollStoppedByRateLimit: 'Online 側レート制限（7xxx ミラーコード）を検出したため自動ポーリングを停止しました。後ほど手動更新してください',
             search: {
-                serverId: 'サーバー ID',
-                pleaseEnterServerId: 'サーバー ID を入力',
                 mode: 'マッチモード',
                 pleaseEnterMode: 'マッチモードを入力',
                 region: 'リージョン',
@@ -311,8 +290,6 @@ export default {
         matchFailureReason: {
             listTitle: 'マッチ失敗理由',
             search: {
-                serverId: 'サーバー ID',
-                pleaseEnterServerId: 'サーバー ID を入力',
                 reasonCode: '失敗理由',
                 pleaseSelectReasonCode: '失敗理由を選択',
                 timeRange: '時間範囲',
@@ -336,8 +313,6 @@ export default {
             search: {
                 abnormalKind: '異常種別',
                 pleaseSelectKind: '異常種別を選択',
-                serverId: 'サーバー ID',
-                pleaseEnterServerId: 'サーバー ID を入力',
             },
             columns: {
                 ticketId: 'チケット ID',
@@ -384,7 +359,6 @@ export default {
             syncDialogTitle: 'セグメントを Online へ同期',
             syncHint: '定義スナップショットを統一配信経路で Online へ送信し、Online がセグメント ID を割り当て返記します。理由は監査のため必須です。',
             syncServerId: 'サーバー ID',
-            syncServerIdPlaceholder: '対象サーバー ID を入力',
             reasonLabel: '理由（必須、監査対象）',
             reasonPlaceholder: '理由を入力（500 字以内）',
             reasonRequired: '理由は必須です',
@@ -423,7 +397,6 @@ export default {
             publishDialogTitle: 'コンフィグロールアウトバージョンを公開',
             publishHint: '公開 = 新バージョン行を Online へ配信。セグメントは同期済みであること。理由は監査のため必須です。',
             serverId: 'サーバー ID',
-            serverIdPlaceholder: '対象サーバー ID を入力',
             reasonLabel: '理由（必須、監査対象）',
             reasonPlaceholder: '配信理由を入力（500 字以内）',
             reasonRequired: '理由は必須です',

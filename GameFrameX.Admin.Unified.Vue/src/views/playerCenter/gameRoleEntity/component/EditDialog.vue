@@ -1,0 +1,29 @@
+<template>
+  <BaseEditDialog ref="dialogRef" :title="props.title" :addApi="gameRoleAddPost" :updateApi="gameRoleUpdatePost" :rules="rules" @reloadTable="emit('reloadTable')">
+    <template #default="{ ruleForm, isEditor }">
+      <TextField v-model="ruleForm.description" name="description" :label="t('message.gameBusiness.description')" :placeholder="t('message.gameBusiness.pleaseEnterDescription')" maxlength="512"/>
+    </template>
+  </BaseEditDialog>
+</template>
+
+<script lang="ts" setup>
+import {ref} from 'vue'
+import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
+import {TextField} from '../../../../components/crud-form-fields'
+import { gameRoleAddPost, gameRoleUpdatePost } from '../../../../api/gameRole'
+
+const props = defineProps({
+  title: {type: String, default: ''},
+})
+const emit = defineEmits(['reloadTable'])
+const dialogRef = ref()
+
+const rules = {
+}
+
+defineExpose({
+  openDialog: (row: any) => dialogRef.value?.openDialog(row),
+  get isEditor() { return dialogRef.value?.isEditor },
+  set isEditor(val) { if (dialogRef.value) dialogRef.value.isEditor = val },
+})
+</script>
