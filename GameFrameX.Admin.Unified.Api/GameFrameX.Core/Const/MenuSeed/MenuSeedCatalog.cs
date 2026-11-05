@@ -45,9 +45,14 @@ public static class MenuSeedCatalog
     {
         get
         {
+            var protectedKeys = Definitions.Where(definition => definition.SuperAdminOnly)
+                                           .Select(definition => definition.Key).ToHashSet(StringComparer.Ordinal);
+            // 超管子树可以挂在公共系统目录下，保护根不等于导航顶层根。
             return Definitions
-                   .Where(u => u.ParentKey == null && u.SuperAdminOnly)
-                   .Select(u => StableSeedId.Menu(u.Key))
+                   .Where(definition => definition.SuperAdminOnly
+                                        && (definition.ParentKey == null
+                                            || !BelongsToSuperAdminOnlySubtree(definition.ParentKey, protectedKeys)))
+                   .Select(definition => StableSeedId.Menu(definition.Key))
                    .ToArray();
         }
     }
@@ -68,7 +73,7 @@ public static class MenuSeedCatalog
 
     /// <summary>
     /// 获取 SuperAdmin 可见菜单 ID。
-    /// <para>规则: SuperAdminOnly 菜单(含整棵子树)及其目录祖先 + 公共工作台(dashboard/home)。只补目录祖先，不引入祖先下的租户业务菜单。</para>
+    /// <para>规则: SuperAdminOnly 菜单(含整棵子树)及其目录祖先 + 公共总览与运营首页(dashboard/home)。只补目录祖先，不引入祖先下的租户业务菜单。</para>
     /// </summary>
     public static IReadOnlyList<long> SuperAdminVisibleMenuIds
     {

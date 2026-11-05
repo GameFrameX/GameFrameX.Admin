@@ -1,3 +1,4 @@
+using GameFrameX.Core.Const.MenuSeed;
 using System.Security.Claims;
 using GameFrameX.Core.Cache;
 using GameFrameX.Core.Const;
@@ -106,6 +107,26 @@ public sealed class RoleAuthorizationCacheTests : IDisposable
             Id = 11, Name = "First role", IsEnabled = false, RowVersion = 0,
         });
         Assert.Empty(await _menus.GetOwnMenuIdListAsync());
+    }
+
+    [Fact]
+    public async Task GrantAllMenus_RejectsNestedProtectedSubtreesButKeepsReadableSelectors()
+    {
+        var seedMenus = MenuSeedCatalog.Menus.ToList();
+        await _database.MainDb.Insertable(seedMenus).ExecuteCommandAsync();
+        await _roleMenus.GrantRoleMenuAsync(new RoleMenuRequest
+        {
+            Id = 11, MenuIdList = seedMenus.Select(menu => menu.Id).ToList(),
+        });
+        var granted = await _database.MainDb.Queryable<TenantRoleMenuEntity>()
+                                     .Where(relation => relation.RoleId == 11)
+                                     .Select(relation => relation.MenuId).ToListAsync();
+        var protectedIdentifiers = MenuSeedCatalog.SuperAdminOnlySubtreeMenuIds;
+        var readableIdentifiers = MenuSeedCatalog.TenantReadableSuperAdminOnlyMenuIds;
+        Assert.NotEmpty(protectedIdentifiers);
+        Assert.All(protectedIdentifiers.Except(readableIdentifiers), identifier => Assert.DoesNotContain(identifier, granted));
+        Assert.All(readableIdentifiers, identifier => Assert.Contains(identifier, granted));
+        Assert.Contains(seedMenus.Single(menu => menu.Key == "route:home").Id, granted);
     }
 
     [Theory]
