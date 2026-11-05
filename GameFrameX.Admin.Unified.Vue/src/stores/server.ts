@@ -2,10 +2,12 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { gameAreaPagePost } from '../api/gameArea'
 import { local } from '../utils/storage'
+import { GameServerStatus } from '../api/gameArea/types'
 
 export interface ServerOption {
     id: string
     name: string
+    serverStatus: GameServerStatus
 }
 
 const selectionStorageKey = 'selectedServerId'
@@ -58,7 +60,7 @@ export const useServerStore = defineStore('server', () => {
                     const result = response.data.data
                     for (const server of result.items ?? []) {
                         const identifier = server.id == null ? '' : String(server.id)
-                        if (identifier) options.set(identifier, { id: identifier, name: server.name || identifier })
+                        if (identifier) options.set(identifier, { id: identifier, name: server.name || identifier, serverStatus: server.serverStatus ?? GameServerStatus.Unknown })
                     }
                     if (!(result.hasNextPage || page < (result.totalPages ?? 0))) break
                     page += 1

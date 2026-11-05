@@ -9,6 +9,7 @@ import {SystemConst} from '../api/systemConst';
 import {GlobalDictionaryType} from '../api/globalDictionaryType';
 import {clearTargetTenantId} from '../utils/targetTenant';
 import {resolveBackendFileUrl} from '../utils/fileUrl';
+import {useServerStore} from './server';
 
 /**
  * 用户信息
@@ -36,6 +37,14 @@ export const useUserInfoStore = defineStore('userInfo', {
         async setUserInfos() {
             // persistedstate auto-hydrates constList/dictList from sessionStorage
             this.userInfos = <UserInfos>await this.getApiUserInfo();
+            const serverStore = useServerStore();
+            if (this.isSuperAdmin) {
+                serverStore.resetServers();
+            } else if (this.userInfos.id) {
+                await serverStore.loadServers().catch(() => {
+                    // 失败状态由区服选择器/健康卡显示，不阻断登录与菜单初始化。
+                });
+            }
         },
         async setConstList() {
             if (this.constList && this.constList.length > 0) return;

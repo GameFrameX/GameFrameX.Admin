@@ -1,6 +1,8 @@
 // 定義内容（PLATFORM-コックピット=SuperAdmin プラットフォームホーム；greeting は appHome で再利用；notice 段はお知らせページで使用）
 export default {
     home: {
+        serverHealth: 'サーバー稼働状況',
+        serverHealthDescription: '登録されているサーバーの稼働状態です。リアルタイムの死活監視結果ではありません。',
         // 版頭
         greetingMorning: 'おはようございます',
         greetingNoon: 'こんにちは',

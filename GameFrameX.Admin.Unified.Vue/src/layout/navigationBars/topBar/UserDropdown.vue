@@ -86,11 +86,11 @@ import screenfull from 'screenfull';
 import {storeToRefs} from 'pinia';
 import {useUserInfoStore} from '../../../stores/userInfo';
 import {useThemeConfigStore} from '../../../stores/themeConfig';
+import {useServerStore} from '../../../stores/server';
 import other from '../../../utils/other';
 
 import {clearAccessTokens} from '../../../utils/axiosUtils';
 import {systemAuthLogoutPost} from '../../../api/systemAuth';
-
 
 import Menu from 'primevue/menu';
 import Dialog from 'primevue/dialog';
@@ -201,8 +201,14 @@ const onHandleCommandClick = async (path: string) => {
   if (path === 'logOut') {
     const confirmed = await showConfirm(t('message.user.logOutMessage'), t('message.user.logOutTitle'));
     if (confirmed) {
-      await systemAuthLogoutPost();
-      clearAccessTokens();
+      try {
+        await systemAuthLogoutPost();
+      } catch {
+        // 远端退出失败也必须清除本地凭据与区服上下文。
+      } finally {
+        useServerStore().resetServers();
+        clearAccessTokens();
+      }
     }
   } else {
     router.push(path);
@@ -269,7 +275,6 @@ const initI18nOrSize = (value: string, attr: string) => {
 onMounted(() => {
   initI18nOrSize('globalComponentSize', 'disabledSize');
   initI18nOrSize('globalI18n', 'disabledI18n');
-
 });
 </script>
 

@@ -1,6 +1,8 @@
 // 定义内容（PLATFORM-驾驶舱=超管平台首页；greeting 供 appHome 复用；notice 段为通知管理页使用）
 export default {
     home: {
+        serverHealth: '区服健康',
+        serverHealthDescription: '区服登记的运行状态，不代表实时探活结果。',
         // 版头
         greetingMorning: '早上好',
         greetingNoon: '中午好',

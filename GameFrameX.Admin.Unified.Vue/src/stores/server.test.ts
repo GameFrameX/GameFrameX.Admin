@@ -3,11 +3,12 @@ import { createPinia, setActivePinia } from 'pinia'
 import { gameAreaPagePost } from '../api/gameArea'
 import { local } from '../utils/storage'
 import { useServerStore } from './server'
+import { GameServerStatus } from '../api/gameArea/types'
 
 vi.mock('../api/gameArea', () => ({ gameAreaPagePost: vi.fn() }))
 const pageRequest = vi.mocked(gameAreaPagePost)
 
-function pageResponse(items: { id: string; name?: string }[], totalPages = 1) {
+function pageResponse(items: { id: string; name?: string; serverStatus?: GameServerStatus }[], totalPages = 1) {
     return { data: { data: { items, totalPages } } } as unknown as Awaited<ReturnType<typeof gameAreaPagePost>>
 }
 
@@ -95,4 +96,21 @@ test('退出后尚未完成的旧请求不能污染新会话', async () => {
     await oldRequest
     expect(store.servers.map(server => server.id)).toEqual(['2'])
     expect(store.loading).toBe(false)
+})
+
+
+test('区服列表保留真实登记状态，缺省状态为未知', async () => {
+    pageRequest.mockResolvedValue(pageResponse([
+        { id: '1', serverStatus: GameServerStatus.Online },
+        { id: '2', serverStatus: GameServerStatus.Offline },
+        { id: '3', serverStatus: GameServerStatus.Maintenance },
+        { id: '4', serverStatus: GameServerStatus.Full },
+        { id: '5' },
+    ]))
+    const store = useServerStore()
+    await store.loadServers()
+    expect(store.servers.map(server => server.serverStatus)).toEqual([
+        GameServerStatus.Online, GameServerStatus.Offline, GameServerStatus.Maintenance,
+        GameServerStatus.Full, GameServerStatus.Unknown,
+    ])
 })

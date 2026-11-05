@@ -8,7 +8,10 @@
       </div>
       <time :datetime="sheetDate">{{ sheetDate }}</time>
     </header>
-    <BusinessOverview v-if="!userStore.isSuperAdmin"/>
+    <template v-if="!userStore.isSuperAdmin">
+      <BusinessOverview/>
+      <ServerHealthCard/>
+    </template>
     <section class="quick-wrap">
       <HomeQuickNav :entries="quickEntries" :ariaLabel="userStore.isSuperAdmin ? t('message.home.quickNav') : t('message.appHome.quickNav')"/>
     </section>
@@ -19,6 +22,7 @@
 import {computed} from 'vue';
 import NarrowScreenHint from '../../../components/narrow-screen-hint/index.vue';
 import BusinessOverview from './components/BusinessOverview.vue';
+import ServerHealthCard from './components/ServerHealthCard.vue';
 import HomeQuickNav from './components/HomeQuickNav.vue';
 import type {QuickNavEntry} from './components/HomeQuickNav.vue';
 import {useUserInfoStore} from '../../../stores/userInfo';

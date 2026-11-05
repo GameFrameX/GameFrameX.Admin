@@ -7,12 +7,14 @@ import {showSuccess, showWarning} from '../../../utils/message';
 import {formatAxis} from '../../../utils/formatTime';
 import {nextLoading} from '../../../utils/loading';
 import {t} from '../../../i18n/index';
+import {useServerStore} from '../../../stores/server';
 
 export const completeSignIn = async (
     accessToken: string | any,
     router: Router,
     welcomeText?: string,
 ): Promise<void> => {
+  useServerStore().resetServers();
   local.set(ACCESS_TOKEN_KEY, accessToken);
   session.set('token', accessToken);
 

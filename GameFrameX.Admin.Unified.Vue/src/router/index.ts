@@ -13,6 +13,7 @@ import {initBackEndControlRoutes} from './backEnd';
 import {clearTokens} from '../utils/http/shared';
 import {showWarning} from '../utils/message';
 import {t} from '../i18n/index';
+import {useServerStore} from '../stores/server';
 
 /**
  * 1、前端控制路由时：isRequestRoutes 为 false，需要写 roles，需要走 setFilterRoute 方法。
@@ -106,6 +107,7 @@ router.beforeEach(async (to, from) => {
     NProgress.configure({showSpinner: false});
     if (to.meta.title) NProgress.start();
     const token = session.get('token');
+    if (!token) useServerStore(pinia).resetServers();
     if (to.path === '/login' && !token) {
         NProgress.done();
         return true;

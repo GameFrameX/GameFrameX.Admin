@@ -1,6 +1,10 @@
 import {mount, flushPromises} from '@vue/test-utils';
 import {beforeEach, expect, test, vi} from 'vitest';
 import {createRouter, createMemoryHistory} from 'vue-router';
+import {createPinia, setActivePinia} from 'pinia';
+import PrimeVue from 'primevue/config';
+import {gameAreaPagePost} from '../../../api/gameArea';
+import {systemEnumEnumDataListGet} from '../../../api/systemEnum';
 import DashboardHome from './index.vue';
 import {gameHomeOverviewPost, gameHomeOnlineTrendPost} from '../../../api/gameHome';
 
@@ -10,6 +14,12 @@ const {userStore} = vi.hoisted(() => ({
 vi.mock('../../../stores/userInfo', () => ({useUserInfoStore: () => userStore}));
 vi.mock('../../../i18n/index', () => ({t: (key: string) => key}));
 vi.mock('../../../api/gameHome', () => ({gameHomeOverviewPost: vi.fn(), gameHomeOnlineTrendPost: vi.fn()}));
+
+vi.mock('../../../api/gameArea', () => ({gameAreaPagePost: vi.fn()}));
+vi.mock('../../../api/systemEnum', () => ({systemEnumEnumDataListGet: vi.fn()}));
+vi.mock('../../../utils/message', () => ({showSuccess: vi.fn(), showError: vi.fn()}));
+
+vi.mock('vue-clipboard3', () => ({default: () => ({toClipboard: vi.fn()})}));
 
 const overviewRequest = vi.mocked(gameHomeOverviewPost);
 const trendRequest = vi.mocked(gameHomeOnlineTrendPost);
@@ -27,7 +37,7 @@ async function renderDashboard() {
   await router.push('/dashboard/home');
   return mount(DashboardHome, {
     global: {
-      plugins: [router],
+      plugins: [router, PrimeVue],
       stubs: {HomeTrendChart: true, HomeTermIllust: true, NarrowScreenHint: true},
     },
   });
@@ -35,6 +45,9 @@ async function renderDashboard() {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  setActivePinia(createPinia());
+  vi.stubGlobal('localStorage', {getItem: () => null, setItem: vi.fn(), removeItem: vi.fn()});
+  vi.mocked(systemEnumEnumDataListGet).mockResolvedValue({data: {data: []}} as unknown as Awaited<ReturnType<typeof systemEnumEnumDataListGet>>);
   userStore.isSuperAdmin = true;
   userStore.userInfos.account = 'superadmin';
   overviewRequest.mockResolvedValue({data: {data: {onlineCount: 123, todayOrderCount: 45, playerTotalCount: 678}}} as Awaited<ReturnType<typeof gameHomeOverviewPost>>);
@@ -50,6 +63,9 @@ test('超管只显示平台入口，业务卡片不挂载也不发送聚合请�
   expect(wrapper.find('a[href="/playerCenter/gameUserEntity"]').exists()).toBe(false);
   expect(overviewRequest).not.toHaveBeenCalled();
   expect(trendRequest).not.toHaveBeenCalled();
+  expect(gameAreaPagePost).not.toHaveBeenCalled();
+  expect(systemEnumEnumDataListGet).not.toHaveBeenCalled();
+  expect(wrapper.find('.server-health-card').exists()).toBe(false);
   wrapper.unmount();
 });
 
