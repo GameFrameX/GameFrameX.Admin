@@ -11,7 +11,7 @@
     :scrollable="true"
     @reloadTable="emit('reloadTable')"
   >
-    <template #default="{ ruleForm, isEditor }">
+    <template #default="{ ruleForm }">
 
       <FormLabel name="bindUserId">{{ t('message.gameBusiness.openAccess.bindUserId') }}</FormLabel>
       <FormField name="bindUserId" v-slot="{ props: fProps, invalid, error }">

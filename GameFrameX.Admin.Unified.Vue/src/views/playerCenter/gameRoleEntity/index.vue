@@ -51,8 +51,7 @@
 </template>
 
 <script lang="ts" setup="" name="gameRoleEntity">
-import {ref, computed, watch, onMounted} from 'vue'
-import { useRoute } from 'vue-router'
+import {ref, computed, onMounted} from 'vue'
 import { showConfirm, showSuccess } from '../../../utils/message.ts'
 import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import type { CrudAction } from '../../../components/crud-data-table/types.ts'
@@ -67,7 +66,6 @@ import { gameRoleSelectStringPost } from '../../../api/gameRole'
 import { gameAreaSelectStringPost } from '../../../api/gameArea'
 import {MAX_SELECT_SIZE} from '../../../constants/pagination.ts'
 
-const route = useRoute()
 const editDialogRef = ref()
 const editTitle = ref('')
 

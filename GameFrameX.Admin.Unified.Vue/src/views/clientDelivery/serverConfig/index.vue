@@ -45,7 +45,6 @@
 <script lang="ts" setup="" name="tenantGameAppServerConfig">
 import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import {computed, onMounted, ref} from 'vue'
-import {useRoute} from 'vue-router'
 import {useCrudTable} from '../../../composables/useCrudTable.ts'
 import {usePrimeTablePage} from '../../../composables'
 
@@ -53,12 +52,10 @@ import {formatUnix} from '../../../utils/formatTime.ts'
 import editDialog from '/@/views/clientDelivery/serverConfig/component/EditDialog.vue'
 import { gameAppServerConfigPagePost, gameAppServerConfigDeletePost } from '../../../api/gameAppServerConfig'
 import type {CrudColumnConfig} from '../../../components/crud-data-table/types.ts'
-import {showWarning} from '../../../utils/message.ts'
 
 const editDialogRef = ref()
 const editTenantGameAppServerConfigTitle = ref('')
 
-const route = useRoute()
 
 const {
   loading, tableData, queryParams, tableParams,
@@ -130,7 +127,6 @@ const actions = {
 
 onMounted(async () => {
 
-  const map: Record<string, string> = {}
 
 
 

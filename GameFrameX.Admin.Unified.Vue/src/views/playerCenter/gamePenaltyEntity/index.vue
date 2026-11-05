@@ -48,8 +48,7 @@
 </template>
 
 <script lang="ts" setup="" name="gamepenalty">
-import {ref, computed, watch, onMounted} from 'vue'
-import { useRoute } from 'vue-router'
+import {ref, computed, onMounted} from 'vue'
 import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import type { CrudAction, CrudColumnConfig } from '../../../components/crud-data-table/types.ts'
 import SearchForm from '/@/components/search-form/index.vue'
@@ -73,7 +72,6 @@ import {
   type EnumOption,
 } from './constants'
 
-const route = useRoute()
 const addDialogRef = ref()
 const revokeDialogRef = ref()
 const syncResultDialogRef = ref()

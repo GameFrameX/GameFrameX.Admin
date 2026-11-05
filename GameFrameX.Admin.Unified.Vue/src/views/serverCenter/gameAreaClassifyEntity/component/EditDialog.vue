@@ -1,5 +1,5 @@
 <template>
-  <BaseEditDialog ref="dialogRef" :title="props.title" scrollable scrollMaxHeight="65vh" :addApi="gameAreaClassifyAddPost" :updateApi="gameAreaClassifyUpdatePost" :rules="rules" :beforeOpen="beforeOpen" @reloadTable="emit('reloadTable')">
+  <BaseEditDialog ref="dialogRef" :title="props.title" scrollable scrollMaxHeight="65vh" :addApi="gameAreaClassifyAddPost" :updateApi="gameAreaClassifyUpdatePost" :rules="rules" @reloadTable="emit('reloadTable')">
     <template #default="{ ruleForm, isEditor }">
       <TextField v-model="ruleForm.name" name="name" :label="t('message.gameBusiness.name')" :placeholder="t('message.gameBusiness.pleaseEnterName')" maxlength="64"/>
       <TextField v-model="ruleForm.description" name="description" :label="t('message.gameBusiness.description')" :placeholder="t('message.gameBusiness.pleaseEnterDescription')" maxlength="512"/>
@@ -33,11 +33,6 @@ const dialogRef = ref()
 const rules = {
   name: [{required: true, message: t('message.gameBusiness.pleaseEnterName'), trigger: 'blur'}],
   description: [{required: true, message: t('message.gameBusiness.pleaseEnterDescription'), trigger: 'blur'}],
-}
-
-const beforeOpen = (form: any, isEditor: boolean) => {
-
-
 }
 
 const isEditor = computed({

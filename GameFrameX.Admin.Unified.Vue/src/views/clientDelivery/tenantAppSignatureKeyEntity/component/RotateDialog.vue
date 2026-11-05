@@ -18,7 +18,6 @@ import { ref } from 'vue'
 import Dialog from 'primevue/dialog'
 import Button from 'primevue/button'
 import DatePicker from 'primevue/datepicker'
-import InputNumber from 'primevue/inputnumber'
 import { appSignatureKeyRotatePost } from '../../../../api/appSignatureKey'
 
 const emit = defineEmits(['rotated'])
@@ -27,7 +26,7 @@ const visible = ref(false)
 
 const oldKeyExpireTime = ref<any>(null)
 
-const open = (row: any) => {
+const open = () => {
 
   oldKeyExpireTime.value = null
   visible.value = true

@@ -1,5 +1,5 @@
 <template>
-  <BaseEditDialog ref="dialogRef" :title="props.title" scrollable :addApi="gameDockerTagAddPost" :updateApi="gameDockerTagUpdatePost" :rules="rules" :beforeOpen="beforeOpen" @reloadTable="emit('reloadTable')">
+  <BaseEditDialog ref="dialogRef" :title="props.title" scrollable :addApi="gameDockerTagAddPost" :updateApi="gameDockerTagUpdatePost" :rules="rules" @reloadTable="emit('reloadTable')">
     <template #default="{ ruleForm, isEditor }">
       <TextField v-model="ruleForm.name" name="name" :label="t('message.gameBusiness.name')" :placeholder="t('message.gameBusiness.pleaseEnterName')" maxlength="64"/>
       <TextareaField v-model="ruleForm.serverVersion" name="serverVersion" :label="t('message.gameBusiness.area.tag')" :placeholder="t('message.gameBusiness.pleaseEnterDescription')" maxlength="512" :autoResize="true" rows="3"/>
@@ -23,11 +23,6 @@ const dialogRef = ref()
 const rules = {
   name: [{required: true, message: t('message.gameBusiness.pleaseEnterName'), trigger: 'blur'}],
   serverVersion: [{required: true, message: t('message.gameBusiness.pleaseEnterGameVersion'), trigger: 'blur'}],
-}
-
-const beforeOpen = async (form: any, isEditor: boolean) => {
-
-
 }
 
 defineExpose({

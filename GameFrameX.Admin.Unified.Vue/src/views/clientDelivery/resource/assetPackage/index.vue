@@ -33,7 +33,6 @@
 
 <script lang="ts" setup="" name="tenantGameAppAssetPackage">
 import {computed, ref} from 'vue'
-import {useRoute} from 'vue-router'
 import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import type {CrudColumnConfig} from '../../../../components/crud-data-table/types.ts'
 import {useCrudTable} from '../../../../composables/useCrudTable.ts'
@@ -43,7 +42,6 @@ import editDialog from '/@/views/clientDelivery/resource/assetPackage/component/
 import { gameAppAssetPackageDeletePost, gameAppAssetPackagePagePost } from '../../../../api/gameAppAssetPackage'
 import {createdNameColumn, descriptionColumn, nameColumn, nameSearchField} from '../../../../utils/crudConfig.ts'
 
-const route = useRoute()
 const editDialogRef = ref()
 const editTenantGameAppAssetPackageTitle = ref('')
 

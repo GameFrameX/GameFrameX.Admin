@@ -1,5 +1,5 @@
 <template>
-  <BaseEditDialog ref="dialogRef" :title="props.title" :addApi="gameGoodsCatalogueAddPost" :updateApi="gameGoodsCatalogueUpdatePost" :rules="rules" :beforeOpen="beforeOpen" :beforeSubmit="beforeSubmit" @reloadTable="emit('reloadTable')">
+  <BaseEditDialog ref="dialogRef" :title="props.title" :addApi="gameGoodsCatalogueAddPost" :updateApi="gameGoodsCatalogueUpdatePost" :rules="rules" :beforeSubmit="beforeSubmit" @reloadTable="emit('reloadTable')">
     <template #default="{ ruleForm }">
       <TextField v-model="ruleForm.name" name="name" :label="t('message.gameBusiness.name')" :placeholder="t('message.gameBusiness.pleaseEnterName')" maxlength="64"/>
       <TextField v-model="ruleForm.description" name="description" :label="t('message.gameBusiness.description')" :placeholder="t('message.gameBusiness.pleaseEnterDescription')" maxlength="512"/>
@@ -13,7 +13,6 @@ import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import {TextField} from '../../../../components/crud-form-fields'
 import { gameGoodsCatalogueAddPost, gameGoodsCatalogueUpdatePost } from '../../../../api/gameGoodsCatalogue'
 
-import {showError} from '../../../../utils/message.ts'
 
 const props = defineProps({
   title: {type: String, default: ''},
@@ -24,10 +23,6 @@ const dialogRef = ref()
 const rules = {
   name: [{required: true, message: t('message.gameBusiness.pleaseEnterName'), trigger: 'blur'}],
   description: [{required: true, message: t('message.gameBusiness.pleaseEnterDescription'), trigger: 'blur'}],
-}
-
-const beforeOpen = (form: any) => {
-
 }
 
 const beforeSubmit = (form: any) => {

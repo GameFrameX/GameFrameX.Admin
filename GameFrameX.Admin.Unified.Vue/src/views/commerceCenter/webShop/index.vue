@@ -43,7 +43,6 @@
 
 <script lang="ts" setup="" name="webShop">
 import {ref, computed} from 'vue'
-import {useRoute} from 'vue-router'
 import SearchForm from '/@/components/search-form/index.vue'
 import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import type { CrudColumnConfig } from '../../../components/crud-data-table/types.ts'
@@ -54,7 +53,6 @@ import {usePrimeTablePage} from '../../../composables'
 import editDialog from '/@/views/commerceCenter/webShop/component/EditDialog.vue'
 import { gameWebShopPagePost, gameWebShopDeletePost } from '../../../api/gameWebShop'
 
-const route = useRoute()
 
 const searchFields = computed(() => [
 ])

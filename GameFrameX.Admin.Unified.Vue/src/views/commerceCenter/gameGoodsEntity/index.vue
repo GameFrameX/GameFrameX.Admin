@@ -40,8 +40,7 @@ import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import SearchForm from '/@/components/search-form/index.vue'
 import type {CrudColumnConfig} from '../../../components/crud-data-table/types.ts'
 import {formatUnix} from '../../../utils/formatTime.ts'
-import {ref, computed, watch, onMounted} from 'vue'
-import {useRoute} from 'vue-router'
+import {ref, computed, onMounted} from 'vue'
 import {useCrudTable} from '../../../composables/useCrudTable.ts'
 import {usePrimeTablePage} from '../../../composables'
 
@@ -50,7 +49,6 @@ import { gameGoodsPagePost, gameGoodsDeletePost } from '../../../api/gameGoods';
 import { gameGoodsCatalogueSelectPost } from '../../../api/gameGoodsCatalogue';
 import {MAX_SELECT_SIZE} from '../../../constants/pagination.ts';
 
-const route = useRoute()
 
 const searchFields = computed(() => [
   { key: 'configId', label: t('message.gameBusiness.goods.configId'), type: 'number', placeholder: t('message.gameBusiness.goods.pleaseEnterConfigId'), advanced: true },

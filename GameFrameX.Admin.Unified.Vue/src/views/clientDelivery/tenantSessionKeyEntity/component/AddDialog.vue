@@ -22,7 +22,6 @@ import { ref } from 'vue'
 import Dialog from 'primevue/dialog'
 import Button from 'primevue/button'
 import DatePicker from 'primevue/datepicker'
-import InputNumber from 'primevue/inputnumber'
 import InputText from 'primevue/inputtext'
 import { sessionKeyAddPost } from '../../../../api/sessionKey'
 

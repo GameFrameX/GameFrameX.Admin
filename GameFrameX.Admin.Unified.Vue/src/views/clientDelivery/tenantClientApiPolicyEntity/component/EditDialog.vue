@@ -10,7 +10,7 @@
     :beforeSubmit="beforeSubmit"
     @reloadTable="emit('reloadTable')"
   >
-    <template #default="{ ruleForm, isEditor }">
+    <template #default="{ ruleForm }">
       <BaseEditFieldGroup :title="t('message.client.clientApiPolicySectionScope')">
 
       </BaseEditFieldGroup>

@@ -43,7 +43,6 @@ import type { CrudAction } from '../../../components/crud-data-table/types.ts'
 import type { CrudColumnConfig } from '../../../components/crud-data-table/types.ts'
 import { formatUnix } from '../../../utils/formatTime.ts'
 import {ref, computed} from 'vue'
-import {useRoute} from 'vue-router'
 import {showConfirm, showSuccess} from '../../../utils/message.ts'
 import mailDialog from '/@/views/playerCenter/gameUserEntity/component/MailDialog.vue'
 import editDialog from '/@/views/playerCenter/gameUserEntity/component/EditDialog.vue'
@@ -53,7 +52,6 @@ import commonFunction from '../../../utils/commonFunction.ts'
 import {useCrudTable} from '../../../composables/useCrudTable.ts'
 import {usePrimeTablePage} from '../../../composables'
 
-const route = useRoute()
 // eslint-disable-next-line @typescript-eslint/naming-convention -- TODO(命名治理): 存量 PascalCase 命名（枚举映射表/C# 风格函数式命名），待配套治理 issue 改名
 const getEnumStatusData_Index = ref<any>([])
 const {getEnumDesc} = commonFunction()

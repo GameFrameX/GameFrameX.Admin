@@ -34,7 +34,6 @@
 
 <script lang="ts" setup="" name="gameRedeemCodeChannelEntity">
 import {ref, computed} from 'vue'
-import {useRoute} from 'vue-router'
 import SearchForm from '/@/components/search-form/index.vue'
 import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import type { CrudColumnConfig } from '../../../components/crud-data-table/types.ts'
@@ -45,7 +44,6 @@ import {usePrimeTablePage} from '../../../composables'
 import editDialog from '/@/views/commerceCenter/gameRedeemCodeChannelEntity/component/EditDialog.vue'
 import { gameRedeemCodeChannelPagePost, gameRedeemCodeChannelDeletePost } from '../../../api/gameRedeemCodeChannel'
 
-const route = useRoute()
 
 const searchFields = computed(() => [
   { key: 'name', label: t('message.gameBusiness.name'), type: 'input', placeholder: t('message.gameBusiness.pleaseEnterName') },

@@ -89,8 +89,7 @@ import SearchForm from '/@/components/search-form/index.vue'
 import commonFunction from '../../../utils/commonFunction.ts'
 
 import {computed, onMounted, ref, watch} from 'vue'
-import {useRoute} from 'vue-router'
-import {showConfirm, showSuccess, showWarning} from '../../../utils/message.ts'
+import {showConfirm, showSuccess} from '../../../utils/message.ts'
 import {useCrudTable} from '../../../composables/useCrudTable.ts'
 import {usePrimeTablePage} from '../../../composables'
 import {formatUnix} from '../../../utils/formatTime.ts'
@@ -103,7 +102,6 @@ import editDialog from './component/EditDialog.vue'
 const editDialogRef = ref()
 const editTitle = ref('')
 const {copyText} = commonFunction()
-const route = useRoute()
 
 const selectedPackageId = ref<number>(0)
 const packageOptions = ref<{label: string; value: number}[]>([])
@@ -219,7 +217,6 @@ const onPage = usePrimeTablePage(tableParams, onQuery)
 
 const paymentScopeLabel = (row: any) => row.packageId ? t('gameBusiness.configScope.packageOverride') + '：' + (packageMap.value[row.packageId] || row.packageId) : t('gameBusiness.configScope.gameDefault')
 
-const paymentScopeSeverity = (row: any) => row.packageId ? 'warn' : 'success'
 
 const loadPackageOptions = async () => {
 

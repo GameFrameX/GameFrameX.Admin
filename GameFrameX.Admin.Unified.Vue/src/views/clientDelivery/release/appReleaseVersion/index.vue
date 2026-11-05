@@ -35,8 +35,7 @@
 </template>
 
 <script lang="ts" setup="" name="appversion">
-import {computed, ref, watch} from 'vue'
-import {useRoute} from 'vue-router'
+import {computed, ref} from 'vue'
 import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import type {CrudColumnConfig} from '../../../../components/crud-data-table/types.ts'
 import {useCrudTable} from '../../../../composables/useCrudTable.ts'
@@ -53,7 +52,6 @@ import { channelDefinitionAvailableGet } from '../../../../api/channelDefinition
 import { mapAvailableChannelDefinitions } from '../../../../utils/channelDefinition.ts'
 import {MAX_SELECT_SIZE} from '../../../../constants/pagination.ts'
 
-const route = useRoute()
 
 const editDialogRef = ref()
 const editTenantGameAppReleaseVersionTitle = ref('')

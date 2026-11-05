@@ -1,5 +1,5 @@
 <template>
-  <BaseEditDialog ref="dialogRef" :title="props.title" :addApi="gameRoleAddPost" :updateApi="gameRoleUpdatePost" :rules="rules" :beforeOpen="beforeOpen" @reloadTable="emit('reloadTable')">
+  <BaseEditDialog ref="dialogRef" :title="props.title" :addApi="gameRoleAddPost" :updateApi="gameRoleUpdatePost" :rules="rules" @reloadTable="emit('reloadTable')">
     <template #default="{ ruleForm, isEditor }">
       <TextField v-model="ruleForm.description" name="description" :label="t('message.gameBusiness.description')" :placeholder="t('message.gameBusiness.pleaseEnterDescription')" maxlength="512"/>
     </template>
@@ -19,11 +19,6 @@ const emit = defineEmits(['reloadTable'])
 const dialogRef = ref()
 
 const rules = {
-}
-
-const beforeOpen = (form: any, isEditor: boolean) => {
-
-
 }
 
 defineExpose({

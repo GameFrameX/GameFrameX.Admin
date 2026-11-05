@@ -33,7 +33,6 @@
 
 <script lang="ts" setup="" name="gameDockerEntity">
 import {ref, computed, onMounted} from 'vue'
-import {useRoute} from 'vue-router'
 import SearchForm from '/@/components/search-form/index.vue'
 import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import editDialog from '/@/views/serverCenter/gameDockerTagEntity/component/EditDialog.vue'
@@ -44,7 +43,6 @@ import {usePrimeTablePage} from '../../../composables'
 
 import type {CrudColumnConfig} from '../../../components/crud-data-table/types.ts'
 
-const route = useRoute()
 
 const searchFields = computed(() => [
   { key: 'name', label: t('message.gameBusiness.name'), type: 'input', placeholder: t('message.gameBusiness.pleaseEnterName') },

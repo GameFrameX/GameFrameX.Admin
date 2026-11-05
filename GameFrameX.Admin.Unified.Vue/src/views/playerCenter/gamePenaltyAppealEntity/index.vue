@@ -37,7 +37,6 @@
 
 <script lang="ts" setup="" name="gameappeal">
 import {ref, computed} from 'vue'
-import { useRoute } from 'vue-router'
 import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import type { CrudAction, CrudColumnConfig } from '../../../components/crud-data-table/types.ts'
 import SearchForm from '/@/components/search-form/index.vue'
@@ -55,7 +54,6 @@ import {
   type EnumOption,
 } from './constants'
 
-const route = useRoute()
 const addDialogRef = ref()
 const reviewDialogRef = ref()
 const addTitle = ref('')

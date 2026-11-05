@@ -39,8 +39,7 @@
 </template>
 
 <script lang="ts" setup="" name="webShop">
-import {ref, computed, watch, onMounted} from 'vue'
-import {useRoute} from 'vue-router'
+import {ref, computed, onMounted} from 'vue'
 import SearchForm from '/@/components/search-form/index.vue'
 import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import type { CrudAction } from '../../../components/crud-data-table/types.ts'
@@ -55,7 +54,6 @@ import { gameWebShopOrderPagePost, gameWebShopOrderDeletePost } from '../../../a
 import { gameWebShopSelectPost } from '../../../api/gameWebShop'
 import {MAX_SELECT_SIZE} from '../../../constants/pagination.ts'
 
-const route = useRoute()
 
 const searchFields = computed(() => [
 ])

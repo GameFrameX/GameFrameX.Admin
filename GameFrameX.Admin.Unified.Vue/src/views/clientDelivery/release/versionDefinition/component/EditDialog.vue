@@ -5,7 +5,6 @@
     :addApi="gameAppVersionDefinitionAddPost"
     :updateApi="gameAppVersionDefinitionUpdatePost"
     :rules="rules"
-    :beforeOpen="beforeOpen"
     @reloadTable="emit('reloadTable')"
   >
     <template #default="{ ruleForm }">
@@ -32,11 +31,6 @@ const dialogRef = ref()
 
 const rules = {
   name: [{ required: true, message: () => t('message.client.pleaseInputName'), trigger: 'blur' }],
-}
-
-const beforeOpen = async (form: any, _isEditor: boolean) => {
-
-
 }
 
 defineExpose({

@@ -59,7 +59,6 @@ import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import SearchForm from '/@/components/search-form/index.vue'
 import type { CrudAction, CrudColumnConfig } from '../../../components/crud-data-table/types.ts'
 import {ref, computed} from 'vue'
-import {useRoute} from 'vue-router'
 import {showConfirm, showSuccess} from '../../../utils/message.ts'
 import {useCrudTable} from '../../../composables/useCrudTable.ts'
 import {usePrimeTablePage} from '../../../composables'
@@ -77,7 +76,6 @@ const getEnumLanguageData_Index = ref<any>([])
 const getEnumServerStatusData_Index = ref<any>([])
 const {getEnumDesc} = commonFunction()
 
-const route = useRoute()
 
 const languageOptions = computed(() =>
     getEnumLanguageData_Index.value.map((item: any) => ({

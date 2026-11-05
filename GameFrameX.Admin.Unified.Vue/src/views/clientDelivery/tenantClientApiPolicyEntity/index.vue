@@ -53,7 +53,6 @@
 
 <script lang="ts" setup name="tenantClientApiPolicyEntity">
 import {computed, onMounted, ref} from 'vue'
-import {useRoute} from 'vue-router'
 import Tag from 'primevue/tag'
 import SearchForm from '/@/components/search-form/index.vue'
 import CrudDataTable from '/@/components/crud-data-table/index.vue'
@@ -66,7 +65,6 @@ import {showConfirm, showSuccess} from '../../../utils/message.ts'
 import editDialog from './component/EditDialog.vue'
 import { clientApiPolicyPagePost, clientApiPolicyDeletePost, clientApiPolicyDetailGet, clientApiPolicyRotatePost } from '../../../api/clientApiPolicy'
 
-const route = useRoute()
 const editDialogRef = ref()
 const editTitle = ref('')
 

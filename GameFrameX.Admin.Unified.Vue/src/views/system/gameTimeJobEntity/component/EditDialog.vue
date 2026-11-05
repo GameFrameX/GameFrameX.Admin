@@ -5,7 +5,6 @@
     :addApi="(params: any) => gameTimeJobAddPost(params)"
     :updateApi="(params: any) => gameTimeJobUpdatePost(params)"
     :rules="rules"
-    :beforeOpen="beforeOpen"
     @reloadTable="emit('reloadTable')"
   >
     <template #default="{ ruleForm }">
@@ -35,11 +34,6 @@ const dialogRef = ref()
 const rules = {
   name: [{required: true, message: t('message.gameBusiness.pleaseEnterName'), trigger: 'blur'}],
   cron: [{required: true, message: t('message.gameBusiness.timeJob.cron'), trigger: 'blur'}],
-}
-
-const beforeOpen = async (form: any, isEditor: boolean) => {
-
-
 }
 
 defineExpose({

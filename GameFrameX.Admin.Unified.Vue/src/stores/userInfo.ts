@@ -59,8 +59,6 @@ export const useUserInfoStore = defineStore('userInfo', {
             if (res.data.data == null) return {};
 
             const d = res.data.data;
-            if (Number(d.accountType) !== 999) {
-            }
 
             const userInfos = {
                 id: d.id,

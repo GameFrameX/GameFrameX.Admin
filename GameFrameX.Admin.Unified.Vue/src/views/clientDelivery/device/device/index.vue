@@ -25,7 +25,6 @@
 
 <script lang="ts" setup="" name="tenantGameAppDevice">
 import {computed, onMounted, ref} from 'vue'
-import {useRoute} from 'vue-router'
 import SearchForm from '/@/components/search-form/index.vue'
 import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import type {CrudColumnConfig} from '../../../../components/crud-data-table/types.ts'
@@ -37,7 +36,6 @@ import { gameAppDevicePagePost, gameAppDeviceDeletePost } from '../../../../api/
 import { deviceGroupSelectPost } from '../../../../api/deviceGroup'
 import {descriptionColumn, nameColumn} from '../../../../utils/crudConfig.ts'
 
-const route = useRoute()
 const editDialogRef = ref()
 const editTenantGameAppDeviceTitle = ref('')
 const groupOptions = ref<any[]>([])

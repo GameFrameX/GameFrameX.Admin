@@ -33,7 +33,6 @@
 import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import SearchForm from '/@/components/search-form/index.vue'
 import {ref, onMounted, computed} from 'vue'
-import {useRoute} from 'vue-router'
 import {useCrudTable} from '../../../composables/useCrudTable.ts'
 import {usePrimeTablePage} from '../../../composables'
 import {showConfirm} from '../../../utils/message.ts'
@@ -42,7 +41,6 @@ import { gameTimeJobPagePost, gameTimeJobDeletePost } from '../../../api/gameTim
 
 import type {CrudColumnConfig} from '../../../components/crud-data-table/types.ts'
 
-const route = useRoute()
 
 const editDialogRef = ref()
 const editTitle = ref('')

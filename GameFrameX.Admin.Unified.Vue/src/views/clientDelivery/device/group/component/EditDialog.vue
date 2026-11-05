@@ -1,6 +1,6 @@
 <template>
   <BaseEditDialog ref="dialogRef" :title="props.title" :addApi="deviceGroupAddPost" :updateApi="deviceGroupUpdatePost" :beforeOpen="beforeOpen" :beforeSubmit="beforeSubmit" @reloadTable="emit('reloadTable')">
-    <template #default="{ ruleForm, isEditor }">
+    <template #default="{ ruleForm }">
             <TextField v-model="ruleForm.name" name="name" :label="t('message.client.groupName')" :placeholder="t('message.client.groupName')" maxlength="128"/>
       <TextareaField v-model="ruleForm.description" name="description" :label="t('message.client.descriptionInfo')" :placeholder="t('message.common.form.pleaseInput')" maxlength="512" :autoResize="true" rows="3"/>
       <FormLabel name="deviceIds">{{ t('message.client.deviceSelection') }}</FormLabel>
@@ -43,7 +43,7 @@ const loadDevices = async () => {
   }
 }
 
-const beforeOpen = (form: any, isEditor: boolean) => {
+const beforeOpen = () => {
 
   loadDevices()
 }

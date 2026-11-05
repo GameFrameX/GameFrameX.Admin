@@ -49,19 +49,16 @@
 <script lang="ts" setup="" name="tenantGameAppFeatureSwitch">
 import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import {computed, onMounted, ref} from 'vue'
-import {useRoute} from 'vue-router'
 import {useCrudTable} from '../../../composables/useCrudTable.ts'
 import {usePrimeTablePage} from '../../../composables'
 
 import editDialog from '/@/views/clientDelivery/featureSwitch/component/EditDialog.vue'
 import { gameAppFeatureSwitchPagePost, gameAppFeatureSwitchDeletePost } from '../../../api/gameAppFeatureSwitch'
 import type {CrudColumnConfig} from '../../../components/crud-data-table/types.ts'
-import {showWarning} from '../../../utils/message.ts'
 import {formatUnix} from '../../../utils/formatTime.ts'
 
 const editDialogRef = ref()
 const editFeatureSwitchTitle = ref('')
-const route = useRoute()
 
 const {
   loading, tableData, queryParams, tableParams,

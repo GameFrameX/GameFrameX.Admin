@@ -25,7 +25,6 @@
 
 <script lang="ts" setup="" name="DeviceGroup">
 import {computed, onMounted, ref} from 'vue'
-import {useRoute} from 'vue-router'
 import SearchForm from '/@/components/search-form/index.vue'
 import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import type {CrudColumnConfig} from '../../../../components/crud-data-table/types.ts'
@@ -36,7 +35,6 @@ import {descriptionColumn, nameColumn} from '../../../../utils/crudConfig.ts'
 import editDialog from '/@/views/clientDelivery/device/group/component/EditDialog.vue'
 import { deviceGroupPagePost, deviceGroupDeletePost } from '../../../../api/deviceGroup'
 
-const route = useRoute()
 const editDialogRef = ref()
 const editDeviceGroupTitle = ref('')
 

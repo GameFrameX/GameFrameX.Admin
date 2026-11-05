@@ -42,7 +42,6 @@
 
 <script lang="ts" setup name="gameTenantGameAppPackage">
 import { computed, ref } from 'vue'
-import { useRoute } from 'vue-router'
 import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import type { CrudAction, CrudColumnConfig } from '../../../components/crud-data-table/types.ts'
 import SearchForm from '/@/components/search-form/index.vue'
@@ -55,7 +54,6 @@ import { gameAppPackageDeletePost, gameAppPackagePagePost, gameAppPackageSetDefa
 
 import editDialog from './component/EditDialog.vue'
 
-const route = useRoute()
 const editDialogRef = ref()
 const editTitle = ref('')
 

@@ -40,7 +40,6 @@ import SearchForm from '/@/components/search-form/index.vue'
 import type {CrudColumnConfig} from '../../../../components/crud-data-table/types.ts'
 import {formatUnix} from '../../../../utils/formatTime.ts'
 import {computed, ref} from 'vue'
-import {useRoute} from 'vue-router'
 import {useCrudTable} from '../../../../composables/useCrudTable.ts'
 import {usePrimeTablePage} from '../../../../composables'
 
@@ -48,8 +47,6 @@ import editDialog from '/@/views/noticeCenter/reward/gameRewardTemplateGroupEnti
 import { gameRewardTemplateGroupDeletePost, gameRewardTemplateGroupPagePost } from '../../../../api/gameRewardTemplateGroup'
 import {isEnabled} from '../../../../utils/isEnabled.ts'
 
-const emptyPage = {data: {result: {items: [], total: 0}}}
-const route = useRoute()
 
 const editDialogRef = ref()
 const editTitle = ref('')

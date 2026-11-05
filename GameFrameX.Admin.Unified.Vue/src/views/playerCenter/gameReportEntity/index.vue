@@ -42,7 +42,6 @@
 
 <script lang="ts" setup="" name="gamereport">
 import {ref, computed} from 'vue'
-import { useRoute } from 'vue-router'
 import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import type { CrudAction, CrudColumnConfig } from '../../../components/crud-data-table/types.ts'
 import SearchForm from '/@/components/search-form/index.vue'
@@ -64,7 +63,6 @@ import {
 
 const REPORT_TARGET_OPTIONS = PENALTY_TARGET_TYPE_OPTIONS
 
-const route = useRoute()
 const addDialogRef = ref()
 const linkPenaltyDialogRef = ref()
 const addTitle = ref('')

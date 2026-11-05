@@ -103,8 +103,7 @@
 </template>
 
 <script lang="ts" setup="" name="gameOrderEntity">
-import {ref, computed, watch, onMounted} from 'vue'
-import { useRoute } from 'vue-router'
+import {ref, computed, onMounted} from 'vue'
 import Button from 'primevue/button'
 import { showConfirm, showSuccess } from '../../../utils/message.ts'
 import CrudDataTable from '/@/components/crud-data-table/index.vue'
@@ -126,7 +125,6 @@ import { usePrimeTablePage } from '../../../composables'
 
 import { mapAvailableChannelDefinitions } from '../../../utils/channelDefinition.ts'
 
-const route = useRoute()
 // eslint-disable-next-line @typescript-eslint/naming-convention -- TODO(命名治理): 存量 PascalCase 命名（枚举映射表/C# 风格函数式命名），待配套治理 issue 改名
 const getEnumStatusData_Index = ref<any>([])
 

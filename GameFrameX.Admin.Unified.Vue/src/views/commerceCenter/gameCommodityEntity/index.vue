@@ -42,8 +42,7 @@
 
 <script lang="ts" setup="" name="gameCommodityEntity">
 import {onMounted} from 'vue'
-import {ref, computed, watch} from 'vue'
-import {useRoute} from 'vue-router'
+import {ref, computed} from 'vue'
 import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import type {CrudColumnConfig} from '../../../components/crud-data-table/types.ts'
 import { useCrudTable } from '../../../composables/useCrudTable.ts'
@@ -54,7 +53,6 @@ import { gameCommodityPagePost, gameCommodityDeletePost } from '../../../api/gam
 import { gameGoodsCatalogueSelectPost } from '../../../api/gameGoodsCatalogue'
 import {MAX_SELECT_SIZE} from '../../../constants/pagination.ts'
 
-const route = useRoute()
 
 const editDialogRef = ref()
 const editTitle = ref('')

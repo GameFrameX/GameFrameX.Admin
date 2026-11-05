@@ -72,7 +72,6 @@ import SearchForm from '/@/components/search-form/index.vue'
 import type { CrudAction, CrudColumnConfig } from '../../../../components/crud-data-table/types.ts'
 import {formatUnix} from '../../../../utils/formatTime.ts'
 import {ref, computed} from 'vue'
-import { useRoute } from 'vue-router'
 import { showSuccess } from '../../../../utils/message.ts'
 import { useCrudTable } from '../../../../composables/useCrudTable.ts'
 import {usePrimeTablePage } from '../../../../composables'
@@ -90,7 +89,6 @@ import {
   MailCampaignPublishStatus,
 } from './constants'
 
-const route = useRoute()
 
 const editDialogRef = ref()
 const detailDialogRef = ref()

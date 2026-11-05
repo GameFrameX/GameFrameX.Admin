@@ -54,7 +54,7 @@ const getGameGoodsCatalogueEntityTreeData = async () => {
   gameGoodsCatalogueEntityTreeData.value = list.data.data ?? [];
 };
 
-const beforeOpen = (form: any, isEditor: boolean) => {
+const beforeOpen = () => {
 
 
   getGameGoodsCatalogueEntityTreeData()

@@ -40,8 +40,7 @@ import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import SearchForm from '/@/components/search-form/index.vue'
 import type {CrudColumnConfig} from '../../../../components/crud-data-table/types.ts'
 import {formatUnix} from '../../../../utils/formatTime.ts'
-import {ref, computed, watch, onMounted} from 'vue'
-import {useRoute} from 'vue-router'
+import {ref, computed, onMounted} from 'vue'
 import editDialog from '/@/views/noticeCenter/mail/gameMailTemplateEntity/component/EditDialog.vue'
 import { gameMailTemplatePagePost, gameMailTemplateDeletePost } from '../../../../api/gameMailTemplate'
 import { gameMailTemplateCategorySelectPost } from '../../../../api/gameMailTemplateCategory'
@@ -51,7 +50,6 @@ import {usePrimeTablePage} from '../../../../composables'
 import {MAX_SELECT_SIZE} from '../../../../constants/pagination.ts'
 import {isEnabled} from '../../../../utils/isEnabled.ts'
 
-const route = useRoute()
 
 const editDialogRef = ref()
 const editGameMailTemplateEntityTitle = ref('')

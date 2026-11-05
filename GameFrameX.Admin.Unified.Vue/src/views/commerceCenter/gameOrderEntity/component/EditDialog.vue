@@ -1,7 +1,7 @@
 <template>
   <BaseEditDialog ref="dialogRef" :title="props.title" scrollable scrollMaxHeight="65vh"
                   :addApi="gameOrderAddPost" :updateApi="gameOrderUpdatePost" :rules="rules"
-                  :beforeOpen="beforeOpen" @reloadTable="emit('reloadTable')">
+                  @reloadTable="emit('reloadTable')">
     <template #default="{ ruleForm, isEditor }">
       <FormLabel name="status">{{ t('message.gameBusiness.order.orderStatus') }}</FormLabel>
       <FormField name="status" v-slot="{ props: fProps, invalid, error }">
@@ -52,11 +52,6 @@ const statusOptions = computed(() =>
 
 const rules = {
   status: [{required: true, message: t('message.gameBusiness.pleaseSelectOrderStatus'), trigger: 'blur'}],
-}
-
-const beforeOpen = (form: any, isEditor: boolean) => {
-
-
 }
 
 onMounted(async () => {

@@ -54,7 +54,6 @@
 <script lang="ts" setup="" name="tenantGameAppRemoteConfig">
 import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import {computed, onMounted, ref} from 'vue'
-import {useRoute} from 'vue-router'
 import {useCrudTable} from '../../../composables/useCrudTable.ts'
 import {usePrimeTablePage} from '../../../composables'
 
@@ -70,7 +69,6 @@ import { gameAppPackageListGet } from '../../../api/gameAppPackage'
 import {MAX_PAGE_SIZE, MAX_SELECT_SIZE} from '../../../constants/pagination.ts'
 import type {CrudAction} from '../../../components/crud-data-table/types.ts'
 import type {CrudColumnConfig} from '../../../components/crud-data-table/types.ts'
-import {showWarning} from '../../../utils/message.ts'
 
 import { mapAvailableChannelDefinitions } from '../../../utils/channelDefinition.ts'
 
@@ -80,7 +78,6 @@ const editTenantGameAppRemoteConfigTitle = ref('')
 const contentEditTitle = ref('')
 const modeMap = ref<Record<string, any>>({})
 
-const route = useRoute()
 
 const querySelections = ref<any>({
   platform: [],

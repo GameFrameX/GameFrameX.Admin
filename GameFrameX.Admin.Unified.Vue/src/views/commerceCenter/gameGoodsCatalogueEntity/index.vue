@@ -39,14 +39,12 @@ import SearchForm from '/@/components/search-form/index.vue'
 import type {CrudColumnConfig} from '../../../components/crud-data-table/types.ts'
 import {formatUnix} from '../../../utils/formatTime.ts'
 import {ref, computed} from 'vue'
-import {useRoute} from 'vue-router'
 import {useCrudTable} from '../../../composables/useCrudTable.ts'
 import {usePrimeTablePage} from '../../../composables'
 
 import editDialog from '/@/views/commerceCenter/gameGoodsCatalogueEntity/component/EditDialog.vue'
 import { gameGoodsCataloguePagePost, gameGoodsCatalogueDeletePost } from '../../../api/gameGoodsCatalogue';
 
-const route = useRoute()
 
 const searchFields = computed(() => [
   { key: 'description', label: t('message.gameBusiness.description'), type: 'input', placeholder: t('message.gameBusiness.pleaseEnterDescription'), advanced: true },

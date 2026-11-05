@@ -41,9 +41,6 @@ import {
 
 type ActionType = 'revoke' | 'enable' | 'disable' | 'refresh'
 
-const props = defineProps({
-
-})
 const emit = defineEmits(['done', 'secret'])
 
 const visible = ref(false)

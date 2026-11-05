@@ -36,7 +36,6 @@
 <script lang="ts" setup="" name="gameAreaClassifyEntity">
 import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import {ref, computed} from 'vue'
-import {useRoute} from 'vue-router'
 import {useCrudTable} from '../../../composables/useCrudTable.ts'
 import {usePrimeTablePage} from '../../../composables'
 
@@ -45,7 +44,6 @@ import { gameAreaClassifyPagePost, gameAreaClassifyDeletePost } from '../../../a
 import {formatUnix} from '../../../utils/formatTime.ts'
 import type {CrudColumnConfig} from '../../../components/crud-data-table/types.ts'
 
-const route = useRoute()
 
 const editDialogRef = ref()
 const editGameAreaClassifyEntityTitle = ref('')

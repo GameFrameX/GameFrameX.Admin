@@ -27,7 +27,7 @@ import {MAX_SELECT_SIZE} from '../../constants/pagination'
 
 import type {RewardItem} from './rewardItems'
 
-const props = withDefaults(defineProps<{
+withDefaults(defineProps<{
 
   disabled?: boolean
   rewardPlaceholder?: string

@@ -51,7 +51,6 @@
 
 <script lang="ts" setup="" name="antiCheatEventEntity">
 import {ref, computed, onMounted} from 'vue'
-import {useRoute} from 'vue-router'
 import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import type {CrudAction, CrudColumnConfig} from '../../../components/crud-data-table/types.ts'
 import {useCrudTable} from '../../../composables/useCrudTable.ts'
@@ -73,7 +72,6 @@ import {
     suggestedActionSeverity,
 } from './constants'
 
-const route = useRoute()
 const detailDialogRef = ref()
 const reviewDialogRef = ref()
 

@@ -56,8 +56,8 @@
 </template>
 
 <script lang="ts" setup="" name="penaltyEnforcement">
-import {ref, computed, watch, onMounted} from 'vue'
-import {useRoute, useRouter} from 'vue-router'
+import {ref, computed, onMounted} from 'vue'
+import { useRouter} from 'vue-router'
 import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import type {CrudAction, CrudColumnConfig} from '../../../components/crud-data-table/types.ts'
 import {useCrudTable} from '../../../composables/useCrudTable.ts'
@@ -79,7 +79,6 @@ import {
     statusSeverity,
 } from './constants'
 
-const route = useRoute()
 const router = useRouter()
 
 const labelOf = (options: Array<{ value: number; label: string }>, value: number): string => {

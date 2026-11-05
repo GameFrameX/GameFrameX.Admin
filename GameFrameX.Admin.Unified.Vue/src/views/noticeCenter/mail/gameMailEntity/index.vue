@@ -57,8 +57,7 @@ import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import SearchForm from '/@/components/search-form/index.vue'
 import type { CrudAction, CrudColumnConfig } from '../../../../components/crud-data-table/types.ts'
 import {formatUnix} from '../../../../utils/formatTime.ts'
-import {ref, computed, watch, onMounted} from 'vue'
-import {useRoute} from 'vue-router'
+import {ref, computed, onMounted} from 'vue'
 import {showConfirm, showSuccess} from '../../../../utils/message.ts'
 import {useCrudTable} from '../../../../composables/useCrudTable.ts'
 import {usePrimeTablePage} from '../../../../composables'
@@ -71,7 +70,6 @@ import commonFunction from '../../../../utils/commonFunction.ts'
 import { gameAreaSelectStringPost } from '../../../../api/gameArea'
 import {MAX_SELECT_SIZE} from '../../../../constants/pagination.ts'
 
-const route = useRoute()
 // eslint-disable-next-line @typescript-eslint/naming-convention -- TODO(命名治理): 存量 PascalCase 命名（枚举映射表/C# 风格函数式命名），待配套治理 issue 改名
 const getEnumStatusData_Index = ref<any>([])
 // eslint-disable-next-line @typescript-eslint/naming-convention -- TODO(命名治理): 存量 PascalCase 命名（枚举映射表/C# 风格函数式命名），待配套治理 issue 改名

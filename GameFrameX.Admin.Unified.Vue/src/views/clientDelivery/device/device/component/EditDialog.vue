@@ -5,10 +5,9 @@
     :addApi="gameAppDeviceAddPost"
     :updateApi="gameAppDeviceUpdatePost"
     :rules="rules"
-    :beforeOpen="beforeOpen"
     @reloadTable="emit('reloadTable')"
   >
-    <template #default="{ ruleForm, isEditor }">
+    <template #default="{ ruleForm }">
             <TextField v-model="ruleForm.name" name="name" :label="t('message.common.label.name')" :placeholder="t('message.common.label.name')" maxlength="128"/>
       <TextareaField v-model="ruleForm.description" name="description" :label="t('message.client.detailedDescription')" :placeholder="t('message.common.form.pleaseInput')" maxlength="512" :autoResize="true" rows="3"/>
       <TextareaField v-model="ruleForm.deviceUniqueIdentifier" name="deviceUniqueIdentifier" :label="t('message.client.machineCode')" :placeholder="t('message.client.machineCode')" maxlength="512" :autoResize="true" rows="3"/>
@@ -42,10 +41,6 @@ const rules = {
     message: () => t('message.client.pleaseInputMachineCode'),
     trigger: 'change',
   }],
-}
-
-const beforeOpen = (form: any, isEditor: boolean) => {
-
 }
 
 defineExpose({

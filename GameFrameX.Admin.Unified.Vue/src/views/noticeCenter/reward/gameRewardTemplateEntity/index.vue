@@ -44,8 +44,7 @@
 import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import SearchForm from '/@/components/search-form/index.vue'
 import {formatUnix} from '../../../../utils/formatTime.ts'
-import {computed, ref, watch, onMounted} from 'vue'
-import {useRoute} from 'vue-router'
+import {computed, ref, onMounted} from 'vue'
 import {useCrudTable} from '../../../../composables/useCrudTable.ts'
 import {usePrimeTablePage} from '../../../../composables'
 
@@ -57,8 +56,6 @@ import { gameRewardTemplateGroupSelectPost } from '../../../../api/gameRewardTem
 import {isEnabled} from '../../../../utils/isEnabled.ts'
 import type {CrudAction, CrudColumnConfig} from '../../../../components/crud-data-table/types.ts'
 
-const emptyPage = {data: {result: {items: [], total: 0}}}
-const route = useRoute()
 
 const editDialogRef = ref()
 const editTitle = ref('')

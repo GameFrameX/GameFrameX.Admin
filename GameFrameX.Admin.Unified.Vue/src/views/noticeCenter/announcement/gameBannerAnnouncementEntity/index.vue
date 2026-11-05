@@ -41,8 +41,7 @@
 </template>
 
 <script lang="ts" setup="" name="gameBannerAnnouncementEntity">
-import {ref, computed, watch, onMounted} from 'vue'
-import {useRoute} from 'vue-router'
+import {ref, computed, onMounted} from 'vue'
 import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import type {CrudColumnConfig} from '../../../../components/crud-data-table/types.ts'
 import {formatUnix} from '../../../../utils/formatTime.ts'
@@ -54,7 +53,6 @@ import { gameBannerAnnouncementPagePost, gameBannerAnnouncementDeletePost } from
 import { gameAreaSelectStringPost } from '../../../../api/gameArea'
 import {MAX_SELECT_SIZE} from '../../../../constants/pagination.ts'
 
-const route = useRoute()
 
 const editDialogRef = ref()
 const editTitle = ref('')

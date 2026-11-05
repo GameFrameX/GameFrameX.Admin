@@ -36,7 +36,6 @@
 
 <script lang="ts" setup="" name="version">
 import {computed, ref} from 'vue'
-import {useRoute} from 'vue-router'
 import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import type {CrudColumnConfig} from '../../../../components/crud-data-table/types.ts'
 import {useCrudTable} from '../../../../composables/useCrudTable.ts'
@@ -46,7 +45,6 @@ import editDialog from '/@/views/clientDelivery/release/versionDefinition/compon
 import { gameAppVersionDefinitionPagePost, gameAppVersionDefinitionDeletePost } from '../../../../api/gameAppVersionDefinition'
 import {createdNameColumn, descriptionColumn, nameColumn, updatedNameColumn} from '../../../../utils/crudConfig.ts'
 
-const route = useRoute()
 
 const editDialogRef = ref()
 const editTenantGameAppVersionDefinitionTitle = ref('')

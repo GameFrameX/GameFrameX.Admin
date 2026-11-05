@@ -61,8 +61,7 @@
 </template>
 
 <script lang="ts" setup name="gameOrderFulfillmentEntity">
-import {ref, computed, watch, onMounted} from 'vue'
-import { useRoute } from 'vue-router'
+import {ref, computed, onMounted} from 'vue'
 import Button from 'primevue/button'
 import Tag from 'primevue/tag'
 import Card from 'primevue/card'
@@ -91,7 +90,6 @@ import {
   FULFILLMENT_STATUS_VALUES,
 } from './constants'
 
-const route = useRoute()
 const detailDialogRef = ref()
 const actionDialogRef = ref()
 const exporting = ref(false)

@@ -53,7 +53,6 @@
 
 <script lang="ts" setup name="gameAppOpenAccess">
 import { computed, ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
 import Tag from 'primevue/tag'
 import Card from 'primevue/card'
 import CrudDataTable from '/@/components/crud-data-table/index.vue'
@@ -71,7 +70,6 @@ import editDialog from './component/EditDialog.vue'
 import secretDialog from './component/SecretDialog.vue'
 import actionDialog from './component/ActionDialog.vue'
 
-const route = useRoute()
 const editDialogRef = ref()
 const secretDialogRef = ref()
 const actionDialogRef = ref()

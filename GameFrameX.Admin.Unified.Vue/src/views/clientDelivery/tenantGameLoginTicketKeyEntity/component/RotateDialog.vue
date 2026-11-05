@@ -23,7 +23,7 @@ const emit = defineEmits(['rotate'])
 const visible = ref(false)
 const expireTime = ref<any>(null)
 
-const open = (row: any) => {
+const open = () => {
 
   expireTime.value = null
   visible.value = true

@@ -34,8 +34,7 @@
 </template>
 
 <script lang="ts" setup="" name="gameRedeemCodeUseRecordEntity">
-import {ref, computed, watch, onMounted} from 'vue'
-import {useRoute} from 'vue-router'
+import {ref, computed, onMounted} from 'vue'
 import { gameRedeemCodeUseRecordPagePost } from '../../../api/gameRedeemCodeUseRecord'
 import { gameRedeemCodeChannelSelectStringPost } from '../../../api/gameRedeemCodeChannel'
 import { gameAreaSelectStringPost } from '../../../api/gameArea'
@@ -46,7 +45,6 @@ import { formatUnix } from '../../../utils/formatTime.ts'
 import {useCrudTable} from '../../../composables/useCrudTable.ts'
 import {usePrimeTablePage} from '../../../composables'
 
-const route = useRoute()
 
 const searchFields = computed(() => [
   { key: 'areaId', label: t('message.gameBusiness.role.areaName'), type: 'select', options: areaList.value, optionLabel: 'value', optionValue: 'id', placeholder: t('message.gameBusiness.order.pleaseSelectArea') },

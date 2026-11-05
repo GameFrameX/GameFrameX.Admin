@@ -43,7 +43,6 @@ import SearchForm from '/@/components/search-form/index.vue'
 import type {CrudColumnConfig} from '../../../../components/crud-data-table/types.ts'
 import {formatUnix} from '../../../../utils/formatTime.ts'
 import {ref, computed} from 'vue'
-import {useRoute} from 'vue-router'
 import {useCrudTable} from '../../../../composables/useCrudTable.ts'
 import {usePrimeTablePage} from '../../../../composables'
 
@@ -51,7 +50,6 @@ import editDialog from '/@/views/noticeCenter/mail/gameMailTemplateCategoryEntit
 import { gameMailTemplateCategoryPagePost, gameMailTemplateCategoryDeletePost } from '../../../../api/gameMailTemplateCategory'
 import {isEnabled} from '../../../../utils/isEnabled.ts'
 
-const route = useRoute()
 
 const editDialogRef = ref()
 const editGameMailTemplateCategoryEntityTitle = ref('')

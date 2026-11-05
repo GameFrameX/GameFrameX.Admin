@@ -55,7 +55,7 @@ const getGameGoodsCatalogueEntityClassifyIdDropdownList = async () => {
   filteredClassifyIdList.value = [...gameGoodsCatalogueEntityClassifyIdDropdownList.value];
 };
 
-const beforeOpen = (form: any, isEditor: boolean) => {
+const beforeOpen = () => {
 
 
   getGameGoodsCatalogueEntityClassifyIdDropdownList()

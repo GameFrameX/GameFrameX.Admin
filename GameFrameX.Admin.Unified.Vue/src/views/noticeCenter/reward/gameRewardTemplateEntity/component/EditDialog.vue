@@ -57,7 +57,7 @@ const loadGroupList = async () => {
   groupList.value = ((await gameRewardTemplateGroupSelectPost({pageSize: MAX_SELECT_SIZE})).data.data ?? [])
 }
 
-const beforeOpen = (form: any, isEditor: boolean) => {
+const beforeOpen = (form: any) => {
 
   form.isEnabled = isEnabled(form)
   form.rewardItemsJson = parseRewardItems(form.rewardItemsJson)
