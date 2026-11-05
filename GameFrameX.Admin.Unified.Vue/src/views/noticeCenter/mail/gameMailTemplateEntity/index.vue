@@ -8,7 +8,7 @@
             :showAdd="true"
             authPrefix="gameMailTemplateEntity"
             @query="onQuery"
-            
+
             @add="openAddGameMailTemplateEntity"
         />
       </template>
@@ -29,7 +29,7 @@
           </template>
           <template #body-createdTime="{ data }">{{ formatUnix(data.createdTime) }}</template>
         </CrudDataTable>
-        <editDialog ref="editDialogRef" :title="editGameMailTemplateEntityTitle" :appId="queryParams.appId" @reloadTable="onQuery"/>
+        <editDialog ref="editDialogRef" :title="editGameMailTemplateEntityTitle" @reloadTable="onQuery"/>
       </template>
     </Card>
   </div>
@@ -47,12 +47,11 @@ import { gameMailTemplatePagePost, gameMailTemplateDeletePost } from '../../../.
 import { gameMailTemplateCategorySelectPost } from '../../../../api/gameMailTemplateCategory'
 import {useCrudTable} from '../../../../composables/useCrudTable.ts'
 import {usePrimeTablePage} from '../../../../composables'
-import {useCurrentApp} from '../../../../composables/useCurrentApp.ts'
+
 import {MAX_SELECT_SIZE} from '../../../../constants/pagination.ts'
 import {isEnabled} from '../../../../utils/isEnabled.ts'
 
 const route = useRoute()
-const {resolveInitialAppId} = useCurrentApp()
 
 const editDialogRef = ref()
 const editGameMailTemplateEntityTitle = ref('')
@@ -83,20 +82,13 @@ const {
   immediate: true,
 })
 
-queryParams.value.appId = resolveInitialAppId(route.query)
-
-const loadCategoryList = async (appId?: number) => {
-  const res = await gameMailTemplateCategorySelectPost({appId: appId, pageSize: MAX_SELECT_SIZE})
+const loadCategoryList = async () => {
+  const res = await gameMailTemplateCategorySelectPost({pageSize: MAX_SELECT_SIZE})
   categoryList.value = res.data.data ?? []
 }
 
-watch(() => queryParams.value.appId, (newVal) => {
-  queryParams.value.categoryId = undefined
-  loadCategoryList(newVal)
-})
-
 onMounted(async () => {
-  await loadCategoryList(queryParams.value.appId)
+  await loadCategoryList()
 })
 
 const onPage = usePrimeTablePage(tableParams, onQuery)
@@ -129,9 +121,4 @@ const columns = computed<CrudColumnConfig[]>(() => [
   {field: 'createdTime', header: t('common.label.createTime'), width: '200px', bodyKey: 'createdTime'},
 ])
 
-watch(() => route.query.appId, async () => {
-  queryParams.value.appId = resolveInitialAppId(route.query)
-  queryParams.value.categoryId = undefined
-  await onQuery()
-})
 </script>

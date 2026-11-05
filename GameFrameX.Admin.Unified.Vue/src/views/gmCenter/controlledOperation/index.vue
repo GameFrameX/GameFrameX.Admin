@@ -95,7 +95,7 @@
 
         <div class="flex justify-content-end gap-2 mt-3">
           <Button :label="t('message.common.button.cancel')" text @click="resetForm" />
-          <Button v-if="auth('onlineControlledCommand:execute')" class="onlineControlledOperation-submit"
+          <Button v-if="auth('onlinePlayerTimeline:execute')" class="onlineControlledOperation-submit"
                   :label="t('message.onlineCenter.controlledOperation.execute')"
                   icon="fa-solid fa-triangle-exclamation"
                   :severity="highRisk ? 'danger' : 'warn'"

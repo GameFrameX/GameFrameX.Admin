@@ -34,7 +34,7 @@
           <template #body-createdTime="{ data }">{{ formatUnix(data.createdTime) }}</template>
         </CrudDataTable>
 
-        <editDialog ref="editDialogRef" :title="editTitle" :appId="queryParams.appId" @reloadTable="onQuery"/>
+        <editDialog ref="editDialogRef" :title="editTitle" @reloadTable="onQuery"/>
       </template>
     </Card>
   </div>
@@ -47,18 +47,17 @@ import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import type { CrudAction, CrudColumnConfig } from '../../../components/crud-data-table/types.ts'
 import SearchForm from '/@/components/search-form/index.vue'
 import { useCrudTable } from '../../../composables/useCrudTable.ts'
-import {usePrimeTablePage, useRouteAppIdQuerySync } from '../../../composables'
+import {usePrimeTablePage } from '../../../composables'
 import { showConfirm, showSuccess } from '../../../utils/message.ts'
 import { formatUnix } from '../../../utils/formatTime.ts'
 import { faCircleCheck, faPowerOff, faToggleOn } from '../../../utils/icons.ts'
 import { gameAppPackageDeletePost, gameAppPackagePagePost, gameAppPackageSetDefaultPost, gameAppPackageSetStatusPost } from '../../../api/gameAppPackage'
-import { useCurrentApp } from '../../../composables/useCurrentApp.ts'
+
 import editDialog from './component/EditDialog.vue'
 
 const route = useRoute()
 const editDialogRef = ref()
 const editTitle = ref('')
-const {resolveInitialAppId} = useCurrentApp()
 
 const searchFields = computed(() => [
   { key: 'name', label: t('gameBusiness.package.name'), type: 'input' as const, placeholder: t('gameBusiness.package.name') },
@@ -87,7 +86,7 @@ const {
   onQuery,
 } = useCrudTable({
   api: {
-    pageApi: (params) => gameAppPackagePagePost({ ...params, appId: params.appId }),
+    pageApi: (params) => gameAppPackagePagePost({ ...params }),
     deleteApi: (params) => gameAppPackageDeletePost({ id: params.id, rowVersion: params.rowVersion }),
   },
   immediate: true,
@@ -97,7 +96,6 @@ queryParams.value = {
   name: undefined,
   packageName: undefined,
   packageVersion: undefined,
-  appId: resolveInitialAppId(route.query),
 }
 tableParams.value.pageSize = 10
 
@@ -157,10 +155,4 @@ const customActions: CrudAction[] = [
   },
 ]
 
-useRouteAppIdQuerySync({
-  route,
-  queryParams,
-  resolveAppId: resolveInitialAppId,
-  onQuery,
-})
 </script>

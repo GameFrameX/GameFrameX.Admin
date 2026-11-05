@@ -7,7 +7,6 @@ import {getAPI} from '../utils/axiosUtils';
 import {SystemAuth} from '../api/systemAuth';
 import {SystemConst} from '../api/systemConst';
 import {GlobalDictionaryType} from '../api/globalDictionaryType';
-import {clearTargetTenantId} from '../utils/targetTenant';
 import {resolveBackendFileUrl} from '../utils/fileUrl';
 import {useServerStore} from './server';
 
@@ -61,7 +60,6 @@ export const useUserInfoStore = defineStore('userInfo', {
 
             const d = res.data.data;
             if (Number(d.accountType) !== 999) {
-                clearTargetTenantId();
             }
 
             const userInfos = {

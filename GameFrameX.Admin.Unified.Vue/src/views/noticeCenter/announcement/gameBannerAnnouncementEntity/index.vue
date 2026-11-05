@@ -9,7 +9,7 @@
             authPrefix="gameBannerAnnouncementEntity"
             :defaultSearchKey="false"
             @query="onQuery"
-            
+
             @add="openAddGameBannerAnnouncementEntity"
         />
       </template>
@@ -34,7 +34,7 @@
             <Tag v-else :value="t('message.gameBusiness.no')" severity="danger" />
           </template>
         </CrudDataTable>
-        <editDialog ref="editDialogRef" :title="editTitle" :appId="queryParams.appId" @reloadTable="onQuery" />
+        <editDialog ref="editDialogRef" :title="editTitle" @reloadTable="onQuery" />
       </template>
     </Card>
   </div>
@@ -48,14 +48,13 @@ import type {CrudColumnConfig} from '../../../../components/crud-data-table/type
 import {formatUnix} from '../../../../utils/formatTime.ts'
 import { useCrudTable } from '../../../../composables/useCrudTable.ts'
 import {usePrimeTablePage} from '../../../../composables'
-import {useCurrentApp} from '../../../../composables/useCurrentApp.ts'
+
 import editDialog from '/@/views/noticeCenter/announcement/gameBannerAnnouncementEntity/component/EditDialog.vue'
 import { gameBannerAnnouncementPagePost, gameBannerAnnouncementDeletePost } from '../../../../api/gameBannerAnnouncement'
 import { gameAreaSelectStringPost } from '../../../../api/gameArea'
 import {MAX_SELECT_SIZE} from '../../../../constants/pagination.ts'
 
 const route = useRoute()
-const {resolveInitialAppId} = useCurrentApp()
 
 const editDialogRef = ref()
 const editTitle = ref('')
@@ -73,8 +72,8 @@ const getAreaName = (areaId: number) => {
   }
   return areaId
 }
-const loadAreaList = async (appId?: number) => {
-  const res = await gameAreaSelectStringPost({appId: appId, pageSize: MAX_SELECT_SIZE})
+const loadAreaList = async () => {
+  const res = await gameAreaSelectStringPost({pageSize: MAX_SELECT_SIZE})
   areaList.value = res.data.data ?? []
 }
 
@@ -96,19 +95,6 @@ const {
 } = useCrudTable({
   api: { pageApi: gameBannerAnnouncementPagePost, deleteApi: gameBannerAnnouncementDeletePost },
   immediate: true,
-})
-
-queryParams.value.appId = resolveInitialAppId(route.query)
-
-watch(() => queryParams.value.appId, (newVal) => {
-  queryParams.value.areaId = undefined
-  loadAreaList(newVal)
-})
-
-watch(() => route.query.appId, async () => {
-  queryParams.value.appId = resolveInitialAppId(route.query)
-  queryParams.value.areaId = undefined
-  await onQuery()
 })
 
 const onPage = usePrimeTablePage(tableParams, onQuery)
@@ -144,6 +130,6 @@ const columns = computed<CrudColumnConfig[]>(() => [
 ])
 
 onMounted(async () => {
-  await loadAreaList(queryParams.value.appId)
+  await loadAreaList()
 })
 </script>

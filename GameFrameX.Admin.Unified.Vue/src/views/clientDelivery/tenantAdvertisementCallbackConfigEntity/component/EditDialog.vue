@@ -13,10 +13,6 @@
     @reloadTable="emit('reloadTable')"
   >
     <template #default="{ ruleForm }">
-      <FormLabel name="appId">{{ t('gameBusiness.configScope.scope') }}</FormLabel>
-      <FormField name="appId" v-slot="{ props: fProps }">
-        <ConfigAppScopePicker v-bind="fProps" v-model="ruleForm.appId" :appOptions="props.appOptions" class="w-full"/>
-      </FormField>
 
       <FormLabel name="provider">Provider</FormLabel>
       <FormField name="provider" v-slot="{ props: fProps, invalid, error }">
@@ -122,7 +118,7 @@ import Message from 'primevue/message'
 import Tag from 'primevue/tag'
 import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import {TextareaField} from '../../../../components/crud-form-fields'
-import ConfigAppScopePicker from '/@/components/config-app-scope-picker/index.vue'
+
 import {showError} from '../../../../utils/message.ts'
 import { advertisementCallbackConfigAddPost, advertisementCallbackConfigProvidersGet, advertisementCallbackConfigSchemaGet, advertisementCallbackConfigUpdatePost } from '../../../../api/advertisementCallbackConfig'
 import {isEnabled} from '../../../../utils/isEnabled.ts'
@@ -151,7 +147,6 @@ interface AdCallbackSchema {
 
 const props = defineProps({
   title: {type: String, default: ''},
-  appOptions: {type: Array, default: () => []},
 })
 const emit = defineEmits(['reloadTable'])
 const dialogRef = ref()
@@ -162,7 +157,6 @@ const schema = ref<AdCallbackSchema | null>(null)
 
 const defaultForm = () => ({
   id: 0,
-  appId: 0,
   provider: 'TopOn',
   configJson: '',
   isEnabled: true,
@@ -252,7 +246,7 @@ const onProviderChange = async (form: any) => {
 
 const beforeOpen = async (form: any) => {
   const normalized = {...defaultForm(), ...form}
-  normalized.appId = normalized.appId ?? 0
+
   normalized.provider = normalized.provider || 'TopOn'
   normalized.isEnabled = normalized.isEnabled !== false
   const next = await loadSchema(normalized.provider)
@@ -293,7 +287,6 @@ const beforeSubmit = (form: any, isEditor: boolean) => {
 
   return {
     id: form.id,
-    appId: form.appId ?? 0,
     provider: form.provider || 'TopOn',
     configJson: JSON.stringify(configObj),
     isEnabled: isEnabled(form),

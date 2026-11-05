@@ -46,17 +46,13 @@ import {TextField, TextareaField} from '../../../../../components/crud-form-fiel
 import { gameAnnouncementAddPost, gameAnnouncementUpdatePost } from '../../../../../api/gameAnnouncement'
 import { gameAreaSelectStringPost } from '../../../../../api/gameArea'
 import { globalLanguageSelectPost } from '../../../../../api/globalLanguage'
-import {normalizeAppId} from '../../../../../utils/appWorkspace.ts'
+
 import {MAX_SELECT_SIZE} from '../../../../../constants/pagination.ts'
 
 const props = defineProps({
   title: {
     type: String,
     default: '',
-  },
-  appId: {
-    type: [Number, String],
-    default: undefined,
   },
 })
 const emit = defineEmits(['reloadTable'])
@@ -76,16 +72,14 @@ const rules = {
   endTime: [{required: true, message: t('message.gameBusiness.pleaseSelectEndTime'), trigger: 'blur'}],
 }
 
-const loadAreaOptions = async (appId?: number) => {
-  areaIdOptions.value = (await gameAreaSelectStringPost({appId: appId, pageSize: MAX_SELECT_SIZE})).data.data ?? []
+const loadAreaOptions = async () => {
+  areaIdOptions.value = (await gameAreaSelectStringPost({pageSize: MAX_SELECT_SIZE})).data.data ?? []
 }
 
 const beforeOpen = (form: any, isEditor: boolean) => {
-  const appId = normalizeAppId(props.appId)
-  if (appId) form.appId = appId
-  if (form.appId) {
-    loadAreaOptions(form.appId)
-  }
+
+
+  loadAreaOptions()
   // 回显：long(秒) → Date 供 DatePicker 显示
   if (form.startTime && typeof form.startTime === 'number') {
     form.startTime = new Date(form.startTime * 1000)

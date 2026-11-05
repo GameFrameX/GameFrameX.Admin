@@ -20,7 +20,7 @@
       <FormLabel>{{ t('message.gameBusiness.isEnabled') }}</FormLabel>
       <div><ToggleSwitch v-model="ruleForm.isEnabled"/></div>
       <FormLabel>{{ t('message.gameBusiness.rewardTemplate.rewardItems') }}</FormLabel>
-      <RewardItemsEditor v-model="ruleForm.rewardItemsJson" :appId="ruleForm.appId"/>
+      <RewardItemsEditor v-model="ruleForm.rewardItemsJson"/>
       <TextField v-model="ruleForm.description" name="description" :label="t('message.gameBusiness.description')" :placeholder="t('message.gameBusiness.pleaseEnterDescription')" maxlength="512"/>
     </template>
   </BaseEditDialog>
@@ -37,10 +37,10 @@ import {parseRewardItems, toRewardItemsJson} from '../../../../../components/rew
 import { gameRewardTemplateAddPost, gameRewardTemplateUpdatePost } from '../../../../../api/gameRewardTemplate'
 import { gameRewardTemplateGroupSelectPost } from '../../../../../api/gameRewardTemplateGroup'
 import {isEnabled} from '../../../../../utils/isEnabled.ts'
-import {normalizeAppId, type AppWorkspaceId} from '../../../../../utils/appWorkspace.ts'
+
 import {MAX_SELECT_SIZE} from '../../../../../constants/pagination.ts'
 
-const props = defineProps({title: {type: String, default: ''}, appId: {type: [Number, String], default: undefined}})
+const props = defineProps({title: {type: String, default: ''}})
 const emit = defineEmits(['reloadTable'])
 const dialogRef = ref()
 const groupList = ref<any[]>([])
@@ -53,15 +53,15 @@ const rules = {
 
 const defaultForm = () => ({isEnabled: true, sort: 100, rewardItemsJson: [], snapshotSchemaVersion: 1} as any)
 
-const loadGroupList = async (appId?: AppWorkspaceId) => {
-  groupList.value = appId ? ((await gameRewardTemplateGroupSelectPost({appId, pageSize: MAX_SELECT_SIZE})).data.data ?? []) : []
+const loadGroupList = async () => {
+  groupList.value = ((await gameRewardTemplateGroupSelectPost({pageSize: MAX_SELECT_SIZE})).data.data ?? [])
 }
 
 const beforeOpen = (form: any, isEditor: boolean) => {
-  form.appId = isEditor ? normalizeAppId(form.appId) : normalizeAppId(props.appId)
+
   form.isEnabled = isEnabled(form)
   form.rewardItemsJson = parseRewardItems(form.rewardItemsJson)
-  loadGroupList(form.appId)
+  loadGroupList()
   return form
 }
 

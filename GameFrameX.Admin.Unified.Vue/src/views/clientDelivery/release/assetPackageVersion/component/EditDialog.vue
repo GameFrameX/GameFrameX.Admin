@@ -70,10 +70,6 @@ var props = defineProps({
     type: String,
     default: '',
   },
-  appId: {
-    type: [Number, String],
-    default: undefined,
-  },
 })
 const emit = defineEmits(['reloadTable'])
 
@@ -114,13 +110,11 @@ const rules = {
 }
 
 // 母包映射按当前应用过滤，避免跨应用母包错配；无应用时退回全量兜底。
-const loadPackageInfo = async (appId?: number | string) => {
+const loadPackageInfo = async () => {
   try {
     const payload: any = {page: 1, pageSize: MAX_PAGE_SIZE}
-    const id = appId
-    if (id) {
-      payload.appId = id
-    }
+
+
     const res = await gameAppPackagePagePost(payload)
     const items = res.data.data?.items ?? []
     const map: Record<string, { id?: number; isMaster: boolean; masterName?: string }> = {}
@@ -148,16 +142,15 @@ const resolvePackageId = (packageName?: string) => {
   return packageInfoMap.value[packageName]?.id
 }
 
-const loadResourceVersionOptions = async (appId?: number, packageName?: string) => {
-  const id = appId
+const loadResourceVersionOptions = async (packageName?: string) => {
+
   const packageId = resolvePackageId(packageName)
-  if (!id || !packageId) {
+  if (!packageId) {
     queryParams.value.resourceVersion = []
     return
   }
 
   const res = await gameAppAssetPackageVersionSelectPost({
-    appId: id,
     appPackageId: packageId,
     pageSize: MAX_SELECT_SIZE,
   })
@@ -176,7 +169,7 @@ const onPackageChange = (val: any, clearResourceVersion = true) => {
   } else {
     selectedPackageMaster.value = ''
   }
-  loadResourceVersionOptions(ruleForm?.appId, packageName)
+  loadResourceVersionOptions(packageName)
 }
 
 const onQuerySelectorChannel = async () => {
@@ -187,9 +180,9 @@ const onQuerySelectorPlatform = async () => {
   const res = await globalPlatformSelectPost({pageSize: MAX_SELECT_SIZE})
   queryParams.value.platform = res.data.data
 }
-const onQuerySelectorAppVersion = async (appId?: number | string) => {
-  const id = appId
-  const res = await gameAppVersionDefinitionSelectPost(id ? {appId: id, pageSize: MAX_SELECT_SIZE} : {pageSize: MAX_SELECT_SIZE})
+const onQuerySelectorAppVersion = async () => {
+
+  const res = await gameAppVersionDefinitionSelectPost({pageSize: MAX_SELECT_SIZE})
   queryParams.value.appVersion = res.data.data
 }
 // 包名候选按当前应用加载，置顶 default 应用默认选项。
@@ -209,45 +202,35 @@ const buildPackageOptions = (packages: any[]) => {
   return options
 }
 
-const onQuerySelectorPackage = async (appId?: number | string) => {
-  const id = appId
-  if (!id) {
-    queryParams.value.package = buildPackageOptions([])
-    return
-  }
-  const res = await gameAppPackageListGet({appId: id})
+const onQuerySelectorPackage = async () => {
+
+
+  const res = await gameAppPackageListGet({})
   queryParams.value.package = buildPackageOptions(res.data?.data || [])
 }
 const onQuerySelectorLanguage = async () => {
   const res = await globalLanguageSelectPost({pageSize: MAX_SELECT_SIZE})
   queryParams.value.language = res.data.data
 }
-const onQuerySelectorAssetPackageName = async (appId?: number | string) => {
-  const id = appId
-  const res = await gameAppAssetPackageSelectPost(id ? {appId: id, pageSize: MAX_SELECT_SIZE} : {pageSize: MAX_SELECT_SIZE})
+const onQuerySelectorAssetPackageName = async () => {
+
+  const res = await gameAppAssetPackageSelectPost({pageSize: MAX_SELECT_SIZE})
   queryParams.value.assetPackageName = res.data.data
 }
 
-const resolveInitialAppId = (form: any) => {
-  const raw = props.appId ?? form?.appId
-  // C270：appId 运行时为字符串（雪花 Id），保持字符串判断有效性，禁止 Number() 回转
-  const id = raw === undefined || raw === null || raw === 0 || raw === '0' ? undefined : String(raw)
-  return id || undefined
-}
-
 const beforeOpen = (form: any, isEditor: boolean) => {
-  const appId = resolveInitialAppId(form)
-  if (appId) form.appId = appId
+
+
   return form
 }
 
 const openDialog = (row: any) => {
   dialogRef.value.openDialog(row)
   // 编辑态按记录应用加载包名候选与母包映射，使历史包名能命中并正确解析母包。
-  onQuerySelectorPackage(row?.appId)
-  onQuerySelectorAppVersion(row?.appId)
-  onQuerySelectorAssetPackageName(row?.appId)
-  loadPackageInfo(row?.appId).then(() => {
+  onQuerySelectorPackage()
+  onQuerySelectorAppVersion()
+  onQuerySelectorAssetPackageName()
+  loadPackageInfo().then(() => {
     if (dialogRef.value?.ruleForm?.package) {
       onPackageChange(dialogRef.value.ruleForm.package, false)
     } else {
@@ -257,15 +240,11 @@ const openDialog = (row: any) => {
 }
 
 onMounted(async () => {
-  // 设备分组按应用维度过滤（后端 appId 必填）；无应用上下文时跳过，避免空参 400
-  const appId = resolveInitialAppId(null)
-  if (!appId) {
-    return
-  }
+
+
   deviceGroupData.value = (await deviceGroupPagePost({
     page: 1,
-    pageSize: MAX_PAGE_SIZE,
-    appId
+    pageSize: MAX_PAGE_SIZE
   })).data.data?.items ?? []
 })
 

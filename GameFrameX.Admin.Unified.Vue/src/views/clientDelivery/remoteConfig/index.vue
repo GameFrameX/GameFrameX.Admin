@@ -8,7 +8,7 @@
             :showAdd="true"
             authPrefix="gameAppRemoteConfig"
             @query="runScopedQuery"
-            
+
             @add="openAddTenantGameAppRemoteConfig"
         />
       </template>
@@ -25,9 +25,7 @@
                    :columns="columns"
                    :exportQuery="queryParams"
                    @page="onPage">
-          <template #body-appId="{ data }">
-            <Tag :value="getAppScopeLabel(data.appId)" :severity="getAppScopeSeverity(data.appId)"/>
-          </template>
+
           <template #body-activeModeCode="{ data }">
             <Tag :value="getModeDisplayName(data.activeModeCode)"
                  :severity="getModeTagType(data.activeModeCode)"/>
@@ -59,7 +57,7 @@ import {computed, onMounted, ref} from 'vue'
 import {useRoute} from 'vue-router'
 import {useCrudTable} from '../../../composables/useCrudTable.ts'
 import {usePrimeTablePage} from '../../../composables'
-import {useCurrentApp} from '../../../composables/useCurrentApp.ts'
+
 import editDialog from '/@/views/clientDelivery/remoteConfig/component/EditDialog.vue'
 import contentEditDialog from '/@/views/clientDelivery/remoteConfig/component/ContentEditDialog.vue'
 import { gameAppRemoteConfigPagePost, gameAppRemoteConfigDeletePost } from '../../../api/gameAppRemoteConfig'
@@ -73,7 +71,7 @@ import {MAX_PAGE_SIZE, MAX_SELECT_SIZE} from '../../../constants/pagination.ts'
 import type {CrudAction} from '../../../components/crud-data-table/types.ts'
 import type {CrudColumnConfig} from '../../../components/crud-data-table/types.ts'
 import {showWarning} from '../../../utils/message.ts'
-import {normalizeAppId, normalizeRouteAppId, type AppWorkspaceId} from '../../../utils/appWorkspace.ts'
+
 import { mapAvailableChannelDefinitions } from '../../../utils/channelDefinition.ts'
 
 const editDialogRef = ref()
@@ -81,9 +79,9 @@ const contentEditDialogRef = ref()
 const editTenantGameAppRemoteConfigTitle = ref('')
 const contentEditTitle = ref('')
 const modeMap = ref<Record<string, any>>({})
-const appMap = ref<Record<string, string>>({})
+
 const route = useRoute()
-const {appOptions, loadApps, currentAppId, setCurrentApp} = useCurrentApp()
+
 const querySelections = ref<any>({
   platform: [],
   language: [],
@@ -98,40 +96,16 @@ const {
   immediate: false,
 })
 
-const currentQueryAppId = (): AppWorkspaceId | undefined => {
-  return normalizeAppId(queryParams.value?.appId) ?? normalizeAppId(currentAppId.value)
-}
-
-const isAvailableAppId = (appId: AppWorkspaceId | undefined) => {
-  return appId !== undefined && !!appMap.value[String(appId)]
-}
-
-const requireCurrentQueryAppId = (): AppWorkspaceId | undefined => {
-  const appId = currentQueryAppId()
-  if (appId === undefined) {
-    showWarning(t('gameBusiness.appWorkspace.appIdRequired'))
-    return undefined
-  }
-  if (!isAvailableAppId(appId)) {
-    showWarning(t('gameBusiness.appWorkspace.appUnavailable'))
-    return undefined
-  }
-  return appId
-}
-
 const runScopedQuery = () => {
-  const appId = requireCurrentQueryAppId()
-  if (appId === undefined) {
-    return
-  }
-  queryParams.value.appId = appId
+
+
+
   onQuery()
 }
 
 const onPage = usePrimeTablePage(tableParams, runScopedQuery)
 
 const searchFields = computed(() => [
-  // appId 只来自 URL 解析（onMounted 里 normalizeRouteAppId），不作为查询表单字段暴露
   { key: 'channel', label: t('message.client.channelName'), type: 'select', options: querySelections.value.channel, placeholder: t('message.common.form.pleaseSelect') },
   { key: 'platform', label: t('message.client.platform'), type: 'select', options: querySelections.value.platform, placeholder: t('message.common.form.pleaseSelect') },
   { key: 'appVersion', label: t('message.client.version'), type: 'select', options: querySelections.value.version, placeholder: t('message.common.form.pleaseSelect'), advanced: true },
@@ -148,21 +122,6 @@ const getModeTagType = (code: string) => {
   if (code === 'review') return 'warn'
   if (code === 'formal') return 'success'
   return 'info'
-}
-
-const getAppScopeLabel = (appId: any) => {
-  const id = normalizeAppId(appId)
-  if (id === undefined) {
-    return t('gameBusiness.appWorkspace.appUnavailable')
-  }
-  return appMap.value[String(id)] || String(id)
-}
-
-const getAppScopeSeverity = (appId: any) => {
-  if (normalizeAppId(appId) === undefined) {
-    return 'danger'
-  }
-  return 'success'
 }
 
 const loadModeDefs = async () => {
@@ -195,14 +154,10 @@ const onPlatformQuery = async () => {
   querySelections.value.platform = res.data.data
 }
 
-const onVersionQuery = async (appId?: AppWorkspaceId) => {
-  const id = normalizeAppId(appId)
-  if (id === undefined) {
-    querySelections.value.version = []
-    querySelections.value.oldVersion = []
-    return
-  }
-  const res = await gameAppVersionDefinitionSelectPost({appId: id, pageSize: MAX_SELECT_SIZE})
+const onVersionQuery = async () => {
+
+
+  const res = await gameAppVersionDefinitionSelectPost({pageSize: MAX_SELECT_SIZE})
   querySelections.value.version = res.data.data
   querySelections.value.oldVersion = res.data.data
 }
@@ -225,62 +180,38 @@ const buildPackageOptions = (packages: any[]) => {
   return options
 }
 
-const onPackageQuery = async (appId?: AppWorkspaceId) => {
-  const id = normalizeAppId(appId)
-  if (id === undefined) {
-    querySelections.value.package = []
-    return
-  }
-  const res = await gameAppPackageListGet({appId: id})
-  querySelections.value.package = buildPackageOptions(res.data?.data || [])
-}
+const onPackageQuery = async () => {
 
-const onAppQuery = async () => {
-  await loadApps()
-  const map: Record<string, string> = {}
-  for (const a of appOptions.value) {
-    const id = normalizeAppId(a.id)
-    if (id === undefined || a.isEnabled === false) {
-      continue
-    }
-    map[String(id)] = a.appName || a.name || String(id)
-  }
-  appMap.value = map
+
+  const res = await gameAppPackageListGet({})
+  querySelections.value.package = buildPackageOptions(res.data?.data || [])
 }
 
 // 打开新增页面
 const openAddTenantGameAppRemoteConfig = () => {
-  const appId = requireCurrentQueryAppId()
-  if (appId === undefined) {
-    return
-  }
+
+
   editTenantGameAppRemoteConfigTitle.value = t('message.client.addRemoteConfig')
   editDialogRef.value.isEditor = false
-  editDialogRef.value.openDialog({appId})
+  editDialogRef.value.openDialog({})
 }
 
 // 打开编辑页面
 const openEditTenantGameAppRemoteConfig = (row: any) => {
-  if (normalizeAppId(row?.appId) === undefined) {
-    showWarning(t('gameBusiness.appWorkspace.appUnavailable'))
-    return
-  }
+
   editTenantGameAppRemoteConfigTitle.value = t('message.client.editRemoteConfig')
   editDialogRef.value.isEditor = true
   editDialogRef.value.openDialog(row)
 }
 
 const onScopedDelete = async (row: any) => {
-  const appId = requireCurrentQueryAppId()
-  if (appId === undefined) {
-    return
-  }
-  queryParams.value.appId = appId
+
+
+
   await onDelete(row)
 }
 
 const columns = computed<CrudColumnConfig[]>(() => [
-  {field: 'appId', header: t('message.gameBusiness.app.appId'), width: '130px', align: 'center', bodyKey: 'appId'},
   {field: 'channel', header: t('message.client.channelName'), width: '105px'},
   {field: 'platform', header: t('message.client.platformName'), width: '90px'},
   {field: 'appVersion', header: t('message.client.newVersion'), width: '80px'},
@@ -317,25 +248,18 @@ const customActions: CrudAction[] = [
 ]
 
 onMounted(async () => {
-  await onAppQuery()
-  const appId = normalizeRouteAppId(route) ?? normalizeAppId(currentAppId.value)
-  if (appId === undefined) {
-    showWarning(t('gameBusiness.appWorkspace.appIdRequired'))
-    return
-  }
-  if (!isAvailableAppId(appId)) {
-    showWarning(t('gameBusiness.appWorkspace.appUnavailable'))
-    return
-  }
 
-  setCurrentApp(appId)
-  queryParams.value.appId = appId
+
+
+
+
+
   await Promise.all([
     onLanguageQuery(),
     onPlatformQuery(),
     onChannelQuery(),
-    onVersionQuery(appId),
-    onPackageQuery(appId),
+    onVersionQuery(),
+    onPackageQuery(),
     loadModeDefs(),
   ])
   runScopedQuery()

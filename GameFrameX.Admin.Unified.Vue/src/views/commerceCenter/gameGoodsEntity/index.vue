@@ -29,7 +29,7 @@
           <template #body-createdTime="{ data }">{{ formatUnix(data.createdTime) }}</template>
           <template #body-updateTime="{ data }">{{ formatUnix(data.updateTime) }}</template>
         </CrudDataTable>
-        <editDialog ref="editDialogRef" :title="editTitle" :appId="queryParams.appId" @reloadTable="onQuery" />
+        <editDialog ref="editDialogRef" :title="editTitle" @reloadTable="onQuery" />
       </template>
     </Card>
   </div>
@@ -44,14 +44,13 @@ import {ref, computed, watch, onMounted} from 'vue'
 import {useRoute} from 'vue-router'
 import {useCrudTable} from '../../../composables/useCrudTable.ts'
 import {usePrimeTablePage} from '../../../composables'
-import {useCurrentApp} from '../../../composables/useCurrentApp.ts'
+
 import editDialog from '/@/views/commerceCenter/gameGoodsEntity/component/EditDialog.vue'
 import { gameGoodsPagePost, gameGoodsDeletePost } from '../../../api/gameGoods';
 import { gameGoodsCatalogueSelectPost } from '../../../api/gameGoodsCatalogue';
 import {MAX_SELECT_SIZE} from '../../../constants/pagination.ts';
 
 const route = useRoute()
-const {resolveInitialAppId} = useCurrentApp()
 
 const searchFields = computed(() => [
   { key: 'configId', label: t('message.gameBusiness.goods.configId'), type: 'number', placeholder: t('message.gameBusiness.goods.pleaseEnterConfigId'), advanced: true },
@@ -71,8 +70,6 @@ const {
   api: {pageApi: gameGoodsPagePost, deleteApi: gameGoodsDeletePost},
   immediate: true,
 })
-
-queryParams.value.appId = resolveInitialAppId(route.query)
 
 const onPage = usePrimeTablePage(tableParams, onQuery)
 
@@ -112,24 +109,14 @@ const getClassifyName = (areaId: number) => {
   }
   return areaId;
 };
-const getGameGoodsCatalogueEntityClassifyIdDropdownList = async (appId?: number) => {
-  let list = await gameGoodsCatalogueSelectPost({appId: appId, pageSize: MAX_SELECT_SIZE});
+const getGameGoodsCatalogueEntityClassifyIdDropdownList = async () => {
+  let list = await gameGoodsCatalogueSelectPost({pageSize: MAX_SELECT_SIZE});
   gameGoodsCatalogueEntityClassifyIdDropdownList.value = list.data.data ?? [];
 };
 
 // Reset dependent filter selections when current app changes
-watch(() => queryParams.value.appId, (newVal) => {
-  queryParams.value.classifyId = undefined
-  getGameGoodsCatalogueEntityClassifyIdDropdownList(newVal)
-})
-
-watch(() => route.query.appId, async () => {
-  queryParams.value.appId = resolveInitialAppId(route.query)
-  queryParams.value.classifyId = undefined
-  await onQuery()
-})
 
 onMounted(async () => {
-  await getGameGoodsCatalogueEntityClassifyIdDropdownList(queryParams.value.appId)
+  await getGameGoodsCatalogueEntityClassifyIdDropdownList()
 })
 </script>

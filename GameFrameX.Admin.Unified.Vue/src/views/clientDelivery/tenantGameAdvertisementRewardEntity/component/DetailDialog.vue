@@ -2,7 +2,6 @@
   <Dialog v-model:visible="visible" modal :header="t('message.gameBusiness.advertisementReward.detailTitle')" :draggable="false" class="w-full md:w-40rem">
     <div v-block-loading="loading">
       <div v-if="row" class="grid grid-cols-2" style="gap: 0.5rem 1.5rem;">
-        <DetailItem :label="t('message.gameBusiness.advertisementReward.app')">{{ appName(row.appId) }}</DetailItem>
         <DetailItem :label="t('message.gameBusiness.advertisementReward.provider')">{{ row.provider || '-' }}</DetailItem>
         <DetailItem :label="t('message.gameBusiness.advertisementReward.status')">
           <Tag :value="statusDesc(row.status)" :severity="adRewardStatusSeverity(row.status)" />
@@ -44,7 +43,7 @@ import Dialog from 'primevue/dialog'
 import Button from 'primevue/button'
 import Tag from 'primevue/tag'
 import { t } from '../../../../i18n/index.ts'
-import { useCurrentApp } from '../../../../composables/useCurrentApp.ts'
+
 import { gameAdvertisementRewardDetailGet } from '../../../../api/gameAdvertisementReward'
 import {
   ADVERTISEMENT_REWARD_STATUS_OPTIONS,
@@ -64,8 +63,6 @@ const DetailItem = defineComponent({
       ])
   },
 })
-
-const { appName } = useCurrentApp()
 
 const visible = ref(false)
 const loading = ref(false)

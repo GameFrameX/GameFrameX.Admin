@@ -9,7 +9,7 @@
             authPrefix="gameUserEntity"
             :defaultSearchKey="false"
             @query="onQuery"
-            
+
             @add="onAddGameUserEntity"
         />
       </template>
@@ -51,14 +51,13 @@ import { gameUserPagePost, gameUserBanPost, gameUserUnsealPost } from '../../../
 import {systemEnumEnumDataListGet} from '../../../api/systemEnum';
 import commonFunction from '../../../utils/commonFunction.ts'
 import {useCrudTable} from '../../../composables/useCrudTable.ts'
-import {usePrimeTablePage, useRouteAppIdQuerySync} from '../../../composables'
-import {useCurrentApp} from '../../../composables/useCurrentApp.ts'
+import {usePrimeTablePage} from '../../../composables'
 
 const route = useRoute()
 // eslint-disable-next-line @typescript-eslint/naming-convention -- TODO(命名治理): 存量 PascalCase 命名（枚举映射表/C# 风格函数式命名），待配套治理 issue 改名
 const getEnumStatusData_Index = ref<any>([])
 const {getEnumDesc} = commonFunction()
-const {resolveInitialAppId} = useCurrentApp()
+
 const editDialogRef = ref()
 const mailDialogRef = ref()
 const addGameUserEntityTitle = t('message.gameBusiness.user.addAccount')
@@ -105,7 +104,7 @@ const onAddGameUserEntity = () => {
 const onBanGameRoleEntity = async (row: any) => {
   const confirmed = await showConfirm(t('message.gameBusiness.user.confirmBan'), t('message.common.message.tip'))
   if (!confirmed) return
-  await gameUserBanPost({id: row.id, appId: queryParams.value.appId})
+  await gameUserBanPost({id: row.id})
   onQuery()
   showSuccess(t('message.gameBusiness.user.banSuccess'))
 }
@@ -113,7 +112,7 @@ const onBanGameRoleEntity = async (row: any) => {
 const onUnsealGameRoleEntity = async (row: any) => {
   const confirmed = await showConfirm(t('message.gameBusiness.user.confirmUnban'), t('message.common.message.tip'))
   if (!confirmed) return
-  await gameUserUnsealPost({id: row.id, appId: queryParams.value.appId})
+  await gameUserUnsealPost({id: row.id})
   onQuery()
   showSuccess(t('message.gameBusiness.user.unbanSuccess'))
 }
@@ -141,13 +140,6 @@ const customActions: CrudAction[] = [
     visible: (row: any) => row.status != 2,
   },
 ]
-
-useRouteAppIdQuerySync({
-  route,
-  queryParams,
-  resolveAppId: resolveInitialAppId,
-  onQuery: onQuery,
-})
 
 onQuery()
 </script>

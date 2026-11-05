@@ -3,7 +3,7 @@
     <Card>
       <template #content>
         <SearchForm v-model="queryParams" :fields="searchFields" :defaultSearchKey="false"
-                    authPrefix="tenantDevice" :showAdd="hasApp" @query="guardedQuery" @reset="onReset" @add="openAddDialog"/>
+                    authPrefix="tenantDevice" :showAdd="true" @query="guardedQuery" @reset="onReset" @add="openAddDialog"/>
       </template>
     </Card>
     <Card style="margin-top: 8px">
@@ -17,7 +17,7 @@
                        :exportQuery="queryParams"
                        @page="onPage" showIdColumn :idColumnHeader="t('message.common.label.id')" idColumnWidth="200px">
         </CrudDataTable>
-        <editDialog ref="editDialogRef" :title="editTenantGameAppDeviceTitle" :appId="queryParams.appId" @reloadTable="onQuery"/>
+        <editDialog ref="editDialogRef" :title="editTenantGameAppDeviceTitle" @reloadTable="onQuery"/>
       </template>
     </Card>
   </div>
@@ -30,8 +30,8 @@ import SearchForm from '/@/components/search-form/index.vue'
 import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import type {CrudColumnConfig} from '../../../../components/crud-data-table/types.ts'
 import {useCrudTable} from '../../../../composables/useCrudTable.ts'
-import {usePrimeTablePage, useRouteAppIdQuerySync} from '../../../../composables'
-import {useCurrentApp} from '../../../../composables/useCurrentApp.ts'
+import {usePrimeTablePage} from '../../../../composables'
+
 import editDialog from '/@/views/clientDelivery/device/device/component/EditDialog.vue'
 import { gameAppDevicePagePost, gameAppDeviceDeletePost } from '../../../../api/gameAppDevice'
 import { deviceGroupSelectPost } from '../../../../api/deviceGroup'
@@ -40,16 +40,10 @@ import {descriptionColumn, nameColumn} from '../../../../utils/crudConfig.ts'
 const route = useRoute()
 const editDialogRef = ref()
 const editTenantGameAppDeviceTitle = ref('')
-const {ensureCurrentAppFromQuery} = useCurrentApp()
-
-// 设备分组下拉（当前应用的分组；appId 是作用域而非搜索条件，不再暴露应用下拉）
 const groupOptions = ref<any[]>([])
 const loadGroups = async () => {
-  if (!hasApp.value) {
-    groupOptions.value = []
-    return
-  }
-  const res = await deviceGroupSelectPost({appId: queryParams.value.appId})
+
+  const res = await deviceGroupSelectPost({})
   groupOptions.value = res.data.data ?? []
 }
 
@@ -66,21 +60,12 @@ const {
   immediate: false,
 })
 
-// 设备码为应用级资源（C211）：未选应用时不请求、清空列表，避免后端 AppId<=0 抛错。
-const hasApp = computed(() => !!queryParams.value.appId && queryParams.value.appId !== "0")
-
 const guardedQuery = async () => {
-  if (!hasApp.value) {
-    tableData.value = []
-    tableParams.value.total = 0
-    return
-  }
+
   await onQuery()
 }
-
-// 重置搜索条件时保留当前应用上下文（appId 是作用域而非搜索条件），清分组筛选后重新查询。
 const onReset = () => {
-  queryParams.value.appId = ensureCurrentAppFromQuery(route.query)
+
   queryParams.value.groupId = undefined
   guardedQuery()
 }
@@ -111,13 +96,6 @@ const actions = {
   edit: openEditTenantGameAppDevice,
   delete: onDelete,
 }
-
-useRouteAppIdQuerySync({
-  route,
-  queryParams,
-  resolveAppId: ensureCurrentAppFromQuery,
-  onQuery: guardedQuery,
-})
 
 onMounted(async () => {
   await loadGroups()

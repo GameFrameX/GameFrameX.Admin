@@ -41,10 +41,10 @@
           <template #body-createdTime="{ data }">{{ formatUnix(data.createdTime) }}</template>
         </CrudDataTable>
 
-        <editDialog ref="editDialogRef" :title="editTitle" :appId="queryParams.appId"
+        <editDialog ref="editDialogRef" :title="editTitle"
                     @reloadTable="onQuery" @secret="onSecret" />
         <secretDialog ref="secretDialogRef" />
-        <actionDialog ref="actionDialogRef" :appId="queryParams.appId"
+        <actionDialog ref="actionDialogRef"
                       @done="onQuery" @secret="onSecret" />
       </template>
     </Card>
@@ -61,8 +61,8 @@ import type { CrudAction, CrudColumnConfig } from '../../../components/crud-data
 import { createAction } from '../../../components/crud-data-table'
 import SearchForm from '/@/components/search-form/index.vue'
 import { useCrudTable } from '../../../composables/useCrudTable.ts'
-import {usePrimeTablePage, useRouteAppIdQuerySync } from '../../../composables'
-import { useCurrentApp } from '../../../composables/useCurrentApp.ts'
+import {usePrimeTablePage } from '../../../composables'
+
 import { showConfirm, showSuccess } from '../../../utils/message.ts'
 import { formatUnix } from '../../../utils/formatTime.ts'
 import { t } from '../../../i18n/index.ts'
@@ -76,8 +76,6 @@ const editDialogRef = ref()
 const secretDialogRef = ref()
 const actionDialogRef = ref()
 const editTitle = ref('')
-
-const { ensureCurrentAppFromQuery } = useCurrentApp()
 
 // isEnabled 过滤选项
 const statusOptions = computed(() => [
@@ -117,14 +115,11 @@ const {
   },
   immediate: false,
 })
-
-// 初始化 appId 为当前应用
 queryParams.value = {
   scenario: undefined,
   subjectName: undefined,
   accessKey: undefined,
   isEnabled: undefined,
-  appId: ensureCurrentAppFromQuery(route.query),
 }
 
 tableParams.value.pageSize = 10
@@ -161,7 +156,7 @@ const onDelete = async (row: any) => {
     t('message.common.message.tip'),
   )
   if (!confirmed) return
-  await gameAppOpenAccessDeletePost({ id: row.id, appId: queryParams.value.appId, rowVersion: row.rowVersion })
+  await gameAppOpenAccessDeletePost({ id: row.id, rowVersion: row.rowVersion })
   onQuery()
   showSuccess(t('message.gameBusiness.openAccess.deleteSuccess'))
 }
@@ -222,12 +217,6 @@ const actions = {
 }
 
 // ---- 路由应用切换 ----
-useRouteAppIdQuerySync({
-  route,
-  queryParams,
-  resolveAppId: ensureCurrentAppFromQuery,
-  onQuery: onQuery,
-})
 
 onMounted(() => {
   onQuery()

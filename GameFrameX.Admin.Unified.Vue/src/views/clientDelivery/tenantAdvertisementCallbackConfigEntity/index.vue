@@ -25,9 +25,7 @@
                        showIdColumn
                        idColumnWidth="120px"
                        @page="onPage">
-          <template #body-appId="{ data }">
-            <Tag :severity="scopeOf(data.appId) === 'tenant' ? 'info' : 'success'" :value="scopeLabel(data.appId)"/>
-          </template>
+
           <template #body-provider="{ data }">
             <Tag :value="formatProvider(data.provider)"/>
           </template>
@@ -43,7 +41,7 @@
           </template>
           <template #body-createdTime="{ data }">{{ formatUnix(data.createdTime) }}</template>
         </CrudDataTable>
-        <editDialog ref="editDialogRef" :title="editTitle" :appOptions="appOptions" @reloadTable="onQuery"/>
+        <editDialog ref="editDialogRef" :title="editTitle" @reloadTable="onQuery"/>
       </template>
     </Card>
   </div>
@@ -57,14 +55,12 @@ import type {CrudColumnConfig} from '../../../components/crud-data-table/types.t
 import {useCrudTable} from '../../../composables/useCrudTable.ts'
 import {usePrimeTablePage} from '../../../composables'
 import {formatUnix} from '../../../utils/formatTime.ts'
-import {useConfigAppScope} from '../../../composables/useConfigAppScope.ts'
+
 import editDialog from './component/EditDialog.vue'
 import { advertisementCallbackConfigPagePost, advertisementCallbackConfigDeletePost, advertisementCallbackConfigDetailGet, advertisementCallbackConfigProvidersGet } from '../../../api/advertisementCallbackConfig'
 
 const editDialogRef = ref()
 const editTitle = ref('')
-
-const {appOptions, loadApps, scopeOf, scopeLabel, scopeSearchOptions} = useConfigAppScope()
 
 const providerOptions = ref<{label: string; value: string}[]>([])
 
@@ -74,13 +70,11 @@ const statusOptions = [
 ]
 
 const searchFields = computed(() => [
-  {key: 'appId', label: t('gameBusiness.configScope.scope'), type: 'select' as const, options: scopeSearchOptions.value, placeholder: t('gameBusiness.configScope.all')},
   {key: 'provider', label: 'Provider', type: 'select' as const, options: providerOptions.value, placeholder: 'Provider'},
   {key: 'isActive', label: '状态', type: 'select' as const, options: statusOptions, placeholder: '状态'},
 ])
 
 const columns = computed<CrudColumnConfig[]>(() => [
-  {field: 'appId', header: t('gameBusiness.configScope.scope'), width: '120px', align: 'center', bodyKey: 'appId'},
   {field: 'provider', header: 'Provider', width: '150px', align: 'center', bodyKey: 'provider'},
   {field: 'callbackUrl', header: '回调 URL', width: '260px'},
   {field: 'signingSecret', header: '签名密钥', width: '120px', align: 'center', bodyKey: 'signingSecret', sensitive: true},
@@ -136,7 +130,7 @@ const formatProvider = (value: string) => providerOptions.value.find((item) => i
 const hasSecret = (value: any) => !!String(value ?? '').trim()
 
 onMounted(async () => {
-  loadApps()
+
   try {
     const res: any = await advertisementCallbackConfigProvidersGet()
     const list = res.data?.data ?? []

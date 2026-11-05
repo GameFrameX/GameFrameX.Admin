@@ -8,7 +8,7 @@ test('直接保留后端菜单树，不再根据旧应用作用域筛选菜单',
     {path: '/dashboard', meta: {title: 'Overview', menuContext: 'tenantShell'}, children: [
       {path: '/dashboard/home', meta: {title: 'Home', appScope: 'console'}},
     ]},
-    {path: '/serverCenter', meta: {title: 'Servers', menuContext: 'appWorkspace'}, children: [
+    {path: '/serverCenter', meta: {title: 'Servers', menuContext: 'retiredContext'}, children: [
       {path: '/serverCenter/gameAreaEntity', meta: {title: 'Areas', appScope: 'app'}},
       {path: '/serverCenter/hidden', meta: {isHide: true}},
     ]},

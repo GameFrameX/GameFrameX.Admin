@@ -12,11 +12,6 @@
     @reloadTable="emit('reloadTable')"
   >
     <template #default="{ ruleForm, isEditor }">
-      <FormLabel>{{ t('message.gameBusiness.openAccess.appId') }}</FormLabel>
-      <div>
-        <Select filter v-model="ruleForm.appId" :options="appOptions" optionLabel="name" optionValue="id"
-                :disabled="isEditor" :placeholder="t('message.gameBusiness.appContext.pleaseSelectGameApp')" class="w-full" />
-      </div>
 
       <FormLabel name="bindUserId">{{ t('message.gameBusiness.openAccess.bindUserId') }}</FormLabel>
       <FormField name="bindUserId" v-slot="{ props: fProps, invalid, error }">
@@ -58,20 +53,18 @@ import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import {TextField, TextareaField} from '../../../../components/crud-form-fields'
 import { gameAppOpenAccessAddPost, gameAppOpenAccessUpdatePost } from '../../../../api/gameAppOpenAccess'
 import { tenantUserPagePost } from '../../../../api/tenantUser'
-import { useCurrentApp } from '../../../../composables/useCurrentApp.ts'
+
 import { MAX_PAGE_SIZE } from '../../../../constants/pagination.ts'
-import { normalizeAppId } from '../../../../utils/appWorkspace.ts'
+
 import { t } from '../../../../i18n/index.ts'
 
 const props = defineProps({
   title: { type: String, default: '' },
-  appId: { type: [Number, String], default: undefined },
 })
 const emit = defineEmits(['reloadTable', 'secret'])
 
 const dialogRef = ref()
 const userOptions = ref<any[]>([])
-const { appOptions, loadApps } = useCurrentApp()
 
 const scopeOptions = computed(() => [
   { label: t('message.gameBusiness.openAccess.scopePackageReport'), value: 'package-report' },
@@ -86,7 +79,6 @@ const rules = {
 }
 
 const defaultForm = () => ({
-  appId: normalizeAppId(props.appId),
   bindUserId: undefined,
   scenario: '',
   purpose: '',
@@ -98,8 +90,8 @@ const defaultForm = () => ({
 
 // ---- beforeOpen：解析 scopesJson → scopesArray，expiresTime Unix 秒 → Date ----
 const beforeOpen = (form: any, isEditor: boolean) => {
-  const appId = normalizeAppId(props.appId)
-  if (appId) form.appId = appId
+
+
 
   if (isEditor) {
     // 解析 scopesJson → scopesArray
@@ -170,7 +162,7 @@ const loadUsers = async () => {
 
 defineExpose({
   openDialog: async (row: any) => {
-    await Promise.all([loadUsers(), loadApps()])
+    await Promise.all([loadUsers()])
     dialogRef.value?.openDialog(row)
   },
   get isEditor() { return dialogRef.value?.isEditor },

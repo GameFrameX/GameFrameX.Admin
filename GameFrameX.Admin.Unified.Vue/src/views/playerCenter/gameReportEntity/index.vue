@@ -48,8 +48,8 @@ import type { CrudAction, CrudColumnConfig } from '../../../components/crud-data
 import SearchForm from '/@/components/search-form/index.vue'
 import Tag from 'primevue/tag'
 import { useCrudTable } from '../../../composables/useCrudTable.ts'
-import {usePrimeTablePage, useRouteAppIdQuerySync} from '../../../composables'
-import { useCurrentApp } from '../../../composables/useCurrentApp.ts'
+import {usePrimeTablePage} from '../../../composables'
+
 import {formatUnix} from '../../../utils/formatTime.ts'
 import addDialog from '/@/views/playerCenter/gameReportEntity/component/AddDialog.vue'
 import linkPenaltyDialog from '/@/views/playerCenter/gameReportEntity/component/LinkPenaltyDialog.vue'
@@ -68,8 +68,6 @@ const route = useRoute()
 const addDialogRef = ref()
 const linkPenaltyDialogRef = ref()
 const addTitle = ref('')
-
-const {resolveInitialAppId} = useCurrentApp()
 
 const getEnumLabel = (options: EnumOption[], value: number | undefined | null) => {
   const opt = findEnumOption(options, value)
@@ -141,10 +139,4 @@ const customActions: CrudAction[] = [
   },
 ]
 
-useRouteAppIdQuerySync({
-  route,
-  queryParams,
-  resolveAppId: resolveInitialAppId,
-  onQuery,
-})
 </script>

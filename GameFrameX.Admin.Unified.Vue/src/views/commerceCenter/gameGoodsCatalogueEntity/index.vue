@@ -9,7 +9,7 @@
             authPrefix="gameGoodsCatalogueEntity"
             :defaultSearchKey="false"
             @query="onQuery"
-            
+
             @add="openAddGameGoodsCatalogueEntity"
         />
       </template>
@@ -27,7 +27,7 @@
           <template #body-createdTime="{ data }">{{ formatUnix(data.createdTime) }}</template>
           <template #body-updateTime="{ data }">{{ formatUnix(data.updateTime) }}</template>
         </CrudDataTable>
-        <editDialog ref="editDialogRef" :title="editTitle" :appId="queryParams.appId" @reloadTable="onQuery" />
+        <editDialog ref="editDialogRef" :title="editTitle" @reloadTable="onQuery" />
       </template>
     </Card>
   </div>
@@ -41,13 +41,12 @@ import {formatUnix} from '../../../utils/formatTime.ts'
 import {ref, computed} from 'vue'
 import {useRoute} from 'vue-router'
 import {useCrudTable} from '../../../composables/useCrudTable.ts'
-import {usePrimeTablePage, useRouteAppIdQuerySync} from '../../../composables'
-import {useCurrentApp} from '../../../composables/useCurrentApp.ts'
+import {usePrimeTablePage} from '../../../composables'
+
 import editDialog from '/@/views/commerceCenter/gameGoodsCatalogueEntity/component/EditDialog.vue'
 import { gameGoodsCataloguePagePost, gameGoodsCatalogueDeletePost } from '../../../api/gameGoodsCatalogue';
 
 const route = useRoute()
-const {resolveInitialAppId} = useCurrentApp()
 
 const searchFields = computed(() => [
   { key: 'description', label: t('message.gameBusiness.description'), type: 'input', placeholder: t('message.gameBusiness.pleaseEnterDescription'), advanced: true },
@@ -94,10 +93,4 @@ const columns = computed<CrudColumnConfig[]>(() => [
   {field: 'updateTime', header: t('message.gameBusiness.updateTime'), width: '200px', bodyKey: 'updateTime'},
 ])
 
-useRouteAppIdQuerySync({
-  route,
-  queryParams,
-  resolveAppId: resolveInitialAppId,
-  onQuery,
-})
 </script>

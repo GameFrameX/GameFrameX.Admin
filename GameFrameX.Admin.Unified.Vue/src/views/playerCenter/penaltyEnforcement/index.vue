@@ -62,7 +62,7 @@ import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import type {CrudAction, CrudColumnConfig} from '../../../components/crud-data-table/types.ts'
 import {useCrudTable} from '../../../composables/useCrudTable.ts'
 import {usePrimeTablePage} from '../../../composables'
-import {useCurrentApp} from '../../../composables/useCurrentApp.ts'
+
 import {formatUnix} from '../../../utils/formatTime.ts'
 import { gamePenaltyPagePost } from '../../../api/gamePenalty'
 import { gameAreaSelectStringPost } from '../../../api/gameArea'
@@ -81,7 +81,6 @@ import {
 
 const route = useRoute()
 const router = useRouter()
-const {resolveInitialAppId} = useCurrentApp()
 
 const labelOf = (options: Array<{ value: number; label: string }>, value: number): string => {
     const found = options.find((o) => o.value === value)
@@ -118,8 +117,6 @@ const {
     immediate: false,
 })
 
-queryParams.value.appId = resolveInitialAppId(route.query)
-
 const onPage = usePrimeTablePage(tableParams, onQuery)
 
 // 区服名映射（按当前应用加载，对齐 redeemCenter/gameRedeemCodeEntity）。
@@ -131,15 +128,10 @@ const getAreaName = (areaId: number | null | undefined) => {
     const item = areaList.value.find((a: any) => a.id === areaId)
     return item ? item.label : String(areaId)
 }
-const loadAreaList = async (appId?: number) => {
-    const res = await gameAreaSelectStringPost({appId: appId, pageSize: MAX_SELECT_SIZE})
+const loadAreaList = async () => {
+    const res = await gameAreaSelectStringPost({pageSize: MAX_SELECT_SIZE})
     areaList.value = res.data?.data ?? []
 }
-
-watch(() => queryParams.value.appId, (newVal) => {
-    queryParams.value.areaId = undefined
-    loadAreaList(newVal)
-})
 
 // 跳转入口（issue 第 3 条）。目标路由由 C123（GFX-113）实现；未合入时 fallback 提示。
 const navigateIfReady = (path: string, query: Record<string, unknown>) => {
@@ -152,11 +144,11 @@ const navigateIfReady = (path: string, query: Record<string, unknown>) => {
 }
 
 const gotoPenalty = (row: any) => {
-    navigateIfReady('/playerCenter/gamePenaltyEntity', {appId: queryParams.value.appId, targetType: row.targetType, targetId: row.targetId})
+    navigateIfReady('/playerCenter/gamePenaltyEntity', {targetType: row.targetType, targetId: row.targetId})
 }
 
 const gotoAppeal = (row: any) => {
-    navigateIfReady('/playerCenter/gamePenaltyAppealEntity', {appId: queryParams.value.appId, penaltyId: row.id})
+    navigateIfReady('/playerCenter/gamePenaltyAppealEntity', {penaltyId: row.id})
 }
 
 const columns = computed<CrudColumnConfig[]>(() => [
@@ -181,14 +173,8 @@ const customActions = computed<CrudAction[]>(() => [
     {auth: 'page', label: t('message.gameBusiness.penaltyEnforcement.action.gotoAppeal'), icon: 'fa-solid fa-comment', onClick: gotoAppeal},
 ])
 
-watch(() => route.query.appId, async () => {
-    queryParams.value.appId = resolveInitialAppId(route.query)
-    queryParams.value.areaId = undefined
-    await onQuery()
-})
-
 onMounted(async () => {
-    await loadAreaList(queryParams.value.appId)
+    await loadAreaList()
     await onQuery()
 })
 </script>

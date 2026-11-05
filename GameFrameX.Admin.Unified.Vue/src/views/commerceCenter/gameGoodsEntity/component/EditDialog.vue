@@ -25,12 +25,11 @@ import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import {TextField} from '../../../../components/crud-form-fields'
 import { gameGoodsAddPost, gameGoodsUpdatePost } from '../../../../api/gameGoods'
 import { gameGoodsCatalogueSelectPost } from '../../../../api/gameGoodsCatalogue'
-import {normalizeAppId} from '../../../../utils/appWorkspace.ts'
+
 import {MAX_SELECT_SIZE} from '../../../../constants/pagination.ts'
 
 const props = defineProps({
   title: {type: String, default: ''},
-  appId: {type: [Number, String], default: undefined},
 })
 const emit = defineEmits(['reloadTable'])
 const dialogRef = ref()
@@ -50,18 +49,16 @@ const filteredClassifyIdOptions = computed(() =>
   }))
 )
 
-const getGameGoodsCatalogueEntityClassifyIdDropdownList = async (appId?: number) => {
-  let list = await gameGoodsCatalogueSelectPost({appId: appId, pageSize: MAX_SELECT_SIZE});
+const getGameGoodsCatalogueEntityClassifyIdDropdownList = async () => {
+  let list = await gameGoodsCatalogueSelectPost({pageSize: MAX_SELECT_SIZE});
   gameGoodsCatalogueEntityClassifyIdDropdownList.value = list.data.data ?? [];
   filteredClassifyIdList.value = [...gameGoodsCatalogueEntityClassifyIdDropdownList.value];
 };
 
 const beforeOpen = (form: any, isEditor: boolean) => {
-  const appId = normalizeAppId(props.appId)
-  if (appId) form.appId = appId
-  if (form.appId) {
-    getGameGoodsCatalogueEntityClassifyIdDropdownList(form.appId)
-  }
+
+
+  getGameGoodsCatalogueEntityClassifyIdDropdownList()
 }
 
 const isEditor = computed({

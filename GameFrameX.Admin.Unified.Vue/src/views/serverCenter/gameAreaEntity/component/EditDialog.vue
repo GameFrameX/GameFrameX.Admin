@@ -106,16 +106,11 @@ import { gameDockerTagSelectPost } from '../../../../api/gameDockerTag'
 import { gameAppVersionDefinitionPagePost } from '../../../../api/gameAppVersionDefinition'
 import {MAX_PAGE_SIZE, MAX_SELECT_SIZE} from '../../../../constants/pagination.ts'
 import {isEnabled} from '../../../../utils/isEnabled.ts'
-import {normalizeAppId} from '../../../../utils/appWorkspace.ts'
 
 var props = defineProps({
   title: {
     type: String,
     default: '',
-  },
-  appId: {
-    type: [Number, String],
-    default: undefined,
   },
 })
 const emit = defineEmits(['reloadTable'])
@@ -129,7 +124,6 @@ const getEnumPackageData = ref<any>([])
 const getEnumDockerTag = ref<any>([])
 const getTenantGameAppVersionDefinitionData = ref<any>([])
 const gameAreaClassifyEntityClassifyIdDropdownList = ref<any>([])
-const selectedAppId = ref<number | undefined>(undefined)
 
 const serverStatusOptions = computed(() =>
     getEnumServerStatusData.value.map((item: any) => ({
@@ -157,7 +151,7 @@ const platformOptions = computed(() =>
 )
 const packageOptions = computed(() =>
     getEnumPackageData.value
-        .filter((item: any) => !selectedAppId.value || item.appId === selectedAppId.value)
+
         .map((item: any) => ({
           label: item.packageVersion ? `[${item.name}] ${item.packageName} / ${item.packageVersion}` : `[${item.name}] ${item.packageName}`,
           value: item.id
@@ -172,7 +166,7 @@ const dockerTagOptions = computed(() =>
 )
 const tenantGameAppVersionDefinitionOptions = computed(() =>
     getTenantGameAppVersionDefinitionData.value
-        .filter((item: any) => !selectedAppId.value || item.appId === selectedAppId.value)
+
         .map((item: any) => ({
           label: `[${item.name}] ${item.description}`,
           value: item.name
@@ -197,19 +191,14 @@ const rules = {
   appVersion: [{required: true, message: t('message.gameBusiness.pleaseSelectTenantGameAppVersionDefinition'), trigger: 'blur'}],
 }
 
-const loadScopedOptions = async (appId?: number) => {
-  if (!appId) return
-  const params = {page: 1, pageSize: MAX_PAGE_SIZE, appId}
-  getEnumPackageData.value = (await gameAppPackagePagePost(params)).data.data?.items ?? []
-  getEnumDockerTag.value = (await gameDockerTagSelectPost({appId, pageSize: MAX_SELECT_SIZE})).data.data ?? []
-  getTenantGameAppVersionDefinitionData.value = (await gameAppVersionDefinitionPagePost(params)).data.data?.items ?? []
-  const classifyList = await gameAreaClassifySelectPost({searchKey: '', appId, pageSize: MAX_SELECT_SIZE})
-  gameAreaClassifyEntityClassifyIdDropdownList.value = classifyList.data.data ?? []
-}
+const loadScopedOptions = async () => {
 
-const routeAppId = () => {
-  // C270：normalizeAppId 已保证超 2^53 雪花 Id 保持字符串，直接透传，禁止 Number() 回转丢精度
-  return normalizeAppId(props.appId)
+  const params = {page: 1, pageSize: MAX_PAGE_SIZE}
+  getEnumPackageData.value = (await gameAppPackagePagePost(params)).data.data?.items ?? []
+  getEnumDockerTag.value = (await gameDockerTagSelectPost({pageSize: MAX_SELECT_SIZE})).data.data ?? []
+  getTenantGameAppVersionDefinitionData.value = (await gameAppVersionDefinitionPagePost(params)).data.data?.items ?? []
+  const classifyList = await gameAreaClassifySelectPost({searchKey: '', pageSize: MAX_SELECT_SIZE})
+  gameAreaClassifyEntityClassifyIdDropdownList.value = classifyList.data.data ?? []
 }
 
 const beforeOpen = async (form: any, isEditor: boolean) => {
@@ -219,10 +208,10 @@ const beforeOpen = async (form: any, isEditor: boolean) => {
   if (form.platformId == 0 || form.platformId == null) {
     form.platformId = getEnumPlatformData.value.find((x: any) => x.isDefault || x.value === 'default')?.id ?? 0
   }
-  const appId = routeAppId()
-  if (appId) form.appId = appId
-  selectedAppId.value = appId
-  await loadScopedOptions(selectedAppId.value)
+
+
+
+  await loadScopedOptions()
   // 接口配置默认值（C175/C176）：ClientDispatch/Fulfillment 默认 game/api；Gm/Control 空 = 不构造对应能力 URL；EnableClientGm 默认关闭。
   // 仅新增模式填前缀默认；编辑回显保持后端归一化后的存储值，null 前缀规整为空串避免显示 "null"。
   if (form.clientDispatchApiPrefix == null && !isEditor) form.clientDispatchApiPrefix = 'game/api'
@@ -240,8 +229,8 @@ const beforeOpen = async (form: any, isEditor: boolean) => {
 }
 
 const beforeSubmit = (form: any) => {
-  const appId = routeAppId()
-  if (appId) form.appId = appId
+
+
   form.isEnabled = isEnabled(form)
   // 提交：Date → long 秒；空值保持 null（lastMaintenanceTime 允许 null）
   const payload = {...form}

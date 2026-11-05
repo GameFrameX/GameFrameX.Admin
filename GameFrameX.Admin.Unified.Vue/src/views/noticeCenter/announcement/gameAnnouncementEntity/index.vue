@@ -39,7 +39,7 @@
           <template #body-createdTime="{ data }">{{ formatUnix(data.createdTime) }}</template>
           <template #body-updateTime="{ data }">{{ formatUnix(data.updateTime) }}</template>
         </CrudDataTable>
-        <editDialog ref="editDialogRef" :title="editGameAnnouncementEntityTitle" :appId="queryParams.appId" @reloadTable="onQuery" />
+        <editDialog ref="editDialogRef" :title="editGameAnnouncementEntityTitle" @reloadTable="onQuery" />
       </template>
     </Card>
   </div>
@@ -58,13 +58,10 @@ import { globalLanguageSelectPost } from '../../../../api/globalLanguage'
 import {MAX_SELECT_SIZE} from '../../../../constants/pagination.ts'
 import { useCrudTable } from '../../../../composables/useCrudTable.ts'
 import {usePrimeTablePage } from '../../../../composables'
-import { useCurrentApp } from '../../../../composables/useCurrentApp.ts'
 
 const route = useRoute()
 const editDialogRef = ref()
 const editGameAnnouncementEntityTitle = ref('')
-
-const {resolveInitialAppId} = useCurrentApp()
 
 const searchFields = computed(() => [
   { key: 'language', label: t('message.gameBusiness.language'), type: 'select', options: languageOptions.value, optionLabel: 'label', optionValue: 'value', placeholder: t('message.gameBusiness.pleaseSelectLanguage'), advanced: true },
@@ -86,8 +83,6 @@ const {
   },
   immediate: true,
 })
-
-queryParams.value.appId = resolveInitialAppId(route.query)
 
 const onPage = usePrimeTablePage(tableParams, onQuery)
 
@@ -149,8 +144,8 @@ const getAreaName = (areaId?: number) => {
 }
 const getLanguageName = (language?: string) => languageMap.value[language || 'default'] || language || 'default'
 
-const loadAreaList = async (appId?: number) => {
-  const res = await gameAreaSelectStringPost({appId: appId, pageSize: MAX_SELECT_SIZE})
+const loadAreaList = async () => {
+  const res = await gameAreaSelectStringPost({pageSize: MAX_SELECT_SIZE})
   areaList.value = res.data.data ?? []
 }
 const loadLanguageList = async () => {
@@ -166,19 +161,9 @@ const loadLanguageList = async () => {
 }
 
 // Reset dependent filter selections when current app changes
-watch(() => queryParams.value.appId, (newVal) => {
-  queryParams.value.areaId = undefined
-  loadAreaList(newVal)
-})
-
-watch(() => route.query.appId, async () => {
-  queryParams.value.appId = resolveInitialAppId(route.query)
-  queryParams.value.areaId = undefined
-  await onQuery()
-})
 
 onMounted(async () => {
-  await loadAreaList(queryParams.value.appId)
+  await loadAreaList()
   await loadLanguageList()
 })
 </script>

@@ -96,7 +96,7 @@
           <template #body-roleRegisterTime="{ data }">{{ formatUnix(data.roleRegisterTime) }}</template>
           <template #body-createdTime="{ data }">{{ formatUnix(data.createdTime) }}</template>
         </CrudDataTable>
-        <editDialog ref="editDialogRef" :title="editGameOrderEntityTitle" :appId="queryParams.appId" @reloadTable="onQuery" />
+        <editDialog ref="editDialogRef" :title="editGameOrderEntityTitle" @reloadTable="onQuery" />
       </template>
     </Card>
   </div>
@@ -123,7 +123,7 @@ import { globalPlatformSelectPost } from '../../../api/globalPlatform'
 import { channelDefinitionAvailableGet } from '../../../api/channelDefinition'
 import { useCrudTable } from '../../../composables/useCrudTable.ts'
 import { usePrimeTablePage } from '../../../composables'
-import { useCurrentApp } from '../../../composables/useCurrentApp.ts'
+
 import { mapAvailableChannelDefinitions } from '../../../utils/channelDefinition.ts'
 
 const route = useRoute()
@@ -135,8 +135,6 @@ const editDialogRef = ref()
 const getEnumChannelData = ref<any>([])
 const getEnumPlatformData = ref<any>([])
 const editGameOrderEntityTitle = ref('')
-
-const {resolveInitialAppId} = useCurrentApp()
 
 const enumStatusOptions = computed(() =>
   (getEnumStatusData_Index.value || []).map((item: any) => ({ label: `[${item.value}] ${item.describe}`, value: item.value }))
@@ -180,8 +178,6 @@ const {
   },
   immediate: false,
 })
-
-queryParams.value.appId = resolveInitialAppId(route.query)
 
 const onPage = usePrimeTablePage(tableParams, doQuery)
 
@@ -284,8 +280,8 @@ const getAreaName = (areaId: number) => {
   return areaId
 }
 
-const loadAreaList = async (appId?: number) => {
-  const res = await gameAreaSelectStringPost({ appId: appId, pageSize: MAX_SELECT_SIZE })
+const loadAreaList = async () => {
+  const res = await gameAreaSelectStringPost({ pageSize: MAX_SELECT_SIZE })
   areaList.value = res.data.data ?? []
 }
 
@@ -295,23 +291,9 @@ const onResetAndSummary = () => {
 }
 
 // Reset dependent filter selections when current app changes (also reload dropdowns by app)
-watch(() => queryParams.value.appId, (newVal) => {
-  queryParams.value.areaId = undefined
-  loadAreaList(newVal)
-  // channel/platform are tenant/global scope; reload dropdown candidates for consistency
-  channelDefinitionAvailableGet({pageSize: MAX_SELECT_SIZE}).then((res: any) => {
-    getEnumChannelData.value = mapAvailableChannelDefinitions((res.data.data || []), 'code')
-  })
-})
-
-watch(() => route.query.appId, async () => {
-  queryParams.value.appId = resolveInitialAppId(route.query)
-  queryParams.value.areaId = undefined
-  await onQuery()
-})
 
 onMounted(async () => {
-  await loadAreaList(queryParams.value.appId)
+  await loadAreaList()
   getEnumChannelData.value = mapAvailableChannelDefinitions((await channelDefinitionAvailableGet({pageSize: MAX_SELECT_SIZE})).data.data || [], 'code')
   getEnumPlatformData.value = (await globalPlatformSelectPost({pageSize: MAX_SELECT_SIZE})).data.data ?? []
   onQuery()

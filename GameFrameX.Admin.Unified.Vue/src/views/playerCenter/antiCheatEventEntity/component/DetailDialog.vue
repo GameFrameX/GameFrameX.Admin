@@ -2,7 +2,6 @@
   <Dialog v-model:visible="visible" modal :header="t('message.gameBusiness.antiCheat.detail.title')" :style="{ width: 'min(720px, calc(100vw - 32px))' }" :draggable="false">
     <div v-block-loading="loading" class="antiCheat-detail">
       <div class="grid">
-        <div class="col-6 field"><span class="label">{{ t('message.gameBusiness.appContext.currentApp') }}:</span> {{ appName(detail.appId) }}</div>
         <div class="col-6 field"><span class="label">{{ t('message.gameBusiness.antiCheat.provider.label') }}:</span> {{ providerLabel(detail.provider) }}</div>
         <div class="col-6 field" v-if="detail.providerName"><span class="label">{{ t('message.gameBusiness.antiCheat.providerName') }}:</span> {{ detail.providerName }}</div>
         <div class="col-6 field" v-if="detail.providerEventId"><span class="label">{{ t('message.gameBusiness.antiCheat.providerEventId') }}:</span> {{ detail.providerEventId }}</div>
@@ -34,7 +33,7 @@
 
 <script lang="ts" setup="" name="antiCheatDetailDialog">
 import {ref} from 'vue'
-import {useCurrentApp} from '../../../../composables/useCurrentApp.ts'
+
 import {formatUnix} from '../../../../utils/formatTime.ts'
 import { gameAntiCheatEventDetailGet } from '../../../../api/gameAntiCheatEvent'
 import {
@@ -48,7 +47,6 @@ import {
     suggestedActionSeverity,
 } from '../constants'
 
-const {appName} = useCurrentApp()
 const visible = ref(false)
 const loading = ref(false)
 const detail = ref<any>({})

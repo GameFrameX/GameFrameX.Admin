@@ -8,7 +8,7 @@
             :showAdd="true"
             authPrefix="gameAppReleaseVersion"
             @query="onQuery"
-            
+
             @add="openAddTenantGameAppReleaseVersion"
         />
       </template>
@@ -28,7 +28,7 @@
             <span v-else>{{ t('message.common.label.no') }}</span>
           </template>
         </CrudDataTable>
-        <editDialog ref="editDialogRef" :title="editTenantGameAppReleaseVersionTitle" :appId="queryParams.appId" @reloadTable="onQuery"/>
+        <editDialog ref="editDialogRef" :title="editTenantGameAppReleaseVersionTitle" @reloadTable="onQuery"/>
       </template>
     </Card>
   </div>
@@ -40,8 +40,8 @@ import {useRoute} from 'vue-router'
 import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import type {CrudColumnConfig} from '../../../../components/crud-data-table/types.ts'
 import {useCrudTable} from '../../../../composables/useCrudTable.ts'
-import {usePrimeTablePage, useRouteAppIdQuerySync} from '../../../../composables'
-import {useCurrentApp} from '../../../../composables/useCurrentApp.ts'
+import {usePrimeTablePage} from '../../../../composables'
+
 import editDialog from '/@/views/clientDelivery/release/appReleaseVersion/component/EditDialog.vue'
 import { gameAppReleaseVersionPagePost, gameAppReleaseVersionDeletePost } from '../../../../api/gameAppReleaseVersion'
 
@@ -54,7 +54,6 @@ import { mapAvailableChannelDefinitions } from '../../../../utils/channelDefinit
 import {MAX_SELECT_SIZE} from '../../../../constants/pagination.ts'
 
 const route = useRoute()
-const {resolveInitialAppId} = useCurrentApp()
 
 const editDialogRef = ref()
 const editTenantGameAppReleaseVersionTitle = ref('')
@@ -115,15 +114,14 @@ const onPlatformQuery = async () => {
   querySelections.value.platform = res.data.data
 }
 
-const onVersionQuery = async (appId?: number | string) => {
-  const id = appId
-  const res = await gameAppVersionDefinitionSelectPost(id ? {appId: id, pageSize: MAX_SELECT_SIZE} : {pageSize: MAX_SELECT_SIZE})
+const onVersionQuery = async () => {
+
+  const res = await gameAppVersionDefinitionSelectPost({pageSize: MAX_SELECT_SIZE})
   querySelections.value.version = res.data.data
   querySelections.value.oldVersion = res.data.data
 }
 
 // 包名候选按当前应用加载：gameAppPackageListGet 已按应用过滤、默认包置顶；
-// 无应用或租户默认(appId=0)时只保留 default 应用默认选项，避免展示其它应用包名。
 const buildPackageOptions = (packages: any[]) => {
   const options: any[] = [{label: t('message.client.appDefaultPackage'), value: 'default'}]
   for (const p of packages || []) {
@@ -140,22 +138,18 @@ const buildPackageOptions = (packages: any[]) => {
   return options
 }
 
-const onPackageQuery = async (appId?: number | string) => {
-  const id = appId
-  if (!id) {
-    querySelections.value.package = buildPackageOptions([])
-    return
-  }
-  const res = await gameAppPackageListGet({appId: id, pageSize: MAX_SELECT_SIZE})
+const onPackageQuery = async () => {
+
+
+  const res = await gameAppPackageListGet({pageSize: MAX_SELECT_SIZE})
   querySelections.value.package = buildPackageOptions(res.data?.data || [])
 }
-
 
 // 打开新增页面
 const openAddTenantGameAppReleaseVersion = () => {
   editTenantGameAppReleaseVersionTitle.value = t('message.client.addAppVersion')
   editDialogRef.value.isEditor = false
-  editDialogRef.value.openDialog({appId: queryParams.value.appId})
+  editDialogRef.value.openDialog({})
 }
 
 // 打开编辑页面
@@ -171,26 +165,10 @@ const actions = {
 }
 
 // 切换应用：清空包名筛选并按新应用重载包名候选，避免残留其它应用的包。
-watch(() => queryParams.value?.appId, (next) => {
-  if (queryParams.value) {
-    queryParams.value.package = undefined
-    queryParams.value.appVersion = undefined
-    queryParams.value.oldVersion = undefined
-  }
-  onPackageQuery(next)
-  onVersionQuery(next)
-})
-
-useRouteAppIdQuerySync({
-  route,
-  queryParams,
-  resolveAppId: resolveInitialAppId,
-  onQuery,
-})
 
 onLanguageQuery()
-onPackageQuery(queryParams.value?.appId)
+onPackageQuery()
 onPlatformQuery()
 onChannelQuery()
-onVersionQuery(queryParams.value?.appId)
+onVersionQuery()
 </script>

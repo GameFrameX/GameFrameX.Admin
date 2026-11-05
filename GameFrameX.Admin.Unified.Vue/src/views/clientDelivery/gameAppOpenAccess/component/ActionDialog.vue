@@ -42,7 +42,7 @@ import {
 type ActionType = 'revoke' | 'enable' | 'disable' | 'refresh'
 
 const props = defineProps({
-  appId: { type: [Number, String], default: undefined },
+
 })
 const emit = defineEmits(['done', 'secret'])
 
@@ -128,7 +128,6 @@ const confirm = async () => {
   try {
     const payload: any = {
       id: row.value.id,
-      appId: props.appId,
       rowVersion: row.value.rowVersion,
     }
     if (trimmed) {

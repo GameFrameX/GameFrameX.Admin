@@ -12,12 +12,11 @@ import {ref} from 'vue'
 import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import {TextField} from '../../../../components/crud-form-fields'
 import { gameGoodsCatalogueAddPost, gameGoodsCatalogueUpdatePost } from '../../../../api/gameGoodsCatalogue'
-import {normalizeAppId} from '../../../../utils/appWorkspace.ts'
+
 import {showError} from '../../../../utils/message.ts'
 
 const props = defineProps({
   title: {type: String, default: ''},
-  appId: {type: [Number, String], default: undefined},
 })
 const emit = defineEmits(['reloadTable'])
 const dialogRef = ref()
@@ -27,19 +26,14 @@ const rules = {
   description: [{required: true, message: t('message.gameBusiness.pleaseEnterDescription'), trigger: 'blur'}],
 }
 
-const currentRouteAppId = () => normalizeAppId(props.appId)
-
 const beforeOpen = (form: any) => {
-  form.appId = form.appId ?? currentRouteAppId()
+
 }
 
 const beforeSubmit = (form: any) => {
-  const appId = currentRouteAppId()
-  if (!appId) {
-    showError(t('message.gameBusiness.appContext.gameAppRequired'))
-    return false
-  }
-  return {...form, appId}
+
+
+  return {...form}
 }
 
 defineExpose({

@@ -80,7 +80,7 @@ import { gameAreaSelectStringPost } from '../../../api/gameArea'
 import {MAX_SELECT_SIZE} from '../../../constants/pagination.ts'
 import { useCrudTable } from '../../../composables/useCrudTable.ts'
 import { usePrimeTablePage } from '../../../composables'
-import { useCurrentApp } from '../../../composables/useCurrentApp.ts'
+
 import { showConfirm, showSuccess, showWarning } from '../../../utils/message.ts'
 import { exportExcel } from '../../../utils/exportExcel.ts'
 import { t } from '../../../i18n/index.ts'
@@ -95,8 +95,6 @@ const route = useRoute()
 const detailDialogRef = ref()
 const actionDialogRef = ref()
 const exporting = ref(false)
-
-const {resolveInitialAppId} = useCurrentApp()
 
 const typeOptions = computed(() =>
   FULFILLMENT_TYPE_OPTIONS.map((i) => ({ value: i.value, label: t(`message.gameBusiness.orderFulfillment.${i.i18nKey}`) }))
@@ -150,8 +148,6 @@ const {
   },
   immediate: false,
 })
-
-queryParams.value.appId = resolveInitialAppId(route.query)
 
 const onPage = usePrimeTablePage(tableParams, onQuery)
 
@@ -229,21 +225,10 @@ const getAreaName = (areaId: number) => {
   return areaId
 }
 
-const loadAreaList = async (appId?: number) => {
-  const res = await gameAreaSelectStringPost({ appId: appId, pageSize: MAX_SELECT_SIZE })
+const loadAreaList = async () => {
+  const res = await gameAreaSelectStringPost({ pageSize: MAX_SELECT_SIZE })
   areaList.value = res.data.data ?? []
 }
-
-watch(() => queryParams.value.appId, (newVal) => {
-  queryParams.value.areaId = undefined
-  loadAreaList(newVal)
-})
-
-watch(() => route.query.appId, async () => {
-  queryParams.value.appId = resolveInitialAppId(route.query)
-  queryParams.value.areaId = undefined
-  await onQuery()
-})
 
 const onExport = async () => {
   const confirmed = await showConfirm(t('message.gameBusiness.orderFulfillment.exportConfirm'), t('message.common.message.tip'))
@@ -279,13 +264,8 @@ const onExport = async () => {
   }
 }
 
-watch(() => queryParams.value.appId, (newVal) => {
-  queryParams.value.areaId = undefined
-  loadAreaList(newVal)
-})
-
 onMounted(async () => {
-  await loadAreaList(queryParams.value.appId)
+  await loadAreaList()
   onQuery()
 })
 </script>

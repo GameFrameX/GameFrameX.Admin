@@ -6,7 +6,7 @@
     </header>
     <p class="description">{{ t('message.home.serverHealthDescription') }}</p>
     <p v-if="serverStore.loadFailed" role="alert">{{ t('message.menu.loadServersFailed') }}</p>
-    <p v-else-if="serverStore.loading || !serverStore.loaded" role="status">{{ t('message.gameBusiness.appWorkspace.loadingSummary') }}</p>
+    <p v-else-if="serverStore.loading || !serverStore.loaded" role="status">{{ t('message.home.loadingSummary') }}</p>
     <p v-else-if="serverStore.servers.length === 0" role="status">{{ t('message.menu.noServersAvailable') }}</p>
     <template v-else>
       <dl class="status-counts">

@@ -9,7 +9,7 @@
             authPrefix="gameDockerEntity"
             :defaultSearchKey="false"
             @query="onQuery"
-            
+
             @add="openAddgameDockerEntity"
         />
       </template>
@@ -25,7 +25,7 @@
                        :exportQuery="queryParams"
                        @page="onPage">
         </CrudDataTable>
-        <editDialog ref="editDialogRef" :title="editgameDockerEntityTitle" :appId="queryParams.appId" @reloadTable="onQuery"/>
+        <editDialog ref="editDialogRef" :title="editgameDockerEntityTitle" @reloadTable="onQuery"/>
       </template>
     </Card>
   </div>
@@ -40,12 +40,11 @@ import editDialog from '/@/views/serverCenter/gameDockerTagEntity/component/Edit
 import { gameDockerTagPagePost, gameDockerTagDeletePost } from '../../../api/gameDockerTag'
 import {systemEnumEnumDataListGet} from '../../../api/systemEnum';
 import {useCrudTable} from '../../../composables/useCrudTable.ts'
-import {usePrimeTablePage, useRouteAppIdQuerySync} from '../../../composables'
-import {useCurrentApp} from '../../../composables/useCurrentApp.ts'
+import {usePrimeTablePage} from '../../../composables'
+
 import type {CrudColumnConfig} from '../../../components/crud-data-table/types.ts'
 
 const route = useRoute()
-const {resolveInitialAppId} = useCurrentApp()
 
 const searchFields = computed(() => [
   { key: 'name', label: t('message.gameBusiness.name'), type: 'input', placeholder: t('message.gameBusiness.pleaseEnterName') },
@@ -103,13 +102,6 @@ const actions = {
   edit: openEditgameDockerEntity,
   delete: { onClick: onDelete, visible: (row: any) => row.isDelete !== true && row.isDeleted !== true && row.IsDeleted !== true },
 }
-
-useRouteAppIdQuerySync({
-  route,
-  queryParams,
-  resolveAppId: resolveInitialAppId,
-  onQuery: onQuery,
-})
 
 onMounted(async () => {
   await onQuery()

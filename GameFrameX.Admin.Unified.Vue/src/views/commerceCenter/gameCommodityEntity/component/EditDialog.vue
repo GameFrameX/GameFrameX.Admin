@@ -23,10 +23,10 @@ import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import {TextField} from '../../../../components/crud-form-fields'
 import { gameCommodityAddPost, gameCommodityUpdatePost } from '../../../../api/gameCommodity'
 import { gameGoodsCatalogueSelectPost } from '../../../../api/gameGoodsCatalogue'
-import {normalizeAppId} from '../../../../utils/appWorkspace.ts'
+
 import {MAX_SELECT_SIZE} from '../../../../constants/pagination.ts'
 
-const props = defineProps({title: {type: String, default: ''}, appId: {type: [Number, String], default: undefined}})
+const props = defineProps({title: {type: String, default: ''}})
 const emit = defineEmits(['reloadTable'])
 const dialogRef = ref()
 
@@ -49,17 +49,15 @@ const convertTreeToCascade = (data: any[]): any[] => {
 const gameGoodsCatalogueEntityTreeData = ref<any>([])
 const cascadeOptions = computed(() => convertTreeToCascade(gameGoodsCatalogueEntityTreeData.value))
 
-const getGameGoodsCatalogueEntityTreeData = async (appId?: number) => {
-  let list = await gameGoodsCatalogueSelectPost({appId: appId, pageSize: MAX_SELECT_SIZE});
+const getGameGoodsCatalogueEntityTreeData = async () => {
+  let list = await gameGoodsCatalogueSelectPost({pageSize: MAX_SELECT_SIZE});
   gameGoodsCatalogueEntityTreeData.value = list.data.data ?? [];
 };
 
 const beforeOpen = (form: any, isEditor: boolean) => {
-  const appId = normalizeAppId(props.appId)
-  if (appId) form.appId = appId
-  if (form.appId) {
-    getGameGoodsCatalogueEntityTreeData(form.appId)
-  }
+
+
+  getGameGoodsCatalogueEntityTreeData()
 }
 
 const isEditor = computed({

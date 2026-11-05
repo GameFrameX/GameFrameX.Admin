@@ -14,7 +14,11 @@ import zhTw from '../../i18n/pages/errors/zh-tw'
 import en from '../../i18n/pages/errors/en'
 import ja from '../../i18n/pages/errors/ja'
 import ko from '../../i18n/pages/errors/ko'
-import { resolveResponseMessage } from './shared'
+import { clearTokens, resolveResponseMessage } from './shared'
+import {createPinia, setActivePinia} from 'pinia'
+import {useServerStore} from '../../stores/server'
+
+vi.mock('../../api/gameArea', () => ({gameAreaPagePost: vi.fn()}))
 
 // ── i18n 桩状态：t/te 调用时读取，locale 可切换 ─────────────
 
@@ -77,11 +81,6 @@ vi.mock('../message', () => ({
 	showError: (): void => undefined,
 }))
 
-vi.mock('../targetTenant', () => ({
-	TARGET_TENANT_ID_HEADER: 'x-target-tenant-id',
-	getTargetTenantId: () => null,
-	clearTargetTenantId: () => undefined,
-}))
 
 // ── 断言数据 ──────────────────────────────────────────────
 
@@ -143,4 +142,17 @@ test('未知 Online 码 + 空后端 message → 返回空串，不虚构成功�
 			).toBe('')
 		}
 	}
+})
+
+// HTTP 401 与主动退出共用清理入口，必须同时清除内存区服上下文。
+test('清除凭据时重置区服选择和加载状态', () => {
+  setActivePinia(createPinia())
+  const servers = useServerStore()
+  servers.selectedServerId = '1001'
+  servers.loaded = true
+  clearTokens()
+  expect(servers.selectedServerId).toBe('')
+  expect(servers.loaded).toBe(false)
+  expect(servers.servers).toEqual([])
+  setActivePinia(undefined)
 })

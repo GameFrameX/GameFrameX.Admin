@@ -26,10 +26,7 @@
                        showIdColumn
                        idColumnWidth="120px"
                        @page="onPage">
-          <template #body-appId="{ data }">
-            <Tag v-if="String(data.appId) === '0'" severity="info" :value="t('message.client.clientApiPolicyTenantDefault')"/>
-            <span v-else>{{ data.appId }}</span>
-          </template>
+
           <template #body-ticketExpireTime="{ data }">
             <span v-if="data.ticketExpireTime">{{ formatUnix(data.ticketExpireTime) }}</span>
             <span v-else class="text-color-secondary">{{ t('message.client.clientApiPolicyTicketNeverExpires') }}</span>
@@ -63,8 +60,7 @@ import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import type {CrudAction, CrudColumnConfig} from '../../../components/crud-data-table/types.ts'
 import {useCrudTable} from '../../../composables/useCrudTable.ts'
 import {usePrimeTablePage} from '../../../composables'
-import {useCurrentApp} from '../../../composables/useCurrentApp.ts'
-import {visibleApps} from '../../../utils/appWorkspace.ts'
+
 import {formatUnix} from '../../../utils/formatTime.ts'
 import {showConfirm, showSuccess} from '../../../utils/message.ts'
 import editDialog from './component/EditDialog.vue'
@@ -74,27 +70,11 @@ const route = useRoute()
 const editDialogRef = ref()
 const editTitle = ref('')
 
-const {appOptions, loadApps} = useCurrentApp()
-
-// 从工作台跳转携带 ?appId=X 时作为初始过滤 + 新增预填；0 表示租户默认行
-const initialAppId = (() => {
-  const raw = Array.isArray(route.query.appId) ? route.query.appId[0] : route.query.appId
-  const n = Number(raw)
-  return raw !== undefined && raw !== '' && Number.isInteger(n) && n >= 0 ? String(n) : undefined
-})()
-
-// 应用过滤选项：租户默认行（AppId=0）+ 可见应用列表
-const appFilterOptions = computed(() => [
-  {label: t('message.client.clientApiPolicyTenantDefault'), value: '0'},
-  ...visibleApps(appOptions.value).map((app: any) => ({label: app.name, value: String(app.id)})),
-])
-
 const searchFields = computed(() => [
-  {key: 'appId', label: t('message.client.clientApiPolicyAppId'), type: 'select' as const, options: appFilterOptions.value, optionLabel: 'label', optionValue: 'value'},
+
 ])
 
 const columns = computed<CrudColumnConfig[]>(() => [
-  {field: 'appId', header: t('message.client.clientApiPolicyAppId'), width: '130px', align: 'center', bodyKey: 'appId'},
   {field: 'lifetimeMinutes', header: t('message.client.clientApiPolicyLifetimeMinutes'), width: '120px', align: 'center'},
   {field: 'ticketExpireTime', header: t('message.client.clientApiPolicyTicketExpireTime'), width: '170px', align: 'center', bodyKey: 'ticketExpireTime'},
   {field: 'enableKeyAutoCreate', header: t('message.client.clientApiPolicyEnableKeyAutoCreate'), width: '110px', align: 'center', bodyKey: 'enableKeyAutoCreate'},
@@ -120,14 +100,13 @@ const {
   immediate: false,
 })
 
-queryParams.value = {appId: initialAppId}
+queryParams.value = {}
 
 const onPage = usePrimeTablePage(tableParams, onQuery)
 
 const openAdd = () => {
   editTitle.value = t('message.client.clientApiPolicyAddTitle')
-  // 从工作台按应用跳入时预填该应用级行；否则默认租户默认行（AppId=0）
-  editDialogRef.value.openDialog(initialAppId && initialAppId !== '0' ? {appId: Number(initialAppId)} : {})
+  editDialogRef.value.openDialog({})
 }
 
 const openEdit = async (row: any) => {
@@ -144,8 +123,6 @@ const openEdit = async (row: any) => {
   }
   editDialogRef.value.openDialog(row)
 }
-
-// 轮换签名密钥（C373）：仅租户默认行（AppId=0）的密钥被运行时消费，故只在该行露出
 const onRotate = async (row: any) => {
   const confirmed = await showConfirm(
       t('message.client.clientApiPolicyRotateConfirm'),
@@ -171,12 +148,12 @@ const customActions: CrudAction[] = [
     icon: 'fa-solid fa-rotate',
     severity: 'warn',
     onClick: onRotate,
-    visible: (row: any) => String(row.appId) === '0',
+
   },
 ]
 
 onMounted(() => {
-  loadApps()
+
   onQuery()
 })
 </script>

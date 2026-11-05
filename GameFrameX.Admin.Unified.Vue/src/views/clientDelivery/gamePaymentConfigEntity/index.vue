@@ -3,17 +3,8 @@
     <Card>
       <template #content>
         <div class="payment-scope-toolbar">
+
           <Select
-            filter
-            v-model="selectedGameAppId"
-            :options="appScopeOptions"
-            optionLabel="name"
-            optionValue="id"
-            :placeholder="t('gameBusiness.configScope.scope')"
-            class="payment-scope-app"
-          />
-          <Select
-            v-if="selectedGameAppId"
             filter
             v-model="selectedPackageId"
             :options="packageOptions"
@@ -22,7 +13,7 @@
             :placeholder="t('message.client.packageName')"
             class="payment-scope-pkg"
           />
-          <Tag v-if="!selectedGameAppId" severity="warn" :value="t('gameBusiness.appWorkspace.appIdRequired')"/>
+
         </div>
         <Message
           v-if="selectedPackageId && !loading && tableData.length === 0"
@@ -70,9 +61,7 @@
           showIdColumn
           idColumnWidth="120px"
         >
-          <template #body-appId="{ data }">
-            <Tag :severity="paymentScopeSeverity(data)" :value="paymentScopeLabel(data)"/>
-          </template>
+
           <template #body-payChannel="{ data }">
             <Tag :value="formatChannel(data.payChannel)"/>
           </template>
@@ -87,7 +76,7 @@
           <template #body-createdTime="{ data }">{{ formatUnix(data.createdTime) }}</template>
         </CrudDataTable>
 
-        <editDialog ref="editDialogRef" :title="editTitle" :appOptions="appOptions" :packageMap="packageMap" @reloadTable="onQuery"/>
+        <editDialog ref="editDialogRef" :title="editTitle" :packageMap="packageMap" @reloadTable="onQuery"/>
       </template>
     </Card>
   </div>
@@ -107,29 +96,18 @@ import {usePrimeTablePage} from '../../../composables'
 import {formatUnix} from '../../../utils/formatTime.ts'
 import { gamePaymentConfigPagePost, gamePaymentConfigDeletePost as deletePaymentConfigApi, gamePaymentConfigChannelsGet, gamePaymentConfigDetailGet } from '../../../api/gamePaymentConfig'
 import { gameAppPackageListGet } from '../../../api/gameAppPackage'
-import {useCurrentApp} from '../../../composables/useCurrentApp.ts'
+
 import {buildNotifyUrl} from './notifyUrl'
 import editDialog from './component/EditDialog.vue'
-import {normalizeAppId, normalizeRouteAppId, type AppWorkspaceId} from '../../../utils/appWorkspace.ts'
 
 const editDialogRef = ref()
 const editTitle = ref('')
 const {copyText} = commonFunction()
 const route = useRoute()
-const {appOptions, appName, loadApps, currentAppId, setCurrentApp} = useCurrentApp()
-const selectedGameAppId = ref<AppWorkspaceId | undefined>(undefined)
+
 const selectedPackageId = ref<number>(0)
 const packageOptions = ref<{label: string; value: number}[]>([])
 const packageMap = ref<Record<number, string>>({})
-
-const appScopeOptions = computed(() => [
-  ...appOptions.value
-    .filter((a: any) => a.isEnabled !== false && normalizeAppId(a.id) !== undefined)
-    .map((a: any) => {
-      const id = normalizeAppId(a.id) as AppWorkspaceId
-      return {id, name: a.appName || a.name || String(id)}
-    }),
-])
 
 const channelOptions = ref<{label: string; value: string}[]>([])
 
@@ -150,7 +128,6 @@ const searchFields = computed(() => [
 ])
 
 const columns = computed<CrudColumnConfig[]>(() => [
-  {field: 'appId', header: t('gameBusiness.configScope.scope'), width: '200px', align: 'center', bodyKey: 'appId'},
   {field: 'payChannel', header: '支付渠道', width: '120px', align: 'center', bodyKey: 'payChannel'},
   {field: 'isSandbox', header: '环境', width: '110px', align: 'center', bodyKey: 'isSandbox'},
   {field: 'isEnabled', header: '状态', width: '100px', align: 'center', bodyKey: 'isEnabled'},
@@ -175,8 +152,6 @@ const {
 
 queryParams.value = {
   searchKey: undefined,
-  appId: undefined,
-  gameAppId: undefined,
   packageId: undefined,
   payChannel: undefined,
   isSandbox: undefined,
@@ -189,15 +164,10 @@ const formatChannel = (channel: string) => {
 }
 
 const openAddPaymentConfig = () => {
-  const appId = normalizeAppId(selectedGameAppId.value)
-  if (appId === undefined) {
-    showWarning(t('gameBusiness.appWorkspace.appIdRequired'))
-    return
-  }
+
+
   editTitle.value = '新增支付配置'
   editDialogRef.value?.openDialog({
-    appId,
-    gameAppId: appId,
     packageId: selectedPackageId.value || undefined,
   })
 }
@@ -247,40 +217,15 @@ const customActions: CrudAction[] = [
 
 const onPage = usePrimeTablePage(tableParams, onQuery)
 
-const paymentScopeLabel = (row: any) => {
-  const app = normalizeAppId(row.gameAppId) ?? normalizeAppId(row.appId)
-  const pkg = row.packageId || 0
-  if (app === undefined) {
-    return t('gameBusiness.appWorkspace.appUnavailable')
-  }
-  const appText = appName(app) || `App ${app}`
-  if (pkg === 0) {
-    return `${t('gameBusiness.configScope.appOverride')}：${appText}`
-  }
-  const pkgText = packageMap.value[pkg] || `Package ${pkg}`
-  return `${t('gameBusiness.configScope.packageOverride')}：${pkgText}`
-}
+const paymentScopeLabel = (row: any) => row.packageId ? t('gameBusiness.configScope.packageOverride') + '：' + (packageMap.value[row.packageId] || row.packageId) : t('gameBusiness.configScope.gameDefault')
 
-const paymentScopeSeverity = (row: any) => {
-  const app = normalizeAppId(row.gameAppId) ?? normalizeAppId(row.appId)
-  const pkg = row.packageId || 0
-  if (app === undefined) {
-    return 'danger'
-  }
-  if (pkg === 0) {
-    return 'success'
-  }
-  return 'warn'
-}
+const paymentScopeSeverity = (row: any) => row.packageId ? 'warn' : 'success'
 
-const loadPackageOptions = async (appId: AppWorkspaceId) => {
-  const id = normalizeAppId(appId)
-  if (id === undefined) {
-    packageOptions.value = []
-    return
-  }
+const loadPackageOptions = async () => {
+
+
   try {
-    const res: any = await gameAppPackageListGet({appId: id})
+    const res: any = await gameAppPackageListGet({})
     const list = res.data?.data ?? []
     packageOptions.value = (list || []).map((p: any) => {
       const pkgId = Number(p.id)
@@ -294,43 +239,26 @@ const loadPackageOptions = async (appId: AppWorkspaceId) => {
 }
 
 const applyScopeQuery = () => {
-  const appId = normalizeAppId(selectedGameAppId.value)
-  if (appId === undefined) {
-    return
-  }
-  queryParams.value.appId = appId
-  queryParams.value.gameAppId = appId
+
+
+
+
   queryParams.value.packageId = selectedPackageId.value || undefined
   onQuery()
 }
-
-watch(selectedGameAppId, async (value) => {
-  selectedPackageId.value = 0
-  packageOptions.value = []
-  if (value) {
-    await loadPackageOptions(value)
-  }
-  applyScopeQuery()
-})
 
 watch(selectedPackageId, () => {
   applyScopeQuery()
 })
 
 onMounted(async () => {
-  await loadApps()
-  const initialAppId = normalizeRouteAppId(route) ?? currentAppId.value
-  const appId = normalizeAppId(initialAppId)
-  if (appId === undefined) {
-    showWarning(t('gameBusiness.appWorkspace.appIdRequired'))
-    return
-  }
-  if (!appOptions.value.some((app: any) => String(normalizeAppId(app.id)) === String(appId) && app.isEnabled !== false)) {
-    showWarning(t('gameBusiness.appWorkspace.appUnavailable'))
-    return
-  }
-  setCurrentApp(appId)
-  selectedGameAppId.value = appId
+  await loadPackageOptions()
+
+
+
+
+
+
 
   try {
     const channelRes: any = await gamePaymentConfigChannelsGet()

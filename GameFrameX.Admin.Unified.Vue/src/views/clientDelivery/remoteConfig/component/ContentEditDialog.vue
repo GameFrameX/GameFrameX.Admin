@@ -39,7 +39,6 @@ import {gameAppRemoteConfigKeyPagePost} from '../../../../api/gameAppRemoteConfi
 import {gameAppRemoteConfigModePagePost} from '../../../../api/gameAppRemoteConfigMode'
 import {MAX_PAGE_SIZE} from '../../../../constants/pagination.ts'
 import {showError} from '../../../../utils/message.ts'
-import {normalizeAppId} from '../../../../utils/appWorkspace.ts'
 
 const props = defineProps({
   title: {
@@ -283,11 +282,8 @@ const openDialog = async (row: any) => {
 }
 
 const beforeSubmit = (ruleForm: any) => {
-  const appId = normalizeAppId(ruleForm.appId)
-  if (appId === undefined) {
-    showError(t('gameBusiness.appWorkspace.appIdRequired'))
-    return false
-  }
+
+
 
   const {modeContents, valid} = buildModeContents()
   if (!valid) {
@@ -295,7 +291,6 @@ const beforeSubmit = (ruleForm: any) => {
     return false
   }
 
-  ruleForm.appId = appId
   ruleForm.modeContents = JSON.stringify(modeContents)
   ruleForm.content = JSON.stringify(modeContents[ruleForm.activeModeCode] ?? {})
   return ruleForm

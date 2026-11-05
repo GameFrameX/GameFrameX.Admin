@@ -21,13 +21,12 @@ import FormField from '@primevue/forms/formfield'
 import Message from 'primevue/message'
 import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import {TextField} from '../../../../../components/crud-form-fields'
-import {normalizeAppId} from '../../../../../utils/appWorkspace.ts'
+
 import { gameMailTemplateCategoryAddPost, gameMailTemplateCategoryUpdatePost } from '../../../../../api/gameMailTemplateCategory'
 import {isEnabled} from '../../../../../utils/isEnabled.ts'
 
 const props = defineProps({
   title: {type: String, default: ''},
-  appId: {type: [Number, String], default: undefined},
 })
 const emit = defineEmits(['reloadTable'])
 const dialogRef = ref()
@@ -39,8 +38,8 @@ const rules = {
 const defaultForm = () => ({isEnabled: true, sort: 0})
 
 const beforeOpen = (form: any, isEditor: boolean) => {
-  const appId = normalizeAppId(props.appId)
-  if (appId) form.appId = appId
+
+
   form.isEnabled = isEnabled(form)
   return form
 }

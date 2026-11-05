@@ -1,8 +1,7 @@
 <template>
   <Dialog v-model:visible="visible" modal header="新增会话密钥" :style="{ width: 'min(460px, calc(100vw - 32px))' }">
     <div class="key-form">
-      <div class="key-label">应用 ID</div>
-      <InputNumber v-model="appId" :useGrouping="false" class="w-full" placeholder="密钥归属的应用（密钥域）"/>
+
       <div class="key-label">生效时间</div>
       <DatePicker v-model="notBeforeTime" showTime class="w-full" placeholder="留空表示立即生效"/>
       <div class="key-label">过期时间</div>
@@ -13,7 +12,7 @@
     </div>
     <template #footer>
       <Button label="取消" text @click="visible = false"/>
-      <Button label="确认新增" :disabled="appId == null" @click="confirm"/>
+      <Button label="确认新增" @click="confirm"/>
     </template>
   </Dialog>
 </template>
@@ -30,13 +29,13 @@ import { sessionKeyAddPost } from '../../../../api/sessionKey'
 const emit = defineEmits(['added'])
 
 const visible = ref(false)
-const appId = ref<number | null>(null)
+
 const notBeforeTime = ref<any>(null)
 const expireTime = ref<any>(null)
 const remark = ref('')
 
 const open = () => {
-  appId.value = null
+
   notBeforeTime.value = null
   expireTime.value = null
   remark.value = ''
@@ -46,7 +45,6 @@ const open = () => {
 const confirm = async () => {
   const toLong = (value: any) => (value ? Math.floor(new Date(value).getTime() / 1000) : null)
   const res = await sessionKeyAddPost({
-    appId: appId.value != null ? String(appId.value) : undefined,
     notBeforeTime: toLong(notBeforeTime.value),
     expireTime: toLong(expireTime.value),
     remark: remark.value || null,

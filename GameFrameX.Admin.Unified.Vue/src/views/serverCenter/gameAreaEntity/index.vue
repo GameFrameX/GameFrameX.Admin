@@ -48,7 +48,7 @@
           <template #body-updateTime="{ data }">{{ formatUnix(data.updateTime) }}</template>
           <template #body-createdTime="{ data }">{{ formatUnix(data.createdTime) }}</template>
         </CrudDataTable>
-        <editDialog ref="editDialogRef" :title="editGameAreaEntityTitle" :appId="queryParams.appId" @reloadTable="onQuery"/>
+        <editDialog ref="editDialogRef" :title="editGameAreaEntityTitle" @reloadTable="onQuery"/>
       </template>
     </Card>
   </div>
@@ -62,11 +62,11 @@ import {ref, computed} from 'vue'
 import {useRoute} from 'vue-router'
 import {showConfirm, showSuccess} from '../../../utils/message.ts'
 import {useCrudTable} from '../../../composables/useCrudTable.ts'
-import {usePrimeTablePage, useRouteAppIdQuerySync} from '../../../composables'
+import {usePrimeTablePage} from '../../../composables'
 import editDialog from '/@/views/serverCenter/gameAreaEntity/component/EditDialog.vue'
 import {isEnabled} from '../../../utils/isEnabled.ts'
 import { gameAreaDisableDeletePost, gameAreaOpenPost, gameAreaPagePost, gameAreaRestartPost, gameAreaStopPost } from '../../../api/gameArea'
-import {useCurrentApp} from '../../../composables/useCurrentApp.ts'
+
 import {systemEnumEnumDataListGet} from '../../../api/systemEnum';
 import commonFunction from '../../../utils/commonFunction.ts'
 import {formatUnix} from '../../../utils/formatTime.ts'
@@ -78,7 +78,6 @@ const getEnumServerStatusData_Index = ref<any>([])
 const {getEnumDesc} = commonFunction()
 
 const route = useRoute()
-const {resolveInitialAppId} = useCurrentApp()
 
 const languageOptions = computed(() =>
     getEnumLanguageData_Index.value.map((item: any) => ({
@@ -201,10 +200,4 @@ const customActions: CrudAction[] = [
   },
 ]
 
-useRouteAppIdQuerySync({
-  route,
-  queryParams,
-  resolveAppId: resolveInitialAppId,
-  onQuery,
-})
 </script>

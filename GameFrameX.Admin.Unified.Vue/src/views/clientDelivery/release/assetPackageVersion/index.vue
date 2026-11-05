@@ -11,7 +11,7 @@
             :hideLabel="t('message.client.hide')"
             :defaultSearchKey="false"
             @query="onQuery"
-            
+
             @add="openAddTenantGameAppAssetPackageVersion"
         />
       </template>
@@ -40,7 +40,6 @@
         <editDialog
             ref="editDialogRef"
             :title="editTenantGameAppAssetPackageVersionTitle"
-            :appId="queryParams.appId"
             @reloadTable="onQuery"
         />
         <updateHistoryDialog ref="updateHistoryDialogRef" :title="historyTenantGameAppAssetPackageVersionTitle"
@@ -56,8 +55,8 @@ import {useRoute} from 'vue-router'
 import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import type { CrudAction, CrudColumnConfig } from '../../../../components/crud-data-table/types.ts'
 import {useCrudTable} from '../../../../composables/useCrudTable.ts'
-import {usePrimeTablePage, useRouteAppIdQuerySync} from '../../../../composables'
-import {useCurrentApp} from '../../../../composables/useCurrentApp.ts'
+import {usePrimeTablePage} from '../../../../composables'
+
 import editDialog from '/@/views/clientDelivery/release/assetPackageVersion/component/EditDialog.vue'
 import updateHistoryDialog from '/@/views/clientDelivery/release/assetPackageVersion/component/UpdateHistory.vue'
 import { gameAppAssetPackageVersionPagePost, gameAppAssetPackageVersionDeletePost } from '../../../../api/gameAppAssetPackageVersion'
@@ -71,7 +70,6 @@ import {MAX_PAGE_SIZE, MAX_SELECT_SIZE} from '../../../../constants/pagination.t
 import { mapAvailableChannelDefinitions } from '../../../../utils/channelDefinition.ts'
 
 const route = useRoute()
-const {resolveInitialAppId} = useCurrentApp()
 
 const editDialogRef = ref()
 const updateHistoryDialogRef = ref()
@@ -81,13 +79,11 @@ const querySelectorParams = ref<any>({app: []})
 const packageInfoMap = ref<Record<string, { isMaster: boolean; masterName?: string }>>({})
 
 // 加载包名母包映射
-const loadPackageInfo = async (appId?: number | string) => {
+const loadPackageInfo = async () => {
   try {
-    const id = appId
+
     const payload: any = {page: 1, pageSize: MAX_PAGE_SIZE}
-    if (id) {
-      payload.appId = id
-    }
+
     const res = await gameAppPackagePagePost(payload)
     const items = res.data.data?.items ?? []
     const map: Record<string, { isMaster: boolean; masterName?: string }> = {}
@@ -146,7 +142,7 @@ const columns = computed<CrudColumnConfig[]>(() => [
 const openAddTenantGameAppAssetPackageVersion = () => {
   editTenantGameAppAssetPackageVersionTitle.value = t('message.client.addAssetPackageVersion')
   editDialogRef.value.isEditor = false
-  editDialogRef.value.openDialog({appId: queryParams.value.appId})
+  editDialogRef.value.openDialog({})
 }
 
 // 打开编辑页面
@@ -184,13 +180,12 @@ const onQuerySelectorPlatform = async () => {
   const res = await globalPlatformSelectPost({pageSize: MAX_SELECT_SIZE})
   querySelectorParams.value.platform = res.data.data
 }
-const onQuerySelectorAppVersion = async (appId?: number | string) => {
-  const id = appId
-  const res = await gameAppVersionDefinitionSelectPost(id ? {appId: id, pageSize: MAX_SELECT_SIZE} : {pageSize: MAX_SELECT_SIZE})
+const onQuerySelectorAppVersion = async () => {
+
+  const res = await gameAppVersionDefinitionSelectPost({pageSize: MAX_SELECT_SIZE})
   querySelectorParams.value.appVersion = res.data.data
 }
 // 包名候选按当前应用加载：gameAppPackageListGet 已按应用过滤、默认包置顶；
-// 无应用或租户默认(appId=0)时只保留 default 应用默认选项，避免展示其它应用包名。
 const buildPackageOptions = (packages: any[]) => {
   const options: any[] = [{label: t('message.client.appDefaultPackage'), value: 'default'}]
   for (const p of packages || []) {
@@ -207,49 +202,29 @@ const buildPackageOptions = (packages: any[]) => {
   return options
 }
 
-const onQuerySelectorPackage = async (appId?: number | string) => {
-  const id = appId
-  if (!id) {
-    querySelectorParams.value.package = buildPackageOptions([])
-    return
-  }
-  const res = await gameAppPackageListGet({appId: id, pageSize: MAX_SELECT_SIZE})
+const onQuerySelectorPackage = async () => {
+
+
+  const res = await gameAppPackageListGet({pageSize: MAX_SELECT_SIZE})
   querySelectorParams.value.package = buildPackageOptions(res.data?.data || [])
 }
 const onQuerySelectorLanguage = async () => {
   const res = await globalLanguageSelectPost({pageSize: MAX_SELECT_SIZE})
   querySelectorParams.value.language = res.data.data
 }
-const onQuerySelectorAssetPackageName = async (appId?: number | string) => {
-  const id = appId
-  const res = await gameAppAssetPackageSelectPost(id ? {appId: id, pageSize: MAX_SELECT_SIZE} : {pageSize: MAX_SELECT_SIZE})
+const onQuerySelectorAssetPackageName = async () => {
+
+  const res = await gameAppAssetPackageSelectPost({pageSize: MAX_SELECT_SIZE})
   querySelectorParams.value.assetPackageName = res.data.data
 }
 
 // 切换应用：清空包名筛选并按新应用重载包名候选，避免残留其它应用的包。
-watch(() => queryParams.value?.appId, (next) => {
-  if (queryParams.value) {
-    queryParams.value.package = undefined
-    queryParams.value.assetPackageName = undefined
-  }
-  onQuerySelectorPackage(next)
-  onQuerySelectorAppVersion(next)
-  onQuerySelectorAssetPackageName(next)
-  loadPackageInfo(next)
-})
-
-useRouteAppIdQuerySync({
-  route,
-  queryParams,
-  resolveAppId: resolveInitialAppId,
-  onQuery,
-})
 
 onQuerySelectorChannel()
 onQuerySelectorPlatform()
-onQuerySelectorAppVersion(queryParams.value?.appId)
-onQuerySelectorPackage(queryParams.value?.appId)
+onQuerySelectorAppVersion()
+onQuerySelectorPackage()
 onQuerySelectorLanguage()
-onQuerySelectorAssetPackageName(queryParams.value?.appId)
-loadPackageInfo(queryParams.value?.appId)
+onQuerySelectorAssetPackageName()
+loadPackageInfo()
 </script>

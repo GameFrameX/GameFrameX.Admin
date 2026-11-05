@@ -48,19 +48,17 @@ import {computed, onMounted, ref} from 'vue'
 import {useRoute} from 'vue-router'
 import {useCrudTable} from '../../../composables/useCrudTable.ts'
 import {usePrimeTablePage} from '../../../composables'
-import {useCurrentApp} from '../../../composables/useCurrentApp.ts'
+
 import {formatUnix} from '../../../utils/formatTime.ts'
 import editDialog from '/@/views/clientDelivery/serverConfig/component/EditDialog.vue'
 import { gameAppServerConfigPagePost, gameAppServerConfigDeletePost } from '../../../api/gameAppServerConfig'
 import type {CrudColumnConfig} from '../../../components/crud-data-table/types.ts'
 import {showWarning} from '../../../utils/message.ts'
-import {normalizeAppId, normalizeRouteAppId, type AppWorkspaceId} from '../../../utils/appWorkspace.ts'
 
 const editDialogRef = ref()
 const editTenantGameAppServerConfigTitle = ref('')
-const appMap = ref<Record<string, string>>({})
+
 const route = useRoute()
-const {appOptions, loadApps, currentAppId, setCurrentApp} = useCurrentApp()
 
 const {
   loading, tableData, queryParams, tableParams,
@@ -70,33 +68,10 @@ const {
   immediate: false,
 })
 
-const currentQueryAppId = (): AppWorkspaceId | undefined => {
-  return normalizeAppId(queryParams.value?.appId) ?? normalizeAppId(currentAppId.value)
-}
-
-const isAvailableAppId = (appId: AppWorkspaceId | undefined) => {
-  return appId !== undefined && !!appMap.value[String(appId)]
-}
-
-const requireCurrentQueryAppId = (): AppWorkspaceId | undefined => {
-  const appId = currentQueryAppId()
-  if (appId === undefined) {
-    showWarning(t('gameBusiness.appWorkspace.appIdRequired'))
-    return undefined
-  }
-  if (!isAvailableAppId(appId)) {
-    showWarning(t('gameBusiness.appWorkspace.appUnavailable'))
-    return undefined
-  }
-  return appId
-}
-
 const runScopedQuery = () => {
-  const appId = requireCurrentQueryAppId()
-  if (appId === undefined) {
-    return
-  }
-  queryParams.value.appId = appId
+
+
+
   onQuery()
 }
 
@@ -117,32 +92,25 @@ const shortenMd5 = (md5: any) => {
 
 // 打开新增页面
 const openAddTenantGameAppServerConfig = () => {
-  const appId = requireCurrentQueryAppId()
-  if (appId === undefined) {
-    return
-  }
+
+
   editTenantGameAppServerConfigTitle.value = t('message.client.addServerConfig')
   editDialogRef.value.isEditor = false
-  editDialogRef.value.openDialog({appId})
+  editDialogRef.value.openDialog({})
 }
 
 // 打开编辑页面
 const openEditTenantGameAppServerConfig = (row: any) => {
-  if (normalizeAppId(row?.appId) === undefined) {
-    showWarning(t('gameBusiness.appWorkspace.appUnavailable'))
-    return
-  }
+
   editTenantGameAppServerConfigTitle.value = t('message.client.editServerConfig')
   editDialogRef.value.isEditor = true
   editDialogRef.value.openDialog(row)
 }
 
 const onScopedDelete = async (row: any) => {
-  const appId = requireCurrentQueryAppId()
-  if (appId === undefined) {
-    return
-  }
-  queryParams.value.appId = appId
+
+
+
   await onDelete(row)
 }
 
@@ -161,28 +129,14 @@ const actions = {
 }
 
 onMounted(async () => {
-  await loadApps()
+
   const map: Record<string, string> = {}
-  for (const a of appOptions.value) {
-    const id = normalizeAppId(a.id)
-    if (id !== undefined) {
-      map[String(id)] = a.appName || a.name || String(id)
-    }
-  }
-  appMap.value = map
 
-  const appId = normalizeRouteAppId(route) ?? normalizeAppId(currentAppId.value)
-  if (appId === undefined) {
-    showWarning(t('gameBusiness.appWorkspace.appIdRequired'))
-    return
-  }
-  if (!isAvailableAppId(appId)) {
-    showWarning(t('gameBusiness.appWorkspace.appUnavailable'))
-    return
-  }
 
-  setCurrentApp(appId)
-  queryParams.value.appId = appId
+
+
+
+
   runScopedQuery()
 })
 </script>

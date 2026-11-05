@@ -47,12 +47,12 @@ import FormField from '@primevue/forms/formfield'
 import Message from 'primevue/message'
 import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import {TextareaField} from '../../../../../components/crud-form-fields'
-import {normalizeAppId} from '../../../../../utils/appWorkspace.ts'
+
 import { gameBannerAnnouncementAddPost, gameBannerAnnouncementUpdatePost } from '../../../../../api/gameBannerAnnouncement'
 import { gameAreaSelectStringPost } from '../../../../../api/gameArea'
 import {MAX_SELECT_SIZE} from '../../../../../constants/pagination.ts'
 
-const props = defineProps({title: {type: String, default: ''}, appId: {type: [Number, String], default: undefined}})
+const props = defineProps({title: {type: String, default: ''}})
 const emit = defineEmits(['reloadTable'])
 const dialogRef = ref()
 
@@ -72,16 +72,14 @@ const rules = {
   repeatCount: [{required: true, message: t('message.gameBusiness.bannerAnnouncement.pleaseEnterRepeatCount'), trigger: 'blur'}],
 }
 
-const loadAreaList = async (appId?: number) => {
-  areaIdOptions.value = (await gameAreaSelectStringPost({appId: appId, pageSize: MAX_SELECT_SIZE})).data.data ?? []
+const loadAreaList = async () => {
+  areaIdOptions.value = (await gameAreaSelectStringPost({pageSize: MAX_SELECT_SIZE})).data.data ?? []
 }
 
 const beforeOpen = (form: any, isEditor: boolean) => {
-  const appId = normalizeAppId(props.appId)
-  if (appId) form.appId = appId
-  if (form.appId) {
-    loadAreaList(form.appId)
-  }
+
+
+  loadAreaList()
   // 回显：long(秒) → Date 供 DatePicker 显示
   if (form.startTime && typeof form.startTime === 'number') {
     form.startTime = new Date(form.startTime * 1000)

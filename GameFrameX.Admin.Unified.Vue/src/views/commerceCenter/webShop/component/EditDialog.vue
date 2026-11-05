@@ -89,17 +89,13 @@ import {TextField} from '../../../../components/crud-form-fields'
 import {faTrash} from '../../../../utils/icons.ts'
 import { gameGoodsSelectStringPost } from '../../../../api/gameGoods'
 import { gameWebShopAddPost, gameWebShopUpdatePost } from '../../../../api/gameWebShop'
-import {normalizeAppId} from '../../../../utils/appWorkspace.ts'
+
 import {MAX_SELECT_SIZE} from '../../../../constants/pagination.ts'
 
 const props = defineProps({
   title: {
     type: String,
     default: '',
-  },
-  appId: {
-    type: [Number, String],
-    default: undefined,
   },
 });
 const emit = defineEmits(['reloadTable']);
@@ -111,18 +107,13 @@ const itemDataList = ref<any>([])
 
 const defaultForm = () => ({
   id: 0,
-  appId: normalizeAppId(props.appId),
   itemJson: '[]',
 })
 
 const beforeOpen = (form: any, isEditor: boolean) => {
   itemDataList.value = []
   oneItemData.value = {}
-  if (form.appId) {
-    loadGoods(form.appId)
-  } else {
-    getGoodsList.value = []
-  }
+  loadGoods()
   if (isEditor) {
     try {
       const items = JSON.parse(form.itemJson);
@@ -143,8 +134,8 @@ const beforeSubmit = (form: any) => {
   return form
 }
 
-const loadGoods = async (appId?: number) => {
-  getGoodsList.value = (await gameGoodsSelectStringPost({appId: appId, pageSize: MAX_SELECT_SIZE})).data.data ?? []
+const loadGoods = async () => {
+  getGoodsList.value = (await gameGoodsSelectStringPost({pageSize: MAX_SELECT_SIZE})).data.data ?? []
 }
 
 const addOneItem = () => {

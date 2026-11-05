@@ -39,7 +39,7 @@
         </div>
       </template>
       <FormLabel>{{ t('message.gameBusiness.mail.defaultAttachments') }}</FormLabel>
-      <RewardItemsEditor v-model="ruleForm.defaultAttachmentsJson" :appId="ruleForm.appId"
+      <RewardItemsEditor v-model="ruleForm.defaultAttachmentsJson"
                          :rewardPlaceholder="t('message.gameBusiness.mail.pleaseSelectAttachment')"
                          :addLabel="t('message.gameBusiness.mail.addAttachment')"/>
       <TextField v-model="ruleForm.description" name="description" :label="t('message.gameBusiness.description')" :placeholder="t('message.gameBusiness.pleaseEnterDescription')" maxlength="512"/>
@@ -60,18 +60,18 @@ import { gameMailTemplateCategorySelectPost } from '../../../../../api/gameMailT
 import {systemEnumEnumDataListGet} from '../../../../../api/systemEnum';
 import {extractVariablesFromAll, toVariableLabels} from '../../../../../utils/templateUtils.ts'
 import {isEnabled} from '../../../../../utils/isEnabled.ts'
-import {normalizeAppId, type AppWorkspaceId} from '../../../../../utils/appWorkspace.ts'
+
 import {MAX_SELECT_SIZE} from '../../../../../constants/pagination.ts'
 
-const props = defineProps({title: {type: String, default: ''}, appId: {type: [Number, String], default: undefined}})
+const props = defineProps({title: {type: String, default: ''}})
 const emit = defineEmits(['reloadTable'])
 const dialogRef = ref()
 
 const categoryList = ref<any[]>([])
 const getEnumMailTypeData = ref<any>([])
 
-const loadCategoryList = async (appId?: AppWorkspaceId) => {
-  const catRes = await gameMailTemplateCategorySelectPost({appId: appId, pageSize: MAX_SELECT_SIZE})
+const loadCategoryList = async () => {
+  const catRes = await gameMailTemplateCategorySelectPost({pageSize: MAX_SELECT_SIZE})
   categoryList.value = catRes.data.data ?? []
 }
 
@@ -86,20 +86,17 @@ const rules = {
 
 const beforeOpen = (form: any) => {
   form.isEnabled = isEnabled(form)
-  const appId = normalizeAppId(props.appId)
-  if (appId) {
-    form.appId = appId
-  }
+
+
   form.defaultAttachmentsJson = parseRewardItems(form.defaultAttachmentsJson)
-  loadCategoryList(appId ?? normalizeAppId(form.appId))
+  loadCategoryList()
   return form
 }
 
 const beforeSubmit = (form: any) => {
-  const appId = normalizeAppId(props.appId)
+
   return {
     ...form,
-    ...(appId ? {appId} : {}),
     defaultAttachmentsJson: toRewardItemsJson(form.defaultAttachmentsJson),
   }
 }

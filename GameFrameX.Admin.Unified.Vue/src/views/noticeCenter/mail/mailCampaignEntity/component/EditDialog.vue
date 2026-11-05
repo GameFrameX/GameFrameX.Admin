@@ -141,7 +141,7 @@ import { t } from '../../../../../i18n/index.ts'
 import { gameMailCampaignAddPost, gameMailCampaignUpdatePost } from '../../../../../api/gameMailCampaign'
 import { gameAreaSelectStringPost } from '../../../../../api/gameArea'
 import { faMinus, faPlus } from '../../../../../utils/icons.ts'
-import {normalizeAppId} from '../../../../../utils/appWorkspace.ts'
+
 import {MAX_SELECT_SIZE} from '../../../../../constants/pagination.ts'
 import {
   MAIL_CAMPAIGN_MAIL_TYPE_OPTIONS,
@@ -153,7 +153,6 @@ import {
 
 const props = defineProps({
   title: { type: String, default: '' },
-  appId: { type: [Number, String], default: undefined },
 })
 const emit = defineEmits(['reloadTable'])
 const dialogRef = ref()
@@ -167,7 +166,6 @@ const languageOptions = computed(() => MAIL_CAMPAIGN_LANGUAGE_OPTIONS.map((o) =>
 const minExpireDate = computed(() => new Date())
 
 const defaultForm = () => ({
-  appId: undefined as number | undefined,
   areaId: undefined as number | undefined,
   name: '',
   mailType: 1,
@@ -192,12 +190,9 @@ const rules = {
   expireAttachmentPolicy: [{ required: true, message: () => t('message.gameBusiness.mailCampaign.expirePolicyRequired'), trigger: 'change' }],
 }
 
-const loadAreaOptions = async (appId?: number) => {
-  if (!appId) {
-    areaIdOptions.value = []
-    return
-  }
-  areaIdOptions.value = (await gameAreaSelectStringPost({ appId: appId, pageSize: MAX_SELECT_SIZE })).data.data ?? []
+const loadAreaOptions = async () => {
+
+  areaIdOptions.value = (await gameAreaSelectStringPost({ pageSize: MAX_SELECT_SIZE })).data.data ?? []
 }
 
 // JSON 字符串 → 数组
@@ -227,7 +222,7 @@ const parseIdsToArray = (text: string): number[] => {
     .split(/[,;\s]+/)
     .map((s) => s.trim())
     .filter((s) => s.length > 0)
-    
+
     .filter((s) => /^[1-9]\d*$/.test(s))
 }
 
@@ -243,11 +238,9 @@ const toDate = (v: any): Date | null => {
 }
 
 const beforeOpen = async (form: any, _isEditor: boolean) => {
-  const appId = normalizeAppId(props.appId)
-  if (appId) form.appId = appId
-  if (form.appId) {
-    await loadAreaOptions(form.appId)
-  }
+
+
+  await loadAreaOptions()
   form.titles = safeParseArray(form.titlesJson)
   if (form.titles.length === 0) form.titles = [{ language: 'zh-cn', text: '' }]
   form.contents = safeParseArray(form.contentsJson)

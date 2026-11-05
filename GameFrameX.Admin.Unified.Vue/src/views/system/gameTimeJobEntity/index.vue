@@ -23,7 +23,7 @@
             <ToggleSwitch v-model="data.isOnce" disabled/>
           </template>
         </CrudDataTable>
-        <editDialog ref="editDialogRef" :title="editTitle" :appId="queryParams.appId" @reloadTable="onQuery"/>
+        <editDialog ref="editDialogRef" :title="editTitle" @reloadTable="onQuery"/>
       </template>
     </Card>
   </div>
@@ -35,15 +35,15 @@ import SearchForm from '/@/components/search-form/index.vue'
 import {ref, onMounted, computed} from 'vue'
 import {useRoute} from 'vue-router'
 import {useCrudTable} from '../../../composables/useCrudTable.ts'
-import {usePrimeTablePage, useRouteAppIdQuerySync} from '../../../composables'
+import {usePrimeTablePage} from '../../../composables'
 import {showConfirm} from '../../../utils/message.ts'
 import editDialog from '/@/views/system/gameTimeJobEntity/component/EditDialog.vue'
 import { gameTimeJobPagePost, gameTimeJobDeletePost } from '../../../api/gameTimeJob'
-import {useCurrentApp} from '../../../composables/useCurrentApp.ts'
+
 import type {CrudColumnConfig} from '../../../components/crud-data-table/types.ts'
 
 const route = useRoute()
-const {resolveInitialAppId} = useCurrentApp()
+
 const editDialogRef = ref()
 const editTitle = ref('')
 
@@ -100,17 +100,10 @@ const actions = {
 }
 
 const onReset = () => {
-  queryParams.value = {appId: resolveInitialAppId(route.query)}
+  queryParams.value = {}
   tableParams.value.page = 1
   onQuery()
 }
-
-useRouteAppIdQuerySync({
-  route,
-  queryParams,
-  resolveAppId: resolveInitialAppId,
-  onQuery,
-})
 
 onMounted(async () => {
   await onQuery()

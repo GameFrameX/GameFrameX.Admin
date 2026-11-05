@@ -8,7 +8,7 @@
             :showAdd="true"
             authPrefix="gameCommodityEntity"
             @query="onQuery"
-            
+
             @add="openAddGameCommodityEntity"
         />
       </template>
@@ -34,27 +34,27 @@
             <Tag v-else :value="t('message.gameBusiness.no')" severity="danger" />
           </template>
         </CrudDataTable>
-        <editDialog ref="editDialogRef" :title="editTitle" :appId="queryParams.appId" @reloadTable="onQuery" />
+        <editDialog ref="editDialogRef" :title="editTitle" @reloadTable="onQuery" />
       </template>
     </Card>
   </div>
 </template>
 
 <script lang="ts" setup="" name="gameCommodityEntity">
+import {onMounted} from 'vue'
 import {ref, computed, watch} from 'vue'
 import {useRoute} from 'vue-router'
 import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import type {CrudColumnConfig} from '../../../components/crud-data-table/types.ts'
 import { useCrudTable } from '../../../composables/useCrudTable.ts'
-import {usePrimeTablePage, useRouteAppIdQuerySync} from '../../../composables'
-import {useCurrentApp} from '../../../composables/useCurrentApp.ts'
+import {usePrimeTablePage} from '../../../composables'
+
 import editDialog from '/@/views/commerceCenter/gameCommodityEntity/component/EditDialog.vue'
 import { gameCommodityPagePost, gameCommodityDeletePost } from '../../../api/gameCommodity'
 import { gameGoodsCatalogueSelectPost } from '../../../api/gameGoodsCatalogue'
 import {MAX_SELECT_SIZE} from '../../../constants/pagination.ts'
 
 const route = useRoute()
-const {resolveInitialAppId} = useCurrentApp()
 
 const editDialogRef = ref()
 const editTitle = ref('')
@@ -65,10 +65,12 @@ const getCategoryName = (categoryId: any) => {
   const found = catalogueOptions.value.find((item: any) => item.id === categoryId)
   return found ? found.value : categoryId
 }
-const loadCatalogueOptions = async (appId?: number | string) => {
-  const list = await gameGoodsCatalogueSelectPost({appId: appId, pageSize: MAX_SELECT_SIZE})
+const loadCatalogueOptions = async () => {
+  const list = await gameGoodsCatalogueSelectPost({pageSize: MAX_SELECT_SIZE})
   catalogueOptions.value = list.data.data ?? []
 }
+
+onMounted(loadCatalogueOptions)
 
 const searchFields = computed(() => [
   { key: 'status', label: t('message.gameBusiness.area.status'), type: 'input', placeholder: t('message.gameBusiness.user.pleaseSelectStatus'), advanced: true },
@@ -115,14 +117,4 @@ const columns = computed<CrudColumnConfig[]>(() => [
   {field: 'updatedName', header: t('message.common.label.modifier'), width: '140px'},
 ])
 
-useRouteAppIdQuerySync({
-  route,
-  queryParams,
-  resolveAppId: resolveInitialAppId,
-  onQuery,
-})
-
-watch(() => queryParams.value.appId, (newVal) => {
-  loadCatalogueOptions(newVal)
-}, { immediate: true })
 </script>

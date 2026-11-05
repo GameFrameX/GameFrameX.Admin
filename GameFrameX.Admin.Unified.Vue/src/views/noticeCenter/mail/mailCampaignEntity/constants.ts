@@ -44,7 +44,6 @@ export interface MailCampaignAttachment {
 // Campaign 行（对齐 C134 TenantGameMailCampaignEntityOutput，camelCase）
 export interface MailCampaignRow {
   id?: number;
-  appId: number;
   areaId: number;
   name: string;
   mailType: number;

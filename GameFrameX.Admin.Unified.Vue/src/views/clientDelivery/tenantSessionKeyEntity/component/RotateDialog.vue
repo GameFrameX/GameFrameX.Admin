@@ -1,8 +1,7 @@
 <template>
   <Dialog v-model:visible="visible" modal header="轮换会话密钥" :style="{ width: 'min(460px, calc(100vw - 32px))' }">
     <div class="key-form">
-      <div class="key-label">应用 ID</div>
-      <InputNumber :modelValue="appId" :useGrouping="false" class="w-full" disabled/>
+
       <div class="key-label">旧密钥到期时间（双活窗口收口）</div>
       <DatePicker v-model="oldKeyExpireTime" showTime class="w-full" placeholder="留空表示不改动旧密钥租约"/>
       <small class="key-tip">轮换 = 新插一把立即生效的密钥，旧密钥不禁用不删除：新旧双活期间两边信封均可解密，客户端全量切换后再让旧密钥到期退场。</small>
@@ -25,18 +24,18 @@ import { sessionKeyRotatePost } from '../../../../api/sessionKey'
 const emit = defineEmits(['rotated'])
 
 const visible = ref(false)
-const appId = ref(0)
+
 const oldKeyExpireTime = ref<any>(null)
 
 const open = (row: any) => {
-  appId.value = Number(row.appId)
+
   oldKeyExpireTime.value = null
   visible.value = true
 }
 
 const confirm = async () => {
   const expireTimeLong = oldKeyExpireTime.value ? Math.floor(new Date(oldKeyExpireTime.value).getTime() / 1000) : null
-  const res = await sessionKeyRotatePost({ appId: String(appId.value), oldKeyExpireTime: expireTimeLong })
+  const res = await sessionKeyRotatePost({ oldKeyExpireTime: expireTimeLong })
   visible.value = false
   emit('rotated', res.data)
 }

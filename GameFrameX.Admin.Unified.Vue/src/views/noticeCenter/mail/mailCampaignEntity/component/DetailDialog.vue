@@ -2,7 +2,6 @@
   <Dialog v-model:visible="visible" modal :header="t('message.gameBusiness.mailCampaign.detailTitle')" :draggable="false" class="w-full md:w-50rem">
     <div v-block-loading="loading">
       <div v-if="row" class="grid grid-cols-2" style="gap: 0.5rem 1.5rem;">
-        <DetailItem :label="t('message.gameBusiness.appContext.currentApp')">{{ appName(row.appId) }}</DetailItem>
         <DetailItem :label="t('message.gameBusiness.mailCampaign.areaId')">{{ row.areaId }}</DetailItem>
         <DetailItem :label="t('message.gameBusiness.mailCampaign.name')">{{ row.name }}</DetailItem>
         <DetailItem :label="t('message.gameBusiness.mailCampaign.mailType')">
@@ -84,7 +83,7 @@ import Dialog from 'primevue/dialog'
 import Button from 'primevue/button'
 import Tag from 'primevue/tag'
 import { t } from '../../../../../i18n/index.ts'
-import { useCurrentApp } from '../../../../../composables/useCurrentApp.ts'
+
 import {
   MAIL_CAMPAIGN_MAIL_TYPE_OPTIONS,
   MAIL_CAMPAIGN_EXPIRE_POLICY_OPTIONS,
@@ -153,8 +152,6 @@ const AttachmentPreview = defineComponent({
     }
   },
 })
-
-const { appName } = useCurrentApp()
 
 const visible = ref(false)
 const loading = ref(false)

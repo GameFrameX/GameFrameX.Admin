@@ -38,7 +38,7 @@
           <template #body-createdTime="{ data }">{{ formatUnix(data.createdTime) }}</template>
           <template #body-updateTime="{ data }">{{ formatUnix(data.updateTime) }}</template>
         </CrudDataTable>
-        <editDialog ref="editDialogRef" :title="editGameRedeemCodeEntityTitle" :appId="queryParams.appId" @reloadTable="onQuery"/>
+        <editDialog ref="editDialogRef" :title="editGameRedeemCodeEntityTitle" @reloadTable="onQuery"/>
       </template>
     </Card>
   </div>
@@ -52,7 +52,7 @@ import type { CrudColumnConfig } from '../../../components/crud-data-table/types
 import { formatUnix } from '../../../utils/formatTime.ts'
 import {useCrudTable} from '../../../composables/useCrudTable.ts'
 import {usePrimeTablePage} from '../../../composables'
-import {useCurrentApp} from '../../../composables/useCurrentApp.ts'
+
 import editDialog from '/@/views/commerceCenter/gameRedeemCodeEntity/component/EditDialog.vue'
 import { gameRedeemCodePagePost, gameRedeemCodeDeletePost } from '../../../api/gameRedeemCode'
 import { gameRedeemCodeChannelSelectStringPost } from '../../../api/gameRedeemCodeChannel'
@@ -62,8 +62,6 @@ import {MAX_SELECT_SIZE} from '../../../constants/pagination.ts'
 const route = useRoute()
 const editDialogRef = ref()
 const editGameRedeemCodeEntityTitle = ref('')
-
-const {resolveInitialAppId} = useCurrentApp()
 
 const searchFields = computed(() => [
   { key: 'areaId', label: t('message.gameBusiness.role.areaName'), type: 'select', options: areaList.value, optionLabel: 'value', optionValue: 'id', placeholder: t('message.gameBusiness.order.pleaseSelectArea'), advanced: true },
@@ -83,8 +81,6 @@ const {
   api: {pageApi: gameRedeemCodePagePost, deleteApi: gameRedeemCodeDeletePost},
   immediate: true,
 })
-
-queryParams.value.appId = resolveInitialAppId(route.query)
 
 const columns = computed<CrudColumnConfig[]>(() => [
   {field: 'areaId', header: t('message.gameBusiness.role.areaName'), width: '140px', bodyKey: 'areaId'},
@@ -123,8 +119,8 @@ const getAreaName = (areaId: number) => {
   }
   return t('message.gameBusiness.redeemcode.allServer')
 }
-const getAreaList = async (appId?: number) => {
-  const res = await gameAreaSelectStringPost({appId: appId, pageSize: MAX_SELECT_SIZE})
+const getAreaList = async () => {
+  const res = await gameAreaSelectStringPost({pageSize: MAX_SELECT_SIZE})
   areaList.value = res.data.data ?? []
 }
 
@@ -143,28 +139,15 @@ const getRedeemCodeChannelName = (areaId: number) => {
   }
   return t('message.gameBusiness.redeemcode.channelNotFound')
 }
-const getRedeemCodeChannelList = async (appId?: number) => {
-  const res = await gameRedeemCodeChannelSelectStringPost({appId: appId, pageSize: MAX_SELECT_SIZE})
+const getRedeemCodeChannelList = async () => {
+  const res = await gameRedeemCodeChannelSelectStringPost({pageSize: MAX_SELECT_SIZE})
   redeemCodeChannelList.value = res.data.data ?? []
 }
 
 // Reset dependent filter selections when current app changes
-watch(() => queryParams.value.appId, (newVal) => {
-  queryParams.value.areaId = undefined
-  queryParams.value.channelId = undefined
-  getAreaList(newVal)
-  getRedeemCodeChannelList(newVal)
-})
-
-watch(() => route.query.appId, async () => {
-  queryParams.value.appId = resolveInitialAppId(route.query)
-  queryParams.value.areaId = undefined
-  queryParams.value.channelId = undefined
-  await onQuery()
-})
 
 onMounted(async () => {
-  await getAreaList(queryParams.value.appId)
-  await getRedeemCodeChannelList(queryParams.value.appId)
+  await getAreaList()
+  await getRedeemCodeChannelList()
 })
 </script>

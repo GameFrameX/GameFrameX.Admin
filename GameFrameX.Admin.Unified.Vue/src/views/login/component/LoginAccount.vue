@@ -80,7 +80,7 @@
 
 <script lang="ts" setup name="loginAccount">
 import {onMounted, reactive, ref} from 'vue';
-import {useRouter} from 'vue-router';
+import {useRoute, useRouter} from 'vue-router';
 import {showError} from '../../../utils/message';
 import {t} from '../../../i18n/index';
 
@@ -99,6 +99,7 @@ const props = defineProps<{
 }>();
 
 const router = useRouter();
+const route = useRoute();
 
 const accountRef = ref<any>(null);
 const passwordRef = ref<any>(null);

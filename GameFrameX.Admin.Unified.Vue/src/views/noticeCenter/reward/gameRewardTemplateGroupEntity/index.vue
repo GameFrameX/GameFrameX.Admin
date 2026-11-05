@@ -5,7 +5,7 @@
         <SearchForm
             v-model="queryParams"
             :fields="searchFields"
-            :showAdd="!!queryParams.appId"
+            :showAdd="true"
             authPrefix="gameRewardTemplateGroupEntity"
             @query="onQuery"
             @add="openAdd"
@@ -28,7 +28,7 @@
           </template>
           <template #body-createdTime="{ data }">{{ formatUnix(data.createdTime) }}</template>
         </CrudDataTable>
-        <editDialog ref="editDialogRef" :title="editTitle" :appId="queryParams.appId" @reloadTable="onQuery"/>
+        <editDialog ref="editDialogRef" :title="editTitle" @reloadTable="onQuery"/>
       </template>
     </Card>
   </div>
@@ -42,15 +42,15 @@ import {formatUnix} from '../../../../utils/formatTime.ts'
 import {computed, ref} from 'vue'
 import {useRoute} from 'vue-router'
 import {useCrudTable} from '../../../../composables/useCrudTable.ts'
-import {usePrimeTablePage, useRouteAppIdQuerySync} from '../../../../composables'
-import {useCurrentApp} from '../../../../composables/useCurrentApp.ts'
+import {usePrimeTablePage} from '../../../../composables'
+
 import editDialog from '/@/views/noticeCenter/reward/gameRewardTemplateGroupEntity/component/EditDialog.vue'
 import { gameRewardTemplateGroupDeletePost, gameRewardTemplateGroupPagePost } from '../../../../api/gameRewardTemplateGroup'
 import {isEnabled} from '../../../../utils/isEnabled.ts'
 
 const emptyPage = {data: {result: {items: [], total: 0}}}
 const route = useRoute()
-const {resolveInitialAppId} = useCurrentApp()
+
 const editDialogRef = ref()
 const editTitle = ref('')
 
@@ -65,7 +65,7 @@ const searchFields = computed(() => [
 
 const {loading, tableData, queryParams, tableParams, onQuery, onDelete} = useCrudTable({
   api: {
-    pageApi: (params) => params.appId ? gameRewardTemplateGroupPagePost(params) : Promise.resolve(emptyPage),
+    pageApi: (params) => gameRewardTemplateGroupPagePost(params),
     deleteApi: (params) => gameRewardTemplateGroupDeletePost(params),
   },
   immediate: true,
@@ -97,12 +97,5 @@ const columns = computed<CrudColumnConfig[]>(() => [
   {field: 'isEnabled', header: t('message.gameBusiness.isEnabled'), width: '100px', bodyKey: 'isEnabled'},
   {field: 'createdTime', header: t('common.label.createTime'), width: '200px', bodyKey: 'createdTime'},
 ])
-
-useRouteAppIdQuerySync({
-  route,
-  queryParams,
-  resolveAppId: resolveInitialAppId,
-  onQuery,
-})
 
 </script>

@@ -9,7 +9,7 @@
             authPrefix="gameMailTemplateCategoryEntity"
             :defaultSearchKey="false"
             @query="onQuery"
-            
+
             @add="openAddGameMailTemplateCategoryEntity"
         />
       </template>
@@ -31,7 +31,6 @@
           <template #body-createdTime="{ data }">{{ formatUnix(data.createdTime) }}</template>
         </CrudDataTable>
         <editDialog ref="editDialogRef" :title="editGameMailTemplateCategoryEntityTitle"
-                    :appId="queryParams.appId"
                     @reloadTable="onQuery"/>
       </template>
     </Card>
@@ -46,14 +45,13 @@ import {formatUnix} from '../../../../utils/formatTime.ts'
 import {ref, computed} from 'vue'
 import {useRoute} from 'vue-router'
 import {useCrudTable} from '../../../../composables/useCrudTable.ts'
-import {usePrimeTablePage, useRouteAppIdQuerySync} from '../../../../composables'
-import {useCurrentApp} from '../../../../composables/useCurrentApp.ts'
+import {usePrimeTablePage} from '../../../../composables'
+
 import editDialog from '/@/views/noticeCenter/mail/gameMailTemplateCategoryEntity/component/EditDialog.vue'
 import { gameMailTemplateCategoryPagePost, gameMailTemplateCategoryDeletePost } from '../../../../api/gameMailTemplateCategory'
 import {isEnabled} from '../../../../utils/isEnabled.ts'
 
 const route = useRoute()
-const {resolveInitialAppId} = useCurrentApp()
 
 const editDialogRef = ref()
 const editGameMailTemplateCategoryEntityTitle = ref('')
@@ -111,10 +109,4 @@ const columns = computed<CrudColumnConfig[]>(() => [
   {field: 'createdTime', header: t('common.label.createTime'), width: '200px', bodyKey: 'createdTime'},
 ])
 
-useRouteAppIdQuerySync({
-  route,
-  queryParams,
-  resolveAppId: resolveInitialAppId,
-  onQuery,
-})
 </script>

@@ -60,10 +60,6 @@ var props = defineProps({
     type: String,
     default: '',
   },
-  appId: {
-    type: [Number, String],
-    default: undefined,
-  },
 })
 const emit = defineEmits(['reloadTable'])
 
@@ -113,9 +109,9 @@ const onPlatformQuery = async () => {
   querySelections.value.platform = res.data.data
 }
 
-const onVersionQuery = async (appId?: number | string) => {
-  const id = appId
-  const res = await gameAppVersionDefinitionSelectPost(id ? {appId: id, pageSize: MAX_SELECT_SIZE} : {pageSize: MAX_SELECT_SIZE})
+const onVersionQuery = async () => {
+
+  const res = await gameAppVersionDefinitionSelectPost({pageSize: MAX_SELECT_SIZE})
   querySelections.value.version = res.data.data
   querySelections.value.oldVersion = res.data.data
 }
@@ -137,46 +133,26 @@ const buildPackageOptions = (packages: any[]) => {
   return options
 }
 
-const onPackageQuery = async (appId?: number | string) => {
-  const id = appId
-  if (!id) {
-    querySelections.value.package = buildPackageOptions([])
-    return
-  }
-  const res = await gameAppPackageListGet({appId: id, pageSize: MAX_SELECT_SIZE})
+const onPackageQuery = async () => {
+
+
+  const res = await gameAppPackageListGet({pageSize: MAX_SELECT_SIZE})
   querySelections.value.package = buildPackageOptions(res.data?.data || [])
 }
 
-
-const resolveInitialAppId = (form: any) => {
-  const raw = props.appId ?? form?.appId
-  // C270：appId 运行时为字符串（雪花 Id），保持字符串判断有效性，禁止 Number() 回转
-  const id = raw === undefined || raw === null || raw === 0 || raw === '0' ? undefined : String(raw)
-  return id || undefined
-}
-
 const beforeOpen = (form: any, isEditor: boolean) => {
-  const appId = resolveInitialAppId(form)
-  if (appId) form.appId = appId
+
+
   return form
 }
 
 // 切换应用：清空包名并按新应用重载候选，避免保留其它应用的包。
-const onAppChange = (ruleForm: any) => {
-  if (ruleForm) {
-    ruleForm.package = undefined
-    ruleForm.appVersion = undefined
-    ruleForm.oldVersion = undefined
-  }
-  onPackageQuery(ruleForm?.appId)
-  onVersionQuery(ruleForm?.appId)
-}
 
 const openDialog = (row: any) => {
   dialogRef.value.openDialog(row)
   // 编辑态按记录应用加载包名，使历史包名能命中候选。
-  onPackageQuery(row?.appId)
-  onVersionQuery(row?.appId)
+  onPackageQuery()
+  onVersionQuery()
 }
 
 defineExpose({openDialog})

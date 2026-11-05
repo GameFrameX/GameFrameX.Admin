@@ -55,8 +55,8 @@ import {useRoute} from 'vue-router'
 import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import type {CrudAction, CrudColumnConfig} from '../../../components/crud-data-table/types.ts'
 import {useCrudTable} from '../../../composables/useCrudTable.ts'
-import {usePrimeTablePage, useRouteAppIdQuerySync} from '../../../composables'
-import {useCurrentApp} from '../../../composables/useCurrentApp.ts'
+import {usePrimeTablePage} from '../../../composables'
+
 import {formatUnix} from '../../../utils/formatTime.ts'
 import detailDialog from '/@/views/playerCenter/antiCheatEventEntity/component/DetailDialog.vue'
 import reviewDialog from '/@/views/playerCenter/antiCheatEventEntity/component/ReviewDialog.vue'
@@ -76,8 +76,6 @@ import {
 const route = useRoute()
 const detailDialogRef = ref()
 const reviewDialogRef = ref()
-
-const {resolveInitialAppId} = useCurrentApp()
 
 const labelOf = (options: Array<{ value: number; label: string }>, value: number): string => {
     const found = options.find((o) => o.value === value)
@@ -135,13 +133,6 @@ const customActions = computed<CrudAction[]>(() => [
     {auth: 'detail', label: t('message.gameBusiness.antiCheat.action.detail'), icon: 'fa-solid fa-eye', onClick: openDetail},
     {auth: 'review', label: t('message.gameBusiness.antiCheat.action.review'), icon: 'fa-solid fa-gavel', severity: 'warn', onClick: openReview, visible: (row: any) => row.manualReviewState === MANUAL_REVIEW_STATE.Pending},
 ])
-
-useRouteAppIdQuerySync({
-    route,
-    queryParams,
-    resolveAppId: resolveInitialAppId,
-    onQuery,
-})
 
 onMounted(async () => {
     await onQuery()

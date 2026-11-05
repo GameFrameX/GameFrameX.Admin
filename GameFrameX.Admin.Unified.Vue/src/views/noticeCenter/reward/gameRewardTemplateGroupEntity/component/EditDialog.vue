@@ -27,9 +27,8 @@ import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import {TextField} from '../../../../../components/crud-form-fields'
 import { gameRewardTemplateGroupAddPost, gameRewardTemplateGroupUpdatePost } from '../../../../../api/gameRewardTemplateGroup'
 import {isEnabled} from '../../../../../utils/isEnabled.ts'
-import {normalizeAppId} from '../../../../../utils/appWorkspace.ts'
 
-const props = defineProps({title: {type: String, default: ''}, appId: {type: [Number, String], default: undefined}})
+const props = defineProps({title: {type: String, default: ''}})
 const emit = defineEmits(['reloadTable'])
 const dialogRef = ref()
 
@@ -40,10 +39,8 @@ const rules = {
 const defaultForm = () => ({isEnabled: true, sort: 100})
 
 const beforeOpen = (form: any) => {
-  const appId = normalizeAppId(props.appId)
-  if (appId) {
-    form.appId = appId
-  }
+
+
   form.isEnabled = isEnabled(form)
   return form
 }

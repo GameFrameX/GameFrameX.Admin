@@ -11,11 +11,9 @@ import {ref} from 'vue'
 import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import {TextField} from '../../../../components/crud-form-fields'
 import { gameRoleAddPost, gameRoleUpdatePost } from '../../../../api/gameRole'
-import {normalizeAppId} from '../../../../utils/appWorkspace.ts'
 
 const props = defineProps({
   title: {type: String, default: ''},
-  appId: {type: [Number, String], default: undefined},
 })
 const emit = defineEmits(['reloadTable'])
 const dialogRef = ref()
@@ -24,8 +22,8 @@ const rules = {
 }
 
 const beforeOpen = (form: any, isEditor: boolean) => {
-  const appId = normalizeAppId(props.appId)
-  if (appId) form.appId = appId
+
+
 }
 
 defineExpose({

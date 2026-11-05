@@ -66,7 +66,7 @@ import { gameAreaSelectStringPost } from "../../../../../api/gameArea";
 import { gameGoodsSelectStringPost } from "../../../../../api/gameGoods";
 import commonFunction from "../../../../../utils/commonFunction.ts";
 import {formatUnix} from "../../../../../utils/formatTime.ts";
-import {normalizeAppId} from "../../../../../utils/appWorkspace.ts";
+
 import {parseRewardItems} from "../../../../../components/reward-items-editor/rewardItems.ts";
 import {MAX_SELECT_SIZE} from '../../../../../constants/pagination.ts';
 
@@ -85,10 +85,9 @@ const openDialog = async (row: any) => {
   formInfo.value = row;
   formInfo.value.attachmentsJson = parseRewardItems(formInfo.value.attachmentsJson);
 
-  const appId = resolveAppId(formInfo.value);
   await Promise.all([
-    getAreaList(appId),
-    loadGoodsList(appId),
+    getAreaList(),
+    loadGoodsList(),
   ]);
   isShowDrawer.value = true;
 };
@@ -111,17 +110,14 @@ const getItemName = (id: number) => {
   }
 
 }
-const resolveAppId = (row: any) => {
-  return normalizeAppId(row?.appId)
-}
 
-const getAreaList = async (appId?: number) => {
-  const res = await gameAreaSelectStringPost({appId, pageSize: MAX_SELECT_SIZE});
+const getAreaList = async () => {
+  const res = await gameAreaSelectStringPost({pageSize: MAX_SELECT_SIZE});
   areaList.value = res.data.data ?? [];
 };
 
-const loadGoodsList = async (appId?: number) => {
-  getGoodsList.value = (await gameGoodsSelectStringPost({appId, pageSize: MAX_SELECT_SIZE})).data.data ?? [];
+const loadGoodsList = async () => {
+  getGoodsList.value = (await gameGoodsSelectStringPost({pageSize: MAX_SELECT_SIZE})).data.data ?? [];
 }
 
 // Cancel

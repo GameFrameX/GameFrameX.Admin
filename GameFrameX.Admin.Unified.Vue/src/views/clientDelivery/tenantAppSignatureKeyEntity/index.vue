@@ -63,6 +63,7 @@
 </template>
 
 <script lang="ts" setup name="tenantAppSignatureKeyEntity">
+import {showConfirm, showSuccess} from '../../../utils/message'
 import { computed, ref } from 'vue'
 import SearchForm from '/@/components/search-form/index.vue'
 import CrudDataTable from '/@/components/crud-data-table/index.vue'
@@ -78,7 +79,6 @@ import renewDialog from './component/RenewDialog.vue'
 import revealDialog from './component/RevealDialog.vue'
 
 const searchFields = computed(() => [
-  { key: 'appId', label: '应用ID', type: 'number' as const, placeholder: '按应用 ID 筛选' },
   {
     key: 'isActive', label: '状态', type: 'select' as const, placeholder: '状态',
     options: [
@@ -131,7 +131,6 @@ const onDisable = async (row: any) => {
 }
 
 const columns = computed<CrudColumnConfig[]>(() => [
-  { field: 'appId', header: '应用ID', width: '110px', align: 'center' },
   { field: 'kid', header: 'Key ID', width: '260px', bodyKey: 'kid' },
   { field: 'secret', header: '密钥', width: '110px', align: 'center', bodyKey: 'secret' },
   { field: 'notBeforeTime', header: '生效时间', width: '170px', align: 'center', bodyKey: 'notBeforeTime' },

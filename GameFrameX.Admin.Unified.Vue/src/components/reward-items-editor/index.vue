@@ -3,32 +3,32 @@
     <div v-for="(item, index) in rows" :key="index" class="reward-items-editor-row">
       <Select filter v-model="item._catalogueId" :options="catalogueOptions" optionLabel="value" optionValue="id"
               :placeholder="t('message.gameBusiness.goods.pleaseSelectCatalogue')" showClear class="catalogue-select"
-              :disabled="disabled || !appId" @change="onCatalogueChange(item)"/>
+              :disabled="disabled" @change="onCatalogueChange(item)"/>
       <Select v-model="item.id" :options="getFilteredGoods(item._catalogueId)" optionLabel="label" optionValue="id"
               :placeholder="rewardPlaceholder" filter class="goods-select"
-              :disabled="disabled || !appId" @change="onGoodsChange(item)"/>
+              :disabled="disabled" @change="onGoodsChange(item)"/>
       <Button type="button" severity="danger" outlined class="remove-button" :aria-label="t('message.common.button.delete')"
               :disabled="disabled" @click="removeItem(index)">
         <component :is="faMinus"/>
       </Button>
     </div>
-    <Button type="button" class="add-button" :disabled="disabled || !appId" @click="addItem">
+    <Button type="button" class="add-button" :disabled="disabled" @click="addItem">
       <component :is="faPlus" class="mr-1"/>{{ addLabel }}
     </Button>
   </div>
 </template>
 
 <script setup lang="ts">
-import {computed, ref, watch} from 'vue'
+import {computed, onMounted, ref, watch} from 'vue'
 import {faMinus, faPlus} from '../../utils/icons'
 import { gameGoodsPagePost } from '../../api/gameGoods'
 import { gameGoodsCatalogueSelectPost } from '../../api/gameGoodsCatalogue'
 import {MAX_SELECT_SIZE} from '../../constants/pagination'
-import {normalizeAppId, type AppWorkspaceId} from '../../utils/appWorkspace'
+
 import type {RewardItem} from './rewardItems'
 
 const props = withDefaults(defineProps<{
-  appId?: number | string
+
   disabled?: boolean
   rewardPlaceholder?: string
   addLabel?: string
@@ -42,8 +42,6 @@ const model = defineModel<RewardItem[]>({default: () => []})
 const goodsOptions = ref<any[]>([])
 const catalogueOptions = ref<any[]>([])
 
-const appId = computed(() => normalizeAppId(props.appId))
-
 const rows = computed(() => Array.isArray(model.value) ? model.value : [])
 
 const ensureRowDefaults = (item: RewardItem) => {
@@ -51,17 +49,13 @@ const ensureRowDefaults = (item: RewardItem) => {
   if (item.star === undefined) item.star = 0
 }
 
-const loadOptions = async (scopedAppId?: AppWorkspaceId) => {
-  if (!scopedAppId) {
-    goodsOptions.value = []
-    catalogueOptions.value = []
-    return
-  }
+const loadOptions = async () => {
+
   // 物品选项走 page 接口：selectString 按基类声明类型序列化会裁剪派生字段 classifyId（后端问题 26），
   // 而目录过滤依赖 classifyId，故改用含完整字段的 page 响应映射 {id, label: name, classifyId}。
   const [goodsRes, catalogueRes] = await Promise.all([
-    gameGoodsPagePost({page: 1, pageSize: MAX_SELECT_SIZE, appId: scopedAppId}),
-    gameGoodsCatalogueSelectPost({appId: scopedAppId, pageSize: MAX_SELECT_SIZE}),
+    gameGoodsPagePost({page: 1, pageSize: MAX_SELECT_SIZE}),
+    gameGoodsCatalogueSelectPost({pageSize: MAX_SELECT_SIZE}),
   ])
   goodsOptions.value = (goodsRes.data.data?.items ?? []).map((item: any) => ({
     id: item.id,
@@ -93,9 +87,7 @@ const removeItem = (index: number) => {
   model.value = rows.value.filter((_, itemIndex) => itemIndex !== index)
 }
 
-watch(appId, (value) => {
-  loadOptions(value)
-}, {immediate: true})
+onMounted(() => { void loadOptions() })
 
 watch(model, (value) => {
   if (!Array.isArray(value)) {

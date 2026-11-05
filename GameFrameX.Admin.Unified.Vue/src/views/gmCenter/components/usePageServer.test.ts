@@ -1,6 +1,7 @@
 import { beforeEach, expect, test, vi } from 'vitest'
 import { createPinia, setActivePinia } from 'pinia'
 import { effectScope, ref } from 'vue'
+import { GameServerStatus } from '../../../api/_shared/data-contracts'
 import { useServerStore } from '../../../stores/server'
 import { usePageServer } from './usePageServer'
 
@@ -12,7 +13,7 @@ beforeEach(() => {
 
 function createSelection() {
     const store = useServerStore()
-    store.servers = [{ id: '9007199254740993', name: 'First' }, { id: '2', name: 'Second' }]
+    store.servers = [{ id: '9007199254740993', name: 'First', serverStatus: GameServerStatus.Unknown }, { id: '2', name: 'Second', serverStatus: GameServerStatus.Unknown }]
     store.selectedServerId = '9007199254740993'
     const scope = effectScope()
     const selection = scope.run(() => usePageServer())!

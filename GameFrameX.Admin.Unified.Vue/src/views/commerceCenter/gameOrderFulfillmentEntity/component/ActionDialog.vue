@@ -2,7 +2,6 @@
   <Dialog v-model:visible="visible" modal :header="title" :draggable="false" :dismissableMask="false" class="w-full md:w-30rem">
     <div v-if="row" class="flex flex-column gap-2">
       <div class="surface-100 p-2 border-round text-sm">
-        <div><span class="text-color-secondary">{{ t('message.gameBusiness.orderFulfillment.app') }}：</span>{{ appName(row.appId) }}</div>
         <div><span class="text-color-secondary">{{ t('message.gameBusiness.orderFulfillment.orderId') }}：</span>{{ row.orderId }}</div>
         <div><span class="text-color-secondary">{{ t('message.gameBusiness.orderFulfillment.amountCents') }}：</span>{{ row.amount }}</div>
         <div><span class="text-color-secondary">{{ t('message.gameBusiness.orderFulfillment.type') }}：</span>{{ typeDesc(row.type) }}</div>
@@ -30,10 +29,8 @@ import Textarea from 'primevue/textarea'
 import { t } from '../../../../i18n/index.ts'
 import { showSuccess } from '../../../../utils/message.ts'
 import { gameOrderFulfillmentRefundPost, gameOrderFulfillmentCompensatePost, gameOrderFulfillmentResendPost } from '../../../../api/gameOrderFulfillment'
-import { useCurrentApp } from '../../../../composables/useCurrentApp.ts'
-import { FULFILLMENT_TYPE_OPTIONS, FULFILLMENT_STATUS_OPTIONS } from '../constants'
 
-const { appName } = useCurrentApp()
+import { FULFILLMENT_TYPE_OPTIONS, FULFILLMENT_STATUS_OPTIONS } from '../constants'
 
 type ActionType = 'refund' | 'compensate' | 'resend'
 

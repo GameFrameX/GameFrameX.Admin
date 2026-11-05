@@ -71,7 +71,7 @@
       </div>
       <FormLabel name="attachmentsJson">{{ t('message.gameBusiness.mail.attachmentList') }}</FormLabel>
       <FormField name="attachmentsJson" v-slot="{ invalid, error }">
-        <RewardItemsEditor v-model="ruleForm.attachmentsJson" :appId="ruleForm.appId" :disabled="isEditor"
+        <RewardItemsEditor v-model="ruleForm.attachmentsJson" :disabled="isEditor"
                            :rewardPlaceholder="t('message.gameBusiness.mail.pleaseSelectAttachment')"
                            :addLabel="t('message.gameBusiness.mail.addAttachment')"/>
         <Message v-if="invalid" severity="error" size="small" variant="simple">{{ error }}</Message>
@@ -95,7 +95,7 @@ import {systemEnumEnumDataListGet} from '../../../../../api/systemEnum';
 import { gameAreaSelectStringPost } from '../../../../../api/gameArea'
 import {extractVariablesFromAll, renderTemplate} from '../../../../../utils/templateUtils.ts'
 import { gameRewardTemplateCopySnapshotPost, gameRewardTemplateSelectPost } from '../../../../../api/gameRewardTemplate'
-import {normalizeAppId, type AppWorkspaceId} from '../../../../../utils/appWorkspace.ts'
+
 import {MAX_PAGE_SIZE, MAX_SELECT_SIZE} from '../../../../../constants/pagination.ts'
 
 interface ListItem {
@@ -108,10 +108,6 @@ var props = defineProps({
   title: {
     type: String,
     default: '',
-  },
-  appId: {
-    type: [Number, String],
-    default: undefined,
   },
 })
 const emit = defineEmits(['reloadTable'])
@@ -170,8 +166,8 @@ const resolveRewardTemplateId = (value: any) => (value && typeof value === "obje
 const onRewardTemplateChange = async (event?: any) => {
   const templateId = resolveRewardTemplateId(event?.value ?? selectedRewardTemplateId.value)
   selectedRewardTemplateId.value = Number.isFinite(templateId) ? templateId : undefined
-  if (!templateId || !ruleForm.value.appId) return
-  const response = await gameRewardTemplateCopySnapshotPost({id: templateId, appId: ruleForm.value.appId})
+  if (!templateId) return
+  const response = await gameRewardTemplateCopySnapshotPost({id: templateId})
   const snapshot = response.data.data
   ruleForm.value.attachmentsJson = parseRewardItems(snapshot?.rewardItemsJson)
 }
@@ -206,51 +202,46 @@ const rules = {
   expirationTime: [{required: true, message: t('message.gameBusiness.pleaseSelectMailExpiry'), trigger: 'change'}],
 }
 
-const loadAreaOptions = async (appId?: AppWorkspaceId) => {
-  areaIdOptions.value = (await gameAreaSelectStringPost({appId: appId, pageSize: MAX_SELECT_SIZE})).data.data ?? []
+const loadAreaOptions = async () => {
+  areaIdOptions.value = (await gameAreaSelectStringPost({pageSize: MAX_SELECT_SIZE})).data.data ?? []
 }
 
 // 玩家选项来自角色表（后端契约：playerIdList 与角色 Id 匹配），按区服过滤
-const loadPlayerOptions = async (appId?: AppWorkspaceId, areaId?: number) => {
-  if (!appId || !areaId) {
+const loadPlayerOptions = async (areaId?: number) => {
+  if (!areaId) {
     playerOptions.value = []
     return
   }
-  const res = await gameRolePagePost({appId, areaId, page: 1, pageSize: 100})
+  const res = await gameRolePagePost({areaId, page: 1, pageSize: 100})
   playerOptions.value = (res.data.data?.items ?? []).map((item: any) => ({id: String(item.id), label: item.name ?? String(item.id)}))
 }
 
 const onAreaChange = async (event?: any) => {
   const areaId = event?.value ?? ruleForm.value.areaId
   selectedPlayerIds.value = []
-  await loadPlayerOptions(await resolveAppId(ruleForm.value), areaId)
+  await loadPlayerOptions(areaId)
 }
 
-const loadTemplateOptions = async (appId?: AppWorkspaceId) => {
+const loadTemplateOptions = async () => {
   // 模板下拉需取全字段（titleTemplate/bodyTemplate/defaultMailType/defaultExpirationDays/defaultAttachmentsJson）：
   // select 接口只有 id/value/label，onTemplateChange 取不到模板字段会清空表单而非填充
-  const tplRes = await gameMailTemplatePagePost({appId, page: 1, pageSize: MAX_PAGE_SIZE})
+  const tplRes = await gameMailTemplatePagePost({page: 1, pageSize: MAX_PAGE_SIZE})
   templateList.value = (tplRes.data.data?.items ?? []).map((item: any) => ({
     ...item,
     name: item.name || item.label || item.value || item.titleTemplate || String(item.id ?? ''),
   }))
 }
 
-const loadRewardTemplateOptions = async (appId?: AppWorkspaceId) => {
-  rewardTemplateList.value = appId ? ((await gameRewardTemplateSelectPost({appId, pageSize: MAX_SELECT_SIZE})).data.data ?? []) : []
+const loadRewardTemplateOptions = async () => {
+  rewardTemplateList.value = ((await gameRewardTemplateSelectPost({pageSize: MAX_SELECT_SIZE})).data.data ?? [])
 }
 
-const resolveAppId = async (form: any) => {
-  const raw = props.appId ?? form.appId
-  return normalizeAppId(raw)
-}
+const loadScopedOptions = async () => {
 
-const loadScopedOptions = async (appId?: AppWorkspaceId) => {
-  if (!appId) return
   await Promise.all([
-    loadAreaOptions(appId),
-    loadTemplateOptions(appId),
-    loadRewardTemplateOptions(appId),
+    loadAreaOptions(),
+    loadTemplateOptions(),
+    loadRewardTemplateOptions(),
   ])
 }
 
@@ -277,21 +268,16 @@ const onBeforeOpen = async (form: any) => {
     selectedPlayerIds.value = []
   }
 
-  const appId = await resolveAppId(form)
-  if (appId) {
-    form.appId = appId
-  }
-  await loadScopedOptions(appId)
+
+  await loadScopedOptions()
   // 编辑回显：已选玩家需要 options 才能显示名称
-  await loadPlayerOptions(appId, form.areaId)
+  await loadPlayerOptions(form.areaId)
 }
 
 const onBeforeSubmit = (form: any) => {
   const payload = {...form}
-  const appId = normalizeAppId(props.appId)
-  if (appId) {
-    payload.appId = appId
-  }
+
+
   if (templateVariables.value.length > 0) {
     const data: Record<string, string> = {}
     templateVariables.value.forEach(varName => {

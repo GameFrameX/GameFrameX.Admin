@@ -26,7 +26,7 @@
           <template #body-createdTime="{ data }">{{ formatUnix(data.createdTime) }}</template>
           <template #body-updateTime="{ data }">{{ formatUnix(data.updateTime) }}</template>
         </CrudDataTable>
-        <editDialog ref="editDialogRef" :title="editGameRedeemCodeChannelEntityTitle" :appId="queryParams.appId" @reloadTable="onQuery"/>
+        <editDialog ref="editDialogRef" :title="editGameRedeemCodeChannelEntityTitle" @reloadTable="onQuery"/>
       </template>
     </Card>
   </div>
@@ -40,13 +40,12 @@ import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import type { CrudColumnConfig } from '../../../components/crud-data-table/types.ts'
 import { formatUnix } from '../../../utils/formatTime.ts'
 import {useCrudTable} from '../../../composables/useCrudTable.ts'
-import {usePrimeTablePage, useRouteAppIdQuerySync} from '../../../composables'
-import {useCurrentApp} from '../../../composables/useCurrentApp.ts'
+import {usePrimeTablePage} from '../../../composables'
+
 import editDialog from '/@/views/commerceCenter/gameRedeemCodeChannelEntity/component/EditDialog.vue'
 import { gameRedeemCodeChannelPagePost, gameRedeemCodeChannelDeletePost } from '../../../api/gameRedeemCodeChannel'
 
 const route = useRoute()
-const {resolveInitialAppId} = useCurrentApp()
 
 const searchFields = computed(() => [
   { key: 'name', label: t('message.gameBusiness.name'), type: 'input', placeholder: t('message.gameBusiness.pleaseEnterName') },
@@ -99,10 +98,4 @@ const actions = {
   delete: onDelete,
 }
 
-useRouteAppIdQuerySync({
-  route,
-  queryParams,
-  resolveAppId: resolveInitialAppId,
-  onQuery,
-})
 </script>

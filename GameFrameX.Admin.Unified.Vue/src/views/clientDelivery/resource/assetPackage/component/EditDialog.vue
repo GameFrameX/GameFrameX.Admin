@@ -21,16 +21,11 @@ import { ref } from 'vue'
 import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import {TextField} from '../../../../../components/crud-form-fields'
 import { gameAppAssetPackageAddPost, gameAppAssetPackageUpdatePost } from '../../../../../api/gameAppAssetPackage'
-import {normalizeAppId} from '../../../../../utils/appWorkspace.ts'
 
 const props = defineProps({
   title: {
     type: String,
     default: '',
-  },
-  appId: {
-    type: [Number, String],
-    default: undefined,
   },
 })
 const emit = defineEmits(['reloadTable'])
@@ -41,25 +36,17 @@ const rules = {
   description: [{ required: true, message: () => t('message.client.pleaseInputDetailedDescription'), trigger: 'blur' }],
 }
 
-const resolveGameAppId = (form: any) => {
-  const appId = Number(normalizeAppId(props.appId) ?? form?.appId)
-  return Number.isFinite(appId) && appId > 0 ? appId : undefined
-}
-
 const beforeOpen = (form: any, _isEditor: boolean) => {
-  const appId = normalizeAppId(props.appId)
-  if (appId) form.appId = appId
+
+
   return form
 }
 
 const beforeSubmit = (form: any) => {
-  const appId = resolveGameAppId(form)
-  if (!appId) {
-    return false
-  }
+
+
   return {
     ...form,
-    appId: appId,
   }
 }
 

@@ -35,7 +35,7 @@
           </template>
           <template #body-createdTime="{ data }">{{ formatUnix(data.createdTime) }}</template>
         </CrudDataTable>
-        <editDialog ref="editDialogRef" :title="editwebShopTitle" :appId="queryParams.appId" @reloadTable="onQuery"/>
+        <editDialog ref="editDialogRef" :title="editwebShopTitle" @reloadTable="onQuery"/>
       </template>
     </Card>
   </div>
@@ -49,13 +49,12 @@ import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import type { CrudColumnConfig } from '../../../components/crud-data-table/types.ts'
 import { formatUnix } from '../../../utils/formatTime.ts'
 import {useCrudTable} from '../../../composables/useCrudTable.ts'
-import {usePrimeTablePage, useRouteAppIdQuerySync} from '../../../composables'
-import {useCurrentApp} from '../../../composables/useCurrentApp.ts'
+import {usePrimeTablePage} from '../../../composables'
+
 import editDialog from '/@/views/commerceCenter/webShop/component/EditDialog.vue'
 import { gameWebShopPagePost, gameWebShopDeletePost } from '../../../api/gameWebShop'
 
 const route = useRoute()
-const {resolveInitialAppId} = useCurrentApp()
 
 const searchFields = computed(() => [
 ])
@@ -108,10 +107,4 @@ const actions = {
   delete: onDelete,
 }
 
-useRouteAppIdQuerySync({
-  route,
-  queryParams,
-  resolveAppId: resolveInitialAppId,
-  onQuery,
-})
 </script>

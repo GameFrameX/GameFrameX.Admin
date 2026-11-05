@@ -45,7 +45,7 @@
           <template #body-expirationTime="{ data }">{{ formatUnix(data.expirationTime) }}</template>
           <template #body-createdTime="{ data }">{{ formatUnix(data.createdTime) }}</template>
         </CrudDataTable>
-        <editDialog ref="editDialogRef" :title="editGameMailEntityTitle" :appId="queryParams.appId" @reloadTable="onQuery"></editDialog>
+        <editDialog ref="editDialogRef" :title="editGameMailEntityTitle" @reloadTable="onQuery"></editDialog>
         <infoDrawer ref="infoDrawerRef"/>
       </template>
     </Card>
@@ -62,7 +62,7 @@ import {useRoute} from 'vue-router'
 import {showConfirm, showSuccess} from '../../../../utils/message.ts'
 import {useCrudTable} from '../../../../composables/useCrudTable.ts'
 import {usePrimeTablePage} from '../../../../composables'
-import {useCurrentApp} from '../../../../composables/useCurrentApp.ts'
+
 import editDialog from '/@/views/noticeCenter/mail/gameMailEntity/component/EditDialog.vue'
 import infoDrawer from '/@/views/noticeCenter/mail/gameMailEntity/component/InfoDrawer.vue'
 import { gameMailPagePost, gameMailDeletePost, gameMailSendPost } from '../../../../api/gameMail'
@@ -82,8 +82,6 @@ const editDialogRef = ref()
 const infoDrawerRef = ref()
 const editGameMailEntityTitle = ref('')
 
-const {resolveInitialAppId} = useCurrentApp()
-
 // Area list (loaded by current app scope)
 const areaList = ref<any>([])
 const getAreaName = (areaId: number) => {
@@ -95,8 +93,8 @@ const getAreaName = (areaId: number) => {
   }
   return areaId
 }
-const getAreaList = async (appId?: number) => {
-  const res = await gameAreaSelectStringPost({appId: appId, pageSize: MAX_SELECT_SIZE})
+const getAreaList = async () => {
+  const res = await gameAreaSelectStringPost({pageSize: MAX_SELECT_SIZE})
   areaList.value = res.data.data ?? []
 }
 
@@ -119,8 +117,6 @@ const {
 })
 
 const onPage = usePrimeTablePage(tableParams, onQuery)
-
-queryParams.value.appId = resolveInitialAppId(route.query)
 
 // Load enum data
 const loadEnums = async () => {
@@ -210,18 +206,8 @@ const columns = computed<CrudColumnConfig[]>(() => [
 ])
 
 // Reset dependent filter selections when current app changes
-watch(() => queryParams.value.appId, (newVal) => {
-  queryParams.value.areaId = undefined
-  getAreaList(newVal)
-})
-
-watch(() => route.query.appId, async () => {
-  queryParams.value.appId = resolveInitialAppId(route.query)
-  queryParams.value.areaId = undefined
-  await onQuery()
-})
 
 onMounted(async () => {
-  await getAreaList(queryParams.value.appId)
+  await getAreaList()
 })
 </script>

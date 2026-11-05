@@ -12,12 +12,7 @@
   >
     <template #default="{ ruleForm, isEditor }">
       <BaseEditFieldGroup :title="t('message.client.clientApiPolicySectionScope')">
-        <FormLabel name="appId">{{ t('message.client.clientApiPolicyAppId') }}</FormLabel>
-        <FormField name="appId" v-slot="{ props: fProps, invalid, error }">
-          <InputNumber v-bind="fProps" v-model="ruleForm.appId" :min="0" :disabled="isEditor" :useGrouping="false" class="w-full"/>
-          <small class="field-help">{{ t('message.client.clientApiPolicyAppIdHint') }}</small>
-          <Message v-if="invalid" severity="error" size="small" variant="simple">{{ error }}</Message>
-        </FormField>
+
       </BaseEditFieldGroup>
 
       <BaseEditFieldGroup :title="t('message.client.clientApiPolicySectionToken')">
@@ -117,9 +112,7 @@ const beforeOpen = (form: any, isEditor: boolean) => {
   if (!isEditor && !form.signingKey) {
     form.signingKey = ''
   }
-  if (form.appId === undefined || form.appId === null || form.appId === '') {
-    form.appId = 0
-  }
+
   if (form.lifetimeMinutes === undefined || form.lifetimeMinutes === null) {
     form.lifetimeMinutes = 60
   }
@@ -156,7 +149,6 @@ const beforeSubmit = (form: any, isEditor: boolean) => {
   const signingKey = isEditor && (!form.signingKey || form.signingKey === SECRET_MASK) ? '' : (form.signingKey ?? '')
 
   const normalized: Record<string, any> = {
-    appId: Number(form.appId) || 0,
     signingKey,
     lifetimeMinutes: lifetime,
     ticketExpireTime,
@@ -173,7 +165,6 @@ const beforeSubmit = (form: any, isEditor: boolean) => {
 
 defineExpose({
   openDialog: (row: any) => dialogRef.value?.openDialog({
-    appId: 0,
     signingKey: '',
     lifetimeMinutes: 60,
     ticketExpireTime: null,

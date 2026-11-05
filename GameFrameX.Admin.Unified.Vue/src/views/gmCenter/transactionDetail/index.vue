@@ -84,8 +84,8 @@ const onQuery = async () => {
   const request = beginServerRequest()
   if (!transactionId || !request) return
   try {
-    // 生成层将 GET 参数标为 number；这里只调整静态类型，线缆仍保留完整 string Id。
-    const res = await onlineAssetTransactionQueryDetailGet({ serverId: request.serverId as unknown as number, transactionId })
+    // 后端 GET DTO 使用 long；生成客户端要求 number，调用处转换区服 Id。
+    const res = await onlineAssetTransactionQueryDetailGet({ serverId: Number(request.serverId), transactionId })
     if (request.isCurrent()) detail.value = res.data?.data ?? null
   } catch {
     if (request.isCurrent()) detail.value = null

@@ -20,16 +20,11 @@ import {ref} from 'vue'
 import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import {TextField} from '../../../../../components/crud-form-fields'
 import { gameAppVersionDefinitionAddPost, gameAppVersionDefinitionUpdatePost } from '../../../../../api/gameAppVersionDefinition'
-import {normalizeAppId} from '../../../../../utils/appWorkspace.ts'
 
 const props = defineProps({
   title: {
     type: String,
     default: '',
-  },
-  appId: {
-    type: [Number, String],
-    default: undefined,
   },
 })
 const emit = defineEmits(['reloadTable'])
@@ -40,8 +35,8 @@ const rules = {
 }
 
 const beforeOpen = async (form: any, _isEditor: boolean) => {
-  const appId = normalizeAppId(props.appId)
-  if (appId) form.appId = appId
+
+
 }
 
 defineExpose({

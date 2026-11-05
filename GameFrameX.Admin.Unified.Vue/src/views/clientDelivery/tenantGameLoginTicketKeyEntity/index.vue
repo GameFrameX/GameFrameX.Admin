@@ -52,6 +52,7 @@
 </template>
 
 <script lang="ts" setup name="tenantGameLoginTicketKeyEntity">
+import {showConfirm, showSuccess} from '../../../utils/message'
 import {computed, ref} from 'vue'
 import SearchForm from '/@/components/search-form/index.vue'
 import CrudDataTable from '/@/components/crud-data-table/index.vue'
@@ -82,12 +83,12 @@ const rotateDialogRef = ref()
 
 const onPage = usePrimeTablePage(tableParams, onQuery)
 
-const onRotateSubmit = async (payload: { appId: number, expireTime: number | null }) => {
+const onRotateSubmit = async (payload: {  expireTime: number | null }) => {
   const confirmed = await showConfirm('确认为该应用轮换签名密钥？新密钥立即生效，若指定到期日则旧密钥到期后自然退场。', '提示')
   if (!confirmed) {
     return
   }
-  await gameLoginTicketKeyRotatePost({appId: payload.appId, expireTime: payload.expireTime})
+  await gameLoginTicketKeyRotatePost({expireTime: payload.expireTime})
   onQuery()
   showSuccess('签名密钥已轮换')
 }
@@ -109,7 +110,6 @@ const onDisable = async (row: any) => {
 }
 
 const columns = computed<CrudColumnConfig[]>(() => [
-  {field: 'appId', header: '应用ID', width: '120px', align: 'center'},
   {field: 'kid', header: 'Key ID', width: '240px'},
   {field: 'algorithm', header: '算法', width: '90px', align: 'center'},
   {field: 'publicKeyPem', header: '公钥 (PEM)', bodyKey: 'publicKeyPem'},

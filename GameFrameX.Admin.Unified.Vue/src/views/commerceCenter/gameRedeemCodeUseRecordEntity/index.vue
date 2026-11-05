@@ -45,10 +45,8 @@ import type { CrudColumnConfig } from '../../../components/crud-data-table/types
 import { formatUnix } from '../../../utils/formatTime.ts'
 import {useCrudTable} from '../../../composables/useCrudTable.ts'
 import {usePrimeTablePage} from '../../../composables'
-import {useCurrentApp} from '../../../composables/useCurrentApp.ts'
 
 const route = useRoute()
-const {resolveInitialAppId} = useCurrentApp()
 
 const searchFields = computed(() => [
   { key: 'areaId', label: t('message.gameBusiness.role.areaName'), type: 'select', options: areaList.value, optionLabel: 'value', optionValue: 'id', placeholder: t('message.gameBusiness.order.pleaseSelectArea') },
@@ -69,8 +67,6 @@ const {
   },
   immediate: true,
 })
-
-queryParams.value.appId = resolveInitialAppId(route.query)
 
 const columns = computed<CrudColumnConfig[]>(() => [
   {field: 'areaId', header: t('message.gameBusiness.role.areaName'), width: '200px', bodyKey: 'areaId'},
@@ -93,8 +89,8 @@ const getAreaName = (areaId: number) => {
   return t('message.gameBusiness.redeemcode.allServer')
 }
 
-const loadAreaList = async (appId?: number) => {
-  const res = await gameAreaSelectStringPost({appId: appId, pageSize: MAX_SELECT_SIZE})
+const loadAreaList = async () => {
+  const res = await gameAreaSelectStringPost({pageSize: MAX_SELECT_SIZE})
   areaList.value = res.data.data ?? []
 }
 
@@ -113,29 +109,15 @@ const getRedeemCodeChannelName = (row: any) => {
   }
   return t('message.gameBusiness.redeemcode.channelNotFound')
 }
-const loadChannelList = async (appId?: number) => {
-  const res = await gameRedeemCodeChannelSelectStringPost({appId: appId, pageSize: MAX_SELECT_SIZE})
+const loadChannelList = async () => {
+  const res = await gameRedeemCodeChannelSelectStringPost({pageSize: MAX_SELECT_SIZE})
   redeemCodeChannelList.value = res.data.data ?? []
 }
 
-watch(() => queryParams.value.appId, (newVal) => {
-  queryParams.value.areaId = undefined
-  queryParams.value.channelId = undefined
-  loadAreaList(newVal)
-  loadChannelList(newVal)
-})
-
-watch(() => route.query.appId, async () => {
-  queryParams.value.appId = resolveInitialAppId(route.query)
-  queryParams.value.areaId = undefined
-  queryParams.value.channelId = undefined
-  await onQuery()
-})
-
 onMounted(async () => {
   await Promise.all([
-    loadAreaList(queryParams.value.appId),
-    loadChannelList(queryParams.value.appId),
+    loadAreaList(),
+    loadChannelList(),
   ])
 })
 </script>

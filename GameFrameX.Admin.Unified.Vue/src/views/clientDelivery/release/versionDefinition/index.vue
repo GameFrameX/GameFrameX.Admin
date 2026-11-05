@@ -27,7 +27,6 @@
         <editDialog
             ref="editDialogRef"
             :title="editTenantGameAppVersionDefinitionTitle"
-            :appId="queryParams.appId"
             @reloadTable="onQuery"
         />
       </template>
@@ -41,14 +40,13 @@ import {useRoute} from 'vue-router'
 import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import type {CrudColumnConfig} from '../../../../components/crud-data-table/types.ts'
 import {useCrudTable} from '../../../../composables/useCrudTable.ts'
-import {usePrimeTablePage, useRouteAppIdQuerySync} from '../../../../composables'
-import {useCurrentApp} from '../../../../composables/useCurrentApp.ts'
+import {usePrimeTablePage} from '../../../../composables'
+
 import editDialog from '/@/views/clientDelivery/release/versionDefinition/component/EditDialog.vue'
 import { gameAppVersionDefinitionPagePost, gameAppVersionDefinitionDeletePost } from '../../../../api/gameAppVersionDefinition'
 import {createdNameColumn, descriptionColumn, nameColumn, updatedNameColumn} from '../../../../utils/crudConfig.ts'
 
 const route = useRoute()
-const {resolveInitialAppId} = useCurrentApp()
 
 const editDialogRef = ref()
 const editTenantGameAppVersionDefinitionTitle = ref('')
@@ -76,7 +74,7 @@ const onPage = usePrimeTablePage(tableParams, onQuery)
 // 打开新增页面
 const openAddTenantGameAppVersionDefinition = () => {
   editTenantGameAppVersionDefinitionTitle.value = t('message.client.addVersion')
-  editDialogRef.value.openDialog({appId: queryParams.value.appId})
+  editDialogRef.value.openDialog({})
 }
 
 // 打开编辑页面
@@ -90,10 +88,4 @@ const actions = {
   delete: onDelete,
 }
 
-useRouteAppIdQuerySync({
-  route,
-  queryParams,
-  resolveAppId: resolveInitialAppId,
-  onQuery,
-})
 </script>

@@ -28,15 +28,6 @@
             @click="onScreenfullClick">
       <i :class="!state.isScreenfull ? 'fa-solid fa-expand' : 'fa-solid fa-compress'"></i>
     </button>
-    <button v-if="isSuperAdmin && targetTenantId"
-            type="button"
-            class="layout-navbars-breadcrumb-user-target"
-            :title="t('message.layout.user.targetTenantActive')"
-            :aria-label="`${t('message.layout.user.targetTenantActive')}: ${targetTenantId}`"
-            @click="openTargetTenantDialog">
-      <i class="fa-solid fa-building-user"></i>
-      <span>{{ t('message.layout.user.targetTenantShort') }}: {{ targetTenantId }}</span>
-    </button>
     <button type="button" class="layout-navbars-breadcrumb-user-icon"
             :aria-label="userMenuLabel"
             :aria-haspopup="'menu'"
@@ -49,39 +40,13 @@
     </button>
     <Menu ref="userMenuRef" :model="userMenuItems" :popup="true"/>
     <Search ref="searchRef"/>
-    <Dialog v-model:visible="targetTenantDialogVisible"
-            modal
-            :header="t('message.layout.user.targetTenantDialogTitle')"
-            :style="{ width: 'min(360px, calc(100vw - 32px))' }">
-      <div class="target-tenant-dialog">
-        <label for="target-tenant-id">{{ t('message.layout.user.targetTenantInputLabel') }}</label>
-        <InputText id="target-tenant-id"
-                   v-model="targetTenantInput"
-                   class="w-full"
-                   :placeholder="t('message.layout.user.targetTenantInputPlaceholder')"
-                   @keyup.enter="saveTargetTenant"/>
-        <small>{{ t('message.layout.user.targetTenantHint') }}</small>
-      </div>
-      <template #footer>
-        <Button v-if="targetTenantId"
-                text
-                severity="secondary"
-                :label="t('message.layout.user.targetTenantExit')"
-                @click="clearTargetTenant"/>
-        <Button text
-                severity="secondary"
-                :label="t('message.common.button.cancel')"
-                @click="targetTenantDialogVisible = false"/>
-        <Button :label="t('message.common.button.confirm')" @click="saveTargetTenant"/>
-      </template>
-    </Dialog>
   </div>
 </template>
 
 <script setup lang="ts" name="layoutBreadcrumbUser">
 import {defineAsyncComponent, ref, computed, reactive, onMounted} from 'vue';
 import {useRouter} from 'vue-router';
-import {showConfirm, showSuccess, showWarning} from '../../../utils/message';
+import {showConfirm, showWarning} from '../../../utils/message';
 import screenfull from 'screenfull';
 import {storeToRefs} from 'pinia';
 import {useUserInfoStore} from '../../../stores/userInfo';
@@ -93,15 +58,6 @@ import {clearAccessTokens} from '../../../utils/axiosUtils';
 import {systemAuthLogoutPost} from '../../../api/systemAuth';
 
 import Menu from 'primevue/menu';
-import Dialog from 'primevue/dialog';
-import InputText from 'primevue/inputtext';
-import Button from 'primevue/button';
-import {
-  clearTargetTenantId,
-  getTargetTenantId,
-  normalizeTargetTenantId,
-  setTargetTenantId,
-} from '../../../utils/targetTenant';
 
 // 引入组件
 // eslint-disable-next-line @typescript-eslint/naming-convention -- Vue 组件占位变量（defineAsyncComponent/defineComponent 绑定），按 Vue 风格指南保持 PascalCase
@@ -112,15 +68,12 @@ const Search = defineAsyncComponent(() => import('/@/layout/navigationBars/topBa
 const router = useRouter();
 const stores = useUserInfoStore();
 const storesThemeConfig = useThemeConfigStore();
-const {userInfos, isSuperAdmin} = storeToRefs(stores);
+const {userInfos} = storeToRefs(stores);
 const {themeConfig} = storeToRefs(storesThemeConfig);
 const searchRef = ref();
 const sizeMenuRef = ref();
 const langMenuRef = ref();
 const userMenuRef = ref();
-const targetTenantDialogVisible = ref(false);
-const targetTenantId = ref(getTargetTenantId());
-const targetTenantInput = ref(targetTenantId.value);
 const state = reactive({
   isScreenfull: false,
   disabledI18n: 'zh-cn',
@@ -164,22 +117,6 @@ const userMenuItems = computed(() => {
     {label: t('message.user.dropdown2'), command: () => router.push('/system/userCenter')},
   ];
 
-  if (isSuperAdmin.value) {
-    items.push({
-      label: targetTenantId.value
-        ? `${t('message.layout.user.targetTenantActive')}: ${targetTenantId.value}`
-        : t('message.layout.user.targetTenantSet'),
-      command: openTargetTenantDialog,
-    });
-
-    if (targetTenantId.value) {
-      items.push({
-        label: t('message.layout.user.targetTenantExit'),
-        command: clearTargetTenant,
-      });
-    }
-  }
-
   items.push({label: t('message.user.dropdown5'), command: () => onHandleCommandClick('logOut')});
   return items;
 });
@@ -213,34 +150,6 @@ const onHandleCommandClick = async (path: string) => {
   } else {
     router.push(path);
   }
-};
-
-const openTargetTenantDialog = () => {
-  targetTenantInput.value = targetTenantId.value;
-  targetTenantDialogVisible.value = true;
-};
-
-const saveTargetTenant = () => {
-  const normalized = normalizeTargetTenantId(targetTenantInput.value);
-  if (!normalized) {
-    showWarning(t('message.layout.user.targetTenantInvalid'));
-    return;
-  }
-
-  setTargetTenantId(normalized);
-  targetTenantId.value = normalized;
-  targetTenantDialogVisible.value = false;
-  showSuccess(t('message.layout.user.targetTenantSaved'));
-  window.location.reload();
-};
-
-const clearTargetTenant = () => {
-  clearTargetTenantId();
-  targetTenantId.value = '';
-  targetTenantInput.value = '';
-  targetTenantDialogVisible.value = false;
-  showSuccess(t('message.layout.user.targetTenantCleared'));
-  window.location.reload();
 };
 
 // 菜单搜索点击
@@ -330,42 +239,6 @@ onMounted(() => {
     }
   }
 
-  &-target {
-    max-width: 220px;
-    height: 28px;
-    padding: 0 10px;
-    margin-right: 6px;
-    border: 1px solid var(--p-primary-color);
-    border-radius: 14px;
-    color: var(--p-primary-color);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    cursor: pointer;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    // 由 div 换原生 button（C248 键盘可达），字体沿用全局文本
-    background: transparent;
-    font: inherit;
-
-    // 按压反馈（GFX-661）
-    &:active {
-      background: var(--p-primary-100);
-      transform: scale(0.96);
-    }
-
-    &:focus-visible {
-      outline: 2px solid var(--p-primary-color);
-      outline-offset: 2px;
-    }
-  }
-}
-
-.target-tenant-dialog {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
 }
 
 // 手机端隐藏低频工具（组件大小/语言/全屏）与用户名，为折叠按钮腾出空间（C143，阈值见 theme/breakpoints.scss）

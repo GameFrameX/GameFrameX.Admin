@@ -44,7 +44,7 @@
       </div>
       <FormLabel name="contents">{{ t('message.gameBusiness.redeemcode.giftContent') }}</FormLabel>
       <FormField name="contents" v-slot="{ invalid, error }">
-        <RewardItemsEditor v-model="ruleForm.contents" :appId="ruleForm.appId" :disabled="isEditor"
+        <RewardItemsEditor v-model="ruleForm.contents" :disabled="isEditor"
                            :rewardPlaceholder="t('message.gameBusiness.mail.pleaseSelectAttachment')"
                            :addLabel="t('message.gameBusiness.mail.addAttachment')"/>
         <Message v-if="invalid" severity="error" size="small" variant="simple">{{ error }}</Message>
@@ -66,7 +66,6 @@ import { gameAreaSelectStringPost } from '../../../../api/gameArea'
 import { gameRedeemCodeChannelSelectStringPost } from '../../../../api/gameRedeemCodeChannel'
 import {MAX_SELECT_SIZE} from '../../../../constants/pagination.ts'
 import { gameRewardTemplateCopySnapshotPost, gameRewardTemplateSelectPost } from '../../../../api/gameRewardTemplate'
-import {normalizeAppId, type AppWorkspaceId} from '../../../../utils/appWorkspace.ts'
 
 interface ListItem {
   id: number
@@ -78,10 +77,6 @@ var props = defineProps({
   title: {
     type: String,
     default: '',
-  },
-  appId: {
-    type: [Number, String],
-    default: undefined,
   },
 })
 const emit = defineEmits(['reloadTable'])
@@ -124,24 +119,24 @@ const rules = {
   ],
 }
 
-const loadAreaOptions = async (appId?: AppWorkspaceId) => {
-  areaIdOptions.value = (await gameAreaSelectStringPost({appId: appId, pageSize: MAX_SELECT_SIZE})).data.data ?? []
+const loadAreaOptions = async () => {
+  areaIdOptions.value = (await gameAreaSelectStringPost({pageSize: MAX_SELECT_SIZE})).data.data ?? []
 }
 
-const loadChannelOptions = async (appId?: AppWorkspaceId) => {
-  redeemCodeChannelOptions.value = (await gameRedeemCodeChannelSelectStringPost({appId: appId, pageSize: MAX_SELECT_SIZE})).data.data ?? []
+const loadChannelOptions = async () => {
+  redeemCodeChannelOptions.value = (await gameRedeemCodeChannelSelectStringPost({pageSize: MAX_SELECT_SIZE})).data.data ?? []
 }
 
-const loadRewardTemplateOptions = async (appId?: AppWorkspaceId) => {
-  rewardTemplateList.value = appId ? ((await gameRewardTemplateSelectPost({appId, pageSize: MAX_SELECT_SIZE})).data.data ?? []) : []
+const loadRewardTemplateOptions = async () => {
+  rewardTemplateList.value = ((await gameRewardTemplateSelectPost({pageSize: MAX_SELECT_SIZE})).data.data ?? [])
 }
 
-const loadScopedOptions = async (appId?: AppWorkspaceId) => {
-  if (!appId) return
+const loadScopedOptions = async () => {
+
   await Promise.all([
-    loadAreaOptions(appId),
-    loadChannelOptions(appId),
-    loadRewardTemplateOptions(appId),
+    loadAreaOptions(),
+    loadChannelOptions(),
+    loadRewardTemplateOptions(),
   ])
 }
 
@@ -151,8 +146,8 @@ const onRewardTemplateChange = async (event?: any) => {
   const ruleForm = dialogRef.value?.ruleForm
   const templateId = resolveRewardTemplateId(event?.value ?? selectedRewardTemplateId.value)
   selectedRewardTemplateId.value = Number.isFinite(templateId) ? templateId : undefined
-  if (!templateId || !ruleForm?.appId) return
-  const response = await gameRewardTemplateCopySnapshotPost({id: templateId, appId: ruleForm.appId})
+  if (!templateId) return
+  const response = await gameRewardTemplateCopySnapshotPost({id: templateId})
   const snapshot = response.data.data
   ruleForm.contents = parseRewardItems(snapshot?.rewardItemsJson)
 }
@@ -160,11 +155,9 @@ const onRewardTemplateChange = async (event?: any) => {
 const beforeOpen = (form: any, isEditor: boolean) => {
   selectedRewardTemplateId.value = undefined
   form.contents = parseRewardItems(form.contents)
-  const appId = normalizeAppId(props.appId)
-  if (appId) form.appId = appId
-  if (form.appId) {
-    loadScopedOptions(form.appId)
-  }
+
+
+  loadScopedOptions()
   // 回显：long(秒) → Date 供 DatePicker 显示
   if (form.startTime && typeof form.startTime === 'number') {
     form.startTime = new Date(form.startTime * 1000)
@@ -190,7 +183,7 @@ const beforeSubmit = (form: any) => {
 }
 
 onMounted(async () => {
-  await loadScopedOptions(normalizeAppId(props.appId))
+  await loadScopedOptions()
 })
 
 defineExpose({

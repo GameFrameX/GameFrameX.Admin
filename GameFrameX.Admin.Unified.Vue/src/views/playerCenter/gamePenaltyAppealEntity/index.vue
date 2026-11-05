@@ -43,8 +43,8 @@ import type { CrudAction, CrudColumnConfig } from '../../../components/crud-data
 import SearchForm from '/@/components/search-form/index.vue'
 import Tag from 'primevue/tag'
 import { useCrudTable } from '../../../composables/useCrudTable.ts'
-import { usePrimeTablePage, useRouteAppIdQuerySync } from '../../../composables'
-import { useCurrentApp } from '../../../composables/useCurrentApp.ts'
+import { usePrimeTablePage } from '../../../composables'
+
 import {formatUnix} from '../../../utils/formatTime.ts'
 import addDialog from '/@/views/playerCenter/gamePenaltyAppealEntity/component/AddDialog.vue'
 import reviewDialog from '/@/views/playerCenter/gamePenaltyAppealEntity/component/ReviewDialog.vue'
@@ -59,8 +59,6 @@ const route = useRoute()
 const addDialogRef = ref()
 const reviewDialogRef = ref()
 const addTitle = ref('')
-
-const {resolveInitialAppId} = useCurrentApp()
 
 const getEnumLabel = (options: EnumOption[], value: number | undefined | null) => {
   const opt = findEnumOption(options, value)
@@ -91,13 +89,6 @@ const {
 })
 
 const onPage = usePrimeTablePage(tableParams, onQuery)
-
-useRouteAppIdQuerySync({
-  route,
-  queryParams,
-  resolveAppId: resolveInitialAppId,
-  onQuery,
-})
 
 const openAdd = () => {
   addTitle.value = t('message.gameBusiness.trustSafety.appeal.addAppeal')

@@ -55,7 +55,7 @@
           </template>
           <template #body-createdTime="{ data }">{{ formatUnix(data.createdTime) }}</template>
         </CrudDataTable>
-        <editDialog ref="editDialogRef" :title="editTitle" :appId="queryParams.appId" @reloadTable="onQuery"/>
+        <editDialog ref="editDialogRef" :title="editTitle" @reloadTable="onQuery"/>
         <detailDialog ref="detailDialogRef"/>
         <publishConfirmDialog ref="publishDialogRef" @done="onQuery"/>
         <revokeDialog ref="revokeDialogRef" @done="onQuery"/>
@@ -75,8 +75,8 @@ import {ref, computed} from 'vue'
 import { useRoute } from 'vue-router'
 import { showSuccess } from '../../../../utils/message.ts'
 import { useCrudTable } from '../../../../composables/useCrudTable.ts'
-import {usePrimeTablePage, useRouteAppIdQuerySync } from '../../../../composables'
-import { useCurrentApp } from '../../../../composables/useCurrentApp.ts'
+import {usePrimeTablePage } from '../../../../composables'
+
 import { t } from '../../../../i18n/index.ts'
 import editDialog from '/@/views/noticeCenter/mail/mailCampaignEntity/component/EditDialog.vue'
 import detailDialog from '/@/views/noticeCenter/mail/mailCampaignEntity/component/DetailDialog.vue'
@@ -91,7 +91,6 @@ import {
 } from './constants'
 
 const route = useRoute()
-const {resolveInitialAppId} = useCurrentApp()
 
 const editDialogRef = ref()
 const detailDialogRef = ref()
@@ -133,13 +132,6 @@ const {
 })
 
 const onPage = usePrimeTablePage(tableParams, onQuery)
-
-useRouteAppIdQuerySync({
-  route,
-  queryParams,
-  resolveAppId: resolveInitialAppId,
-  onQuery,
-})
 
 const openAdd = () => {
   editTitle.value = t('message.gameBusiness.mailCampaign.add')

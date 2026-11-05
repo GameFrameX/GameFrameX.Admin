@@ -38,11 +38,9 @@ import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import {TextField} from '../../../../components/crud-form-fields'
 import { gameOrderAddPost, gameOrderUpdatePost } from '../../../../api/gameOrder'
 import {systemEnumEnumDataListGet} from '../../../../api/systemEnum';
-import {normalizeAppId} from '../../../../utils/appWorkspace.ts'
 
 const props = defineProps({
   title: {type: String, default: ''},
-  appId: {type: [Number, String], default: undefined},
 })
 const emit = defineEmits(['reloadTable'])
 const dialogRef = ref()
@@ -57,8 +55,8 @@ const rules = {
 }
 
 const beforeOpen = (form: any, isEditor: boolean) => {
-  const appId = normalizeAppId(props.appId)
-  if (appId) form.appId = appId
+
+
 }
 
 onMounted(async () => {

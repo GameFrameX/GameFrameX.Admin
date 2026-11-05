@@ -5,7 +5,7 @@
         <SearchForm
             v-model="queryParams"
             :fields="searchFields"
-            :showAdd="!!queryParams.appId"
+            :showAdd="true"
             authPrefix="gameRewardTemplateEntity"
             @query="onQuery"
             @add="openAdd"
@@ -31,7 +31,7 @@
           </template>
           <template #body-createdTime="{ data }">{{ formatUnix(data.createdTime) }}</template>
         </CrudDataTable>
-        <editDialog ref="editDialogRef" :title="editTitle" :appId="queryParams.appId" @reloadTable="onQuery"/>
+        <editDialog ref="editDialogRef" :title="editTitle" @reloadTable="onQuery"/>
         <Dialog v-model:visible="snapshotVisible" modal :header="t('message.gameBusiness.rewardTemplate.snapshotPreview')" :style="{ width: 'min(720px, calc(100vw - 32px))' }">
           <Textarea v-model="snapshotJson" readonly autoResize class="w-full font-mono snapshot-textarea"/>
         </Dialog>
@@ -48,7 +48,7 @@ import {computed, ref, watch, onMounted} from 'vue'
 import {useRoute} from 'vue-router'
 import {useCrudTable} from '../../../../composables/useCrudTable.ts'
 import {usePrimeTablePage} from '../../../../composables'
-import {useCurrentApp} from '../../../../composables/useCurrentApp.ts'
+
 import {MAX_SELECT_SIZE} from '../../../../constants/pagination.ts'
 import editDialog from '/@/views/noticeCenter/reward/gameRewardTemplateEntity/component/EditDialog.vue'
 import { gameRewardTemplateCopySnapshotPost, gameRewardTemplateDeletePost, gameRewardTemplatePagePost } from '../../../../api/gameRewardTemplate'
@@ -56,11 +56,10 @@ import {parseRewardItems} from '../../../../components/reward-items-editor/rewar
 import { gameRewardTemplateGroupSelectPost } from '../../../../api/gameRewardTemplateGroup'
 import {isEnabled} from '../../../../utils/isEnabled.ts'
 import type {CrudAction, CrudColumnConfig} from '../../../../components/crud-data-table/types.ts'
-import type {AppWorkspaceId} from '../../../../utils/appWorkspace.ts'
 
 const emptyPage = {data: {result: {items: [], total: 0}}}
 const route = useRoute()
-const {resolveInitialAppId} = useCurrentApp()
+
 const editDialogRef = ref()
 const editTitle = ref('')
 const groupList = ref<any[]>([])
@@ -79,16 +78,14 @@ const searchFields = computed(() => [
 
 const {loading, tableData, queryParams, tableParams, onQuery, onDelete} = useCrudTable({
   api: {
-    pageApi: (params) => params.appId ? gameRewardTemplatePagePost(params) : Promise.resolve(emptyPage),
+    pageApi: (params) => gameRewardTemplatePagePost(params),
     deleteApi: (params) => gameRewardTemplateDeletePost(params),
   },
   immediate: true,
 })
 
-queryParams.value.appId = resolveInitialAppId(route.query)
-
-const loadGroupList = async (appId?: AppWorkspaceId) => {
-  groupList.value = appId ? ((await gameRewardTemplateGroupSelectPost({appId, pageSize: MAX_SELECT_SIZE})).data.data ?? []) : []
+const loadGroupList = async () => {
+  groupList.value = ((await gameRewardTemplateGroupSelectPost({pageSize: MAX_SELECT_SIZE})).data.data ?? [])
 }
 
 const rewardSummary = (value?: string) => {
@@ -97,17 +94,6 @@ const rewardSummary = (value?: string) => {
     .map((u) => `${u.itemId || u.id} x ${u.count}`)
     .join(', ')
 }
-
-watch(() => queryParams.value.appId, (newVal) => {
-  queryParams.value.groupId = undefined
-  loadGroupList(newVal)
-})
-
-watch(() => route.query.appId, async () => {
-  queryParams.value.appId = resolveInitialAppId(route.query)
-  queryParams.value.groupId = undefined
-  await onQuery()
-})
 
 const onPage = usePrimeTablePage(tableParams, onQuery)
 
@@ -124,7 +110,7 @@ const openEdit = (row: any) => {
 }
 
 const previewSnapshot = async (row: any) => {
-  const response = await gameRewardTemplateCopySnapshotPost({id: row.id, appId: queryParams.value.appId})
+  const response = await gameRewardTemplateCopySnapshotPost({id: row.id})
   const snapshot = response.data.data
   snapshotJson.value = JSON.stringify(snapshot ? JSON.parse(snapshot.rewardItemsJson || '[]') : [], null, 2)
   snapshotVisible.value = true
@@ -153,7 +139,7 @@ const columns = computed<CrudColumnConfig[]>(() => [
   {field: 'createdTime', header: t('common.label.createTime'), width: '200px', bodyKey: 'createdTime'},
 ])
 
-onMounted(() => loadGroupList(queryParams.value.appId))
+onMounted(() => loadGroupList())
 </script>
 
 <style scoped>

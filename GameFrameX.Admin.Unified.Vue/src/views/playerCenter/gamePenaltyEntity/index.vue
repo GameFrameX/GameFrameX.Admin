@@ -56,7 +56,7 @@ import SearchForm from '/@/components/search-form/index.vue'
 import Tag from 'primevue/tag'
 import { useCrudTable } from '../../../composables/useCrudTable.ts'
 import {usePrimeTablePage} from '../../../composables'
-import { useCurrentApp } from '../../../composables/useCurrentApp.ts'
+
 import {formatUnix} from '../../../utils/formatTime.ts'
 import addDialog from '/@/views/playerCenter/gamePenaltyEntity/component/AddDialog.vue'
 import revokeDialog from '/@/views/playerCenter/gamePenaltyEntity/component/RevokeDialog.vue'
@@ -78,8 +78,6 @@ const addDialogRef = ref()
 const revokeDialogRef = ref()
 const syncResultDialogRef = ref()
 const addTitle = ref('')
-
-const {resolveInitialAppId} = useCurrentApp()
 
 const getEnumLabel = (options: EnumOption[], value: number | undefined | null) => {
   const opt = findEnumOption(options, value)
@@ -112,8 +110,6 @@ const {
   immediate: true,
 })
 
-queryParams.value.appId = resolveInitialAppId(route.query)
-
 const onPage = usePrimeTablePage(tableParams, onQuery)
 
 // 区服名映射（按当前应用加载）
@@ -129,8 +125,8 @@ const getAreaName = (areaId: number | null | undefined) => {
   }
   return String(areaId)
 }
-const loadAreaList = async (appId?: number) => {
-  const res = await gameAreaSelectStringPost({ appId: appId, pageSize: MAX_SELECT_SIZE })
+const loadAreaList = async () => {
+  const res = await gameAreaSelectStringPost({ pageSize: MAX_SELECT_SIZE })
   areaList.value = res.data.data ?? []
 }
 
@@ -211,18 +207,7 @@ const customActions: CrudAction[] = [
   },
 ]
 
-watch(() => queryParams.value.appId, (newVal) => {
-  queryParams.value.areaId = undefined
-  loadAreaList(newVal)
-})
-
-watch(() => route.query.appId, async () => {
-  queryParams.value.appId = resolveInitialAppId(route.query)
-  queryParams.value.areaId = undefined
-  await onQuery()
-})
-
 onMounted(async () => {
-  await loadAreaList(queryParams.value.appId)
+  await loadAreaList()
 })
 </script>

@@ -63,7 +63,7 @@ import { globalPlatformSelectPost } from '../../../../api/globalPlatform'
 import { globalLanguageSelectPost } from '../../../../api/globalLanguage'
 import { channelDefinitionAvailableGet } from '../../../../api/channelDefinition'
 import { gameAppPackageListGet } from '../../../../api/gameAppPackage'
-import {normalizeAppId, type AppWorkspaceId} from '../../../../utils/appWorkspace.ts'
+
 import { mapAvailableChannelDefinitions } from '../../../../utils/channelDefinition.ts'
 import {MAX_SELECT_SIZE} from '../../../../constants/pagination.ts'
 
@@ -71,11 +71,6 @@ var props = defineProps({
   title: {
     type: String,
     default: '',
-  },
-  // 页面所属应用（新增时表单无行数据，包名候选按该 appId 加载）
-  appId: {
-    type: [Number, String],
-    default: undefined,
   },
 })
 const emit = defineEmits(['reloadTable'])
@@ -154,13 +149,10 @@ const onChannelQuery = async () => {
 }
 
 // 包名候选按当前应用加载（包名维度仅应用作用域行有效）；置顶「不限」项。
-const onPackageQuery = async (appId?: AppWorkspaceId) => {
-  const id = normalizeAppId(appId)
-  if (id === undefined) {
-    scopeOptions.value.package = [unlimitedOption()]
-    return
-  }
-  const res = await gameAppPackageListGet({appId: id})
+const onPackageQuery = async () => {
+
+
+  const res = await gameAppPackageListGet({})
   const packages = res.data?.data || []
   const options: any[] = [unlimitedOption()]
   for (const p of packages) {
@@ -195,14 +187,11 @@ const beforeOpen = async (form: any, _isEditor: boolean) => {
   // Unix 秒 → Date 供 DatePicker 回显
   form.startTime = toDate(form.startTime)
   form.endTime = toDate(form.endTime)
-  // appId 归属：编辑态用行自带值；新增态（openDialog({})）回落页面传入的 props.appId
-  const appId = normalizeAppId(form?.appId) ?? normalizeAppId(props.appId)
-  if (appId !== undefined) {
-    form.appId = appId
-  }
+
+
   loading.value = true
   try {
-    await onPackageQuery(appId)
+    await onPackageQuery()
   } finally {
     loading.value = false
   }

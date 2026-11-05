@@ -121,7 +121,6 @@ import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import {TextareaField} from '../../../../components/crud-form-fields'
 import {showError} from '../../../../utils/message.ts'
 import { gamePaymentConfigAddPost, gamePaymentConfigChannelsGet, gamePaymentConfigSchemaGet, gamePaymentConfigUpdatePost } from '../../../../api/gamePaymentConfig'
-import {normalizeAppId} from '../../../../utils/appWorkspace.ts'
 
 interface PaymentFieldOption {
   value: string
@@ -146,47 +145,20 @@ interface PaymentSchema {
 
 const props = defineProps({
   title: {type: String, default: ''},
-  appOptions: {type: Array, default: () => []},
   packageMap: {type: Object, default: () => ({})},
 })
 const emit = defineEmits(['reloadTable'])
 const dialogRef = ref()
 
-const scopeText = (form: any) => {
-  const app = normalizeAppId(form?.gameAppId) ?? normalizeAppId(form?.appId)
-  const pkg = form?.packageId || 0
-  if (app === undefined) {
-    return t('gameBusiness.appWorkspace.appUnavailable')
-  }
-  const appItem = (props.appOptions as any[]).find((a: any) => String(normalizeAppId(a.id)) === String(app))
-  const appText = appItem?.name || `App ${app}`
-  if (pkg === 0) {
-    return `${t('gameBusiness.configScope.appOverride')}：${appText}`
-  }
-  const pkgMap = props.packageMap as Record<number, string>
-  const pkgText = pkgMap[pkg] || `Package ${pkg}`
-  return `${t('gameBusiness.configScope.packageOverride')}：${pkgText}`
-}
+const scopeText = (form: any) => form.packageId ? t('gameBusiness.configScope.packageOverride') + '：' + ((props.packageMap as Record<string, string>)[form.packageId] || form.packageId) : t('gameBusiness.configScope.gameDefault')
 
-const scopeSeverity = (form: any) => {
-  const app = normalizeAppId(form?.gameAppId) ?? normalizeAppId(form?.appId)
-  const pkg = form?.packageId || 0
-  if (app === undefined) {
-    return 'danger'
-  }
-  if (pkg === 0) {
-    return 'success'
-  }
-  return 'warn'
-}
+const scopeSeverity = (form: any) => form.packageId ? 'warn' : 'success'
 
 const channelOptions = ref<{ value: string; label: string }[]>([])
 const schema = ref<PaymentSchema | null>(null)
 
 const defaultForm = () => ({
   id: 0,
-  appId: undefined,
-  gameAppId: undefined,
   packageId: undefined,
   payChannel: undefined,
   isSandbox: false,
@@ -278,11 +250,8 @@ const beforeOpen = async (form: any, isEditor: boolean) => {
 }
 
 const beforeSubmit = (form: any) => {
-  const appId = normalizeAppId(form.gameAppId) ?? normalizeAppId(form.appId)
-  if (appId === undefined) {
-    showError(t('gameBusiness.appWorkspace.appIdRequired'))
-    return false
-  }
+
+
   if (!form.payChannel) {
     showError('请选择支付渠道')
     return false
@@ -311,8 +280,6 @@ const beforeSubmit = (form: any) => {
 
   const normalized: Record<string, any> = {
     id: form.id,
-    appId,
-    gameAppId: appId,
     packageId: form.packageId || undefined,
     payChannel: String(form.payChannel || '').trim().toLowerCase(),
     isSandbox: !!form.isSandbox,

@@ -30,11 +30,9 @@ import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import FormHelpText from '/@/components/form-help-text/index.vue'
 import {TextField} from '../../../../components/crud-form-fields'
 import { gameRedeemCodeChannelAddPost, gameRedeemCodeChannelUpdatePost } from '../../../../api/gameRedeemCodeChannel'
-import {normalizeAppId} from '../../../../utils/appWorkspace.ts'
 
 const props = defineProps({
   title: {type: String, default: ''},
-  appId: {type: [Number, String], default: undefined},
 })
 const emit = defineEmits(['reloadTable'])
 
@@ -46,8 +44,8 @@ const rules = {
 }
 
 const beforeOpen = (form: any, isEditor: boolean) => {
-  const appId = normalizeAppId(props.appId)
-  if (appId) form.appId = appId
+
+
   // 每角色可用次数：缺省回退 0（C159 默认值；后端未返回字段时保证新建/编辑回显一致）
   if (form.roleUsageLimit === undefined || form.roleUsageLimit === null) {
     form.roleUsageLimit = 0

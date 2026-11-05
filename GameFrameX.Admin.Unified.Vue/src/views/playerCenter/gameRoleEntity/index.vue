@@ -44,7 +44,7 @@
           </template>
           <template #body-lastLoginTime="{ data }">{{ formatUnix(data.lastLoginTime) }}</template>
         </CrudDataTable>
-        <editDialog ref="editDialogRef" :title="editTitle" :appId="queryParams.appId" @reloadTable="onQuery" />
+        <editDialog ref="editDialogRef" :title="editTitle" @reloadTable="onQuery" />
       </template>
     </Card>
   </div>
@@ -60,7 +60,7 @@ import type { CrudColumnConfig } from '../../../components/crud-data-table/types
 import { formatUnix } from '../../../utils/formatTime.ts'
 import { useCrudTable } from '../../../composables/useCrudTable.ts'
 import {usePrimeTablePage} from '../../../composables'
-import { useCurrentApp } from '../../../composables/useCurrentApp.ts'
+
 import editDialog from '/@/views/playerCenter/gameRoleEntity/component/EditDialog.vue'
 import { gameRolePagePost, gameRoleSyncPost, gameRoleUpdateToSandBoxPost, gameRoleUpdateToUnSandBoxPost } from '../../../api/gameRole'
 import { gameRoleSelectStringPost } from '../../../api/gameRole'
@@ -70,8 +70,6 @@ import {MAX_SELECT_SIZE} from '../../../constants/pagination.ts'
 const route = useRoute()
 const editDialogRef = ref()
 const editTitle = ref('')
-
-const {resolveInitialAppId} = useCurrentApp()
 
 const searchFields = computed(() => [
   { key: 'userId', label: t('message.gameBusiness.user.userId'), type: 'input', placeholder: t('message.gameBusiness.role.pleaseEnterUserId') },
@@ -94,8 +92,6 @@ const {
   api: { pageApi: gameRolePagePost },
   immediate: true,
 })
-
-queryParams.value.appId = resolveInitialAppId(route.query)
 
 const onPage = usePrimeTablePage(tableParams, onQuery)
 
@@ -199,24 +195,14 @@ const getAreaName = (areaId: number) => {
   return areaId
 }
 
-const getAreaList = async (appId?: number) => {
-  const res = await gameAreaSelectStringPost({ appId: appId, pageSize: MAX_SELECT_SIZE })
+const getAreaList = async () => {
+  const res = await gameAreaSelectStringPost({ pageSize: MAX_SELECT_SIZE })
   areaList.value = res.data.data ?? []
 }
 
 // Reset dependent filter selections when current app changes
-watch(() => queryParams.value.appId, (newVal) => {
-  queryParams.value.areaId = undefined
-  getAreaList(newVal)
-})
-
-watch(() => route.query.appId, async () => {
-  queryParams.value.appId = resolveInitialAppId(route.query)
-  queryParams.value.areaId = undefined
-  await onQuery()
-})
 
 onMounted(async () => {
-  await getAreaList(queryParams.value.appId)
+  await getAreaList()
 })
 </script>

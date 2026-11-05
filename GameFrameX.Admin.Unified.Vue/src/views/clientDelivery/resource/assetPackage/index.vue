@@ -9,7 +9,7 @@
             authPrefix="gameAppAssetPackage"
             :defaultSearchKey="false"
             @query="onQuery"
-            
+
             @add="openAddTenantGameAppAssetPackage"
         />
       </template>
@@ -25,7 +25,7 @@
                        :exportQuery="queryParams"
                        @page="onPage">
         </CrudDataTable>
-        <editDialog ref="editDialogRef" :title="editTenantGameAppAssetPackageTitle" :appId="queryParams.appId" @reloadTable="onQuery"/>
+        <editDialog ref="editDialogRef" :title="editTenantGameAppAssetPackageTitle" @reloadTable="onQuery"/>
       </template>
     </Card>
   </div>
@@ -37,8 +37,8 @@ import {useRoute} from 'vue-router'
 import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import type {CrudColumnConfig} from '../../../../components/crud-data-table/types.ts'
 import {useCrudTable} from '../../../../composables/useCrudTable.ts'
-import {usePrimeTablePage, useRouteAppIdQuerySync} from '../../../../composables'
-import {useCurrentApp} from '../../../../composables/useCurrentApp.ts'
+import {usePrimeTablePage} from '../../../../composables'
+
 import editDialog from '/@/views/clientDelivery/resource/assetPackage/component/EditDialog.vue'
 import { gameAppAssetPackageDeletePost, gameAppAssetPackagePagePost } from '../../../../api/gameAppAssetPackage'
 import {createdNameColumn, descriptionColumn, nameColumn, nameSearchField} from '../../../../utils/crudConfig.ts'
@@ -46,7 +46,6 @@ import {createdNameColumn, descriptionColumn, nameColumn, nameSearchField} from 
 const route = useRoute()
 const editDialogRef = ref()
 const editTenantGameAppAssetPackageTitle = ref('')
-const {resolveInitialAppId} = useCurrentApp()
 
 const searchFields = computed(() => [
   nameSearchField({label: t('message.client.packageAssetName'), placeholder: t('message.client.packageAssetName')}),
@@ -70,7 +69,7 @@ const onPage = usePrimeTablePage(tableParams, onQuery)
 const openAddTenantGameAppAssetPackage = () => {
   editTenantGameAppAssetPackageTitle.value = t('message.client.addAssetPackage')
   editDialogRef.value.isEditor = false
-  editDialogRef.value.openDialog({appId: queryParams.value.appId})
+  editDialogRef.value.openDialog({})
 }
 
 const openEditTenantGameAppAssetPackage = (row: any) => {
@@ -90,10 +89,4 @@ const actions = {
   delete: onDelete,
 }
 
-useRouteAppIdQuerySync({
-  route,
-  queryParams,
-  resolveAppId: resolveInitialAppId,
-  onQuery,
-})
 </script>

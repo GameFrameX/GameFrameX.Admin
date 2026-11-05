@@ -7,7 +7,7 @@
             :fields="searchFields"
             authPrefix="gameWebShopOrderEntity"
             @query="onQuery"
-            
+
         />
       </template>
     </Card>
@@ -48,15 +48,14 @@ import type { CrudColumnConfig } from '../../../components/crud-data-table/types
 import { formatUnix } from '../../../utils/formatTime.ts'
 import { createAction } from '../../../components/crud-data-table'
 import {useCrudTable} from '../../../composables/useCrudTable.ts'
-import {usePrimeTablePage, useRouteAppIdQuerySync} from '../../../composables'
-import {useCurrentApp} from '../../../composables/useCurrentApp.ts'
+import {usePrimeTablePage} from '../../../composables'
+
 import editDialog from '/@/views/commerceCenter/webShopOrder/component/EditDialog.vue'
 import { gameWebShopOrderPagePost, gameWebShopOrderDeletePost } from '../../../api/gameWebShopOrder'
 import { gameWebShopSelectPost } from '../../../api/gameWebShop'
 import {MAX_SELECT_SIZE} from '../../../constants/pagination.ts'
 
 const route = useRoute()
-const {resolveInitialAppId} = useCurrentApp()
 
 const searchFields = computed(() => [
 ])
@@ -77,13 +76,6 @@ const {
 })
 
 const onPage = usePrimeTablePage(tableParams, onQuery)
-
-useRouteAppIdQuerySync({
-  route,
-  queryParams,
-  resolveAppId: resolveInitialAppId,
-  onQuery,
-})
 
 const actions = { delete: onDelete }
 
@@ -114,8 +106,8 @@ const customActions: CrudAction[] = [
 
 // WebShop list for display
 const wenShopListData = ref<Array<{ id: number; logo: string; name: string }>>([])
-const getListWebShop = async (appId?: number) => {
-  var res = await gameWebShopSelectPost({appId: appId, pageSize: MAX_SELECT_SIZE})
+const getListWebShop = async () => {
+  var res = await gameWebShopSelectPost({pageSize: MAX_SELECT_SIZE})
   wenShopListData.value = res.data.data ?? []
 }
 const getWebShopInfo = (id: any) => {
@@ -125,11 +117,7 @@ const getWebShopInfo = (id: any) => {
   }
 }
 
-watch(() => queryParams.value.appId, (newVal) => {
-  getListWebShop(newVal)
-})
-
 onMounted(async () => {
-  await getListWebShop(queryParams.value.appId)
+  await getListWebShop()
 })
 </script>

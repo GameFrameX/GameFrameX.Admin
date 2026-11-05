@@ -22,10 +22,9 @@ const emit = defineEmits(['rotate'])
 
 const visible = ref(false)
 const expireTime = ref<any>(null)
-const appId = ref(0)
 
 const open = (row: any) => {
-  appId.value = row.appId
+
   expireTime.value = null
   visible.value = true
 }
@@ -33,7 +32,7 @@ const open = (row: any) => {
 const confirm = () => {
   // 到期时间存为 Unix 秒（long）；留空 = null（永不过期）
   const expireTimeLong = expireTime.value ? Math.floor(new Date(expireTime.value).getTime() / 1000) : null
-  emit('rotate', {appId: appId.value, expireTime: expireTimeLong})
+  emit('rotate', {expireTime: expireTimeLong})
   visible.value = false
 }
 

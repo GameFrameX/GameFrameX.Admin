@@ -39,7 +39,6 @@
         <editDialog
             ref="editDialogRef"
             :title="editFeatureSwitchTitle"
-            :appId="activeAppId"
             @reloadTable="runScopedQuery"
         />
       </template>
@@ -53,19 +52,16 @@ import {computed, onMounted, ref} from 'vue'
 import {useRoute} from 'vue-router'
 import {useCrudTable} from '../../../composables/useCrudTable.ts'
 import {usePrimeTablePage} from '../../../composables'
-import {useCurrentApp} from '../../../composables/useCurrentApp.ts'
+
 import editDialog from '/@/views/clientDelivery/featureSwitch/component/EditDialog.vue'
 import { gameAppFeatureSwitchPagePost, gameAppFeatureSwitchDeletePost } from '../../../api/gameAppFeatureSwitch'
 import type {CrudColumnConfig} from '../../../components/crud-data-table/types.ts'
 import {showWarning} from '../../../utils/message.ts'
 import {formatUnix} from '../../../utils/formatTime.ts'
-import {normalizeAppId, normalizeRouteAppId, type AppWorkspaceId} from '../../../utils/appWorkspace.ts'
 
 const editDialogRef = ref()
 const editFeatureSwitchTitle = ref('')
 const route = useRoute()
-const {appOptions, loadApps, currentAppId, setCurrentApp} = useCurrentApp()
-const appMap = ref<Record<string, string>>({})
 
 const {
   loading, tableData, queryParams, tableParams,
@@ -76,38 +72,12 @@ const {
   deleteConfirmLabelFields: ['switchKey', 'displayName', 'id'],
 })
 
-const currentQueryAppId = (): AppWorkspaceId | undefined => {
-  return normalizeAppId(queryParams.value?.appId) ?? normalizeAppId(currentAppId.value)
-}
-
-const isAvailableAppId = (appId: AppWorkspaceId | undefined) => {
-  return appId !== undefined && !!appMap.value[String(appId)]
-}
-
-const requireCurrentQueryAppId = (): AppWorkspaceId | undefined => {
-  const appId = currentQueryAppId()
-  if (appId === undefined) {
-    showWarning(t('gameBusiness.appWorkspace.appIdRequired'))
-    return undefined
-  }
-  if (!isAvailableAppId(appId)) {
-    showWarning(t('gameBusiness.appWorkspace.appUnavailable'))
-    return undefined
-  }
-  return appId
-}
-
 const runScopedQuery = () => {
-  const appId = requireCurrentQueryAppId()
-  if (appId === undefined) {
-    return
-  }
-  queryParams.value.appId = appId
+
+
+
   onQuery()
 }
-
-// 弹窗 appId 绑定：新增表单无行数据，包名候选/提交归属按当前作用域应用兜底
-const activeAppId = computed(() => currentQueryAppId())
 
 const onPage = usePrimeTablePage(tableParams, runScopedQuery)
 
@@ -123,7 +93,6 @@ const audienceOptions = computed(() => [
 ])
 
 const searchFields = computed(() => [
-  // appId 只来自 URL 解析（onMounted 里 normalizeRouteAppId），不作为查询表单字段暴露
   { key: 'switchKey', label: t('message.featureSwitch.switchKey'), type: 'input', placeholder: t('message.featureSwitch.switchKeyPlaceholder') },
   { key: 'audience', label: t('message.featureSwitch.audience'), type: 'select', options: audienceOptions.value, optionLabel: 'label', optionValue: 'value', placeholder: t('message.common.form.pleaseSelect') },
   { key: 'isEnabled', label: t('message.client.isEnabled'), type: 'select', options: enabledOptions.value, optionLabel: 'label', optionValue: 'value', placeholder: t('message.common.form.pleaseSelect') },
@@ -165,28 +134,12 @@ const getTimeWindow = (row: any) => {
   return `${row.startTime ? formatUnix(row.startTime) : '∞'} ~ ${row.endTime ? formatUnix(row.endTime) : '∞'}`
 }
 
-const onAppQuery = async () => {
-  await loadApps()
-  const map: Record<string, string> = {}
-  for (const a of appOptions.value) {
-    const id = normalizeAppId(a.id)
-    if (id === undefined || a.isEnabled === false) {
-      continue
-    }
-    map[String(id)] = a.appName || a.name || String(id)
-  }
-  appMap.value = map
-}
-
 // 打开新增页面
 const openAddFeatureSwitch = () => {
-  const appId = requireCurrentQueryAppId()
-  if (appId === undefined) {
-    return
-  }
+
+
   editFeatureSwitchTitle.value = t('message.featureSwitch.addTitle')
   editDialogRef.value.isEditor = false
-  // 空对象走 defaultForm 默认值（audience/rollout/isEnabled），appId 由 props 兜底注入
   editDialogRef.value.openDialog({})
 }
 
@@ -198,11 +151,9 @@ const openEditFeatureSwitch = (row: any) => {
 }
 
 const onScopedDelete = async (row: any) => {
-  const appId = requireCurrentQueryAppId()
-  if (appId === undefined) {
-    return
-  }
-  queryParams.value.appId = appId
+
+
+
   await onDelete(row)
 }
 
@@ -225,19 +176,12 @@ const actions = {
 }
 
 onMounted(async () => {
-  await onAppQuery()
-  const appId = normalizeRouteAppId(route) ?? normalizeAppId(currentAppId.value)
-  if (appId === undefined) {
-    showWarning(t('gameBusiness.appWorkspace.appIdRequired'))
-    return
-  }
-  if (!isAvailableAppId(appId)) {
-    showWarning(t('gameBusiness.appWorkspace.appUnavailable'))
-    return
-  }
 
-  setCurrentApp(appId)
-  queryParams.value.appId = appId
+
+
+
+
+
   runScopedQuery()
 })
 </script>

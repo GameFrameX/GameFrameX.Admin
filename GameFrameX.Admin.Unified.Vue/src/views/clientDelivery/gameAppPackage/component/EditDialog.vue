@@ -14,7 +14,7 @@
 
       <FormLabel>{{ t('gameBusiness.package.parentPackage') }}</FormLabel>
       <div>
-        <Select filter v-model="ruleForm.parentPackageId" :options="parentPackageOptions(ruleForm.appId)" optionLabel="label" optionValue="id" :placeholder="ruleForm.appId ? t('gameBusiness.package.parentPackagePlaceholder') : t('gameBusiness.package.parentPackageNoApp')" :disabled="!ruleForm.appId" showClear class="w-full"/>
+        <Select filter v-model="ruleForm.parentPackageId" :options="parentPackageOptions()" optionLabel="label" optionValue="id" :placeholder="t('gameBusiness.package.parentPackagePlaceholder')" showClear class="w-full"/>
         <Message severity="secondary" size="small" variant="simple" style="margin-top: 4px">{{ t('gameBusiness.package.parentPackageHint') }}</Message>
       </div>
 
@@ -54,12 +54,11 @@ import { gameAppPackageAddPost, gameAppPackageUpdatePost, gameAppPackagePagePost
 import { globalPlatformSelectPost } from '../../../../api/globalPlatform'
 import { channelDefinitionAvailableGet } from '../../../../api/channelDefinition'
 import { MAX_PAGE_SIZE, MAX_SELECT_SIZE } from '../../../../constants/pagination.ts'
-import {normalizeAppId} from '../../../../utils/appWorkspace.ts'
+
 import { mapAvailableChannelDefinitions } from '../../../../utils/channelDefinition.ts'
 
 const props = defineProps({
   title: { type: String, default: '' },
-  appId: { type: [Number, String], default: undefined },
 })
 const emit = defineEmits(['reloadTable'])
 const dialogRef = ref()
@@ -76,7 +75,6 @@ const rules = {
 }
 
 const defaultForm = () => ({
-  appId: normalizeAppId(props.appId),
   parentPackageId: undefined,
   isDefault: false,
 })
@@ -95,8 +93,8 @@ const firstOptionValue = (options: any[], ...keys: string[]) => {
 }
 
 const beforeOpen = (form: any, isEditor: boolean) => {
-  const appId = normalizeAppId(props.appId)
-  if (appId) form.appId = appId
+
+
   if (isEditor) {
     return
   }
@@ -104,12 +102,10 @@ const beforeOpen = (form: any, isEditor: boolean) => {
   form.channelId = form.channelId ?? firstOptionValue(channelOptions.value, 'value', 'id')
 }
 
-const parentPackageOptions = (appId: any) => {
-  if (!appId) {
-    return []
-  }
+const parentPackageOptions = () => {
+
   return allPackages.value
-    .filter((p) => p.appId === String(appId) && !p.parentPackageId && p.isEnabled !== false && p.id !== editingId.value)
+    .filter((p) => !p.parentPackageId && p.isEnabled !== false && p.id !== editingId.value)
     .map((p) => ({
       id: p.id,
       label: p.packageVersion ? `${p.packageName} / ${p.packageVersion}` : p.packageName,
@@ -120,7 +116,7 @@ const loadOptions = async () => {
   const [platforms, channels, packages] = await Promise.all([
     globalPlatformSelectPost({ page: 1, pageSize: MAX_SELECT_SIZE }),
     channelDefinitionAvailableGet({pageSize: MAX_SELECT_SIZE}),
-    gameAppPackagePagePost({ page: 1, pageSize: MAX_PAGE_SIZE, appId: normalizeAppId(props.appId) }),
+    gameAppPackagePagePost({ page: 1, pageSize: MAX_PAGE_SIZE }),
   ])
   platformOptions.value = platforms.data.data || []
   channelOptions.value = mapAvailableChannelDefinitions(channels.data.data || [], 'id')
