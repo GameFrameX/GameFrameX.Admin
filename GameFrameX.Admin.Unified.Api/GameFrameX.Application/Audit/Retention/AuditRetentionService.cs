@@ -10,48 +10,6 @@ using SqlSugar;
 namespace GameFrameX.Application.Audit.Retention;
 
 /// <summary>
-/// 单张源表的留存处理结果。
-/// </summary>
-public sealed class AuditRetentionTableResult
-{
-    /// <summary>
-    /// 日志种类标题（访问日志 / 操作日志）。
-    /// </summary>
-    public string LogKind { get; set; } = string.Empty;
-
-    /// <summary>
-    /// 本次从源表搬入归档表的行数。
-    /// </summary>
-    public long ArchivedCount { get; set; }
-
-    /// <summary>
-    /// 本次从归档表按保留天数清理的行数。
-    /// </summary>
-    public long PurgedCount { get; set; }
-}
-
-/// <summary>
-/// 一次留存执行的汇总结果。
-/// </summary>
-public sealed class AuditRetentionExecutionResult
-{
-    /// <summary>
-    /// 留存开关是否开启（false 时本次为空跑，未搬移任何数据）。
-    /// </summary>
-    public bool Enabled { get; set; }
-
-    /// <summary>
-    /// 各源表处理结果。
-    /// </summary>
-    public List<AuditRetentionTableResult> Tables { get; set; } = new();
-
-    /// <summary>
-    /// 总耗时（毫秒）。
-    /// </summary>
-    public long ElapsedMilliseconds { get; set; }
-}
-
-/// <summary>
 /// 审计日志留存服务（C404 / GFX-1216 R3）。把主库超期的访问 / 操作日志按批搬入同库归档表，
 /// 再按归档保留天数清理归档表；范围不含异常日志与差异日志（契约 §1.7）。
 /// </summary>
