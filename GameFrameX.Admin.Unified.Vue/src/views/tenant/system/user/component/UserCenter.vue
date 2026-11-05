@@ -33,14 +33,6 @@
             </div>
             <div class="account-center-org">
               <p>
-                <i class="fa-solid fa-school"></i>
-                <span>{{ userInfos.orgName ?? t('message.system.user.accountType_superAdmin') }}</span>
-              </p>
-              <p>
-                <i class="fa-solid fa-mug-hot"></i>
-                <span>{{ userInfos.posName ?? t('message.system.user.accountType_superAdmin') }}</span>
-              </p>
-              <p>
                 <i class="fa-solid fa-location-dot"></i>
                 <span>{{ userInfos.address ?? t('message.system.user.addressPlaceholder') }}</span>
               </p>
@@ -74,7 +66,6 @@
             <Tabs v-model:value="state.selectedTabName">
               <TabList>
                 <Tab value="0">{{ t('system.userCenter.basicInfo') }}</Tab>
-                <Tab value="1">{{ t('system.user.orgSection') }}</Tab>
                 <Tab value="2">{{ t('system.userCenter.changePwd') }}</Tab>
               </TabList>
               <TabPanels>
@@ -124,9 +115,6 @@
                       </div>
                     </div>
                   </Form>
-                </TabPanel>
-                <TabPanel value="1">
-                  <OrgTree ref="orgTreeRef"/>
                 </TabPanel>
                 <TabPanel value="2">
                   <Form ref="ruleFormPasswordRef" :initialValues="state.ruleFormPassword" :resolver="passwordResolver" @submit="onPasswordFormSubmit">
@@ -215,7 +203,6 @@ import {showConfirm} from '../../../../../utils/message.ts';
 import {useUserInfoStore} from '../../../../../stores/userInfo.ts';
 import {base64ToFile} from '../../../../../utils/base64Conver.ts';
 import {resolveBackendFileUrl} from '../../../../../utils/fileUrl.ts';
-import OrgTree from '/@/views/tenant/system/user/component/OrgTree.vue';
 import CropperDialog from '/@/components/image-cropper/index.vue';
 import VueGridLayout from 'vue-grid-layout';
 

@@ -77,7 +77,6 @@
     <Menu ref="menuRef" :model="contextMenuItems" :popup="true" />
 
     <EditRole ref="editRoleRef" :title="state.editRoleTitle" @query="onQuery"/>
-    <GrantData ref="grantDataRef" @query="onQuery"/>
   </div>
 </template>
 
@@ -88,7 +87,6 @@ import {computed, onMounted, reactive, ref} from 'vue';
 import {showConfirm, showSuccess} from '../../../../utils/message.ts';
 import {auth} from '../../../../utils/authFunction.ts';
 import EditRole from '/@/views/tenant/system/role/component/EditRole.vue';
-import GrantData from '/@/views/tenant/system/role/component/GrantData.vue';
 
 import {tenantRolePagePost, tenantRoleDeletePost} from '../../../../api/tenantRole';
 import {TenantRoleEntity} from '../../../../api/_shared/data-contracts.ts';
@@ -103,19 +101,10 @@ import CrudDataTable from '/@/components/crud-data-table/index.vue';
 import Menu from 'primevue/menu';
 
 const editRoleRef = ref<InstanceType<typeof EditRole>>();
-const grantDataRef = ref<InstanceType<typeof GrantData>>();
 const menuRef = ref();
 const contextMenuRow = ref<any>(null);
 
 const contextMenuItems = computed(() => [
-  {
-    label: t('system.role.grantDataScope'),
-    icon: 'fa-solid fa-building',
-    command: () => {
-      if (contextMenuRow.value) openGrantData(contextMenuRow.value);
-    },
-    disabled: !auth('systemRole:grantDataScope'),
-  },
   {
     label: t('common.button.delete') + t('system.role.roleName'),
     icon: 'fa-solid fa-trash',
@@ -173,10 +162,6 @@ const openAddRole = () => {
 const openEditRole = async (row: any) => {
   state.editRoleTitle = t('system.role.editRole');
   editRoleRef.value?.openDialog(row);
-};
-
-const openGrantData = (row: any) => {
-  grantDataRef.value?.openDialog(row);
 };
 
 const delRole = async (row: any) => {

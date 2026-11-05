@@ -70,54 +70,12 @@
                 </FormField>
                 <FormLabel>{{ t('system.user.age') }}</FormLabel>
                 <div><InputNumber v-model="ruleForm.age" :placeholder="t('system.user.age')" class="w100"/></div>
-                <FormLabel>{{ t('common.label.sort') }}</FormLabel>
-                <div><InputNumber v-model="ruleForm.orderNo" :placeholder="t('common.label.sort')" class="w100"/></div>
-              </BaseEditFieldGroup>
-
-              <BaseEditFieldGroup :title="t('system.user.orgSection')">
-                <FormLabel name="orgId">{{ t('system.user.belongOrg') }}</FormLabel>
-                <FormField name="orgId" v-slot="{ props: fProps, invalid, error }">
-                  <CascadeSelect v-bind="fProps" v-model="ruleForm.orgId" :options="cascadeOrgOptions" optionLabel="label" optionValue="value" optionGroupLabel="label" optionGroupChildren="items" :placeholder="t('system.user.belongOrg')" class="w100" showClear/>
-                  <Message v-if="invalid" severity="error" size="small" variant="simple">{{ error }}</Message>
-                </FormField>
-                <FormLabel name="posId">{{ t('system.user.position') }}</FormLabel>
-                <FormField name="posId" v-slot="{ props: fProps, invalid, error }">
-                  <Select filter v-bind="fProps" v-model="ruleForm.posId" :placeholder="t('system.user.position')" :options="posData" optionLabel="name" optionValue="id" showClear class="w100"/>
-                  <Message v-if="invalid" severity="error" size="small" variant="simple">{{ error }}</Message>
-                </FormField>
                 <FormLabel>{{ t('system.user.jobNum') }}</FormLabel>
                 <div><InputText v-model="ruleForm.jobNum" :placeholder="t('system.user.jobNum')" class="w-full"/></div>
                 <FormLabel>{{ t('system.user.joinDate') }}</FormLabel>
                 <div><DatePicker v-model="ruleForm.joinTime" dateFormat="yy-mm-dd" :placeholder="t('system.user.joinDate')" class="w100"/></div>
-              </BaseEditFieldGroup>
-
-              <BaseEditFieldGroup :title="t('system.user.extOrgSection')">
-                <div style="grid-column: 1 / -1">
-                  <div style="margin-bottom: 12px;">
-                    <Button outlined @click="addExtOrgRow(ruleForm)">
-                      <i :class="faPlus" class="mr-1"></i>
-                      {{ t('system.user.addExtOrg') }}
-                    </Button>
-                    <span style="font-size: 12px; color: gray; padding-left: 5px">{{ t('system.user.extOrgDataPermission') }}</span>
-                  </div>
-                  <template v-if="ruleForm.extOrgIdList != undefined && ruleForm.extOrgIdList.length > 0">
-                    <div v-for="(v, k) in ruleForm.extOrgIdList" :key="k" style="display: grid; grid-template-columns: auto 1fr auto 1fr; gap: 12px 16px; align-items: start; margin-bottom: 12px;">
-                      <FormLabel>
-                        <Button rounded severity="danger" size="small" @click="deleteExtOrgRow(ruleForm, k)">
-                          <i :class="faTrash" class="mr-1"></i>
-                        </Button>
-                        {{ t('system.user.belongOrg') }}
-                      </FormLabel>
-                      <CascadeSelect v-model="ruleForm.extOrgIdList[k].orgId" :options="cascadeOrgOptions" optionLabel="label" optionValue="value" optionGroupLabel="label" optionGroupChildren="items" :placeholder="t('system.user.orgPlaceholder')" class="w100" showClear/>
-                      <FormLabel>{{ t('system.user.position') }}</FormLabel>
-                      <Select filter v-model="ruleForm.extOrgIdList[k].posId" :placeholder="t('system.user.posName')" :options="posData" optionLabel="name" optionValue="id" showClear class="w100"/>
-                    </div>
-                  </template>
-                  <div v-else class="flex flex-column align-items-center" style="padding: 20px 0">
-                    <i class="fa-solid fa-inbox" style="font-size: 40px; color: var(--p-text-muted-color); margin-bottom: 8px"></i>
-                    <span style="color: var(--p-text-muted-color); font-size: 14px">{{ t('common.table.noData') }}</span>
-                  </div>
-                </div>
+                <FormLabel>{{ t('common.label.sort') }}</FormLabel>
+                <div><InputNumber v-model="ruleForm.orderNo" :placeholder="t('common.label.sort')" class="w100"/></div>
               </BaseEditFieldGroup>
             </TabPanel>
             <TabPanel value="1">
@@ -158,25 +116,16 @@
 </template>
 
 <script lang="ts" setup>
-import {faPlus, faTrash} from '../../../../../utils/icons.ts';
 
 import {computed, onMounted, ref} from 'vue'
-import {storeToRefs} from 'pinia'
-import {useUserInfoStore} from '../../../../../stores/userInfo.ts'
 import FormField from '@primevue/forms/formfield'
 import Message from 'primevue/message'
-import CascadeSelect from 'primevue/cascadeselect'
 import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import BaseEditFieldGroup from '/@/components/base-edit-dialog/FieldGroup.vue'
-import {tenantPositionListGet} from '../../../../../api/tenantPosition';
 import {tenantRoleListGet} from '../../../../../api/tenantRole';
 import {tenantUserAddPost, tenantUserUpdatePost, tenantUserOwnRoleListGet} from '../../../../../api/tenantUser';
-// ponytail: C400 已删除后端端点，此处只为保持 build 可用；C403 连页删除
-// 扩展组织列表端点已随组织域删除：本地失败桩与 404 行为一致，不发请求、不伪造数据。
-const tenantUserOwnExtOrgListGet = (..._args: unknown[]): Promise<never> => Promise.reject(new Error('ownExtOrgList retired'));
-import {RoleOutput, TenantOrganizationEntity, TenantPositionEntity} from '../../../../../api/_shared/data-contracts.ts'
+import {RoleOutput} from '../../../../../api/_shared/data-contracts.ts'
 
-import Button from 'primevue/button';
 import InputText from 'primevue/inputtext';
 import Textarea from 'primevue/textarea';
 import InputNumber from 'primevue/inputnumber';
@@ -192,32 +141,13 @@ import TabPanel from 'primevue/tabpanel';
 
 var props = defineProps({
   title: {type: String, default: ''},
-  orgData: {type: Array<TenantOrganizationEntity>, default: () => []},
 })
 const emit = defineEmits(['query'])
 const dialogRef = ref()
 
-const storesUserInfo = useUserInfoStore()
-const {userInfos} = storeToRefs(storesUserInfo)
-
 const loading = ref(false)
 const selectedTabName = ref('0')
-const posData = ref<TenantPositionEntity[]>([])
 const roleData = ref<RoleOutput[]>([])
-
-const convertOrgToCascade = (data: TenantOrganizationEntity[]): any[] => {
-  if (!data) return []
-  return data.map((item: any) => {
-    const children = item.children ?? item.items ?? []
-    return {
-      value: item.id ?? item.value ?? item.key,
-      label: item.name ?? item.label ?? '',
-      ...(children.length > 0 ? {items: convertOrgToCascade(children)} : {}),
-    }
-  })
-}
-
-const cascadeOrgOptions = computed(() => convertOrgToCascade(props.orgData))
 
 const accountTypeOptions = computed(() => [
   {label: t('system.user.accountType_superAdmin'), value: 888},
@@ -250,8 +180,6 @@ const cultureLevelOptions = computed(() => [
 
 onMounted(async () => {
   loading.value = true
-  var res = await tenantPositionListGet()
-  posData.value = res.data.data ?? []
   var res1 = await tenantRoleListGet()
   roleData.value = res1.data.data ?? []
   loading.value = false
@@ -264,8 +192,6 @@ const rules = {
   birthdayTime: [{required: true, message: t('system.user.birthday') + t('common.form.required'), trigger: 'blur'}],
   roleIdList: [{required: true, message: t('system.user.roleSet') + t('common.form.required'), trigger: 'blur'}],
   accountType: [{required: true, message: t('system.user.accountType') + t('common.form.required'), trigger: 'blur'}],
-  orgId: [{required: true, message: t('system.user.belongOrg') + t('common.form.required'), trigger: 'blur'}],
-  posId: [{required: true, message: t('system.user.posName') + t('common.form.required'), trigger: 'blur'}],
 }
 
 const beforeOpen = async (form: any, isEditor: boolean) => {
@@ -279,8 +205,6 @@ const beforeOpen = async (form: any, isEditor: boolean) => {
   if (isEditor && form.id != undefined) {
     var resRole = await tenantUserOwnRoleListGet(form.id)
     form.roleIdList = resRole.data.data
-    var resExtOrg = await tenantUserOwnExtOrgListGet(form.id)
-    form.extOrgIdList = resExtOrg.data.data
   } else {
     form.accountType = 777
   }
@@ -296,15 +220,6 @@ const beforeSubmit = (form: any) => {
     payload.joinTime = Math.floor(new Date(payload.joinTime).getTime() / 1000)
   }
   return payload
-}
-
-const addExtOrgRow = (form: any) => {
-  if (form.extOrgIdList == undefined) form.extOrgIdList = []
-  form.extOrgIdList?.push({})
-}
-
-const deleteExtOrgRow = (form: any, k: number) => {
-  form.extOrgIdList?.splice(k, 1)
 }
 
 defineExpose({

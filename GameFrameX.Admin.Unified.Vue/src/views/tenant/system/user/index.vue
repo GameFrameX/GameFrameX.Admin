@@ -1,22 +1,5 @@
 <template>
   <div class="sys-user-container flex gap-2 w-full h-full">
-    <div class="org-tree-sidebar">
-      <!-- 移动端树折叠开关（C252）：bp-down(md) 下树默认收起，表格恢复全宽 -->
-      <Button
-        class="org-tree-toggle"
-        severity="secondary"
-        size="small"
-        outlined
-        :aria-expanded="isMobileTreeOpen"
-        :aria-label="t('system.org.filterByOrgTree')"
-        @click="isMobileTreeOpen = !isMobileTreeOpen"
-      >
-        <i class="fa-solid fa-sitemap mr-1"></i>
-        {{ t('system.org.filterByOrgTree') }}
-      </Button>
-      <OrgTree v-show="isMobileTreeOpen" ref="orgTreeRef" @nodeSelect="nodeClick"/>
-    </div>
-
     <div class="flex-1 min-w-0">
       <Card>
         <template #content>
@@ -113,25 +96,22 @@
 
     <Menu ref="menuRef" :model="contextMenuItems" :popup="true" />
 
-    <EditUser ref="editUserRef" :title="state.editUserTitle" :orgData="state.orgTreeData" @query="onQuery"/>
+    <EditUser ref="editUserRef" :title="state.editUserTitle" @query="onQuery"/>
   </div>
 </template>
 
 <script lang="ts" setup name="systemUser">
 import { faArrowsRotate, faEllipsisVertical, faMagnifyingGlass, faPenToSquare, faPlus } from '../../../../utils/icons.ts';
 
-import {computed, onMounted, reactive, ref, watch} from 'vue';
+import {computed, onMounted, reactive, ref} from 'vue';
 import {showConfirm, showSuccess} from '../../../../utils/message.ts';
 import {auth} from '../../../../utils/authFunction.ts';
 import {resolveBackendFileUrl} from '../../../../utils/fileUrl.ts';
-import OrgTree from '/@/components/org-tree/OrgTree.vue';
 import EditUser from '/@/views/tenant/system/user/component/EditUser.vue';
 
 import {tenantUserDeletePost, tenantUserPagePost, tenantUserResetPwdPost, tenantUserSetStatusPost} from '../../../../api/tenantUser';
-import {tenantOrganizationListGet} from '../../../../api/tenantOrganization';
-import {TenantOrganizationEntity, TenantUserEntity} from '../../../../api/_shared/data-contracts.ts';
+import {TenantUserEntity} from '../../../../api/_shared/data-contracts.ts';
 import {normalizeIsEnabled} from '../../../../utils/isEnabled.ts';
-import {useMediaQueryMatch} from '../../../../composables/useMediaQueryMatch.ts';
 
 import Card from 'primevue/card';
 import InputText from 'primevue/inputtext';
@@ -143,22 +123,10 @@ import ToggleSwitch from 'primevue/toggleswitch';
 import CrudDataTable from '/@/components/crud-data-table/index.vue';
 import Menu from 'primevue/menu';
 
-const orgTreeRef = ref<InstanceType<typeof OrgTree>>();
 const editUserRef = ref<InstanceType<typeof EditUser>>();
 const menuRef = ref();
 const contextMenuRow = ref<any>(null);
-const defaultRootOrgId = 1300000000101;
 type UserRow = TenantUserEntity & Record<string, any>;
-
-// 移动端组织树折叠（C252）：窄视口（bp-down(md)）下树默认收起、点按钮展开；
-// 桌面端树恒显示（isMobileTreeOpen 初始为 true，且脱离窄视口时保持展开）。
-const isNarrowViewport = useMediaQueryMatch('(max-width: 767px)');
-const isMobileTreeOpen = ref(!isNarrowViewport.value);
-watch(isNarrowViewport, (narrow) => {
-  if (!narrow) {
-    isMobileTreeOpen.value = true;
-  }
-});
 
 const contextMenuItems = computed(() => [
   {
@@ -187,9 +155,7 @@ const toggleMenu = (event: Event, row: any) => {
 const state = reactive({
   loading: false,
   userData: [] as Array<UserRow>,
-  orgTreeData: [] as Array<TenantOrganizationEntity>,
   queryParams: {
-    orgId: -1,
     account: undefined,
     realName: undefined,
     phone: undefined,
@@ -203,16 +169,8 @@ const state = reactive({
 });
 
 onMounted(async () => {
-  loadOrgData();
   onQuery();
 });
-
-const loadOrgData = async () => {
-  state.loading = true;
-  var res = await tenantOrganizationListGet({id: defaultRootOrgId});
-  state.orgTreeData = res.data.data ?? [];
-  state.loading = false;
-};
 
 const onQuery = async () => {
   state.loading = true;
@@ -224,7 +182,6 @@ const onQuery = async () => {
 };
 
 const resetQuery = () => {
-  state.queryParams.orgId = -1;
   state.queryParams.account = undefined;
   state.queryParams.realName = undefined;
   state.queryParams.phone = undefined;
@@ -282,48 +239,4 @@ const resetUserPwd = async (row: any) => {
   showSuccess(`${t('system.user.resetPwdSuccess')}：${res.data.data?.newPassword}`);
 };
 
-const nodeClick = async (node: any) => {
-  state.queryParams.orgId = node.id;
-  state.queryParams.account = undefined;
-  state.queryParams.realName = undefined;
-  state.queryParams.phone = undefined;
-  onQuery();
-  // 移动端选完节点自动收起树（C252），把屏幕还给结果表
-  if (isNarrowViewport.value) {
-    isMobileTreeOpen.value = false;
-  }
-};
 </script>
-
-<style lang="scss" scoped>
-.org-tree-sidebar {
-  width: 280px;
-  min-width: 280px;
-  flex-shrink: 0;
-}
-
-// 移动端组织树侧栏降级（C252，GFX-658）：280px 定宽侧栏在 375px 手机上
-// 吃掉约 75% 宽度、表格持续横拖；bp-down(md) 下容器改竖排、侧栏全宽、
-// 树默认收起，由 .org-tree-toggle 按钮控制显隐（JS 侧 isMobileTreeOpen）。
-.org-tree-toggle {
-  display: none;
-}
-
-@include bp-down(md) {
-  .sys-user-container {
-    flex-direction: column;
-  }
-
-  .org-tree-sidebar {
-    width: 100%;
-    min-width: 0;
-    flex-shrink: 1;
-  }
-
-  .org-tree-toggle {
-    display: inline-flex;
-    width: 100%;
-    justify-content: center;
-  }
-}
-</style>

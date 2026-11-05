@@ -26,12 +26,6 @@
           </div>
           <div class="col-6 mb20">
             <div class="field mb20">
-              <label>{{ t('message.system.openAccess.bindTenant') }}</label>
-              <Select v-model="state.ruleForm.bindTenantId" :options="state.tenantData" optionLabel="name" optionValue="id" placeholder="绑定租户" filter showClear class="w100" @change="tenantChange"/>
-            </div>
-          </div>
-          <div class="col-6 mb20">
-            <div class="field mb20">
               <label>{{ t('message.system.openAccess.bindUser') }}</label>
               <Select v-model="state.ruleForm.bindUserId" :options="userDataOptions" optionLabel="label" optionValue="id" placeholder="绑定用户" filter showClear class="w100"/>
             </div>
@@ -48,11 +42,12 @@
 
 <script lang="ts" setup name="systemOpenAccessEdit">
 
-import {onMounted, reactive, ref, computed} from 'vue';
+import {reactive, ref, computed} from 'vue';
 
 import {systemOpenAccessUpdatePost, systemOpenAccessAddPost, systemOpenAccessCreateSecretPost} from '../../../../../api/systemOpenAccess';
-import {systemTenantPagePost, systemTenantUserListPost} from '../../../../../api/systemTenant';
-import {TenantUserEntity, TenantOutput, UpdateOpenAccessInput} from '../../../../../api/_shared/data-contracts.ts';
+import {tenantUserPagePost} from '../../../../../api/tenantUser';
+import type {TenantUserResponse} from '../../../../../api/tenantUser/types';
+import {UpdateOpenAccessInput} from '../../../../../api/_shared/data-contracts.ts';
 import {MAX_PAGE_SIZE} from '../../../../../constants/pagination.ts';
 
 const props = defineProps({
@@ -63,8 +58,7 @@ const ruleFormRef = ref();
 const state = reactive({
   dialogVisible: false,
   ruleForm: {} as UpdateOpenAccessInput,
-  tenantData: [] as Array<TenantOutput>,
-  userData: [] as Array<TenantUserEntity>,
+  userData: [] as Array<TenantUserResponse>,
 });
 
 const userDataOptions = computed(() => {
@@ -74,17 +68,12 @@ const userDataOptions = computed(() => {
   }));
 });
 
-onMounted(async () => {
-  var res = await systemTenantPagePost({page: 1, pageSize: MAX_PAGE_SIZE});
-  state.tenantData = res.data.data?.items ?? [];
-});
-
-const openDialog = (row: any) => {
+const openDialog = async (row: any) => {
   state.ruleForm = JSON.parse(JSON.stringify(row));
   state.dialogVisible = true;
   ruleFormRef.value?.resetFields?.();
 
-  tenantChange();
+  await loadUsers();
 };
 
 const closeDialog = () => {
@@ -109,15 +98,18 @@ const submit = () => {
   })();
 };
 
-const tenantChange = async () => {
-  if (!state.ruleForm.bindTenantId) {
-    state.ruleForm.bindUserId = undefined;
-    state.userData = [];
-    return;
+const loadUsers = async () => {
+  const users: TenantUserResponse[] = [];
+  let page = 1;
+  let hasNextPage = true;
+  while (hasNextPage) {
+    const response = await tenantUserPagePost({page, pageSize: MAX_PAGE_SIZE, orderBy: 'Id'});
+    const result = response.data.data;
+    users.push(...(result?.items ?? []));
+    hasNextPage = result?.hasNextPage ?? page < (result?.totalPages ?? 0);
+    page += 1;
   }
-
-  var res = await systemTenantUserListPost({tenantId: state.ruleForm.bindTenantId});
-  state.userData = res.data.data ?? [];
+  state.userData = users;
 };
 
 const createSecret = async () => {

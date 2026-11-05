@@ -1,6 +1,6 @@
 {
   "description": "C151 全量用户可见中文债务基线：check:text 对 changed files 中不在基线的新增中文硬编码 fail；基线内条目为已分类历史债务，随迁移推进删除。重新生成：node scripts/check-frontend-standards.mjs text-baseline",
-  "count": 252,
+  "count": 251,
   "fingerprints": [
     "src/views/app/appCenter/gamePaymentConfigEntity/component/EditDialog.vue:\"备注\"",
     "src/views/app/appCenter/gamePaymentConfigEntity/component/EditDialog.vue:\"请选择支付渠道\"",
@@ -185,7 +185,6 @@
     "src/views/platform/system/dict/component/EditDictData.vue:\"样式(Style)\"",
     "src/views/platform/system/job/component/JobScriptCode.ts:\"你的作业编号\"",
     "src/views/platform/system/openAccess/component/EditOpenAccess.vue:\"绑定用户\"",
-    "src/views/platform/system/openAccess/component/EditOpenAccess.vue:\"绑定租户\"",
     "src/views/platform/system/openAccess/component/EditOpenAccess.vue:>生成密钥<",
     "src/views/platform/system/openAccess/component/HelpView.vue:\"计算签名\"",
     "src/views/platform/system/openAccess/component/HelpView.vue:>OpenAPI 使用<",
