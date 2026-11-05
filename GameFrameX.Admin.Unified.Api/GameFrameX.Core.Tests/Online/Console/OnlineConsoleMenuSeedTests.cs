@@ -11,20 +11,21 @@ namespace GameFrameX.Core.Tests.Online.Console;
 public sealed class OnlineConsoleMenuSeedTests
 {
     [Fact]
-    public void OnlineConsoleMenus_Container_RedirectsToDashboardPage()
+    public void OnlineConsoleMenus_Container_UsesOnlineOperationsRoot()
     {
         var menus = GlobalMenuSeedData.BuildData();
-        var container = Assert.Single(menus, m => m.Key == "route:onlineCenter");
+        var container = Assert.Single(menus, m => m.Key == "route:gmCenter");
 
-        // 容器点击直达首子页（与 platform 容器重定向先例同构：Redirect = 目标页面完整 Path，含 /app 受众段）。
-        Assert.Equal("/app/onlineCenter/onlineDashboard", container.Redirect);
+        // C403：独立在线运维根使用 Layout，不保留旧容器重定向。
+        Assert.Null(container.Redirect);
+        Assert.Equal("Layout", container.Component);
     }
 
     [Theory]
-    [InlineData("route:onlineDashboard", "在线总览", "message.menu.onlineDashboard", 50, "/app/onlineCenter/onlineDashboard", "/app/onlineCenter/onlineDashboard/index")]
-    [InlineData("route:onlinePlayerTimeline", "玩家时间线", "message.menu.onlinePlayerTimeline", 630, "/app/onlineCenter/onlinePlayerTimeline", "/app/onlineCenter/onlinePlayerTimeline/index")]
-    [InlineData("route:onlineAuditSearch", "统一审计检索", "message.menu.onlineAuditSearch", 640, "/app/onlineCenter/onlineAuditSearch", "/app/onlineCenter/onlineAuditSearch/index")]
-    public void OnlineConsoleMenus_Pages_Use_C324_AppAudienceSegment(
+    [InlineData("route:onlineDashboard", "在线总览", "message.menu.onlineDashboard", 50, "/gmCenter/onlineDashboard", "/gmCenter/onlineDashboard/index")]
+    [InlineData("route:onlinePlayerTimeline", "玩家时间线", "message.menu.onlinePlayerTimeline", 630, "/gmCenter/onlinePlayerTimeline", "/gmCenter/onlinePlayerTimeline/index")]
+    [InlineData("route:onlineAuditSearch", "统一审计检索", "message.menu.onlineAuditSearch", 640, "/gmCenter/onlineAuditSearch", "/gmCenter/onlineAuditSearch/index")]
+    public void OnlineConsoleMenus_Pages_UseOnlineOperationsPaths(
         string key, string title, string titleCode, int orderNo, string path, string component)
     {
         var menus = GlobalMenuSeedData.BuildData();
@@ -32,11 +33,11 @@ public sealed class OnlineConsoleMenuSeedTests
 
         Assert.Equal(MenuTypeEnum.Menu, page.Type);
         Assert.Equal(MenuAppScopeEnum.Console, page.AppScope);
-        Assert.Equal(StableSeedId.Menu("route:onlineCenter"), page.Pid);
+        Assert.Equal(StableSeedId.Menu("route:gmCenter"), page.Pid);
         Assert.Equal(title, page.Title);
         Assert.Equal(titleCode, page.TitleCode);
         Assert.Equal(orderNo, page.OrderNo);
-        // C324：叶子页面带 /app 受众段。
+        // C403：叶子路径和组件直接使用 gmCenter 前缀。
         Assert.Equal(path, page.Path);
         Assert.Equal(component, page.Component);
         // 控制台查询受众：租户管理员 + 运营负责人 + 客服 GM + 数据分析。

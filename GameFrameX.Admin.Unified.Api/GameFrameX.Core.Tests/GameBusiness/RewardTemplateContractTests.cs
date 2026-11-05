@@ -61,13 +61,13 @@ public class RewardTemplateContractTests
         var templatePage = menus.Single(u => u.Key == "route:gameRewardTemplateEntity");
         var permissions = menus.Where(u => !string.IsNullOrEmpty(u.Permission)).Select(u => u.Permission!).ToHashSet(StringComparer.Ordinal);
 
-        Assert.Equal("/contentCenter/reward", rewardRoot.Path);
+        Assert.Equal("/noticeCenter/reward", rewardRoot.Path);
         Assert.Equal(rewardRoot.Id, groupPage.Pid);
-        Assert.Equal("/app/contentCenter/reward/gameRewardTemplateGroupEntity", groupPage.Path);
-        Assert.Equal("/app/contentCenter/reward/gameRewardTemplateGroupEntity/index", groupPage.Component);
+        Assert.Equal("/noticeCenter/reward/gameRewardTemplateGroupEntity", groupPage.Path);
+        Assert.Equal("/noticeCenter/reward/gameRewardTemplateGroupEntity/index", groupPage.Component);
         Assert.Equal(rewardRoot.Id, templatePage.Pid);
-        Assert.Equal("/app/contentCenter/reward/gameRewardTemplateEntity", templatePage.Path);
-        Assert.Equal("/app/contentCenter/reward/gameRewardTemplateEntity/index", templatePage.Component);
+        Assert.Equal("/noticeCenter/reward/gameRewardTemplateEntity", templatePage.Path);
+        Assert.Equal("/noticeCenter/reward/gameRewardTemplateEntity/index", templatePage.Component);
 
         Assert.Contains("gameRewardTemplateGroup:Select", permissions);
         Assert.Contains("gameRewardTemplate:Select", permissions);

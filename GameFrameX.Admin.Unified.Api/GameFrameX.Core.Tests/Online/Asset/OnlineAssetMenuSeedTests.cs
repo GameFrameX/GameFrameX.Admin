@@ -11,27 +11,27 @@ namespace GameFrameX.Core.Tests.Online.Asset;
 public sealed class OnlineAssetMenuSeedTests
 {
     [Fact]
-    public void OnlineAssetMenus_Container_PathMatches_C324_DirForm_And_Dedup_WithC350()
+    public void OnlineAssetMenus_Container_UsesOnlineOperationsRoot()
     {
         var menus = GlobalMenuSeedData.BuildData();
-        var container = Assert.Single(menus, m => m.Key == "route:onlineCenter");
+        var container = Assert.Single(menus, m => m.Key == "route:gmCenter");
 
         Assert.Equal(MenuTypeEnum.Dir, container.Type);
-        // C324：Dir 无 /app 受众段；C366：提升为顶层根（Pid=0），OrderNo=550 紧邻区服运维 500。
-        Assert.Equal("/onlineCenter", container.Path);
+        // C403：在线运维是独立根目录，排序由共享契约固定。
+        Assert.Equal("/gmCenter", container.Path);
         Assert.Equal(0, container.Pid);
         Assert.Equal(MenuAppScopeEnum.Console, container.AppScope);
-        Assert.Equal("message.menu.onlineCenter", container.TitleCode);
-        Assert.Equal("在线平台", container.Title);
-        Assert.Equal(550, container.OrderNo);
+        Assert.Equal("message.menu.gmCenter", container.TitleCode);
+        Assert.Equal("在线运维", container.Title);
+        Assert.Equal(300, container.OrderNo);
         // C366：容器受众 = 13 个叶子受众并集（playerSegment/configRollout 为 ServerOps，运营/观测页为 OpsManager/GmSupport/DataAnalyst）。
     }
 
     [Theory]
-    [InlineData("route:onlineWalletLedger", "资产流水", "message.menu.onlineWalletLedger", 300, "/app/onlineCenter/walletLedger", "/app/onlineCenter/walletLedger/index")]
-    [InlineData("route:onlineTransactionDetail", "交易详情", "message.menu.onlineTransactionDetail", 400, "/app/onlineCenter/transactionDetail", "/app/onlineCenter/transactionDetail/index")]
-    [InlineData("route:onlineAssetAudit", "资产审计", "message.menu.onlineAssetAudit", 500, "/app/onlineCenter/assetAudit", "/app/onlineCenter/assetAudit/index")]
-    public void OnlineAssetMenus_Pages_Use_C324_AppAudienceSegment_AndMatchLedgerSpec(
+    [InlineData("route:onlineWalletLedger", "资产流水", "message.menu.onlineWalletLedger", 300, "/gmCenter/walletLedger", "/gmCenter/walletLedger/index")]
+    [InlineData("route:onlineTransactionDetail", "交易详情", "message.menu.onlineTransactionDetail", 400, "/gmCenter/transactionDetail", "/gmCenter/transactionDetail/index")]
+    [InlineData("route:onlineAssetAudit", "资产审计", "message.menu.onlineAssetAudit", 500, "/gmCenter/assetAudit", "/gmCenter/assetAudit/index")]
+    public void OnlineAssetMenus_Pages_UseOnlineOperationsPathsAndMatchLedgerSpec(
         string key, string title, string titleCode, int orderNo, string path, string component)
     {
         var menus = GlobalMenuSeedData.BuildData();
@@ -39,11 +39,11 @@ public sealed class OnlineAssetMenuSeedTests
 
         Assert.Equal(MenuTypeEnum.Menu, page.Type);
         Assert.Equal(MenuAppScopeEnum.Console, page.AppScope);
-        Assert.Equal(StableSeedId.Menu("route:onlineCenter"), page.Pid);
+        Assert.Equal(StableSeedId.Menu("route:gmCenter"), page.Pid);
         Assert.Equal(title, page.Title);
         Assert.Equal(titleCode, page.TitleCode);
         Assert.Equal(orderNo, page.OrderNo);
-        // C324：叶子页面带 /app 受众段；Dir 不带。
+        // C403：叶子路径和组件直接使用 gmCenter 前缀。
         Assert.Equal(path, page.Path);
         Assert.Equal(component, page.Component);
     }
