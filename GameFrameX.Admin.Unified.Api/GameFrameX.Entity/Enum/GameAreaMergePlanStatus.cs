@@ -2,7 +2,6 @@ namespace GameFrameX.Entity.Enum;
 
 /// <summary>合服计划状态。</summary>
 [Description("合服计划状态")]
-[AdminEnum]
 public enum GameAreaMergePlanStatus
 {
     [Description("草稿")] Draft = 0,
