@@ -39,7 +39,7 @@
           <template #body-revokeTime="{ data }">{{ formatUnix(data.revokeTime) }}</template>
           <template #body-createdTime="{ data }">{{ formatUnix(data.createdTime) }}</template>
         </CrudDataTable>
-        <addDialog ref="addDialogRef" :title="addTitle" :appId="queryParams.appId" @reloadTable="onQuery" />
+        <addDialog ref="addDialogRef" :title="addTitle" @reloadTable="onQuery" />
         <revokeDialog ref="revokeDialogRef" @reloadTable="onQuery" />
         <syncOnlineResultDialog ref="syncResultDialogRef" />
       </template>

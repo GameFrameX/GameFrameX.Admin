@@ -6,13 +6,9 @@
     :beforeOpen="beforeOpen" :beforeSubmit="beforeSubmit"
     scrollable @reloadTable="emit('reloadTable')">
     <template #default="{ ruleForm }">
-      <FormLabel name="appId">{{ t('gameBusiness.configScope.scope') }}</FormLabel>
-      <FormField name="appId" v-slot="{ props: fProps }">
-        <ConfigAppScopePicker v-bind="fProps" v-model="ruleForm.appId" :appOptions="appOptions" class="w-full" @update:modelValue="(val) => onAppChange(ruleForm, val)"/>
-      </FormField>
       <FormLabel name="areaId">{{ t('message.gameBusiness.trustSafety.penalty.areaId') }}</FormLabel>
       <FormField name="areaId" v-slot="{ props: fProps, invalid, error }">
-        <Select filter showClear v-bind="fProps" v-model="ruleForm.areaId" :options="areaIdOptions" optionLabel="label" optionValue="id" :placeholder="t('message.gameBusiness.trustSafety.penalty.allServer')" class="w-full" :disabled="!ruleForm.appId || areaIdOptions.length === 0"/>
+        <Select filter showClear v-bind="fProps" v-model="ruleForm.areaId" :options="areaIdOptions" optionLabel="label" optionValue="id" :placeholder="t('message.gameBusiness.trustSafety.penalty.allServer')" class="w-full" :disabled="areaIdOptions.length === 0"/>
         <Message v-if="invalid" severity="error" size="small" variant="simple">{{ error }}</Message>
       </FormField>
       <FormLabel name="targetType">{{ t('message.gameBusiness.trustSafety.penalty.targetType') }}</FormLabel>
@@ -59,9 +55,7 @@ import Textarea from 'primevue/textarea'
 import Select from 'primevue/select'
 import DatePicker from 'primevue/datepicker'
 import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
-import ConfigAppScopePicker from '/@/components/config-app-scope-picker/index.vue'
 import { gamePenaltyAddPost } from '../../../../api/gamePenalty'
-import { tenantGameAppEntityListGet } from '../../../../api/tenantGameAppEntity'
 import { gameAreaSelectStringPost } from '../../../../api/gameArea'
 import {MAX_SELECT_SIZE} from '../../../../constants/pagination.ts'
 import {
@@ -71,12 +65,10 @@ import {
 
 const props = defineProps({
   title: { type: String, default: '' },
-  appId: { type: [Number, String], default: undefined },
 })
 const emit = defineEmits(['reloadTable'])
 const dialogRef = ref()
 
-const appOptions = ref<any[]>([])
 const areaIdOptions = ref<any[]>([])
 
 const targetTypeOptions = computed(() => PENALTY_TARGET_TYPE_OPTIONS.map((o) => ({ label: t(o.labelKey), value: o.value })))
@@ -89,27 +81,9 @@ const rules = {
   reason: [{ required: true, message: t('message.gameBusiness.trustSafety.penalty.pleaseEnterReason'), trigger: 'blur' }],
 }
 
-const loadAreaOptions = async (appId?: number) => {
-  if (!appId) {
-    areaIdOptions.value = []
-    return
-  }
-  areaIdOptions.value = (await gameAreaSelectStringPost({ appId: appId, pageSize: MAX_SELECT_SIZE })).data.data ?? []
-}
-
-const onAppChange = (form: any, appId?: number | string) => {
-  form.appId = appId ?? form.appId ?? 0
-  form.areaId = undefined
-  loadAreaOptions(form.appId)
-}
-
-const beforeOpen = (form: any) => {
-  if (!form.appId && props.appId) {
-    form.appId = props.appId
-  }
-  if (form.appId) {
-    loadAreaOptions(form.appId)
-  }
+const beforeOpen = async (form: any) => {
+  areaIdOptions.value = []
+  areaIdOptions.value = (await gameAreaSelectStringPost({ pageSize: MAX_SELECT_SIZE })).data.data ?? []
   // 回显：long(秒) → Date 供 DatePicker 显示；0 / null = 永久，保持 null
   if (form.expireTime && typeof form.expireTime === 'number') {
     form.expireTime = new Date(form.expireTime * 1000)
@@ -120,16 +94,9 @@ const beforeOpen = (form: any) => {
 
 const beforeSubmit = (form: any) => ({
   ...form,
-  appId: form.appId ?? 0,
-  areaId: form.appId ? form.areaId : undefined,
   // 提交：Date → long 秒；null / 空 = 永久，统一传 0
   expireTime: form.expireTime ? Math.floor(new Date(form.expireTime).getTime() / 1000) : 0,
 })
-
-;(async () => {
-  const res = await tenantGameAppEntityListGet()
-  appOptions.value = res.data?.data || []
-})()
 
 defineExpose({
   openDialog: (row: any) => dialogRef.value?.openDialog(row),
