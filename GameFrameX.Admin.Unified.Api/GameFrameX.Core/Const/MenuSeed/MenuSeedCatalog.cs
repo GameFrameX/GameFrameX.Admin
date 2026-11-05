@@ -68,7 +68,7 @@ public static class MenuSeedCatalog
 
     /// <summary>
     /// 获取 SuperAdmin 可见菜单 ID。
-    /// <para>规则: SuperAdminOnly 菜单(含整棵子树) + 公共工作台(dashboard/home)。租户业务菜单不向 SuperAdmin 展示, 避免无目标租户上下文时仓储层抛 D1016。</para>
+    /// <para>规则: SuperAdminOnly 菜单(含整棵子树)及其目录祖先 + 公共工作台(dashboard/home)。只补目录祖先，不引入祖先下的租户业务菜单。</para>
     /// </summary>
     public static IReadOnlyList<long> SuperAdminVisibleMenuIds
     {
@@ -85,6 +85,16 @@ public static class MenuSeedCatalog
                 if (BelongsToSuperAdminOnlySubtree(definition.Key, superAdminOnlyKeys))
                 {
                     visibleKeys.Add(definition.Key);
+                    var parentKey = definition.ParentKey;
+                    while (parentKey != null && DefinitionsByKey.TryGetValue(parentKey, out var parent))
+                    {
+                        if (parent.Type == MenuTypeEnum.Dir)
+                        {
+                            visibleKeys.Add(parent.Key);
+                        }
+
+                        parentKey = parent.ParentKey;
+                    }
                 }
             }
 
