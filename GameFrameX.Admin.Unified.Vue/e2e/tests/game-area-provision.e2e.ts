@@ -52,7 +52,8 @@ for (const registrationFailures of [0, 1]) {
     await page.context().storageState({ path: ADMIN_STATE });
     await navigateByMenu(page, '开服向导', '区服');
     const wizard = page.locator('.gameAreaProvision-container');
-    await wizard.getByRole('combobox', { name: '模板区服', exact: true }).click();
+    // 模板下拉的 label 未做 aria 关联（无 accessible name），按容器内首个 combobox 定位。
+    await wizard.getByRole('combobox').first().click();
     const previewResponse = page.waitForResponse(response => /\/gameAreaProvision\/preview(?:\?|$)/.test(response.url()));
     await page.getByRole('option', { name: process.env.E2E_PROVISION_TEMPLATE_NAME ?? 'E2E 开服模板', exact: true }).click();
     expect(readField(await (await previewResponse).json(), 'code')).toBe(0);

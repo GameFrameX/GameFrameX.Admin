@@ -26,9 +26,14 @@ test('合服向导：真实登录、预演、双人复核、执行与源服退�
     await applicant.context().storageState({ path: ADMIN_STATE });
     await navigateByMenu(applicant, '合服', '区服');
     await applicant.getByRole('button', { name: '新建计划', exact: true }).click();
-    await applicant.getByRole('combobox', { name: '目标服', exact: true }).click();
+    // 向导下拉的 label 未做 aria 关联（无 accessible name），按向导弹窗内出现的顺序定位。
+    const mergeDialog = applicant.locator('.p-dialog:visible').first();
+    await mergeDialog.getByRole('combobox').nth(0).click();
     await applicant.getByRole('option', { name: targetName!, exact: true }).click();
-    await applicant.getByRole('combobox', { name: '源服', exact: true }).click();
+    await applicant.mouse.click(5, 5);
+    await applicant.waitForTimeout(400);
+    // MultiSelect 的 combobox 是隐藏 input，点击可见的多选组件本体。
+    await mergeDialog.locator('.p-multiselect').first().click();
     for (const source of sourceNames) await applicant.getByRole('option', { name: source, exact: true }).click();
     await applicant.getByRole('dialog').getByText('源服执行成功后退场。请先确认范围，再生成计划。').click();
     await applicant.locator('#merge-create-reason').fill('C404 合服浏览器演练');
