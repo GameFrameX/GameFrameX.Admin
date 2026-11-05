@@ -60,7 +60,7 @@ export const useServerStore = defineStore('server', () => {
                     const result = response.data.data
                     for (const server of result.items ?? []) {
                         const identifier = server.id == null ? '' : String(server.id)
-                        if (identifier) options.set(identifier, { id: identifier, name: server.name || identifier, serverStatus: server.serverStatus ?? GameServerStatus.Unknown })
+                        if (identifier && server.serverStatus !== GameServerStatus.Merged) options.set(identifier, { id: identifier, name: server.name || identifier, serverStatus: server.serverStatus ?? GameServerStatus.Unknown })
                     }
                     if (!(result.hasNextPage || page < (result.totalPages ?? 0))) break
                     page += 1

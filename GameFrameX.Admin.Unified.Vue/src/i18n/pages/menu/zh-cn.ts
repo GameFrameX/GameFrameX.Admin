@@ -1,6 +1,7 @@
 // 定义内容
 export default {
     menu: {
+        gameAreaMerge: '合服',
         dashboard: '总览',
         serverCenter: '区服',
         noticeCenter: '内容运营',

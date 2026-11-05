@@ -1,6 +1,15 @@
 export default {
     errors: {
         codes: {
+            "60700001": "Merge plan not found",
+            "60700002": "Merge plan state does not allow this operation",
+            "60700003": "Target and source servers must exist and be distinct",
+            "60700004": "Server is reserved by an unfinished merge plan",
+            "60700005": "Another operator must review and provide a reason",
+            "60700006": "Merge report touches the global domain; approval forbidden",
+            "60700007": "Confirm backup and provide its identifier before execution",
+            "60700008": "Merge report does not match the plan",
+            "60700009": "Merge call failed; verify and rehearse again",
             '10000001': 'Internal error',
             '20000001': 'Not found',
             '20000002': 'Parameter validation failed',
