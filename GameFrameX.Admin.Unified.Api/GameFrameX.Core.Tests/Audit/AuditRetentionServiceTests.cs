@@ -157,8 +157,10 @@ public sealed class AuditRetentionServiceTests : IDisposable
         var jobDetail = typeof(AuditRetentionJob).GetCustomAttributes(typeof(JobDetailAttribute), false).OfType<JobDetailAttribute>().Single();
         Assert.Equal("job_auditRetention", jobDetail.JobId);
         Assert.False(jobDetail.Concurrent);
-        var daily = typeof(AuditRetentionJob).GetCustomAttributes(typeof(DailyAttribute), false).OfType<DailyAttribute>().Single();
-        Assert.Equal("trigger_auditRetention", daily.TriggerId);
+        // C404 裁定 §9.8：触发器由无参 [Daily]（调度合一后休眠）改为每天 03:30 的 Cron。
+        var cron = typeof(AuditRetentionJob).GetCustomAttributes(typeof(CronAttribute), false).OfType<CronAttribute>().Single();
+        Assert.Equal("trigger_auditRetention", cron.TriggerId);
+        Assert.Equal("0 30 3 * * *", cron.Expression);
         Assert.Equal(typeof(IJob), typeof(AuditRetentionJob).GetInterfaces().Single());
     }
 

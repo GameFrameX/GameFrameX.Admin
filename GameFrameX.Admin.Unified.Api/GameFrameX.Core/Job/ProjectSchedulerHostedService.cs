@@ -133,6 +133,11 @@ public sealed class ProjectSchedulerHostedService : BackgroundService
             return;
         }
 
+        if (factory.IsPausedAll())
+        {
+            return;
+        }
+
         foreach (var scheduler in factory.GetJobSnapshot())
         {
             if (scheduler.IsPaused() || scheduler.JobType == null)
