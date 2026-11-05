@@ -31,4 +31,7 @@ public enum GameServerStatus
     /// 满员
     /// </summary>
     [Description("满员")] Full = 4,
+
+    /// <summary>已合服，不再接受客户端选服。</summary>
+    [Description("已合服")] Merged = 5,
 }

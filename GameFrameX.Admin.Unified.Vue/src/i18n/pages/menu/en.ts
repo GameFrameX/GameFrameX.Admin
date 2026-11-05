@@ -1,6 +1,7 @@
 // Define content
 export default {
     menu: {
+        gameAreaMerge: 'Server merge',
         dashboard: 'Overview',
         serverCenter: 'Servers',
         noticeCenter: 'Content Operations',

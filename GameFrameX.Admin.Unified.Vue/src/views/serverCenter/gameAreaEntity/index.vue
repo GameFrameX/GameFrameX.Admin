@@ -39,7 +39,7 @@
             <Tag v-else severity="danger" :value="t('message.gameBusiness.no')"/>
           </template>
           <template #body-serverStatus="{ data }">
-            <Tag :value="getEnumDesc(data.serverStatus, getEnumServerStatusData_Index)"/>
+            <Tag :value="data.serverStatus === 5 ? t('message.gameAreaMerge.merged') : getEnumDesc(data.serverStatus, getEnumServerStatusData_Index)"/>
           </template>
           <template #body-language="{ data }">
             <Tag :value="getEnumDesc(data.language, getEnumLanguageData_Index)"/>
@@ -152,6 +152,7 @@ const restartGameAreaEntity = async (row: any) => {
 }
 
 const columns = computed<CrudColumnConfig[]>(() => [
+  {field: 'mergedIntoServerId', header: t('message.gameAreaMerge.mergedInto'), width: '160px'},
   {field: 'name', header: t('message.gameBusiness.name'), width: '140px'},
   {field: 'description', header: t('message.gameBusiness.description'), width: '140px'},
   {field: 'isDefault', header: t('message.gameBusiness.isDefault'), width: '120px', bodyKey: 'isDefault'},

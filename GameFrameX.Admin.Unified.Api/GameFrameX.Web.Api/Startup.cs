@@ -5,6 +5,7 @@ using GameFrameX.Application.Platform.Job;
 using GameFrameX.Application.ServerCenter.Mail;
 using GameFrameX.Application.GmCenter.LiveOps.Dispatch;
 using GameFrameX.Application.ServerCenter.Online;
+using GameFrameX.Application.ServerCenter.GameAreaMerge;
 using GameFrameX.Application.ClientDelivery.GamePaymentConfig;
 using GameFrameX.Advertisement.Abstract;
 using GameFrameX.Payment.Abstract;
@@ -90,6 +91,7 @@ public class Startup
         services.AddScoped<GameFrameX.Application.ServerCenter.GameAreaProvision.GameAreaProvisionService>();
         services.AddScoped<IOnlineServerEndpointResolver, OnlineServerEndpointResolver>();
         services.AddHttpClient<IOnlineServerClient, OnlineServerClient>();
+        services.AddGameAreaMergeClient();
         // C343 / vault:C8 S7.7：LiveOps 统一下发单一入口（业务层唯一消费 IOnlineServerClient 的调度面）。
         services.AddScoped<IOnlineLiveOpsDispatchService, OnlineLiveOpsDispatchService>();
         // C200：外网 IP 查询命名客户端（ComputerUtility.GetIpFromOnlineAsync 使用），配置超时避免国外部署 myip.ipip.net 挂死。

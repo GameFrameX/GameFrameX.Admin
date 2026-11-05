@@ -122,6 +122,12 @@ gameAreaProvision:execute
 gameAreaProvision:preview
 gameAreaProvision:status
 gameAreaProvision:templates
+gameAreaMerge:add
+gameAreaMerge:approve
+gameAreaMerge:detail
+gameAreaMerge:dryRun
+gameAreaMerge:execute
+gameAreaMerge:page
 gameBannerAnnouncementEntity:add
 gameBannerAnnouncementEntity:delete
 gameBannerAnnouncementEntity:detail

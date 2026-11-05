@@ -15,6 +15,8 @@ export enum GameServerStatus {
   Maintenance = 3,
   /** 满员 */
   Full = 4,
+  /** 已合服 */
+  Merged = 5,
 }
 
 /** @format int32 */
@@ -445,6 +447,7 @@ export interface UpdateTenantGameAreaEntityRequest {
   serverType: string;
   language: GameLanguage;
   serverStatus: GameServerStatus;
+  mergedIntoServerId?: number | null;
   /** 客户端版本 */
   appVersion?: string | null;
   /** 指定可以加入此服务器的玩家类型 */
