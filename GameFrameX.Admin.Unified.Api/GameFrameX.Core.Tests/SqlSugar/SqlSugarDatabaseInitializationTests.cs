@@ -36,6 +36,8 @@ public class SqlSugarDatabaseInitializationTests : IDisposable
         typeof(TenantGameGoodsEntity),
         typeof(SystemLogVisitEntity),
         typeof(SystemLogOperationEntity),
+        typeof(SystemLogVisitArchiveEntity),
+        typeof(SystemLogOperationArchiveEntity),
         typeof(SystemLogDiffEntity),
         typeof(TenantLogVisitEntity),
         typeof(TenantLogOperationEntity),
@@ -176,6 +178,8 @@ public class SqlSugarDatabaseInitializationTests : IDisposable
         Assert.True(TableExists(mainDb, typeof(TenantGameGoodsEntity)));
         Assert.True(TableExists(mainDb, typeof(SystemLogVisitEntity)));
         Assert.True(TableExists(mainDb, typeof(SystemLogOperationEntity)));
+        Assert.True(TableExists(mainDb, typeof(SystemLogVisitArchiveEntity)));
+        Assert.True(TableExists(mainDb, typeof(SystemLogOperationArchiveEntity)));
         Assert.True(TableExists(mainDb, typeof(SystemLogDiffEntity)));
         Assert.True(TableExists(mainDb, typeof(TenantLogVisitEntity)));
         Assert.True(TableExists(mainDb, typeof(TenantLogOperationEntity)));
