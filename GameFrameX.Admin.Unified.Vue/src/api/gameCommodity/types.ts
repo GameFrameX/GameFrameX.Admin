@@ -8,7 +8,7 @@ export interface AddTenantGameCommodityEntityRequest {
    * @minLength 1
    */
   status: string;
-  /** 类别Id。引用 GameGoodsCatalogue.Id；Id 后缀契约兼容数字/字符串提交。 */
+  /** 类别Id。引用 TenantGameGoodsCatalogueEntity.Id；Id 后缀契约兼容数字/字符串提交。 */
   categoryId: string;
   /** 多少rmb */
   cost: boolean;

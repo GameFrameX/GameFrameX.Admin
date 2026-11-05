@@ -30,7 +30,7 @@ export interface GameAdvertisementRewardResponse {
   transactionId?: string | null;
   /** 广告位/单元。UnityAds 无则空。 */
   advertisementUnit?: string | null;
-  /** 角色 Id。反查自 GameRole。 */
+  /** 角色 Id。反查自 TenantGameRoleEntity。 */
   roleId?: string | null;
   /** 用户 Id。来自平台 userId 参数。 */
   userId?: string;

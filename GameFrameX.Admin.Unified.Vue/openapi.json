@@ -20076,6 +20076,2112 @@
         }
       }
     },
+    "/api/gameAreaMerge/add": {
+      "post": {
+        "tags": [
+          "gameAreaMerge"
+        ],
+        "summary": "验证区服及占用关系，在目标服生成合服计划。",
+        "operationId": "GameAreaMergeAddPost",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateGameAreaMergePlanRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateGameAreaMergePlanRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateGameAreaMergePlanRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "required": [
+                    "code",
+                    "message",
+                    "data",
+                    "trackId",
+                    "errorCode",
+                    "type",
+                    "time",
+                    "extras"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "响应码，0 表示成功，失败时承载统一数字业务错误码（模块枚举 8 位数值，见 GameFrameX.Core/Enum/Errors 与 error-codes.json 码表）",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "错误或提示信息"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/GameAreaMergePlanResponse"
+                    },
+                    "trackId": {
+                      "type": "string",
+                      "description": "链路追踪标识，未启用追踪时为 null",
+                      "nullable": true
+                    },
+                    "errorCode": {
+                      "type": "string",
+                      "description": "已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段",
+                      "nullable": true
+                    },
+                    "type": {
+                      "type": "string",
+                      "description": "响应类型（success/warning/error）",
+                      "nullable": true
+                    },
+                    "time": {
+                      "type": "integer",
+                      "description": "Unix 时间戳（秒）",
+                      "format": "int64"
+                    },
+                    "extras": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "required": [
+                    "code",
+                    "message",
+                    "data",
+                    "trackId",
+                    "errorCode",
+                    "type",
+                    "time",
+                    "extras"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "响应码，0 表示成功，失败时承载统一数字业务错误码（模块枚举 8 位数值，见 GameFrameX.Core/Enum/Errors 与 error-codes.json 码表）",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "错误或提示信息"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/GameAreaMergePlanResponse"
+                    },
+                    "trackId": {
+                      "type": "string",
+                      "description": "链路追踪标识，未启用追踪时为 null",
+                      "nullable": true
+                    },
+                    "errorCode": {
+                      "type": "string",
+                      "description": "已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段",
+                      "nullable": true
+                    },
+                    "type": {
+                      "type": "string",
+                      "description": "响应类型（success/warning/error）",
+                      "nullable": true
+                    },
+                    "time": {
+                      "type": "integer",
+                      "description": "Unix 时间戳（秒）",
+                      "format": "int64"
+                    },
+                    "extras": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "required": [
+                    "code",
+                    "message",
+                    "data",
+                    "trackId",
+                    "errorCode",
+                    "type",
+                    "time",
+                    "extras"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "响应码，0 表示成功，失败时承载统一数字业务错误码（模块枚举 8 位数值，见 GameFrameX.Core/Enum/Errors 与 error-codes.json 码表）",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "错误或提示信息"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/GameAreaMergePlanResponse"
+                    },
+                    "trackId": {
+                      "type": "string",
+                      "description": "链路追踪标识，未启用追踪时为 null",
+                      "nullable": true
+                    },
+                    "errorCode": {
+                      "type": "string",
+                      "description": "已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段",
+                      "nullable": true
+                    },
+                    "type": {
+                      "type": "string",
+                      "description": "响应类型（success/warning/error）",
+                      "nullable": true
+                    },
+                    "time": {
+                      "type": "integer",
+                      "description": "Unix 时间戳（秒）",
+                      "format": "int64"
+                    },
+                    "extras": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/gameAreaMerge/approve": {
+      "post": {
+        "tags": [
+          "gameAreaMerge"
+        ],
+        "summary": "当前登录复核人确认零全局域写入；申请人不得自批。",
+        "operationId": "GameAreaMergeApprovePost",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApproveGameAreaMergePlanRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApproveGameAreaMergePlanRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApproveGameAreaMergePlanRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "required": [
+                    "code",
+                    "message",
+                    "data",
+                    "trackId",
+                    "errorCode",
+                    "type",
+                    "time",
+                    "extras"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "响应码，0 表示成功，失败时承载统一数字业务错误码（模块枚举 8 位数值，见 GameFrameX.Core/Enum/Errors 与 error-codes.json 码表）",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "错误或提示信息"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/GameAreaMergePlanResponse"
+                    },
+                    "trackId": {
+                      "type": "string",
+                      "description": "链路追踪标识，未启用追踪时为 null",
+                      "nullable": true
+                    },
+                    "errorCode": {
+                      "type": "string",
+                      "description": "已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段",
+                      "nullable": true
+                    },
+                    "type": {
+                      "type": "string",
+                      "description": "响应类型（success/warning/error）",
+                      "nullable": true
+                    },
+                    "time": {
+                      "type": "integer",
+                      "description": "Unix 时间戳（秒）",
+                      "format": "int64"
+                    },
+                    "extras": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "required": [
+                    "code",
+                    "message",
+                    "data",
+                    "trackId",
+                    "errorCode",
+                    "type",
+                    "time",
+                    "extras"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "响应码，0 表示成功，失败时承载统一数字业务错误码（模块枚举 8 位数值，见 GameFrameX.Core/Enum/Errors 与 error-codes.json 码表）",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "错误或提示信息"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/GameAreaMergePlanResponse"
+                    },
+                    "trackId": {
+                      "type": "string",
+                      "description": "链路追踪标识，未启用追踪时为 null",
+                      "nullable": true
+                    },
+                    "errorCode": {
+                      "type": "string",
+                      "description": "已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段",
+                      "nullable": true
+                    },
+                    "type": {
+                      "type": "string",
+                      "description": "响应类型（success/warning/error）",
+                      "nullable": true
+                    },
+                    "time": {
+                      "type": "integer",
+                      "description": "Unix 时间戳（秒）",
+                      "format": "int64"
+                    },
+                    "extras": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "required": [
+                    "code",
+                    "message",
+                    "data",
+                    "trackId",
+                    "errorCode",
+                    "type",
+                    "time",
+                    "extras"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "响应码，0 表示成功，失败时承载统一数字业务错误码（模块枚举 8 位数值，见 GameFrameX.Core/Enum/Errors 与 error-codes.json 码表）",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "错误或提示信息"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/GameAreaMergePlanResponse"
+                    },
+                    "trackId": {
+                      "type": "string",
+                      "description": "链路追踪标识，未启用追踪时为 null",
+                      "nullable": true
+                    },
+                    "errorCode": {
+                      "type": "string",
+                      "description": "已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段",
+                      "nullable": true
+                    },
+                    "type": {
+                      "type": "string",
+                      "description": "响应类型（success/warning/error）",
+                      "nullable": true
+                    },
+                    "time": {
+                      "type": "integer",
+                      "description": "Unix 时间戳（秒）",
+                      "format": "int64"
+                    },
+                    "extras": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/gameAreaMerge/detail": {
+      "get": {
+        "tags": [
+          "gameAreaMerge"
+        ],
+        "summary": "读取计划与两个阶段的完整报告快照。",
+        "operationId": "GameAreaMergeDetailGet",
+        "parameters": [
+          {
+            "name": "Id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "maximum": 9.223372036854776E+18,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "required": [
+                    "code",
+                    "message",
+                    "data",
+                    "trackId",
+                    "errorCode",
+                    "type",
+                    "time",
+                    "extras"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "响应码，0 表示成功，失败时承载统一数字业务错误码（模块枚举 8 位数值，见 GameFrameX.Core/Enum/Errors 与 error-codes.json 码表）",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "错误或提示信息"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/GameAreaMergePlanResponse"
+                    },
+                    "trackId": {
+                      "type": "string",
+                      "description": "链路追踪标识，未启用追踪时为 null",
+                      "nullable": true
+                    },
+                    "errorCode": {
+                      "type": "string",
+                      "description": "已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段",
+                      "nullable": true
+                    },
+                    "type": {
+                      "type": "string",
+                      "description": "响应类型（success/warning/error）",
+                      "nullable": true
+                    },
+                    "time": {
+                      "type": "integer",
+                      "description": "Unix 时间戳（秒）",
+                      "format": "int64"
+                    },
+                    "extras": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "required": [
+                    "code",
+                    "message",
+                    "data",
+                    "trackId",
+                    "errorCode",
+                    "type",
+                    "time",
+                    "extras"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "响应码，0 表示成功，失败时承载统一数字业务错误码（模块枚举 8 位数值，见 GameFrameX.Core/Enum/Errors 与 error-codes.json 码表）",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "错误或提示信息"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/GameAreaMergePlanResponse"
+                    },
+                    "trackId": {
+                      "type": "string",
+                      "description": "链路追踪标识，未启用追踪时为 null",
+                      "nullable": true
+                    },
+                    "errorCode": {
+                      "type": "string",
+                      "description": "已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段",
+                      "nullable": true
+                    },
+                    "type": {
+                      "type": "string",
+                      "description": "响应类型（success/warning/error）",
+                      "nullable": true
+                    },
+                    "time": {
+                      "type": "integer",
+                      "description": "Unix 时间戳（秒）",
+                      "format": "int64"
+                    },
+                    "extras": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "required": [
+                    "code",
+                    "message",
+                    "data",
+                    "trackId",
+                    "errorCode",
+                    "type",
+                    "time",
+                    "extras"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "响应码，0 表示成功，失败时承载统一数字业务错误码（模块枚举 8 位数值，见 GameFrameX.Core/Enum/Errors 与 error-codes.json 码表）",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "错误或提示信息"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/GameAreaMergePlanResponse"
+                    },
+                    "trackId": {
+                      "type": "string",
+                      "description": "链路追踪标识，未启用追踪时为 null",
+                      "nullable": true
+                    },
+                    "errorCode": {
+                      "type": "string",
+                      "description": "已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段",
+                      "nullable": true
+                    },
+                    "type": {
+                      "type": "string",
+                      "description": "响应类型（success/warning/error）",
+                      "nullable": true
+                    },
+                    "time": {
+                      "type": "integer",
+                      "description": "Unix 时间戳（秒）",
+                      "format": "int64"
+                    },
+                    "extras": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/gameAreaMerge/dryRun": {
+      "post": {
+        "tags": [
+          "gameAreaMerge"
+        ],
+        "summary": "仅草稿或失败计划可重新预演；保存报告供复核。",
+        "operationId": "GameAreaMergeDryRunPost",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BaseIdRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BaseIdRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/BaseIdRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "required": [
+                    "code",
+                    "message",
+                    "data",
+                    "trackId",
+                    "errorCode",
+                    "type",
+                    "time",
+                    "extras"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "响应码，0 表示成功，失败时承载统一数字业务错误码（模块枚举 8 位数值，见 GameFrameX.Core/Enum/Errors 与 error-codes.json 码表）",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "错误或提示信息"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/GameAreaMergePlanResponse"
+                    },
+                    "trackId": {
+                      "type": "string",
+                      "description": "链路追踪标识，未启用追踪时为 null",
+                      "nullable": true
+                    },
+                    "errorCode": {
+                      "type": "string",
+                      "description": "已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段",
+                      "nullable": true
+                    },
+                    "type": {
+                      "type": "string",
+                      "description": "响应类型（success/warning/error）",
+                      "nullable": true
+                    },
+                    "time": {
+                      "type": "integer",
+                      "description": "Unix 时间戳（秒）",
+                      "format": "int64"
+                    },
+                    "extras": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "required": [
+                    "code",
+                    "message",
+                    "data",
+                    "trackId",
+                    "errorCode",
+                    "type",
+                    "time",
+                    "extras"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "响应码，0 表示成功，失败时承载统一数字业务错误码（模块枚举 8 位数值，见 GameFrameX.Core/Enum/Errors 与 error-codes.json 码表）",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "错误或提示信息"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/GameAreaMergePlanResponse"
+                    },
+                    "trackId": {
+                      "type": "string",
+                      "description": "链路追踪标识，未启用追踪时为 null",
+                      "nullable": true
+                    },
+                    "errorCode": {
+                      "type": "string",
+                      "description": "已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段",
+                      "nullable": true
+                    },
+                    "type": {
+                      "type": "string",
+                      "description": "响应类型（success/warning/error）",
+                      "nullable": true
+                    },
+                    "time": {
+                      "type": "integer",
+                      "description": "Unix 时间戳（秒）",
+                      "format": "int64"
+                    },
+                    "extras": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "required": [
+                    "code",
+                    "message",
+                    "data",
+                    "trackId",
+                    "errorCode",
+                    "type",
+                    "time",
+                    "extras"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "响应码，0 表示成功，失败时承载统一数字业务错误码（模块枚举 8 位数值，见 GameFrameX.Core/Enum/Errors 与 error-codes.json 码表）",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "错误或提示信息"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/GameAreaMergePlanResponse"
+                    },
+                    "trackId": {
+                      "type": "string",
+                      "description": "链路追踪标识，未启用追踪时为 null",
+                      "nullable": true
+                    },
+                    "errorCode": {
+                      "type": "string",
+                      "description": "已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段",
+                      "nullable": true
+                    },
+                    "type": {
+                      "type": "string",
+                      "description": "响应类型（success/warning/error）",
+                      "nullable": true
+                    },
+                    "time": {
+                      "type": "integer",
+                      "description": "Unix 时间戳（秒）",
+                      "format": "int64"
+                    },
+                    "extras": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/gameAreaMerge/execute": {
+      "post": {
+        "tags": [
+          "gameAreaMerge"
+        ],
+        "summary": "备份确认后同步执行；成功或幂等回放时原子完成计划与源服退场。",
+        "operationId": "GameAreaMergeExecutePost",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExecuteGameAreaMergePlanRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExecuteGameAreaMergePlanRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExecuteGameAreaMergePlanRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "required": [
+                    "code",
+                    "message",
+                    "data",
+                    "trackId",
+                    "errorCode",
+                    "type",
+                    "time",
+                    "extras"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "响应码，0 表示成功，失败时承载统一数字业务错误码（模块枚举 8 位数值，见 GameFrameX.Core/Enum/Errors 与 error-codes.json 码表）",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "错误或提示信息"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/GameAreaMergePlanResponse"
+                    },
+                    "trackId": {
+                      "type": "string",
+                      "description": "链路追踪标识，未启用追踪时为 null",
+                      "nullable": true
+                    },
+                    "errorCode": {
+                      "type": "string",
+                      "description": "已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段",
+                      "nullable": true
+                    },
+                    "type": {
+                      "type": "string",
+                      "description": "响应类型（success/warning/error）",
+                      "nullable": true
+                    },
+                    "time": {
+                      "type": "integer",
+                      "description": "Unix 时间戳（秒）",
+                      "format": "int64"
+                    },
+                    "extras": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "required": [
+                    "code",
+                    "message",
+                    "data",
+                    "trackId",
+                    "errorCode",
+                    "type",
+                    "time",
+                    "extras"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "响应码，0 表示成功，失败时承载统一数字业务错误码（模块枚举 8 位数值，见 GameFrameX.Core/Enum/Errors 与 error-codes.json 码表）",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "错误或提示信息"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/GameAreaMergePlanResponse"
+                    },
+                    "trackId": {
+                      "type": "string",
+                      "description": "链路追踪标识，未启用追踪时为 null",
+                      "nullable": true
+                    },
+                    "errorCode": {
+                      "type": "string",
+                      "description": "已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段",
+                      "nullable": true
+                    },
+                    "type": {
+                      "type": "string",
+                      "description": "响应类型（success/warning/error）",
+                      "nullable": true
+                    },
+                    "time": {
+                      "type": "integer",
+                      "description": "Unix 时间戳（秒）",
+                      "format": "int64"
+                    },
+                    "extras": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "required": [
+                    "code",
+                    "message",
+                    "data",
+                    "trackId",
+                    "errorCode",
+                    "type",
+                    "time",
+                    "extras"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "响应码，0 表示成功，失败时承载统一数字业务错误码（模块枚举 8 位数值，见 GameFrameX.Core/Enum/Errors 与 error-codes.json 码表）",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "错误或提示信息"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/GameAreaMergePlanResponse"
+                    },
+                    "trackId": {
+                      "type": "string",
+                      "description": "链路追踪标识，未启用追踪时为 null",
+                      "nullable": true
+                    },
+                    "errorCode": {
+                      "type": "string",
+                      "description": "已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段",
+                      "nullable": true
+                    },
+                    "type": {
+                      "type": "string",
+                      "description": "响应类型（success/warning/error）",
+                      "nullable": true
+                    },
+                    "time": {
+                      "type": "integer",
+                      "description": "Unix 时间戳（秒）",
+                      "format": "int64"
+                    },
+                    "extras": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/gameAreaMerge/page": {
+      "post": {
+        "tags": [
+          "gameAreaMerge"
+        ],
+        "summary": "查询合服计划，最新计划优先。",
+        "operationId": "GameAreaMergePagePost",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BasePageRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BasePageRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/BasePageRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "required": [
+                    "code",
+                    "message",
+                    "data",
+                    "trackId",
+                    "errorCode",
+                    "type",
+                    "time",
+                    "extras"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "响应码，0 表示成功，失败时承载统一数字业务错误码（模块枚举 8 位数值，见 GameFrameX.Core/Enum/Errors 与 error-codes.json 码表）",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "错误或提示信息"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/GameAreaMergePlanResponseSqlSugarPagedList"
+                    },
+                    "trackId": {
+                      "type": "string",
+                      "description": "链路追踪标识，未启用追踪时为 null",
+                      "nullable": true
+                    },
+                    "errorCode": {
+                      "type": "string",
+                      "description": "已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段",
+                      "nullable": true
+                    },
+                    "type": {
+                      "type": "string",
+                      "description": "响应类型（success/warning/error）",
+                      "nullable": true
+                    },
+                    "time": {
+                      "type": "integer",
+                      "description": "Unix 时间戳（秒）",
+                      "format": "int64"
+                    },
+                    "extras": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "required": [
+                    "code",
+                    "message",
+                    "data",
+                    "trackId",
+                    "errorCode",
+                    "type",
+                    "time",
+                    "extras"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "响应码，0 表示成功，失败时承载统一数字业务错误码（模块枚举 8 位数值，见 GameFrameX.Core/Enum/Errors 与 error-codes.json 码表）",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "错误或提示信息"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/GameAreaMergePlanResponseSqlSugarPagedList"
+                    },
+                    "trackId": {
+                      "type": "string",
+                      "description": "链路追踪标识，未启用追踪时为 null",
+                      "nullable": true
+                    },
+                    "errorCode": {
+                      "type": "string",
+                      "description": "已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段",
+                      "nullable": true
+                    },
+                    "type": {
+                      "type": "string",
+                      "description": "响应类型（success/warning/error）",
+                      "nullable": true
+                    },
+                    "time": {
+                      "type": "integer",
+                      "description": "Unix 时间戳（秒）",
+                      "format": "int64"
+                    },
+                    "extras": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "required": [
+                    "code",
+                    "message",
+                    "data",
+                    "trackId",
+                    "errorCode",
+                    "type",
+                    "time",
+                    "extras"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "响应码，0 表示成功，失败时承载统一数字业务错误码（模块枚举 8 位数值，见 GameFrameX.Core/Enum/Errors 与 error-codes.json 码表）",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "错误或提示信息"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/GameAreaMergePlanResponseSqlSugarPagedList"
+                    },
+                    "trackId": {
+                      "type": "string",
+                      "description": "链路追踪标识，未启用追踪时为 null",
+                      "nullable": true
+                    },
+                    "errorCode": {
+                      "type": "string",
+                      "description": "已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段",
+                      "nullable": true
+                    },
+                    "type": {
+                      "type": "string",
+                      "description": "响应类型（success/warning/error）",
+                      "nullable": true
+                    },
+                    "time": {
+                      "type": "integer",
+                      "description": "Unix 时间戳（秒）",
+                      "format": "int64"
+                    },
+                    "extras": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/gameAreaProvision/create": {
+      "post": {
+        "tags": [
+          "gameAreaProvision"
+        ],
+        "summary": "以新区服编号为幂等键创建禁用行；同编号但参数不同的请求拒绝覆盖。",
+        "operationId": "GameAreaProvisionCreatePost",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GameAreaProvisionCreateRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GameAreaProvisionCreateRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/GameAreaProvisionCreateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "required": [
+                    "code",
+                    "message",
+                    "data",
+                    "trackId",
+                    "errorCode",
+                    "type",
+                    "time",
+                    "extras"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "响应码，0 表示成功，失败时承载统一数字业务错误码（模块枚举 8 位数值，见 GameFrameX.Core/Enum/Errors 与 error-codes.json 码表）",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "错误或提示信息"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/GameAreaProvisionStatusResponse"
+                    },
+                    "trackId": {
+                      "type": "string",
+                      "description": "链路追踪标识，未启用追踪时为 null",
+                      "nullable": true
+                    },
+                    "errorCode": {
+                      "type": "string",
+                      "description": "已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段",
+                      "nullable": true
+                    },
+                    "type": {
+                      "type": "string",
+                      "description": "响应类型（success/warning/error）",
+                      "nullable": true
+                    },
+                    "time": {
+                      "type": "integer",
+                      "description": "Unix 时间戳（秒）",
+                      "format": "int64"
+                    },
+                    "extras": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "required": [
+                    "code",
+                    "message",
+                    "data",
+                    "trackId",
+                    "errorCode",
+                    "type",
+                    "time",
+                    "extras"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "响应码，0 表示成功，失败时承载统一数字业务错误码（模块枚举 8 位数值，见 GameFrameX.Core/Enum/Errors 与 error-codes.json 码表）",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "错误或提示信息"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/GameAreaProvisionStatusResponse"
+                    },
+                    "trackId": {
+                      "type": "string",
+                      "description": "链路追踪标识，未启用追踪时为 null",
+                      "nullable": true
+                    },
+                    "errorCode": {
+                      "type": "string",
+                      "description": "已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段",
+                      "nullable": true
+                    },
+                    "type": {
+                      "type": "string",
+                      "description": "响应类型（success/warning/error）",
+                      "nullable": true
+                    },
+                    "time": {
+                      "type": "integer",
+                      "description": "Unix 时间戳（秒）",
+                      "format": "int64"
+                    },
+                    "extras": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "required": [
+                    "code",
+                    "message",
+                    "data",
+                    "trackId",
+                    "errorCode",
+                    "type",
+                    "time",
+                    "extras"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "响应码，0 表示成功，失败时承载统一数字业务错误码（模块枚举 8 位数值，见 GameFrameX.Core/Enum/Errors 与 error-codes.json 码表）",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "错误或提示信息"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/GameAreaProvisionStatusResponse"
+                    },
+                    "trackId": {
+                      "type": "string",
+                      "description": "链路追踪标识，未启用追踪时为 null",
+                      "nullable": true
+                    },
+                    "errorCode": {
+                      "type": "string",
+                      "description": "已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段",
+                      "nullable": true
+                    },
+                    "type": {
+                      "type": "string",
+                      "description": "响应类型（success/warning/error）",
+                      "nullable": true
+                    },
+                    "time": {
+                      "type": "integer",
+                      "description": "Unix 时间戳（秒）",
+                      "format": "int64"
+                    },
+                    "extras": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/gameAreaProvision/execute": {
+      "post": {
+        "tags": [
+          "gameAreaProvision"
+        ],
+        "summary": "从尚未完成的步骤继续，失败保留已有事实，绝不提前启用。",
+        "operationId": "GameAreaProvisionExecutePost",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BaseIdRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BaseIdRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/BaseIdRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "required": [
+                    "code",
+                    "message",
+                    "data",
+                    "trackId",
+                    "errorCode",
+                    "type",
+                    "time",
+                    "extras"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "响应码，0 表示成功，失败时承载统一数字业务错误码（模块枚举 8 位数值，见 GameFrameX.Core/Enum/Errors 与 error-codes.json 码表）",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "错误或提示信息"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/GameAreaProvisionStatusResponse"
+                    },
+                    "trackId": {
+                      "type": "string",
+                      "description": "链路追踪标识，未启用追踪时为 null",
+                      "nullable": true
+                    },
+                    "errorCode": {
+                      "type": "string",
+                      "description": "已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段",
+                      "nullable": true
+                    },
+                    "type": {
+                      "type": "string",
+                      "description": "响应类型（success/warning/error）",
+                      "nullable": true
+                    },
+                    "time": {
+                      "type": "integer",
+                      "description": "Unix 时间戳（秒）",
+                      "format": "int64"
+                    },
+                    "extras": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "required": [
+                    "code",
+                    "message",
+                    "data",
+                    "trackId",
+                    "errorCode",
+                    "type",
+                    "time",
+                    "extras"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "响应码，0 表示成功，失败时承载统一数字业务错误码（模块枚举 8 位数值，见 GameFrameX.Core/Enum/Errors 与 error-codes.json 码表）",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "错误或提示信息"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/GameAreaProvisionStatusResponse"
+                    },
+                    "trackId": {
+                      "type": "string",
+                      "description": "链路追踪标识，未启用追踪时为 null",
+                      "nullable": true
+                    },
+                    "errorCode": {
+                      "type": "string",
+                      "description": "已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段",
+                      "nullable": true
+                    },
+                    "type": {
+                      "type": "string",
+                      "description": "响应类型（success/warning/error）",
+                      "nullable": true
+                    },
+                    "time": {
+                      "type": "integer",
+                      "description": "Unix 时间戳（秒）",
+                      "format": "int64"
+                    },
+                    "extras": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "required": [
+                    "code",
+                    "message",
+                    "data",
+                    "trackId",
+                    "errorCode",
+                    "type",
+                    "time",
+                    "extras"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "响应码，0 表示成功，失败时承载统一数字业务错误码（模块枚举 8 位数值，见 GameFrameX.Core/Enum/Errors 与 error-codes.json 码表）",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "错误或提示信息"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/GameAreaProvisionStatusResponse"
+                    },
+                    "trackId": {
+                      "type": "string",
+                      "description": "链路追踪标识，未启用追踪时为 null",
+                      "nullable": true
+                    },
+                    "errorCode": {
+                      "type": "string",
+                      "description": "已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段",
+                      "nullable": true
+                    },
+                    "type": {
+                      "type": "string",
+                      "description": "响应类型（success/warning/error）",
+                      "nullable": true
+                    },
+                    "time": {
+                      "type": "integer",
+                      "description": "Unix 时间戳（秒）",
+                      "format": "int64"
+                    },
+                    "extras": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/gameAreaProvision/preview": {
+      "get": {
+        "tags": [
+          "gameAreaProvision"
+        ],
+        "summary": "预览显式克隆字段及必须填写的差异字段，不复制状态与运行时标识。",
+        "operationId": "GameAreaProvisionPreviewGet",
+        "parameters": [
+          {
+            "name": "Id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "maximum": 9.223372036854776E+18,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "required": [
+                    "code",
+                    "message",
+                    "data",
+                    "trackId",
+                    "errorCode",
+                    "type",
+                    "time",
+                    "extras"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "响应码，0 表示成功，失败时承载统一数字业务错误码（模块枚举 8 位数值，见 GameFrameX.Core/Enum/Errors 与 error-codes.json 码表）",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "错误或提示信息"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/GameAreaProvisionPreviewResponse"
+                    },
+                    "trackId": {
+                      "type": "string",
+                      "description": "链路追踪标识，未启用追踪时为 null",
+                      "nullable": true
+                    },
+                    "errorCode": {
+                      "type": "string",
+                      "description": "已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段",
+                      "nullable": true
+                    },
+                    "type": {
+                      "type": "string",
+                      "description": "响应类型（success/warning/error）",
+                      "nullable": true
+                    },
+                    "time": {
+                      "type": "integer",
+                      "description": "Unix 时间戳（秒）",
+                      "format": "int64"
+                    },
+                    "extras": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "required": [
+                    "code",
+                    "message",
+                    "data",
+                    "trackId",
+                    "errorCode",
+                    "type",
+                    "time",
+                    "extras"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "响应码，0 表示成功，失败时承载统一数字业务错误码（模块枚举 8 位数值，见 GameFrameX.Core/Enum/Errors 与 error-codes.json 码表）",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "错误或提示信息"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/GameAreaProvisionPreviewResponse"
+                    },
+                    "trackId": {
+                      "type": "string",
+                      "description": "链路追踪标识，未启用追踪时为 null",
+                      "nullable": true
+                    },
+                    "errorCode": {
+                      "type": "string",
+                      "description": "已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段",
+                      "nullable": true
+                    },
+                    "type": {
+                      "type": "string",
+                      "description": "响应类型（success/warning/error）",
+                      "nullable": true
+                    },
+                    "time": {
+                      "type": "integer",
+                      "description": "Unix 时间戳（秒）",
+                      "format": "int64"
+                    },
+                    "extras": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "required": [
+                    "code",
+                    "message",
+                    "data",
+                    "trackId",
+                    "errorCode",
+                    "type",
+                    "time",
+                    "extras"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "响应码，0 表示成功，失败时承载统一数字业务错误码（模块枚举 8 位数值，见 GameFrameX.Core/Enum/Errors 与 error-codes.json 码表）",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "错误或提示信息"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/GameAreaProvisionPreviewResponse"
+                    },
+                    "trackId": {
+                      "type": "string",
+                      "description": "链路追踪标识，未启用追踪时为 null",
+                      "nullable": true
+                    },
+                    "errorCode": {
+                      "type": "string",
+                      "description": "已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段",
+                      "nullable": true
+                    },
+                    "type": {
+                      "type": "string",
+                      "description": "响应类型（success/warning/error）",
+                      "nullable": true
+                    },
+                    "time": {
+                      "type": "integer",
+                      "description": "Unix 时间戳（秒）",
+                      "format": "int64"
+                    },
+                    "extras": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/gameAreaProvision/status": {
+      "get": {
+        "tags": [
+          "gameAreaProvision"
+        ],
+        "summary": "从区服记录和 Online 日历查询四个步骤的事实状态。",
+        "operationId": "GameAreaProvisionStatusGet",
+        "parameters": [
+          {
+            "name": "Id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "maximum": 9.223372036854776E+18,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "required": [
+                    "code",
+                    "message",
+                    "data",
+                    "trackId",
+                    "errorCode",
+                    "type",
+                    "time",
+                    "extras"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "响应码，0 表示成功，失败时承载统一数字业务错误码（模块枚举 8 位数值，见 GameFrameX.Core/Enum/Errors 与 error-codes.json 码表）",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "错误或提示信息"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/GameAreaProvisionStatusResponse"
+                    },
+                    "trackId": {
+                      "type": "string",
+                      "description": "链路追踪标识，未启用追踪时为 null",
+                      "nullable": true
+                    },
+                    "errorCode": {
+                      "type": "string",
+                      "description": "已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段",
+                      "nullable": true
+                    },
+                    "type": {
+                      "type": "string",
+                      "description": "响应类型（success/warning/error）",
+                      "nullable": true
+                    },
+                    "time": {
+                      "type": "integer",
+                      "description": "Unix 时间戳（秒）",
+                      "format": "int64"
+                    },
+                    "extras": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "required": [
+                    "code",
+                    "message",
+                    "data",
+                    "trackId",
+                    "errorCode",
+                    "type",
+                    "time",
+                    "extras"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "响应码，0 表示成功，失败时承载统一数字业务错误码（模块枚举 8 位数值，见 GameFrameX.Core/Enum/Errors 与 error-codes.json 码表）",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "错误或提示信息"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/GameAreaProvisionStatusResponse"
+                    },
+                    "trackId": {
+                      "type": "string",
+                      "description": "链路追踪标识，未启用追踪时为 null",
+                      "nullable": true
+                    },
+                    "errorCode": {
+                      "type": "string",
+                      "description": "已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段",
+                      "nullable": true
+                    },
+                    "type": {
+                      "type": "string",
+                      "description": "响应类型（success/warning/error）",
+                      "nullable": true
+                    },
+                    "time": {
+                      "type": "integer",
+                      "description": "Unix 时间戳（秒）",
+                      "format": "int64"
+                    },
+                    "extras": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "required": [
+                    "code",
+                    "message",
+                    "data",
+                    "trackId",
+                    "errorCode",
+                    "type",
+                    "time",
+                    "extras"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "响应码，0 表示成功，失败时承载统一数字业务错误码（模块枚举 8 位数值，见 GameFrameX.Core/Enum/Errors 与 error-codes.json 码表）",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "错误或提示信息"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/GameAreaProvisionStatusResponse"
+                    },
+                    "trackId": {
+                      "type": "string",
+                      "description": "链路追踪标识，未启用追踪时为 null",
+                      "nullable": true
+                    },
+                    "errorCode": {
+                      "type": "string",
+                      "description": "已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段",
+                      "nullable": true
+                    },
+                    "type": {
+                      "type": "string",
+                      "description": "响应类型（success/warning/error）",
+                      "nullable": true
+                    },
+                    "time": {
+                      "type": "integer",
+                      "description": "Unix 时间戳（秒）",
+                      "format": "int64"
+                    },
+                    "extras": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/gameAreaProvision/templates": {
+      "get": {
+        "tags": [
+          "gameAreaProvision"
+        ],
+        "summary": "获取可选模板（包含禁用行，但不包含已软删行）。",
+        "operationId": "GameAreaProvisionTemplatesGet",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "required": [
+                    "code",
+                    "message",
+                    "data",
+                    "trackId",
+                    "errorCode",
+                    "type",
+                    "time",
+                    "extras"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "响应码，0 表示成功，失败时承载统一数字业务错误码（模块枚举 8 位数值，见 GameFrameX.Core/Enum/Errors 与 error-codes.json 码表）",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "错误或提示信息"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/GameAreaProvisionTemplateResponse"
+                      }
+                    },
+                    "trackId": {
+                      "type": "string",
+                      "description": "链路追踪标识，未启用追踪时为 null",
+                      "nullable": true
+                    },
+                    "errorCode": {
+                      "type": "string",
+                      "description": "已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段",
+                      "nullable": true
+                    },
+                    "type": {
+                      "type": "string",
+                      "description": "响应类型（success/warning/error）",
+                      "nullable": true
+                    },
+                    "time": {
+                      "type": "integer",
+                      "description": "Unix 时间戳（秒）",
+                      "format": "int64"
+                    },
+                    "extras": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "required": [
+                    "code",
+                    "message",
+                    "data",
+                    "trackId",
+                    "errorCode",
+                    "type",
+                    "time",
+                    "extras"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "响应码，0 表示成功，失败时承载统一数字业务错误码（模块枚举 8 位数值，见 GameFrameX.Core/Enum/Errors 与 error-codes.json 码表）",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "错误或提示信息"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/GameAreaProvisionTemplateResponse"
+                      }
+                    },
+                    "trackId": {
+                      "type": "string",
+                      "description": "链路追踪标识，未启用追踪时为 null",
+                      "nullable": true
+                    },
+                    "errorCode": {
+                      "type": "string",
+                      "description": "已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段",
+                      "nullable": true
+                    },
+                    "type": {
+                      "type": "string",
+                      "description": "响应类型（success/warning/error）",
+                      "nullable": true
+                    },
+                    "time": {
+                      "type": "integer",
+                      "description": "Unix 时间戳（秒）",
+                      "format": "int64"
+                    },
+                    "extras": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "required": [
+                    "code",
+                    "message",
+                    "data",
+                    "trackId",
+                    "errorCode",
+                    "type",
+                    "time",
+                    "extras"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "响应码，0 表示成功，失败时承载统一数字业务错误码（模块枚举 8 位数值，见 GameFrameX.Core/Enum/Errors 与 error-codes.json 码表）",
+                      "format": "int32"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "错误或提示信息"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/GameAreaProvisionTemplateResponse"
+                      }
+                    },
+                    "trackId": {
+                      "type": "string",
+                      "description": "链路追踪标识，未启用追踪时为 null",
+                      "nullable": true
+                    },
+                    "errorCode": {
+                      "type": "string",
+                      "description": "已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段",
+                      "nullable": true
+                    },
+                    "type": {
+                      "type": "string",
+                      "description": "响应类型（success/warning/error）",
+                      "nullable": true
+                    },
+                    "time": {
+                      "type": "integer",
+                      "description": "Unix 时间戳（秒）",
+                      "format": "int64"
+                    },
+                    "extras": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/gameBannerAnnouncement/add": {
       "post": {
         "tags": [
@@ -74568,6 +76674,26 @@
           "审核驳回"
         ]
       },
+      "ApproveGameAreaMergePlanRequest": {
+        "required": [
+          "Reason"
+        ],
+        "type": "object",
+        "properties": {
+          "Id": {
+            "type": "string"
+          },
+          "Reason": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "ReviewerOperatorId": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "description": "合服流程数据。"
+      },
       "AvailableChannelDefinitionResponse": {
         "type": "object",
         "properties": {
@@ -74635,6 +76761,35 @@
             "maximum": 9.223372036854776E+18,
             "minimum": 1,
             "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "BasePageRequest": {
+        "type": "object",
+        "properties": {
+          "SearchKey": {
+            "type": "string",
+            "nullable": true
+          },
+          "Page": {
+            "maximum": 2147483647,
+            "minimum": 1,
+            "type": "integer",
+            "format": "int32"
+          },
+          "PageSize": {
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer",
+            "format": "int32"
+          },
+          "OrderBy": {
+            "type": "string",
+            "nullable": true
+          },
+          "IsDescending": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -75138,6 +77293,31 @@
           "Apply",
           "Lift"
         ]
+      },
+      "CreateGameAreaMergePlanRequest": {
+        "required": [
+          "Reason"
+        ],
+        "type": "object",
+        "properties": {
+          "TargetServerId": {
+            "type": "string"
+          },
+          "SourceServerIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "nullable": true
+          },
+          "Reason": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "description": "合服流程数据。"
       },
       "CultureLevelEnum": {
         "enum": [
@@ -75818,6 +77998,26 @@
         },
         "additionalProperties": false,
         "description": "枚举类型输出参数"
+      },
+      "ExecuteGameAreaMergePlanRequest": {
+        "required": [
+          "BackupIdentifier"
+        ],
+        "type": "object",
+        "properties": {
+          "Id": {
+            "type": "string"
+          },
+          "BackupIdentifier": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "BackupConfirmed": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "description": "合服流程数据。"
       },
       "ExportColumnRequest": {
         "type": "object",
@@ -78159,6 +80359,261 @@
         },
         "additionalProperties": false
       },
+      "GameAreaMergePlanResponse": {
+        "type": "object",
+        "properties": {
+          "Id": {
+            "type": "string"
+          },
+          "RowVersion": {
+            "type": "string",
+            "nullable": true
+          },
+          "CreatedTime": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "TargetServerId": {
+            "type": "string"
+          },
+          "SourceServerIds": {
+            "type": "string",
+            "nullable": true
+          },
+          "PlanId": {
+            "type": "string",
+            "nullable": true
+          },
+          "Status": {
+            "$ref": "#/components/schemas/GameAreaMergePlanStatus"
+          },
+          "DryRunReportSnapshot": {
+            "type": "string",
+            "nullable": true
+          },
+          "ExecutionReportSnapshot": {
+            "type": "string",
+            "nullable": true
+          },
+          "ApplicantOperatorId": {
+            "type": "string"
+          },
+          "ReviewerOperatorId": {
+            "type": "string",
+            "nullable": true
+          },
+          "Reason": {
+            "type": "string",
+            "nullable": true
+          },
+          "BackupIdentifier": {
+            "type": "string",
+            "nullable": true
+          },
+          "BackupConfirmed": {
+            "type": "boolean"
+          },
+          "DryRunTime": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "ApprovedTime": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "ExecutionStartedTime": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "CompletedTime": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "FailedTime": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "FailureMessage": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "合服计划详情，包含阶段报告快照。"
+      },
+      "GameAreaMergePlanResponseSqlSugarPagedList": {
+        "type": "object",
+        "properties": {
+          "Page": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "PageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "TotalPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GameAreaMergePlanResponse"
+            },
+            "nullable": true
+          },
+          "HasPrevPage": {
+            "type": "boolean"
+          },
+          "HasNextPage": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "GameAreaMergePlanStatus": {
+        "enum": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "type": "integer",
+        "format": "int32",
+        "x-enum-varnames": [
+          "Draft",
+          "DryRunCompleted",
+          "Approved",
+          "Executing",
+          "Completed",
+          "Failed"
+        ],
+        "x-enum-descriptions": [
+          "草稿",
+          "已预演",
+          "已批准",
+          "执行中",
+          "已完成",
+          "失败"
+        ]
+      },
+      "GameAreaProvisionCreateRequest": {
+        "type": "object",
+        "properties": {
+          "TemplateId": {
+            "type": "string"
+          },
+          "ServerId": {
+            "type": "string"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "HttpManageUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "TcpSocketUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "WebSocketUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "ServerParameters": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "开服向导CreateRequest契约。"
+      },
+      "GameAreaProvisionPreviewResponse": {
+        "type": "object",
+        "properties": {
+          "TemplateId": {
+            "type": "string"
+          },
+          "ClonedFields": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "nullable": true
+            },
+            "nullable": true
+          },
+          "RequiredFields": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "开服向导PreviewResponse契约。"
+      },
+      "GameAreaProvisionStatusResponse": {
+        "type": "object",
+        "properties": {
+          "ServerId": {
+            "type": "string"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "RecordCreated": {
+            "type": "boolean"
+          },
+          "ContainerCreated": {
+            "type": "boolean"
+          },
+          "Registered": {
+            "type": "boolean"
+          },
+          "IsEnabled": {
+            "type": "boolean"
+          },
+          "OpenedAtUnixMilliseconds": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "MergedIntoServerId": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "description": "开服向导StatusResponse契约。"
+      },
+      "GameAreaProvisionTemplateResponse": {
+        "type": "object",
+        "properties": {
+          "Id": {
+            "type": "string"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "开服向导TemplateResponse契约。"
+      },
       "GameAreaResponse": {
         "type": "object",
         "properties": {
@@ -78190,6 +80645,11 @@
           },
           "ServerStatus": {
             "$ref": "#/components/schemas/GameServerStatus"
+          },
+          "MergedIntoServerId": {
+            "type": "string",
+            "description": "已合入的目标区服。",
+            "nullable": true
           },
           "HttpManageUrl": {
             "type": "string",
@@ -81773,7 +84233,8 @@
           1,
           2,
           3,
-          4
+          4,
+          5
         ],
         "type": "integer",
         "format": "int32",
@@ -81782,14 +84243,16 @@
           "Online",
           "Offline",
           "Maintenance",
-          "Full"
+          "Full",
+          "Merged"
         ],
         "x-enum-descriptions": [
           "未知",
           "在线",
           "离线",
           "维护中",
-          "满员"
+          "满员",
+          "已合服"
         ]
       },
       "GameTimeJobResponse": {
@@ -96827,6 +99290,14 @@
     {
       "name": "gameAreaClassify",
       "description": "游戏大区分类服务"
+    },
+    {
+      "name": "gameAreaMerge",
+      "description": "合服计划、预演、双人复核及同步执行编排。"
+    },
+    {
+      "name": "gameAreaProvision",
+      "description": "开服向导：禁用行落库、创建容器、登记 Online 开服锚点，最后启用。"
     },
     {
       "name": "gameBannerAnnouncement",

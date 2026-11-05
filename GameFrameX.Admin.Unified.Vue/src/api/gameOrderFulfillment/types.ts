@@ -55,7 +55,7 @@ export interface FulfillmentActionResponse {
 export interface GameOrderFulfillmentResponse {
   /** Id */
   id?: string;
-  /** 来源订单 Id（GameOrder.Id）。 */
+  /** 来源订单 Id（TenantGameOrderEntity.Id）。 */
   orderId?: string;
   /** 支付渠道/Provider（alipay/apple/google/xsolla），来自订单。 */
   payChannel?: string | null;

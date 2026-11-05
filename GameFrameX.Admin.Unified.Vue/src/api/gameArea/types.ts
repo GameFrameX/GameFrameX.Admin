@@ -248,6 +248,8 @@ export interface GameAreaResponse {
   /** 大区分类Id */
   classifyId?: string;
   serverStatus?: GameServerStatus;
+  /** 已合入的目标区服。 */
+  mergedIntoServerId?: string | null;
   /** Http 管理连接地址 */
   httpManageUrl?: string | null;
   /** TcpSocket 连接地址 */
@@ -447,7 +449,6 @@ export interface UpdateTenantGameAreaEntityRequest {
   serverType: string;
   language: GameLanguage;
   serverStatus: GameServerStatus;
-  mergedIntoServerId?: number | null;
   /** 客户端版本 */
   appVersion?: string | null;
   /** 指定可以加入此服务器的玩家类型 */

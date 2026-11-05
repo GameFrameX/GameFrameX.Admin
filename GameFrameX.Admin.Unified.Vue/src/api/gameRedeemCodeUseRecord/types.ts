@@ -39,9 +39,9 @@ export interface GameRedeemCodeUseRecordResponse {
   rowVersion?: string | null;
   /** 角色ID */
   playerIdString?: string | null;
-  /** 兑换码渠道/分组ID（来自关联的 GameRedeemCode.ChannelId） */
+  /** 兑换码渠道/分组ID（来自关联的 TenantGameRedeemCodeEntity.ChannelId） */
   channelId?: string | null;
-  /** 兑换码渠道/分组名称（来自关联的 GameRedeemCodeChannel.Name） */
+  /** 兑换码渠道/分组名称（来自关联的 TenantGameRedeemCodeChannelEntity.Name） */
   channelName?: string | null;
 }
 
@@ -81,7 +81,7 @@ export interface PageTenantGameRedeemCodeUseRecordEntityRequest {
   code?: string | null;
   /** 角色ID */
   playerId?: string | null;
-  /** 兑换码渠道/分组ID（关联 GameRedeemCode.ChannelId 过滤） */
+  /** 兑换码渠道/分组ID（关联 TenantGameRedeemCodeEntity.ChannelId 过滤） */
   channelId?: string | null;
 }
 

@@ -37,7 +37,7 @@ export interface AddTenantGamePenaltyAppealEntityRequest {
 export interface GamePenaltyAppealResponse {
   /** Id */
   id?: string;
-  /** 关联处罚 Id（GamePenalty.Id）。 */
+  /** 关联处罚 Id（TenantGamePenaltyEntity.Id）。 */
   penaltyId?: string;
   /** 申诉人 = 被处罚账号 UserId。 */
   appellantId?: string;
