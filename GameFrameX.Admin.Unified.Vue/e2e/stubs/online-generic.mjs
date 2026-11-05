@@ -26,8 +26,8 @@ const server = createServer(async (request, response) => {
       if (body.length > 65536) throw new Error('request-too-large');
     }
     if (body) JSON.parse(body);
-    // Online 查询类 action 全部空成功；列表类给空数组、聚合类给空对象由调用方自适配（Data 通用 null/空）。
-    return reply(0, null, 'ok');
+    // Online 查询类 action 全部空成功：Data 必须是 JSON 对象（OnlineServerClient 把缺失 Data 判为协议错误）。
+    return reply(0, {}, 'ok');
   } catch (error) {
     return reply(4000, null, error.message);
   }
