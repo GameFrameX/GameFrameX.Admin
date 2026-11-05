@@ -1,0 +1,51 @@
+export default {
+  "menu": {
+    "gameAreaProvision": "Server provisioning"
+  },
+  "gameAreaProvision": {
+    "title": "Server provisioning",
+    "hint": "Select a template and enter the new server settings. The server is enabled only after registration succeeds. Resolve failures before retrying, or enter an existing server ID to resume.",
+    "template": "Template server",
+    "cloneTitle": "Configuration copied from the template",
+    "resetHint": "Default selection, recommendation and client debugging stay off. Events, load, container identity and maintenance time are reset.",
+    "start": "Create and provision",
+    "retry": "Retry incomplete steps",
+    "query": "Check status",
+    "newServer": "Start another server",
+    "record": "Server record",
+    "container": "Game container",
+    "registration": "Opening registration",
+    "enabled": "Enable server",
+    "complete": "Complete",
+    "pending": "Pending",
+    "success": "Provisioning complete. The new server is enabled.",
+    "failed": "Operation failed. Check status before retrying.",
+    "invalidIdentifier": "Enter a valid positive integer server ID.",
+    "fields": {
+      "ServerId": "New server ID",
+      "Name": "New server name",
+      "HttpManageUrl": "Game server HTTP management URL",
+      "TcpSocketUrl": "TCP endpoint",
+      "WebSocketUrl": "WebSocket endpoint",
+      "ServerParameters": "Container environment overrides (JSON string dictionary)",
+      "Description": "Description",
+      "ClassifyId": "Server category",
+      "Capacity": "Capacity",
+      "ServerVersion": "Server version",
+      "ServerType": "Server type",
+      "LocalizationKey": "Localization key",
+      "Language": "Language",
+      "AllowedPlayerProfile": "Player admission policy",
+      "AccessControls": "Access controls",
+      "ChannelId": "Channel ID",
+      "PlatformId": "Platform ID",
+      "PackageId": "Package ID",
+      "AppVersion": "Client version",
+      "ClientDispatchApiPrefix": "Client dispatch prefix",
+      "FulfillmentApiPrefix": "Fulfillment prefix",
+      "GmApiPrefix": "GM prefix",
+      "ControlApiPrefix": "Control prefix",
+      "OnlineAdminApiPrefix": "Online administration prefix"
+    }
+  }
+};
