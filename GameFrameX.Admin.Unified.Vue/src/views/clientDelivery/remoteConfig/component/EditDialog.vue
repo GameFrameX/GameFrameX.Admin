@@ -2,11 +2,6 @@
   <BaseEditDialog ref="dialogRef" class="global-info-edit-dialog" :title="props.title" :addApi="gameAppRemoteConfigAddPost" :updateApi="gameAppRemoteConfigUpdatePost" :rules="rules" :beforeSubmit="beforeSubmit" scrollable @reloadTable="emit('reloadTable')">
     <template #default="{ ruleForm, isEditor }">
       <div v-block-loading="loading" class="global-info-edit-dialog-content">
-      <FormLabel name="appId">{{ t('message.gameBusiness.app.appId') }}</FormLabel>
-      <FormField name="appId" v-slot="{ props: fProps, invalid, error }">
-        <Select v-bind="fProps" filter v-model="ruleForm.appId" :placeholder="t('message.common.form.pleaseSelect')" :disabled="isEditor" :options="querySelections.app" optionLabel="label" optionValue="value" @change="onAppChange(ruleForm)" class="w-full"/>
-        <Message v-if="invalid" severity="error" size="small" variant="simple">{{ error }}</Message>
-      </FormField>
       <FormLabel name="channel">{{ t('message.client.channelName') }}</FormLabel>
       <FormField name="channel" v-slot="{ props: fProps, invalid, error }">
         <Select v-bind="fProps" clearable filter v-model="ruleForm.channel" :placeholder="t('message.client.pleaseSelectChannelPlaceholder')" :disabled="isEditor" :options="ensureValueOption(querySelections.channel, ruleForm.channel)" optionLabel="label" optionValue="value" class="w-full"/>
@@ -64,13 +59,11 @@ import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import {TextField, TextareaField} from '../../../../components/crud-form-fields'
 import {showError} from '../../../../utils/message.ts'
 import { gameAppRemoteConfigAddPost, gameAppRemoteConfigUpdatePost } from '../../../../api/gameAppRemoteConfig'
-import { tenantGameAppEntityListGet } from '../../../../api/tenantGameAppEntity'
 import { globalPlatformSelectPost } from '../../../../api/globalPlatform'
 import { globalLanguageSelectPost } from '../../../../api/globalLanguage'
 import { gameAppVersionDefinitionSelectPost } from '../../../../api/gameAppVersionDefinition'
 import { gameAppPackageListGet } from '../../../../api/gameAppPackage'
 import { channelDefinitionAvailableGet } from '../../../../api/channelDefinition'
-import {normalizeAppId, type AppWorkspaceId} from '../../../../utils/appWorkspace.ts'
 import { mapAvailableChannelDefinitions } from '../../../../utils/channelDefinition.ts'
 import {MAX_SELECT_SIZE} from '../../../../constants/pagination.ts'
 
@@ -89,7 +82,6 @@ const querySelections = ref<any>({
   platform: [],
   language: [],
   channel: [],
-  app: [],
 })
 
 // 禁用 Select 在编辑模式下若 options 不含当前值（如渠道仅返回可用项、主数据为空或已删除），
@@ -139,29 +131,18 @@ const onPlatformQuery = async () => {
   querySelections.value.platform = res.data.data
 }
 
-const onVersionQuery = async (appId?: AppWorkspaceId) => {
-  const id = normalizeAppId(appId)
-  if (id === undefined) {
-    querySelections.value.version = []
-    querySelections.value.oldVersion = []
-    return
-  }
-  const res = await gameAppVersionDefinitionSelectPost({appId: id, pageSize: MAX_SELECT_SIZE})
+const onVersionQuery = async () => {
+  const res = await gameAppVersionDefinitionSelectPost({pageSize: MAX_SELECT_SIZE})
   querySelections.value.version = res.data.data
   querySelections.value.oldVersion = res.data.data
 }
 
-const onPackageQuery = async (appId?: AppWorkspaceId) => {
-  const id = normalizeAppId(appId)
-  if (id === undefined) {
-    querySelections.value.package = []
-    return
-  }
-  const res = await gameAppPackageListGet({appId: id})
+const onPackageQuery = async () => {
+  const res = await gameAppPackageListGet()
   querySelections.value.package = buildPackageOptions(res.data?.data || [])
 }
 
-// 包名候选按当前应用加载，置顶 default 应用默认选项。
+// 包名候选从主库加载，置顶 default 默认选项。
 const buildPackageOptions = (packages: any[]) => {
   const options: any[] = [{label: t('message.client.appDefaultPackage'), value: 'default'}]
   for (const p of packages || []) {
@@ -178,39 +159,14 @@ const buildPackageOptions = (packages: any[]) => {
   return options
 }
 
-// 切换应用：清空包名并按新应用重载候选，避免保留其它应用的包。
-const onAppChange = (ruleForm: any) => {
-  if (ruleForm) {
-    ruleForm.package = undefined
-    ruleForm.version = undefined
-    ruleForm.oldVersion = undefined
-  }
-  onPackageQuery(ruleForm?.appId)
-  onVersionQuery(ruleForm?.appId)
-}
-
-const onAppQuery = async () => {
-  const res = await tenantGameAppEntityListGet({})
-  const apps = res.data?.data || []
-  const options: any[] = []
-  for (const a of apps) {
-    const id = normalizeAppId(a.id)
-    if (id === undefined || a.isEnabled === false) {
-      continue
-    }
-    options.push({label: a.appName || a.name || String(id), value: id})
-  }
-  querySelections.value.app = options
-}
-
 const openDialog = async (row: any) => {
   dialogRef.value.openDialog(row)
   loading.value = true
   try {
-    // 编辑态按记录应用加载候选，使历史包名与版本能命中选项。
+    // 每次打开刷新候选，历史值通过 ensureValueOption 保持回显。
     await Promise.all([
-      onPackageQuery(row?.appId),
-      onVersionQuery(row?.appId),
+      onPackageQuery(),
+      onVersionQuery(),
     ])
   } finally {
     loading.value = false
@@ -218,12 +174,7 @@ const openDialog = async (row: any) => {
 }
 
 const beforeSubmit = (ruleForm: any) => {
-  const appId = normalizeAppId(ruleForm.appId)
-  if (appId === undefined) {
-    showError(t('gameBusiness.appWorkspace.appIdRequired'))
-    return false
-  }
-  ruleForm.appId = appId
+  delete ruleForm.appId
   ruleForm.content = ruleForm.content || '{}'
   ruleForm.modeContents = ruleForm.modeContents || '{}'
   ruleForm.isEnabled = ruleForm.isEnabled !== false
@@ -253,7 +204,6 @@ defineExpose({
 onLanguageQuery()
 onPlatformQuery()
 onChannelQuery()
-onAppQuery()
 </script>
 
 <style scoped>

@@ -2,11 +2,6 @@
   <BaseEditDialog ref="dialogRef" class="server-config-edit-dialog" :title="props.title" :addApi="gameAppServerConfigAddPost" :updateApi="gameAppServerConfigUpdatePost" :rules="rules" :beforeSubmit="beforeSubmit" scrollable @reloadTable="emit('reloadTable')">
     <template #default="{ ruleForm, isEditor }">
       <div class="server-config-edit-dialog-content">
-      <FormLabel name="appId">{{ t('message.gameBusiness.app.appId') }}</FormLabel>
-      <FormField name="appId" v-slot="{ props: fProps, invalid, error }">
-        <Select v-bind="fProps" filter v-model="ruleForm.appId" :placeholder="t('message.common.form.pleaseSelect')" :disabled="isEditor" :options="querySelections.app" optionLabel="label" optionValue="value" class="w-full"/>
-        <Message v-if="invalid" severity="error" size="small" variant="simple">{{ error }}</Message>
-      </FormField>
       <TextField v-model="ruleForm.key" name="key" :label="t('message.client.serverConfigKey')" :placeholder="t('message.client.serverConfigKeyPlaceholder')" maxlength="256"/>
       <FormLabel>{{ t('message.client.serverConfigMd5') }}</FormLabel>
       <div>
@@ -39,8 +34,6 @@ import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import {TextField, TextareaField} from '../../../../components/crud-form-fields'
 import {showError} from '../../../../utils/message.ts'
 import { gameAppServerConfigAddPost, gameAppServerConfigUpdatePost } from '../../../../api/gameAppServerConfig'
-import { tenantGameAppEntityListGet } from '../../../../api/tenantGameAppEntity'
-import {normalizeAppId} from '../../../../utils/appWorkspace.ts'
 
 var props = defineProps({
   title: {
@@ -53,10 +46,6 @@ const emit = defineEmits(['reloadTable'])
 const dialogRef = ref()
 const currentMd5 = ref('')
 const jsonError = ref('')
-
-const querySelections = ref<any>({
-  app: [],
-})
 
 const rules = {
   key: [{required: true, message: () => t('message.client.serverConfigKeyRequired'), trigger: 'blur'}],
@@ -77,20 +66,6 @@ const validateJson = (value: string) => {
   }
 }
 
-const onAppQuery = async () => {
-  const res = await tenantGameAppEntityListGet({})
-  const apps = res.data?.data || []
-  const options: any[] = []
-  for (const a of apps) {
-    const id = normalizeAppId(a.id)
-    if (id === undefined || a.isEnabled === false) {
-      continue
-    }
-    options.push({label: a.appName || a.name || String(id), value: id})
-  }
-  querySelections.value.app = options
-}
-
 const openDialog = (row: any) => {
   currentMd5.value = row?.md5 ? String(row.md5) : ''
   jsonError.value = ''
@@ -98,12 +73,7 @@ const openDialog = (row: any) => {
 }
 
 const beforeSubmit = (ruleForm: any) => {
-  const appId = normalizeAppId(ruleForm.appId)
-  if (appId === undefined) {
-    showError(t('gameBusiness.appWorkspace.appIdRequired'))
-    return false
-  }
-  ruleForm.appId = appId
+  delete ruleForm.appId
   ruleForm.enabled = ruleForm.enabled !== false
   ruleForm.description = ruleForm.description ?? ''
   try {
@@ -121,7 +91,6 @@ defineExpose({
   get isEditor() { return dialogRef.value?.isEditor },
   set isEditor(val) { if (dialogRef.value) dialogRef.value.isEditor = val },
 })
-onAppQuery()
 </script>
 
 <style scoped>
