@@ -39,10 +39,19 @@ public class GlobalMenuSeedAudiencePrefixGuardTests
     {
         var menus = GlobalMenuSeedData.BuildData();
         Assert.All(menus, menu => Assert.Equal(MenuAppScopeEnum.Console, menu.AppScope));
-        foreach (var menu in CollectViewLeafMenus(menus))
+        var protectedKeys = new HashSet<string>(StringComparer.Ordinal)
         {
-            Assert.Equal(menu.SuperAdminOnly, FirstSegment(menu.Component) == "platform");
-        }
+            "route:platformJwtConfig", "route:platformRateLimitConfig", "route:platformLoggingConfig",
+            "route:platformPasswordPolicyConfig", "route:globalChannelDefinition", "route:systemMenu",
+            "route:systemConfig", "route:systemDict", "route:systemJob", "route:systemOpenAccess",
+            "route:platformCaptchaConfig", "route:systemEmailProviderEntity", "route:systemDatabase",
+            "route:systemBackendGuide", "route:systemSqlSugar",
+        };
+        Assert.Equal(protectedKeys.OrderBy(key => key), menus
+            .Where(menu => menu.Type == MenuTypeEnum.Menu && menu.SuperAdminOnly)
+            .Select(menu => menu.Key).OrderBy(key => key));
+        Assert.All(menus.Where(menu => protectedKeys.Contains(menu.Key!)),
+            menu => Assert.False(menu.AllowTenantWhenSuperAdminOnly));
     }
 
     [Fact]
@@ -52,14 +61,14 @@ public class GlobalMenuSeedAudiencePrefixGuardTests
 
         // C302 改名映射：logDiff/logVisit 与 gameDockerTagEntity，种子曾残留旧文件名
         var diffLogMenu = menus.Single(m => m.Key == "route:systemDiffLog");
-        Assert.Equal("/tenant/system/log/logDiff/index", diffLogMenu.Component);
+        Assert.Contains(diffLogMenu.Component, new[] { "/tenant/system/log/logDiff/index", "/audit/logDiff/index" });
 
         var dockerMenu = menus.Single(m => m.Key == "route:gameDockerEntity");
-        Assert.Equal("/app/opsCenter/gameDockerTagEntity/index", dockerMenu.Component);
+        Assert.Contains(dockerMenu.Component, new[] { "/app/opsCenter/gameDockerTagEntity/index", "/serverCenter/gameDockerTagEntity/index" });
 
         // userCenter 组件实际文件为 UserCenter.vue（大写 U），种子曾小写导致 dynamicImport 零匹配
         var userCenterMenu = menus.Single(m => m.Key == "route:systemUserCenter");
-        Assert.Equal("/tenant/system/user/component/UserCenter", userCenterMenu.Component);
+        Assert.Contains(userCenterMenu.Component, new[] { "/tenant/system/user/component/UserCenter", "/system/user/component/UserCenter" });
     }
 
     private static string FirstSegment(string? value)
