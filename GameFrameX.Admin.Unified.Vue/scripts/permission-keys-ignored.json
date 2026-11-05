@@ -9,7 +9,7 @@
     "onlineControlledCommand:execute"
   ],
   "views/app/appCenter/tenantGameAdvertisementRewardEntity/index.vue": [
-    "tenantGameAdvertisementRewardEntity:export"
+    "gameAdvertisementReward:export"
   ],
   "views/platform/global/platformLoggingConfig/index.vue": [
     "platformLoggingConfig:update"
@@ -28,5 +28,8 @@
     "systemDictType:update",
     "systemDictType:page",
     "systemDictType:delete"
+  ],
+  "views/tenant/system/role/index.vue": [
+    "systemRole:grantDataScope"
   ]
 }
