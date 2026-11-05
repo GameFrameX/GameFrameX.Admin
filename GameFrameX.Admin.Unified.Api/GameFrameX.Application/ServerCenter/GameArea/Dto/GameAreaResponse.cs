@@ -43,6 +43,9 @@ public class GameAreaResponse : IBasePageResponse<Entity.Tenant.Game.TenantGameA
     /// </summary>
     public GameServerStatus ServerStatus { get; set; }
 
+    /// <summary>已合入的目标区服。</summary>
+    public long? MergedIntoServerId { get; set; }
+
     /// <summary>
     /// Http 管理连接地址
     /// </summary>

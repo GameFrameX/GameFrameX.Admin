@@ -47,6 +47,7 @@ public static class ErrorSegmentRegistry
         new(603, ErrorDomain.GameData, "Area", nameof(AreaErrorCode), false, "游戏数据域：区服"),
         new(604, ErrorDomain.GameData, "Archive", nameof(ArchiveErrorCode), false, "游戏数据域：存档"),
         new(605, ErrorDomain.GameData, "GameHome", nameof(GameHomeErrorCode), false, "游戏数据域：首页运营驾驶舱"),
+        new(607, ErrorDomain.GameData, "AreaMerge", nameof(AreaMergeErrorCode), false, "游戏数据域：合服编排"),
         new(701, ErrorDomain.GameTrade, "Order", nameof(OrderErrorCode), false, "游戏交易域：订单与商城"),
         new(703, ErrorDomain.GameTrade, "RedeemCode", nameof(RedeemCodeErrorCode), false, "游戏交易域：兑换码"),
         new(704, ErrorDomain.GameTrade, "Payment", nameof(PaymentErrorCode), false, "游戏交易域：支付渠道"),

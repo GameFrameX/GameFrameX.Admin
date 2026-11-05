@@ -47,6 +47,7 @@ public partial class GlobalMenuSeedData : ISqlSugarEntitySeedData<GlobalMenuEnti
         menus.AddRange(OnlineSocialMenus());
         menus.AddRange(OnlineMenus());
         menus.AddRange(OnlineMatchMenus());
+        menus.AddRange(ServerMergeMenus());
         return menus;
     }
 }

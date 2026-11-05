@@ -62,6 +62,7 @@ public class GameAreaService : GenericCrudSelectService<Entity.Tenant.Game.Tenan
                              ClassifyIdName = SqlFunc.Subqueryable<Entity.Tenant.Game.TenantGameAreaClassifyEntity>().Where(classifyid => classifyid.Id == u.ClassifyId).Select(classifyid => classifyid.Name),
                              IsEnabled = u.IsEnabled,
                              ServerStatus = u.ServerStatus,
+                             MergedIntoServerId = u.MergedIntoServerId,
                              HttpManageUrl = u.HttpManageUrl,
                              TcpSocketUrl = u.TcpSocketUrl,
                              WebSocketUrl = u.WebSocketUrl,

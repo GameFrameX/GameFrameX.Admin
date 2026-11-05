@@ -30,7 +30,7 @@ public class GameAreaController : BaseController<TenantGameAreaEntity>
     {
         var catList = await PRepository.AsSugarClient().Queryable<TenantGameAreaClassifyEntity>().ToListAsync();
         var gameAreaCatEntityList = new List<GameAreaClassifyResponse>(catList.Count);
-        var gameAreaEntities = await PRepository.GetListAsync();
+        var gameAreaEntities = await PRepository.GetListAsync(area => area.ServerStatus != GameFrameX.Entity.Enum.GameServerStatus.Merged);
         var areaPolicy = await _optionsProvider.GetAreaPolicyAsync();
         foreach (var gameAreaCatEntity in catList)
         {
