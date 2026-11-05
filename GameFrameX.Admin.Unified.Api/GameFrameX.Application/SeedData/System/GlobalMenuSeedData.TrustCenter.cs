@@ -11,17 +11,11 @@ using GameFrameX.Core.Api;
 namespace GameFrameX.Application.SeedData.System;
 
 /// <summary>
-/// 信任与安全中心 域菜单种子（partial；由 <see cref="GlobalMenuSeedData.BuildData"/> 聚合）。
+/// 玩家中心的举报、处罚、申诉、反作弊事件与处罚生效状态菜单。
 /// <para>
-/// 落地 C123（GFX-113）/ C124（GFX-115）前端先行时显式欠账的后端菜单 seed + 权限码 seed：
-/// 前端 <c>src/views/app/trustCenter/</c> 五页（举报管理 / 处罚管理 / 申诉管理 / 反作弊事件 / 处罚生效状态）
-/// 自 #157 起即存在，但端点全部靠 <c>permission:auto:*</c> 挂根兜底（pid=0，非超管调用必 403）。
-/// 本文件补齐：顶层根 <c>route:trustCenter</c> + 四个新页面行 + 显式按钮（Key=前端权限码，Permission=现役路由名）。
-/// </para>
-/// <para>
-/// 处罚管理 <c>route:gamePenaltyEntity</c> 自 Player partial 迁入（#157 views 三段重组后组件路径
-/// 已从 playerCenter 移至 trustCenter，原 Component 指向死路径）；Key/Id 不变，存量租户 role-menu 绑定无感。
-/// 其余未显式绑定的端点（update/detail/delete 等）经 controllerPidMap 挂到所属页面，随页面授权隐式放行。
+/// 前端页面位于 <c>src/views/playerCenter/</c>，统一挂在 <c>route:player</c> 根下。
+/// 页面和按钮保留稳定 Key/Id，Permission 对应现役路由名；未显式绑定的端点由
+/// controllerPidMap 挂到所属页面，随页面授权放行。
 /// </para>
 /// </summary>
 public partial class GlobalMenuSeedData
