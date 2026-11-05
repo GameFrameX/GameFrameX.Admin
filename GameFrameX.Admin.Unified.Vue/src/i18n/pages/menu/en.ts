@@ -15,7 +15,7 @@ export default {
         globalConfig: 'Global Configuration',
         develop: 'Development Tools',
         doc: 'Help Documentation',
-        home: 'Dashboard',
+        home: 'Operations Home',
         systemUser: 'Account Management',
         systemRole: 'Role Management',
         systemUserCenter: 'User Center',

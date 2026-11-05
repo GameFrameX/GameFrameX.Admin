@@ -15,7 +15,7 @@ export default {
         globalConfig: 'グローバル設定',
         develop: '開発ツール',
         doc: 'ヘルプドキュメント',
-        home: 'ダッシュボード',
+        home: '運営ホーム',
         systemUser: 'アカウント管理',
         systemRole: 'ロール管理',
         systemUserCenter: '個人センター',

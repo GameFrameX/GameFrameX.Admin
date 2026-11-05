@@ -15,7 +15,7 @@ export default {
         globalConfig: '全局配置',
         develop: '开发工具',
         doc: '帮助文档',
-        home: '工作台',
+        home: '运营首页',
         systemUser: '账号管理',
         systemRole: '角色管理',
         systemUserCenter: '个人中心',

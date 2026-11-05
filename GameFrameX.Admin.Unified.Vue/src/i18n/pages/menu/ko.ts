@@ -15,7 +15,7 @@ export default {
         globalConfig: '전역 설정',
         develop: '개발 도구',
         doc: '도움말 문서',
-        home: '대시보드',
+        home: '운영 홈',
         systemUser: '계정 관리',
         systemRole: '역할 관리',
         systemUserCenter: '개인 센터',

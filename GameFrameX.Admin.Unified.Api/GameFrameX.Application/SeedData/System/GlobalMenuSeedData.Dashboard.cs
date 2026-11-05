@@ -57,7 +57,7 @@ public partial class GlobalMenuSeedData
                 Component = "/dashboard/home/index",
                 Redirect = null,
                 Permission = null,
-                Title = "工作台",
+                Title = "运营首页",
                 TitleCode = "message.menu.home",
                 Icon = "fa-solid fa-house",
                 OutLink = null,

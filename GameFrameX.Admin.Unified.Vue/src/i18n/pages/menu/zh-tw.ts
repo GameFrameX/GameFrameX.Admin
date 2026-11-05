@@ -15,7 +15,7 @@ export default {
         globalConfig: '全域配置',
         develop: '開發工具',
         doc: '說明文件',
-        home: '工作台',
+        home: '營運首頁',
         systemUser: '帳號管理',
         systemRole: '角色管理',
         systemUserCenter: '個人中心',
