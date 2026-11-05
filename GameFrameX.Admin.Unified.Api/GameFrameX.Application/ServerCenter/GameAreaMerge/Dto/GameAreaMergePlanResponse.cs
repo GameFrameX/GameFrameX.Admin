@@ -25,4 +25,9 @@ public class GameAreaMergePlanResponse
     public long? CompletedTime { get; set; }
     public long? FailedTime { get; set; }
     public string? FailureMessage { get; set; }
+    public long? CancelledByOperatorId { get; set; }
+    public long? CancelledTime { get; set; }
+    public string? CancellationReason { get; set; }
+    public bool Cancellable { get; set; }
+    public bool ExecutionReclaimable { get; set; }
 }

@@ -13,6 +13,8 @@ public class GameAreaMergeService : IAdminApiController
 {
     // 本宿主串行预留区服，执行仍通过持久化状态比较防重复触发。
     private static readonly SemaphoreSlim PlanGate = new(1, 1);
+    // ponytail: 300 秒宽限是固定值，当前上限为 300 秒；若执行链路需要更长缓冲，升级时应改为配置项并同步状态机与验收契约。
+    private const int ExecutionReclaimGraceSeconds = 300;
     private readonly SqlSugarRepository<TenantGameAreaMergePlanEntity> _repository;
     private readonly SqlSugarRepository<TenantGameAreaEntity> _areaRepository;
     private readonly GameAreaMergeClient _client;
@@ -30,10 +32,20 @@ public class GameAreaMergeService : IAdminApiController
     /// <summary>查询合服计划，最新计划优先。</summary>
     [HttpPost(CrudActionRoutes.Page)]
     [DisplayName("查询合服计划")]
-    public Task<SqlSugarPagedList<GameAreaMergePlanResponse>> PageAsync(BasePageRequest input)
+    public async Task<SqlSugarPagedList<GameAreaMergePlanResponse>> PageAsync(BasePageRequest input)
     {
-        return _repository.AsQueryable().OrderByDescending(plan => plan.Id)
-            .Select<GameAreaMergePlanResponse>().ToPagedListAsync(input.Page, input.PageSize);
+        var page = await _repository.AsQueryable().OrderByDescending(plan => plan.Id)
+            .ToPagedListAsync(input.Page, input.PageSize);
+        return new SqlSugarPagedList<GameAreaMergePlanResponse>
+        {
+            Page = page.Page,
+            PageSize = page.PageSize,
+            Total = page.Total,
+            TotalPages = page.TotalPages,
+            Items = page.Items.Select(ToResponse).ToList(),
+            HasPrevPage = page.HasPrevPage,
+            HasNextPage = page.HasNextPage,
+        };
     }
 
     /// <summary>读取计划与两个阶段的完整报告快照。</summary>
@@ -41,7 +53,38 @@ public class GameAreaMergeService : IAdminApiController
     [DisplayName("合服计划详情")]
     public async Task<GameAreaMergePlanResponse> DetailAsync([FromQuery] BaseIdRequest input)
     {
-        return (await FindAsync(input.Id)).Adapt<GameAreaMergePlanResponse>();
+        return ToResponse(await FindAsync(input.Id));
+    }
+
+    /// <summary>取消尚未进入执行阶段的合服计划，释放参与区服。</summary>
+    [HttpPost("cancel")]
+    [DisplayName("取消合服计划")]
+    public async Task<GameAreaMergePlanResponse> CancelAsync(CancelGameAreaMergePlanRequest input)
+    {
+        RequireOperator();
+        RequireReason(input.Reason);
+        var cancelledTime = Now();
+        var cancelled = await _repository.Context.Updateable<TenantGameAreaMergePlanEntity>()
+            .SetColumns(plan => new TenantGameAreaMergePlanEntity
+            {
+                Status = GameAreaMergePlanStatus.Cancelled,
+                CancelledByOperatorId = _currentUser.UserId,
+                CancelledTime = cancelledTime,
+                CancellationReason = input.Reason.Trim(),
+            })
+            .Where(plan => plan.Id == input.Id
+                && plan.ExecutionStartedTime == null
+                && (plan.Status == GameAreaMergePlanStatus.Draft
+                    || plan.Status == GameAreaMergePlanStatus.DryRunCompleted
+                    || plan.Status == GameAreaMergePlanStatus.Approved
+                    || plan.Status == GameAreaMergePlanStatus.Failed))
+            .ExecuteCommandAsync();
+        if (cancelled != 1)
+        {
+            throw BusinessError.Oh(AreaMergeErrorCode.CancellationNotAllowed);
+        }
+
+        return ToResponse(await FindAsync(input.Id));
     }
 
     /// <summary>验证区服及占用关系，在目标服生成合服计划。</summary>
@@ -67,7 +110,9 @@ public class GameAreaMergeService : IAdminApiController
             {
                 throw BusinessError.Oh(AreaMergeErrorCode.InvalidServers);
             }
-            var activePlans = await _repository.AsQueryable().Where(plan => plan.Status != GameAreaMergePlanStatus.Completed).ToListAsync();
+            var activePlans = await _repository.AsQueryable()
+                .Where(plan => plan.Status != GameAreaMergePlanStatus.Completed && plan.Status != GameAreaMergePlanStatus.Cancelled)
+                .ToListAsync();
             if (activePlans.Any(plan => Sources(plan).Append(plan.TargetServerId).Intersect(participants).Any()))
             {
                 throw BusinessError.Oh(AreaMergeErrorCode.SourceReserved);
@@ -86,7 +131,7 @@ public class GameAreaMergeService : IAdminApiController
             ValidateReport(entity, report, false);
             entity.PlanId = report.PlanId;
             await _repository.InsertWithDiffLogAsync(entity);
-            return entity.Adapt<GameAreaMergePlanResponse>();
+            return ToResponse(entity);
         }
         finally
         {
@@ -112,6 +157,7 @@ public class GameAreaMergeService : IAdminApiController
                 {
                     throw BusinessError.Oh(AreaMergeErrorCode.InvalidReport);
                 }
+                // ponytail: ExecutionStartedTime 只记录是否曾进入执行，重新预演不得清除，否则失败计划会错误恢复为可取消。
                 entity.DryRunReportSnapshot = JsonSerializer.Serialize(report);
                 entity.Status = GameAreaMergePlanStatus.DryRunCompleted;
                 entity.DryRunTime = Now();
@@ -127,7 +173,7 @@ public class GameAreaMergeService : IAdminApiController
                 await FailAsync(entity);
                 throw;
             }
-            return entity.Adapt<GameAreaMergePlanResponse>();
+            return ToResponse(entity);
         }
         finally
         {
@@ -166,7 +212,7 @@ public class GameAreaMergeService : IAdminApiController
             entity.ApprovedTime = Now();
             entity.Status = GameAreaMergePlanStatus.Approved;
             await PersistAsync(entity);
-            return entity.Adapt<GameAreaMergePlanResponse>();
+            return ToResponse(entity);
         }
         finally
         {
@@ -182,24 +228,33 @@ public class GameAreaMergeService : IAdminApiController
         var entity = await FindAsync(input.Id);
         if (entity.Status == GameAreaMergePlanStatus.Completed)
         {
-            return entity.Adapt<GameAreaMergePlanResponse>();
+            return ToResponse(entity);
         }
-        EnsureState(entity, GameAreaMergePlanStatus.Approved);
+        if (entity.Status != GameAreaMergePlanStatus.Approved && !IsExecutionReclaimable(entity))
+        {
+            throw BusinessError.Oh(AreaMergeErrorCode.InvalidState);
+        }
         if (!input.BackupConfirmed || string.IsNullOrWhiteSpace(input.BackupIdentifier))
         {
             throw BusinessError.Oh(AreaMergeErrorCode.BackupRequired);
         }
         entity.BackupIdentifier = input.BackupIdentifier.Trim();
         entity.BackupConfirmed = true;
-        entity.ExecutionStartedTime = Now();
+        var executionStartedTime = Now();
+        var reclaimCutoff = executionStartedTime - _client.ExecutionTimeoutSeconds - ExecutionReclaimGraceSeconds;
+        entity.ExecutionStartedTime = executionStartedTime;
         var claimed = await _repository.Context.Updateable<TenantGameAreaMergePlanEntity>()
             .SetColumns(plan => new TenantGameAreaMergePlanEntity
             {
                 Status = GameAreaMergePlanStatus.Executing,
                 BackupIdentifier = entity.BackupIdentifier,
                 BackupConfirmed = true,
-                ExecutionStartedTime = entity.ExecutionStartedTime,
-            }).Where(plan => plan.Id == entity.Id && plan.Status == GameAreaMergePlanStatus.Approved).ExecuteCommandAsync();
+                ExecutionStartedTime = executionStartedTime,
+            }).Where(plan => plan.Id == entity.Id
+                && (plan.Status == GameAreaMergePlanStatus.Approved
+                    || (plan.Status == GameAreaMergePlanStatus.Executing
+                        && plan.ExecutionStartedTime != null
+                        && plan.ExecutionStartedTime <= reclaimCutoff))).ExecuteCommandAsync();
         if (claimed != 1)
         {
             throw BusinessError.Oh(AreaMergeErrorCode.InvalidState);
@@ -243,7 +298,7 @@ public class GameAreaMergeService : IAdminApiController
             await FailAsync(entity);
             throw;
         }
-        return entity.Adapt<GameAreaMergePlanResponse>();
+        return ToResponse(entity);
     }
 
     private async Task<TenantGameAreaMergePlanEntity> FindAsync(long identifier)
@@ -283,6 +338,29 @@ public class GameAreaMergeService : IAdminApiController
     }
 
     private static long Now() => DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+
+    private bool IsExecutionReclaimable(TenantGameAreaMergePlanEntity entity)
+    {
+        if (entity.Status != GameAreaMergePlanStatus.Executing || !entity.ExecutionStartedTime.HasValue)
+        {
+            return false;
+        }
+
+        var reclaimCutoff = Now() - _client.ExecutionTimeoutSeconds - ExecutionReclaimGraceSeconds;
+        return entity.ExecutionStartedTime.Value <= reclaimCutoff;
+    }
+
+    private GameAreaMergePlanResponse ToResponse(TenantGameAreaMergePlanEntity entity)
+    {
+        var response = entity.Adapt<GameAreaMergePlanResponse>();
+        response.Cancellable = entity.ExecutionStartedTime == null
+            && (entity.Status == GameAreaMergePlanStatus.Draft
+                || entity.Status == GameAreaMergePlanStatus.DryRunCompleted
+                || entity.Status == GameAreaMergePlanStatus.Approved
+                || entity.Status == GameAreaMergePlanStatus.Failed);
+        response.ExecutionReclaimable = IsExecutionReclaimable(entity);
+        return response;
+    }
 
     private static long[] Sources(TenantGameAreaMergePlanEntity entity) => entity.SourceServerIds.Split(',').Select(value => long.Parse(value, CultureInfo.InvariantCulture)).ToArray();
 

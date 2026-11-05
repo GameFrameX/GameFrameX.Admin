@@ -8,6 +8,49 @@ import { readField } from './admin-menu-fixture';
 // HttpManageUrl 指向 server-merge.mjs；两个不同普通运营账号均授予合服/区服菜单。
 // E2E_MERGE_TARGET_NAME / E2E_MERGE_SOURCE_NAMES(JSON 字符串数组) 必填，禁止任取共享库区服。
 // E2E_MERGE_REVIEWER_ACCOUNT / E2E_MERGE_REVIEWER_PASSWORD 必填；测试不主动调用授权/准备 API。
+test('合服向导：取消计划释放区服并允许同范围再次建计划', async ({ browser }) => {
+  const targetName = process.env.E2E_MERGE_TARGET_NAME;
+  const sourceNames: string[] = JSON.parse(process.env.E2E_MERGE_SOURCE_NAMES ?? '[]');
+  expect(targetName, '请准备隔离目标区服').toBeTruthy();
+  expect(sourceNames.length, '请准备至少两个隔离源区服').toBeGreaterThanOrEqual(2);
+  const page = await anonPage(browser);
+  try {
+    await signIn(page, process.env.E2E_ACCOUNT ?? 'admin', process.env.E2E_PASSWORD ?? '123456');
+    await page.context().storageState({ path: ADMIN_STATE });
+    await navigateByMenu(page, '合服', '区服');
+    for (const cancellationReason of ['取消错误范围', '再次取消演练']) {
+      await page.getByRole('button', { name: '新建计划', exact: true }).click();
+      const mergeDialog = page.locator('.p-dialog:visible').first();
+      await mergeDialog.getByRole('combobox').nth(0).click();
+      await page.getByRole('option', { name: targetName!, exact: true }).click();
+      await page.mouse.click(5, 5);
+      await page.waitForTimeout(400);
+      await mergeDialog.locator('.p-multiselect').first().click();
+      for (const source of sourceNames) {
+        const option = page.getByRole('option', { name: source, exact: true });
+        await option.waitFor({ state: 'visible', timeout: 10_000 });
+        await option.click();
+      }
+      await page.getByRole('dialog').getByText('源服执行成功后退场。请先确认范围，再生成计划。').click();
+      await page.locator('#merge-create-reason').fill('C404 取消后重建演练');
+      await page.getByRole('button', { name: '生成计划', exact: true }).click();
+      await expect(page.getByTestId('merge-status')).toHaveText('草稿');
+      await page.getByRole('button', { name: '取消计划', exact: true }).last().click();
+      const cancellationDialog = page.getByRole('dialog').last();
+      await cancellationDialog.locator('#merge-cancellation-reason').fill(cancellationReason);
+      await cancellationDialog.getByRole('button', { name: '取消计划', exact: true }).click();
+      await expect(page.getByText('确认取消此合服计划？取消后参与区服可重新建计划。')).toBeVisible();
+      await page.getByRole('button', { name: '确定', exact: true }).click();
+      await expect(page.getByTestId('merge-status')).toHaveText('已取消');
+      await expect(page.getByText(cancellationReason, { exact: true })).toBeVisible();
+      await page.getByRole('dialog').getByRole('button', { name: /close|关闭/i }).click();
+    }
+  } finally {
+    await page.context().storageState({ path: ADMIN_STATE });
+    await page.context().close();
+  }
+});
+
 test('合服向导：真实登录、预演、双人复核、执行与源服退场', async ({ browser }) => {
   const targetName = process.env.E2E_MERGE_TARGET_NAME;
   const sourceNames: string[] = JSON.parse(process.env.E2E_MERGE_SOURCE_NAMES ?? '[]');

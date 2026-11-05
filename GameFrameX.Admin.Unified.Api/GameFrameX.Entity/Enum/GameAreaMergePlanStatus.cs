@@ -10,4 +10,5 @@ public enum GameAreaMergePlanStatus
     [Description("执行中")] Executing = 3,
     [Description("已完成")] Completed = 4,
     [Description("失败")] Failed = 5,
+    [Description("已取消")] Cancelled = 6,
 }

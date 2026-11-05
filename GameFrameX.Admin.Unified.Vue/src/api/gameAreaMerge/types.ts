@@ -15,6 +15,15 @@ export enum GameAreaMergePlanStatus {
   Completed = 4,
   /** 失败 */
   Failed = 5,
+  /** 已取消 */
+  Cancelled = 6,
+}
+
+/** 取消合服计划请求。 */
+export interface CancelGameAreaMergePlanRequest {
+  id?: string;
+  /** @minLength 1 */
+  reason: string;
 }
 
 /** 合服流程数据。 */
@@ -87,6 +96,11 @@ export interface GameAreaMergePlanResponse {
   /** @format int64 */
   failedTime?: number | null;
   failureMessage?: string | null;
+  cancelledByOperatorId?: string | null;
+  cancelledTime?: number | null;
+  cancellationReason?: string | null;
+  cancellable?: boolean;
+  executionReclaimable?: boolean;
 }
 
 export interface GameAreaMergePlanResponseSqlSugarPagedList {
@@ -147,6 +161,21 @@ export interface GameAreaMergeApprovePostData {
    * Unix 时间戳（秒）
    * @format int64
    */
+  time: number;
+  extras: object | null;
+}
+
+export interface GameAreaMergeCancelPostData {
+  /** @format int32 */
+  code: number;
+  /** 错误或提示信息 */
+  message: string;
+  /** 合服计划详情，包含阶段报告快照。 */
+  data: GameAreaMergePlanResponse;
+  trackId: string | null;
+  errorCode: string | null;
+  type: string | null;
+  /** @format int64 */
   time: number;
   extras: object | null;
 }

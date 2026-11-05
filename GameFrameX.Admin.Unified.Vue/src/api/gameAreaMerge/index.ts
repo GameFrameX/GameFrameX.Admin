@@ -12,10 +12,12 @@
 import {
   ApproveGameAreaMergePlanRequest,
   BasePageRequest,
+  CancelGameAreaMergePlanRequest,
   CreateGameAreaMergePlanRequest,
   ExecuteGameAreaMergePlanRequest,
   GameAreaMergeAddPostData,
   GameAreaMergeApprovePostData,
+  GameAreaMergeCancelPostData,
   GameAreaMergeDetailGetData,
   GameAreaMergeDryRunPostData,
   GameAreaMergeExecutePostData,
@@ -68,6 +70,26 @@ export class GameAreaMerge<SecurityDataType = unknown> {
   ) =>
     this.http.request<GameAreaMergeApprovePostData, any>({
       path: `/api/gameAreaMerge/approve`,
+      method: "POST",
+      body: data,
+      type: ContentType.Json,
+      format: "json",
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags gameAreaMerge
+   * @name GameAreaMergeCancelPost
+   * @summary 取消尚未进入执行阶段的合服计划，释放参与区服。
+   * @request POST:/api/gameAreaMerge/cancel
+   */
+  gameAreaMergeCancelPost = (
+    data: CancelGameAreaMergePlanRequest,
+    params: RequestParams = {},
+  ) =>
+    this.http.request<GameAreaMergeCancelPostData, any>({
+      path: `/api/gameAreaMerge/cancel`,
       method: "POST",
       body: data,
       type: ContentType.Json,
@@ -158,6 +180,7 @@ export class GameAreaMerge<SecurityDataType = unknown> {
 
 export const gameAreaMergeAddPost = (...args: Parameters<InstanceType<typeof GameAreaMerge>['gameAreaMergeAddPost']>) => getAPI(GameAreaMerge).gameAreaMergeAddPost(...args);
 export const gameAreaMergeApprovePost = (...args: Parameters<InstanceType<typeof GameAreaMerge>['gameAreaMergeApprovePost']>) => getAPI(GameAreaMerge).gameAreaMergeApprovePost(...args);
+export const gameAreaMergeCancelPost = (...args: Parameters<InstanceType<typeof GameAreaMerge>['gameAreaMergeCancelPost']>) => getAPI(GameAreaMerge).gameAreaMergeCancelPost(...args);
 export const gameAreaMergeDetailGet = (...args: Parameters<InstanceType<typeof GameAreaMerge>['gameAreaMergeDetailGet']>) => getAPI(GameAreaMerge).gameAreaMergeDetailGet(...args);
 export const gameAreaMergeDryRunPost = (...args: Parameters<InstanceType<typeof GameAreaMerge>['gameAreaMergeDryRunPost']>) => getAPI(GameAreaMerge).gameAreaMergeDryRunPost(...args);
 export const gameAreaMergeExecutePost = (...args: Parameters<InstanceType<typeof GameAreaMerge>['gameAreaMergeExecutePost']>) => getAPI(GameAreaMerge).gameAreaMergeExecutePost(...args);

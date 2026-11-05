@@ -6,12 +6,17 @@ namespace GameFrameX.Application.ServerCenter.GameAreaMerge;
 /// <summary>为合服配置独立超时，沿用 Online 的作用域与双层信封协议。</summary>
 public sealed class GameAreaMergeClient
 {
+    private const int DefaultExecutionTimeoutSeconds = 1800;
     private readonly OnlineServerClient _client;
     private readonly OnlineScopeContextFactory _scopeFactory;
+    public int ExecutionTimeoutSeconds { get; }
 
     public GameAreaMergeClient(HttpClient httpClient, IOnlineServerEndpointResolver endpointResolver,
         SqlSugarRepository<TenantGameAreaEntity> repository, OnlineScopeContextFactory scopeFactory)
     {
+        ExecutionTimeoutSeconds = httpClient.Timeout == Timeout.InfiniteTimeSpan
+            ? DefaultExecutionTimeoutSeconds
+            : (int)Math.Max(1, httpClient.Timeout.TotalSeconds);
         _client = new OnlineServerClient(httpClient, endpointResolver, repository);
         _scopeFactory = scopeFactory;
     }

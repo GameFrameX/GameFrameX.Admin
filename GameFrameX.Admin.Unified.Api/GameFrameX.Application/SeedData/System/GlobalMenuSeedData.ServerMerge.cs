@@ -99,6 +99,19 @@ public partial class GlobalMenuSeedData
             },
             new()
             {
+                Id = StableSeedId.Menu("gameAreaMerge:cancel"),
+                Key = "gameAreaMerge:cancel",
+                Pid = StableSeedId.Menu("route:gameAreaMerge"),
+                Type = MenuTypeEnum.Button,
+                Permission = MenuSeedRouteName.Of<GameAreaMergeService>(nameof(GameAreaMergeService.CancelAsync)),
+                Title = "取消",
+                IsEnabled = true,
+                CreatedTime = 1793808000,
+                SuperAdminOnly = false,
+                IsDeleted = false,
+            },
+            new()
+            {
                 Id = StableSeedId.Menu("gameAreaMerge:execute"),
                 Key = "gameAreaMerge:execute",
                 Pid = StableSeedId.Menu("route:gameAreaMerge"),

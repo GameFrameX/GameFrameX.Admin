@@ -39,4 +39,8 @@ public enum AreaMergeErrorCode
     [ErrorText("合服调用失败，请核查后重新预演", "Merge call failed; verify and rehearse again")]
     DispatchFailed = 60700009,
 
+    /// <summary>合服计划不允许取消。</summary>
+    [ErrorText("合服计划不允许取消", "Merge plan cannot be cancelled")]
+    CancellationNotAllowed = 60700010,
+
 }

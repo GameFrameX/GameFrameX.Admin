@@ -77,4 +77,16 @@ public class TenantGameAreaMergePlanEntity : EntityBasic
     [SugarColumn(ColumnDescription = "失败原因", IsNullable = true, ColumnDataType = StaticConfig.CodeFirst_BigString)]
     public string? FailureMessage { get; set; }
 
+    /// <summary>取消人。</summary>
+    [SugarColumn(ColumnDescription = "取消人", IsNullable = true)]
+    public long? CancelledByOperatorId { get; set; }
+
+    /// <summary>取消时间。</summary>
+    [SugarColumn(ColumnDescription = "取消时间", IsNullable = true)]
+    public long? CancelledTime { get; set; }
+
+    /// <summary>取消原因。</summary>
+    [SugarColumn(ColumnDescription = "取消原因", IsNullable = true, ColumnDataType = StaticConfig.CodeFirst_BigString)]
+    public string? CancellationReason { get; set; }
+
 }

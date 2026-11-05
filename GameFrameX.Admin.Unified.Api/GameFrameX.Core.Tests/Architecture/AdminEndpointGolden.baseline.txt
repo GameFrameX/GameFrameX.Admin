@@ -457,6 +457,7 @@ GameFrameX.Application.ServerCenter.GameAreaClassify.GameAreaClassifyService|api
 GameFrameX.Application.ServerCenter.GameAreaClassify.GameAreaClassifyService|api/gameAreaClassify/update|POST
 GameFrameX.Application.ServerCenter.GameAreaMerge.GameAreaMergeService|api/gameAreaMerge/add|POST
 GameFrameX.Application.ServerCenter.GameAreaMerge.GameAreaMergeService|api/gameAreaMerge/approve|POST
+GameFrameX.Application.ServerCenter.GameAreaMerge.GameAreaMergeService|api/gameAreaMerge/cancel|POST
 GameFrameX.Application.ServerCenter.GameAreaMerge.GameAreaMergeService|api/gameAreaMerge/detail|GET
 GameFrameX.Application.ServerCenter.GameAreaMerge.GameAreaMergeService|api/gameAreaMerge/dryRun|POST
 GameFrameX.Application.ServerCenter.GameAreaMerge.GameAreaMergeService|api/gameAreaMerge/execute|POST

@@ -119,6 +119,7 @@ gameAreaEntity:page
 gameAreaEntity:update
 gameAreaMerge:add
 gameAreaMerge:approve
+gameAreaMerge:cancel
 gameAreaMerge:detail
 gameAreaMerge:dryRun
 gameAreaMerge:execute

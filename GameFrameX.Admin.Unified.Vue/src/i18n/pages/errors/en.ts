@@ -162,6 +162,7 @@ export default {
             '60700007': 'Confirm backup and provide its identifier before execution',
             '60700008': 'Merge report does not match the plan',
             '60700009': 'Merge call failed; verify and rehearse again',
+            '60700010': 'Merge plan cannot be cancelled',
             '70100001': 'Product not found',
             '70300001': 'Redeem code has expired',
             '70300002': 'Redeem code usage limit reached',

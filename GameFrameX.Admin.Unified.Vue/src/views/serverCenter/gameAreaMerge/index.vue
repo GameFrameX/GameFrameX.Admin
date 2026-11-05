@@ -19,7 +19,10 @@
           <Column :header="t('message.gameAreaMerge.status')"><template #body="{ data }"><Tag :value="statusLabels[data.status]" /></template></Column>
           <Column field="reason" :header="t('message.gameAreaMerge.reason')" />
           <Column :header="t('message.gameAreaMerge.actions')">
-            <template #body="{ data }"><Button v-auth="'gameAreaMerge:detail'" :label="t('message.gameAreaMerge.detail')" text @click="openDetail(data.id)" /></template>
+            <template #body="{ data }">
+              <Button v-auth="'gameAreaMerge:detail'" :label="t('message.gameAreaMerge.detail')" text @click="openDetail(data.id)" />
+              <Button v-if="data.cancellable === true" v-auth="'gameAreaMerge:cancel'" :label="t('message.gameAreaMerge.cancel')" text severity="danger" @click="openCancel(data)" />
+            </template>
           </Column>
           <template #empty>{{ t('message.gameAreaMerge.empty') }}</template>
         </DataTable>
@@ -49,6 +52,7 @@
         <p>{{ t('message.gameAreaMerge.target') }}: {{ selected.targetServerId }} · {{ t('message.gameAreaMerge.sources') }}: {{ selected.sourceServerIds }}</p>
         <p>{{ t('message.gameAreaMerge.applicant') }}: {{ selected.applicantOperatorId }} · {{ t('message.gameAreaMerge.reviewer') }}: {{ selected.reviewerOperatorId ?? '—' }}</p>
         <p>{{ t('message.gameAreaMerge.reason') }}: {{ selected.reason }}</p>
+        <p v-if="selected.cancellationReason">{{ t('message.gameAreaMerge.cancelReason') }}: {{ selected.cancellationReason }}</p>
         <p v-if="selected.backupIdentifier">{{ t('message.gameAreaMerge.backup') }}: {{ selected.backupIdentifier }}</p>
         <Message v-if="selected.status === 3" severity="info" :closable="false">{{ t('message.gameAreaMerge.runningHint') }}</Message>
         <Message v-if="selected.failureMessage" severity="error" :closable="false">{{ t('message.gameAreaMerge.failureHint') }}</Message>
@@ -65,6 +69,7 @@
           </DataTable>
         </div>
         <Button v-auth="'gameAreaMerge:detail'" :label="t('message.gameAreaMerge.refresh')" :loading="busy" @click="openDetail(selected.id)" />
+        <Button v-if="selected.cancellable === true" v-auth="'gameAreaMerge:cancel'" severity="danger" :label="t('message.gameAreaMerge.cancel')" :loading="busy" @click="openCancel(selected)" />
         <Button v-if="selected.status === 0 || selected.status === 5" v-auth="'gameAreaMerge:dryRun'" :label="t('message.gameAreaMerge.dryRun')" :loading="busy" @click="dryRun" />
         <div v-if="selected.status === 1" class="merge-form">
           <Message v-if="!canApprove" severity="warn" :closable="false">{{ t('message.gameAreaMerge.reviewHint') }}</Message>
@@ -74,15 +79,24 @@
           <Textarea id="merge-review-reason" v-model="reviewReason" maxlength="200" rows="2" />
           <Button v-auth="'gameAreaMerge:approve'" :label="t('message.gameAreaMerge.approve')" :disabled="!canApprove || !reviewReason.trim()" :loading="busy" @click="approve" />
         </div>
-        <div v-if="selected.status === 2" class="merge-form">
+        <div v-if="selected.status === 2 || selected.executionReclaimable === true" class="merge-form">
           <label for="merge-backup">{{ t('message.gameAreaMerge.backup') }}</label>
           <InputText id="merge-backup" v-model="backupIdentifier" maxlength="200" />
           <div class="flex gap-2 align-items-center">
             <Checkbox inputId="merge-backup-confirmed" v-model="backupConfirmed" binary />
             <label for="merge-backup-confirmed">{{ t('message.gameAreaMerge.backupConfirmed') }}</label>
           </div>
-          <Button v-auth="'gameAreaMerge:execute'" severity="danger" :label="t('message.gameAreaMerge.execute')" :disabled="!backupConfirmed || !backupIdentifier.trim()" :loading="busy" @click="execute" />
+          <Button v-auth="'gameAreaMerge:execute'" severity="danger" :label="selected.executionReclaimable === true ? t('message.gameAreaMerge.reexecute') : t('message.gameAreaMerge.execute')" :disabled="!backupConfirmed || !backupIdentifier.trim()" :loading="busy" @click="execute" />
         </div>
+      </div>
+    </Dialog>
+
+    <Dialog v-model:visible="cancellationVisible" modal :header="t('message.gameAreaMerge.cancel')" :style="{ width: 'min(34rem, 95vw)' }">
+      <div v-if="selected" class="merge-form">
+        <p>{{ selected.planId }}</p>
+        <label for="merge-cancellation-reason">{{ t('message.gameAreaMerge.cancelReason') }}</label>
+        <Textarea id="merge-cancellation-reason" v-model="cancellationReason" required maxlength="200" rows="3" />
+        <Button v-auth="'gameAreaMerge:cancel'" severity="danger" :label="t('message.gameAreaMerge.cancel')" :disabled="!cancellationReason.trim()" :loading="busy" @click="cancel" />
       </div>
     </Dialog>
   </section>
@@ -91,7 +105,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
 import type { PageState } from 'primevue/paginator'
-import { gameAreaMergeAddPost, gameAreaMergeApprovePost, gameAreaMergeDetailGet, gameAreaMergeDryRunPost, gameAreaMergeExecutePost, gameAreaMergePagePost } from '../../../api/gameAreaMerge'
+import { gameAreaMergeAddPost, gameAreaMergeApprovePost, gameAreaMergeCancelPost, gameAreaMergeDetailGet, gameAreaMergeDryRunPost, gameAreaMergeExecutePost, gameAreaMergePagePost } from '../../../api/gameAreaMerge'
 import type { GameAreaMergePlanResponse } from '../../../api/gameAreaMerge/types'
 import { useServerStore } from '../../../stores/server'
 import { useUserInfoStore } from '../../../stores/userInfo'
@@ -107,6 +121,7 @@ const loading = ref(false)
 const busy = ref(false)
 const creating = ref(false)
 const detailsVisible = ref(false)
+const cancellationVisible = ref(false)
 const pageNumber = ref(1)
 const pageSize = 20
 const total = ref(0)
@@ -114,13 +129,14 @@ const targetServerId = ref('')
 const sourceServerIds = ref<string[]>([])
 const createReason = ref('')
 const reviewReason = ref('')
+const cancellationReason = ref('')
 const backupIdentifier = ref('')
 const backupConfirmed = ref(false)
 const currentOperatorId = computed(() => Number(userStore.userInfos.id))
 const availableServers = computed(() => serverStore.servers)
 const sourceOptions = computed(() => availableServers.value.filter(server => server.id !== targetServerId.value))
 watch(targetServerId, identifier => { sourceServerIds.value = sourceServerIds.value.filter(source => source !== identifier) })
-const statusLabels = computed(() => [t('message.gameAreaMerge.draft'), t('message.gameAreaMerge.rehearsed'), t('message.gameAreaMerge.approved'), t('message.gameAreaMerge.running'), t('message.gameAreaMerge.completed'), t('message.gameAreaMerge.failed')])
+const statusLabels = computed(() => [t('message.gameAreaMerge.draft'), t('message.gameAreaMerge.rehearsed'), t('message.gameAreaMerge.approved'), t('message.gameAreaMerge.running'), t('message.gameAreaMerge.completed'), t('message.gameAreaMerge.failed'), t('message.gameAreaMerge.cancelled')])
 
 interface ReportStep { step: string; affectedCount: number; details: string }
 interface Report { title: string; globalDomainRowsTouched: number; alreadyExecuted: boolean; steps: ReportStep[] }
@@ -157,7 +173,12 @@ async function openCreate() {
 async function openDetail(identifier: number) {
   selected.value = (await gameAreaMergeDetailGet({ id: identifier })).data.data
   detailsVisible.value = true
-  reviewReason.value = ''; backupIdentifier.value = ''; backupConfirmed.value = false
+  reviewReason.value = ''; backupIdentifier.value = selected.value.backupIdentifier ?? ''; backupConfirmed.value = selected.value.backupConfirmed === true
+}
+function openCancel(plan: GameAreaMergePlanResponse) {
+  selected.value = plan
+  cancellationReason.value = ''
+  cancellationVisible.value = true
 }
 async function perform(action: () => Promise<void>) {
   if (busy.value) return
@@ -188,6 +209,15 @@ async function execute() {
     selected.value = (await gameAreaMergeExecutePost({ id: identifier, backupIdentifier: backupIdentifier.value, backupConfirmed: backupConfirmed.value })).data.data
     await serverStore.loadServers(true)
     showSuccess(t('message.gameAreaMerge.completed'))
+  })
+}
+async function cancel() {
+  if (!selected.value || !cancellationReason.value.trim() || !await showConfirm(t('message.gameAreaMerge.cancelConfirm'), t('message.gameAreaMerge.cancel'))) return
+  const identifier = selected.value.id
+  await perform(async () => {
+    selected.value = (await gameAreaMergeCancelPost({ id: identifier, reason: cancellationReason.value })).data.data
+    cancellationVisible.value = false
+    showSuccess(t('message.gameAreaMerge.cancelled'))
   })
 }
 onMounted(loadPlans)
