@@ -144,6 +144,8 @@ public class Startup
 
         // 共享健康检查注册（C261，GFX-668）：与三 host 同口径收敛至 Core Bootstrap（self live + database ready）
         services.AddHostHealthChecks();
+        // 业务定时任务实现（非控制器，显式注册供 GameTimeJobDispatchJob 按名解析执行）。
+        services.AddScoped<EmailTask>();
         if (enableSchedule)
         {
             services.AddAdminSchedule(true);

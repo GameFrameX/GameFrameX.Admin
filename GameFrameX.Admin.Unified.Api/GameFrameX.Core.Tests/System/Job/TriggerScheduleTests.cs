@@ -1,3 +1,4 @@
+using GameFrameX.Application.Platform.Job;
 using GameFrameX.Core.Job;
 
 namespace GameFrameX.Core.Tests.System.Job;
@@ -7,6 +8,13 @@ namespace GameFrameX.Core.Tests.System.Job;
 /// </summary>
 public sealed class TriggerScheduleTests
 {
+    public TriggerScheduleTests()
+    {
+        // ModuleInitializer 只在 Application 程序集首次执行代码时运行；过滤执行时
+        // 可能没有任何用例先触碰过该程序集，这里显式安装 cron 解释钩子保证确定性。
+        CronTriggerScheduleInstaller.Install();
+    }
+
     [Fact]
     public void GetNextOccurrence_PeriodArguments_AddsSeconds()
     {

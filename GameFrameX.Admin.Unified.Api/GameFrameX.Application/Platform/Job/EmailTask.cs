@@ -1,32 +1,36 @@
 using GameFrameX.Application.NoticeCenter.GameMail.Dto;
 using GameFrameX.Application.ServerCenter;
-using GameFrameX.Core.Enum;
 using GameFrameX.Core.Job;
 using GameFrameX.Core.Service.Cache;
+using GameFrameX.Core.SqlSugar;
 using GameFrameX.Entity.Enum;
 using GameFrameX.Foundation.Http.Extension;
 using GameFrameX.Foundation.Http.Normalization;
 using GameFrameX.Foundation.Json;
 using Microsoft.Extensions.Logging;
 
-// 邮件定时任务实现（C404/GFX-1216 调度合一：解除自单仓整合以来的整体块注释，
-// 并把执行体移植到当前 API 面——旧文引用的 ListAsync&lt;&gt; 等类型已随框架迁移退役）。
+// 邮件定时任务实现（C404/GFX-1216 调度合一：解除自单仓整合以来的整体块注释，并把执行体移植到当前 API 面）。
+// 注意：本类不是 Admin API 控制器（不继承 BaseService），经 Startup 显式注册进 DI，
+// 由 GameTimeJobDispatchJob 按业务定时任务 cron 到期触发——继承 BaseService 会被动态 API
+// 发现成控制器并撞上 AdminActionStyle / EndpointGolden / ParameterShape 守护测试。
 namespace GameFrameX.Application.Platform.Job;
 
 /// <summary>
 /// 邮件定时任务：按 SystemCacheService "MailId" 通道传入的邮件 Id，把草稿邮件经 Fulfillment
-/// 通道投递到区服游戏服。由 <see cref="GameTimeJobDispatchJob"/> 按行业务定时任务 cron 到期触发。
+/// 通道投递到区服游戏服。
 /// </summary>
-public class EmailTask : BaseService<TenantGameMailEntity>, IScheduleJob
+public class EmailTask : IScheduleJob
 {
     private readonly ILogger<EmailTask> _logger;
     private readonly HttpClient _httpClientFactory;
     private readonly SystemCacheService _systemCacheService;
+    private readonly SqlSugarRepository<TenantGameMailEntity> _mailRepository;
     private readonly SqlSugarRepository<TenantGameAreaEntity> _gameAreaEntityRepository;
     private readonly SqlSugarRepository<TenantGameRoleEntity> _gameRoleEntityRepository;
 
-    public EmailTask(ILogger<EmailTask> logger, SqlSugarRepository<TenantGameMailEntity> repository, SqlSugarRepository<TenantGameAreaEntity> systemTenantGameAreaEntity, SqlSugarRepository<TenantGameRoleEntity> systemTenantGameRoleEntity, HttpClient httpClientFactory, SystemCacheService systemCacheService) : base(repository)
+    public EmailTask(ILogger<EmailTask> logger, SqlSugarRepository<TenantGameMailEntity> mailRepository, SqlSugarRepository<TenantGameAreaEntity> systemTenantGameAreaEntity, SqlSugarRepository<TenantGameRoleEntity> systemTenantGameRoleEntity, HttpClient httpClientFactory, SystemCacheService systemCacheService)
     {
+        _mailRepository = mailRepository;
         _gameAreaEntityRepository = systemTenantGameAreaEntity;
         _gameRoleEntityRepository = systemTenantGameRoleEntity;
         _logger = logger;
@@ -51,7 +55,7 @@ public class EmailTask : BaseService<TenantGameMailEntity>, IScheduleJob
         _logger.LogInformation("EmailTask 执行时间: {ExecutionTime}, MailId: {MailId}", DateTime.Now, mailId);
 
         // 查找要发送的邮件（仅草稿态；非草稿视作已处理）
-        var gameMailEntity = await Repository.GetSingleAsync(u => u.Id == mailId && u.Status == GameMailStatus.Draft, cancellationToken);
+        var gameMailEntity = await _mailRepository.GetSingleAsync(u => u.Id == mailId && u.Status == GameMailStatus.Draft, cancellationToken);
         if (gameMailEntity == null)
         {
             _systemCacheService.Remove("MailId");
@@ -104,7 +108,7 @@ public class EmailTask : BaseService<TenantGameMailEntity>, IScheduleJob
         if (resultData.IsSuccess)
         {
             gameMailEntity.Status = GameMailStatus.Sent;
-            await Repository.UpdateAsync(gameMailEntity, cancellationToken);
+            await _mailRepository.UpdateAsync(gameMailEntity, cancellationToken);
         }
         else
         {
