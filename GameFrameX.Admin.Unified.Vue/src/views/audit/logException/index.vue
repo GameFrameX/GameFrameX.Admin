@@ -142,7 +142,7 @@ const clearLog = async () => {
 
 const exportLog = async () => {
   state.loading = true;
-  var res = await logExceptionExportPost(state.queryParams, {responseType: 'blob'});
+  var res = await logExceptionExportPost(state.queryParams, {format: 'blob'});
   state.loading = false;
   var fileName = getFileName(res.headers);
   downloadByData(res.data as any, fileName);
