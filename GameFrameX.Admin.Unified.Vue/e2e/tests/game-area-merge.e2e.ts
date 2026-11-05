@@ -45,7 +45,7 @@ test('合服向导：取消计划释放区服并允许同范围再次建计划',
       await expect(page.getByTestId('merge-status')).toHaveText('已取消');
       await expect(page.getByTestId('merge-detail')).toContainText(cancellationReason);
       await shot(page, `merge-cancelled-round-${round + 1}`);
-      await page.getByRole('dialog').getByRole('button', { name: /close|关闭/i }).click();
+      await page.locator('.p-dialog:visible').first().getByRole('button', { name: /close|关闭/i }).click();
     }
     const records = await readApiRecords(page);
     for (const endpoint of ['add', 'cancel']) {
