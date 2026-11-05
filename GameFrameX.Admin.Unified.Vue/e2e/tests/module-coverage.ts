@@ -238,7 +238,7 @@ async function probeAddDialog(page: Page, report: LeafReport, issues: string[]):
   // 若清空后仍有默认值残留（InputNumber 预填/程序回填，属合法默认提交路径）则跳过拦截断言 ——
   const requiredMarkers = await dialog.locator('.form-label-required').count();
   if (requiredMarkers > 0) {
-    const editable = dialog.locator('input:visible:not([type="checkbox"]):not([type="hidden"]), textarea:visible');
+    const editable = dialog.locator('input:visible:not([type="checkbox"]):not([type="hidden"]):not([readonly]):not(:disabled), textarea:visible:not([readonly]):not(:disabled)');
     const editableCount = await editable.count();
     for (let i = 0; i < editableCount; i += 1) {
       await editable.nth(i).fill('', { timeout: 1500 }).catch(() => undefined);
@@ -304,7 +304,7 @@ async function probeEditFormValidation(page: Page, report: LeafReport, issues: s
     return boxes.map((node) => (node as HTMLInputElement).value);
   });
   if (originals.length === 0) return false;
-  const boxes = dialog.locator('input:visible:not([type="checkbox"]):not([type="hidden"]), textarea:visible');
+  const boxes = dialog.locator('input:visible:not([type="checkbox"]):not([type="hidden"]):not([readonly]):not(:disabled), textarea:visible:not([readonly]):not(:disabled)');
   for (let i = 0; i < originals.length; i += 1) {
     await boxes.nth(i).fill('', { timeout: 2000 }).catch(() => undefined);
   }
@@ -374,6 +374,13 @@ async function closeDialog(page: Page): Promise<void> {
 // 打开的面板会吞掉页脚按钮的点击（outside-click 先吃掉 mousedown），必须先收起才能关弹窗；
 // 视口角落落在遮罩上——PrimeVue Dialog 默认 dismissableMask=false，不会误关宿主弹窗。
 async function collapseSelectOverlay(page: Page): Promise<void> {
+  // 日期输入在清空时会打开浮层；从它自己的输入框按 Escape，避免时间面板挡住取消按钮。
+  const expandedDateInputs = page.locator('.p-datepicker input[aria-expanded="true"]:visible');
+  // 关闭一个浮层会改变动态 locator 的索引；每次重新取当前首个展开输入。
+  for (let attempt = 0; attempt < 10 && await expandedDateInputs.count() > 0; attempt += 1) {
+    await expandedDateInputs.first().press('Escape');
+    await sleep(80);
+  }
   await page.mouse.click(5, 5);
   await sleep(250);
 }

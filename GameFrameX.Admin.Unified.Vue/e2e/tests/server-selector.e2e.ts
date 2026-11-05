@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Route } from '@playwright/test';
 import { expectOverview, navigateByMenu, shot } from './helpers';
 import { installApiRecorder, readApiRecords, apiAnomalies } from './module-coverage';
 import { globalServerSelector, selectServerOption } from './server-selection';
@@ -21,10 +21,16 @@ test('区服全局切换、页内覆盖隔离与刷新持久化', async ({ page 
       }
     }).catch(() => undefined);
   });
+  let delayFirstServer = false;
+  let delayedRoute: Route | undefined;
   await installApiRecorder(page);
   await page.route('**/api/onlineOverviewQuery/snapshot', async route => {
     const serverId: unknown = route.request().postDataJSON()?.serverId;
     const index = [...servers.keys()].indexOf(String(serverId));
+    if (delayFirstServer && index === 0) {
+      delayedRoute = route;
+      return;
+    }
     await route.fulfill({ json: { code: 0, data: { onlinePlayerCount: index + 101, sessionCount: 0,
       matchCount: 0, reconnectRate: 0, queueSummaries: [], serverTime: 1793808000 } } });
   });
@@ -80,4 +86,22 @@ test('区服全局切换、页内覆盖隔离与刷新持久化', async ({ page 
   await expectServerPayload('/onlineOverviewQuery/snapshot', first[0]);
   await expect(page.locator('[data-metric="onlinePlayerCount"]')).toHaveText('101');
   await shot(page, 'server-persisted-after-reload');
+
+  // 先挂住第一服请求，再切至第二服；旧结果晚到也不得覆盖第二服的 DOM。
+  const refreshedGlobalSelector = globalServerSelector(page);
+  await selectServerOption(page, refreshedGlobalSelector, second[1]);
+  await expect(page.locator('[data-metric="onlinePlayerCount"]')).toHaveText('102');
+  delayFirstServer = true;
+  await selectServerOption(page, refreshedGlobalSelector, first[1]);
+  await expect.poll(() => Boolean(delayedRoute)).toBe(true);
+  await selectServerOption(page, refreshedGlobalSelector, second[1]);
+  await expect(page.locator('[data-metric="onlinePlayerCount"]')).toHaveText('102');
+  const oldResponse = page.waitForResponse(response => response.url().includes('/onlineOverviewQuery/snapshot')
+    && String(response.request().postDataJSON()?.serverId) === first[0]);
+  await delayedRoute!.fulfill({ json: { code: 0, data: { onlinePlayerCount: 999, sessionCount: 0,
+    matchCount: 0, reconnectRate: 0, queueSummaries: [], serverTime: 1793808000 } } });
+  await (await oldResponse).finished();
+  await page.evaluate(() => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
+  await expect(page.locator('[data-metric="onlinePlayerCount"]')).toHaveText('102');
+  await shot(page, 'server-delayed-response-does-not-overwrite');
 });

@@ -62,18 +62,27 @@ export async function grantAdminMenus(browser: Browser, adminPage: Page, adminTo
     expect(readField(envelope, 'code')).toBe(0);
     const menuIdentifiers: string[] = [];
     const rootKeys: string[] = [];
-    const visit = (nodes: unknown[]): void => {
+    const sharedSelectorKeys: string[] = [];
+    const visit = (nodes: unknown[], protectedAncestor = false): void => {
       for (const node of nodes) {
-        // 保护整个超管子树，不能仅剔除叶子或丢掉普通 system 父根。
         expect(typeof readField(node, 'superAdminOnly')).toBe('boolean');
-        if (readField(node, 'superAdminOnly') === true) continue;
-        menuIdentifiers.push(identifier(readField(node, 'id')));
-        if (String(readField(node, 'pid')) === '0') rootKeys.push(String(readField(node, 'key')));
+        const protectedBranch = protectedAncestor || readField(node, 'superAdminOnly') === true;
+        // 既有只读选择器例外允许业务页取平台/语言；仍不授予任何超管目录或管理叶子。
+        const sharedSelector = readField(node, 'allowTenantWhenSuperAdminOnly') === true;
+        if (sharedSelector) {
+          expect(readField(node, 'type'), '租户可读例外只能是辅助按钮').toBe(3);
+          sharedSelectorKeys.push(String(readField(node, 'key')));
+        }
+        if (!protectedBranch || sharedSelector) {
+          menuIdentifiers.push(identifier(readField(node, 'id')));
+          if (String(readField(node, 'pid')) === '0' && readField(node, 'type') === 1) rootKeys.push(String(readField(node, 'key')));
+        }
         const children = readField(node, 'children');
-        if (children != null) visit(rows(children));
+        if (children != null) visit(rows(children), protectedBranch);
       }
     };
     visit(rows(readField(envelope, 'data')));
+    expect(sharedSelectorKeys.sort()).toEqual(['globalLanguage:Select', 'globalPlatform:Select']);
     expect(rootKeys.sort()).toEqual([
       'route:dashboard', 'route:serverCenter', 'route:noticeCenter', 'route:gmCenter', 'route:player',
       'route:commerceCenter', 'route:clientDelivery', 'route:audit', 'route:system',

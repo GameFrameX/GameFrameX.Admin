@@ -155,9 +155,10 @@ export async function navigateByMenu(page: Page, leafTitle: string, rootGroup?: 
     // 分组开关同样用文本定位（label 精确匹配），重渲染后可自动重试
     const scope =
       action.where === 'header'
-        ? '.p-panelmenu-panel > .p-panelmenu-header span.menu-nav-item[role="button"]'
-        : '.p-panelmenu li[aria-expanded] > .p-panelmenu-item-content span.menu-nav-item[role="button"]';
-    await page
+        ? '.p-panelmenu-header span.menu-nav-item[role="button"]'
+        : 'li[aria-expanded] > .p-panelmenu-item-content span.menu-nav-item[role="button"]';
+    const container = rootGroup ? menuRoot(page, rootGroup) : page.locator('.p-panelmenu');
+    await container
       .locator(scope)
       .filter({ has: page.getByText(action.label, { exact: true }) })
       .first()
@@ -185,6 +186,7 @@ export function menuRoot(page: Page, title: string) {
 
 export async function expectOverview(page: Page): Promise<void> {
   await expect(page).toHaveURL(/#\/dashboard\/home(?:[/?]|$)/);
+  await expect(page.getByRole('tab', {name: /^运营首页/})).toBeVisible();
   await expect(menuRoot(page, '总览')).toBeVisible();
 }
 

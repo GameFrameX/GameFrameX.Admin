@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { expectOverview, navigateByMenu, pickDateTime, shot, sleep, superadminPage } from './helpers';
 
 // 单 shell 数据闭环：20 个保留实体，按根组 + 叶子标题真实导航，不读取菜单树或直接跳 hash。
-// 迁移只改变菜单归属，保留新增→编辑回显→删除的动作强度与既有控件填充策略。
+// 菜单归属和控件序列按终态对账，保留新增→编辑回显→删除的动作强度。
 // 例外与既有风险（集成轮核验，不以迁移宣称已修）：
 // - 应用管理已按 C400/C403 删除，不再作为 CRUD 例外或入口。
 // - 游戏角色：历史新增权限问题；本轮 admin 显式授权后应复核，仍未加入此矩阵。
@@ -10,7 +10,8 @@ import { expectOverview, navigateByMenu, pickDateTime, shot, sleep, superadminPa
 // - 游戏订单/发货账本：商业化中心的多表业务页，不是通用 CRUD 对话框。
 // - 支付配置：列表锚点；游戏内商品：级联与绑定（Api#291）；角色管理：上下文菜单动作。
 // - 分包管理、游戏公告、奖励模板/兑换码、物品目录、资源包、游戏运营配置：
-//   保留现有闭环失败，不删除/跳过；C402 失败原因和终态预期逐项见 C403 notes.md。
+//   保留历史失败的闭环回归，不删除/跳过；隔离夹具提供语言/平台只读授权及奖励分组/物品。
+//   控件序列按终态核验，C402 失败原因与集成实际结果逐项见 C403 notes.md。
 // - 渠道软删问题 Api#287、邮件 Vue#198 等历史项不能因标题迁移直接视为修复。
 
 // 2026-10-20 补编辑半边：闭环升级为 新增 → 行回显 → 编辑提交（回显断言 + 改值）→ 行回显新值 → 删除 → 行消失。
@@ -138,7 +139,7 @@ const ENTITIES: EntitySpec[] = [
     name: '游戏运营配置',
     menuTitle: '游戏运营配置',
     menuRoot: 'C 端交付',
-    fields: ['select', 'text', 'json', 'text'],
+    fields: ['text', 'json', 'text'],
     createApi: /gameAppServerConfig\/add/,
     deleteApi: /gameAppServerConfig\/delete/,
   },
@@ -146,7 +147,7 @@ const ENTITIES: EntitySpec[] = [
     name: '分包管理',
     menuTitle: '分包管理',
     menuRoot: 'C 端交付',
-    fields: ['select', 'text', 'select', 'select', 'text', 'text'],
+    fields: ['skip-select', 'text', 'select', 'select', 'text', 'text'],
     createApi: /gameAppPackage\/add/,
     deleteApi: /gameAppPackage\/delete/,
   },
