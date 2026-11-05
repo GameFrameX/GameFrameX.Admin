@@ -36,13 +36,13 @@ import {ref, computed, onMounted} from 'vue'
 import {useRoute} from 'vue-router'
 import SearchForm from '/@/components/search-form/index.vue'
 import CrudDataTable from '/@/components/crud-data-table/index.vue'
-import editDialog from '/@/views/app/opsCenter/gameDockerTagEntity/component/EditDialog.vue'
-import { gameDockerTagPagePost, gameDockerTagDeletePost } from '../../../../api/gameDockerTag'
-import {systemEnumEnumDataListGet} from '../../../../api/systemEnum';
-import {useCrudTable} from '../../../../composables/useCrudTable.ts'
-import {usePrimeTablePage, useRouteAppIdQuerySync} from '../../../../composables'
-import {useCurrentApp} from '../../../../composables/useCurrentApp.ts'
-import type {CrudColumnConfig} from '../../../../components/crud-data-table/types.ts'
+import editDialog from '/@/views/serverCenter/gameDockerTagEntity/component/EditDialog.vue'
+import { gameDockerTagPagePost, gameDockerTagDeletePost } from '../../../api/gameDockerTag'
+import {systemEnumEnumDataListGet} from '../../../api/systemEnum';
+import {useCrudTable} from '../../../composables/useCrudTable.ts'
+import {usePrimeTablePage, useRouteAppIdQuerySync} from '../../../composables'
+import {useCurrentApp} from '../../../composables/useCurrentApp.ts'
+import type {CrudColumnConfig} from '../../../components/crud-data-table/types.ts'
 
 const route = useRoute()
 const {resolveInitialAppId} = useCurrentApp()

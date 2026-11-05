@@ -21,9 +21,9 @@ import {ref, computed} from 'vue'
 import FormField from '@primevue/forms/formfield'
 import Message from 'primevue/message'
 import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
-import {TextField} from '../../../../../components/crud-form-fields'
-import { gameAreaClassifyAddPost, gameAreaClassifyUpdatePost } from '../../../../../api/gameAreaClassify'
-import {normalizeAppId} from '../../../../../utils/appWorkspace.ts'
+import {TextField} from '../../../../components/crud-form-fields'
+import { gameAreaClassifyAddPost, gameAreaClassifyUpdatePost } from '../../../../api/gameAreaClassify'
+import {normalizeAppId} from '../../../../utils/appWorkspace.ts'
 
 const props = defineProps({
   title: {type: String, default: ''},

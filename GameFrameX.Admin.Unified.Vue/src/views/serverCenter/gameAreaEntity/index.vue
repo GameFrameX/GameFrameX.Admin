@@ -57,19 +57,19 @@
 <script lang="ts" setup="" name="gameAreaEntity">
 import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import SearchForm from '/@/components/search-form/index.vue'
-import type { CrudAction, CrudColumnConfig } from '../../../../components/crud-data-table/types.ts'
+import type { CrudAction, CrudColumnConfig } from '../../../components/crud-data-table/types.ts'
 import {ref, computed} from 'vue'
 import {useRoute} from 'vue-router'
-import {showConfirm, showSuccess} from '../../../../utils/message.ts'
-import {useCrudTable} from '../../../../composables/useCrudTable.ts'
-import {usePrimeTablePage, useRouteAppIdQuerySync} from '../../../../composables'
-import editDialog from '/@/views/app/opsCenter/gameAreaEntity/component/EditDialog.vue'
-import {isEnabled} from '../../../../utils/isEnabled.ts'
-import { gameAreaDisableDeletePost, gameAreaOpenPost, gameAreaPagePost, gameAreaRestartPost, gameAreaStopPost } from '../../../../api/gameArea'
-import {useCurrentApp} from '../../../../composables/useCurrentApp.ts'
-import {systemEnumEnumDataListGet} from '../../../../api/systemEnum';
-import commonFunction from '../../../../utils/commonFunction.ts'
-import {formatUnix} from '../../../../utils/formatTime.ts'
+import {showConfirm, showSuccess} from '../../../utils/message.ts'
+import {useCrudTable} from '../../../composables/useCrudTable.ts'
+import {usePrimeTablePage, useRouteAppIdQuerySync} from '../../../composables'
+import editDialog from '/@/views/serverCenter/gameAreaEntity/component/EditDialog.vue'
+import {isEnabled} from '../../../utils/isEnabled.ts'
+import { gameAreaDisableDeletePost, gameAreaOpenPost, gameAreaPagePost, gameAreaRestartPost, gameAreaStopPost } from '../../../api/gameArea'
+import {useCurrentApp} from '../../../composables/useCurrentApp.ts'
+import {systemEnumEnumDataListGet} from '../../../api/systemEnum';
+import commonFunction from '../../../utils/commonFunction.ts'
+import {formatUnix} from '../../../utils/formatTime.ts'
 
 // eslint-disable-next-line @typescript-eslint/naming-convention -- TODO(命名治理): 存量 PascalCase 命名（枚举映射表/C# 风格函数式命名），待配套治理 issue 改名
 const getEnumLanguageData_Index = ref<any>([])

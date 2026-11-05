@@ -37,13 +37,13 @@
 import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import {ref, computed} from 'vue'
 import {useRoute} from 'vue-router'
-import {useCrudTable} from '../../../../composables/useCrudTable.ts'
-import {usePrimeTablePage, useRouteAppIdQuerySync} from '../../../../composables'
-import {useCurrentApp} from '../../../../composables/useCurrentApp.ts'
-import editDialog from '/@/views/app/opsCenter/gameAreaClassifyEntity/component/EditDialog.vue'
-import { gameAreaClassifyPagePost, gameAreaClassifyDeletePost } from '../../../../api/gameAreaClassify'
-import {formatUnix} from '../../../../utils/formatTime.ts'
-import type {CrudColumnConfig} from '../../../../components/crud-data-table/types.ts'
+import {useCrudTable} from '../../../composables/useCrudTable.ts'
+import {usePrimeTablePage, useRouteAppIdQuerySync} from '../../../composables'
+import {useCurrentApp} from '../../../composables/useCurrentApp.ts'
+import editDialog from '/@/views/serverCenter/gameAreaClassifyEntity/component/EditDialog.vue'
+import { gameAreaClassifyPagePost, gameAreaClassifyDeletePost } from '../../../api/gameAreaClassify'
+import {formatUnix} from '../../../utils/formatTime.ts'
+import type {CrudColumnConfig} from '../../../components/crud-data-table/types.ts'
 
 const route = useRoute()
 const {resolveInitialAppId} = useCurrentApp()

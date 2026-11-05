@@ -11,9 +11,9 @@
 <script lang="ts" setup>
 import {ref} from 'vue'
 import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
-import {TextField, TextareaField} from '../../../../../components/crud-form-fields'
-import { gameDockerTagUpdatePost, gameDockerTagAddPost } from '../../../../../api/gameDockerTag'
-import {normalizeAppId} from '../../../../../utils/appWorkspace.ts'
+import {TextField, TextareaField} from '../../../../components/crud-form-fields'
+import { gameDockerTagUpdatePost, gameDockerTagAddPost } from '../../../../api/gameDockerTag'
+import {normalizeAppId} from '../../../../utils/appWorkspace.ts'
 
 const props = defineProps({
   title: {type: String, default: ''},
