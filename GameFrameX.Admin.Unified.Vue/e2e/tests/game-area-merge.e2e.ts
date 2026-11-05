@@ -34,7 +34,11 @@ test('合服向导：真实登录、预演、双人复核、执行与源服退�
     await applicant.waitForTimeout(400);
     // MultiSelect 的 combobox 是隐藏 input，点击可见的多选组件本体。
     await mergeDialog.locator('.p-multiselect').first().click();
-    for (const source of sourceNames) await applicant.getByRole('option', { name: source, exact: true }).click();
+    for (const source of sourceNames) {
+      const option = applicant.getByRole('option', { name: source, exact: true });
+      await option.waitFor({ state: 'visible', timeout: 10_000 });
+      await option.click();
+    }
     await applicant.getByRole('dialog').getByText('源服执行成功后退场。请先确认范围，再生成计划。').click();
     await applicant.locator('#merge-create-reason').fill('C404 合服浏览器演练');
     const createdResponse = applicant.waitForResponse(response => response.url().includes('/api/gameAreaMerge/add') && response.request().method() === 'POST');
