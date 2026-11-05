@@ -48,23 +48,20 @@ public class TenantRoleMenuService
     {
         await _transactionRunner.ExecuteAsync(async () =>
         {
-            if (input.MenuIdList == null || input.MenuIdList.Count == 0)
+            input.MenuIdList = await ExcludeSuperAdminOnlyMenusAsync(input.MenuIdList);
+            await _systemRoleMenuRepository.DeleteAsync(u => u.RoleId == input.Id);
+            if (input.MenuIdList.Count > 0)
             {
-                return;
+                var menus = input.MenuIdList.Select(u => new TenantRoleMenuEntity
+                {
+                    RoleId = input.Id,
+                    MenuId = u,
+                }).ToList();
+                await _systemRoleMenuRepository.InsertRangeAsync(menus);
             }
 
-            input.MenuIdList = await ExcludeSuperAdminOnlyMenusAsync(input.MenuIdList);
-
-            await _systemRoleMenuRepository.DeleteAsync(u => u.RoleId == input.Id);
-            var menus = input.MenuIdList.Select(u => new TenantRoleMenuEntity
-            {
-                RoleId = input.Id,
-                MenuId = u,
-            }).ToList();
-            await _systemRoleMenuRepository.InsertRangeAsync(menus);
-
             // 清除缓存
-            // _systemCacheService.RemoveByPrefixKey(CacheConst.KeyUserMenu);
+            _systemCacheService.RemoveByPrefixKey(CacheConst.KeyUserMenu);
             _systemCacheService.RemoveByPrefixKey(CacheConst.KeyUserButton);
         });
     }
@@ -77,6 +74,8 @@ public class TenantRoleMenuService
     public async Task DeleteRoleMenuByRoleIdAsync(long roleId)
     {
         await _systemRoleMenuRepository.DeleteAsync(u => u.RoleId == roleId);
+        _systemCacheService.RemoveByPrefixKey(CacheConst.KeyUserMenu);
+        _systemCacheService.RemoveByPrefixKey(CacheConst.KeyUserButton);
     }
 
     /// <summary>

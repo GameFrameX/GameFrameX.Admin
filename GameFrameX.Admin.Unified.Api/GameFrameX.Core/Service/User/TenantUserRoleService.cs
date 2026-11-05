@@ -33,17 +33,16 @@ public class TenantUserRoleService
         {
             await _systemUserRoleRepository.DeleteAsync(u => u.UserId == input.UserId);
 
-            if (input.RoleIdList == null || input.RoleIdList.Count < 1)
+            if (input.RoleIdList != null && input.RoleIdList.Count > 0)
             {
-                return;
+                var roles = input.RoleIdList.Select(u => new TenantUserRoleEntity
+                {
+                    UserId = input.UserId,
+                    RoleId = u,
+                }).ToList();
+                await _systemUserRoleRepository.InsertRangeAsync(roles);
             }
-
-            var roles = input.RoleIdList.Select(u => new TenantUserRoleEntity
-            {
-                UserId = input.UserId,
-                RoleId = u,
-            }).ToList();
-            await _systemUserRoleRepository.InsertRangeAsync(roles);
+            _systemCacheService.Remove(CacheConst.KeyUserMenu + input.UserId);
             _systemCacheService.Remove(CacheConst.KeyUserButton + input.UserId);
         });
     }
@@ -58,7 +57,11 @@ public class TenantUserRoleService
         await _systemUserRoleRepository.AsQueryable()
                                 .Where(u => u.RoleId == roleId)
                                 .Select(u => u.UserId)
-                                .ForEachAsync(userId => { _systemCacheService.Remove(CacheConst.KeyUserButton + userId); });
+                                .ForEachAsync(userId =>
+                                {
+                                    _systemCacheService.Remove(CacheConst.KeyUserMenu + userId);
+                                    _systemCacheService.Remove(CacheConst.KeyUserButton + userId);
+                                });
 
         await _systemUserRoleRepository.DeleteAsync(u => u.RoleId == roleId);
     }
@@ -71,6 +74,7 @@ public class TenantUserRoleService
     public async Task DeleteUserRoleByUserIdAsync(long userId)
     {
         await _systemUserRoleRepository.DeleteAsync(u => u.UserId == userId);
+        _systemCacheService.Remove(CacheConst.KeyUserMenu + userId);
         _systemCacheService.Remove(CacheConst.KeyUserButton + userId);
     }
 
@@ -95,7 +99,11 @@ public class TenantUserRoleService
     public async Task<List<long>> GetUserRoleIdListAsync(long userId)
     {
         return await _systemUserRoleRepository.AsQueryable()
-                                       .Where(u => u.UserId == userId).Select(u => u.RoleId).ToListAsync();
+                                       .InnerJoin<TenantRoleEntity>((userRole, role) => userRole.RoleId == role.Id)
+                                       .Where((userRole, role) => userRole.UserId == userId)
+                                       .Where((userRole, role) => (role.IsEnabled == null || role.IsEnabled == true)
+                                           && (role.IsDeleted == null || role.IsDeleted == false))
+                                       .Select((userRole, role) => userRole.RoleId).ToListAsync();
     }
 
     /// <summary>
