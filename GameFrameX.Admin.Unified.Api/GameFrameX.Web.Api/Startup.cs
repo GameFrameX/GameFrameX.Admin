@@ -87,6 +87,7 @@ public class Startup
         services.AddHttpClient<IMailCampaignServerClient, MailCampaignServerClient>();
         // C339 / vault:C2 S1.7：Online 平台管理客户端基座（作用域注入 + 镜像错误码映射）。
         services.AddScoped<OnlineScopeContextFactory>();
+        services.AddScoped<GameFrameX.Application.ServerCenter.GameAreaProvision.GameAreaProvisionService>();
         services.AddScoped<IOnlineServerEndpointResolver, OnlineServerEndpointResolver>();
         services.AddHttpClient<IOnlineServerClient, OnlineServerClient>();
         // C343 / vault:C8 S7.7：LiveOps 统一下发单一入口（业务层唯一消费 IOnlineServerClient 的调度面）。
