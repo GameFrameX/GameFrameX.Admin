@@ -1,11 +1,16 @@
+using GameFrameX.Entity.Enum;
+
 namespace GameFrameX.Core.Job;
 
 public sealed class ProjectScheduler
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly List<IJobPersistence> _persistences;
+    private readonly List<TriggerBuilder> _triggerBuilders = new();
+    private readonly object _triggerLock = new();
     private JobBuilder _jobBuilder;
     private bool _paused;
+    private int _executing;
 
     public ProjectScheduler(JobBuilder jobBuilder, IServiceProvider serviceProvider, IEnumerable<IJobPersistence> persistences)
     {
@@ -17,6 +22,14 @@ public sealed class ProjectScheduler
     public string? JobId
     {
         get { return _jobBuilder.JobId; }
+    }
+
+    /// <summary>
+    /// 作业 CLR 类型（无法解析时为 null，触发循环跳过）。
+    /// </summary>
+    internal Type? JobType
+    {
+        get { return _jobBuilder.JobType; }
     }
 
     public JobBuilder GetJobBuilder()
@@ -33,17 +46,48 @@ public sealed class ProjectScheduler
     public Task AddTriggerAsync(TriggerBuilder builder)
     {
         builder.Trigger.JobId = JobId;
+        lock (_triggerLock)
+        {
+            var existingIndex = _triggerBuilders.FindIndex(item => string.Equals(item.TriggerId, builder.TriggerId, StringComparison.Ordinal));
+            if (existingIndex >= 0)
+            {
+                _triggerBuilders[existingIndex] = builder;
+            }
+            else
+            {
+                _triggerBuilders.Add(builder);
+            }
+        }
+
         return NotifyTriggerChangedAsync(builder.Trigger, PersistenceBehavior.Appended);
     }
 
     public Task UpdateTriggerAsync(TriggerBuilder builder)
     {
         builder.Trigger.JobId = JobId;
+        lock (_triggerLock)
+        {
+            var existingIndex = _triggerBuilders.FindIndex(item => string.Equals(item.TriggerId, builder.TriggerId, StringComparison.Ordinal));
+            if (existingIndex >= 0)
+            {
+                _triggerBuilders[existingIndex] = builder;
+            }
+            else
+            {
+                _triggerBuilders.Add(builder);
+            }
+        }
+
         return NotifyTriggerChangedAsync(builder.Trigger, PersistenceBehavior.Updated);
     }
 
     public Task RemoveTriggerAsync(string triggerId)
     {
+        lock (_triggerLock)
+        {
+            _triggerBuilders.RemoveAll(item => string.Equals(item.TriggerId, triggerId, StringComparison.Ordinal));
+        }
+
         return NotifyTriggerChangedAsync(new Trigger { JobId = JobId, TriggerId = triggerId, }, PersistenceBehavior.Removed);
     }
 
@@ -59,10 +103,26 @@ public sealed class ProjectScheduler
 
     public void PauseTrigger(string triggerId)
     {
+        lock (_triggerLock)
+        {
+            var trigger = _triggerBuilders.FirstOrDefault(item => string.Equals(item.TriggerId, triggerId, StringComparison.Ordinal))?.Trigger;
+            if (trigger != null)
+            {
+                trigger.Status = TriggerStatus.Pause;
+            }
+        }
     }
 
     public void StartTrigger(string triggerId)
     {
+        lock (_triggerLock)
+        {
+            var trigger = _triggerBuilders.FirstOrDefault(item => string.Equals(item.TriggerId, triggerId, StringComparison.Ordinal))?.Trigger;
+            if (trigger != null)
+            {
+                trigger.Status = TriggerStatus.Ready;
+            }
+        }
     }
 
     public async Task<object?> RunAsync(CancellationToken cancellationToken)
@@ -77,6 +137,61 @@ public sealed class ProjectScheduler
         var context = new JobExecutingContext { JobDetail = _jobBuilder.Detail, };
         await job.ExecuteAsync(context, cancellationToken);
         return context.Result;
+    }
+
+    /// <summary>
+    /// 挂载扫描 / 预载得到的初始触发器（仅内存，不通知持久化——持久化由 Preload 语义负责）。
+    /// </summary>
+    internal void AttachTriggerBuilder(TriggerBuilder triggerBuilder)
+    {
+        triggerBuilder.Trigger.JobId = JobId;
+        lock (_triggerLock)
+        {
+            if (_triggerBuilders.All(item => !string.Equals(item.TriggerId, triggerBuilder.TriggerId, StringComparison.Ordinal)))
+            {
+                _triggerBuilders.Add(triggerBuilder);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 当前触发器快照（触发循环逐个评估用）。
+    /// </summary>
+    internal IReadOnlyList<Trigger> GetTriggerSnapshot()
+    {
+        lock (_triggerLock)
+        {
+            return _triggerBuilders.Select(item => item.Trigger).ToArray();
+        }
+    }
+
+    /// <summary>
+    /// 是否暂停调度（触发循环跳过本作业）。
+    /// </summary>
+    internal bool IsPaused()
+    {
+        return _paused;
+    }
+
+    /// <summary>
+    /// 尝试占用执行位：<see cref="JobDetail.Concurrent"/> 为 false 时上一次执行未结束则拒绝（本次触发跳过，不排队）。
+    /// </summary>
+    internal bool TryBeginExecution()
+    {
+        if (!_jobBuilder.Detail.Concurrent)
+        {
+            return Interlocked.CompareExchange(ref _executing, 1, 0) == 0;
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// 释放执行位（与 <see cref="TryBeginExecution"/> 配对）。
+    /// </summary>
+    internal void EndExecution()
+    {
+        Interlocked.Exchange(ref _executing, 0);
     }
 
     private async Task NotifyChangedAsync(PersistenceBehavior behavior)

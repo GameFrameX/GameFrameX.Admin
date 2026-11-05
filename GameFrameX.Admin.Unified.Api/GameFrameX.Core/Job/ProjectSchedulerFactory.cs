@@ -15,12 +15,27 @@ public sealed class ProjectSchedulerFactory : ISchedulerFactory
 
     public void AddJob(JobBuilder builder)
     {
-        if (string.IsNullOrWhiteSpace(builder.JobId))
+        AddJob(SchedulerBuilder.Create(builder));
+    }
+
+    /// <summary>
+    /// 注册作业并保留其触发器（触发循环按触发器评估执行；JobBuilder-only 重载不携带触发器）。
+    /// </summary>
+    public void AddJob(SchedulerBuilder builder)
+    {
+        var jobBuilder = builder.GetJobBuilder();
+        if (string.IsNullOrWhiteSpace(jobBuilder.JobId))
         {
             return;
         }
 
-        _jobs[builder.JobId] = new ProjectScheduler(builder, _serviceProvider, _persistences);
+        var scheduler = new ProjectScheduler(jobBuilder, _serviceProvider, _persistences);
+        foreach (var triggerBuilder in builder.GetEnumerable())
+        {
+            scheduler.AttachTriggerBuilder(triggerBuilder);
+        }
+
+        _jobs[jobBuilder.JobId] = scheduler;
     }
 
     public ProjectScheduler? GetJob(string jobId)
@@ -31,6 +46,14 @@ public sealed class ProjectSchedulerFactory : ISchedulerFactory
     public void RemoveJob(string jobId)
     {
         _jobs.TryRemove(jobId, out _);
+    }
+
+    /// <summary>
+    /// 当前作业快照（触发循环评估用）。
+    /// </summary>
+    public IReadOnlyCollection<ProjectScheduler> GetJobSnapshot()
+    {
+        return _jobs.Values.ToArray();
     }
 
     public void PauseAll()
