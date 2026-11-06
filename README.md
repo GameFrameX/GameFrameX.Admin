@@ -48,6 +48,7 @@ Admin/
 ├── doc/                             # README images
 ├── .github/workflows/               # CI: three API images + frontend image builds, frontend tests, external image sync
 ├── docker-compose.yml               # One-command full-stack orchestration (PostgreSQL + 3 APIs + frontend)
+├── docker-compose.admin.yml          # Admin-independent stack: own PostgreSQL + 3 API hosts, no frontend container
 ├── .env.example                     # Compose environment variable template (copy to .env and override as needed)
 ├── AGENTS.md / CLAUDE.md            # AI agent entry points (root instructions + readme_i18n config)
 └── LICENSE.md                       # License
@@ -93,6 +94,18 @@ docker compose up -d --build
 Compose ships PostgreSQL + the three hosts (20802/20806/20808) + the Admin frontend (20800, mutually exclusive with `pnpm run dev` — stop the dev server before starting the containers); once the healthchecks turn green you are good to go.
 
 Environment variable entry point: copy the root [`.env.example`](.env.example) to `.env` and override as needed (unset variables fall back to the compose defaults; `.env` is not committed to git).
+
+### Admin-Independent Stack (docker-compose.admin.yml)
+
+Production or isolated environments can instead use the Admin-independent compose: its own PostgreSQL plus the three API hosts only, with no frontend container — serve the console static site from the unified stack's `web-vue` or your own static hosting. Note that `WEB_VUE_API_URL` only configures the `web-vue` container in the unified compose; it does not touch self-hosted static sites. For self-hosting, set `window.__env__.VITE_API_URL` to a browser-reachable Web API address in the built/published `config/config.js`.
+
+A non-empty `POSTGRES_PASSWORD` is required: set it in the root `.env` (or the runtime environment) before starting, otherwise Compose aborts before the stack comes up.
+
+```bash
+docker compose -f docker-compose.admin.yml up -d --build
+```
+
+Startup order is enforced by healthchecks: `pg` → `admin-web` (initializes the main database) → `admin-client` / `admin-hub`. When game servers also run in Docker, start this stack first and wait for all four healthchecks to pass before starting the game-server compose; the two composes never `depends_on` each other and never share the Admin PostgreSQL volume. Isolation overrides (`ADMIN_WEB_PORT` / `ADMIN_CLIENT_PORT` / `ADMIN_HUB_PORT` / `ADMIN_POSTGRES_DATA_DIRECTORY`) go in the same root `.env`.
 
 For finer-grained commands and pitfalls, see [`GameFrameX.Admin.Unified.Api/README.md`](GameFrameX.Admin.Unified.Api/README.md) (backend manual) and [`GameFrameX.Admin.Unified.Vue/README.md`](GameFrameX.Admin.Unified.Vue/README.md) (frontend manual).
 
@@ -257,6 +270,8 @@ Not "recommendations" — hard constraints that **take effect by default**.
 docker compose up -d --build
 # Ships PostgreSQL + Admin(20802) + Client(20808) + Hub(20806) + frontend(20800); wait for healthchecks to turn green (the frontend container and the dev server both grab port 20800 — they are mutually exclusive)
 ```
+
+Production can also use the Admin-independent stack ([`docker-compose.admin.yml`](docker-compose.admin.yml)): own PostgreSQL + the three API hosts, fixed healthcheck startup order — see [Admin-Independent Stack](#admin-independent-stack-docker-composeadminyml).
 
 For single-container `docker run`, paired environment variable overrides (a half-paired override fails fast at startup), and other details, see [Backend README · Deployment](GameFrameX.Admin.Unified.Api/README.md#deployment).
 

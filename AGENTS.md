@@ -7,6 +7,10 @@ GameFrameX Admin is handled as one integrated front-end/back-end project. This f
 - `GameFrameX.Admin.Unified.Api/` — .NET backend
 - `GameFrameX.Admin.Unified.Vue/` — Vue frontend
 
+## Positioning (2.0)
+
+Single-game operations console (Admin / Client / Hub hosts + Vue console) — not a SaaS multi-tenant platform; `ServerId` is the only operational scope. Deployment entries: root `docker-compose.yml` (unified stack incl. the frontend) and `docker-compose.admin.yml` (Admin-independent stack: own PostgreSQL + three API hosts, no frontend container; healthcheck order `pg` → `admin-web` → `admin-client` / `admin-hub`; never `depends_on` the game-server compose and never shares its volumes).
+
 ## Required Reading
 
 - Before reading or changing code, first read `gfx-doc/agent-handbook/INDEX.md`.

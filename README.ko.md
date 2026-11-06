@@ -48,6 +48,7 @@ Admin/
 ├── doc/                             # README 이미지
 ├── .github/workflows/               # CI: 3개 API 이미지와 프론트엔드 이미지 빌드, 프론트엔드 테스트, 외부 이미지 동기화
 ├── docker-compose.yml               # 한 줄 명령 풀스택 오케스트레이션(PostgreSQL + 3 API + 프론트엔드)
+├── docker-compose.admin.yml          # Admin 독립 스택: 자체 PostgreSQL + 3 API 호스트, 프론트엔드 컨테이너 없음
 ├── .env.example                     # compose 환경 변수 템플릿(.env로 복사한 뒤 필요에 따라 재정의)
 ├── AGENTS.md / CLAUDE.md            # AI Agent 협업 진입점(루트 지침 + readme_i18n 설정)
 └── LICENSE.md                       # 라이선스
@@ -93,6 +94,18 @@ docker compose up -d --build
 Compose에는 PostgreSQL + 세 개의 host(20802/20806/20808) + Admin 프론트엔드(20800, `pnpm run dev`와 상호배타적이므로 컨테이너 기동 전에 dev server를 먼저 중지)가 내장되어 있으며, 기동 후 healthcheck가 초록색이 되면 접속할 수 있습니다.
 
 환경 변수 통합 입구: 루트의 [`.env.example`](.env.example)을 `.env`로 복사한 뒤 필요에 따라 재정의하세요(설정하지 않은 변수는 compose 기본값을 사용하며 `.env`는 git에 포함되지 않습니다).
+
+### Admin 독립 스택(docker-compose.admin.yml)
+
+프로덕션 또는 격리 환경에서는 Admin 독립 compose를 사용할 수 있습니다. 자체 PostgreSQL + 세 개의 API 호스트만 포함되며 프론트엔드 컨테이너는 없습니다. 콘솔 정적 사이트는 통합 compose의 `web-vue` 또는 자체 정적 호스팅으로 게시하세요. `WEB_VUE_API_URL`은 통합 compose의 `web-vue` 컨테이너에만 적용되며 자체 호스팅 정적 사이트에는 적용되지 않습니다. 자체 호스팅 시 빌드/배포된 `config/config.js`의 `window.__env__.VITE_API_URL`을 브라우저에서 접근 가능한 Web API 주소로 설정하세요.
+
+기동 전에 루트의 `.env`(또는 실행 환경)에 비어 있지 않은 `POSTGRES_PASSWORD`를 설정해야 합니다. 설정하지 않으면 Compose가 기동 전에 오류로 중단됩니다.
+
+```bash
+docker compose -f docker-compose.admin.yml up -d --build
+```
+
+기동 순서는 healthcheck로 고정됩니다: `pg` → `admin-web`(메인 DB 초기화) → `admin-client` / `admin-hub`. 게임 서버도 Docker에서 구동한다면 이 스택을 먼저 띄우고 네 개의 healthcheck가 모두 초록색이 된 뒤 게임 서버 compose를 기동하세요. 두 compose는 서로 `depends_on`하지 않으며 Admin의 PostgreSQL 데이터 볼륨도 공유하지 않습니다. 격리 재정의(`ADMIN_WEB_PORT` / `ADMIN_CLIENT_PORT` / `ADMIN_HUB_PORT` / `ADMIN_POSTGRES_DATA_DIRECTORY`)도 같은 루트의 `.env`에 작성합니다.
 
 더 자세한 명령과 주의점은 [`GameFrameX.Admin.Unified.Api/README.ko.md`](GameFrameX.Admin.Unified.Api/README.ko.md)(백엔드 매뉴얼)와 [`GameFrameX.Admin.Unified.Vue/README.ko.md`](GameFrameX.Admin.Unified.Vue/README.ko.md)(프론트엔드 매뉴얼)를 참조하세요.
 
@@ -257,6 +270,8 @@ Compose에는 PostgreSQL + 세 개의 host(20802/20806/20808) + Admin 프론트�
 docker compose up -d --build
 # PostgreSQL + Admin(20802) + Client(20808) + Hub(20806) + 프론트엔드(20800) 내장, 기동 후 healthcheck가 초록색이 될 때까지 대기 (프론트엔드 컨테이너와 dev server가 20800을 두고 경합, 상호배타)
 ```
+
+프로덕션에서는 Admin 독립 스택([`docker-compose.admin.yml`](docker-compose.admin.yml))도 사용할 수 있습니다. 자체 PostgreSQL + 3 API 호스트, healthcheck로 고정된 기동 순서. 자세한 내용은 [Admin 독립 스택](#admin-독립-스택docker-composeadminyml)을 참조하세요.
 
 단일 컨테이너 `docker run`, 환경 변수 쌍별 덮어쓰기(절반만 덮어쓰면 기동 시 즉시 오류) 등 세부사항은 [백엔드 README · 배포](GameFrameX.Admin.Unified.Api/README.ko.md#배포)를 참조하세요.
 

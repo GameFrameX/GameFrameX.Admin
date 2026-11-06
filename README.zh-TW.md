@@ -48,6 +48,7 @@ Admin/
 ├── doc/                             # README 配圖
 ├── .github/workflows/               # CI：三 API 鏡像與前端鏡像構建、前端測試、外部鏡像同步
 ├── docker-compose.yml               # 一鍵全棧編排（PostgreSQL + 三 API + 前端）
+├── docker-compose.admin.yml          # Admin 獨立棧：自帶 PostgreSQL + 三 API 宿主，無前端容器
 ├── .env.example                     # compose 環境變數模板（複製為 .env 後按需覆蓋）
 ├── AGENTS.md / CLAUDE.md            # AI Agent 協作入口（根指令 + readme_i18n 配置）
 └── LICENSE.md                       # 開源協議
@@ -93,6 +94,18 @@ docker compose up -d --build
 Compose 內建 PostgreSQL + 三個 host（20802/20806/20808）+ Admin 前端（20800，與 `pnpm run dev` 互斥，起容器前先停 dev server），起完等 healthcheck 變綠即可存取。
 
 環境變數統一入口：複製根目錄 [`.env.example`](.env.example) 為 `.env` 後按需覆蓋（未填寫的變數走 compose 預設值；`.env` 不進 git）。
+
+### Admin 獨立棧（docker-compose.admin.yml）
+
+生產或隔離環境可改用 Admin 獨立 compose：自帶 PostgreSQL + 僅三個 API 宿主，不含前端容器——管理台靜態站點用統一 compose 的 `web-vue` 或自有靜態託管發布。注意 `WEB_VUE_API_URL` 只配置統一 compose 裡的 `web-vue` 容器，不會作用於自架靜態站點；自架時需在構建/發布的 `config/config.js` 中把 `window.__env__.VITE_API_URL` 設為瀏覽器可達的 Web API 位址。
+
+啟動前必須在根目錄 `.env`（或執行環境）設置非空 `POSTGRES_PASSWORD`，否則 Compose 會在啟動前報錯中止。
+
+```bash
+docker compose -f docker-compose.admin.yml up -d --build
+```
+
+啟動順序由 healthcheck 固定：`pg` → `admin-web`（初始化主庫）→ `admin-client` / `admin-hub`。遊戲服也在 Docker 裡時，先起本棧、等四個 healthcheck 全綠後再起遊戲服 compose；兩份 compose 互相不 `depends_on`，也不共享 Admin 的 PostgreSQL 資料卷。隔離覆蓋（`ADMIN_WEB_PORT` / `ADMIN_CLIENT_PORT` / `ADMIN_HUB_PORT` / `ADMIN_POSTGRES_DATA_DIRECTORY`）同樣寫根目錄 `.env`。
 
 更細的命令與踩坑見 [`GameFrameX.Admin.Unified.Api/README.zh-TW.md`](GameFrameX.Admin.Unified.Api/README.zh-TW.md)（後端手冊）與 [`GameFrameX.Admin.Unified.Vue/README.zh-TW.md`](GameFrameX.Admin.Unified.Vue/README.zh-TW.md)（前端手冊）。
 
@@ -257,6 +270,8 @@ Compose 內建 PostgreSQL + 三個 host（20802/20806/20808）+ Admin 前端（2
 docker compose up -d --build
 # 內建 PostgreSQL + Admin(20802) + Client(20808) + Hub(20806) + 前端(20800)，起完等 healthcheck 變綠（前端容器與 dev server 同搶 20800，互斥）
 ```
+
+生產也可改用 Admin 獨立棧（[`docker-compose.admin.yml`](docker-compose.admin.yml)）：自帶 PostgreSQL + 三 API 宿主、healthcheck 固定啟動順序，詳見 [Admin 獨立棧](#admin-獨立棧docker-composeadminyml)。
 
 單容器 `docker run`、環境變數成對覆蓋（半套覆蓋啟動期直接報錯）等細節見 [後端 README · 部署](GameFrameX.Admin.Unified.Api/README.zh-TW.md#部署)。
 
