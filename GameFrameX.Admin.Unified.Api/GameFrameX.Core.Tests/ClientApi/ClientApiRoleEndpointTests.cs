@@ -189,7 +189,8 @@ public sealed class ClientApiRoleEndpointTests
         db.InitTenantTables(typeof(TenantGameUserEntity));
         var issuer = new ClientApiTokenIssuer(FakeOptionsProvider.WithTokenPolicy("unit-test-signing-key", 60));
         var accessToken = await issuer.IssueAsync(await db.TenantDb.Queryable<TenantGameUserEntity>().FirstAsync(u => u.Id == 1001), "Guest");
-        var controller = CreateController(db, ClientApiRecordingHttpHandler.WithGameServerDefaults(), issuer);
+        var handler = ClientApiRecordingHttpHandler.WithGameServerDefaults();
+        var controller = CreateController(db, handler, issuer);
         db.AttachContext(controller);
 
         var result = await controller.Login(new GamePlayerLoginRequest
@@ -199,14 +200,59 @@ public sealed class ClientApiRoleEndpointTests
             AccessToken = accessToken.Token,
             ExtraFields = new Dictionary<string, JsonElement>
             {
-                ["tenantId"] = JsonDocument.Parse("10").RootElement.Clone(),
-                ["appId"] = JsonDocument.Parse("20").RootElement.Clone(),
-                ["gameAppId"] = JsonDocument.Parse("30").RootElement.Clone(),
+                ["tenantId"] = JsonDocument.Parse("10").RootElement.Clone(), // c406-keep
+                ["appId"] = JsonDocument.Parse("20").RootElement.Clone(), // c406-keep
+                ["gameAppId"] = JsonDocument.Parse("30").RootElement.Clone(), // c406-keep
             },
         });
 
         var root = ClientApiResultReader.Read(result);
         Assert.Equal(0, ClientApiResultReader.Code(root));
+        Assert.Single(handler.RequestBodies);
+        using (var body = JsonDocument.Parse(handler.RequestBodies.Single()))
+        {
+            Assert.DoesNotContain("tenantId", body.RootElement.EnumerateObject().Select(property => property.Name), StringComparer.OrdinalIgnoreCase); // c406-keep
+            Assert.DoesNotContain("appId", body.RootElement.EnumerateObject().Select(property => property.Name), StringComparer.OrdinalIgnoreCase); // c406-keep
+            Assert.DoesNotContain("gameAppId", body.RootElement.EnumerateObject().Select(property => property.Name), StringComparer.OrdinalIgnoreCase); // c406-keep
+        }
+
+        Assert.DoesNotContain(handler.RequestPaths, path => path.Contains("tenantId", StringComparison.OrdinalIgnoreCase)); // c406-keep
+        Assert.DoesNotContain(handler.RequestPaths, path => path.Contains("appId", StringComparison.OrdinalIgnoreCase)); // c406-keep
+        Assert.DoesNotContain(handler.RequestPaths, path => path.Contains("gameAppId", StringComparison.OrdinalIgnoreCase)); // c406-keep
+    }
+
+    [Fact]
+    public async Task GameRole_Login_RejectsIdentityOverrideUserId()
+    {
+        using (var db = new ClientApiTestDb())
+        {
+            db.SeedUser(1001, "identity-override-user");
+            db.SeedAreaClassify(10);
+            db.SeedArea(2001, 10);
+            db.SeedRole(3001, 1001, 2001);
+            db.InitTenantTables(typeof(TenantGameUserEntity));
+            var issuer = new ClientApiTokenIssuer(FakeOptionsProvider.WithTokenPolicy("unit-test-signing-key", 60));
+            var accessToken = await issuer.IssueAsync(await db.TenantDb.Queryable<TenantGameUserEntity>().FirstAsync(user => user.Id == 1001), "Guest");
+            var handler = ClientApiRecordingHttpHandler.WithGameServerDefaults();
+            var controller = CreateController(db, handler, issuer);
+            db.AttachContext(controller);
+
+            var result = await controller.Login(new GamePlayerLoginRequest
+            {
+                PlayerId = 3001,
+                AreaId = 2001,
+                AccessToken = accessToken.Token,
+                ExtraFields = new Dictionary<string, JsonElement>
+                {
+                    ["userId"] = JsonDocument.Parse("9999").RootElement.Clone(), // c406-keep
+                },
+            });
+
+            var root = ClientApiResultReader.Read(result);
+            Assert.Equal((int)AuthErrorCode.AuthorizeInvalid, ClientApiResultReader.Code(root));
+            Assert.Equal("请求体不能包含身份覆盖字段", ClientApiResultReader.Message(root));
+            Assert.Empty(handler.RequestBodies);
+        }
     }
 
     [Fact]

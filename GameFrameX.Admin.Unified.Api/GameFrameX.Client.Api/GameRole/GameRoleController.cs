@@ -18,6 +18,8 @@ namespace GameFrameX.Client.Api.GameRole;
 /// </summary>
 public class GameRoleController : BaseController<TenantGameRoleEntity>
 {
+    private static readonly string[] IdentityOverrideFieldNames = { "userId", "accountId", };
+
     private readonly HttpClient _httpClientFactory;
     private readonly ClientApiTokenIssuer _clientApiTokenIssuer;
     private readonly GameLoginTicketIssuer _gameLoginTicketIssuer;
@@ -222,6 +224,11 @@ public class GameRoleController : BaseController<TenantGameRoleEntity>
     [ProducesResponseType(200, Type = typeof(GameLoginTicketResponse))]
     public async Task<HttpJsonResultData<GameLoginTicketResponse>> Login([FromBody] GamePlayerLoginRequest input)
     {
+        if (HasForbiddenIdentityOverrideField(input))
+        {
+            return GameApiResult.Error<GameLoginTicketResponse>(AuthErrorCode.AuthorizeInvalid, "请求体不能包含身份覆盖字段");
+        }
+
         var tokenValidation = await _clientApiTokenIssuer.ValidateAsync(input.AccessToken);
         if (!tokenValidation.IsValid)
         {
@@ -352,6 +359,16 @@ public class GameRoleController : BaseController<TenantGameRoleEntity>
         }
 
         return long.TryParse(item.ToString(), out value);
+    }
+
+    private static bool HasForbiddenIdentityOverrideField(GamePlayerLoginRequest input)
+    {
+        if (input.ExtraFields == null)
+        {
+            return false;
+        }
+
+        return input.ExtraFields.Keys.Any(key => IdentityOverrideFieldNames.Contains(key, StringComparer.OrdinalIgnoreCase));
     }
 
     private static string BuildRouteTarget(TenantGameAreaEntity area)
