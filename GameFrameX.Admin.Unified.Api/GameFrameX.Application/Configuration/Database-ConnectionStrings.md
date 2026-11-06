@@ -50,4 +50,5 @@
 
 ## 注意
 
-默认租户库自动推导仅支持 **PostgreSQL / Sqlite / MySQL**；其余 DbType 需按 [Database.json](./Database.json) 文件头第 3 条显式配置租户库。
+自 2.0 起为单游戏单主库：`ConfigId=main` 的主库是唯一业务库（见 [Database.json](./Database.json) 文件头第 3 条），不存在按作用域自动推导的分库。
+Database.json 中除 main 外可登记额外连接，仅供数据库运维工具按 ConfigId 直连对应库查看，不参与业务路由。连接串格式见上表。

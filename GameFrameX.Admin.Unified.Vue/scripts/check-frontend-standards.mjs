@@ -1073,7 +1073,7 @@ function checkComponentNames() {
 // 反向守护（2026-09-17，appSignatureKeyEntity 菜单缺失事故防回潮）：
 // checkRoutes 只校验「种子 → 页面文件」方向；本检查补上「页面文件 → 种子/静态路由」方向——
 // src/views 下每个目录式页面入口（index.vue）必须被某条菜单种子 Component 引用，或被
-// src/router/*.ts 静态路由 import，否则该页面在任何租户的动态菜单里都不可达（孤儿页）。
+// src/router/*.ts 静态路由 import，否则该页面在任何管理员的动态菜单里都不可达（孤儿页）。
 // 确属有意不做菜单的页面（纯嵌入组件、壳页面）登记 allowlist orphanPages 并写明原因，只增不删需评审。
 function staticRouteViewImports() {
     const refs = new Set()

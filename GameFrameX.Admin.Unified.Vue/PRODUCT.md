@@ -8,7 +8,7 @@ web
 
 ## Users
 
-使用 GameFrameX 框架的独立游戏开发者与小团队的运营/开发人员（推断自仓库 README「独立游戏开发者的圆梦大使」与多中心后台结构）。登录用户是被管理员建号的内部用户（多租户、应用作用域），桌面为主、每天高频「开门」的操作者。
+使用 GameFrameX 框架的独立游戏开发者与小团队的运营/开发人员（推断自仓库 README「独立游戏开发者的圆梦大使」与多中心后台结构）。登录用户是被管理员建号的内部用户（单游戏运营，ServerId 作用域），桌面为主、每天高频「开门」的操作者。
 
 ## Product Purpose
 
@@ -16,11 +16,11 @@ GameFrameX Admin：游戏前后端一站式框架的管理后台（玩家中心�
 
 ## Positioning
 
-独立游戏前后端一体化解决方案（Unity/Godot/Laya 多端 + .NET Actor 架构服务器 + 热更新），多租户/应用作用域管理模型——不是通用 admin 模板。
+独立游戏前后端一体化解决方案（Unity/Godot/Laya 多端 + .NET Actor 架构服务器 + 热更新），单游戏运营管理模型（ServerId 唯一作用域）——不是通用 admin 模板。
 
 ## Operating Context
 
-多租户登录（账号@租户ID 格式）；登录摩擦由服务端配置驱动（图片验证码、二次校验开关）；`?token=` 免登路径；5 语言（zh-cn/zh-tw/en/ja/ko）；亮暗双主题（`.dark` class）；PrimeVue Aura 派生 preset + 品牌蓝 #03538F 十阶色板。
+账号密码登录（登录页无租户/作用域字段）；登录摩擦由服务端配置驱动（图片验证码、二次校验开关）；`?token=` 免登路径；5 语言（zh-cn/zh-tw/en/ja/ko）；亮暗双主题（`.dark` class）；PrimeVue Aura 派生 preset + 品牌蓝 #03538F 十阶色板。
 
 ## Capabilities and Constraints
 
