@@ -7,7 +7,7 @@ using GameFrameX.Entity.Enum;
 namespace GameFrameX.Application.GmCenter.Social;
 
 /// <summary>
-/// Online 处罚联动命令服务（高危；权限码 onlinePenaltyLinkCommand:execute 仅同步 TenantAdmin）。
+/// Online 处罚联动命令服务（高危；权限码 onlinePenaltyLinkCommand:execute 仅同步 Admin）。
 /// <para>
 /// 路由前缀 /api/onlinePenaltyLinkCommand（change C350 / vault:C7、vault:C2 S1.4）。
 /// 经 <see cref="IOnlineServerClient"/> 调 Online 显式命令接口（踢下线 / 吊销 Token / 禁言，三命令硬白名单，X3 红线）；
@@ -15,7 +15,7 @@ namespace GameFrameX.Application.GmCenter.Social;
 /// 一律经 <see cref="ExecuteLinkAsync"/>，不得绕过本服务直调 Online 命令接口（守护测试 OnlineSocialCommandWhitelistTests）。
 /// </para>
 /// <para>
-/// 语义契约：Admin 侧处罚事实仍以 <c>TenantGamePenaltyEntity</c> 为唯一事实源，本服务只把「已生效的事实」同步到 Online 运行时
+/// 语义契约：Admin 侧处罚事实仍以 <c>GamePenaltyEntity</c> 为唯一事实源，本服务只把「已生效的事实」同步到 Online 运行时
 /// （事实源先行）；联动失败不回滚事实源，可按 IdempotencyKey 重试（见 <see cref="BuildLinkCommandIdempotencyKey"/>）。
 /// </para>
 /// </summary>
@@ -37,8 +37,8 @@ public class OnlinePenaltyLinkCommandService : IAdminApiController
     /// </summary>
     private const string MutePlayerAction = "mute_player";
 
-    private readonly SqlSugarRepository<TenantGamePenaltyEntity> _penaltyRepository;
-    private readonly SqlSugarRepository<TenantGameAreaEntity> _gameAreaRepository;
+    private readonly SqlSugarRepository<GamePenaltyEntity> _penaltyRepository;
+    private readonly SqlSugarRepository<GameAreaEntity> _gameAreaRepository;
     private readonly IOnlineServerClient _onlineServerClient;
     private readonly OnlineScopeContextFactory _scopeContextFactory;
 
@@ -46,8 +46,8 @@ public class OnlinePenaltyLinkCommandService : IAdminApiController
     /// Online 处罚联动命令服务构造函数。
     /// </summary>
     public OnlinePenaltyLinkCommandService(
-        SqlSugarRepository<TenantGamePenaltyEntity> penaltyRepository,
-        SqlSugarRepository<TenantGameAreaEntity> gameAreaRepository,
+        SqlSugarRepository<GamePenaltyEntity> penaltyRepository,
+        SqlSugarRepository<GameAreaEntity> gameAreaRepository,
         IOnlineServerClient onlineServerClient,
         OnlineScopeContextFactory scopeContextFactory)
     {
@@ -73,7 +73,7 @@ public class OnlinePenaltyLinkCommandService : IAdminApiController
     /// <summary>
     /// 联动命令唯一执行入口（供处置流与 gamePenaltyEntity 页同步动作复用）。
     /// <para>
-    /// 「事实源先行、联动可重试」：调用前处罚事实必须已写入 <c>TenantGamePenaltyEntity</c> 且处于生效中——
+    /// 「事实源先行、联动可重试」：调用前处罚事实必须已写入 <c>GamePenaltyEntity</c> 且处于生效中——
     /// Online 命令只是把既有事实生效到运行时，本方法不产生任何新处罚；联动失败不影响事实源状态，
     /// 重新调用同（PenaltyId, Command, ServerId）组合时 Online 侧按 IdempotencyKey 返回首次结果（vault:C2 S1.5），
     /// 因此重试天然幂等，不会重复处罚。
@@ -121,7 +121,7 @@ public class OnlinePenaltyLinkCommandService : IAdminApiController
     /// <summary>
     /// 确定联动目标区服集：处罚行 AreaId 有值 = 单区服；null（全区服生效）= App 下全部区服逐一联动。
     /// </summary>
-    private async Task<List<long>> ResolveLinkTargetServerIdsAsync(TenantGamePenaltyEntity penalty)
+    private async Task<List<long>> ResolveLinkTargetServerIdsAsync(GamePenaltyEntity penalty)
     {
         if (penalty.AreaId.HasValue)
         {
@@ -143,7 +143,7 @@ public class OnlinePenaltyLinkCommandService : IAdminApiController
     /// 向单个区服下发联动命令并落一条结果（含旧 Token 吊销确认字段）。
     /// <para>单区服命令失败（Online 业务码 / 传输异常）不中断其余区服——聚合语义下逐区服呈现成败，可针对性重试。</para>
     /// </summary>
-    private async Task<OnlinePenaltyLinkResultResponse> ExecuteForServerAsync(TenantGamePenaltyEntity penalty, OnlinePenaltyCommandKind command, long serverId)
+    private async Task<OnlinePenaltyLinkResultResponse> ExecuteForServerAsync(GamePenaltyEntity penalty, OnlinePenaltyCommandKind command, long serverId)
     {
         var action = MapCommandToAction(command);
         try
@@ -225,7 +225,7 @@ public class OnlinePenaltyLinkCommandService : IAdminApiController
     /// <summary>
     /// 构建联动命令幂等键：<c>penalty-{PenaltyId}-{command}-{serverId}</c>。
     /// <para>
-    /// 为什么先写事实源：Admin 侧处罚以 <c>TenantGamePenaltyEntity</c> 为唯一事实源，Online 命令只负责「生效到运行时」；
+    /// 为什么先写事实源：Admin 侧处罚以 <c>GamePenaltyEntity</c> 为唯一事实源，Online 命令只负责「生效到运行时」；
     /// 若命令先于事实落库，联路中断会出现「运行时已被限制但 Admin 无记录」的不可审计状态。
     /// 为什么重试幂等：同一（处罚 + 命令 + 区服）组合的重复调用携带相同 IdempotencyKey，Online 侧按 vault:C2 S1.5
     /// 契约返回首次执行结果，不会重复踢人 / 重复吊销；因此联动失败可以直接安全重试（含 gamePenaltyEntity 页的手动同步）。

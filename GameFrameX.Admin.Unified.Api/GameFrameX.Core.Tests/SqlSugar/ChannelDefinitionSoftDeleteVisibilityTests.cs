@@ -5,8 +5,8 @@ using GameFrameX.Core.Service.User;
 using GameFrameX.Core.Tests.ClientApi;
 using GameFrameX.Entity.Enum;
 using GameFrameX.Entity.Global;
-using GameFrameX.Entity.Tenant;
-using GameFrameX.Entity.Tenant.Game.App;
+using GameFrameX.Entity.Business;
+using GameFrameX.Entity.Business.Game.App;
 using Microsoft.AspNetCore.Http;
 
 namespace GameFrameX.Core.Tests.SqlSugar;
@@ -24,7 +24,7 @@ public sealed class ChannelDefinitionSoftDeleteVisibilityTests : IDisposable
 
     public ChannelDefinitionSoftDeleteVisibilityTests()
     {
-        _db.InitTenantTables(typeof(TenantChannelDefinitionEntity), typeof(TenantGameAppPackageEntity));
+        _db.InitBusinessTables(typeof(ChannelDefinitionEntity), typeof(GameAppPackageEntity));
         _db.MainDb.CodeFirst.InitTables(typeof(GlobalChannelDefinitionEntity));
     }
 
@@ -78,7 +78,7 @@ public sealed class ChannelDefinitionSoftDeleteVisibilityTests : IDisposable
 
         // 锁定过滤器装配真实生效：不绕过过滤器时软删行被 ISafeDeletedFilter 隐藏
         // （防止「过滤器未装上导致前两个测试恒绿」假阳性）。
-        var rows = await _db.TenantDb.Queryable<TenantChannelDefinitionEntity>()
+        var rows = await _db.Db.Queryable<ChannelDefinitionEntity>()
                             .Where(u => u.Code.StartsWith("GFX_919"))
                             .ToListAsync();
         var codes = rows.Select(u => u.Code).ToList();
@@ -88,13 +88,13 @@ public sealed class ChannelDefinitionSoftDeleteVisibilityTests : IDisposable
 
     private void SeedChannel(long id, string code, bool isEnabled, bool isDeleted)
     {
-        _db.TenantDb.Insertable(new TenantChannelDefinitionEntity
+        _db.Db.Insertable(new ChannelDefinitionEntity
         {
             Id = id,
             Code = code,
             Name = code.ToLowerInvariant(),
             Description = code.ToLowerInvariant(),
-            Scope = ChannelScopeEnum.Tenant,
+            Scope = ChannelScopeEnum.Business,
             PlatformCode = "all",
             IsEnabled = isEnabled,
             IsDeleted = isDeleted,
@@ -104,14 +104,14 @@ public sealed class ChannelDefinitionSoftDeleteVisibilityTests : IDisposable
 
     private ChannelDefinitionService CreateService()
     {
-        // 复刻 Admin host DI 形态：Repository<T> 按实体边界路由——租户表经 TenantDbProvider 走租户库
-        // （生产过滤器 + TenantId 填充 AOP 已装配），全局表落主库连接。
+        // 复刻 Admin host DI 形态：Repository<T> 按实体边界路由——租户表经 DbProvider 走租户库
+        // （生产过滤器 + Id 填充 AOP 已装配），全局表落主库连接。
         var currentUserContext = new CurrentUserContext(new HttpContextAccessor());
 
         return new ChannelDefinitionService(
-            _db.Repository<TenantChannelDefinitionEntity>(),
+            _db.Repository<ChannelDefinitionEntity>(),
             _db.Repository<GlobalChannelDefinitionEntity>(),
-            _db.Repository<TenantGameAppPackageEntity>(),
+            _db.Repository<GameAppPackageEntity>(),
             currentUserContext);
     }
 }

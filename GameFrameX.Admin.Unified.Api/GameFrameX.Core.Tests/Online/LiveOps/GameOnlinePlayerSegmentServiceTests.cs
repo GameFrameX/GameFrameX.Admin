@@ -8,8 +8,8 @@ using GameFrameX.Core.Exceptions;
 using GameFrameX.Core.Extension;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Entity.Game.Online;
-using GameFrameX.Entity.Tenant.Game;
-using GameFrameX.Entity.Tenant.Game.Online;
+using GameFrameX.Entity.Business.Game;
+using GameFrameX.Entity.Business.Game.Online;
 using GameFrameX.Foundation.Orm.Entity;
 using SqlSugar;
 
@@ -21,7 +21,7 @@ namespace GameFrameX.Core.Tests.Online.LiveOps;
 // 被灰度版本行引用的分群不可删除。
 public sealed class GameOnlinePlayerSegmentServiceTests : IDisposable
 {
-    private const long TenantA = 1001;
+    private const long A = 1001;
     private const long App100 = 100;
 
     private readonly string _dbPath = Path.Combine(Path.GetTempPath(), $"online_segment_{Guid.NewGuid():N}.db");
@@ -43,8 +43,8 @@ public sealed class GameOnlinePlayerSegmentServiceTests : IDisposable
         SqlSugarUnifiedConfig.ConfigureBaseFilters(_db);
         _db.CodeFirst.InitTables(
 
-            typeof(TenantGameOnlinePlayerSegmentEntity),
-            typeof(TenantGameOnlineConfigRolloutEntity));
+            typeof(GameOnlinePlayerSegmentEntity),
+            typeof(GameOnlineConfigRolloutEntity));
     }
 
     /// <summary>
@@ -59,7 +59,7 @@ public sealed class GameOnlinePlayerSegmentServiceTests : IDisposable
         var exception = await Assert.ThrowsAsync<BusinessException>(() => service.AddAsync(NewAdd("[{\"Field\":\"nickname\",\"Op\":\"eq\",\"Value\":\"bot\"}]")));
 
         Assert.Equal(20000002, exception.Code);
-        Assert.Equal(0, await _db.Queryable<TenantGameOnlinePlayerSegmentEntity>().CountAsync());
+        Assert.Equal(0, await _db.Queryable<GameOnlinePlayerSegmentEntity>().CountAsync());
     }
 
     /// <summary>
@@ -98,7 +98,7 @@ public sealed class GameOnlinePlayerSegmentServiceTests : IDisposable
         var response = await service.AddAsync(NewAdd(
             "[{\"Field\":\"activeDays\",\"Op\":\"gte\",\"Value\":\"7\"},{\"Field\":\"retentionDays\",\"Op\":\"lte\",\"Value\":\"30\"},{\"Field\":\"totalPaymentAmount\",\"Op\":\"eq\",\"Value\":\"0\"}]"));
 
-        var persisted = await _db.Queryable<TenantGameOnlinePlayerSegmentEntity>().FirstAsync(u => u.Id == response.Id);
+        var persisted = await _db.Queryable<GameOnlinePlayerSegmentEntity>().FirstAsync(u => u.Id == response.Id);
         Assert.NotNull(persisted);
         Assert.Equal(OnlinePlayerSegmentSyncStatus.NotSynced, persisted.SyncStatus);
     }
@@ -126,7 +126,7 @@ public sealed class GameOnlinePlayerSegmentServiceTests : IDisposable
         Assert.Equal(501, result.OnlineSegmentId);
         Assert.Equal("seg-cv-9", result.ConfirmVersion);
 
-        var persisted = await _db.Queryable<TenantGameOnlinePlayerSegmentEntity>().FirstAsync(u => u.Id == segment.Id);
+        var persisted = await _db.Queryable<GameOnlinePlayerSegmentEntity>().FirstAsync(u => u.Id == segment.Id);
         Assert.Equal(OnlinePlayerSegmentSyncStatus.Synced, persisted.SyncStatus);
         Assert.Equal(501, persisted.LastOnlineSegmentId);
         Assert.Equal(2001, persisted.LastSyncServerId);
@@ -150,7 +150,7 @@ public sealed class GameOnlinePlayerSegmentServiceTests : IDisposable
             Reason = "unit-test-sync",
         }));
 
-        var persisted = await _db.Queryable<TenantGameOnlinePlayerSegmentEntity>().FirstAsync(u => u.Id == segment.Id);
+        var persisted = await _db.Queryable<GameOnlinePlayerSegmentEntity>().FirstAsync(u => u.Id == segment.Id);
         Assert.Equal(OnlinePlayerSegmentSyncStatus.Failed, persisted.SyncStatus);
     }
 
@@ -164,7 +164,7 @@ public sealed class GameOnlinePlayerSegmentServiceTests : IDisposable
         var service = CreateService();
         var segment = await service.AddAsync(NewAdd(null));
 
-        await _db.Insertable(new TenantGameOnlineConfigRolloutEntity
+        await _db.Insertable(new GameOnlineConfigRolloutEntity
         {
             Id = 6001,
             ServerId = 2001,
@@ -187,9 +187,9 @@ public sealed class GameOnlinePlayerSegmentServiceTests : IDisposable
         Assert.Equal(20000002, exception.Code);
     }
 
-    private AddTenantGameOnlinePlayerSegmentRequest NewAdd(string? conditionsJson)
+    private AddGameOnlinePlayerSegmentRequest NewAdd(string? conditionsJson)
     {
-        return new AddTenantGameOnlinePlayerSegmentRequest
+        return new AddGameOnlinePlayerSegmentRequest
         {
             Name = "unit-segment",
             Description = null,
@@ -200,8 +200,8 @@ public sealed class GameOnlinePlayerSegmentServiceTests : IDisposable
     private GameOnlinePlayerSegmentService CreateService()
     {
         return new GameOnlinePlayerSegmentService(
-            Repository<TenantGameOnlinePlayerSegmentEntity>(),
-            Repository<TenantGameOnlineConfigRolloutEntity>(),
+            Repository<GameOnlinePlayerSegmentEntity>(),
+            Repository<GameOnlineConfigRolloutEntity>(),
             _dispatch);
     }
 
@@ -232,7 +232,7 @@ public sealed class GameOnlinePlayerSegmentServiceTests : IDisposable
             return Task.CompletedTask;
         }
 
-        public Task<OnlinePlayerSegmentSyncResponse> SyncSegmentToOnlineAsync(TenantGameOnlinePlayerSegmentEntity segment, long serverId, string reason)
+        public Task<OnlinePlayerSegmentSyncResponse> SyncSegmentToOnlineAsync(GameOnlinePlayerSegmentEntity segment, long serverId, string reason)
         {
             if (FailNextSync)
             {
@@ -248,12 +248,12 @@ public sealed class GameOnlinePlayerSegmentServiceTests : IDisposable
             });
         }
 
-        public Task<OnlineConfigRolloutDispatchResponse> PublishRolloutToOnlineAsync(TenantGameOnlineConfigRolloutEntity rollout)
+        public Task<OnlineConfigRolloutDispatchResponse> PublishRolloutToOnlineAsync(GameOnlineConfigRolloutEntity rollout)
         {
             throw new NotSupportedException("灰度发布行为由 GameOnlineConfigRolloutServiceTests 覆盖");
         }
 
-        public Task<OnlineConfigRolloutDispatchResponse> RollbackRolloutToOnlineAsync(TenantGameOnlineConfigRolloutEntity rollout)
+        public Task<OnlineConfigRolloutDispatchResponse> RollbackRolloutToOnlineAsync(GameOnlineConfigRolloutEntity rollout)
         {
             throw new NotSupportedException("灰度回滚行为由 GameOnlineConfigRolloutServiceTests 覆盖");
         }

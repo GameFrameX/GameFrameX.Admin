@@ -1,9 +1,9 @@
 using GameFrameX.Client.Api.Services.PayVerification;
 using System.Globalization;
-using GameFrameX.Entity.Tenant.ClientApiConfig;
+using GameFrameX.Entity.Business.ClientApiConfig;
 using GameFrameX.Client.Api.GameUserPay.Dto;
 using GameFrameX.Client.Api.Services;
-using GameFrameX.Client.Api.Services.ClientApiTenantOptions;
+using GameFrameX.Client.Api.Services.ClientApiOptions;
 using GameFrameX.Core.Service;
 using GameFrameX.Entity.Enum;
 
@@ -21,8 +21,8 @@ public class GameUserPayController : BaseController
     /// </summary>
     private static long _orderSeq;
 
-    private readonly Repository<TenantGameOrderEntity> _payOrderRepository;
-    private readonly IClientApiTenantOptionsProvider _optionsProvider;
+    private readonly Repository<GameOrderEntity> _payOrderRepository;
+    private readonly IClientApiOptionsProvider _optionsProvider;
     private readonly IPayReceiptVerifier _payReceiptVerifier;
 
     /// <summary>
@@ -31,8 +31,8 @@ public class GameUserPayController : BaseController
     /// <param name="payOrderRepository">支付订单仓储</param>
     /// <param name="optionsProvider">租户配置 Provider（沙箱充值发货开关，C378 起读策略合并表）</param>
     /// <param name="payReceiptVerifier">支付收据验真器</param>
-    public GameUserPayController(Repository<TenantGameOrderEntity> payOrderRepository,
-        IClientApiTenantOptionsProvider optionsProvider,
+    public GameUserPayController(Repository<GameOrderEntity> payOrderRepository,
+        IClientApiOptionsProvider optionsProvider,
         IPayReceiptVerifier payReceiptVerifier)
     {
         _payOrderRepository = payOrderRepository;
@@ -52,7 +52,7 @@ public class GameUserPayController : BaseController
     public async Task<HttpJsonResultData<GameUserPayCreateResponse>> Create([FromBody] GameUserPayCreateRequest request)
     {
         var enableSandbox = await IsSandboxRechargeEnabledAsync();
-        var entity = new TenantGameOrderEntity
+        var entity = new GameOrderEntity
         {
             AccountId = request.UserId.ToString(CultureInfo.InvariantCulture),
             RoleId = request.UserId.ToString(CultureInfo.InvariantCulture),
@@ -161,7 +161,7 @@ public class GameUserPayController : BaseController
     [HttpPost]
     public async Task<HttpJsonResultData<GameUserPayQueryResponse>> Query([FromBody] GameUserPayQueryRequest request)
     {
-        TenantGameOrderEntity? order = null;
+        GameOrderEntity? order = null;
         var accountId = request.UserId.ToString(CultureInfo.InvariantCulture);
         if (!string.IsNullOrEmpty(request.OrderId))
         {
@@ -201,7 +201,7 @@ public class GameUserPayController : BaseController
         if (order == null)
         {
             LogHelper.Warning($"GameUserPay.Report 订单不存在，按流水记账 - OrderId:{request.OrderId}, UserId:{request.UserId}");
-            order = new TenantGameOrderEntity
+            order = new GameOrderEntity
             {
                 AccountId = request.UserId.ToString(CultureInfo.InvariantCulture),
                 RoleId = request.UserId.ToString(CultureInfo.InvariantCulture),
@@ -243,7 +243,7 @@ public class GameUserPayController : BaseController
     /// <summary>
     /// Report 侧流水字段回填（RealMoney/Currency/Level/StrScene）
     /// </summary>
-    private static void ApplyReport(TenantGameOrderEntity order, GameUserPayReportRequest request)
+    private static void ApplyReport(GameOrderEntity order, GameUserPayReportRequest request)
     {
         order.RealMoney = request.RealMoney;
         order.Currency = request.Currency;
@@ -266,7 +266,7 @@ public class GameUserPayController : BaseController
         return amount.Value > uint.MaxValue ? uint.MaxValue : (uint)amount.Value;
     }
 
-    private static string GetProductId(TenantGameOrderEntity order)
+    private static string GetProductId(GameOrderEntity order)
     {
         if (!string.IsNullOrWhiteSpace(order.ProductId))
         {

@@ -48,7 +48,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1789344000,
                 UpdateTime = 1789344000,
                 SuperAdminOnly = false,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -77,7 +77,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1789344000,
                 UpdateTime = 1789344000,
                 SuperAdminOnly = false,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -106,7 +106,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1789344000,
                 UpdateTime = 1789344000,
                 SuperAdminOnly = false,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -134,7 +134,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1789344000,
                 UpdateTime = 1789344000,
                 SuperAdminOnly = false,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -162,7 +162,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1789344000,
                 UpdateTime = 1789344000,
                 SuperAdminOnly = false,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -190,7 +190,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1789344000,
                 UpdateTime = 1789344000,
                 SuperAdminOnly = false,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
         };

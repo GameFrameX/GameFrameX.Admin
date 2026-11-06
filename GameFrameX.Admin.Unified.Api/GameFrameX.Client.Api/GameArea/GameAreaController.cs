@@ -1,5 +1,5 @@
 using GameFrameX.Client.Api.GameArea.Dto;
-using GameFrameX.Client.Api.Services.ClientApiTenantOptions;
+using GameFrameX.Client.Api.Services.ClientApiOptions;
 using GameFrameX.Core.Service;
 
 namespace GameFrameX.Client.Api.GameArea;
@@ -7,15 +7,15 @@ namespace GameFrameX.Client.Api.GameArea;
 /// <summary>
 ///     程序版本控制器
 /// </summary>
-public class GameAreaController : BaseController<TenantGameAreaEntity>
+public class GameAreaController : BaseController<GameAreaEntity>
 {
-    private readonly IClientApiTenantOptionsProvider _optionsProvider;
+    private readonly IClientApiOptionsProvider _optionsProvider;
 
     /// <summary>
     /// </summary>
     /// <param name="service"></param>
     /// <param name="optionsProvider"></param>
-    public GameAreaController(SqlSugarRepository<TenantGameAreaEntity> service, IClientApiTenantOptionsProvider optionsProvider) : base(service)
+    public GameAreaController(SqlSugarRepository<GameAreaEntity> service, IClientApiOptionsProvider optionsProvider) : base(service)
     {
         _optionsProvider = optionsProvider;
     }
@@ -28,7 +28,7 @@ public class GameAreaController : BaseController<TenantGameAreaEntity>
     [ProducesResponseType(200, Type = typeof(List<GameAreaClassifyResponse>))]
     public async Task<HttpJsonResultData<List<GameAreaClassifyResponse>>> GetAreaList([FromBody] GameAreaGetAreaListRequest gameAreaGetAreaListRequest)
     {
-        var catList = await PRepository.AsSugarClient().Queryable<TenantGameAreaClassifyEntity>().ToListAsync();
+        var catList = await PRepository.AsSugarClient().Queryable<GameAreaClassifyEntity>().ToListAsync();
         var gameAreaCatEntityList = new List<GameAreaClassifyResponse>(catList.Count);
         var gameAreaEntities = await PRepository.GetListAsync(area => area.ServerStatus != GameFrameX.Entity.Enum.GameServerStatus.Merged);
         var areaPolicy = await _optionsProvider.GetAreaPolicyAsync();

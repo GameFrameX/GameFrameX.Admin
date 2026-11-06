@@ -1,5 +1,5 @@
 using GameFrameX.Core.SqlSugar;
-using GameFrameX.Entity.Tenant.Game.App;
+using GameFrameX.Entity.Business.Game.App;
 using SqlSugar;
 
 namespace GameFrameX.Core.Tests.SqlSugar;
@@ -27,7 +27,7 @@ public sealed class GameAppPackageDisabledVisibilityTests : IDisposable
         // 复刻生产全局过滤器：软删除 + 启用/禁用（ISafeEnabledFilter 即 BLA-28 根因）。
         SqlSugarUnifiedConfig.ConfigureBaseFilters(_db);
         SqlSugarUnifiedConfig.ConfigureClientFilters(_db);
-        _db.CodeFirst.InitTables(typeof(TenantGameAppPackageEntity));
+        _db.CodeFirst.InitTables(typeof(GameAppPackageEntity));
     }
 
     [Fact]
@@ -37,7 +37,7 @@ public sealed class GameAppPackageDisabledVisibilityTests : IDisposable
         await SeedAsync(2, false, false, null);
 
         // 旧 BuildPageQuery 行为：AsQueryable() 未绕过过滤器 → 禁用记录被 ISafeEnabledFilter 排除。
-        var rows = await _db.Queryable<TenantGameAppPackageEntity>().ToListAsync();
+        var rows = await _db.Queryable<GameAppPackageEntity>().ToListAsync();
 
         var ids = rows.Select(u => u.Id).OrderBy(u => u).ToList();
         Assert.Equal(new List<long> { 1, }, ids);
@@ -52,7 +52,7 @@ public sealed class GameAppPackageDisabledVisibilityTests : IDisposable
         await SeedAsync(3, true, true, null);
 
         // 修复后 BuildPageQuery 行为：绕过全部过滤器，手动补 IsDeleted==false。
-        var rows = await _db.Queryable<TenantGameAppPackageEntity>()
+        var rows = await _db.Queryable<GameAppPackageEntity>()
                             .Filter(null, true)
                             .Where(u => u.IsDeleted == false)
                             .ToListAsync();
@@ -69,9 +69,9 @@ public sealed class GameAppPackageDisabledVisibilityTests : IDisposable
         await SeedAsync(2, false, false, 2);
         await SeedAsync(3, false, false, null);
 
-        long? tenantId = 1;
+        long? id = 1;
         // 修复后查询：绕过过滤器 + IsDeleted==false + 租户隔离 WhereIF（精确复刻 ConfigureAdminFilters 谓词）。
-        var rows = await _db.Queryable<TenantGameAppPackageEntity>()
+        var rows = await _db.Queryable<GameAppPackageEntity>()
                             .Filter(null, true)
                             .Where(u => u.IsDeleted == false)
                                                         .ToListAsync();
@@ -86,12 +86,12 @@ public sealed class GameAppPackageDisabledVisibilityTests : IDisposable
         await SeedAsync(1, false, false, null);
 
         // 旧 SetStatusAsync 行为：GetFirstAsync 受 ISafeEnabledFilter 影响，找不到禁用记录（抛“分包不存在”）。
-        var blocked = await _db.Queryable<TenantGameAppPackageEntity>().FirstAsync(u => u.Id == 1);
+        var blocked = await _db.Queryable<GameAppPackageEntity>().FirstAsync(u => u.Id == 1);
         Assert.Null(blocked);
 
         // 修复后 SetStatusAsync 行为：绕过过滤器 + IsDeleted==false，按 Id 命中禁用记录，可继续重新启用。
-        long? tenantId = null;
-        var found = await _db.Queryable<TenantGameAppPackageEntity>()
+        long? id = null;
+        var found = await _db.Queryable<GameAppPackageEntity>()
                              .Filter(null, true)
                              .Where(u => u.IsDeleted == false)
                                                           .FirstAsync(u => u.Id == 1);
@@ -101,9 +101,9 @@ public sealed class GameAppPackageDisabledVisibilityTests : IDisposable
         Assert.False(found.IsEnabled);
     }
 
-    private async Task SeedAsync(long id, bool? isEnabled, bool isDeleted, long? tenantId)
+    private async Task SeedAsync(long id, bool? isEnabled, bool isDeleted, long? id)
     {
-        var entity = new TenantGameAppPackageEntity
+        var entity = new GameAppPackageEntity
         {
             Id = id,
             Name = $"pkg-{id}",

@@ -2,8 +2,8 @@ using System.Globalization;
 using GameFrameX.Application.Platform.OpenAccess.GameAppOpenAccess;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Core.Tests.ClientApi;
-using GameFrameX.Entity.Tenant;
-using GameFrameX.Entity.Tenant.Game.App;
+using GameFrameX.Entity.Business;
+using GameFrameX.Entity.Business.Game.App;
 
 namespace GameFrameX.Core.Tests.AppManagement;
 
@@ -26,17 +26,17 @@ public sealed class MainDatabaseOpenAccessServiceTests : IDisposable
     {
         using (var database = new ClientApiTestDb())
         {
-            database.InitTenantTables(typeof(TenantGameAppOpenAccessEntity), typeof(TenantUserEntity));
-            var user = new TenantUserEntity { Id = 100 };
-            foreach (var property in typeof(TenantUserEntity).GetProperties().Where(x => x.PropertyType == typeof(string) && x.CanWrite))
+            database.InitBusinessTables(typeof(GameAppOpenAccessEntity), typeof(UserEntity));
+            var user = new UserEntity { Id = 100 };
+            foreach (var property in typeof(UserEntity).GetProperties().Where(x => x.PropertyType == typeof(string) && x.CanWrite))
             {
                 property.SetValue(user, "test");
             }
 
             database.MainDb.Insertable(user).ExecuteCommand();
-            var repository = new SqlSugarRepository<TenantGameAppOpenAccessEntity> { Context = database.MainDb };
+            var repository = new SqlSugarRepository<GameAppOpenAccessEntity> { Context = database.MainDb };
             var service = new GameAppOpenAccessService(repository,
-                new SqlSugarRepository<TenantUserEntity> { Context = database.MainDb });
+                new SqlSugarRepository<UserEntity> { Context = database.MainDb });
             await Assert.ThrowsAnyAsync<Exception>(() => service.AddAsync(new()
             {
                 BindUserId = 404, Scenario = "build", Purpose = "test", SubjectName = "builder", ScopesJson = "[\"package-report\"]",

@@ -13,12 +13,12 @@ public sealed class GameAreaProvisionService : IAdminApiController
 {
     // 单宿主内串行编排；跨宿主以主键唯一、稳定容器名称、ServerId 注册幂等和行版本兜底。
     private static readonly SemaphoreSlim ExecutionGate = new(1, 1);
-    private readonly SqlSugarRepository<TenantGameAreaEntity> _repository;
+    private readonly SqlSugarRepository<GameAreaEntity> _repository;
     private readonly GameAreaService _areaService;
     private readonly OnlineScopeContextFactory _scopeFactory;
     private readonly IOnlineServerClient _onlineClient;
 
-    public GameAreaProvisionService(SqlSugarRepository<TenantGameAreaEntity> repository,
+    public GameAreaProvisionService(SqlSugarRepository<GameAreaEntity> repository,
         GameAreaService areaService, OnlineScopeContextFactory scopeFactory, IOnlineServerClient onlineClient)
     {
         _repository = repository;
@@ -44,7 +44,7 @@ public sealed class GameAreaProvisionService : IAdminApiController
         ValidateIdentifier(input);
         var template = await FindAsync(input.Id) ?? throw BusinessError.Oh(AreaProvisionErrorCode.TemplateNotFound);
         var clone = CloneConfiguration(template);
-        var fields = typeof(TenantGameAreaEntity).GetProperties()
+        var fields = typeof(GameAreaEntity).GetProperties()
             .Where(property => ClonedFieldNames.Contains(property.Name))
             .ToDictionary(property => property.Name, property => Convert.ToString(property.GetValue(clone), CultureInfo.InvariantCulture));
         fields[nameof(GameAreaProvisionCreateRequest.ServerParameters)] = template.ServerParams;
@@ -217,7 +217,7 @@ public sealed class GameAreaProvisionService : IAdminApiController
         return BuildStatus(area, string.IsNullOrWhiteSpace(area.ServerContainerId) ? null : await QueryCalendarAsync(area));
     }
 
-    private async Task<GameAreaProvisionCalendarResponse> QueryCalendarAsync(TenantGameAreaEntity area)
+    private async Task<GameAreaProvisionCalendarResponse> QueryCalendarAsync(GameAreaEntity area)
     {
         try
         {
@@ -238,17 +238,17 @@ public sealed class GameAreaProvisionService : IAdminApiController
         }
     }
 
-    private Task<TenantGameAreaEntity> FindAsync(long identifier)
+    private Task<GameAreaEntity> FindAsync(long identifier)
     {
         return _repository.AsQueryable().Filter(null, true).Where(area => area.IsDeleted == false).FirstAsync(area => area.Id == identifier);
     }
 
-    private async Task<TenantGameAreaEntity> RequireAreaAsync(long identifier)
+    private async Task<GameAreaEntity> RequireAreaAsync(long identifier)
     {
         return await FindAsync(identifier) ?? throw BusinessError.Oh(AreaProvisionErrorCode.ServerNotFound);
     }
 
-    private static GameAreaProvisionStatusResponse BuildStatus(TenantGameAreaEntity area, GameAreaProvisionCalendarResponse? calendar = null)
+    private static GameAreaProvisionStatusResponse BuildStatus(GameAreaEntity area, GameAreaProvisionCalendarResponse? calendar = null)
     {
         return new GameAreaProvisionStatusResponse
         {
@@ -287,7 +287,7 @@ public sealed class GameAreaProvisionService : IAdminApiController
         return Uri.TryCreate(value, UriKind.Absolute, out var address) && schemes.Contains(address.Scheme) && !string.IsNullOrEmpty(address.Host);
     }
 
-    private static bool MatchesRequest(TenantGameAreaEntity area, GameAreaProvisionCreateRequest input)
+    private static bool MatchesRequest(GameAreaEntity area, GameAreaProvisionCreateRequest input)
     {
         return area.Name == input.Name.Trim() && area.HttpManageUrl == input.HttpManageUrl.Trim().TrimEnd('/')
             && area.TcpSocketUrl == input.TcpSocketUrl.Trim() && area.WebSocketUrl == input.WebSocketUrl.Trim()
@@ -337,9 +337,9 @@ public sealed class GameAreaProvisionService : IAdminApiController
         "ClientDispatchApiPrefix", "FulfillmentApiPrefix", "GmApiPrefix", "ControlApiPrefix", "OnlineAdminApiPrefix",
     };
 
-    private static TenantGameAreaEntity CloneConfiguration(TenantGameAreaEntity template)
+    private static GameAreaEntity CloneConfiguration(GameAreaEntity template)
     {
-        return new TenantGameAreaEntity
+        return new GameAreaEntity
         {
             Description = template.Description, ClassifyId = template.ClassifyId, Capacity = template.Capacity,
             ServerParams = template.ServerParams,

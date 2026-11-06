@@ -23,7 +23,7 @@ public sealed class SqlSugarTransactionBoundaryTests
     {
         var assemblies = new[]
         {
-            typeof(TenantUserService).Assembly,
+            typeof(UserService).Assembly,
             typeof(GameFrameX.Application.Platform.OpenAccess.SystemOpenAccessService).Assembly,
         };
 
@@ -32,8 +32,8 @@ public sealed class SqlSugarTransactionBoundaryTests
                                       .SelectMany(u => u.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
                                       .Where(u => u.GetCustomAttributes<SqlSugarTransactionAttribute>(true).Any())
                                       .ToList();
-        Assert.Contains(localTransactionMethods, u => u.DeclaringType == typeof(TenantUserService) && u.Name == nameof(TenantUserService.AddUserAsync));
-        Assert.Contains(localTransactionMethods, u => u.DeclaringType == typeof(TenantRoleService) && u.Name == nameof(TenantRoleService.DeleteRoleAsync));
+        Assert.Contains(localTransactionMethods, u => u.DeclaringType == typeof(UserService) && u.Name == nameof(UserService.AddUserAsync));
+        Assert.Contains(localTransactionMethods, u => u.DeclaringType == typeof(RoleService) && u.Name == nameof(RoleService.DeleteRoleAsync));
         Assert.Contains(localTransactionMethods, u => u.DeclaringType == typeof(GlobalMenuService) && u.Name == nameof(GlobalMenuService.DeleteMenuAsync));
         Assert.Contains(localTransactionMethods, u => u.DeclaringType == typeof(PlatformCaptchaConfigService) && u.Name == nameof(PlatformCaptchaConfigService.UpdateAsync));
         Assert.Contains(localTransactionMethods, u => u.DeclaringType == typeof(PlatformJwtConfigService) && u.Name == nameof(PlatformJwtConfigService.UpdateAsync));
@@ -42,8 +42,8 @@ public sealed class SqlSugarTransactionBoundaryTests
     [Fact]
     public void InternalTransactionalServices_UseExplicitTransactionRunner()
     {
-        AssertUsesTransactionRunner(typeof(TenantRoleMenuService), nameof(TenantRoleMenuService.GrantRoleMenuAsync));
-        AssertUsesTransactionRunner(typeof(TenantUserRoleService), nameof(TenantUserRoleService.GrantUserRoleAsync));
+        AssertUsesTransactionRunner(typeof(RoleMenuService), nameof(RoleMenuService.GrantRoleMenuAsync));
+        AssertUsesTransactionRunner(typeof(UserRoleService), nameof(UserRoleService.GrantUserRoleAsync));
     }
 
     private static void AssertUsesTransactionRunner(Type type, string methodName)

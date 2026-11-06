@@ -55,11 +55,11 @@ public class PhysicalTableNamespaceBoundaryTests
     {
         Assert.True(SqlSugarEntityBoundary.IsPhysicalTableNameAllowedForDatabase(DatabaseOwnership.System, "system_user"));
         Assert.True(SqlSugarEntityBoundary.IsPhysicalTableNameAllowedForDatabase(DatabaseOwnership.System, "global_menu"));
-        Assert.False(SqlSugarEntityBoundary.IsPhysicalTableNameAllowedForDatabase(DatabaseOwnership.System, "tenant_user"));
+        Assert.False(SqlSugarEntityBoundary.IsPhysicalTableNameAllowedForDatabase(DatabaseOwnership.System, "user"));
 
-        Assert.True(SqlSugarEntityBoundary.IsPhysicalTableNameAllowedForDatabase(DatabaseOwnership.Tenant, "tenant_user"));
-        Assert.False(SqlSugarEntityBoundary.IsPhysicalTableNameAllowedForDatabase(DatabaseOwnership.Tenant, "system_user"));
-        Assert.False(SqlSugarEntityBoundary.IsPhysicalTableNameAllowedForDatabase(DatabaseOwnership.Tenant, "global_menu"));
+        Assert.True(SqlSugarEntityBoundary.IsPhysicalTableNameAllowedForDatabase(DatabaseOwnership.Business, "user"));
+        Assert.False(SqlSugarEntityBoundary.IsPhysicalTableNameAllowedForDatabase(DatabaseOwnership.Business, "system_user"));
+        Assert.False(SqlSugarEntityBoundary.IsPhysicalTableNameAllowedForDatabase(DatabaseOwnership.Business, "global_menu"));
     }
 
     [Fact]
@@ -95,7 +95,7 @@ public class PhysicalTableNamespaceBoundaryTests
         var ns = type.Namespace ?? string.Empty;
         return ns.StartsWith("GameFrameX.Client.Api.Integrations.", StringComparison.Ordinal)
                || ns.StartsWith("GameFrameX.Hub.Api.Dto.WebHook", StringComparison.Ordinal)
-               || type.FullName == "GameFrameX.Client.Api.GameWebShop.Dto.TenantGameWebShopEntityBuyNotifyRequest";
+               || type.FullName == "GameFrameX.Client.Api.GameWebShop.Dto.GameWebShopEntityBuyNotifyRequest";
     }
 
     private static IEnumerable<Type> EntityTypes()

@@ -5,7 +5,7 @@ namespace GameFrameX.ObjectStorage.Abstract;
 /// <summary>
 /// 默认对象存储 Adapter 工厂。按 Provider 名返回对应 Adapter 单例，
 /// 并把租户配置（ConfigJson + 路径模板）解析为运行时上下文。
-/// 在 Web.Core/Startup.cs 以 AddSingleton 手动注册到 DI，供 TenantFileService 与 TestConnection 端点共用。
+/// 在 Web.Core/Startup.cs 以 AddSingleton 手动注册到 DI，供 FileService 与 TestConnection 端点共用。
 /// </summary>
 public class DefaultObjectStorageAdapterFactory : IObjectStorageAdapterFactory
 {

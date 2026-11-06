@@ -1,46 +1,46 @@
 using GameFrameX.Advertisement.Abstract;
-using GameFrameX.Client.Api.Services.ClientApiTenantOptions;
+using GameFrameX.Client.Api.Services.ClientApiOptions;
 
 namespace GameFrameX.Core.Tests.ClientApi;
 
 /// <summary>
-/// 测试用 <see cref="IClientApiTenantOptionsProvider"/> 桩，按预设策略返回配置，供 Issuer / 邮件等单测使用。
+/// 测试用 <see cref="IClientApiOptionsProvider"/> 桩，按预设策略返回配置，供 Issuer / 邮件等单测使用。
 /// </summary>
-internal sealed class FakeOptionsProvider : IClientApiTenantOptionsProvider
+internal sealed class FakeOptionsProvider : IClientApiOptionsProvider
 {
-    private TenantEmailOptions _emailOptions = null!;
-    private TenantAdvertisementCallbackOptions _adOptions = new();
-    private TenantClientApiTokenPolicyOptions _tokenPolicy = null!;
-    private TenantGameLoginTicketPolicyOptions _ticketPolicy = new() { TicketExpireTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds() + 60, };
-    private TenantOrderPolicyOptions _orderPolicy = new();
-    private TenantAreaPolicyOptions _areaPolicy = new();
+    private EmailOptions _emailOptions = null!;
+    private AdvertisementCallbackOptions _adOptions = new();
+    private ClientApiTokenPolicyOptions _tokenPolicy = null!;
+    private GameLoginTicketPolicyOptions _ticketPolicy = new() { TicketExpireTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds() + 60, };
+    private OrderPolicyOptions _orderPolicy = new();
+    private AreaPolicyOptions _areaPolicy = new();
 
-    public Task<TenantEmailOptions> GetEmailOptionsAsync()
+    public Task<EmailOptions> GetEmailOptionsAsync()
     {
         return Task.FromResult(_emailOptions);
     }
 
-    public Task<TenantAdvertisementCallbackOptions> GetAdvertisementCallbackOptionsAsync()
+    public Task<AdvertisementCallbackOptions> GetAdvertisementCallbackOptionsAsync()
     {
         return Task.FromResult(_adOptions);
     }
 
-    public Task<TenantClientApiTokenPolicyOptions> GetTokenPolicyAsync()
+    public Task<ClientApiTokenPolicyOptions> GetTokenPolicyAsync()
     {
         return Task.FromResult(_tokenPolicy);
     }
 
-    public Task<TenantGameLoginTicketPolicyOptions> GetGameLoginTicketPolicyAsync()
+    public Task<GameLoginTicketPolicyOptions> GetGameLoginTicketPolicyAsync()
     {
         return Task.FromResult(_ticketPolicy);
     }
 
-    public Task<TenantOrderPolicyOptions> GetOrderPolicyAsync()
+    public Task<OrderPolicyOptions> GetOrderPolicyAsync()
     {
         return Task.FromResult(_orderPolicy);
     }
 
-    public Task<TenantAreaPolicyOptions> GetAreaPolicyAsync()
+    public Task<AreaPolicyOptions> GetAreaPolicyAsync()
     {
         return Task.FromResult(_areaPolicy);
     }
@@ -49,7 +49,7 @@ internal sealed class FakeOptionsProvider : IClientApiTenantOptionsProvider
     {
         return new FakeOptionsProvider
         {
-            _tokenPolicy = new TenantClientApiTokenPolicyOptions { SigningKey = signingKey, LifetimeMinutes = lifetimeMinutes, },
+            _tokenPolicy = new ClientApiTokenPolicyOptions { SigningKey = signingKey, LifetimeMinutes = lifetimeMinutes, },
         };
     }
 
@@ -57,7 +57,7 @@ internal sealed class FakeOptionsProvider : IClientApiTenantOptionsProvider
     {
         return new FakeOptionsProvider
         {
-            _tokenPolicy = new TenantClientApiTokenPolicyOptions { SigningKey = null, LifetimeMinutes = 60, },
+            _tokenPolicy = new ClientApiTokenPolicyOptions { SigningKey = null, LifetimeMinutes = 60, },
         };
     }
 
@@ -66,8 +66,8 @@ internal sealed class FakeOptionsProvider : IClientApiTenantOptionsProvider
     {
         return new FakeOptionsProvider
         {
-            _tokenPolicy = new TenantClientApiTokenPolicyOptions { SigningKey = "unit-test-signing-key", LifetimeMinutes = 60, },
-            _ticketPolicy = new TenantGameLoginTicketPolicyOptions { TicketExpireTime = ticketExpireTime, EnableKeyAutoCreate = true, },
+            _tokenPolicy = new ClientApiTokenPolicyOptions { SigningKey = "unit-test-signing-key", LifetimeMinutes = 60, },
+            _ticketPolicy = new GameLoginTicketPolicyOptions { TicketExpireTime = ticketExpireTime, EnableKeyAutoCreate = true, },
         };
     }
 
@@ -75,7 +75,7 @@ internal sealed class FakeOptionsProvider : IClientApiTenantOptionsProvider
     {
         return new FakeOptionsProvider
         {
-            _emailOptions = new TenantEmailOptions
+            _emailOptions = new EmailOptions
             {
                 FromEmailAddress = fromAddress,
                 FromEmailSecretId = "secret-id",
@@ -95,8 +95,8 @@ internal sealed class FakeOptionsProvider : IClientApiTenantOptionsProvider
     {
         return new FakeOptionsProvider
         {
-            _tokenPolicy = new TenantClientApiTokenPolicyOptions { SigningKey = "unit-test-signing-key", LifetimeMinutes = 60, },
-            _areaPolicy = new TenantAreaPolicyOptions { EnableReturnHttpManager = enableReturnHttpManager, },
+            _tokenPolicy = new ClientApiTokenPolicyOptions { SigningKey = "unit-test-signing-key", LifetimeMinutes = 60, },
+            _areaPolicy = new AreaPolicyOptions { EnableReturnHttpManager = enableReturnHttpManager, },
         };
     }
 }

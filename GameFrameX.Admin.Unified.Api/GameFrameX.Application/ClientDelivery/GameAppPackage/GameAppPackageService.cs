@@ -1,4 +1,4 @@
-using GameFrameX.Entity.Tenant.Game.App;
+using GameFrameX.Entity.Business.Game.App;
 using GameFrameX.Application.ClientDelivery.GameAppPackage.Dto;
 using GameFrameX.Entity.Enum;
 using GameFrameX.Entity.Global;
@@ -12,24 +12,24 @@ namespace GameFrameX.Application.ClientDelivery.GameAppPackage;
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 101)]
 public class GameAppPackageService
-    : GenericCrudSelectService<TenantGameAppPackageEntity,
+    : GenericCrudSelectService<GameAppPackageEntity,
         AddGameAppPackageRequest, UpdateGameAppPackageRequest,
         GameAppPackageResponse, PageGameAppPackageRequest>
 {
     private readonly SqlSugarRepository<GlobalPlatformEntity> _globalPlatformRepository;
     private readonly SqlSugarRepository<GlobalChannelDefinitionEntity> _globalChannelDefinitionRepository;
-    private readonly SqlSugarRepository<TenantChannelDefinitionEntity> _tenantChannelDefinitionRepository;
+    private readonly SqlSugarRepository<ChannelDefinitionEntity> _tenantChannelDefinitionRepository;
 
     public GameAppPackageService(
-        SqlSugarRepository<TenantGameAppPackageEntity> repository,
+        SqlSugarRepository<GameAppPackageEntity> repository,
         SqlSugarRepository<GlobalPlatformEntity> globalPlatformRepository,
         SqlSugarRepository<GlobalChannelDefinitionEntity> globalChannelDefinitionRepository,
-        SqlSugarRepository<TenantChannelDefinitionEntity> tenantChannelDefinitionRepository)
+        SqlSugarRepository<ChannelDefinitionEntity> channelDefinitionRepository)
         : base(repository)
     {
         _globalPlatformRepository = globalPlatformRepository;
         _globalChannelDefinitionRepository = globalChannelDefinitionRepository;
-        _tenantChannelDefinitionRepository = tenantChannelDefinitionRepository;
+        _tenantChannelDefinitionRepository = channelDefinitionRepository;
     }
 
     protected override ISugarQueryable<GameAppPackageResponse> BuildPageQuery(PageGameAppPackageRequest input)
@@ -114,7 +114,7 @@ public class GameAppPackageService
         await ValidateParentPackageAsync(input.ParentPackageId, input.PackageKind);
         var channel = await ValidatePackageAsync(input.PackageName, input.PlatformCode, input.ChannelId);
 
-        var entity = input.Adapt<TenantGameAppPackageEntity>();
+        var entity = input.Adapt<GameAppPackageEntity>();
         NormalizePackageKind(entity);
         FillChannel(entity, channel);
         await FillSnapshotsAsync(entity);
@@ -139,7 +139,7 @@ public class GameAppPackageService
         await ValidateParentPackageAsync(input.ParentPackageId, input.PackageKind, input.Id);
         var channel = await ValidatePackageAsync(input.PackageName, input.PlatformCode, input.ChannelId, input.Id);
 
-        var entity = input.Adapt<TenantGameAppPackageEntity>();
+        var entity = input.Adapt<GameAppPackageEntity>();
         NormalizePackageKind(entity);
         FillChannel(entity, channel);
         await FillSnapshotsAsync(entity);
@@ -160,7 +160,7 @@ public class GameAppPackageService
         await ValidatePackageAsync(input.PackageName, input.PlatformCode, input.ChannelId);
     }
 
-    protected override async Task OnAddedAsync(AddGameAppPackageRequest input, TenantGameAppPackageEntity entity)
+    protected override async Task OnAddedAsync(AddGameAppPackageRequest input, GameAppPackageEntity entity)
     {
         await FillSnapshotsAsync(entity);
         entity.IsEnabled = true;
@@ -189,7 +189,7 @@ public class GameAppPackageService
         await ValidatePackageAsync(input.PackageName, input.PlatformCode, input.ChannelId, input.Id);
     }
 
-    protected override async Task OnUpdatedAsync(UpdateGameAppPackageRequest input, TenantGameAppPackageEntity before, TenantGameAppPackageEntity after)
+    protected override async Task OnUpdatedAsync(UpdateGameAppPackageRequest input, GameAppPackageEntity before, GameAppPackageEntity after)
     {
         var entity = await Repository.GetFirstAsync(u => u.Id == input.Id);
         if (entity == null)
@@ -348,10 +348,10 @@ public class GameAppPackageService
     }
 
     /// <summary>
-    /// 规整 <see cref="TenantGameAppPackageEntity.PackageKind"/> 与 <see cref="TenantGameAppPackageEntity.ParentPackageId"/> 的一致性：
+    /// 规整 <see cref="GameAppPackageEntity.PackageKind"/> 与 <see cref="GameAppPackageEntity.ParentPackageId"/> 的一致性：
     /// 指定母包即视为子包，强制 <see cref="PackageKindEnum.Derived"/>（自动纠正 Master/Normal→Derived），避免运行时按子包语义回退时字段表达与实际关系冲突。
     /// </summary>
-    internal static void NormalizePackageKind(TenantGameAppPackageEntity entity)
+    internal static void NormalizePackageKind(GameAppPackageEntity entity)
     {
         if (entity.ParentPackageId.HasValue)
         {
@@ -359,7 +359,7 @@ public class GameAppPackageService
         }
     }
 
-    private async Task FillSnapshotsAsync(TenantGameAppPackageEntity entity)
+    private async Task FillSnapshotsAsync(GameAppPackageEntity entity)
     {
         var platform = await _globalPlatformRepository.GetFirstAsync(u => u.Name == entity.PlatformCode);
         entity.PlatformName = platform?.Name ?? entity.PlatformCode;
@@ -402,7 +402,7 @@ public class GameAppPackageService
                                                        .FirstAsync(u => u.Id == channelId);
     }
 
-    private static void FillChannel(TenantGameAppPackageEntity entity, GameFrameX.Entity.System.ChannelDefinition channel)
+    private static void FillChannel(GameAppPackageEntity entity, GameFrameX.Entity.System.ChannelDefinition channel)
     {
         entity.ChannelId = channel.Id;
         entity.ChannelCode = string.IsNullOrWhiteSpace(channel.Code) ? channel.Name : channel.Code;

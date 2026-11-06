@@ -23,17 +23,17 @@ public class ChannelDefinitionNamingTests
         Assert.Equal(ChannelScopeEnum.System, channel.Scope);
         Assert.Equal(ChannelTypeEnum.Official, channel.ChannelType);
 
-        var tenantChannel = new TenantChannelDefinitionEntity
+        var channel = new ChannelDefinitionEntity
         {
-            Code = "tenant-official",
-            Name = "Tenant Official",
-            Scope = ChannelScopeEnum.Tenant,
+            Code = "official",
+            Name = "Business Official",
+            Scope = ChannelScopeEnum.Business,
             ChannelType = ChannelTypeEnum.Custom,
             PlatformCode = "all",
         };
 
-        Assert.Equal("tenant-official", tenantChannel.Code);
-        Assert.Equal(ChannelScopeEnum.Tenant, tenantChannel.Scope);
+        Assert.Equal("official", channel.Code);
+        Assert.Equal(ChannelScopeEnum.Business, channel.Scope);
     }
 
     [Fact]
@@ -43,6 +43,6 @@ public class ChannelDefinitionNamingTests
 
         Assert.NotNull(assembly.GetType("GameFrameX.Application.ClientDelivery.ChannelDefinition.GlobalChannelDefinitionService"));
         Assert.NotNull(assembly.GetType("GameFrameX.Application.ClientDelivery.ChannelDefinition.ChannelDefinitionService"));
-        Assert.Null(assembly.GetType("GameFrameX.Application.ClientDelivery.ChannelDefinition.TenantChannelDefinitionService"));
+        Assert.Null(assembly.GetType("GameFrameX.Application.ClientDelivery.ChannelDefinition.ChannelDefinitionService"));
     }
 }

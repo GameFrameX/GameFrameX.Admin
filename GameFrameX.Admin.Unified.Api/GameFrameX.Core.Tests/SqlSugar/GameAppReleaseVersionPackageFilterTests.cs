@@ -1,5 +1,5 @@
 using GameFrameX.Core.SqlSugar;
-using GameFrameX.Entity.Tenant.Game.Release;
+using GameFrameX.Entity.Business.Game.Release;
 using SqlSugar;
 
 namespace GameFrameX.Core.Tests.SqlSugar;
@@ -22,7 +22,7 @@ public sealed class GameAppReleaseVersionPackageFilterTests : IDisposable
         SqlSugarUnifiedConfig.ConfigureBaseSettings(config);
         _db = new SqlSugarScope(config);
         SqlSugarUnifiedConfig.ConfigureBaseFilters(_db);
-        _db.CodeFirst.InitTables(typeof(TenantGameAppReleaseVersionEntity));
+        _db.CodeFirst.InitTables(typeof(GameAppReleaseVersionEntity));
     }
 
 
@@ -81,16 +81,16 @@ public sealed class GameAppReleaseVersionPackageFilterTests : IDisposable
         Assert.False(exists);
     }
 
-    private ISugarQueryable<TenantGameAppReleaseVersionEntity> BuildQuery(string? package)
+    private ISugarQueryable<GameAppReleaseVersionEntity> BuildQuery(string? package)
     {
         var normalizedPackage = string.IsNullOrWhiteSpace(package) ? string.Empty : package.Trim();
-        return _db.Queryable<TenantGameAppReleaseVersionEntity>()
+        return _db.Queryable<GameAppReleaseVersionEntity>()
                   .WhereIF(!string.IsNullOrEmpty(normalizedPackage), u => u.Package == normalizedPackage);
     }
 
     private async Task<bool> CheckReleaseVersionDuplicate(string channel, string platform, string oldVersion, string appVersion, string package, string language, long? excludeId)
     {
-        var query = _db.Queryable<TenantGameAppReleaseVersionEntity>()
+        var query = _db.Queryable<GameAppReleaseVersionEntity>()
                        .Where(u => u.Channel == channel
                                    && u.Platform == platform
                                    && u.OldVersion == oldVersion
@@ -114,9 +114,9 @@ public sealed class GameAppReleaseVersionPackageFilterTests : IDisposable
         await _db.Insertable(BuildVersion(4, "default", now)).ExecuteCommandAsync();
     }
 
-    private static TenantGameAppReleaseVersionEntity BuildVersion(long id, string package, long now)
+    private static GameAppReleaseVersionEntity BuildVersion(long id, string package, long now)
     {
-        return new TenantGameAppReleaseVersionEntity
+        return new GameAppReleaseVersionEntity
         {
             Id = id,
             Channel = "default",

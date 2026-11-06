@@ -5,8 +5,8 @@ using System.Text.Json;
 using GameFrameX.Core.Enum;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Core.Tests.ClientApi;
-using GameFrameX.Entity.Tenant.Game;
-using GameFrameX.Entity.Tenant.Game.ServerConfig;
+using GameFrameX.Entity.Business.Game;
+using GameFrameX.Entity.Business.Game.ServerConfig;
 using GameFrameX.Client.Api.GameUserSession.Dto;
 using GameFrameX.Client.Api.Services;
 using GameFrameX.Entity.Enum;
@@ -17,7 +17,7 @@ namespace GameFrameX.Core.Tests.GameApi;
 /// <summary>
 /// C13 T2：登录控制面契约（正常/首启无档/换端顶号/累计充值/注销 rcode=2/版本纯函数/路由守护）
 /// <para>契约来源：C13 change.md §1 28 字段四态去向 + C280 config 差异下发（C315 数据源切租户库
-/// tenant_game_app_server_config 表，含基线/应用行合并与 Enabled 过滤语义）+ P0-2 存档行会话列。</para>
+/// game_app_server_config 表，含基线/应用行合并与 Enabled 过滤语义）+ P0-2 存档行会话列。</para>
 /// </summary>
 public sealed class GameUserSessionTests
 {
@@ -26,7 +26,7 @@ public sealed class GameUserSessionTests
     {
         using (var db = new ClientApiTestDb())
         {
-            var repository = CreateRepository<TenantGameUserArchiveEntity>(db);
+            var repository = CreateRepository<GameUserArchiveEntity>(db);
             await repository.InsertAsync(MakeArchive(8001, "uuid-a", "iPhone13", 123456));
             var controller = CreateController(db);
 
@@ -37,7 +37,7 @@ public sealed class GameUserSessionTests
             Assert.Equal("uuid-a", data.GetProperty("InstallationId").GetString());
             Assert.Equal("iPhone13", data.GetProperty("UpdateDeviceModel").GetString());
             // P0-2：会话列成对写回存档行（SessionId == 下发 Session）
-            var row = db.TenantDb.Queryable<TenantGameUserArchiveEntity>().Single(x => x.UserId == 8001);
+            var row = db.Db.Queryable<GameUserArchiveEntity>().Single(x => x.UserId == 8001);
             Assert.Equal(data.GetProperty("Session").GetInt64(), row.SessionId);
             Assert.Equal("SM-G991B", row.SessionDeviceModel);
             // 常量回显与请求回显
@@ -63,7 +63,7 @@ public sealed class GameUserSessionTests
             Assert.Equal(string.Empty, data.GetProperty("UpdateDeviceModel").GetString());
             Assert.True(data.GetProperty("Session").GetInt64() > 0);
             // 存档行由 C8 存档链路负责建行，登录不代建
-            Assert.Equal(0, db.TenantDb.Queryable<TenantGameUserArchiveEntity>().Count(x => x.UserId == 8002));
+            Assert.Equal(0, db.Db.Queryable<GameUserArchiveEntity>().Count(x => x.UserId == 8002));
         }
     }
 
@@ -72,7 +72,7 @@ public sealed class GameUserSessionTests
     {
         using (var db = new ClientApiTestDb())
         {
-            var repository = CreateRepository<TenantGameUserArchiveEntity>(db);
+            var repository = CreateRepository<GameUserArchiveEntity>(db);
             await repository.InsertAsync(MakeArchive(8003));
             var controller = CreateController(db);
 
@@ -81,7 +81,7 @@ public sealed class GameUserSessionTests
             Assert.NotEqual(first.GetProperty("Session").GetInt64(), second.GetProperty("Session").GetInt64());
 
             // ponytail: 单副本起步——后登录覆盖（顶号），不保留历史会话
-            var row = db.TenantDb.Queryable<TenantGameUserArchiveEntity>().Single(x => x.UserId == 8003);
+            var row = db.Db.Queryable<GameUserArchiveEntity>().Single(x => x.UserId == 8003);
             Assert.Equal(second.GetProperty("Session").GetInt64(), row.SessionId);
             Assert.Equal("device-B", row.SessionDeviceModel);
         }
@@ -92,7 +92,7 @@ public sealed class GameUserSessionTests
     {
         using (var db = new ClientApiTestDb())
         {
-            var repository = CreateRepository<TenantGameOrderEntity>(db);
+            var repository = CreateRepository<GameOrderEntity>(db);
             await repository.InsertAsync(MakeOrder(8004, "pay_t1", (int)OrderStatusEnum.Shipped, 660));
             await repository.InsertAsync(MakeOrder(8004, "pay_t2", (int)OrderStatusEnum.Unpaid, 990));
             await repository.InsertAsync(MakeOrder(8005, "pay_t3", (int)OrderStatusEnum.Shipped, 500));
@@ -109,7 +109,7 @@ public sealed class GameUserSessionTests
     {
         using (var db = new ClientApiTestDb())
         {
-            var repository = CreateRepository<TenantGameUserEntity>(db);
+            var repository = CreateRepository<GameUserEntity>(db);
             await repository.InsertAsync(MakeUser(8006, GameUserStatus.Deleted, 888));
             var controller = CreateController(db);
 
@@ -137,7 +137,7 @@ public sealed class GameUserSessionTests
     {
         using (var db = new ClientApiTestDb())
         {
-            var repository = CreateRepository<TenantGameAppServerConfigEntity>(db);
+            var repository = CreateRepository<GameAppServerConfigEntity>(db);
             await repository.InsertAsync(MakeServerConfig(319200000000101, "frame", "[1,2,3]", Md5Frame));
             await repository.InsertAsync(MakeServerConfig(319200000000102, "badge", "[4,5]", Md5Badge));
             var controller = CreateController(db);
@@ -165,7 +165,7 @@ public sealed class GameUserSessionTests
     {
         using (var db = new ClientApiTestDb())
         {
-            var repository = CreateRepository<TenantGameAppServerConfigEntity>(db);
+            var repository = CreateRepository<GameAppServerConfigEntity>(db);
             await repository.InsertAsync(MakeServerConfig(319200000000101, "frame", "[1,2,3]", Md5Frame));
             await repository.InsertAsync(MakeServerConfig(319200000000102, "badge", "[4,5]", Md5Badge));
             var controller = CreateController(db);
@@ -191,7 +191,7 @@ public sealed class GameUserSessionTests
     {
         using (var db = new ClientApiTestDb())
         {
-            var repository = CreateRepository<TenantGameAppServerConfigEntity>(db);
+            var repository = CreateRepository<GameAppServerConfigEntity>(db);
             await repository.InsertAsync(MakeServerConfig(319200000000101, "frame", "[1,2,3]", Md5Frame));
             await repository.InsertAsync(MakeServerConfig(319200000000102, "badge", "[4,5]", Md5Badge));
             await repository.InsertAsync(MakeServerConfig(319200000000103, "notify", "{}", Md5Badge, enabled: false));
@@ -214,7 +214,7 @@ public sealed class GameUserSessionTests
     {
         using (var db = new ClientApiTestDb())
         {
-            var repository = CreateRepository<TenantGameAppServerConfigEntity>(db);
+            var repository = CreateRepository<GameAppServerConfigEntity>(db);
             await repository.InsertAsync(MakeServerConfig(319200000000101, "frame", "[1,2,3]", Md5Frame));
             await repository.InsertAsync(MakeServerConfig(319200000000102, "badge", "[4,5]", Md5Badge));
             await repository.InsertAsync(MakeServerConfig(319200000000103, "notify", "{}", Md5Badge, enabled: false));
@@ -255,16 +255,16 @@ public sealed class GameUserSessionTests
     private static GameUserSessionController CreateController(ClientApiTestDb db)
     {
         return new GameUserSessionController(
-            CreateRepository<TenantGameUserArchiveEntity>(db),
-            CreateRepository<TenantGameUserEntity>(db),
-            CreateRepository<TenantGameOrderEntity>(db),
-            CreateRepository<TenantGameAppServerConfigEntity>(db));
+            CreateRepository<GameUserArchiveEntity>(db),
+            CreateRepository<GameUserEntity>(db),
+            CreateRepository<GameOrderEntity>(db),
+            CreateRepository<GameAppServerConfigEntity>(db));
     }
 
     private static Repository<T> CreateRepository<T>(ClientApiTestDb db) where T : GameFrameX.Foundation.Orm.Entity.EntityBase, new()
     {
-        db.InitTenantTables(typeof(T));
-        var tenantDbProvider = db.MainDb;
+        db.InitBusinessTables(typeof(T));
+        var dbProvider = db.MainDb;
         return new Repository<T>(db.MainDb);
     }
 
@@ -288,9 +288,9 @@ public sealed class GameUserSessionTests
     private const string Md5Badge = "0f1e2d3c4b5a69788796a5b4c3d2e1f0";
     private const string Md5FrameApp = "1a2b3c4d5e6f708192a3b4c5d6e7f809";
 
-    private static TenantGameAppServerConfigEntity MakeServerConfig(long id, string key, string config, string md5, bool enabled = true)
+    private static GameAppServerConfigEntity MakeServerConfig(long id, string key, string config, string md5, bool enabled = true)
     {
-        return new TenantGameAppServerConfigEntity
+        return new GameAppServerConfigEntity
         {
             Id = id,
             Key = key,
@@ -300,9 +300,9 @@ public sealed class GameUserSessionTests
         };
     }
 
-    private static TenantGameUserArchiveEntity MakeArchive(long userId, string installationId = "uuid-a", string deviceModel = "iPhone13", long syncTime = 123456)
+    private static GameUserArchiveEntity MakeArchive(long userId, string installationId = "uuid-a", string deviceModel = "iPhone13", long syncTime = 123456)
     {
-        return new TenantGameUserArchiveEntity
+        return new GameUserArchiveEntity
         {
             Name = "archive-" + userId,
             UserId = userId,
@@ -314,9 +314,9 @@ public sealed class GameUserSessionTests
         };
     }
 
-    private static TenantGameUserEntity MakeUser(long id, GameUserStatus status, long deletedTime)
+    private static GameUserEntity MakeUser(long id, GameUserStatus status, long deletedTime)
     {
-        return new TenantGameUserEntity
+        return new GameUserEntity
         {
             Id = id,
             Name = "user-" + id,
@@ -339,9 +339,9 @@ public sealed class GameUserSessionTests
         };
     }
 
-    private static TenantGameOrderEntity MakeOrder(long userId, string orderId, int status, long amount)
+    private static GameOrderEntity MakeOrder(long userId, string orderId, int status, long amount)
     {
-        return new TenantGameOrderEntity
+        return new GameOrderEntity
         {
             AccountId = userId.ToString(),
             RoleId = userId.ToString(),

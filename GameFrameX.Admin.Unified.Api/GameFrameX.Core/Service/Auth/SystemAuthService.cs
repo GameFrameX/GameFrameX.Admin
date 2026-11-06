@@ -160,7 +160,7 @@ public class SystemAuthService : IAdminApiController
     {
         if (user.AccountType != AccountTypeEnum.SuperAdmin)
         {
-            await _serviceProvider.GetRequiredService<TenantOnlineUserService>().SingleLoginAsync(user.Id);
+            await _serviceProvider.GetRequiredService<OnlineUserService>().SingleLoginAsync(user.Id);
         }
 
         // 生成Token令牌
@@ -207,7 +207,7 @@ public class SystemAuthService : IAdminApiController
             return systemUser;
         }
 
-        return await db.Queryable<TenantUserEntity>()
+        return await db.Queryable<UserEntity>()
                        .Where(u => u.IsDeleted == false && u.Account == account)
                        .FirstAsync();
     }
@@ -224,7 +224,7 @@ public class SystemAuthService : IAdminApiController
         var userId = _currentUserContext.UserId;
         SystemUserBase? user = _currentUserContext.SuperAdmin
             ? await _systemUserRepository.GetFirstAsync(u => u.Id == userId)
-            : await _systemUserRepository.Context.Queryable<TenantUserEntity>().FirstAsync(u => u.IsDeleted == false && u.Id == userId);
+            : await _systemUserRepository.Context.Queryable<UserEntity>().FirstAsync(u => u.IsDeleted == false && u.Id == userId);
 
         if (user == null)
         {
@@ -375,7 +375,7 @@ public class SystemAuthService : IAdminApiController
             throw BusinessError.Oh(SystemUserErrorCode.SetupPasswordConfirmMismatch);
         }
 
-        // 密码强度（与 TenantUserService.ChangePwd 同构：平台密码策略开关控制正则校验）
+        // 密码强度（与 UserService.ChangePwd 同构：平台密码策略开关控制正则校验）
         if (CryptogramUtility.StrongPassword && !Regex.IsMatch(input.Password, CryptogramUtility.PasswordStrengthValidation))
         {
             throw BusinessError.Oh(CryptogramUtility.PasswordStrengthValidationMsg);

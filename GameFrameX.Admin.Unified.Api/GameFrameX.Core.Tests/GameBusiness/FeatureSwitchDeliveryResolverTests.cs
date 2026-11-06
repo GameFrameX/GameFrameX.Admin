@@ -2,7 +2,7 @@ using GameFrameX.Application.ClientDelivery.FeatureSwitch;
 using GameFrameX.Core.Const;
 using GameFrameX.Core.Extension;
 using GameFrameX.Core.SqlSugar;
-using GameFrameX.Entity.Tenant.Game.FeatureSwitch;
+using GameFrameX.Entity.Business.Game.FeatureSwitch;
 using SqlSugar;
 
 namespace GameFrameX.Core.Tests.GameBusiness;
@@ -15,7 +15,7 @@ namespace GameFrameX.Core.Tests.GameBusiness;
 /// </summary>
 public sealed class FeatureSwitchDeliveryResolverTests : IDisposable
 {
-    private const long TenantId = 1001;
+    private const long Id = 1001;
     private const long App100 = 100;
     private const long App200 = 200;
 
@@ -34,7 +34,7 @@ public sealed class FeatureSwitchDeliveryResolverTests : IDisposable
         SqlSugarUnifiedConfig.ConfigureBaseSettings(config);
         _db = new SqlSugarScope(config);
         SqlSugarUnifiedConfig.ConfigureBaseFilters(_db);
-        _db.CodeFirst.InitTables(typeof(TenantGameAppFeatureSwitchEntity));
+        _db.CodeFirst.InitTables(typeof(GameAppFeatureSwitchEntity));
     }
 
     /// <summary>
@@ -43,10 +43,10 @@ public sealed class FeatureSwitchDeliveryResolverTests : IDisposable
     [Fact]
     public void Resolve_NewerRowWinsRegardlessOfLegacyApplication()
     {
-        var tenantDefault = Row("login.banner", id: 1, appId: null, valueJson: "{\"v\":\"tenant\"}");
+        var default = Row("login.banner", id: 1, appId: null, valueJson: "{\"v\":\"tenant\"}");
         var appRow = Row("login.banner", id: 2, appId: App100, valueJson: "{\"v\":\"app\"}");
 
-        var result = FeatureSwitchDeliveryResolver.Resolve(new[] { tenantDefault, appRow, }, Query());
+        var result = FeatureSwitchDeliveryResolver.Resolve(new[] { default, appRow, }, Query());
 
         var item = Assert.Single(result.Switches);
         Assert.Equal("{\"v\":\"app\"}", item.ValueJson);
@@ -396,10 +396,10 @@ public sealed class FeatureSwitchDeliveryResolverTests : IDisposable
 
     private FeatureSwitchDeliveryResolver CreateResolver()
     {
-        return new FeatureSwitchDeliveryResolver(new SqlSugarRepository<TenantGameAppFeatureSwitchEntity> { Context = _db, });
+        return new FeatureSwitchDeliveryResolver(new SqlSugarRepository<GameAppFeatureSwitchEntity> { Context = _db, });
     }
 
-    private async Task InsertAsync(TenantGameAppFeatureSwitchEntity row)
+    private async Task InsertAsync(GameAppFeatureSwitchEntity row)
     {
         row.CreatedTime = ToUnixSeconds(NowUtc);
         row.IsDeleted = false;
@@ -433,7 +433,7 @@ public sealed class FeatureSwitchDeliveryResolverTests : IDisposable
         };
     }
 
-    private static TenantGameAppFeatureSwitchEntity Row(
+    private static GameAppFeatureSwitchEntity Row(
         string switchKey,
         long id,
         long? appId = App100,
@@ -450,7 +450,7 @@ public sealed class FeatureSwitchDeliveryResolverTests : IDisposable
         string? deviceWhitelistJson = null,
         bool? isEnabled = true)
     {
-        return new TenantGameAppFeatureSwitchEntity
+        return new GameAppFeatureSwitchEntity
         {
             Id = id,
             SwitchKey = switchKey,

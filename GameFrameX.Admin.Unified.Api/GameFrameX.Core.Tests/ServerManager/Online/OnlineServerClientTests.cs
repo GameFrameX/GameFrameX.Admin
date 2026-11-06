@@ -8,7 +8,7 @@ using GameFrameX.Core.Const;
 using GameFrameX.Core.Exceptions;
 using GameFrameX.Core.Service.User;
 using GameFrameX.Core.SqlSugar;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 using GameFrameX.Foundation.Http.Normalization;
 using GameFrameX.Foundation.Json;
 using GameFrameX.Foundation.Orm.Entity;
@@ -27,7 +27,7 @@ namespace GameFrameX.Core.Tests.ServerManager.Online;
 // 作用域构造后区服被删的时序漂移拒绝。
 public sealed class OnlineServerClientTests : IDisposable
 {
-    private const long TenantA = 1001;
+    private const long A = 1001;
     private const long App100 = 100;
     private const long Area1001 = 2001;
 
@@ -53,7 +53,7 @@ public sealed class OnlineServerClientTests : IDisposable
         _db = _scopeOwner.GetConnectionScope("online-client");
         SqlSugarUnifiedConfig.ConfigureBaseFilters(_db);
         _db.CodeFirst.InitTables(
-            typeof(TenantGameAreaEntity));
+            typeof(GameAreaEntity));
     }
 
     /// <summary>
@@ -81,7 +81,7 @@ public sealed class OnlineServerClientTests : IDisposable
     {
         await SeedAsync();
 
-        var area = await _db.Queryable<TenantGameAreaEntity>().FirstAsync(u => u.Id == Area1001);
+        var area = await _db.Queryable<GameAreaEntity>().FirstAsync(u => u.Id == Area1001);
         area.OnlineAdminApiPrefix = "online/v2";
         await _db.Updateable(area).ExecuteCommandAsync();
 
@@ -105,10 +105,10 @@ public sealed class OnlineServerClientTests : IDisposable
         var handler = new FakeHandler(SuccessEnvelope(new OnlineDemoData { PlayerId = "p-1", }));
         var client = CreateClient(handler);
 
-        await client.PostAsync<OnlineDemoData>("kick_player", new { TenantId = 999L, AppId = 888L, ServerId = 777L, RequestId = "request-1", IdempotencyKey = "key-1", Reason = 3, }, await CreateScopeAsync());
+        await client.PostAsync<OnlineDemoData>("kick_player", new { Id = 999L, AppId = 888L, ServerId = 777L, RequestId = "request-1", IdempotencyKey = "key-1", Reason = 3, }, await CreateScopeAsync());
 
         var body = handler.LastRequestBodyJson;
-        Assert.False(body.ContainsKey("TenantId"));
+        Assert.False(body.ContainsKey("Id"));
         Assert.False(body.ContainsKey("AppId"));
         Assert.Equal(Area1001, Convert.ToInt64(body["ServerId"]?.ToString()));
         Assert.Equal("request-1", body["RequestId"]?.ToString());
@@ -238,7 +238,7 @@ public sealed class OnlineServerClientTests : IDisposable
         var client = CreateClient(handler);
         var scope = await CreateScopeAsync();
 
-        await _db.Deleteable<TenantGameAreaEntity>().Where(u => u.Id == Area1001).ExecuteCommandAsync();
+        await _db.Deleteable<GameAreaEntity>().Where(u => u.Id == Area1001).ExecuteCommandAsync();
 
         var exception = await Assert.ThrowsAsync<BusinessException>(async () =>
                                                                         await client.PostAsync<OnlineDemoData>("kick_player", new { Reason = 1, }, scope));
@@ -252,16 +252,16 @@ public sealed class OnlineServerClientTests : IDisposable
     public async Task ProvisioningClient_ResolvesDisabledOnlyWithProvisioningContext()
     {
         await SeedAsync();
-        var factory = new OnlineScopeContextFactory(Repository<TenantGameAreaEntity>());
+        var factory = new OnlineScopeContextFactory(Repository<GameAreaEntity>());
         var ordinary = await factory.CreateAsync(Area1001);
         SqlSugarUnifiedConfig.ConfigureClientFilters(_db);
-        await _db.Updateable<TenantGameAreaEntity>().SetColumns(area => area.IsEnabled == false)
+        await _db.Updateable<GameAreaEntity>().SetColumns(area => area.IsEnabled == false)
             .Where(area => area.Id == Area1001).ExecuteCommandAsync();
         var client = CreateClient(new FakeHandler(SuccessEnvelope(new OnlineDemoData { PlayerId = "provision" })));
         await Assert.ThrowsAsync<BusinessException>(() => client.PostAsync<OnlineDemoData>("query_server_calendar", new { }, ordinary));
         var scope = await factory.CreateForProvisioningAsync(Area1001);
         Assert.Equal("provision", (await client.PostAsync<OnlineDemoData>("query_server_calendar", new { }, scope)).PlayerId);
-        var deleted = await _db.Queryable<TenantGameAreaEntity>().Filter(null, true).FirstAsync(area => area.Id == Area1001);
+        var deleted = await _db.Queryable<GameAreaEntity>().Filter(null, true).FirstAsync(area => area.Id == Area1001);
         deleted.IsDeleted = true;
         await _db.Updateable(deleted).AS().ExecuteCommandAsync();
         await Assert.ThrowsAsync<BusinessException>(() => client.PostAsync<OnlineDemoData>("query_server_calendar", new { }, scope));
@@ -276,12 +276,12 @@ public sealed class OnlineServerClientTests : IDisposable
 
     private OnlineServerClient CreateClient(FakeHandler handler)
     {
-        return new OnlineServerClient(new HttpClient(handler), new OnlineServerEndpointResolver(), Repository<TenantGameAreaEntity>());
+        return new OnlineServerClient(new HttpClient(handler), new OnlineServerEndpointResolver(), Repository<GameAreaEntity>());
     }
 
     private async Task<OnlineScopeContext> CreateScopeAsync()
     {
-        var factory = new OnlineScopeContextFactory(Repository<TenantGameAreaEntity>());
+        var factory = new OnlineScopeContextFactory(Repository<GameAreaEntity>());
         return await factory.CreateAsync(Area1001, "unit-test");
     }
 
@@ -327,7 +327,7 @@ public sealed class OnlineServerClientTests : IDisposable
     {
         var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
-        await _db.Insertable(new TenantGameAreaEntity
+        await _db.Insertable(new GameAreaEntity
         {
             Id = Area1001,
             Name = "area-1001",

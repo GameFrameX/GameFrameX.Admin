@@ -1,11 +1,11 @@
-using GameFrameX.Entity.Tenant.Game.Release;
+using GameFrameX.Entity.Business.Game.Release;
 
 namespace GameFrameX.Application.ClientDelivery.GameAppAssetPackageVersion.Dto;
 
 /// <summary>
 /// 资源包版本输出参数
 /// </summary>
-public class GameAppAssetPackageVersionResponse : IBasePageResponse<TenantGameAppAssetPackageVersionEntity>
+public class GameAppAssetPackageVersionResponse : IBasePageResponse<GameAppAssetPackageVersionEntity>
 {
     /// <summary>
     /// Id

@@ -13,13 +13,13 @@ namespace GameFrameX.Client.Api.GameUserArchive;
 /// </summary>
 public class GameUserArchiveController : BaseController
 {
-    private readonly Repository<TenantGameUserArchiveEntity> _archiveRepository;
+    private readonly Repository<GameUserArchiveEntity> _archiveRepository;
 
     /// <summary>
     ///
     /// </summary>
     /// <param name="archiveRepository">存档仓储</param>
-    public GameUserArchiveController(Repository<TenantGameUserArchiveEntity> archiveRepository)
+    public GameUserArchiveController(Repository<GameUserArchiveEntity> archiveRepository)
     {
         _archiveRepository = archiveRepository;
     }
@@ -162,7 +162,7 @@ public class GameUserArchiveController : BaseController
         var newSyncTime = Math.Max(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), (entity?.SyncTime ?? 0) + 1);
         if (entity == null)
         {
-            entity = new TenantGameUserArchiveEntity { UserId = request.UserId, };
+            entity = new GameUserArchiveEntity { UserId = request.UserId, };
             ApplyUploadState(entity, request, branches, newSyncTime);
             await _archiveRepository.InsertAsync(entity);
         }
@@ -289,7 +289,7 @@ public class GameUserArchiveController : BaseController
     /// 上传落库统一出口：透传 JSON、user 摘要列（GetOtherProgress/排行展示免解析）、
     /// 冗余摘要组与换端字段。user 表非空 = 提交（与分表三态无关，恒为全量摘要）。
     /// </summary>
-    private static void ApplyUploadState(TenantGameUserArchiveEntity entity, GameUserArchiveUploadRequest request,
+    private static void ApplyUploadState(GameUserArchiveEntity entity, GameUserArchiveUploadRequest request,
         Dictionary<string, List<string>> branches, long newSyncTime)
     {
         entity.BranchesJson = JsonSerializer.Serialize(branches);
@@ -348,7 +348,7 @@ public class GameUserArchiveController : BaseController
         return false;
     }
 
-    private static Dictionary<string, List<string>> DeserializeBranches(TenantGameUserArchiveEntity entity)
+    private static Dictionary<string, List<string>> DeserializeBranches(GameUserArchiveEntity entity)
     {
         if (entity == null || string.IsNullOrEmpty(entity.BranchesJson))
         {

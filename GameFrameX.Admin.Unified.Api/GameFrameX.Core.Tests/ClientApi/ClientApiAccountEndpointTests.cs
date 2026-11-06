@@ -5,7 +5,7 @@ using GameFrameX.Client.Api.Services;
 using GameFrameX.Application.PlayerCenter.GameUser;
 using GameFrameX.Core.Enum;
 using GameFrameX.Entity.Enum;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 
 namespace GameFrameX.Core.Tests.ClientApi;
 
@@ -26,7 +26,7 @@ public sealed class ClientApiAccountEndpointTests
 
         var root = ClientApiResultReader.Read(result);
         var data = ClientApiResultReader.Data(root);
-        var saved = await db.TenantDb.Queryable<TenantGameUserEntity>().FirstAsync(u => u.UserName == "guest-c108");
+        var saved = await db.Db.Queryable<GameUserEntity>().FirstAsync(u => u.UserName == "guest-c108");
         Assert.Equal(0, ClientApiResultReader.Code(root));
         Assert.False(string.IsNullOrWhiteSpace(data.GetProperty("AccessToken").GetString()));
         Assert.Equal("Guest", data.GetProperty("Provider").GetString());
@@ -60,7 +60,7 @@ public sealed class ClientApiAccountEndpointTests
         var controller = CreateController(db);
         db.AttachContext(controller);
 
-        var result = await controller.Login(new LoginTenantGameUserEntityRequest
+        var result = await controller.Login(new LoginGameUserEntityRequest
         {
             UserName = "guest-c108",
             Password = "wrong-password",
@@ -82,7 +82,7 @@ public sealed class ClientApiAccountEndpointTests
         var controller = CreateController(db, issuer);
         db.AttachContext(controller);
 
-        var result = await controller.Get(new QueryByIdTenantGameUserEntityRequest
+        var result = await controller.Get(new QueryByIdGameUserEntityRequest
         {
             Id = 1002,
             AccessToken = token.Token,
@@ -110,7 +110,7 @@ public sealed class ClientApiAccountEndpointTests
         });
 
         var root = ClientApiResultReader.Read(result);
-        var saved = await db.TenantDb.Queryable<TenantGameUserEntity>().FirstAsync(u => u.Id == user.Id);
+        var saved = await db.Db.Queryable<GameUserEntity>().FirstAsync(u => u.Id == user.Id);
         Assert.Equal(0, ClientApiResultReader.Code(root));
         Assert.Equal(GameUserStatus.Deleted, saved.Status);
         Assert.NotNull(saved.DeletedTime);
@@ -171,7 +171,7 @@ public sealed class ClientApiAccountEndpointTests
         db.AttachContext(controller);
 
         // 正确密码 -> 登录成功（Argon2id 常量时间比对通过）
-        var ok = await controller.EmailLogin(new LoginTenantGameUserEntityRequest
+        var ok = await controller.EmailLogin(new LoginGameUserEntityRequest
         {
             UserName = "player@example.test",
             Password = "right-password",
@@ -179,7 +179,7 @@ public sealed class ClientApiAccountEndpointTests
         Assert.Equal(0, ClientApiResultReader.Code(ClientApiResultReader.Read(ok)));
 
         // 错误密码 -> 账号或密码错误
-        var bad = await controller.EmailLogin(new LoginTenantGameUserEntityRequest
+        var bad = await controller.EmailLogin(new LoginGameUserEntityRequest
         {
             UserName = "player@example.test",
             Password = "wrong-password",
@@ -187,7 +187,7 @@ public sealed class ClientApiAccountEndpointTests
         Assert.Equal("账号或密码错误", ClientApiResultReader.Message(ClientApiResultReader.Read(bad)));
 
         // 账号不存在 -> 统一返回账号或密码错误（执行假 Verify 抵御账号枚举，不泄露账号是否存在）
-        var none = await controller.EmailLogin(new LoginTenantGameUserEntityRequest
+        var none = await controller.EmailLogin(new LoginGameUserEntityRequest
         {
             UserName = "nobody@example.test",
             Password = "anything",
@@ -197,12 +197,12 @@ public sealed class ClientApiAccountEndpointTests
 
     private static GameUserController CreateController(ClientApiTestDb db, ClientApiTokenIssuer? issuer = null)
     {
-        db.InitTenantTables(typeof(TenantGameUserEntity), typeof(TenantGameUserEmailEntity), typeof(TenantSessionKeyEntity));
+        db.InitBusinessTables(typeof(GameUserEntity), typeof(GameUserEmailEntity), typeof(SessionKeyEntity));
         return new GameUserController(
-            db.Repository<TenantGameUserEntity>(),
+            db.Repository<GameUserEntity>(),
             issuer ?? CreateTokenIssuer(),
-            new ClientApiSessionKeyIssuer(db.Repository<TenantSessionKeyEntity>()),
-            db.Repository<TenantGameUserEmailEntity>(),
+            new ClientApiSessionKeyIssuer(db.Repository<SessionKeyEntity>()),
+            db.Repository<GameUserEmailEntity>(),
             new FakeGamePenaltyEnforcementService(),
             new GameUserPasswordService());
     }

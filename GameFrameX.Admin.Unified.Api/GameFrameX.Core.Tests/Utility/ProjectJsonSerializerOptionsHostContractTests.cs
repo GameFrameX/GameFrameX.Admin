@@ -12,7 +12,7 @@ public class ProjectJsonSerializerOptionsHostContractTests
     {
         public long Id { get; set; }
 
-        public long? TenantId { get; set; }
+        public long? Id { get; set; }
 
         public long CreatedTime { get; set; }
 
@@ -28,23 +28,23 @@ public class ProjectJsonSerializerOptionsHostContractTests
         var json = JsonSerializer.Serialize(new HostJsonContract
         {
             Id = 4664278385747429000,
-            TenantId = 1300000000001,
+            Id = 1300000000001,
             CreatedTime = 1784073600,
             Name = "hub",
         }, options);
 
         Assert.Contains("\"Id\":\"4664278385747429000\"", json);
-        Assert.Contains("\"TenantId\":\"1300000000001\"", json);
+        Assert.Contains("\"Id\":\"1300000000001\"", json);
         // 非 Id 结尾 long 不受契约影响，保持数字
         Assert.Contains("\"CreatedTime\":1784073600", json);
         Assert.Contains("\"Name\":\"hub\"", json);
 
         // 反向宽容读取：字符串与数字形式的 Id 均可绑定（既有客户端提交数字不破坏）
-        var fromString = JsonSerializer.Deserialize<HostJsonContract>("{\"Id\":\"4664278385747429000\",\"TenantId\":null,\"CreatedTime\":0,\"Name\":null}", options);
+        var fromString = JsonSerializer.Deserialize<HostJsonContract>("{\"Id\":\"4664278385747429000\",\"Id\":null,\"CreatedTime\":0,\"Name\":null}", options);
         Assert.NotNull(fromString);
         Assert.Equal(4664278385747429000, fromString.Id);
 
-        var fromNumber = JsonSerializer.Deserialize<HostJsonContract>("{\"Id\":100,\"TenantId\":null,\"CreatedTime\":0,\"Name\":null}", options);
+        var fromNumber = JsonSerializer.Deserialize<HostJsonContract>("{\"Id\":100,\"Id\":null,\"CreatedTime\":0,\"Name\":null}", options);
         Assert.NotNull(fromNumber);
         Assert.Equal(100, fromNumber.Id);
     }

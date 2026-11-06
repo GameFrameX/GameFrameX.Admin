@@ -9,25 +9,25 @@ using GameFrameX.Application.GmCenter.LiveOps.Dispatch;
 using GameFrameX.Application.GmCenter.LiveOps.PlayerSegment.Dto;
 using GameFrameX.Application.GmCenter.RolloutSemanticMap;
 using GameFrameX.Entity.Game.Online;
-using GameFrameX.Entity.Tenant.Game.Online;
+using GameFrameX.Entity.Business.Game.Online;
 using GameFrameX.Foundation.Json;
 
 #pragma warning disable CS8602, CS8604 // WhereIF(condition, lambda)：lambda 仅在 condition=true 时执行；NRT 无法跨方法传播条件守卫，lambda 内 .Trim() 实际安全
 namespace GameFrameX.Application.GmCenter.LiveOps.PlayerSegment;
 
 /// <summary>
-/// 玩家分群管理服务（来源 change C343 / vault:C8 S7.5）。路由前缀 /api/tenantGameOnlinePlayerSegment（去后缀 + lowerCamelCase）。
+/// 玩家分群管理服务（来源 change C343 / vault:C8 S7.5）。路由前缀 /api/gameOnlinePlayerSegment（去后缀 + lowerCamelCase）。
 /// <para>Admin 只编排分群定义（名称 + 条件白名单校验），不解释、不复算命中（语义解释在 Online 侧，对照见 <c>OnlineRolloutSemanticMap</c>）；
 /// 定义生效须经 <c>syncOnline</c> 经统一下发入口同步 Online（Online 分配分群标识回写 LastOnlineSegmentId）；
 /// 编辑定义不会自动重同步，须再次 syncOnline（显式生效，避免隐式半生效状态）。</para>
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
 public class GameOnlinePlayerSegmentService
-    : GenericCrudService<TenantGameOnlinePlayerSegmentEntity,
-        AddTenantGameOnlinePlayerSegmentRequest, UpdateTenantGameOnlinePlayerSegmentRequest,
-        GameOnlinePlayerSegmentResponse, PageTenantGameOnlinePlayerSegmentRequest>
+    : GenericCrudService<GameOnlinePlayerSegmentEntity,
+        AddGameOnlinePlayerSegmentRequest, UpdateGameOnlinePlayerSegmentRequest,
+        GameOnlinePlayerSegmentResponse, PageGameOnlinePlayerSegmentRequest>
 {
-    private readonly SqlSugarRepository<TenantGameOnlineConfigRolloutEntity> _rolloutRepository;
+    private readonly SqlSugarRepository<GameOnlineConfigRolloutEntity> _rolloutRepository;
     private readonly IOnlineLiveOpsDispatchService _dispatchService;
 
     /// <summary>
@@ -36,8 +36,8 @@ public class GameOnlinePlayerSegmentService
     /// <param name="repository"></param>
     /// <param name="rolloutRepository"></param>
     /// <param name="dispatchService"></param>
-    public GameOnlinePlayerSegmentService(SqlSugarRepository<TenantGameOnlinePlayerSegmentEntity> repository,
-        SqlSugarRepository<TenantGameOnlineConfigRolloutEntity> rolloutRepository,
+    public GameOnlinePlayerSegmentService(SqlSugarRepository<GameOnlinePlayerSegmentEntity> repository,
+        SqlSugarRepository<GameOnlineConfigRolloutEntity> rolloutRepository,
         IOnlineLiveOpsDispatchService dispatchService)
         : base(repository)
     {
@@ -48,7 +48,7 @@ public class GameOnlinePlayerSegmentService
     /// <summary>
     /// 分页查询：按 Name / SyncStatus 过滤。
     /// </summary>
-    protected override ISugarQueryable<GameOnlinePlayerSegmentResponse> BuildPageQuery(PageTenantGameOnlinePlayerSegmentRequest input)
+    protected override ISugarQueryable<GameOnlinePlayerSegmentResponse> BuildPageQuery(PageGameOnlinePlayerSegmentRequest input)
     {
         return Repository.AsQueryable()
                          .WhereIF(!string.IsNullOrWhiteSpace(input.Name), u => u.Name.Contains(input.Name.Trim()))
@@ -59,7 +59,7 @@ public class GameOnlinePlayerSegmentService
     /// <summary>
     /// 新增前：条件白名单校验（初始 NotSynced，须 syncOnline 后才可被灰度引用）。
     /// </summary>
-    protected override Task OnAddingAsync(AddTenantGameOnlinePlayerSegmentRequest input)
+    protected override Task OnAddingAsync(AddGameOnlinePlayerSegmentRequest input)
     {
         ValidateConditions(input.ConditionsJson);
         return Task.CompletedTask;
@@ -68,7 +68,7 @@ public class GameOnlinePlayerSegmentService
     /// <summary>
     /// 更新前：同步状态机字段从既有实体回填（同步回执不可经编辑清除）。
     /// </summary>
-    protected override async Task OnUpdatingAsync(UpdateTenantGameOnlinePlayerSegmentRequest input)
+    protected override async Task OnUpdatingAsync(UpdateGameOnlinePlayerSegmentRequest input)
     {
         var existing = await Repository.GetFirstAsync(u => u.Id == input.Id);
         if (existing == null)

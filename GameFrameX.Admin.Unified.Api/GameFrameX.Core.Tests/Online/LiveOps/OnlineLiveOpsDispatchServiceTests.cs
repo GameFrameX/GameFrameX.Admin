@@ -10,11 +10,11 @@ using GameFrameX.Core.Service.User;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Entity.Game.Mail;
 using GameFrameX.Entity.Game.Online;
-using GameFrameX.Entity.Tenant.Device;
-using GameFrameX.Entity.Tenant.Game;
-using GameFrameX.Entity.Tenant.Game.Announcement;
-using GameFrameX.Entity.Tenant.Game.Online;
-using GameFrameX.Entity.Tenant.Game.RemoteConfig;
+using GameFrameX.Entity.Business.Device;
+using GameFrameX.Entity.Business.Game;
+using GameFrameX.Entity.Business.Game.Announcement;
+using GameFrameX.Entity.Business.Game.Online;
+using GameFrameX.Entity.Business.Game.RemoteConfig;
 using GameFrameX.Foundation.Orm.Entity;
 using Microsoft.AspNetCore.Http;
 using SqlSugar;
@@ -28,7 +28,7 @@ namespace GameFrameX.Core.Tests.Online.LiveOps;
 // 分群同步通道回执映射。作用域走真实 OnlineScopeContextFactory（含租户归属校验）。
 public sealed class OnlineLiveOpsDispatchServiceTests : IDisposable
 {
-    private const long TenantA = 1001;
+    private const long A = 1001;
     private const long App100 = 100;
     private const long App200 = 200;
     private const long Area1001 = 2001; // 归属 App100
@@ -53,12 +53,12 @@ public sealed class OnlineLiveOpsDispatchServiceTests : IDisposable
         SqlSugarUnifiedConfig.ConfigureBaseFilters(_db);
         _db.CodeFirst.InitTables(
 
-            typeof(TenantGameAreaEntity),
-            typeof(TenantGameAppRemoteConfigEntity),
-            typeof(TenantGameAppDeviceGroupEntity),
-            typeof(TenantGameTimeJobEntity),
-            typeof(TenantGameAnnouncementEntity),
-            typeof(TenantGameMailCampaignEntity));
+            typeof(GameAreaEntity),
+            typeof(GameAppRemoteConfigEntity),
+            typeof(GameAppDeviceGroupEntity),
+            typeof(GameTimeJobEntity),
+            typeof(GameAnnouncementEntity),
+            typeof(GameMailCampaignEntity));
     }
 
     /// <summary>
@@ -197,7 +197,7 @@ public sealed class OnlineLiveOpsDispatchServiceTests : IDisposable
         var service = CreateService();
         _client.RespondWith = action => new OnlineLiveOpsResponse { ConfirmVersion = "seg-cv", SegmentId = 501, };
 
-        var segment = new TenantGameOnlinePlayerSegmentEntity
+        var segment = new GameOnlinePlayerSegmentEntity
         {
             Id = 7001,
             Name = "七日活跃",
@@ -229,20 +229,20 @@ public sealed class OnlineLiveOpsDispatchServiceTests : IDisposable
     {
         return new OnlineLiveOpsDispatchService(
             _client,
-            new OnlineScopeContextFactory(Repository<TenantGameAreaEntity>()),
-            Repository<TenantGameAppRemoteConfigEntity>(),
-            Repository<TenantGameAppDeviceGroupEntity>(),
-            Repository<TenantGameTimeJobEntity>(),
-            Repository<TenantGameAnnouncementEntity>(),
-            Repository<TenantGameMailCampaignEntity>());
+            new OnlineScopeContextFactory(Repository<GameAreaEntity>()),
+            Repository<GameAppRemoteConfigEntity>(),
+            Repository<GameAppDeviceGroupEntity>(),
+            Repository<GameTimeJobEntity>(),
+            Repository<GameAnnouncementEntity>(),
+            Repository<GameMailCampaignEntity>());
     }
 
-    private static CurrentUserContext CreateUserContext(long? tenantId)
+    private static CurrentUserContext CreateUserContext(long? id)
     {
         var identity = new ClaimsIdentity("TestAuth");
-        if (tenantId.HasValue)
+        if (id.HasValue)
         {
-            identity.AddClaim(new Claim("TenantId", tenantId.Value.ToString()));
+            identity.AddClaim(new Claim("Id", id.Value.ToString()));
         }
 
         var httpContext = new DefaultHttpContext { User = new ClaimsPrincipal(identity), };
@@ -262,14 +262,14 @@ public sealed class OnlineLiveOpsDispatchServiceTests : IDisposable
         await _db.Insertable(NewArea(Area1001, App100, now)).ExecuteCommandAsync();
 
         // 四类配置来源各一行（归属 App100）；公告 9005 归属 App200（构造跨应用场景）
-        await _db.Insertable(FillStrings(new TenantGameAppRemoteConfigEntity { Id = 9001, })).ExecuteCommandAsync();
-        await _db.Insertable(FillStrings(new TenantGameAppDeviceGroupEntity { Id = 9002, })).ExecuteCommandAsync();
-        await _db.Insertable(FillStrings(new TenantGameTimeJobEntity { Id = 9003, })).ExecuteCommandAsync();
-        await _db.Insertable(FillStrings(new TenantGameAnnouncementEntity { Id = 9004, })).ExecuteCommandAsync();
-        await _db.Insertable(FillStrings(new TenantGameAnnouncementEntity { Id = 9005, })).ExecuteCommandAsync();
+        await _db.Insertable(FillStrings(new GameAppRemoteConfigEntity { Id = 9001, })).ExecuteCommandAsync();
+        await _db.Insertable(FillStrings(new GameAppDeviceGroupEntity { Id = 9002, })).ExecuteCommandAsync();
+        await _db.Insertable(FillStrings(new GameTimeJobEntity { Id = 9003, })).ExecuteCommandAsync();
+        await _db.Insertable(FillStrings(new GameAnnouncementEntity { Id = 9004, })).ExecuteCommandAsync();
+        await _db.Insertable(FillStrings(new GameAnnouncementEntity { Id = 9005, })).ExecuteCommandAsync();
 
         // 邮件方案C 场景：9101 Published（Area1001 / v3 / CampaignId 77），9102 Draft
-        await _db.Insertable(FillStrings(new TenantGameMailCampaignEntity
+        await _db.Insertable(FillStrings(new GameMailCampaignEntity
         {
             Id = 9101,
             AreaId = Area1001,
@@ -280,7 +280,7 @@ public sealed class OnlineLiveOpsDispatchServiceTests : IDisposable
             CreatedTime = now,
             IsDeleted = false,
         })).ExecuteCommandAsync();
-        await _db.Insertable(FillStrings(new TenantGameMailCampaignEntity
+        await _db.Insertable(FillStrings(new GameMailCampaignEntity
         {
             Id = 9102,
             AreaId = Area1001,
@@ -291,9 +291,9 @@ public sealed class OnlineLiveOpsDispatchServiceTests : IDisposable
         })).ExecuteCommandAsync();
     }
 
-    private static TenantGameAreaEntity NewArea(long id, long gameAppId, long now)
+    private static GameAreaEntity NewArea(long id, long gameAppId, long now)
     {
-        return FillStrings(new TenantGameAreaEntity
+        return FillStrings(new GameAreaEntity
         {
             Id = id,
             CreatedTime = now,

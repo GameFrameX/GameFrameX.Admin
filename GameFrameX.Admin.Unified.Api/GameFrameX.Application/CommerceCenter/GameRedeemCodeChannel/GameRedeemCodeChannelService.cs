@@ -8,11 +8,11 @@ namespace GameFrameX.Application.CommerceCenter.GameRedeemCodeChannel;
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
 public class GameRedeemCodeChannelService
-    : GenericCrudSelectService<Entity.Tenant.Game.TenantGameRedeemCodeChannelEntity,
-        AddTenantGameRedeemCodeChannelEntityRequest, UpdateTenantGameRedeemCodeChannelEntityRequest,
-        GameRedeemCodeChannelResponse, PageTenantGameRedeemCodeChannelEntityRequest>
+    : GenericCrudSelectService<Entity.Business.Game.GameRedeemCodeChannelEntity,
+        AddGameRedeemCodeChannelEntityRequest, UpdateGameRedeemCodeChannelEntityRequest,
+        GameRedeemCodeChannelResponse, PageGameRedeemCodeChannelEntityRequest>
 {
-    public GameRedeemCodeChannelService(SqlSugarRepository<Entity.Tenant.Game.TenantGameRedeemCodeChannelEntity> repository)
+    public GameRedeemCodeChannelService(SqlSugarRepository<Entity.Business.Game.GameRedeemCodeChannelEntity> repository)
         : base(repository)
     {
     }
@@ -20,7 +20,7 @@ public class GameRedeemCodeChannelService
     /// <summary>
     /// 新增前校验每角色可用次数。
     /// </summary>
-    protected override Task OnAddingAsync(AddTenantGameRedeemCodeChannelEntityRequest input)
+    protected override Task OnAddingAsync(AddGameRedeemCodeChannelEntityRequest input)
     {
         EnsureValidRoleUsageLimit(input.RoleUsageLimit);
         return Task.CompletedTask;
@@ -29,7 +29,7 @@ public class GameRedeemCodeChannelService
     /// <summary>
     /// 更新前验证记录存在。
     /// </summary>
-    protected override async Task OnUpdatingAsync(UpdateTenantGameRedeemCodeChannelEntityRequest input)
+    protected override async Task OnUpdatingAsync(UpdateGameRedeemCodeChannelEntityRequest input)
     {
         var existing = await Repository.GetFirstAsync(u => u.Id == input.Id);
         if (existing == null)
@@ -51,7 +51,7 @@ public class GameRedeemCodeChannelService
         }
     }
 
-    protected override ISugarQueryable<GameRedeemCodeChannelResponse> BuildPageQuery(PageTenantGameRedeemCodeChannelEntityRequest input)
+    protected override ISugarQueryable<GameRedeemCodeChannelResponse> BuildPageQuery(PageGameRedeemCodeChannelEntityRequest input)
     {
         return Repository.AsQueryable()
                          .WhereIF(!string.IsNullOrWhiteSpace(input.Name), u => u.Name.Contains(input.Name.Trim()))

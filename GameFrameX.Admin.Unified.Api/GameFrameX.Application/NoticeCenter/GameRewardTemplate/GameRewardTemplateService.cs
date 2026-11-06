@@ -9,28 +9,28 @@ namespace GameFrameX.Application.NoticeCenter.GameRewardTemplate;
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
 public class GameRewardTemplateService
-    : GenericCrudSelectService<Entity.Tenant.Game.TenantGameRewardTemplateEntity,
-        AddTenantGameRewardTemplateEntityRequest, UpdateTenantGameRewardTemplateEntityRequest,
-        GameRewardTemplateResponse, PageTenantGameRewardTemplateEntityRequest>
+    : GenericCrudSelectService<Entity.Business.Game.GameRewardTemplateEntity,
+        AddGameRewardTemplateEntityRequest, UpdateGameRewardTemplateEntityRequest,
+        GameRewardTemplateResponse, PageGameRewardTemplateEntityRequest>
 {
-    private readonly SqlSugarRepository<Entity.Tenant.Game.TenantGameRewardTemplateGroupEntity> _groupRepository;
+    private readonly SqlSugarRepository<Entity.Business.Game.GameRewardTemplateGroupEntity> _groupRepository;
 
     public GameRewardTemplateService(
-        SqlSugarRepository<Entity.Tenant.Game.TenantGameRewardTemplateEntity> repository,
-        SqlSugarRepository<Entity.Tenant.Game.TenantGameRewardTemplateGroupEntity> groupRepository)
+        SqlSugarRepository<Entity.Business.Game.GameRewardTemplateEntity> repository,
+        SqlSugarRepository<Entity.Business.Game.GameRewardTemplateGroupEntity> groupRepository)
         : base(repository)
     {
         _groupRepository = groupRepository;
     }
 
-    protected override ISugarQueryable<GameRewardTemplateResponse> BuildPageQuery(PageTenantGameRewardTemplateEntityRequest input)
+    protected override ISugarQueryable<GameRewardTemplateResponse> BuildPageQuery(PageGameRewardTemplateEntityRequest input)
     {
         return Repository.AsQueryable()
                          .WhereIF(!string.IsNullOrWhiteSpace(input.SearchKey), u => u.Name.Contains(input.SearchKey.Trim()))
                          .WhereIF(!string.IsNullOrWhiteSpace(input.Name), u => u.Name.Contains(input.Name.Trim()))
                          .WhereIF(input.GroupId.HasValue, u => u.GroupId == input.GroupId.Value)
                          .WhereIF(input.IsEnabled.HasValue, u => u.IsEnabled == input.IsEnabled.Value)
-                         .LeftJoin<Entity.Tenant.Game.TenantGameRewardTemplateGroupEntity>((t, g) => t.GroupId == g.Id)
+                         .LeftJoin<Entity.Business.Game.GameRewardTemplateGroupEntity>((t, g) => t.GroupId == g.Id)
                          .Select((t, g) => new GameRewardTemplateResponse
                          {
                              Id = t.Id,
@@ -100,14 +100,14 @@ public class GameRewardTemplateService
         };
     }
 
-    protected override async Task OnAddingAsync(AddTenantGameRewardTemplateEntityRequest input)
+    protected override async Task OnAddingAsync(AddGameRewardTemplateEntityRequest input)
     {
         await ValidateGroupAsync(input.GroupId);
         ValidateRewardItemsJson(input.RewardItemsJson);
         input.SnapshotSchemaVersion = 1;
     }
 
-    protected override async Task OnUpdatingAsync(UpdateTenantGameRewardTemplateEntityRequest input)
+    protected override async Task OnUpdatingAsync(UpdateGameRewardTemplateEntityRequest input)
     {
         var existing = await Repository.GetFirstAsync(u => u.Id == input.Id);
         if (existing == null)

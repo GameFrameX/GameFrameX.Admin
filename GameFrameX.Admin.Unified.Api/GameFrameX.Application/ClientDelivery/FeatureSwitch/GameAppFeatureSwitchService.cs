@@ -1,8 +1,8 @@
 using GameFrameX.Application.ClientDelivery.AppScope;
 using GameFrameX.Application.ClientDelivery.FeatureSwitch.Dto;
 using GameFrameX.Core.Const;
-using GameFrameX.Entity.Tenant.Game.App;
-using GameFrameX.Entity.Tenant.Game.FeatureSwitch;
+using GameFrameX.Entity.Business.Game.App;
+using GameFrameX.Entity.Business.Game.FeatureSwitch;
 
 namespace GameFrameX.Application.ClientDelivery.FeatureSwitch;
 
@@ -12,17 +12,17 @@ namespace GameFrameX.Application.ClientDelivery.FeatureSwitch;
 /// Default 哨兵、同作用域组合不重复。</para>
 /// </summary>
 [ApiDescriptionSettings(ClientConst.GroupName, Order = 100)]
-public class GameAppFeatureSwitchService : GenericCrudService<TenantGameAppFeatureSwitchEntity, AddGameAppFeatureSwitchRequest, UpdateGameAppFeatureSwitchRequest, GameAppFeatureSwitchResponse, PageGameAppFeatureSwitchRequest>
+public class GameAppFeatureSwitchService : GenericCrudService<GameAppFeatureSwitchEntity, AddGameAppFeatureSwitchRequest, UpdateGameAppFeatureSwitchRequest, GameAppFeatureSwitchResponse, PageGameAppFeatureSwitchRequest>
 {
-    private readonly SqlSugarRepository<TenantGameAppPackageEntity> _packageRepository;
+    private readonly SqlSugarRepository<GameAppPackageEntity> _packageRepository;
 
     /// <summary>
     /// 初始化活动/功能开关管理服务。
     /// </summary>
     /// <param name="repository">开关注册表仓储。</param>
     /// <param name="packageRepository">分包仓储，供包名作用域校验使用。</param>
-    public GameAppFeatureSwitchService(SqlSugarRepository<TenantGameAppFeatureSwitchEntity> repository,
-        SqlSugarRepository<TenantGameAppPackageEntity> packageRepository) : base(repository)
+    public GameAppFeatureSwitchService(SqlSugarRepository<GameAppFeatureSwitchEntity> repository,
+        SqlSugarRepository<GameAppPackageEntity> packageRepository) : base(repository)
     {
         _packageRepository = packageRepository;
     }

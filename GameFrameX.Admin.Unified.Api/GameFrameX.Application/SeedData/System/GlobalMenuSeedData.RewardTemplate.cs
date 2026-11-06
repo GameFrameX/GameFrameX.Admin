@@ -63,7 +63,7 @@ public partial class GlobalMenuSeedData
             CreatedTime = RewardTemplateSeedTime,
             UpdateTime = RewardTemplateSeedTime,
             SuperAdminOnly = false,
-            AllowTenantWhenSuperAdminOnly = false,
+            AllowAdminWhenSuperAdminOnly = false,
             IsDeleted = false,
         };
     }
@@ -95,7 +95,7 @@ public partial class GlobalMenuSeedData
             CreatedTime = RewardTemplateSeedTime,
             UpdateTime = RewardTemplateSeedTime,
             SuperAdminOnly = false,
-            AllowTenantWhenSuperAdminOnly = false,
+            AllowAdminWhenSuperAdminOnly = false,
             IsDeleted = false,
         };
     }

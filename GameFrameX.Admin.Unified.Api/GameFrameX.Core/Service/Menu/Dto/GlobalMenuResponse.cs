@@ -111,10 +111,10 @@ public class GlobalMenuResponse
     /// <summary>
     /// 超管专属菜单下允许租户只读访问
     /// </summary>
-    public bool AllowTenantWhenSuperAdminOnly { get; set; }
+    public bool AllowAdminWhenSuperAdminOnly { get; set; }
 
     /// <summary>
-    /// 应用作用域（Tenant 租户默认 / Platform 仅超管 / App 应用工作台）。显式声明菜单归属域，取代路由前缀推断。
+    /// 应用作用域（Business 租户默认 / Platform 仅超管 / App 应用工作台）。显式声明菜单归属域，取代路由前缀推断。
     /// </summary>
     public MenuAppScopeEnum AppScope { get; set; }
 

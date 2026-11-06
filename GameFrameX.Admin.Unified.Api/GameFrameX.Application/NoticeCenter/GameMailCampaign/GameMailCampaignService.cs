@@ -18,17 +18,17 @@ using GameFrameX.Foundation.Json;
 namespace GameFrameX.Application.NoticeCenter.GameMailCampaign;
 
 /// <summary>
-/// 运营邮件 Campaign 草稿/发布/撤回管理服务。路由前缀 /api/tenantGameMailCampaignEntity（历史框架 去后缀 + lowerCamelCase）。
+/// 运营邮件 Campaign 草稿/发布/撤回管理服务。路由前缀 /api/gameMailCampaignEntity（历史框架 去后缀 + lowerCamelCase）。
 /// <para>状态机 B1/B3/B4：Draft 可自由增删改与发布重试；Published/Revoked 主体不可编辑/删除（B1），仅 Published 可撤回（撤回不可逆 B3）；Server 拒绝落 Failed。</para>
 /// <para>与既有 <c>GameMailService</c>（直发 post_mail）是两套独立系统，不合并。</para>
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
 public class GameMailCampaignService
-    : GenericCrudService<TenantGameMailCampaignEntity,
-        AddTenantGameMailCampaignEntityRequest, UpdateTenantGameMailCampaignEntityRequest,
-        GameMailCampaignResponse, PageTenantGameMailCampaignEntityRequest>
+    : GenericCrudService<GameMailCampaignEntity,
+        AddGameMailCampaignEntityRequest, UpdateGameMailCampaignEntityRequest,
+        GameMailCampaignResponse, PageGameMailCampaignEntityRequest>
 {
-    private readonly SqlSugarRepository<Entity.Tenant.Game.TenantGameAreaEntity> _gameAreaRepository;
+    private readonly SqlSugarRepository<Entity.Business.Game.GameAreaEntity> _gameAreaRepository;
     private readonly IMailCampaignServerClient _serverClient;
     private readonly IOnlineLiveOpsDispatchService _dispatchService;
     private readonly CurrentUserContext _currentUserContext;
@@ -41,8 +41,8 @@ public class GameMailCampaignService
     /// <param name="serverClient"></param>
     /// <param name="dispatchService"></param>
     /// <param name="currentUserContext"></param>
-    public GameMailCampaignService(SqlSugarRepository<TenantGameMailCampaignEntity> repository,
-        SqlSugarRepository<Entity.Tenant.Game.TenantGameAreaEntity> gameAreaRepository,
+    public GameMailCampaignService(SqlSugarRepository<GameMailCampaignEntity> repository,
+        SqlSugarRepository<Entity.Business.Game.GameAreaEntity> gameAreaRepository,
         IMailCampaignServerClient serverClient,
         IOnlineLiveOpsDispatchService dispatchService,
         CurrentUserContext currentUserContext)
@@ -57,7 +57,7 @@ public class GameMailCampaignService
     /// <summary>
     /// 分页查询：按 Name / MailType / PublishStatus / TemplateId / ServerCampaignId / AreaId 过滤。
     /// </summary>
-    protected override ISugarQueryable<GameMailCampaignResponse> BuildPageQuery(PageTenantGameMailCampaignEntityRequest input)
+    protected override ISugarQueryable<GameMailCampaignResponse> BuildPageQuery(PageGameMailCampaignEntityRequest input)
     {
         return Repository.AsQueryable()
                          .WhereIF(input.AreaId.HasValue, u => u.AreaId == input.AreaId.Value)
@@ -72,7 +72,7 @@ public class GameMailCampaignService
     /// <summary>
     /// 新增前校验内容（多语言标题至少 1 项、附件数量&gt;0）。
     /// </summary>
-    protected override Task OnAddingAsync(AddTenantGameMailCampaignEntityRequest input)
+    protected override Task OnAddingAsync(AddGameMailCampaignEntityRequest input)
     {
         ValidateDraftContent(input.TitlesJson, input.AttachmentsJson);
         return Task.CompletedTask;
@@ -81,7 +81,7 @@ public class GameMailCampaignService
     /// <summary>
     /// 更新前：仅 Draft 可编辑（Published/Revoked 主体不可变 B1）；AreaId 从既有实体回填不可变。
     /// </summary>
-    protected override async Task OnUpdatingAsync(UpdateTenantGameMailCampaignEntityRequest input)
+    protected override async Task OnUpdatingAsync(UpdateGameMailCampaignEntityRequest input)
     {
         var existing = await Repository.GetFirstAsync(u => u.Id == input.Id);
         if (existing == null)
@@ -281,7 +281,7 @@ public class GameMailCampaignService
     /// <summary>
     /// 解析目标区服（调用 Server 接口的目标地址由区服 HttpManageUrl + FulfillmentApiPrefix 承载，来源 change C175）。
     /// </summary>
-    private async Task<Entity.Tenant.Game.TenantGameAreaEntity> ResolveAreaAsync(long areaId)
+    private async Task<Entity.Business.Game.GameAreaEntity> ResolveAreaAsync(long areaId)
     {
         var area = await _gameAreaRepository.GetFirstAsync(u => u.Id == areaId);
         if (area == null || string.IsNullOrWhiteSpace(area.HttpManageUrl))
@@ -315,7 +315,7 @@ public class GameMailCampaignService
         }
     }
 
-    private static PreviewMailCampaignRequest BuildPreviewRequest(TenantGameMailCampaignEntity entity)
+    private static PreviewMailCampaignRequest BuildPreviewRequest(GameMailCampaignEntity entity)
     {
         return new PreviewMailCampaignRequest
         {
@@ -332,7 +332,7 @@ public class GameMailCampaignService
         };
     }
 
-    private static PublishMailCampaignRequest BuildPublishRequest(TenantGameMailCampaignEntity entity)
+    private static PublishMailCampaignRequest BuildPublishRequest(GameMailCampaignEntity entity)
     {
         return new PublishMailCampaignRequest
         {

@@ -5,7 +5,7 @@ using GameFrameX.Entity.Global;
 
 namespace GameFrameX.Core.Tests.Online.Asset;
 
-// C340 / GFX-752 菜单 seed 结构自检（vault:C4 + C324 受众前缀化守护 + 高危按钮 TenantAdmin 独占）：
+// C340 / GFX-752 菜单 seed 结构自检（vault:C4 + C324 受众前缀化守护 + 高危按钮 Admin 独占）：
 // 在线平台容器 + 三页面 + 五按钮（页面查询 ×3 + grant/revoke ×2 高危）。
 // 本测试在 psql 不可用的环境（CI / 本机离线）下提供结构断言兜底；正式仓库以 psql 实测为铁证。
 public sealed class OnlineAssetMenuSeedTests
@@ -49,7 +49,7 @@ public sealed class OnlineAssetMenuSeedTests
     }
 
     [Fact]
-    public void OnlineAssetMenus_HighRiskButtons_AreTenantAdminOnly()
+    public void OnlineAssetMenus_HighRiskButtons_AreAdminOnly()
     {
         var menus = GlobalMenuSeedData.BuildData();
         var grant = Assert.Single(menus, m => m.Key == "onlineWalletLedger:grant");
@@ -60,7 +60,7 @@ public sealed class OnlineAssetMenuSeedTests
         Assert.Equal("onlineAssetGrantCommand:grant", grant.Permission);
         Assert.Equal("人工发放", grant.Title);
         Assert.Equal(200, grant.OrderNo);
-        // 高危：仅 TenantAdmin 可见可执行；OpsManager 排除。
+        // 高危：仅 Admin 可见可执行；OpsManager 排除。
 
         Assert.Equal(MenuTypeEnum.Button, revoke.Type);
         Assert.Equal(StableSeedId.Menu("route:onlineWalletLedger"), revoke.Pid);

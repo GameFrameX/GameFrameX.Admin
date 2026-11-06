@@ -1,6 +1,6 @@
 using GameFrameX.Client.Api.GameUserReward;
 using GameFrameX.Core.Tests.ClientApi;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 using GameFrameX.Client.Api.GameUserReward.Dto;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Client.Api.Services;
@@ -64,9 +64,9 @@ public sealed class GameUserRewardTests
 
     private static GameUserRewardController CreateController(ClientApiTestDb db)
     {
-        db.InitTenantTables(typeof(TenantGameUserRewardEntity));
-        var tenantDbProvider = db.MainDb;
-        var repository = new Repository<TenantGameUserRewardEntity>(db.MainDb);
+        db.InitBusinessTables(typeof(GameUserRewardEntity));
+        var dbProvider = db.MainDb;
+        var repository = new Repository<GameUserRewardEntity>(db.MainDb);
         return new GameUserRewardController(repository);
     }
 }

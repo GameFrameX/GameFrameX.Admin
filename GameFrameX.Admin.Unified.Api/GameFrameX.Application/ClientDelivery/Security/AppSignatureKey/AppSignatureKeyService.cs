@@ -1,8 +1,8 @@
 using System.Security.Cryptography;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 using GameFrameX.Application.ClientDelivery.Security.AppSignatureKey.Dto;
 using GameFrameX.Core.Service;
-using GameFrameX.Core.Service.Tenant;
+using GameFrameX.Core.Service.Business;
 
 #pragma warning disable CS8629 // SqlSugar WhereIF(condition, lambda)：lambda 仅在 condition=true 时执行；NRT 无法跨方法传播条件守卫，lambda 内 .Value 实际安全
 namespace GameFrameX.Application.ClientDelivery.Security.AppSignatureKey;
@@ -11,12 +11,12 @@ namespace GameFrameX.Application.ClientDelivery.Security.AppSignatureKey;
 /// App 传输签名密钥环管理服务（change C2 sig-keyring-server）。
 /// <para>密钥明文仅服务端随机生成（不接受外部提交，避免弱密钥入环），仅 AddAsync/RotateAsync 响应一次性回显；
 /// 列表/详情一律脱敏 ******；实体禁删（历史 key 是在途请求与多版本客户端的验签依据），退场走 DisableAsync 或租约到期。</para>
-/// <para>作用域：主库。路由前缀 /api/tenantAppSignatureKeyEntity（动态路由规则：去 Service 后缀 + lowerCamelCase）。</para>
+/// <para>作用域：主库。路由前缀 /api/appSignatureKeyEntity（动态路由规则：去 Service 后缀 + lowerCamelCase）。</para>
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 114)]
-public class AppSignatureKeyService : BaseService<TenantAppSignatureKeyEntity>
+public class AppSignatureKeyService : BaseService<AppSignatureKeyEntity>
 {
-    public AppSignatureKeyService(SqlSugarRepository<TenantAppSignatureKeyEntity> repository)
+    public AppSignatureKeyService(SqlSugarRepository<AppSignatureKeyEntity> repository)
         : base(repository)
     {
     }
@@ -26,7 +26,7 @@ public class AppSignatureKeyService : BaseService<TenantAppSignatureKeyEntity>
     /// </summary>
     [HttpPost("page")]
     [ApiDescriptionSettings(Name = "Page")]
-    public async Task<SqlSugarPagedList<AppSignatureKeyResponse>> PageAsync(PageTenantAppSignatureKeyRequest input)
+    public async Task<SqlSugarPagedList<AppSignatureKeyResponse>> PageAsync(PageAppSignatureKeyRequest input)
     {
         var page = await Repository.AsQueryable()
                                    .Where(u => u.IsDeleted == false)
@@ -56,10 +56,10 @@ public class AppSignatureKeyService : BaseService<TenantAppSignatureKeyEntity>
         ValidateLease(notBefore, input.ExpireTime, now);
 
         var plainSecret = GenerateSecret();
-        var entity = new TenantAppSignatureKeyEntity
+        var entity = new AppSignatureKeyEntity
         {
             Kid = GenerateKid(now),
-            Secret = TenantSecretCrypto.Encrypt(plainSecret) ?? string.Empty,
+            Secret = SecretCrypto.Encrypt(plainSecret) ?? string.Empty,
             NotBeforeTime = notBefore,
             ExpireTime = input.ExpireTime,
             IsEnabled = true,
@@ -87,10 +87,10 @@ public class AppSignatureKeyService : BaseService<TenantAppSignatureKeyEntity>
         }
 
         var plainSecret = GenerateSecret();
-        var entity = new TenantAppSignatureKeyEntity
+        var entity = new AppSignatureKeyEntity
         {
             Kid = GenerateKid(now),
-            Secret = TenantSecretCrypto.Encrypt(plainSecret) ?? string.Empty,
+            Secret = SecretCrypto.Encrypt(plainSecret) ?? string.Empty,
             NotBeforeTime = now,
             ExpireTime = null,
             IsEnabled = true,
@@ -231,7 +231,7 @@ public class AppSignatureKeyService : BaseService<TenantAppSignatureKeyEntity>
     /// <summary>
     /// 一次性回显输出：库内密文（C371），响应携带生成时明文。
     /// </summary>
-    private static AppSignatureKeyRevealResponse ToRevealOutput(TenantAppSignatureKeyEntity entity, string plainSecret)
+    private static AppSignatureKeyRevealResponse ToRevealOutput(AppSignatureKeyEntity entity, string plainSecret)
     {
         return new AppSignatureKeyRevealResponse
         {

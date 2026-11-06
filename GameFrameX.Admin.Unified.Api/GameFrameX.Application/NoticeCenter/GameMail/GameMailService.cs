@@ -14,27 +14,27 @@ namespace GameFrameX.Application.NoticeCenter.GameMail;
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
 public class GameMailService
-    : GenericCrudService<Entity.Tenant.Game.TenantGameMailEntity,
-        AddTenantGameMailEntityRequest, UpdateTenantGameMailEntityRequest,
-        GameMailResponse, PageTenantGameMailEntityRequest>
+    : GenericCrudService<Entity.Business.Game.GameMailEntity,
+        AddGameMailEntityRequest, UpdateGameMailEntityRequest,
+        GameMailResponse, PageGameMailEntityRequest>
 {
-    private readonly SqlSugarRepository<Entity.Tenant.Game.TenantGameAreaEntity> _gameAreaEntityRepository;
+    private readonly SqlSugarRepository<Entity.Business.Game.GameAreaEntity> _gameAreaEntityRepository;
     private readonly HttpClient _httpClientFactory;
 
     /// <summary>
     ///
     /// </summary>
     /// <param name="repository"></param>
-    /// <param name="systemTenantGameAreaEntity"></param>
+    /// <param name="systemGameAreaEntity"></param>
     /// <param name="httpClientFactory"></param>
-    public GameMailService(SqlSugarRepository<Entity.Tenant.Game.TenantGameMailEntity> repository, SqlSugarRepository<Entity.Tenant.Game.TenantGameAreaEntity> systemTenantGameAreaEntity, HttpClient httpClientFactory)
+    public GameMailService(SqlSugarRepository<Entity.Business.Game.GameMailEntity> repository, SqlSugarRepository<Entity.Business.Game.GameAreaEntity> systemGameAreaEntity, HttpClient httpClientFactory)
         : base(repository)
     {
         _httpClientFactory = httpClientFactory;
-        _gameAreaEntityRepository = systemTenantGameAreaEntity;
+        _gameAreaEntityRepository = systemGameAreaEntity;
     }
 
-    protected override ISugarQueryable<GameMailResponse> BuildPageQuery(PageTenantGameMailEntityRequest input)
+    protected override ISugarQueryable<GameMailResponse> BuildPageQuery(PageGameMailEntityRequest input)
     {
         return Repository.AsQueryable()
                          .WhereIF(!string.IsNullOrWhiteSpace(input.SearchKey), u =>
@@ -49,13 +49,13 @@ public class GameMailService
     /// <summary>
     /// 新增前校验角色并解析附件道具。
     /// </summary>
-    protected override async Task OnAddingAsync(AddTenantGameMailEntityRequest input)
+    protected override async Task OnAddingAsync(AddGameMailEntityRequest input)
     {
 
         if (!input.IsAllPost)
         {
             var playerIdList = JsonHelper.Deserialize<List<string>>(input.PlayerIdListJson);
-            var listAsync = await Repository.AsSugarClient().Queryable<Entity.Tenant.Game.TenantGameRoleEntity>().Where(m => playerIdList.Contains(m.Id.ToString())).ToListAsync();
+            var listAsync = await Repository.AsSugarClient().Queryable<Entity.Business.Game.GameRoleEntity>().Where(m => playerIdList.Contains(m.Id.ToString())).ToListAsync();
             if (listAsync.Count != playerIdList.Count)
             {
                 throw new Exception("有玩家的ID不存在");
@@ -70,7 +70,7 @@ public class GameMailService
             // 批量预加载所有商品，避免 N+1 查询
             var goodsIds = list.Select(p => p.Id).Distinct().ToList();
             var goodsDict = (await Repository.AsSugarClient()
-                                             .Queryable<Entity.Tenant.Game.TenantGameGoodsEntity>()
+                                             .Queryable<Entity.Business.Game.GameGoodsEntity>()
                                              .Where(m => goodsIds.Contains(m.Id))
                                              .ToListAsync())
                 .ToDictionary(m => m.Id);
@@ -92,7 +92,7 @@ public class GameMailService
     /// <summary>
     /// 更新前校验记录存在。
     /// </summary>
-    protected override async Task OnUpdatingAsync(UpdateTenantGameMailEntityRequest input)
+    protected override async Task OnUpdatingAsync(UpdateGameMailEntityRequest input)
     {
         var existing = await Repository.GetFirstAsync(u => u.Id == input.Id);
         if (existing == null)
@@ -126,12 +126,12 @@ public class GameMailService
         // 如果不是全区发的获取角色列表
         if (entity.IsAllPost)
         {
-            playerIdArray = Repository.AsSugarClient().Queryable<Entity.Tenant.Game.TenantGameRoleEntity>().Where(u => entity.AreaId == u.AreaId).ToList(m => m.Id);
+            playerIdArray = Repository.AsSugarClient().Queryable<Entity.Business.Game.GameRoleEntity>().Where(u => entity.AreaId == u.AreaId).ToList(m => m.Id);
         }
         else
         {
             var playerIdList = JsonHelper.Deserialize<List<string>>(entity.PlayerIdListJson);
-            playerIdArray = Repository.AsSugarClient().Queryable<Entity.Tenant.Game.TenantGameRoleEntity>().Where(u => entity.AreaId == u.AreaId && playerIdList.Contains(u.Id.ToString())).ToList(m => m.Id);
+            playerIdArray = Repository.AsSugarClient().Queryable<Entity.Business.Game.GameRoleEntity>().Where(u => entity.AreaId == u.AreaId && playerIdList.Contains(u.Id.ToString())).ToList(m => m.Id);
         }
 
         //获取所有的符合要求的邮件

@@ -1,7 +1,7 @@
 using GameFrameX.Core.Service.Cache;
 using GameFrameX.Core.Service.Message;
 using GameFrameX.Core.Service.Message.Dto;
-using GameFrameX.Core.Service.Tenant;
+using GameFrameX.Core.Service.Business;
 using Microsoft.AspNetCore.SignalR;
 using System.Security.Claims;
 
@@ -51,7 +51,7 @@ public class OnlineUserHub : Hub<IOnlineUserHub>
         var client = Parser.GetDefault().Parse(httpContext.Request.Headers["User-Agent"]);
 
         var userId = claims.FirstOrDefault(u => u.Type == ClaimConst.UserId)?.Value;
-        var user = new TenantOnlineUserEntity
+        var user = new OnlineUserEntity
         {
             ConnectionId = Context.ConnectionId,
             UserId = string.IsNullOrWhiteSpace(userId) ? 0 : long.Parse(userId),
@@ -63,7 +63,7 @@ public class OnlineUserHub : Hub<IOnlineUserHub>
             Os = client.OS.Family + client.OS.Major,
         };
 
-        var systemOnlineUserRepository = httpContext.RequestServices.GetRequiredService<SqlSugarRepository<TenantOnlineUserEntity>>();
+        var systemOnlineUserRepository = httpContext.RequestServices.GetRequiredService<SqlSugarRepository<OnlineUserEntity>>();
         await systemOnlineUserRepository.InsertAsync(user);
         _systemCacheService.Set(CacheConst.KeyUserOnline + user.UserId, user);
     }
@@ -86,7 +86,7 @@ public class OnlineUserHub : Hub<IOnlineUserHub>
             return;
         }
 
-        var systemOnlineUserRepository = httpContext.RequestServices.GetRequiredService<SqlSugarRepository<TenantOnlineUserEntity>>();
+        var systemOnlineUserRepository = httpContext.RequestServices.GetRequiredService<SqlSugarRepository<OnlineUserEntity>>();
         var user = await systemOnlineUserRepository.AsQueryable().Filter("", true).FirstAsync(u => u.ConnectionId == Context.ConnectionId);
         if (user == null)
         {

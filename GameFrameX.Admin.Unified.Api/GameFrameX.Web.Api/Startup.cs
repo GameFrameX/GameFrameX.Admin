@@ -84,7 +84,7 @@ public class Startup
         services.AddSingleton<ISystemEmailSender, GameFrameX.Application.Platform.Email.SystemEmailSender>();
         // 对象存储配置 schema 提供器（供 ObjectStorageConfigService 动态渲染和校验）
         services.AddScoped<IObjectStorageConfigSchemaProvider, ObjectStorageConfigSchemaProvider>();
-        // 对象存储 Adapter 工厂（单例；供 TenantFileService 与 TestConnectionAsync 端点解析租户存储配置）
+        // 对象存储 Adapter 工厂（单例；供 FileService 与 TestConnectionAsync 端点解析租户存储配置）
         services.AddSingleton<IObjectStorageAdapterFactory, ObjectStorage.Abstract.DefaultObjectStorageAdapterFactory>();
         services.AddHttpClient();
         services.AddHttpClient<IMailCampaignServerClient, MailCampaignServerClient>();
@@ -104,7 +104,7 @@ public class Startup
         services.AddSingleton<PlatformLoggingConfigProvider>();
         services.AddHostedService<PlatformLoggingStartupLoader>();
         // 平台密码策略运行时配置（C173）：快照由启动加载器填充并镜像同步 CryptogramUtility 密码策略静态属性，
-        // TenantUserService.ChangePwdAsync 读镜像实现保存后同 Host 动态生效
+        // UserService.ChangePwdAsync 读镜像实现保存后同 Host 动态生效
         services.AddSingleton<PlatformPasswordPolicyConfigProvider>();
         services.AddHostedService<PlatformPasswordPolicyStartupLoader>();
         // JWT

@@ -1,12 +1,12 @@
 using System.Net;
 using GameFrameX.Application.Dashboard.GameHome;
 using GameFrameX.Core.Exceptions;
-using GameFrameX.Core.Service.Tenant;
+using GameFrameX.Core.Service.Business;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Core.Cache;
 using GameFrameX.Core.Option;
 using GameFrameX.Entity.Enum;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 using SqlSugar;
 
 namespace GameFrameX.Core.Tests.System;
@@ -16,22 +16,22 @@ namespace GameFrameX.Core.Tests.System;
 // 用 Sqlite 双库 SqlSugarScope 种子数据，伪造 HttpMessageHandler 验证聚合、降级、计数与趋势桶行为。
 public class GameHomeServiceTests : IDisposable
 {
-    private const long TenantId = 1001L;
-    private const string TenantConfigId = "1001";
+    private const long Id = 1001L;
+    private const string ConfigId = "1001";
 
     private readonly string _dbPath = Path.Combine(Path.GetTempPath(), $"game_home_{Guid.NewGuid():N}.db");
     private readonly SqlSugarScope _db;
-    private readonly FakeTenantDbConnectionProvider _tenantDbProvider;
+    private readonly FakeDbConnectionProvider _tenantDbProvider;
 
     public GameHomeServiceTests()
     {
         SqlSugarCache.Configure(new FakeCache());
         // AuthTestHost 判例：连接配置必须经 SqlSugarSetup.SetDbConfig 装配 ConfigureExternalServices
-        // （实体列名/类型服务，[TenantTable] 实体前缀 mutate 也在此链路），否则 ORM 写读列映射不一致
+        // （实体列名/类型服务，[BusinessTable] 实体前缀 mutate 也在此链路），否则 ORM 写读列映射不一致
         // （实测种子 ControlApiPrefix 落 NULL、读回空导致 Build 抛降级）。建表与种子统一走租户库 scope。
         var config = new DbConnectionConfig
         {
-            ConfigId = TenantConfigId,
+            ConfigId = ConfigId,
             DbType = DbType.Sqlite,
             ConnectionString = $"DataSource={_dbPath}",
             IsAutoCloseConnection = true,
@@ -41,12 +41,12 @@ public class GameHomeServiceTests : IDisposable
         };
         SqlSugarSetup.SetDbConfig(config);
         _db = new SqlSugarScope(new List<ConnectionConfig> { config, });
-        var tenantScope = _db.GetConnectionScope(TenantConfigId);
-        tenantScope.CodeFirst.InitTables<TenantGameAreaEntity>();
-        tenantScope.CodeFirst.InitTables<TenantGameOrderEntity>();
-        tenantScope.CodeFirst.InitTables<TenantGameUserEntity>();
-        tenantScope.CodeFirst.InitTables<TenantGameHomeOnlineSampleEntity>();
-        _tenantDbProvider = new FakeTenantDbConnectionProvider(_db, TenantConfigId);
+        var scope = _db.GetConnectionScope(ConfigId);
+        scope.CodeFirst.InitTables<GameAreaEntity>();
+        scope.CodeFirst.InitTables<GameOrderEntity>();
+        scope.CodeFirst.InitTables<GameUserEntity>();
+        scope.CodeFirst.InitTables<GameHomeOnlineSampleEntity>();
+        _tenantDbProvider = new FakeDbConnectionProvider(_db, ConfigId);
     }
 
     private GameHomeService CreateService(HttpClient? httpClient = null)
@@ -218,7 +218,7 @@ public class GameHomeServiceTests : IDisposable
     private async Task SeedAreaAsync(long id, string httpManageUrl, string controlPrefix, GameServerStatus serverStatus = GameServerStatus.Online)
     {
         var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-        await _db.GetConnectionScope(TenantConfigId).Insertable(new TenantGameAreaEntity
+        await _db.GetConnectionScope(ConfigId).Insertable(new GameAreaEntity
         {
             Id = id,
             CreatedId = 1,
@@ -258,7 +258,7 @@ public class GameHomeServiceTests : IDisposable
 
     private async Task SeedOrderAsync(long id, long createdTime, OrderStatusEnum status)
     {
-        await _db.GetConnectionScope(TenantConfigId).Insertable(new TenantGameOrderEntity
+        await _db.GetConnectionScope(ConfigId).Insertable(new GameOrderEntity
         {
             Id = id,
             CreatedId = 1,
@@ -299,7 +299,7 @@ public class GameHomeServiceTests : IDisposable
 
     private async Task SeedPlayerAsync(long id, long createdTime)
     {
-        await _db.GetConnectionScope(TenantConfigId).Insertable(new TenantGameUserEntity
+        await _db.GetConnectionScope(ConfigId).Insertable(new GameUserEntity
         {
             Id = id,
             CreatedId = 1,
@@ -337,7 +337,7 @@ public class GameHomeServiceTests : IDisposable
 
     private async Task SeedSampleAsync(long sampleTime, int onlineCount)
     {
-        await _db.GetConnectionScope(TenantConfigId).Insertable(new TenantGameHomeOnlineSampleEntity
+        await _db.GetConnectionScope(ConfigId).Insertable(new GameHomeOnlineSampleEntity
         {
             Id = 40000L + sampleTime % 100000,
             CreatedId = 0,

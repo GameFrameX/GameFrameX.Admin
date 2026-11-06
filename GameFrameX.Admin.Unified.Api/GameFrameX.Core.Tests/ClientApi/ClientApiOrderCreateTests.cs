@@ -4,7 +4,7 @@ using GameFrameX.Client.Api.Services;
 using GameFrameX.Application.CommerceCenter.GameOrder;
 using GameFrameX.Core.Enum;
 using GameFrameX.Entity.Enum;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 using GameFrameX.Payment.Abstract;
 using GameFrameX.Payment.Abstract.Interface;
 using GameFrameX.Payment.Abstract.Models;
@@ -25,7 +25,7 @@ public sealed class ClientApiOrderCreateTests
         var controller = CreateController(db, factory);
         db.AttachContext(controller);
 
-        var result = await controller.Create(new CreateTenantGameOrderEntityRequest
+        var result = await controller.Create(new CreateGameOrderEntityRequest
         {
             RoleId = 3001,
             AreaId = 2001,
@@ -39,7 +39,7 @@ public sealed class ClientApiOrderCreateTests
 
         var root = ClientApiResultReader.Read(result);
         var data = ClientApiResultReader.Data(root);
-        var saved = await db.TenantDb.Queryable<TenantGameOrderEntity>().FirstAsync(u => u.RoleId == "3001");
+        var saved = await db.Db.Queryable<GameOrderEntity>().FirstAsync(u => u.RoleId == "3001");
         Assert.Equal(0, ClientApiResultReader.Code(root));
         Assert.Equal("provider-order-1", data.GetProperty("OrderId").GetString());
         Assert.Equal(OrderStatusEnum.Unpaid, saved.Status);
@@ -53,7 +53,7 @@ public sealed class ClientApiOrderCreateTests
         var controller = CreateController(db, new TestPaymentChannelFactory(new TestPaymentChannelHandler("testpay")));
         db.AttachContext(controller, includeApp: false);
 
-        var result = await controller.Create(new CreateTenantGameOrderEntityRequest
+        var result = await controller.Create(new CreateGameOrderEntityRequest
         {
             RoleId = 3001,
             AreaId = 2001,
@@ -80,7 +80,7 @@ public sealed class ClientApiOrderCreateTests
         var controller = CreateController(db, new TestPaymentChannelFactory());
         db.AttachContext(controller);
 
-        var result = await controller.Create(new CreateTenantGameOrderEntityRequest
+        var result = await controller.Create(new CreateGameOrderEntityRequest
         {
             RoleId = 3001,
             AreaId = 2001,
@@ -93,7 +93,7 @@ public sealed class ClientApiOrderCreateTests
         });
 
         var root = ClientApiResultReader.Read(result);
-        var orderCount = await db.TenantDb.Queryable<TenantGameOrderEntity>().CountAsync();
+        var orderCount = await db.Db.Queryable<GameOrderEntity>().CountAsync();
         Assert.Equal((int)PaymentErrorCode.PayChannelNotSupported, ClientApiResultReader.Code(root));
         Assert.Equal("不支持的支付渠道", ClientApiResultReader.Message(root));
         Assert.Equal(0, orderCount);
@@ -101,13 +101,13 @@ public sealed class ClientApiOrderCreateTests
 
     private static GameOrderController CreateController(ClientApiTestDb db, IPaymentChannelFactory factory)
     {
-        db.InitTenantTables(typeof(TenantGameAreaEntity), typeof(TenantGameRoleEntity), typeof(TenantGameOrderEntity));
+        db.InitBusinessTables(typeof(GameAreaEntity), typeof(GameRoleEntity), typeof(GameOrderEntity));
         return new GameOrderController(
-            db.Repository<TenantGameOrderEntity>(),
+            db.Repository<GameOrderEntity>(),
             FakeOptionsProvider.WithAreaPolicy(false),
-            db.Repository<TenantGameRoleEntity>(),
+            db.Repository<GameRoleEntity>(),
             new HttpClient(ClientApiRecordingHttpHandler.WithGameServerDefaults(), false),
-            new GameOrderShipService(db.TenantDb, new ClientApiTestHttpClientFactory(ClientApiRecordingHttpHandler.WithGameServerDefaults())),
+            new GameOrderShipService(db.Db, new ClientApiTestHttpClientFactory(ClientApiRecordingHttpHandler.WithGameServerDefaults())),
             factory,
             new TestGooglePubSubPushAuthenticator(),
             new TestGooglePlayPurchaseService());

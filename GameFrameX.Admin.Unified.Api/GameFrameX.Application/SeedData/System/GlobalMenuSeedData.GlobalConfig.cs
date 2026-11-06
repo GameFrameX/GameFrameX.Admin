@@ -47,7 +47,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1706793684,
                 UpdateTime = 1706793684,
                 SuperAdminOnly = true,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -76,7 +76,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1783612800,
                 UpdateTime = 1783612800,
                 SuperAdminOnly = true,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -104,7 +104,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1783612800,
                 UpdateTime = 1783612800,
                 SuperAdminOnly = true,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -132,7 +132,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1783612800,
                 UpdateTime = 1783612800,
                 SuperAdminOnly = true,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -161,7 +161,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1785168000,
                 UpdateTime = 1785168000,
                 SuperAdminOnly = true,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -189,7 +189,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1785168000,
                 UpdateTime = 1785168000,
                 SuperAdminOnly = true,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -217,7 +217,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1785168000,
                 UpdateTime = 1785168000,
                 SuperAdminOnly = true,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -246,7 +246,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1792377600,
                 UpdateTime = 1792377600,
                 SuperAdminOnly = true,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -274,7 +274,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1792377600,
                 UpdateTime = 1792377600,
                 SuperAdminOnly = true,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -302,7 +302,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1792377600,
                 UpdateTime = 1792377600,
                 SuperAdminOnly = true,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -331,7 +331,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1792377600,
                 UpdateTime = 1792377600,
                 SuperAdminOnly = true,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -359,7 +359,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1792377600,
                 UpdateTime = 1792377600,
                 SuperAdminOnly = true,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -387,7 +387,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1792377600,
                 UpdateTime = 1792377600,
                 SuperAdminOnly = true,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -416,7 +416,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1783612800,
                 UpdateTime = 1783612800,
                 SuperAdminOnly = true,
-                AllowTenantWhenSuperAdminOnly = true,
+                AllowAdminWhenSuperAdminOnly = true,
                 IsDeleted = false,
             },
             new()
@@ -445,7 +445,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1783612800,
                 UpdateTime = 1783612800,
                 SuperAdminOnly = true,
-                AllowTenantWhenSuperAdminOnly = true,
+                AllowAdminWhenSuperAdminOnly = true,
                 IsDeleted = false,
             },
         };

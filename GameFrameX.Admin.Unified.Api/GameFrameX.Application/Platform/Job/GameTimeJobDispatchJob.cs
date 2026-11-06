@@ -8,7 +8,7 @@ namespace GameFrameX.Application.Platform.Job;
 
 /// <summary>
 /// 业务定时任务扫描派发作业（C404 / GFX-1216 调度合一）。
-/// <para>接替已退役的 <c>ScheduledTaskHostedService</c>：周期扫描 <see cref="TenantGameTimeJobEntity"/> 全表，
+/// <para>接替已退役的 <c>ScheduledTaskHostedService</c>：周期扫描 <see cref="GameTimeJobEntity"/> 全表，
 /// 按行的 cron（NCrontab 含秒 6 段）到期执行。语义与旧引擎对齐：</para>
 /// <list type="bullet">
 /// <item>首次见到的行 <c>NextRun = GetNextOccurrence(当下)</c>——停机错过的时间窗不补跑。</item>
@@ -72,12 +72,12 @@ public class GameTimeJobDispatchJob : IJob
 
     private async Task ScanAndExecuteAsync(CancellationToken cancellationToken)
     {
-        List<TenantGameTimeJobEntity> rows;
+        List<GameTimeJobEntity> rows;
         using (var scope = _scopeFactory.CreateScope())
         {
             var database = scope.ServiceProvider.GetRequiredService<ISqlSugarClient>();
             // 与旧引擎同口径：走全局自动过滤器（启用行 / 未删除行）。
-            rows = await database.Queryable<TenantGameTimeJobEntity>().ToListAsync(cancellationToken);
+            rows = await database.Queryable<GameTimeJobEntity>().ToListAsync(cancellationToken);
         }
 
         var dueTasks = ReconcileTracking(rows, Clock());
@@ -93,7 +93,7 @@ public class GameTimeJobDispatchJob : IJob
     /// <summary>
     /// 对账内存跟踪与表数据：新行初始化、变更行重置、消失行移除；返回本次到期的任务。
     /// </summary>
-    private List<TrackedBusinessTask> ReconcileTracking(List<TenantGameTimeJobEntity> rows, DateTime now)
+    private List<TrackedBusinessTask> ReconcileTracking(List<GameTimeJobEntity> rows, DateTime now)
     {
         var dueTasks = new List<TrackedBusinessTask>();
 
@@ -175,7 +175,7 @@ public class GameTimeJobDispatchJob : IJob
 
                 if (row.IsOnce && row.Id > 0)
                 {
-                    var repository = scope.ServiceProvider.GetRequiredService<SqlSugarRepository<TenantGameTimeJobEntity>>();
+                    var repository = scope.ServiceProvider.GetRequiredService<SqlSugarRepository<GameTimeJobEntity>>();
                     await repository.DeleteByIdAsync(row.Id);
                     TrackedTasks.Remove(row.Id);
                     _logger.LogInformation("完成执行一次性定时任务并删除记录: {Description}", row.Description);
@@ -211,7 +211,7 @@ public class GameTimeJobDispatchJob : IJob
         }
     }
 
-    private static string BuildFingerprint(TenantGameTimeJobEntity row)
+    private static string BuildFingerprint(GameTimeJobEntity row)
     {
         return $"{row.Name}|{row.Cron}|{row.IsOnce}|{row.MailId}";
     }
@@ -260,6 +260,6 @@ public class GameTimeJobDispatchJob : IJob
 
         public DateTime? NextRun { get; set; }
 
-        public TenantGameTimeJobEntity? CurrentRow { get; set; }
+        public GameTimeJobEntity? CurrentRow { get; set; }
     }
 }

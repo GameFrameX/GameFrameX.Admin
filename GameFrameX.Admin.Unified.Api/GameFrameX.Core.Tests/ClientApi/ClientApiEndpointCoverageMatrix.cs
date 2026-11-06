@@ -6,10 +6,10 @@ internal static class ClientApiEndpointCoverageMatrix
 {
     private static readonly ClientApiEndpointCoverage[] Endpoints =
     {
-        Endpoint("GameAdWebHook.TopOnNotify", "GET", "api/GameAdWebHook/TopOnNotify/{tenantId:long}/{appId:long}/{packageId:long?}", "ad-callback", true, true, false, true, "valid TopOn callback grants reward once", "invalid-route", "signature-failed", "duplicate-callback", "cross-package"),
-        Endpoint("GameAdWebHook.PangleGlobalNotify", "GET", "api/GameAdWebHook/PangleGlobalNotify/{tenantId:long}/{appId:long}/{packageId:long?}", "ad-callback", true, true, false, true, "valid Pangle callback grants reward once", "invalid-route", "signature-failed", "duplicate-callback", "cross-app"),
-        Endpoint("GameAdWebHook.AdMobNotify", "GET", "api/GameAdWebHook/AdMobNotify/{tenantId:long}/{appId:long}/{packageId:long?}", "ad-callback", true, true, false, true, "valid AdMob callback grants reward once", "invalid-route", "signature-failed", "duplicate-callback", "cross-tenant"),
-        Endpoint("GameAdWebHook.UnityAdsNotify", "GET", "api/GameAdWebHook/UnityAdsNotify/{tenantId:long}/{appId:long}/{packageId:long?}", "ad-callback", true, true, false, true, "valid UnityAds callback grants reward once", "invalid-route", "signature-failed", "duplicate-callback"),
+        Endpoint("GameAdWebHook.TopOnNotify", "GET", "api/GameAdWebHook/TopOnNotify/{id:long}/{appId:long}/{packageId:long?}", "ad-callback", true, true, false, true, "valid TopOn callback grants reward once", "invalid-route", "signature-failed", "duplicate-callback", "cross-package"),
+        Endpoint("GameAdWebHook.PangleGlobalNotify", "GET", "api/GameAdWebHook/PangleGlobalNotify/{id:long}/{appId:long}/{packageId:long?}", "ad-callback", true, true, false, true, "valid Pangle callback grants reward once", "invalid-route", "signature-failed", "duplicate-callback", "cross-app"),
+        Endpoint("GameAdWebHook.AdMobNotify", "GET", "api/GameAdWebHook/AdMobNotify/{id:long}/{appId:long}/{packageId:long?}", "ad-callback", true, true, false, true, "valid AdMob callback grants reward once", "invalid-route", "signature-failed", "duplicate-callback", "cross-tenant"),
+        Endpoint("GameAdWebHook.UnityAdsNotify", "GET", "api/GameAdWebHook/UnityAdsNotify/{id:long}/{appId:long}/{packageId:long?}", "ad-callback", true, true, false, true, "valid UnityAds callback grants reward once", "invalid-route", "signature-failed", "duplicate-callback"),
 
         Endpoint("GameAnnouncement.List", "GET", "api/GameAnnouncementService/List", "announcement", true, true, false, false, "lists enabled announcements by language", "missing-tenant", "disabled-record-hidden"),
         Endpoint("GameAnnouncement.ListByAreaId", "POST", "api/GameAnnouncementService/ListByAreaId", "announcement", true, true, false, false, "lists enabled area announcements", "missing-tenant", "area-not-found"),
@@ -72,9 +72,9 @@ internal static class ClientApiEndpointCoverageMatrix
         Endpoint("GameUserArchive.Download", "POST", "api/GameUserArchive/Download", "archive", true, true, false, false, "downloads owned archive snapshot", "archive-not-found"),
         Endpoint("GameUserArchive.GetOtherProgress", "POST", "api/GameUserArchive/GetOtherProgress", "archive", true, true, false, false, "returns other players progress summary", "progress-not-found"),
 
-        Endpoint("GameUserEmail.SendRegister", "POST", "api/GameUserEmail/SendRegister", "email-code", true, true, false, false, "sends register code through tenant email", "missing-app", "rate-limited", "daily-limit", "tenant-email-missing"),
+        Endpoint("GameUserEmail.SendRegister", "POST", "api/GameUserEmail/SendRegister", "email-code", true, true, false, false, "sends register code through tenant email", "missing-app", "rate-limited", "daily-limit", "email-missing"),
         Endpoint("GameUserEmail.VerifyCode", "POST", "api/GameUserEmail/VerifyCode", "email-code", true, true, false, false, "verifies active code", "code-not-found", "code-expired"),
-        Endpoint("GameUserEmail.SendReset", "POST", "api/GameUserEmail/SendReset", "email-code", true, true, false, false, "sends reset code for existing account", "missing-app", "account-not-found", "rate-limited", "tenant-email-missing"),
+        Endpoint("GameUserEmail.SendReset", "POST", "api/GameUserEmail/SendReset", "email-code", true, true, false, false, "sends reset code for existing account", "missing-app", "account-not-found", "rate-limited", "email-missing"),
 
         Endpoint("GameUserMisc.MarkLogout", "POST", "api/GameUserMisc/MarkLogout", "misc", true, true, false, false, "marks user logout state", "account-not-found"),
         Endpoint("GameUserMisc.RandomRobots", "POST", "api/GameUserMisc/RandomRobots", "misc", true, true, false, false, "returns random robot users excluding caller", "empty-robot-pool"),
@@ -109,7 +109,7 @@ internal static class ClientApiEndpointCoverageMatrix
         string httpMethod,
         string route,
         string group,
-        bool requiresTenant,
+        bool requires,
         bool requiresApp,
         bool requiresAccessToken,
         bool isPublicCallback,
@@ -121,7 +121,7 @@ internal static class ClientApiEndpointCoverageMatrix
             httpMethod,
             route,
             group,
-            requiresTenant,
+            requires,
             requiresApp,
             requiresAccessToken,
             isPublicCallback,

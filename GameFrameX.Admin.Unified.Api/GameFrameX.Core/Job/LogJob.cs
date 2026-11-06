@@ -1,5 +1,5 @@
 using GameFrameX.Core.Extension.Const;
-using GameFrameX.Core.Service.Tenant;
+using GameFrameX.Core.Service.Business;
 using GameFrameX.Entity.Enum;
 using GameFrameX.Entity.System;
 using GameFrameX.Entity.Log;
@@ -37,9 +37,9 @@ public class LogJob : IJob
             // 此处仅保留差异日志与租户历史日志（C400 后只读）的清理。
             await mainDb.Deleteable<SystemLogDiffEntity>().Where(u => u.CreatedTime < cutoffTimestamp).ExecuteCommandAsync(stoppingToken);
 
-            await mainDb.Deleteable<TenantLogVisitEntity>().Where(u => u.CreatedTime < cutoffTimestamp).ExecuteCommandAsync(stoppingToken);
-            await mainDb.Deleteable<TenantLogOperationEntity>().Where(u => u.CreatedTime < cutoffTimestamp).ExecuteCommandAsync(stoppingToken);
-            await mainDb.Deleteable<TenantLogDiffEntity>().Where(u => u.CreatedTime < cutoffTimestamp).ExecuteCommandAsync(stoppingToken);
+            await mainDb.Deleteable<LogVisitEntity>().Where(u => u.CreatedTime < cutoffTimestamp).ExecuteCommandAsync(stoppingToken);
+            await mainDb.Deleteable<LogOperationEntity>().Where(u => u.CreatedTime < cutoffTimestamp).ExecuteCommandAsync(stoppingToken);
+            await mainDb.Deleteable<LogDiffEntity>().Where(u => u.CreatedTime < cutoffTimestamp).ExecuteCommandAsync(stoppingToken);
         }
     }
 }

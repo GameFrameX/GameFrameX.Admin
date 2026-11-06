@@ -33,7 +33,7 @@ public class MenuSeedPermissionRouteReconciliationTests
         "gameLoginTicketKey:update", // 动作被 rotate 取代
         "appSignatureKey:update", // 动作被 renew/rotate 取代
         "sessionKey:update", // 动作被 enable/disable 体系取代
-        "tenantUser:detail", // 端点下线
+        "user:detail", // 端点下线
     };
 
     [Fact]
@@ -76,7 +76,7 @@ public class MenuSeedPermissionRouteReconciliationTests
     public void MenuSeedRouteNameOfProducesCanonicalRouteNames()
     {
         Assert.Equal("gamePenalty:detail", MenuSeedRouteName.Of<GamePenaltyService>(nameof(GamePenaltyService.GetAsync)));
-        Assert.Equal("tenantUser:ownRoleList:{userId}", MenuSeedRouteName.Of<TenantUserService>(nameof(TenantUserService.GetOwnRoleListAsync)));
+        Assert.Equal("user:ownRoleList:{userId}", MenuSeedRouteName.Of<UserService>(nameof(UserService.GetOwnRoleListAsync)));
     }
 
     /// <summary>

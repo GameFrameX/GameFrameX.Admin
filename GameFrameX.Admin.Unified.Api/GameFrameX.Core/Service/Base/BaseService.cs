@@ -1,4 +1,4 @@
-using GameFrameX.Core.Service.Tenant;
+using GameFrameX.Core.Service.Business;
 using GameFrameX.Entity.Base;
 
 namespace GameFrameX.Core.Service.Base;

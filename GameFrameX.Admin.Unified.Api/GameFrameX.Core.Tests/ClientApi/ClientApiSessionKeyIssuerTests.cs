@@ -1,7 +1,7 @@
 using GameFrameX.Client.Api.Services.Auth;
 using System.Text.RegularExpressions;
 using GameFrameX.Client.Api.Services;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 
 namespace GameFrameX.Core.Tests.ClientApi;
 
@@ -17,8 +17,8 @@ public sealed class ClientApiSessionKeyIssuerTests
     public async Task Issue_PersistsKeyWithLeaseAlignedToExpire()
     {
         using var db = new ClientApiTestDb();
-        db.InitTenantTables(typeof(TenantSessionKeyEntity));
-        var issuer = new ClientApiSessionKeyIssuer(db.Repository<TenantSessionKeyEntity>());
+        db.InitBusinessTables(typeof(SessionKeyEntity));
+        var issuer = new ClientApiSessionKeyIssuer(db.Repository<SessionKeyEntity>());
         var before = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
         var expireAt = before + 3600;
 
@@ -29,7 +29,7 @@ public sealed class ClientApiSessionKeyIssuerTests
         Assert.Matches("^[0-9a-f]{64}$", result.Secret);
         Assert.Equal(expireAt, result.ExpireTime);
 
-        var saved = await db.TenantDb.Queryable<TenantSessionKeyEntity>().FirstAsync(e => e.Kid == result.Kid);
+        var saved = await db.Db.Queryable<SessionKeyEntity>().FirstAsync(e => e.Kid == result.Kid);
         Assert.NotNull(saved);
         Assert.Equal(result.Secret, saved.Secret);
         Assert.Equal(expireAt, saved.ExpireTime);
@@ -43,27 +43,27 @@ public sealed class ClientApiSessionKeyIssuerTests
     public async Task Issue_DeletesExpiredKeysFromMainDatabase_KeepsLiveKeys()
     {
         using var db = new ClientApiTestDb();
-        db.InitTenantTables(typeof(TenantSessionKeyEntity));
+        db.InitBusinessTables(typeof(SessionKeyEntity));
         var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-        db.TenantDb.Insertable(new[]
+        db.Db.Insertable(new[]
         {
             Seed(db.AppId, "sess-app-1-expired", now - 10),
             Seed(db.AppId, "sess-app-1-live", now + 3600),
             Seed(db.AppId + 1, "sess-app-2-expired", now - 10),
         }).ExecuteCommand();
 
-        var issuer = new ClientApiSessionKeyIssuer(db.Repository<TenantSessionKeyEntity>());
+        var issuer = new ClientApiSessionKeyIssuer(db.Repository<SessionKeyEntity>());
         await issuer.IssueAsync(now + 120);
 
-        var kids = await db.TenantDb.Queryable<TenantSessionKeyEntity>().Select(e => e.Kid).ToListAsync();
+        var kids = await db.Db.Queryable<SessionKeyEntity>().Select(e => e.Kid).ToListAsync();
         Assert.DoesNotContain("sess-app-1-expired", kids);
         Assert.Contains("sess-app-1-live", kids);
         Assert.DoesNotContain("sess-app-2-expired", kids);
     }
 
-    private static TenantSessionKeyEntity Seed(long appId, string kid, long expireTime)
+    private static SessionKeyEntity Seed(long appId, string kid, long expireTime)
     {
-        return new TenantSessionKeyEntity
+        return new SessionKeyEntity
         {
             Kid = kid,
             Secret = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",

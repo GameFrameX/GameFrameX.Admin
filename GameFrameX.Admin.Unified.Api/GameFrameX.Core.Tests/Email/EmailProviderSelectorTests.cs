@@ -1,5 +1,5 @@
 using GameFrameX.Application.Platform.Email;
-using GameFrameX.Entity.Tenant.ClientApiConfig;
+using GameFrameX.Entity.Business.ClientApiConfig;
 using GameFrameX.Entity.System;
 using GameFrameX.Client.Api.Services.Email;
 using SqlSugar;
@@ -20,7 +20,7 @@ public class EmailProviderSelectorTests : IDisposable
             InitKeyType = InitKeyType.Attribute,
             IsAutoCloseConnection = true,
         });
-        _db.CodeFirst.InitTables<SystemEmailProviderEntity, TenantEmailConfigEntity>();
+        _db.CodeFirst.InitTables<SystemEmailProviderEntity, EmailConfigEntity>();
     }
 
     [Fact]
@@ -64,12 +64,12 @@ public class EmailProviderSelectorTests : IDisposable
     [Fact]
     public async Task TenantSelector_ExactPurposeBeatsDefaultPriority()
     {
-        await InsertTenantAsync(1, 100, 0, 0, 999, 40, true);
-        await InsertTenantAsync(2, 100, 0, 7, 1, 5, true);
-        await InsertTenantAsync(3, 100, 200, 0, 999, 20, true);
-        await InsertTenantAsync(4, 100, 200, 7, 1, 10, true);
+        await InsertAsync(1, 100, 0, 0, 999, 40, true);
+        await InsertAsync(2, 100, 0, 7, 1, 5, true);
+        await InsertAsync(3, 100, 200, 0, 999, 20, true);
+        await InsertAsync(4, 100, 200, 7, 1, 10, true);
 
-        var selected = await TenantEmailConfigSelector.SelectAsync(_db, 7);
+        var selected = await EmailConfigSelector.SelectAsync(_db, 7);
 
         Assert.NotNull(selected);
         Assert.Equal(4, selected.Id);
@@ -78,12 +78,12 @@ public class EmailProviderSelectorTests : IDisposable
     [Fact]
     public async Task TenantSelector_UsesPriorityUpdateTimeAndIdTieBreakAndIgnoresDisabled()
     {
-        await InsertTenantAsync(1, 100, 200, 7, 300, 30, false);
-        await InsertTenantAsync(2, 100, 200, 7, 100, 10, true);
-        await InsertTenantAsync(3, 100, 200, 7, 200, 20, true);
-        await InsertTenantAsync(4, 100, 200, 7, 200, 20, true);
+        await InsertAsync(1, 100, 200, 7, 300, 30, false);
+        await InsertAsync(2, 100, 200, 7, 100, 10, true);
+        await InsertAsync(3, 100, 200, 7, 200, 20, true);
+        await InsertAsync(4, 100, 200, 7, 200, 20, true);
 
-        var selected = await TenantEmailConfigSelector.SelectAsync(_db, 7);
+        var selected = await EmailConfigSelector.SelectAsync(_db, 7);
 
         Assert.NotNull(selected);
         Assert.Equal(4, selected.Id);
@@ -92,8 +92,8 @@ public class EmailProviderSelectorTests : IDisposable
     [Fact]
     public async Task TenantSelector_DefaultPurposeFallbackWorksWithoutRequestContext()
     {
-        await InsertTenantAsync(1, 100, 200, 0, 100, 10, true);
-        var selected = await TenantEmailConfigSelector.SelectAsync(_db, 7);
+        await InsertAsync(1, 100, 200, 0, 100, 10, true);
+        var selected = await EmailConfigSelector.SelectAsync(_db, 7);
 
         Assert.Equal(1, selected?.Id);
     }
@@ -101,10 +101,10 @@ public class EmailProviderSelectorTests : IDisposable
     [Fact]
     public async Task TenantSelector_ReturnsNullWhenNoEnabledProvider()
     {
-        await InsertTenantAsync(1, 999, 200, 7, 100, 10, false);
-        await InsertTenantAsync(2, 100, 200, 7, 100, 10, false);
+        await InsertAsync(1, 999, 200, 7, 100, 10, false);
+        await InsertAsync(2, 100, 200, 7, 100, 10, false);
 
-        var selected = await TenantEmailConfigSelector.SelectAsync(_db, 7);
+        var selected = await EmailConfigSelector.SelectAsync(_db, 7);
 
         Assert.Null(selected);
     }
@@ -137,9 +137,9 @@ public class EmailProviderSelectorTests : IDisposable
         }).ExecuteCommandAsync();
     }
 
-    private async Task InsertTenantAsync(long id, long tenantId, long appId, int purpose, int priority, long updateTime, bool enabled)
+    private async Task InsertAsync(long id, long id, long appId, int purpose, int priority, long updateTime, bool enabled)
     {
-        await _db.Insertable(new TenantEmailConfigEntity
+        await _db.Insertable(new EmailConfigEntity
         {
             Id = id,
             CreatedId = 1,

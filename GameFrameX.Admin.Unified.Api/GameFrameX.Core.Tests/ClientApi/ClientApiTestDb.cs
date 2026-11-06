@@ -7,13 +7,13 @@ using GameFrameX.Foundation.Hash;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Entity.Base;
 using GameFrameX.Entity.System;
-using GameFrameX.Entity.Tenant.Device;
-using GameFrameX.Entity.Tenant.Game;
-using GameFrameX.Entity.Tenant.Game.Announcement;
-using GameFrameX.Entity.Tenant.Game.App;
-using GameFrameX.Entity.Tenant.Game.RemoteConfig;
-using GameFrameX.Entity.Tenant.Game.FeatureSwitch;
-using GameFrameX.Entity.Tenant.Game.Release;
+using GameFrameX.Entity.Business.Device;
+using GameFrameX.Entity.Business.Game;
+using GameFrameX.Entity.Business.Game.Announcement;
+using GameFrameX.Entity.Business.Game.App;
+using GameFrameX.Entity.Business.Game.RemoteConfig;
+using GameFrameX.Entity.Business.Game.FeatureSwitch;
+using GameFrameX.Entity.Business.Game.Release;
 using GameFrameX.Foundation.Json;
 using GameFrameX.Foundation.Orm.Entity;
 using Microsoft.AspNetCore.Http;
@@ -28,29 +28,29 @@ internal sealed class ClientApiTestDb : IDisposable
 {
     private readonly List<string> _dbPaths = new();
 
-    public ClientApiTestDb(long tenantId = 1080001, long appId = 1081001)
+    public ClientApiTestDb(long id = 1080001, long appId = 1081001)
     {
-        TenantId = tenantId;
+        Id = id;
         AppId = appId;
         MainDb = CreateScope("main");
-        TenantDbPath = CreateDatabasePath("tenant");
+        DbPath = CreateDatabasePath("tenant");
 
 
-        TenantDbProvider = MainDb;
-        TenantDb = TenantDbProvider;
+        DbProvider = MainDb;
+        Db = DbProvider;
     }
 
-    public long TenantId { get; }
+    public long Id { get; }
 
     public long AppId { get; }
 
     public SqlSugarScope MainDb { get; }
 
-    public ISqlSugarClient TenantDb { get; }
+    public ISqlSugarClient Db { get; }
 
-    public string TenantDbPath { get; }
+    public string DbPath { get; }
 
-    public ISqlSugarClient TenantDbProvider { get; }
+    public ISqlSugarClient DbProvider { get; }
 
 
     public Repository<T> Repository<T>() where T : EntityBase, new()
@@ -58,23 +58,23 @@ internal sealed class ClientApiTestDb : IDisposable
         return new Repository<T>(MainDb);
     }
 
-    public ClientApiTestDb InitTenantTables(params Type[] tableTypes)
+    public ClientApiTestDb InitBusinessTables(params Type[] tableTypes)
     {
-        TenantDb.CodeFirst.InitTables(tableTypes);
+        Db.CodeFirst.InitTables(tableTypes);
         return this;
     }
 
-    public DefaultHttpContext CreateHttpContext(bool includeTenant = true, bool includeApp = true)
+    public DefaultHttpContext CreateHttpContext(bool include = true, bool includeApp = true)
     {
-        return CreateHttpContext(includeTenant, includeApp, null);
+        return CreateHttpContext(include, includeApp, null);
     }
 
-    public DefaultHttpContext CreateHttpContext(bool includeTenant, bool includeApp, long? packageId)
+    public DefaultHttpContext CreateHttpContext(bool include, bool includeApp, long? packageId)
     {
         var context = new DefaultHttpContext();
-        if (includeTenant)
+        if (include)
         {
-            context.Items["TenantId"] = TenantId;
+            context.Items["Id"] = Id;
         }
 
         if (packageId.HasValue)
@@ -85,15 +85,15 @@ internal sealed class ClientApiTestDb : IDisposable
         return context;
     }
 
-    public void AttachContext(Controller controller, bool includeTenant = true, bool includeApp = true)
+    public void AttachContext(Controller controller, bool include = true, bool includeApp = true)
     {
-        controller.ControllerContext = new ControllerContext { HttpContext = CreateHttpContext(includeTenant, includeApp), };
+        controller.ControllerContext = new ControllerContext { HttpContext = CreateHttpContext(include, includeApp), };
     }
 
-    public TenantGameAppPackageEntity SeedPackage(long packageId, string packageName)
+    public GameAppPackageEntity SeedPackage(long packageId, string packageName)
     {
-        InitTenantTables(typeof(TenantGameAppPackageEntity));
-        var entity = WithSelect(new TenantGameAppPackageEntity
+        InitBusinessTables(typeof(GameAppPackageEntity));
+        var entity = WithSelect(new GameAppPackageEntity
         {
             Id = packageId,
             Name = "C108 Test Package",
@@ -105,14 +105,14 @@ internal sealed class ClientApiTestDb : IDisposable
             IsEnabled = true,
             IsDeleted = false,
         });
-        TenantDb.Insertable(entity).ExecuteCommand();
+        Db.Insertable(entity).ExecuteCommand();
         return entity;
     }
 
-    public TenantGameAreaClassifyEntity SeedAreaClassify(long classifyId)
+    public GameAreaClassifyEntity SeedAreaClassify(long classifyId)
     {
-        InitTenantTables(typeof(TenantGameAreaClassifyEntity));
-        var entity = WithSelect(new TenantGameAreaClassifyEntity
+        InitBusinessTables(typeof(GameAreaClassifyEntity));
+        var entity = WithSelect(new GameAreaClassifyEntity
         {
             Id = classifyId,
             Name = "Asia",
@@ -127,14 +127,14 @@ internal sealed class ClientApiTestDb : IDisposable
             IsEnabled = true,
             IsDeleted = false,
         });
-        TenantDb.Insertable(entity).ExecuteCommand();
+        Db.Insertable(entity).ExecuteCommand();
         return entity;
     }
 
-    public TenantGameAreaEntity SeedArea(long areaId, long classifyId, bool isEnabled = true, GameServerStatus status = GameServerStatus.Online)
+    public GameAreaEntity SeedArea(long areaId, long classifyId, bool isEnabled = true, GameServerStatus status = GameServerStatus.Online)
     {
-        InitTenantTables(typeof(TenantGameAreaEntity));
-        var entity = WithSelect(new TenantGameAreaEntity
+        InitBusinessTables(typeof(GameAreaEntity));
+        var entity = WithSelect(new GameAreaEntity
         {
             Id = areaId,
             Name = $"Area-{areaId}",
@@ -161,22 +161,22 @@ internal sealed class ClientApiTestDb : IDisposable
             AppVersion = "1.0.0",
         });
         entity.IsEnabled = isEnabled;
-        TenantDb.Insertable(entity).ExecuteCommand();
+        Db.Insertable(entity).ExecuteCommand();
         return entity;
     }
 
-    public TenantGameAppFeatureSwitchEntity SeedFeatureSwitch(TenantGameAppFeatureSwitchEntity entity)
+    public GameAppFeatureSwitchEntity SeedFeatureSwitch(GameAppFeatureSwitchEntity entity)
     {
-        InitTenantTables(typeof(TenantGameAppFeatureSwitchEntity));
+        InitBusinessTables(typeof(GameAppFeatureSwitchEntity));
         WithBasic(entity);
-        TenantDb.Insertable(entity).ExecuteCommand();
+        Db.Insertable(entity).ExecuteCommand();
         return entity;
     }
 
-    public TenantGameAppRemoteConfigEntity SeedRemoteConfig(long id, string packageName, string content)
+    public GameAppRemoteConfigEntity SeedRemoteConfig(long id, string packageName, string content)
     {
-        InitTenantTables(typeof(TenantGameAppRemoteConfigEntity));
-        var entity = WithBasic(new TenantGameAppRemoteConfigEntity
+        InitBusinessTables(typeof(GameAppRemoteConfigEntity));
+        var entity = WithBasic(new GameAppRemoteConfigEntity
         {
             Id = id,
             Platform = "ios",
@@ -192,14 +192,14 @@ internal sealed class ClientApiTestDb : IDisposable
             RolloutPercent = 100,
             Description = "C108 global info",
         });
-        TenantDb.Insertable(entity).ExecuteCommand();
+        Db.Insertable(entity).ExecuteCommand();
         return entity;
     }
 
-    public TenantGameAppReleaseVersionEntity SeedAppVersion(long id, string packageName)
+    public GameAppReleaseVersionEntity SeedAppVersion(long id, string packageName)
     {
-        InitTenantTables(typeof(TenantGameAppReleaseVersionEntity));
-        var entity = WithBasic(new TenantGameAppReleaseVersionEntity
+        InitBusinessTables(typeof(GameAppReleaseVersionEntity));
+        var entity = WithBasic(new GameAppReleaseVersionEntity
         {
             Id = id,
             Platform = "ios",
@@ -214,14 +214,14 @@ internal sealed class ClientApiTestDb : IDisposable
             Announcement = "Upgrade now",
             Description = "C108 app version",
         });
-        TenantDb.Insertable(entity).ExecuteCommand();
+        Db.Insertable(entity).ExecuteCommand();
         return entity;
     }
 
-    public TenantGameAppAssetPackageVersionEntity SeedAssetPackageVersion(long id, string packageName)
+    public GameAppAssetPackageVersionEntity SeedAssetPackageVersion(long id, string packageName)
     {
-        InitTenantTables(typeof(TenantGameAppAssetPackageVersionEntity), typeof(TenantGameAppDeviceEntity));
-        var entity = WithBasic(new TenantGameAppAssetPackageVersionEntity
+        InitBusinessTables(typeof(GameAppAssetPackageVersionEntity), typeof(GameAppDeviceEntity));
+        var entity = WithBasic(new GameAppAssetPackageVersionEntity
         {
             Id = id,
             Platform = "ios",
@@ -234,14 +234,14 @@ internal sealed class ClientApiTestDb : IDisposable
             ResourceVersion = "2026.07.18",
             Description = "C108 asset package",
         });
-        TenantDb.Insertable(entity).ExecuteCommand();
+        Db.Insertable(entity).ExecuteCommand();
         return entity;
     }
 
-    public TenantGameAnnouncementEntity SeedAnnouncement(long id, long? areaId, string language, string title, bool isActive = true)
+    public GameAnnouncementEntity SeedAnnouncement(long id, long? areaId, string language, string title, bool isActive = true)
     {
-        InitTenantTables(typeof(TenantGameAnnouncementEntity));
-        var entity = WithBasic(new TenantGameAnnouncementEntity
+        InitBusinessTables(typeof(GameAnnouncementEntity));
+        var entity = WithBasic(new GameAnnouncementEntity
         {
             Id = id,
             AreaId = areaId,
@@ -255,11 +255,11 @@ internal sealed class ClientApiTestDb : IDisposable
             IsEnabled = true,
             IsDeleted = false,
         });
-        TenantDb.Insertable(entity).ExecuteCommand();
+        Db.Insertable(entity).ExecuteCommand();
         return entity;
     }
 
-    public TenantGameUserEntity SeedUser(
+    public GameUserEntity SeedUser(
         long userId,
         string userName,
         string password = "password",
@@ -267,8 +267,8 @@ internal sealed class ClientApiTestDb : IDisposable
         string email = "",
         string deviceId = "")
     {
-        InitTenantTables(typeof(TenantGameUserEntity));
-        var entity = WithSelect(new TenantGameUserEntity
+        InitBusinessTables(typeof(GameUserEntity));
+        var entity = WithSelect(new GameUserEntity
         {
             Id = userId,
             Name = userName,
@@ -290,14 +290,14 @@ internal sealed class ClientApiTestDb : IDisposable
             IsEnabled = true,
             IsDeleted = false,
         });
-        TenantDb.Insertable(entity).ExecuteCommand();
+        Db.Insertable(entity).ExecuteCommand();
         return entity;
     }
 
-    public TenantGameRoleEntity SeedRole(long roleId, long userId, long areaId, long appId = 0, string name = "Role", bool isSandbox = false)
+    public GameRoleEntity SeedRole(long roleId, long userId, long areaId, long appId = 0, string name = "Role", bool isSandbox = false)
     {
-        InitTenantTables(typeof(TenantGameRoleEntity));
-        var entity = WithSelect(new TenantGameRoleEntity
+        InitBusinessTables(typeof(GameRoleEntity));
+        var entity = WithSelect(new GameRoleEntity
         {
             Id = roleId,
             UserId = userId,
@@ -316,14 +316,14 @@ internal sealed class ClientApiTestDb : IDisposable
             AllRecharge = 0,
             OnlineTime = 0,
         });
-        TenantDb.Insertable(entity).ExecuteCommand();
+        Db.Insertable(entity).ExecuteCommand();
         return entity;
     }
 
-    public TenantGameGoodsEntity SeedGoods(long goodsId, long classifyId = 1, int configId = 10001, bool isEnabled = true)
+    public GameGoodsEntity SeedGoods(long goodsId, long classifyId = 1, int configId = 10001, bool isEnabled = true)
     {
-        InitTenantTables(typeof(TenantGameGoodsEntity));
-        var entity = WithSelect(new TenantGameGoodsEntity
+        InitBusinessTables(typeof(GameGoodsEntity));
+        var entity = WithSelect(new GameGoodsEntity
         {
             Id = goodsId,
             Name = $"Goods-{goodsId}",
@@ -334,14 +334,14 @@ internal sealed class ClientApiTestDb : IDisposable
             IsEnabled = isEnabled,
             IsDeleted = false,
         });
-        TenantDb.Insertable(entity).ExecuteCommand();
+        Db.Insertable(entity).ExecuteCommand();
         return entity;
     }
 
-    public TenantGameWebShopEntity SeedWebShop(long shopId, string realPrice, string itemJson, bool isUp = true, int weight = 10)
+    public GameWebShopEntity SeedWebShop(long shopId, string realPrice, string itemJson, bool isUp = true, int weight = 10)
     {
-        InitTenantTables(typeof(TenantGameWebShopEntity));
-        var entity = WithSelect(new TenantGameWebShopEntity
+        InitBusinessTables(typeof(GameWebShopEntity));
+        var entity = WithSelect(new GameWebShopEntity
         {
             Id = shopId,
             Name = $"Shop-{shopId}",
@@ -355,14 +355,14 @@ internal sealed class ClientApiTestDb : IDisposable
             Sales = 0,
             Weight = weight,
         });
-        TenantDb.Insertable(entity).ExecuteCommand();
+        Db.Insertable(entity).ExecuteCommand();
         return entity;
     }
 
-    public TenantGameOrderEntity SeedOrder(long orderId, long roleId, long areaId, string payChannel = "google", OrderStatusEnum status = OrderStatusEnum.Unpaid, decimal amount = 100m, long sku = 1, string? providerTransactionId = null, string? orderProviderId = null, bool isSandbox = false)
+    public GameOrderEntity SeedOrder(long orderId, long roleId, long areaId, string payChannel = "google", OrderStatusEnum status = OrderStatusEnum.Unpaid, decimal amount = 100m, long sku = 1, string? providerTransactionId = null, string? orderProviderId = null, bool isSandbox = false)
     {
-        InitTenantTables(typeof(TenantGameOrderEntity));
-        var entity = WithBasic(new TenantGameOrderEntity
+        InitBusinessTables(typeof(GameOrderEntity));
+        var entity = WithBasic(new GameOrderEntity
         {
             Id = orderId,
             Status = status,
@@ -395,14 +395,14 @@ internal sealed class ClientApiTestDb : IDisposable
             AppleVerifiedTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
             ProviderTransactionId = providerTransactionId ?? string.Empty,
         });
-        TenantDb.Insertable(entity).ExecuteCommand();
+        Db.Insertable(entity).ExecuteCommand();
         return entity;
     }
 
-    public TenantGameRedeemCodeEntity SeedRedeemCode(long codeId, string code, long areaId, string contents, bool isActive = true, int usageLimit = 1, int usedCount = 0, DateTime? startTime = null, DateTime? endTime = null, long? channelId = null)
+    public GameRedeemCodeEntity SeedRedeemCode(long codeId, string code, long areaId, string contents, bool isActive = true, int usageLimit = 1, int usedCount = 0, DateTime? startTime = null, DateTime? endTime = null, long? channelId = null)
     {
-        InitTenantTables(typeof(TenantGameRedeemCodeEntity));
-        var entity = WithBasic(new TenantGameRedeemCodeEntity
+        InitBusinessTables(typeof(GameRedeemCodeEntity));
+        var entity = WithBasic(new GameRedeemCodeEntity
         {
             Id = codeId,
             AreaId = areaId,
@@ -416,27 +416,27 @@ internal sealed class ClientApiTestDb : IDisposable
             EndTime = endTime != null ? new DateTimeOffset(endTime.Value).ToUnixTimeSeconds() : DateTimeOffset.Now.AddHours(1).ToUnixTimeSeconds(),
             Contents = contents,
         });
-        TenantDb.Insertable(entity).ExecuteCommand();
+        Db.Insertable(entity).ExecuteCommand();
         return entity;
     }
 
-    public TenantGameRedeemCodeChannelEntity SeedChannel(long channelId, string name, int roleUsageLimit = 0)
+    public GameRedeemCodeChannelEntity SeedChannel(long channelId, string name, int roleUsageLimit = 0)
     {
-        InitTenantTables(typeof(TenantGameRedeemCodeChannelEntity));
-        var entity = WithSelect(new TenantGameRedeemCodeChannelEntity
+        InitBusinessTables(typeof(GameRedeemCodeChannelEntity));
+        var entity = WithSelect(new GameRedeemCodeChannelEntity
         {
             Id = channelId,
             Name = name,
             RoleUsageLimit = roleUsageLimit,
         });
-        TenantDb.Insertable(entity).ExecuteCommand();
+        Db.Insertable(entity).ExecuteCommand();
         return entity;
     }
 
-    public TenantGameWebShopOrderEntity SeedWebShopOrder(long orderId, long roleId, long areaId, long shopId, string reason = "", bool orderStatus = false)
+    public GameWebShopOrderEntity SeedWebShopOrder(long orderId, long roleId, long areaId, long shopId, string reason = "", bool orderStatus = false)
     {
-        InitTenantTables(typeof(TenantGameWebShopOrderEntity));
-        var entity = WithSelect(new TenantGameWebShopOrderEntity
+        InitBusinessTables(typeof(GameWebShopOrderEntity));
+        var entity = WithSelect(new GameWebShopOrderEntity
         {
             Id = orderId,
             GameShopId = shopId,
@@ -446,7 +446,7 @@ internal sealed class ClientApiTestDb : IDisposable
             OrderStatus = orderStatus,
             OrderId = $"webshop-{orderId}",
         });
-        TenantDb.Insertable(entity).ExecuteCommand();
+        Db.Insertable(entity).ExecuteCommand();
         return entity;
     }
 
@@ -468,10 +468,10 @@ internal sealed class ClientApiTestDb : IDisposable
         return entity;
     }
 
-    public TenantGameUserEmailEntity SeedEmailCode(long id, string email, string code, bool expired = false)
+    public GameUserEmailEntity SeedEmailCode(long id, string email, string code, bool expired = false)
     {
-        InitTenantTables(typeof(TenantGameUserEmailEntity));
-        var entity = WithBasic(new TenantGameUserEmailEntity
+        InitBusinessTables(typeof(GameUserEmailEntity));
+        var entity = WithBasic(new GameUserEmailEntity
         {
             Id = id,
             Email = email,
@@ -483,7 +483,7 @@ internal sealed class ClientApiTestDb : IDisposable
             IsEnabled = true,
             IsDeleted = false,
         });
-        TenantDb.Insertable(entity).ExecuteCommand();
+        Db.Insertable(entity).ExecuteCommand();
         return entity;
     }
 

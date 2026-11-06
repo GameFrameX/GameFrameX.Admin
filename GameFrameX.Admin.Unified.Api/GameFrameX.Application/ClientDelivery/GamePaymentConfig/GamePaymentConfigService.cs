@@ -1,8 +1,8 @@
-using GameFrameX.Entity.Tenant.Game.App;
+using GameFrameX.Entity.Business.Game.App;
 using GameFrameX.Application.ClientDelivery.GamePaymentConfig.Dto;
 using GameFrameX.Payment.Abstract;
 using GameFrameX.Core.Service;
-using GameFrameX.Core.Service.Tenant;
+using GameFrameX.Core.Service.Business;
 
 #pragma warning disable CS8604, CS8629 // SqlSugar WhereIF(condition, lambda)：lambda 仅在 condition=true 时执行；NRT 无法跨方法传播条件守卫，lambda 内 .Trim()/.Value 实际安全
 namespace GameFrameX.Application.ClientDelivery.GamePaymentConfig;
@@ -12,16 +12,16 @@ namespace GameFrameX.Application.ClientDelivery.GamePaymentConfig;
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
 public class GamePaymentConfigService
-    : GenericCrudService<Entity.Tenant.Game.TenantGamePaymentConfigEntity,
+    : GenericCrudService<Entity.Business.Game.GamePaymentConfigEntity,
         AddGamePaymentConfigRequest, UpdateGamePaymentConfigRequest,
         GamePaymentConfigResponse, PageGamePaymentConfigRequest>
 {
-    private readonly SqlSugarRepository<TenantGameAppPackageEntity> _packageRepository;
+    private readonly SqlSugarRepository<GameAppPackageEntity> _packageRepository;
     private readonly IPaymentConfigSchemaProvider _schemaProvider;
 
     public GamePaymentConfigService(
-        SqlSugarRepository<Entity.Tenant.Game.TenantGamePaymentConfigEntity> repository,
-        SqlSugarRepository<TenantGameAppPackageEntity> packageRepository,
+        SqlSugarRepository<Entity.Business.Game.GamePaymentConfigEntity> repository,
+        SqlSugarRepository<GameAppPackageEntity> packageRepository,
         IPaymentConfigSchemaProvider schemaProvider)
         : base(repository)
     {
@@ -54,7 +54,7 @@ public class GamePaymentConfigService
         await ValidateScopeAsync(scope.PackageId);
         await CheckUniqueAsync(scope.PackageId, payChannel, input.IsSandbox);
 
-        var entity = input.Adapt<Entity.Tenant.Game.TenantGamePaymentConfigEntity>();
+        var entity = input.Adapt<Entity.Business.Game.GamePaymentConfigEntity>();
         entity.PayChannel = payChannel;
         ApplyScope(entity, scope);
         entity.IsEnabled = true;
@@ -156,8 +156,8 @@ public class GamePaymentConfigService
         return new PaymentConfigScope(normalizedPackageId == 0 ? null : normalizedPackageId, normalizedPackageId);
     }
 
-    public static Entity.Tenant.Game.TenantGamePaymentConfigEntity? PickBestConfig(
-        IEnumerable<Entity.Tenant.Game.TenantGamePaymentConfigEntity> configs,
+    public static Entity.Business.Game.GamePaymentConfigEntity? PickBestConfig(
+        IEnumerable<Entity.Business.Game.GamePaymentConfigEntity> configs,
         long? packageId)
     {
         var scope = BuildScope(packageId);
@@ -188,7 +188,7 @@ public class GamePaymentConfigService
         }
     }
 
-    private static void ApplyScope(Entity.Tenant.Game.TenantGamePaymentConfigEntity entity, PaymentConfigScope scope)
+    private static void ApplyScope(Entity.Business.Game.GamePaymentConfigEntity entity, PaymentConfigScope scope)
     {
         entity.PackageId = scope.PackageId;
         entity.PackageIdNormalized = scope.PackageIdNormalized;
@@ -200,7 +200,7 @@ public class GamePaymentConfigService
         return idValue > 0 ? idValue : 0;
     }
 
-    private static int GetScopePriority(Entity.Tenant.Game.TenantGamePaymentConfigEntity config, PaymentConfigScope scope)
+    private static int GetScopePriority(Entity.Business.Game.GamePaymentConfigEntity config, PaymentConfigScope scope)
     {
         if (scope.PackageIdNormalized > 0 && config.PackageIdNormalized == scope.PackageIdNormalized)
         {

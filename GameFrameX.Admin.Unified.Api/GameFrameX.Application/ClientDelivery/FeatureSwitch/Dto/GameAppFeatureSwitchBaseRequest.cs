@@ -1,4 +1,4 @@
-using GameFrameX.Entity.Tenant.Game.FeatureSwitch;
+using GameFrameX.Entity.Business.Game.FeatureSwitch;
 
 namespace GameFrameX.Application.ClientDelivery.FeatureSwitch.Dto;
 

@@ -1,7 +1,7 @@
 using GameFrameX.Application.Platform.OpenAccess.Dto;
 using GameFrameX.Core.Const;
 using GameFrameX.Core.Service.Cache;
-using GameFrameX.Core.Service.Tenant;
+using GameFrameX.Core.Service.Business;
 using GameFrameX.Foundation.Http.Normalization;
 
 namespace GameFrameX.Application.Platform.OpenAccess;
@@ -21,11 +21,11 @@ public class SystemOpenAccessService : IAdminApiController
     /// </summary>
     public SystemOpenAccessService(SqlSugarRepository<SystemOpenAccessEntity> systemOpenAccessRepository,
         SystemCacheService systemCacheService,
-        ISqlSugarClient tenantDbConnectionProvider)
+        ISqlSugarClient dbConnectionProvider)
     {
         _systemOpenAccessRepository = systemOpenAccessRepository;
         _systemCacheService = systemCacheService;
-        _tenantDbConnectionProvider = tenantDbConnectionProvider;
+        _tenantDbConnectionProvider = dbConnectionProvider;
     }
 
     /// <summary>
@@ -64,7 +64,7 @@ public class SystemOpenAccessService : IAdminApiController
 
         var openAccess = input.Adapt<SystemOpenAccessEntity>();
         // 凭证静态加密收口（C370）：AccessSecret 以 enc:sec:v1: 密文落库
-        openAccess.AccessSecret = TenantSecretCrypto.Encrypt(openAccess.AccessSecret) ?? string.Empty;
+        openAccess.AccessSecret = SecretCrypto.Encrypt(openAccess.AccessSecret) ?? string.Empty;
         await _systemOpenAccessRepository.InsertAsync(openAccess);
     }
 
@@ -85,7 +85,7 @@ public class SystemOpenAccessService : IAdminApiController
 
         var openAccess = input.Adapt<SystemOpenAccessEntity>();
         // 凭证静态加密收口（C370）：幂等——存量密文行重写不换密文
-        openAccess.AccessSecret = TenantSecretCrypto.Encrypt(openAccess.AccessSecret) ?? string.Empty;
+        openAccess.AccessSecret = SecretCrypto.Encrypt(openAccess.AccessSecret) ?? string.Empty;
         _systemCacheService.Remove(CacheConst.KeyOpenAccess + openAccess.AccessKey);
 
         await _systemOpenAccessRepository.Context.UpdateWithOptimisticLockAsync(openAccess);
@@ -137,7 +137,7 @@ public class SystemOpenAccessService : IAdminApiController
                 var entity = _systemOpenAccessRepository.AsQueryable().First(u => u.AccessKey == accessKey);
                 if (entity != null)
                 {
-                    entity.AccessSecret = TenantSecretCrypto.Decrypt(entity.AccessSecret) ?? string.Empty;
+                    entity.AccessSecret = SecretCrypto.Decrypt(entity.AccessSecret) ?? string.Empty;
                 }
 
                 return entity;
@@ -151,23 +151,23 @@ public class SystemOpenAccessService : IAdminApiController
     /// <param name="openAccess"></param>
     /// <returns></returns>
     [NonAction]
-    public BoundTenantUser GetBoundTenantUser(SystemOpenAccessEntity openAccess)
+    public BoundUser GetBoundUser(SystemOpenAccessEntity openAccess)
     {
-        var tenantDb = _tenantDbConnectionProvider;
-        tenantDb.QueryFilter.ClearAndBackup();
+        var db = _tenantDbConnectionProvider;
+        db.QueryFilter.ClearAndBackup();
         try
         {
-            var user = tenantDb.Queryable<TenantUserEntity>().First(u => u.Id == openAccess.BindUserId);
+            var user = db.Queryable<UserEntity>().First(u => u.Id == openAccess.BindUserId);
             if (user == null)
             {
                 throw BusinessError.Oh(SystemUserErrorCode.AccountNotFound);
             }
 
-            return new BoundTenantUser(user);
+            return new BoundUser(user);
         }
         finally
         {
-            tenantDb.QueryFilter.Restore();
+            db.QueryFilter.Restore();
         }
     }
 }

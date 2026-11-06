@@ -8,10 +8,10 @@ namespace GameFrameX.Client.Api.GameUserEmail;
 /// <summary>
 /// 用户邮件验证码控制器
 /// </summary>
-public class GameUserEmailController : BaseController<TenantGameUserEmailEntity>
+public class GameUserEmailController : BaseController<GameUserEmailEntity>
 {
-    private readonly Repository<TenantGameUserEntity> _gameUserEmailService;
-    private readonly ITenantEmailSender _emailSender;
+    private readonly Repository<GameUserEntity> _gameUserEmailService;
+    private readonly IEmailSender _emailSender;
 
     /// <summary>
     /// 邮件发送频率限制记录（邮箱 → 最后发送时间）
@@ -32,7 +32,7 @@ public class GameUserEmailController : BaseController<TenantGameUserEmailEntity>
     /// <param name="service"></param>
     /// <param name="gameUserEmailService"></param>
     /// <param name="emailSender"></param>
-    public GameUserEmailController(SqlSugarRepository<TenantGameUserEmailEntity> service, Repository<TenantGameUserEntity> gameUserEmailService, ITenantEmailSender emailSender) : base(service)
+    public GameUserEmailController(SqlSugarRepository<GameUserEmailEntity> service, Repository<GameUserEntity> gameUserEmailService, IEmailSender emailSender) : base(service)
     {
         _gameUserEmailService = gameUserEmailService;
         _emailSender = emailSender;
@@ -52,7 +52,7 @@ public class GameUserEmailController : BaseController<TenantGameUserEmailEntity>
             return rateLimitError;
         }
 
-        var entity = input.Adapt<TenantGameUserEmailEntity>();
+        var entity = input.Adapt<GameUserEmailEntity>();
         entity.UserName = input.Email;
         entity.Code = Random.Shared.Next(100000, 1000000).ToString();
         entity.ExpirationTime = TimerHelper.UnixTimeSeconds() + 5 * 60; //设置过期时间为5分钟后
@@ -73,7 +73,7 @@ public class GameUserEmailController : BaseController<TenantGameUserEmailEntity>
             { "verification_code", entity.Code },
         };
         var subject = input.Language.Contains("zh") ? "欢迎注册" : "Welcome to Register";
-        var result = await _emailSender.SendTemplateAsync(TenantEmailPurpose.PlayerRegisterCode, input.Email, Convert.ToUInt64(entity.TemplateId), subject, templateData);
+        var result = await _emailSender.SendTemplateAsync(EmailPurpose.PlayerRegisterCode, input.Email, Convert.ToUInt64(entity.TemplateId), subject, templateData);
 
         if (result)
         {
@@ -128,7 +128,7 @@ public class GameUserEmailController : BaseController<TenantGameUserEmailEntity>
             return HttpJsonResultData<BaseOperationAckResponse>.Success();
         }
 
-        var entity = input.Adapt<TenantGameUserEmailEntity>();
+        var entity = input.Adapt<GameUserEmailEntity>();
         entity.UserName = input.Email;
         entity.Code = Random.Shared.Next(100000, 1000000).ToString();
         entity.ExpirationTime = TimerHelper.UnixTimeSeconds() + 5 * 60; //设置过期时间为5分钟后
@@ -149,7 +149,7 @@ public class GameUserEmailController : BaseController<TenantGameUserEmailEntity>
             { "verification_code", entity.Code },
         };
         var subject = input.Language.Contains("zh") ? "找回密码" : "Password Recovery";
-        var result = await _emailSender.SendTemplateAsync(TenantEmailPurpose.PlayerPasswordReset, input.Email, Convert.ToUInt64(entity.TemplateId), subject, templateData);
+        var result = await _emailSender.SendTemplateAsync(EmailPurpose.PlayerPasswordReset, input.Email, Convert.ToUInt64(entity.TemplateId), subject, templateData);
 
         if (result)
         {

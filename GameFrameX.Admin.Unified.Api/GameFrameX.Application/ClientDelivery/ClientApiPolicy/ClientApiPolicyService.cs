@@ -4,7 +4,7 @@ using GameFrameX.Foundation.Logger;
 using GameFrameX.Application.ClientDelivery.ClientApiPolicy.Dto;
 using GameFrameX.Core.Enum.Errors;
 using GameFrameX.Core.Service;
-using GameFrameX.Core.Service.Tenant;
+using GameFrameX.Core.Service.Business;
 
 #pragma warning disable CS8604, CS8629 // SqlSugar WhereIF(condition, lambda)：lambda 仅在 condition=true 时执行；NRT 无法跨方法传播条件守卫，lambda 内 .Trim()/.Value 实际安全
 namespace GameFrameX.Application.ClientDelivery.ClientApiPolicy;
@@ -14,14 +14,14 @@ namespace GameFrameX.Application.ClientDelivery.ClientApiPolicy;
 /// <para>主库保存唯一运行策略，所有请求读取同一行。</para>
 /// <para>敏感字段（SigningKey）承载 C368 空值防护语义：新增空白自动生成 64-hex、更新空白与 <c>******</c> 同义保留原值；
 /// 输出恒为脱敏占位；该密钥纯服务端内部使用，任何响应均不回显明文。</para>
-/// <para>签名密钥以 <see cref="TenantSecretCrypto"/> 密文落库（C371）：PreserveIfMasked 先换回库中原值（密文形态），
+/// <para>签名密钥以 <see cref="SecretCrypto"/> 密文落库（C371）：PreserveIfMasked 先换回库中原值（密文形态），
 /// Encrypt 幂等跳过已密文值，新明文在落库前加密。</para>
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 112)]
 public class ClientApiPolicyService
-    : GenericCrudService<GameFrameX.Entity.Tenant.ClientApiConfig.TenantClientApiPolicyEntity,
-        AddTenantClientApiPolicyRequest, UpdateTenantClientApiPolicyRequest,
-        ClientApiPolicyResponse, PageTenantClientApiPolicyRequest>
+    : GenericCrudService<GameFrameX.Entity.Business.ClientApiConfig.ClientApiPolicyEntity,
+        AddClientApiPolicyRequest, UpdateClientApiPolicyRequest,
+        ClientApiPolicyResponse, PageClientApiPolicyRequest>
 {
     /// <summary>
     /// 票据固定到期时间上限（秒）：30 天（C142 决策口径）。
@@ -30,7 +30,7 @@ public class ClientApiPolicyService
 
     private readonly GameFrameX.Core.Service.User.CurrentUserContext _currentUserContext;
 
-    public ClientApiPolicyService(SqlSugarRepository<GameFrameX.Entity.Tenant.ClientApiConfig.TenantClientApiPolicyEntity> repository,
+    public ClientApiPolicyService(SqlSugarRepository<GameFrameX.Entity.Business.ClientApiConfig.ClientApiPolicyEntity> repository,
                                               GameFrameX.Core.Service.User.CurrentUserContext currentUserContext)
         : base(repository)
     {
@@ -54,7 +54,7 @@ public class ClientApiPolicyService
         }
 
         var plain = Convert.ToHexString(RandomNumberGenerator.GetBytes(32)).ToLowerInvariant();
-        entity.SigningKey = TenantSecretCrypto.Encrypt(plain) ?? string.Empty;
+        entity.SigningKey = SecretCrypto.Encrypt(plain) ?? string.Empty;
         entity.UpdateTime = TimerHelper.UnixTimeSeconds();
         await Repository.AsUpdateable(entity)
                         .UpdateColumns(e => new { e.SigningKey, e.UpdateTime, })
@@ -64,7 +64,7 @@ public class ClientApiPolicyService
         LogHelper.Info($"[KeyAudit] action=PolicySigningKeyRotate policyId={entity.Id} oldKeyRevoked=immediately operator={_currentUserContext.Account}");
     }
 
-    protected override ISugarQueryable<ClientApiPolicyResponse> BuildPageQuery(PageTenantClientApiPolicyRequest input)
+    protected override ISugarQueryable<ClientApiPolicyResponse> BuildPageQuery(PageClientApiPolicyRequest input)
     {
         var searchKey = input.SearchKey?.Trim();
         return Repository.AsQueryable()
@@ -77,12 +77,12 @@ public class ClientApiPolicyService
     /// 新增主库唯一运行策略。SigningKey 空白时服务端生成 64 位十六进制密钥。
     /// </summary>
     [DisplayName("新增 Client API 运行策略")]
-    public override async Task<ClientApiPolicyResponse> AddAsync(AddTenantClientApiPolicyRequest input)
+    public override async Task<ClientApiPolicyResponse> AddAsync(AddClientApiPolicyRequest input)
     {
         await CheckUniqueScopeAsync(null);
         ValidateTicketExpireTime(input.TicketExpireTime);
 
-        var entity = input.Adapt<GameFrameX.Entity.Tenant.ClientApiConfig.TenantClientApiPolicyEntity>();
+        var entity = input.Adapt<GameFrameX.Entity.Business.ClientApiConfig.ClientApiPolicyEntity>();
         entity.SigningKey = ResolveSigningKeyForStorage(input.SigningKey, null);
         entity.IsEnabled = true;
         await Repository.InsertAsync(entity);
@@ -96,7 +96,7 @@ public class ClientApiPolicyService
     /// 更新运行策略。SigningKey 回传 <c>******</c> 或留空均保留原值（C368：空白与掩码同义），新明文加密落库。
     /// </summary>
     [DisplayName("更新 Client API 运行策略")]
-    public override async Task UpdateAsync(UpdateTenantClientApiPolicyRequest input)
+    public override async Task UpdateAsync(UpdateClientApiPolicyRequest input)
     {
         var entity = await Repository.GetFirstAsync(e => e.Id == input.Id);
         if (entity == null)
@@ -144,7 +144,7 @@ public class ClientApiPolicyService
     [HttpPost(CrudActionRoutes.Page)]
     [ApiDescriptionSettings(Name = "Page")]
     [DisplayName("分页查询 Client API 运行策略")]
-    public override async Task<SqlSugarPagedList<ClientApiPolicyResponse>> PageAsync(PageTenantClientApiPolicyRequest input)
+    public override async Task<SqlSugarPagedList<ClientApiPolicyResponse>> PageAsync(PageClientApiPolicyRequest input)
     {
         var result = await base.PageAsync(input);
         foreach (var item in result.Items)
@@ -177,7 +177,7 @@ public class ClientApiPolicyService
     /// 解析签名密钥最终落库值（C368 + C371 组合语义）。
     /// <para>新增：空白 → CSPRNG 生成 64-hex；非空明文透传。</para>
     /// <para>更新：<c>******</c> 或空白 → 保留库中原值（密文形态）；新明文透传。</para>
-    /// <para>最终值经 <see cref="TenantSecretCrypto.Encrypt"/>：明文加密为 <c>enc:sec:v1:</c> 密文，已密文值幂等透传。</para>
+    /// <para>最终值经 <see cref="SecretCrypto.Encrypt"/>：明文加密为 <c>enc:sec:v1:</c> 密文，已密文值幂等透传。</para>
     /// </summary>
     private static string ResolveSigningKeyForStorage(string? inputKey, string? storedKey)
     {
@@ -200,7 +200,7 @@ public class ClientApiPolicyService
             plain = inputKey.Trim();
         }
 
-        return TenantSecretCrypto.Encrypt(plain) ?? string.Empty;
+        return SecretCrypto.Encrypt(plain) ?? string.Empty;
     }
 
     /// <summary>

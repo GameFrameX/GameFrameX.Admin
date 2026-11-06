@@ -1,7 +1,7 @@
 namespace GameFrameX.Entity.Enum;
 
 /// <summary>
-/// 处罚动作。处罚事实源（TenantGamePenaltyEntity）的动作分类。
+/// 处罚动作。处罚事实源（GamePenaltyEntity）的动作分类。
 /// <para>严格锁定 5 值；登录阻断集合严格等于 {Ban, RestrictLogin}。</para>
 /// <para>禁言与限制发言语义同一，合并为单个 Mute；Mute / RestrictTrade / RestrictMatch 不阻断登录与支付，仅落账。</para>
 /// </summary>

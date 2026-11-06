@@ -1,5 +1,5 @@
 using GameFrameX.Application.ClientDelivery.Rollout;
-using GameFrameX.Entity.Tenant.Game.RemoteConfig;
+using GameFrameX.Entity.Business.Game.RemoteConfig;
 
 namespace GameFrameX.Client.Api.Services.RemoteConfig;
 
@@ -16,7 +16,7 @@ public static class RemoteConfigRolloutMatcher
     /// <param name="record">候选远程配置记录。</param>
     /// <param name="deviceId">客户端稳定设备标识。</param>
     /// <returns>命中返回 true，否则返回 false。</returns>
-    public static bool IsMatch(TenantGameAppRemoteConfigEntity record, string? deviceId)
+    public static bool IsMatch(GameAppRemoteConfigEntity record, string? deviceId)
     {
         if (record.IsEnabled == false)
         {
@@ -36,7 +36,7 @@ public static class RemoteConfigRolloutMatcher
     /// <param name="candidates">候选记录和作用域精确度。</param>
     /// <param name="deviceId">客户端稳定设备标识。</param>
     /// <returns>命中的最高优先级记录；没有命中时返回 null。</returns>
-    public static TenantGameAppRemoteConfigEntity? SelectWinner(
+    public static GameAppRemoteConfigEntity? SelectWinner(
         IEnumerable<RemoteConfigScoredCandidate> candidates,
         string? deviceId)
     {

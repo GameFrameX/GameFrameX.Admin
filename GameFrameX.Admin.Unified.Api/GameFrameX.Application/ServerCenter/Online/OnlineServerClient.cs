@@ -11,11 +11,11 @@ public sealed class OnlineServerClient : IOnlineServerClient
 {
     private readonly HttpClient _httpClient;
     private readonly IOnlineServerEndpointResolver _endpointResolver;
-    private readonly SqlSugarRepository<TenantGameAreaEntity> _gameAreaRepository;
+    private readonly SqlSugarRepository<GameAreaEntity> _gameAreaRepository;
 
     public OnlineServerClient(HttpClient httpClient,
         IOnlineServerEndpointResolver endpointResolver,
-        SqlSugarRepository<TenantGameAreaEntity> gameAreaRepository)
+        SqlSugarRepository<GameAreaEntity> gameAreaRepository)
     {
         _httpClient = httpClient;
         _endpointResolver = endpointResolver;
@@ -104,7 +104,7 @@ public sealed class OnlineServerClient : IOnlineServerClient
         {
             foreach (var property in payload.EnumerateObject())
             {
-                if (string.Equals(property.Name, "TenantId", StringComparison.OrdinalIgnoreCase)
+                if (string.Equals(property.Name, "Id", StringComparison.OrdinalIgnoreCase)
                     || string.Equals(property.Name, "AppId", StringComparison.OrdinalIgnoreCase)
                     || string.Equals(property.Name, "ServerId", StringComparison.OrdinalIgnoreCase))
                 {

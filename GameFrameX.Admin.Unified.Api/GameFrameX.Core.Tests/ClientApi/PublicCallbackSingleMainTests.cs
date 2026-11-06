@@ -3,7 +3,7 @@ using GameFrameX.Client.Api.Integrations.Payment;
 using GameFrameX.Client.Api.Middleware;
 using GameFrameX.Client.Api.Services.PublicCallback;
 using GameFrameX.Core.Middleware;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 using GameFrameX.Payment.AliPay;
 using GameFrameX.Payment.Wechat;
 using Microsoft.AspNetCore.Http;
@@ -18,14 +18,14 @@ public sealed class PublicCallbackSingleMainTests
     public void OutboundPayment_BuildsNotifyUrlFromSiteRootThroughProvider(string channel)
     {
         // 出站下单通知地址经 PaymentOptionSettingProvider 真实构造：站点根地址自动补全新回调路由段
-        //（旧 tenantId/appId 查询作用域不参与），生成的 notify_url 能命中公开回调端点。
+        //（旧 id/appId 查询作用域不参与），生成的 notify_url 能命中公开回调端点。
         using (var database = new ClientApiTestDb())
         {
-            database.InitTenantTables(typeof(TenantGamePaymentConfigEntity));
+            database.InitBusinessTables(typeof(GamePaymentConfigEntity));
             var configJson = channel == "alipay"
                 ? JsonSerializer.Serialize(new AliPayOptionSetting { AliPayNotifyUrl = "https://example.test", })
                 : JsonSerializer.Serialize(new WechatPayOptionSetting { WechatPayNotifyUrl = "https://example.test", });
-            database.TenantDb.Insertable(new TenantGamePaymentConfigEntity
+            database.Db.Insertable(new GamePaymentConfigEntity
             {
                 Id = 1900000005101,
                 PackageIdNormalized = 0,
@@ -36,8 +36,8 @@ public sealed class PublicCallbackSingleMainTests
             }).ExecuteCommand();
 
             var context = new DefaultHttpContext();
-            context.Request.QueryString = new QueryString("?tenantId=123&appId=456");
-            var provider = new PaymentOptionSettingProvider(database.TenantDbProvider, new HttpContextAccessor { HttpContext = context });
+            context.Request.QueryString = new QueryString("?id=123&appId=456");
+            var provider = new PaymentOptionSettingProvider(database.DbProvider, new HttpContextAccessor { HttpContext = context });
 
             var expectedRoute = channel == "alipay" ? "api/GameOrder/NotifyAliPay" : "api/GameOrder/NotifyWeChatPay";
             var notifyUrl = channel == "alipay"
@@ -55,10 +55,10 @@ public sealed class PublicCallbackSingleMainTests
             var context = new DefaultHttpContext();
             context.SetEndpoint(new Endpoint(_ => Task.CompletedTask,
                 new EndpointMetadataCollection(new PublicCallbackEndpointAttribute("pangle", "ad")), "callback"));
-            context.Request.RouteValues["tenantId"] = 999;
+            context.Request.RouteValues["id"] = 999;
             context.Request.RouteValues["appId"] = 888;
             var invoked = false;
-            var middleware = new PublicCallbackTenantResolutionMiddleware(request =>
+            var middleware = new PublicCallbackResolutionMiddleware(request =>
             {
                 invoked = true;
                 Assert.Single(request.Items);

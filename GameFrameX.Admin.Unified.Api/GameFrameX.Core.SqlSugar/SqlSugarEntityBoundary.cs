@@ -11,7 +11,7 @@ public static class SqlSugarEntityBoundary
         new Dictionary<DatabaseOwnership, string>
         {
             [DatabaseOwnership.System] = "system_",
-            [DatabaseOwnership.Tenant] = "tenant_",
+            [DatabaseOwnership.Business] = "tenant_",
             [DatabaseOwnership.Global] = "global_",
         };
 
@@ -25,9 +25,9 @@ public static class SqlSugarEntityBoundary
         return GetOwnership(entityType) == DatabaseOwnership.System;
     }
 
-    public static bool IsTenantTable(Type entityType)
+    public static bool IsBusinessTable(Type entityType)
     {
-        return GetOwnership(entityType) == DatabaseOwnership.Tenant;
+        return GetOwnership(entityType) == DatabaseOwnership.Business;
     }
 
     public static bool IsMainDatabaseTable(Type entityType)
@@ -36,16 +36,16 @@ public static class SqlSugarEntityBoundary
         return true;
     }
 
-    public static bool RequiresTenantContext(Type entityType)
+    public static bool RequiresContext(Type entityType)
     {
         return false;
     }
 
     /// <summary>
     /// 实体归属完全由三类边界 Attribute 决定：<see cref="GlobalTableAttribute"/>（global_）、
-    /// <see cref="PlatformTableAttribute"/>（system_）、<see cref="TenantTableAttribute"/>（tenant_）。
-    /// 外部 <c>[Tenant]</c> 视同 Tenant。未标注任一边界 Attribute 的受管持久化实体将抛出 <see cref="InvalidOperationException"/>。
-    /// C156 起：日志不再使用独立日志库，平台日志归入 <c>system_log_*</c>（system_ 归属），租户日志归入 <c>tenant_log_*</c>（tenant_ 归属）。
+    /// <see cref="PlatformTableAttribute"/>（system_）、<see cref="BusinessTableAttribute"/>（tenant_）。
+    /// 外部 <c>[Business]</c> 视同 Business。未标注任一边界 Attribute 的受管持久化实体将抛出 <see cref="InvalidOperationException"/>。
+    /// C156 起：日志不再使用独立日志库，平台日志归入 <c>system_log_*</c>（system_ 归属），租户日志归入 <c>log_*</c>（tenant_ 归属）。
     /// </summary>
     public static DatabaseOwnership GetOwnership(Type entityType)
     {
@@ -61,9 +61,9 @@ public static class SqlSugarEntityBoundary
             return DatabaseOwnership.System;
         }
 
-        if (entityType.IsDefined(typeof(TenantTableAttribute), false) || IsExternalSpecificTable(entityType))
+        if (entityType.IsDefined(typeof(BusinessTableAttribute), false) || IsExternalSpecificTable(entityType))
         {
-            return DatabaseOwnership.Tenant;
+            return DatabaseOwnership.Business;
         }
 
         throw new InvalidOperationException($"Entity {entityType.FullName} is not assigned to system_, tenant_, or global_ ownership.");
@@ -90,7 +90,7 @@ public static class SqlSugarEntityBoundary
                                         || tableName.StartsWith(Prefixes[DatabaseOwnership.Global], StringComparison.Ordinal),
             DatabaseOwnership.Global => tableName.StartsWith(Prefixes[DatabaseOwnership.System], StringComparison.Ordinal)
                                         || tableName.StartsWith(Prefixes[DatabaseOwnership.Global], StringComparison.Ordinal),
-            DatabaseOwnership.Tenant => tableName.StartsWith(Prefixes[DatabaseOwnership.Tenant], StringComparison.Ordinal),
+            DatabaseOwnership.Business => tableName.StartsWith(Prefixes[DatabaseOwnership.Business], StringComparison.Ordinal),
             _                        => false,
         };
     }
@@ -99,7 +99,7 @@ public static class SqlSugarEntityBoundary
     {
         var markerCount = 0;
         markerCount += entityType.IsDefined(typeof(PlatformTableAttribute), false) ? 1 : 0;
-        markerCount += entityType.IsDefined(typeof(TenantTableAttribute), false) ? 1 : 0;
+        markerCount += entityType.IsDefined(typeof(BusinessTableAttribute), false) ? 1 : 0;
         markerCount += entityType.IsDefined(typeof(GlobalTableAttribute), false) ? 1 : 0;
         return markerCount > 1;
     }

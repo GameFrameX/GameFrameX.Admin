@@ -4,7 +4,7 @@ using GameFrameX.Application.ClientDelivery.GameAppRemoteConfig.Dto;
 using GameFrameX.Application.GmCenter.LiveOps.Dispatch;
 using GameFrameX.Application.GmCenter.LiveOps.Dispatch.Dto;
 using GameFrameX.Entity.Game.Online;
-using GameFrameX.Entity.Tenant.Game.App;
+using GameFrameX.Entity.Business.Game.App;
 
 namespace GameFrameX.Application.ClientDelivery.GameAppRemoteConfig;
 
@@ -12,13 +12,13 @@ namespace GameFrameX.Application.ClientDelivery.GameAppRemoteConfig;
 /// 远程配置管理服务
 /// </summary>
 [ApiDescriptionSettings(ClientConst.GroupName, Order = 100)]
-public class GameAppRemoteConfigService : GenericCrudService<Entity.Tenant.Game.RemoteConfig.TenantGameAppRemoteConfigEntity, AddGameAppRemoteConfigRequest, UpdateGameAppRemoteConfigRequest, GameAppRemoteConfigResponse, PageGameAppRemoteConfigRequest>
+public class GameAppRemoteConfigService : GenericCrudService<Entity.Business.Game.RemoteConfig.GameAppRemoteConfigEntity, AddGameAppRemoteConfigRequest, UpdateGameAppRemoteConfigRequest, GameAppRemoteConfigResponse, PageGameAppRemoteConfigRequest>
 {
-    private readonly SqlSugarRepository<TenantGameAppPackageEntity> _packageRepository;
+    private readonly SqlSugarRepository<GameAppPackageEntity> _packageRepository;
     private readonly IOnlineLiveOpsDispatchService _dispatchService;
 
-    public GameAppRemoteConfigService(SqlSugarRepository<Entity.Tenant.Game.RemoteConfig.TenantGameAppRemoteConfigEntity> repository,
-        SqlSugarRepository<TenantGameAppPackageEntity> packageRepository,
+    public GameAppRemoteConfigService(SqlSugarRepository<Entity.Business.Game.RemoteConfig.GameAppRemoteConfigEntity> repository,
+        SqlSugarRepository<GameAppPackageEntity> packageRepository,
         IOnlineLiveOpsDispatchService dispatchService) : base(repository)
     {
         _packageRepository = packageRepository;

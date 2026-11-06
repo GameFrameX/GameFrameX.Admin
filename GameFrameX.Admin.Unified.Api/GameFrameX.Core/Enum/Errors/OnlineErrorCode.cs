@@ -71,7 +71,7 @@ public enum OnlineErrorCode
     /// Online 跨租户请求被拒绝（镜像 3xxx）
     /// </summary>
     [ErrorText("Online 跨租户请求被拒绝", "Online cross-tenant request denied")]
-    CrossTenantDenied = 32200002,
+    CrossDenied = 32200002,
 
     /// <summary>
     /// Online 跨 App 请求被拒绝（镜像 3xxx）
@@ -86,7 +86,7 @@ public enum OnlineErrorCode
     ServerScopeDenied = 32200004,
 
     /// <summary>
-    /// Online 作用域缺失（Tenant/App/Server 未提供，镜像 3xxx）
+    /// Online 作用域缺失（Business/App/Server 未提供，镜像 3xxx）
     /// </summary>
     [ErrorText("Online 作用域缺失", "Online scope missing")]
     ScopeMissing = 32200005,

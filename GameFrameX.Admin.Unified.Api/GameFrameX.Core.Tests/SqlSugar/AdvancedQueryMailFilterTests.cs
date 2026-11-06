@@ -1,7 +1,7 @@
 using GameFrameX.Core.Enum;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Entity.Enum;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 using SqlSugar;
 
 namespace GameFrameX.Core.Tests.SqlSugar;
@@ -20,7 +20,7 @@ public sealed class AdvancedQueryMailFilterTests : IDisposable
         SqlSugarUnifiedConfig.ConfigureBaseSettings(config);
         _db = new SqlSugarScope(config);
         SqlSugarUnifiedConfig.ConfigureBaseFilters(_db);
-        _db.CodeFirst.InitTables(typeof(TenantGameMailEntity));
+        _db.CodeFirst.InitTables(typeof(GameMailEntity));
     }
 
     [Fact]
@@ -58,9 +58,9 @@ public sealed class AdvancedQueryMailFilterTests : IDisposable
         Assert.Equal(4, all.Count);
     }
 
-    private ISugarQueryable<TenantGameMailEntity> BuildQuery(bool? isAllPost = null, GameMailStatus? status = null, GameMailType? mailType = null)
+    private ISugarQueryable<GameMailEntity> BuildQuery(bool? isAllPost = null, GameMailStatus? status = null, GameMailType? mailType = null)
     {
-        return _db.Queryable<TenantGameMailEntity>()
+        return _db.Queryable<GameMailEntity>()
                   .WhereIF(isAllPost.HasValue, u => u.IsAllPost == isAllPost!.Value)
                   .WhereIF(status.HasValue, u => u.Status == status!.Value)
                   .WhereIF(mailType.HasValue, u => u.MailType == mailType!.Value);
@@ -75,10 +75,10 @@ public sealed class AdvancedQueryMailFilterTests : IDisposable
         await _db.Insertable(BuildMail(4, "m4", false, GameMailStatus.Draft, GameMailType.PersonalMail, now)).ExecuteCommandAsync();
     }
 
-    private static TenantGameMailEntity BuildMail(long id, string title, bool isAllPost, GameMailStatus status, GameMailType mailType, long now)
+    private static GameMailEntity BuildMail(long id, string title, bool isAllPost, GameMailStatus status, GameMailType mailType, long now)
     {
         // 非空字符串列全部给占位值，满足 Sqlite NOT NULL 约束（本测试只断言 IsAllPost/Status/MailType 过滤形状）。
-        return new TenantGameMailEntity
+        return new GameMailEntity
         {
             Id = id, Title = title, SubTitle = "", Body = "", PlayerIdListJson = "[]", AttachmentsJson = "[]",
             IsAllPost = isAllPost, Status = status, MailType = mailType, IsDeleted = false, CreatedTime = now,

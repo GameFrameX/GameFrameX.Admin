@@ -1,4 +1,4 @@
-using GameFrameX.Core.Service.Tenant;
+using GameFrameX.Core.Service.Business;
 using GameFrameX.Core.Extension.Const;
 using GameFrameX.Entity.Log;
 using GameFrameX.Foundation.Orm.Entity;

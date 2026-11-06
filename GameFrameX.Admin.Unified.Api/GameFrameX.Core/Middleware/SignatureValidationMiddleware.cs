@@ -63,7 +63,7 @@ public sealed class SignatureValidationMiddleware
             return;
         }
 
-        // 第三方 provider 回调（PublicCallbackTenantResolutionMiddleware 已打标）没有我们的签名，豁免
+        // 第三方 provider 回调（PublicCallbackResolutionMiddleware 已打标）没有我们的签名，豁免
         if (context.Items.ContainsKey(PublicCallbackRouteContext.ItemKey))
         {
             await _next(context);
@@ -73,7 +73,7 @@ public sealed class SignatureValidationMiddleware
         // 启动期公开只读端点（Tier 0，C379）：远程配置 / 程序版本 / 资源版本等运营性公开数据端点打标豁免。
         // 豁免必须先于 App 风险模式分流——这类端点是登录前第一波请求，客户端本就不在启动期做签名，
         // 若进 FailClosed 分流会打断所有存量客户端启动流程。命中标记即完全跳过验签（含伪造签名头，不做
-        // "带错签名反而拒"语义）；安全边界为 RequireTenantAppContext 上下文解析 + TLS，不改变其他中间件行为。
+        // "带错签名反而拒"语义）；安全边界为 RequireAppContext 上下文解析 + TLS，不改变其他中间件行为。
         // GetEndpoint() 为 null（无路由匹配）时安全降级不豁免，交由后续链路按缺签名头处理。
         if (context.GetEndpoint()?.Metadata.GetMetadata<PublicStartupEndpointAttribute>() != null)
         {

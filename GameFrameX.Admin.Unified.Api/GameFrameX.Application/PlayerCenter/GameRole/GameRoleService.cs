@@ -11,11 +11,11 @@ namespace GameFrameX.Application.PlayerCenter.GameRole;
 /// 游戏角色服务
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
-public class GameRoleService : GenericCrudSelectService<Entity.Tenant.Game.TenantGameRoleEntity, AddTenantGameRoleEntityRequest, UpdateTenantGameRoleEntityRequest, GameRoleResponse, PageTenantGameRoleEntityRequest>
+public class GameRoleService : GenericCrudSelectService<Entity.Business.Game.GameRoleEntity, AddGameRoleEntityRequest, UpdateGameRoleEntityRequest, GameRoleResponse, PageGameRoleEntityRequest>
 {
     private readonly HttpClient _httpClient;
 
-    public GameRoleService(SqlSugarRepository<Entity.Tenant.Game.TenantGameRoleEntity> repository, HttpClient httpClient) : base(repository)
+    public GameRoleService(SqlSugarRepository<Entity.Business.Game.GameRoleEntity> repository, HttpClient httpClient) : base(repository)
     {
         _httpClient = httpClient;
     }
@@ -23,7 +23,7 @@ public class GameRoleService : GenericCrudSelectService<Entity.Tenant.Game.Tenan
     /// <summary>
     /// 构建分页查询条件
     /// </summary>
-    protected override ISugarQueryable<GameRoleResponse> BuildPageQuery(PageTenantGameRoleEntityRequest input)
+    protected override ISugarQueryable<GameRoleResponse> BuildPageQuery(PageGameRoleEntityRequest input)
     {
         return Repository.AsQueryable()
                          .WhereIF(input.Id > 0, u => u.Id == input.Id)
@@ -49,7 +49,7 @@ public class GameRoleService : GenericCrudSelectService<Entity.Tenant.Game.Tenan
     /// </summary>
     [HttpPost(CrudActionRoutes.Page)]
     [ApiDescriptionSettings(Name = "Page")]
-    public override async Task<SqlSugarPagedList<GameRoleResponse>> PageAsync(PageTenantGameRoleEntityRequest input)
+    public override async Task<SqlSugarPagedList<GameRoleResponse>> PageAsync(PageGameRoleEntityRequest input)
     {
         var query = BuildPageQuery(input);
         query = ApplyOrdering(query, input);
@@ -69,7 +69,7 @@ public class GameRoleService : GenericCrudSelectService<Entity.Tenant.Game.Tenan
     /// <returns></returns>
     [HttpPost(CrudActionRoutes.Update)]
     [ApiDescriptionSettings(Name = "Update")]
-    public override async Task UpdateAsync(UpdateTenantGameRoleEntityRequest input)
+    public override async Task UpdateAsync(UpdateGameRoleEntityRequest input)
     {
         if (string.IsNullOrEmpty(input.RoleId))
         {
@@ -82,7 +82,7 @@ public class GameRoleService : GenericCrudSelectService<Entity.Tenant.Game.Tenan
             throw BusinessError.Oh(CommonErrorCode.RecordNotFound);
         }
 
-        var entity = input.Adapt<Entity.Tenant.Game.TenantGameRoleEntity>();
+        var entity = input.Adapt<Entity.Business.Game.GameRoleEntity>();
         entity.Id = long.Parse(input.RoleId);
         await Repository.AsUpdateable(entity).IgnoreColumns(true).ExecuteCommandWithOptLockAsync(true);
     }
@@ -94,10 +94,10 @@ public class GameRoleService : GenericCrudSelectService<Entity.Tenant.Game.Tenan
     /// <returns></returns>
     [HttpPost]
     [ApiDescriptionSettings(Name = "UpdateToSandBox")]
-    public async Task UpdateToSandBoxAsync(UpdateTenantGameRoleEntityRequest input)
+    public async Task UpdateToSandBoxAsync(UpdateGameRoleEntityRequest input)
     {
         var gameRoleEntity = await Repository.GetFirstAsync(u => u.Id == long.Parse(input.RoleId));
-        var gameAreaEntity = await Repository.AsSugarClient().Queryable<Entity.Tenant.Game.TenantGameAreaEntity>().Filter(null, true).Where(u => u.IsDeleted == false).SingleAsync(m => m.Id == gameRoleEntity.AreaId);
+        var gameAreaEntity = await Repository.AsSugarClient().Queryable<Entity.Business.Game.GameAreaEntity>().Filter(null, true).Where(u => u.IsDeleted == false).SingleAsync(m => m.Id == gameRoleEntity.AreaId);
         if (gameAreaEntity == null)
         {
             throw new Exception("区服信息不存在");
@@ -152,10 +152,10 @@ public class GameRoleService : GenericCrudSelectService<Entity.Tenant.Game.Tenan
     /// <returns></returns>
     [HttpPost]
     [ApiDescriptionSettings(Name = "UpdateToUnSandBox")]
-    public async Task UpdateToUnSandBoxAsync(UpdateTenantGameRoleEntityRequest input)
+    public async Task UpdateToUnSandBoxAsync(UpdateGameRoleEntityRequest input)
     {
         var gameRoleEntity = await Repository.GetFirstAsync(u => u.Id == long.Parse(input.RoleId));
-        var gameAreaEntity = await Repository.AsSugarClient().Queryable<Entity.Tenant.Game.TenantGameAreaEntity>().Filter(null, true).Where(u => u.IsDeleted == false).SingleAsync(m => m.Id == gameRoleEntity.AreaId);
+        var gameAreaEntity = await Repository.AsSugarClient().Queryable<Entity.Business.Game.GameAreaEntity>().Filter(null, true).Where(u => u.IsDeleted == false).SingleAsync(m => m.Id == gameRoleEntity.AreaId);
         if (gameAreaEntity == null)
         {
             throw new Exception("区服信息不存在");
@@ -187,10 +187,10 @@ public class GameRoleService : GenericCrudSelectService<Entity.Tenant.Game.Tenan
     /// <returns></returns>
     [HttpPost]
     [ApiDescriptionSettings(Name = "Sync")]
-    public async Task SyncAsync(UpdateTenantGameRoleEntityRequest input)
+    public async Task SyncAsync(UpdateGameRoleEntityRequest input)
     {
         var gameRoleEntity = await Repository.GetFirstAsync(u => u.Id == long.Parse(input.RoleId));
-        var gameAreaEntity = await Repository.AsSugarClient().Queryable<Entity.Tenant.Game.TenantGameAreaEntity>().Filter(null, true).Where(u => u.IsDeleted == false).SingleAsync(m => m.Id == gameRoleEntity.AreaId);
+        var gameAreaEntity = await Repository.AsSugarClient().Queryable<Entity.Business.Game.GameAreaEntity>().Filter(null, true).Where(u => u.IsDeleted == false).SingleAsync(m => m.Id == gameRoleEntity.AreaId);
         if (gameAreaEntity == null)
         {
             throw new Exception("区服信息不存在");

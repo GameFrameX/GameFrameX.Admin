@@ -1,7 +1,7 @@
 using GameFrameX.Application.SeedData.System;
 using GameFrameX.Core.Cache;
 using GameFrameX.Core.Option;
-using GameFrameX.Core.Service.Tenant;
+using GameFrameX.Core.Service.Business;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Core.Tests.System;
 using GameFrameX.Entity.Global;
@@ -116,26 +116,26 @@ public class SeedInsertOnlyTests : IDisposable
     [Fact]
     public void DefaultTenantSeeder_Upsert_InsertsMissingRowsOnly()
     {
-        using (var scope = CreateScope("tenant_2001"))
+        using (var scope = CreateScope("2001"))
         {
-            var tenantConfig = CreateConfig("tenant_2001");
-            SqlSugarSetup.InitDatabase(scope, tenantConfig, new[] { typeof(TenantRoleEntity), });
+            var config = CreateConfig("2001");
+            SqlSugarSetup.InitDatabase(scope, config, new[] { typeof(RoleEntity), });
 
-            var tenantDb = scope.GetConnectionScope("tenant_2001");
-            var role = new TenantRoleEntity { Id = 99001, Name = "初始角色", Code = "init_role", };
-            DefaultTenantDatabaseSeeder.Upsert(tenantDb, new[] { role, });
+            var db = scope.GetConnectionScope("2001");
+            var role = new RoleEntity { Id = 99001, Name = "初始角色", Code = "init_role", };
+            DefaultDatabaseSeeder.Upsert(db, new[] { role, });
 
             // 模拟用户在管理端改名
-            tenantDb.Updateable<TenantRoleEntity>()
+            db.Updateable<RoleEntity>()
                     .SetColumns(u => u.Name == "用户改过")
                     .Where(u => u.Id == 99001)
                     .ExecuteCommand();
 
             // 二次 seed（如默认租户库重复初始化）：同名主键行不再覆盖
-            var seedAgain = new TenantRoleEntity { Id = 99001, Name = "seed 新值", Code = "init_role", };
-            DefaultTenantDatabaseSeeder.Upsert(tenantDb, new[] { seedAgain, });
+            var seedAgain = new RoleEntity { Id = 99001, Name = "seed 新值", Code = "init_role", };
+            DefaultDatabaseSeeder.Upsert(db, new[] { seedAgain, });
 
-            var name = tenantDb.Queryable<TenantRoleEntity>().First(u => u.Id == 99001).Name;
+            var name = db.Queryable<RoleEntity>().First(u => u.Id == 99001).Name;
             Assert.Equal("用户改过", name);
         }
     }

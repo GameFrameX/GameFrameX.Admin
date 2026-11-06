@@ -51,7 +51,7 @@ public class GlobalMenuSeedAudiencePrefixGuardTests
             .Where(menu => menu.Type == MenuTypeEnum.Menu && menu.SuperAdminOnly)
             .Select(menu => menu.Key).OrderBy(key => key));
         Assert.All(menus.Where(menu => protectedKeys.Contains(menu.Key!)),
-            menu => Assert.False(menu.AllowTenantWhenSuperAdminOnly));
+            menu => Assert.False(menu.AllowAdminWhenSuperAdminOnly));
     }
 
     [Fact]
@@ -61,14 +61,14 @@ public class GlobalMenuSeedAudiencePrefixGuardTests
 
         // C302 改名映射：logDiff/logVisit 与 gameDockerTagEntity，种子曾残留旧文件名
         var diffLogMenu = menus.Single(m => m.Key == "route:systemDiffLog");
-        Assert.Contains(diffLogMenu.Component, new[] { "/tenant/system/log/logDiff/index", "/audit/logDiff/index" });
+        Assert.Contains(diffLogMenu.Component, new[] { "/system/log/logDiff/index", "/audit/logDiff/index" });
 
         var dockerMenu = menus.Single(m => m.Key == "route:gameDockerEntity");
         Assert.Contains(dockerMenu.Component, new[] { "/app/opsCenter/gameDockerTagEntity/index", "/serverCenter/gameDockerTagEntity/index" });
 
         // userCenter 组件实际文件为 UserCenter.vue（大写 U），种子曾小写导致 dynamicImport 零匹配
         var userCenterMenu = menus.Single(m => m.Key == "route:systemUserCenter");
-        Assert.Contains(userCenterMenu.Component, new[] { "/tenant/system/user/component/UserCenter", "/system/user/component/UserCenter" });
+        Assert.Contains(userCenterMenu.Component, new[] { "/system/user/component/UserCenter", "/system/user/component/UserCenter" });
     }
 
     private static string FirstSegment(string? value)

@@ -6,13 +6,13 @@ using GameFrameX.Core.Exceptions;
 using GameFrameX.Core.BaseInputOutput;
 using GameFrameX.Core.Extension;
 using GameFrameX.Core.Service;
-using GameFrameX.Core.Service.Tenant;
+using GameFrameX.Core.Service.Business;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Core.Tests.ClientApi;
-using GameFrameX.Entity.Tenant.ClientApiConfig;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.ClientApiConfig;
+using GameFrameX.Entity.Business.Game;
 
-namespace GameFrameX.Core.Tests.Tenant;
+namespace GameFrameX.Core.Tests.Business;
 
 // C373（GFX-838）T1/T2/T3：密钥生命周期操作集。
 // change：gfx-doc/dev/client-api/changes/C373-credential-key-lifecycle/change.md
@@ -26,50 +26,50 @@ public sealed class KeyLifecycleRotateTests : IDisposable
 
     public KeyLifecycleRotateTests()
     {
-        _originalKey = Environment.GetEnvironmentVariable(TenantSecretCrypto.KeyEnvironmentVariable);
-        Environment.SetEnvironmentVariable(TenantSecretCrypto.KeyEnvironmentVariable, "unit-test-secret-key");
-        _db.InitTenantTables(typeof(TenantGameLoginTicketKeyEntity), typeof(TenantClientApiPolicyEntity));
+        _originalKey = Environment.GetEnvironmentVariable(SecretCrypto.KeyEnvironmentVariable);
+        Environment.SetEnvironmentVariable(SecretCrypto.KeyEnvironmentVariable, "unit-test-secret-key");
+        _db.InitBusinessTables(typeof(GameLoginTicketKeyEntity), typeof(ClientApiPolicyEntity));
     }
 
     public void Dispose()
     {
-        Environment.SetEnvironmentVariable(TenantSecretCrypto.KeyEnvironmentVariable, _originalKey);
+        Environment.SetEnvironmentVariable(SecretCrypto.KeyEnvironmentVariable, _originalKey);
         _db.Dispose();
     }
 
     private GameLoginTicketKeyService CreateTicketKeyService()
     {
         return new GameLoginTicketKeyService(
-            new Repository<TenantGameLoginTicketKeyEntity>(_db.MainDb),
+            new Repository<GameLoginTicketKeyEntity>(_db.MainDb),
             new GameFrameX.Core.Service.User.CurrentUserContext(new Microsoft.AspNetCore.Http.HttpContextAccessor()));
     }
 
     private ClientApiPolicyService CreatePolicyService()
     {
         return new ClientApiPolicyService(
-            new Repository<TenantClientApiPolicyEntity>(_db.MainDb),
+            new Repository<ClientApiPolicyEntity>(_db.MainDb),
             new GameFrameX.Core.Service.User.CurrentUserContext(new Microsoft.AspNetCore.Http.HttpContextAccessor()));
     }
 
     /// <summary>
     /// 预置一把「当前生效」的旧钥（模拟既有密钥形态；密文与否不影响轮换标记逻辑，用密文形态贴近 C371 后库内现状）。
     /// </summary>
-    private TenantGameLoginTicketKeyEntity SeedActiveTicketKey()
+    private GameLoginTicketKeyEntity SeedActiveTicketKey()
     {
-        var oldKey = new TenantGameLoginTicketKeyEntity
+        var oldKey = new GameLoginTicketKeyEntity
         {
            
             Kid = "kid-old-active",
             Algorithm = "RS256",
-            PrivateKeyPem = TenantSecretCrypto.Encrypt("old-private-pem") ?? string.Empty,
+            PrivateKeyPem = SecretCrypto.Encrypt("old-private-pem") ?? string.Empty,
             PublicKeyPem = "old-public-pem",
             NotBeforeTime = TimerHelper.UnixTimeSeconds() - 3600,
             ExpireTime = null,
             IsEnabled = true,
             Remark = "seed",
         };
-        _db.TenantDb.Insertable(oldKey).ExecuteCommand();
-        return _db.TenantDb.Queryable<TenantGameLoginTicketKeyEntity>().First(u => u.Kid == "kid-old-active");
+        _db.Db.Insertable(oldKey).ExecuteCommand();
+        return _db.Db.Queryable<GameLoginTicketKeyEntity>().First(u => u.Kid == "kid-old-active");
     }
 
     [Fact]
@@ -81,14 +81,14 @@ public sealed class KeyLifecycleRotateTests : IDisposable
         await CreateTicketKeyService().RotateAsync(new GameLoginTicketKeyRotateRequest { });
 
         var after = TimerHelper.UnixTimeSeconds();
-        var storedOld = _db.TenantDb.Queryable<TenantGameLoginTicketKeyEntity>().First(u => u.Id == oldKey.Id);
+        var storedOld = _db.Db.Queryable<GameLoginTicketKeyEntity>().First(u => u.Id == oldKey.Id);
         Assert.NotNull(storedOld.RotatedTime);
         Assert.InRange(storedOld.RotatedTime.Value, before, after);
         Assert.InRange(storedOld.ExpireTime!.Value, before + GameLoginTicketKeyService.OldKeyDefaultExpireSeconds,
                        after + GameLoginTicketKeyService.OldKeyDefaultExpireSeconds);
 
         // 新钥立即生效（NotBefore ∈ [before, after]），且未被标记轮换
-        var newKey = _db.TenantDb.Queryable<TenantGameLoginTicketKeyEntity>().First(u => u.Kid != "kid-old-active");
+        var newKey = _db.Db.Queryable<GameLoginTicketKeyEntity>().First(u => u.Kid != "kid-old-active");
         Assert.InRange(newKey.NotBeforeTime!.Value, before, after);
         Assert.Null(newKey.RotatedTime);
     }
@@ -102,7 +102,7 @@ public sealed class KeyLifecycleRotateTests : IDisposable
 
         await CreateTicketKeyService().RotateAsync(new GameLoginTicketKeyRotateRequest { OldKeyExpireTime = explicitExpire, });
 
-        var storedOld = _db.TenantDb.Queryable<TenantGameLoginTicketKeyEntity>().First(u => u.Id == oldKey.Id);
+        var storedOld = _db.Db.Queryable<GameLoginTicketKeyEntity>().First(u => u.Id == oldKey.Id);
         Assert.Equal(explicitExpire, storedOld.ExpireTime);
         Assert.NotNull(storedOld.RotatedTime);
     }
@@ -139,32 +139,32 @@ public sealed class KeyLifecycleRotateTests : IDisposable
         // 无旧钥场景（首把密钥轮换）：仅生成新钥，不抛错
         await CreateTicketKeyService().RotateAsync(new GameLoginTicketKeyRotateRequest { });
 
-        var count = _db.TenantDb.Queryable<TenantGameLoginTicketKeyEntity>().Count();
+        var count = _db.Db.Queryable<GameLoginTicketKeyEntity>().Count();
         Assert.Equal(1, count);
     }
 
     [Fact]
     public async Task PolicyRotate_GeneratesNewCipher_OldValueRevokedImmediately()
     {
-        var added = await CreatePolicyService().AddAsync(new AddTenantClientApiPolicyRequest
+        var added = await CreatePolicyService().AddAsync(new AddClientApiPolicyRequest
         {
             SigningKey = string.Empty,
             LifetimeMinutes = 30,
             TicketExpireTime = 0,
         });
-        var cipherBefore = _db.TenantDb.Queryable<TenantClientApiPolicyEntity>().Filter(null, true).First(u => u.Id == added.Id).SigningKey;
-        var plainBefore = TenantSecretCrypto.Decrypt(cipherBefore);
-        Assert.StartsWith(TenantSecretCrypto.EncryptedPrefix, cipherBefore, StringComparison.Ordinal);
+        var cipherBefore = _db.Db.Queryable<ClientApiPolicyEntity>().Filter(null, true).First(u => u.Id == added.Id).SigningKey;
+        var plainBefore = SecretCrypto.Decrypt(cipherBefore);
+        Assert.StartsWith(SecretCrypto.EncryptedPrefix, cipherBefore, StringComparison.Ordinal);
 
         var before = TimerHelper.UnixTimeSeconds();
         await CreatePolicyService().RotateAsync(new BaseIdRequest { Id = added.Id, });
         var after = TimerHelper.UnixTimeSeconds();
 
-        var stored = _db.TenantDb.Queryable<TenantClientApiPolicyEntity>().Filter(null, true).First(u => u.Id == added.Id);
+        var stored = _db.Db.Queryable<ClientApiPolicyEntity>().Filter(null, true).First(u => u.Id == added.Id);
         // 新密文 ≠ 旧密文（旧值即刻作废），仍为密文形态且可解密为新 64-hex
         Assert.NotEqual(cipherBefore, stored.SigningKey);
-        Assert.StartsWith(TenantSecretCrypto.EncryptedPrefix, stored.SigningKey, StringComparison.Ordinal);
-        var plainAfter = TenantSecretCrypto.Decrypt(stored.SigningKey);
+        Assert.StartsWith(SecretCrypto.EncryptedPrefix, stored.SigningKey, StringComparison.Ordinal);
+        var plainAfter = SecretCrypto.Decrypt(stored.SigningKey);
         Assert.NotEqual(plainBefore, plainAfter);
         Assert.Equal(64, plainAfter!.Length);
         Assert.Matches("^[0-9a-f]{64}$", plainAfter);

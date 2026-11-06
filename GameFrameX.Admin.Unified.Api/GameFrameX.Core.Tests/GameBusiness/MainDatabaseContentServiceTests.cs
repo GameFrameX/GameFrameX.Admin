@@ -5,8 +5,8 @@ using GameFrameX.Application.NoticeCenter.GameMailTemplateCategory.Dto;
 using GameFrameX.Core.Exceptions;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Core.Tests.ClientApi;
-using GameFrameX.Entity.Tenant.Game;
-using GameFrameX.Entity.Tenant.Game.Announcement;
+using GameFrameX.Entity.Business.Game;
+using GameFrameX.Entity.Business.Game.Announcement;
 
 namespace GameFrameX.Core.Tests.GameBusiness;
 
@@ -17,26 +17,26 @@ public sealed class MainDatabaseContentServiceTests
     {
         using (var database = new ClientApiTestDb())
         {
-            database.InitTenantTables(typeof(TenantGameAnnouncementEntity));
-            var service = new GameAnnouncementService(new SqlSugarRepository<TenantGameAnnouncementEntity>
+            database.InitBusinessTables(typeof(GameAnnouncementEntity));
+            var service = new GameAnnouncementService(new SqlSugarRepository<GameAnnouncementEntity>
             {
                 Context = database.MainDb,
             }, null!);
-            var created = await service.AddAsync(new AddTenantGameAnnouncementEntityRequest
+            var created = await service.AddAsync(new AddGameAnnouncementEntityRequest
             {
                 Title = "notice", Content = "content", Language = "  ",
                 TitleLocalizationKey = " title.key ", ContentLocalizationKey = " content.key ",
             });
-            var entity = await database.Repository<TenantGameAnnouncementEntity>().GetByIdAsync(created.Id);
+            var entity = await database.Repository<GameAnnouncementEntity>().GetByIdAsync(created.Id);
             Assert.Equal("default", entity.Language);
             Assert.Equal("title.key", entity.TitleLocalizationKey);
             Assert.Equal("content.key", entity.ContentLocalizationKey);
-            Assert.Equal(created.Id, Assert.Single((await service.PageAsync(new PageTenantGameAnnouncementEntityRequest
+            Assert.Equal(created.Id, Assert.Single((await service.PageAsync(new PageGameAnnouncementEntityRequest
             {
                 Language = "default", Title = "notice",
             })).Items).Id);
-            Assert.Empty((await service.PageAsync(new PageTenantGameAnnouncementEntityRequest { Language = "en" })).Items);
-            await Assert.ThrowsAsync<BusinessException>(() => service.UpdateAsync(new UpdateTenantGameAnnouncementEntityRequest
+            Assert.Empty((await service.PageAsync(new PageGameAnnouncementEntityRequest { Language = "en" })).Items);
+            await Assert.ThrowsAsync<BusinessException>(() => service.UpdateAsync(new UpdateGameAnnouncementEntityRequest
             {
                 Id = created.Id + 1, Title = "missing", Content = "content",
             }));
@@ -48,21 +48,21 @@ public sealed class MainDatabaseContentServiceTests
     {
         using (var database = new ClientApiTestDb())
         {
-            database.InitTenantTables(typeof(TenantGameMailTemplateCategoryEntity));
-            var service = new GameMailTemplateCategoryService(new SqlSugarRepository<TenantGameMailTemplateCategoryEntity>
+            database.InitBusinessTables(typeof(GameMailTemplateCategoryEntity));
+            var service = new GameMailTemplateCategoryService(new SqlSugarRepository<GameMailTemplateCategoryEntity>
             {
                 Context = database.MainDb,
             });
-            var created = await service.AddAsync(new AddTenantGameMailTemplateCategoryEntityRequest
+            var created = await service.AddAsync(new AddGameMailTemplateCategoryEntityRequest
             {
                 Name = "operations", Description = "mail", Icon = "mail", IsEnabled = true,
             });
-            Assert.Equal(created.Id, Assert.Single((await service.PageAsync(new PageTenantGameMailTemplateCategoryEntityRequest
+            Assert.Equal(created.Id, Assert.Single((await service.PageAsync(new PageGameMailTemplateCategoryEntityRequest
             {
                 Name = "operations", IsEnabled = true,
             })).Items).Id);
-            Assert.Empty((await service.PageAsync(new PageTenantGameMailTemplateCategoryEntityRequest { Name = "missing" })).Items);
-            await Assert.ThrowsAsync<BusinessException>(() => service.UpdateAsync(new UpdateTenantGameMailTemplateCategoryEntityRequest
+            Assert.Empty((await service.PageAsync(new PageGameMailTemplateCategoryEntityRequest { Name = "missing" })).Items);
+            await Assert.ThrowsAsync<BusinessException>(() => service.UpdateAsync(new UpdateGameMailTemplateCategoryEntityRequest
             {
                 Id = created.Id + 1, Name = "missing", Description = "mail", Icon = "mail",
             }));

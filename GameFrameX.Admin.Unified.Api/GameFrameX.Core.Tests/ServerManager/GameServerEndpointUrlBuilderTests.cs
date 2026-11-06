@@ -1,7 +1,7 @@
 using GameFrameX.Application.ServerCenter;
 using GameFrameX.Core.Enum;
 using GameFrameX.Entity.Enum;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 
 namespace GameFrameX.Core.Tests.ServerManager;
 
@@ -188,8 +188,8 @@ public class GameServerEndpointUrlBuilderTests
 #pragma warning restore CS8625
     }
 
-    private static TenantGameAreaEntity NewArea(string root = "http://game.example")
+    private static GameAreaEntity NewArea(string root = "http://game.example")
     {
-        return new TenantGameAreaEntity { HttpManageUrl = root, };
+        return new GameAreaEntity { HttpManageUrl = root, };
     }
 }

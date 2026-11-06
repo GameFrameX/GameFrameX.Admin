@@ -4,7 +4,7 @@ using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using GameFrameX.Core.Tests.ClientApi;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 using GameFrameX.Foundation.Json;
 using GameFrameX.Client.Api.GameUserPay.Dto;
 using GameFrameX.Client.Api.Services;
@@ -235,7 +235,7 @@ public sealed class AppleServerApiVerifyTests
                 new StubPaymentChannelFactory(new ApplePaymentHandler(), MakeSetting(material)),
                 new ClientApiTestHttpClientFactory(handler));
 
-            var result = await verifier.VerifyAsync(MakeTenantOrder(), new GameUserPayVerifyRequest
+            var result = await verifier.VerifyAsync(MakeOrder(), new GameUserPayVerifyRequest
             {
                 UserId = 7001,
                 OrderId = "pay-271",
@@ -280,7 +280,7 @@ public sealed class AppleServerApiVerifyTests
 
             var verifier = new GamePayReceiptVerifier(new StubPaymentChannelFactory(new ApplePaymentHandler(), setting), new ClientApiTestHttpClientFactory(handler));
 
-            var result = await verifier.VerifyAsync(MakeTenantOrder(), new GameUserPayVerifyRequest
+            var result = await verifier.VerifyAsync(MakeOrder(), new GameUserPayVerifyRequest
             {
                 UserId = 7001,
                 OrderId = "pay-271",
@@ -304,7 +304,7 @@ public sealed class AppleServerApiVerifyTests
             var setting = MakeSetting(material, useServerApiV2: false);
             var verifier = new GamePayReceiptVerifier(new StubPaymentChannelFactory(new ApplePaymentHandler(), setting), new ClientApiTestHttpClientFactory(handler));
 
-            var result = await verifier.VerifyAsync(MakeTenantOrder(), new GameUserPayVerifyRequest
+            var result = await verifier.VerifyAsync(MakeOrder(), new GameUserPayVerifyRequest
             {
                 UserId = 7001,
                 OrderId = "pay-271",
@@ -326,7 +326,7 @@ public sealed class AppleServerApiVerifyTests
             var handler = new RecordingServerApiHandler();
             var verifier = new GamePayReceiptVerifier(new StubPaymentChannelFactory(new ApplePaymentHandler(), MakeSetting(material)), new ClientApiTestHttpClientFactory(handler));
 
-            var result = await verifier.VerifyAsync(MakeTenantOrder(), new GameUserPayVerifyRequest
+            var result = await verifier.VerifyAsync(MakeOrder(), new GameUserPayVerifyRequest
             {
                 UserId = 7001,
                 OrderId = "pay-271",
@@ -347,7 +347,7 @@ public sealed class AppleServerApiVerifyTests
             var handler = new RecordingServerApiHandler();
             var verifier = new GamePayReceiptVerifier(new StubPaymentChannelFactory(new ApplePaymentHandler(), MakeSetting(material)), new ClientApiTestHttpClientFactory(handler));
 
-            var result = await verifier.VerifyAsync(MakeTenantOrder(), new GameUserPayVerifyRequest
+            var result = await verifier.VerifyAsync(MakeOrder(), new GameUserPayVerifyRequest
             {
                 UserId = 7001,
                 OrderId = "pay-271",
@@ -447,9 +447,9 @@ public sealed class AppleServerApiVerifyTests
         };
     }
 
-    private static TenantGameOrderEntity MakeTenantOrder()
+    private static GameOrderEntity MakeOrder()
     {
-        return new TenantGameOrderEntity
+        return new GameOrderEntity
         {
             Id = 9001,
             AccountId = "7001",

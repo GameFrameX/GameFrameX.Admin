@@ -4,7 +4,7 @@ using GameFrameX.Core.Option;
 using GameFrameX.Core.Service.Cache;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Core.Tests.ClientApi;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
@@ -28,11 +28,11 @@ public sealed class GameTimeJobDispatchJobTests : IDisposable
 
     public GameTimeJobDispatchJobTests()
     {
-        _database.InitTenantTables(typeof(TenantGameTimeJobEntity));
+        _database.InitBusinessTables(typeof(GameTimeJobEntity));
 
         var services = new ServiceCollection();
         services.AddSingleton<ISqlSugarClient>(_database.MainDb);
-        services.AddScoped(_ => new SqlSugarRepository<TenantGameTimeJobEntity> { Context = _database.MainDb, });
+        services.AddScoped(_ => new SqlSugarRepository<GameTimeJobEntity> { Context = _database.MainDb, });
         services.AddSingleton<GameFrameX.Core.Extension.Cache.ICache>(_cache);
         services.AddSingleton<IOptions<CacheOptions>>(Options.Create(new CacheOptions()));
         services.AddSingleton<SystemCacheService>();
@@ -140,7 +140,7 @@ public sealed class GameTimeJobDispatchJobTests : IDisposable
         await DispatchAsync();
 
         // 删除：行消失后调度移除，时间推进也不执行。
-        _database.MainDb.Deleteable<TenantGameTimeJobEntity>().Where(row => row.Id == 9005).ExecuteCommand();
+        _database.MainDb.Deleteable<GameTimeJobEntity>().Where(row => row.Id == 9005).ExecuteCommand();
         _fakeNow = _fakeNow.AddSeconds(10);
         await DispatchAsync();
 
@@ -169,7 +169,7 @@ public sealed class GameTimeJobDispatchJobTests : IDisposable
 
     private void InsertRow(long rowId, string cron, bool isOnce, long mailId, string name = "probe")
     {
-        _database.MainDb.Insertable(new TenantGameTimeJobEntity
+        _database.MainDb.Insertable(new GameTimeJobEntity
         {
             Id = rowId,
             Name = name,
@@ -185,7 +185,7 @@ public sealed class GameTimeJobDispatchJobTests : IDisposable
 
     private void UpdateRowCron(long rowId, string cron)
     {
-        _database.MainDb.Updateable<TenantGameTimeJobEntity>()
+        _database.MainDb.Updateable<GameTimeJobEntity>()
                  .SetColumns(row => row.Cron == cron)
                  .Where(row => row.Id == rowId)
                  .ExecuteCommand();
@@ -193,7 +193,7 @@ public sealed class GameTimeJobDispatchJobTests : IDisposable
 
     private int CountRows()
     {
-        return _database.MainDb.Queryable<TenantGameTimeJobEntity>().Count();
+        return _database.MainDb.Queryable<GameTimeJobEntity>().Count();
     }
 
     /// <summary>

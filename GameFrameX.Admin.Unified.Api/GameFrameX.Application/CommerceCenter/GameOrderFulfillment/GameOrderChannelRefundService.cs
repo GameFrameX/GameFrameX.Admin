@@ -1,7 +1,7 @@
 using System.Text.Json;
 using GameFrameX.Core.Enum.Errors;
 using GameFrameX.Core.Exceptions;
-using GameFrameX.Entity.Tenant.Game.App;
+using GameFrameX.Entity.Business.Game.App;
 using GameFrameX.Foundation.Logger;
 using GameFrameX.Payment.Abstract;
 using GameFrameX.Payment.Abstract.Models;
@@ -12,7 +12,7 @@ namespace GameFrameX.Application.CommerceCenter.GameOrderFulfillment;
 /// 渠道退款路由服务：按订单支付渠道解析 <see cref="IRefundManager"/> 与主库支付配置，执行渠道侧退款。
 /// <para>渠道退款必须先于本地账本扣除（<c>GameOrderShipService.RefundAsync</c>）成功执行：
 /// 渠道失败 / 渠道不支持主动退款 / 渠道配置缺失时抛 <see cref="BusinessError"/>（错误码进 PaymentErrorCode 段 704），本地账本不动。</para>
-/// <para>渠道配置来源：主库 TenantGamePaymentConfigEntity 中对应支付渠道的基础分包配置，
+/// <para>渠道配置来源：主库 GamePaymentConfigEntity 中对应支付渠道的基础分包配置，
 /// IsSandbox 与订单匹配者优先；ConfigJson 经 <see cref="PaymentChannelRegistry"/> 反序列化为渠道 Option 类型。</para>
 /// </summary>
 public class GameOrderChannelRefundService
@@ -39,7 +39,7 @@ public class GameOrderChannelRefundService
     /// <param name="order">订单实体（PayChannel / ProviderTransactionId / Amount / IsSandbox 等路由与上下文来源）</param>
     /// <param name="reason">退款原因（管理员填写，透传渠道描述字段并落账本 FailureReason）</param>
     /// <exception cref="BusinessException">渠道未注册（PayChannelNotSupported）/ 配置缺失（RefundConfigMissing）/ 不支持主动退款（RefundNotSupported）/ 渠道返回失败（RefundChannelFailed）</exception>
-    public async Task RefundByOrderAsync(Entity.Tenant.Game.TenantGameOrderEntity order, string reason)
+    public async Task RefundByOrderAsync(Entity.Business.Game.GameOrderEntity order, string reason)
     {
         var channel = (order.PayChannel ?? string.Empty).Trim().ToLowerInvariant();
         if (string.IsNullOrEmpty(channel) || !_refundManagers.TryGetValue(channel, out var refundManager))
@@ -69,7 +69,7 @@ public class GameOrderChannelRefundService
     /// <summary>
     /// 查询渠道侧退款状态（按订单渠道路由，供管理员核对渠道退款进展）。
     /// </summary>
-    public async Task<PaymentChannelRefundQueryResponse> QueryByOrderAsync(Entity.Tenant.Game.TenantGameOrderEntity order)
+    public async Task<PaymentChannelRefundQueryResponse> QueryByOrderAsync(Entity.Business.Game.GameOrderEntity order)
     {
         var channel = (order.PayChannel ?? string.Empty).Trim().ToLowerInvariant();
         if (string.IsNullOrEmpty(channel) || !_refundManagers.TryGetValue(channel, out var refundManager))
@@ -90,17 +90,17 @@ public class GameOrderChannelRefundService
     /// <summary>
     /// 从主库解析渠道基础分包支付配置，IsSandbox 与订单匹配者优先。
     /// </summary>
-    private IPaymentOptionSetting? ResolveOptionSetting(string channel, Entity.Tenant.Game.TenantGameOrderEntity order)
+    private IPaymentOptionSetting? ResolveOptionSetting(string channel, Entity.Business.Game.GameOrderEntity order)
     {
         var isSandbox = order.IsSandbox ?? false;
-        var configs = _db.Queryable<TenantGamePaymentConfigEntity>()
+        var configs = _db.Queryable<GamePaymentConfigEntity>()
                          .Where(u => u.PayChannel == channel && u.IsEnabled == true)
                          .Where(u => u.PackageIdNormalized == 0)
                          .OrderByDescending(u => u.Id)
                          .ToList();
 
-        TenantGamePaymentConfigEntity? sandboxMatched = null;
-        TenantGamePaymentConfigEntity? environmentFallback = null;
+        GamePaymentConfigEntity? sandboxMatched = null;
+        GamePaymentConfigEntity? environmentFallback = null;
         foreach (var config in configs)
         {
             if (string.IsNullOrWhiteSpace(config.ConfigJson))
@@ -144,7 +144,7 @@ public class GameOrderChannelRefundService
     /// <summary>
     /// 构造渠道退款上下文：渠道交易号按渠道挑选（Apple 优先 originalTransactionId，其余用 ProviderTransactionId）。
     /// </summary>
-    private static RefundOrderContext BuildContext(string channel, Entity.Tenant.Game.TenantGameOrderEntity order, string reason)
+    private static RefundOrderContext BuildContext(string channel, Entity.Business.Game.GameOrderEntity order, string reason)
     {
         var transactionId = order.ProviderTransactionId ?? string.Empty;
         if (string.Equals(channel, "apple", StringComparison.Ordinal))

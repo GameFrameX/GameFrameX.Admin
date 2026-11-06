@@ -3,8 +3,8 @@ using GameFrameX.Application.ClientDelivery.FeatureSwitch.Dto;
 using GameFrameX.Core.Exceptions;
 using GameFrameX.Core.Extension;
 using GameFrameX.Core.SqlSugar;
-using GameFrameX.Entity.Tenant.Game.App;
-using GameFrameX.Entity.Tenant.Game.FeatureSwitch;
+using GameFrameX.Entity.Business.Game.App;
+using GameFrameX.Entity.Business.Game.FeatureSwitch;
 using SqlSugar;
 
 namespace GameFrameX.Core.Tests.GameBusiness;
@@ -33,8 +33,8 @@ public sealed class GameAppFeatureSwitchServiceTests : IDisposable
         SqlSugarUnifiedConfig.ConfigureBaseSettings(config);
         _db = new SqlSugarScope(config);
         SqlSugarUnifiedConfig.ConfigureBaseFilters(_db);
-        _db.CodeFirst.InitTables(typeof(TenantGameAppFeatureSwitchEntity));
-        _db.CodeFirst.InitTables(typeof(TenantGameAppPackageEntity));
+        _db.CodeFirst.InitTables(typeof(GameAppFeatureSwitchEntity));
+        _db.CodeFirst.InitTables(typeof(GameAppPackageEntity));
     }
 
     /// <summary>
@@ -47,7 +47,7 @@ public sealed class GameAppFeatureSwitchServiceTests : IDisposable
         await service.AddAsync(NewRequest("switch.table"));
 
         var tableNames = await _db.Ado.SqlQueryAsync<string>("SELECT name FROM sqlite_master WHERE type = 'table'");
-        Assert.Contains("tenant_game_app_feature_switch_entity", tableNames);
+        Assert.Contains("game_app_feature_switch_entity", tableNames);
     }
 
     /// <summary>
@@ -126,9 +126,9 @@ public sealed class GameAppFeatureSwitchServiceTests : IDisposable
         var service = CreateService();
         await InsertAsync("switch.layered", App100);
 
-        var tenantDefault = NewRequest("switch.layered");
+        var default = NewRequest("switch.layered");
 
-        await Assert.ThrowsAsync<BusinessException>(() => service.AddAsync(tenantDefault));
+        await Assert.ThrowsAsync<BusinessException>(() => service.AddAsync(default));
     }
 
     /// <summary>
@@ -204,7 +204,7 @@ public sealed class GameAppFeatureSwitchServiceTests : IDisposable
         request.ValueJson = "{ \"a\" : 1 }";
         var row = await service.AddAsync(request);
 
-        var stored = await _db.Queryable<TenantGameAppFeatureSwitchEntity>().FirstAsync(u => u.Id == row.Id);
+        var stored = await _db.Queryable<GameAppFeatureSwitchEntity>().FirstAsync(u => u.Id == row.Id);
         Assert.Equal("{ \"a\" : 1 }", stored.ValueJson);
     }
 
@@ -270,7 +270,7 @@ public sealed class GameAppFeatureSwitchServiceTests : IDisposable
             ValueJson = "{\"v\":2}",
         });
 
-        var stored = await _db.Queryable<TenantGameAppFeatureSwitchEntity>().FirstAsync(u => u.Id == row.Id);
+        var stored = await _db.Queryable<GameAppFeatureSwitchEntity>().FirstAsync(u => u.Id == row.Id);
         Assert.Equal("{\"v\":2}", stored.ValueJson);
     }
 
@@ -293,7 +293,7 @@ public sealed class GameAppFeatureSwitchServiceTests : IDisposable
             ValueJson = "{\"v\":2}",
         });
 
-        var stored = await _db.Queryable<TenantGameAppFeatureSwitchEntity>().FirstAsync(u => u.Id == row.Id);
+        var stored = await _db.Queryable<GameAppFeatureSwitchEntity>().FirstAsync(u => u.Id == row.Id);
         Assert.Equal("改名后", stored.DisplayName);
     }
 
@@ -336,8 +336,8 @@ public sealed class GameAppFeatureSwitchServiceTests : IDisposable
     private GameAppFeatureSwitchService CreateService()
     {
         return new GameAppFeatureSwitchService(
-            new SqlSugarRepository<TenantGameAppFeatureSwitchEntity> { Context = _db, },
-            new SqlSugarRepository<TenantGameAppPackageEntity> { Context = _db, });
+            new SqlSugarRepository<GameAppFeatureSwitchEntity> { Context = _db, },
+            new SqlSugarRepository<GameAppPackageEntity> { Context = _db, });
     }
 
     private static AddGameAppFeatureSwitchRequest NewRequest(string switchKey)
@@ -358,7 +358,7 @@ public sealed class GameAppFeatureSwitchServiceTests : IDisposable
 
     private async Task InsertAsync(string switchKey, long? appId)
     {
-        await _db.Insertable(new TenantGameAppFeatureSwitchEntity
+        await _db.Insertable(new GameAppFeatureSwitchEntity
         {
             Id = _nextSeedId++,
             SwitchKey = switchKey,
@@ -378,7 +378,7 @@ public sealed class GameAppFeatureSwitchServiceTests : IDisposable
 
     private async Task InsertPackageAsync(long gameAppId, string packageName)
     {
-        await _db.Insertable(new TenantGameAppPackageEntity
+        await _db.Insertable(new GameAppPackageEntity
         {
             Id = _nextSeedId++,
             Name = packageName,

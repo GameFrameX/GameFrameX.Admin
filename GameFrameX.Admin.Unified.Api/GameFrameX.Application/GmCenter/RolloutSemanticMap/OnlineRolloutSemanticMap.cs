@@ -12,7 +12,7 @@ namespace GameFrameX.Application.GmCenter.RolloutSemanticMap;
 /// <item><term>灰度维度</term><description>SegmentId（玩家分群行）+ Percent</description><description>玩家 / 事件数据维度命中 + 百分比桶稳定展开，命中记录可查（VC-7.11）</description><description>设备维度（deviceId）</description></item>
 /// <item><term>百分比语义</term><description>PublishPercentMin=1 ~ PublishPercentMax=100（发布语义：0 无意义即拒绝，100 全量）</description><description>桶序 &lt; percent 即命中，分群未命中直接不生效</description><description>记录级 RolloutPercent 0-100：0=关闭、100=全量（Math.Clamp 防漂移）</description></item>
 /// <item><term>短路优先级</term><description>不设白名单（Admin 不编排个体豁免）</description><description>分群命中是前置条件，百分比只在分群内展开</description><description>DeviceWhitelistJson 白名单命中即生效（先于百分比）</description></item>
-/// <item><term>稳定性依据</term><description>不承诺（Admin 不计算桶）</description><description>同一玩家对同一版本的桶归属稳定（重复判定结果一致，可回溯命中记录）</description><description>稳定桶 = SHA256(tenantId:appId:deviceId:recordId) % 100，同键恒定</description></item>
+/// <item><term>稳定性依据</term><description>不承诺（Admin 不计算桶）</description><description>同一玩家对同一版本的桶归属稳定（重复判定结果一致，可回溯命中记录）</description><description>稳定桶 = SHA256(id:appId:deviceId:recordId) % 100，同键恒定</description></item>
 /// <item><term>回滚语义</term><description>回滚 = 版本化新下发（新 ConfigVersion 行 + TargetVersion 指向目标历史版本；旧行置 RolledBack 不可变）</description><description>按新版本命令生效，Online 侧确认版本回执（VC-7.12：回滚后行为恢复 + 审计完整）</description><description>无版本概念（记录级覆盖），不适用于本对照行</description></item>
 /// </list>
 /// </summary>

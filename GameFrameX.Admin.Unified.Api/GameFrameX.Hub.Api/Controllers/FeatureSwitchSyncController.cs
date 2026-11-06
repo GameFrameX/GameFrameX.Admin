@@ -9,7 +9,7 @@ namespace GameFrameX.Hub.Api.Controllers;
 
 /// <summary>
 /// 功能开关服务器同步控制器（C347 Hub 通道）。
-/// <para>游戏服务器运行时同步通道：机器对机器调用，由 <see cref="TenantGameAppOpenAccessAuthMiddleware"/>
+/// <para>游戏服务器运行时同步通道：机器对机器调用，由 <see cref="GameAppOpenAccessAuthMiddleware"/>
 /// 鉴权（C267 HMAC v2 单头 + nonce 去重 + 时间窗，scope = <see cref="OpenAccessScopeConst.FeatureSwitchSync"/>），
 /// 非 JWT，故标记 <c>[AllowAnonymous]</c>（C236 起 JWT 默认鉴权由各控制器显式承担，本控制器不参与，
 /// 与 <c>PackageBuildReportController</c> 同模式）。</para>

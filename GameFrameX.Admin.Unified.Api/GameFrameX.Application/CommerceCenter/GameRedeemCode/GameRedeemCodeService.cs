@@ -8,16 +8,16 @@ namespace GameFrameX.Application.CommerceCenter.GameRedeemCode;
 /// 兑换码服务
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
-public class GameRedeemCodeService : GenericCrudService<Entity.Tenant.Game.TenantGameRedeemCodeEntity, AddTenantGameRedeemCodeEntityRequest, UpdateTenantGameRedeemCodeEntityRequest, GameRedeemCodeResponse, PageTenantGameRedeemCodeEntityRequest>
+public class GameRedeemCodeService : GenericCrudService<Entity.Business.Game.GameRedeemCodeEntity, AddGameRedeemCodeEntityRequest, UpdateGameRedeemCodeEntityRequest, GameRedeemCodeResponse, PageGameRedeemCodeEntityRequest>
 {
-    public GameRedeemCodeService(SqlSugarRepository<Entity.Tenant.Game.TenantGameRedeemCodeEntity> repository) : base(repository)
+    public GameRedeemCodeService(SqlSugarRepository<Entity.Business.Game.GameRedeemCodeEntity> repository) : base(repository)
     {
     }
 
     /// <summary>
     /// 构建分页查询条件
     /// </summary>
-    protected override ISugarQueryable<GameRedeemCodeResponse> BuildPageQuery(PageTenantGameRedeemCodeEntityRequest input)
+    protected override ISugarQueryable<GameRedeemCodeResponse> BuildPageQuery(PageGameRedeemCodeEntityRequest input)
     {
         return Repository.AsQueryable()
                          .WhereIF(!string.IsNullOrWhiteSpace(input.SearchKey), u =>
@@ -35,7 +35,7 @@ public class GameRedeemCodeService : GenericCrudService<Entity.Tenant.Game.Tenan
     /// <summary>
     /// 新增前解析并校验附件道具。
     /// </summary>
-    protected override async Task OnAddingAsync(AddTenantGameRedeemCodeEntityRequest input)
+    protected override async Task OnAddingAsync(AddGameRedeemCodeEntityRequest input)
     {
 
         var gamePropItemEntities = JsonHelper.Deserialize<List<GamePropItem>>(input.Contents);
@@ -44,7 +44,7 @@ public class GameRedeemCodeService : GenericCrudService<Entity.Tenant.Game.Tenan
         // 批量预加载所有商品，避免 N+1 查询
         var goodsIds = gamePropItemEntities.Select(p => p.Id).Distinct().ToList();
         var goodsDict = (await Repository.AsSugarClient()
-                                         .Queryable<Entity.Tenant.Game.TenantGameGoodsEntity>()
+                                         .Queryable<Entity.Business.Game.GameGoodsEntity>()
                                          .Where(m => goodsIds.Contains(m.Id))
                                          .ToListAsync())
             .ToDictionary(m => m.Id);
@@ -65,7 +65,7 @@ public class GameRedeemCodeService : GenericCrudService<Entity.Tenant.Game.Tenan
     /// <summary>
     /// 更新前验证记录存在。
     /// </summary>
-    protected override async Task OnUpdatingAsync(UpdateTenantGameRedeemCodeEntityRequest input)
+    protected override async Task OnUpdatingAsync(UpdateGameRedeemCodeEntityRequest input)
     {
         var existing = await Repository.GetFirstAsync(u => u.Id == input.Id);
         if (existing == null)

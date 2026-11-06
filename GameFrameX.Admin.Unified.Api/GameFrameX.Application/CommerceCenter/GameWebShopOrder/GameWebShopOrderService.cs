@@ -14,11 +14,11 @@ namespace GameFrameX.Application.CommerceCenter.GameWebShopOrder;
 /// 页面商城订单
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
-public class GameWebShopOrderService : GenericCrudSelectService<Entity.Tenant.Game.TenantGameWebShopOrderEntity, AddTenantGameWebShopOrderEntityRequest, UpdateTenantGameWebShopOrderEntityRequest, GameWebShopOrderResponse, PageTenantGameWebShopOrderEntityRequest>
+public class GameWebShopOrderService : GenericCrudSelectService<Entity.Business.Game.GameWebShopOrderEntity, AddGameWebShopOrderEntityRequest, UpdateGameWebShopOrderEntityRequest, GameWebShopOrderResponse, PageGameWebShopOrderEntityRequest>
 {
     private readonly SqlSugarRepository<SystemConfigEntity> _configService;
-    private readonly SqlSugarRepository<Entity.Tenant.Game.TenantGameWebShopEntity> _webShopService;
-    private readonly SqlSugarRepository<Entity.Tenant.Game.TenantGameAreaEntity> _gameAreaService;
+    private readonly SqlSugarRepository<Entity.Business.Game.GameWebShopEntity> _webShopService;
+    private readonly SqlSugarRepository<Entity.Business.Game.GameAreaEntity> _gameAreaService;
     private readonly HttpClient _httpClient;
 
     /// <summary>
@@ -31,10 +31,10 @@ public class GameWebShopOrderService : GenericCrudSelectService<Entity.Tenant.Ga
     /// <param name="httpClient"></param>
     /// <returns></returns>
     public GameWebShopOrderService(
-        SqlSugarRepository<Entity.Tenant.Game.TenantGameWebShopOrderEntity> repository,
+        SqlSugarRepository<Entity.Business.Game.GameWebShopOrderEntity> repository,
         SqlSugarRepository<SystemConfigEntity> configService,
-        SqlSugarRepository<Entity.Tenant.Game.TenantGameWebShopEntity> webShopService,
-        SqlSugarRepository<Entity.Tenant.Game.TenantGameAreaEntity> gameAreaService,
+        SqlSugarRepository<Entity.Business.Game.GameWebShopEntity> webShopService,
+        SqlSugarRepository<Entity.Business.Game.GameAreaEntity> gameAreaService,
         HttpClient httpClient) : base(repository)
     {
         _configService = configService;
@@ -46,7 +46,7 @@ public class GameWebShopOrderService : GenericCrudSelectService<Entity.Tenant.Ga
     /// <summary>
     /// 商城订单由可信客户端下单和支付回调链路产生，禁止管理后台直接创建。
     /// </summary>
-    protected override Task OnAddingAsync(AddTenantGameWebShopOrderEntityRequest input)
+    protected override Task OnAddingAsync(AddGameWebShopOrderEntityRequest input)
     {
         throw new Exception("商城订单由客户端商城下单链路产生，不支持通过管理后台直接创建");
     }
@@ -54,7 +54,7 @@ public class GameWebShopOrderService : GenericCrudSelectService<Entity.Tenant.Ga
     /// <summary>
     /// 构建分页查询条件
     /// </summary>
-    protected override ISugarQueryable<GameWebShopOrderResponse> BuildPageQuery(PageTenantGameWebShopOrderEntityRequest input)
+    protected override ISugarQueryable<GameWebShopOrderResponse> BuildPageQuery(PageGameWebShopOrderEntityRequest input)
     {
         return Repository.AsQueryable()
                          .WhereIF(!string.IsNullOrWhiteSpace(input.SearchKey), u =>
@@ -97,7 +97,7 @@ public class GameWebShopOrderService : GenericCrudSelectService<Entity.Tenant.Ga
         // 批量预加载所有商品，避免 N+1 查询
         var goodsIds = list.Select(p => p.Id).Distinct().ToList();
         var goodsDict = (await Repository.AsSugarClient()
-                                         .Queryable<Entity.Tenant.Game.TenantGameGoodsEntity>()
+                                         .Queryable<Entity.Business.Game.GameGoodsEntity>()
                                          .Where(m => goodsIds.Contains(m.Id))
                                          .ToListAsync())
             .ToDictionary(m => m.Id);

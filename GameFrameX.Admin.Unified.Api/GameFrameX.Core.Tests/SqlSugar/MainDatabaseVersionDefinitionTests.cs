@@ -3,7 +3,7 @@ using GameFrameX.Application.ClientDelivery.GameAppVersionDefinition.Dto;
 using GameFrameX.Core.Exceptions;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Core.Tests.ClientApi;
-using GameFrameX.Entity.Tenant.Game.Release;
+using GameFrameX.Entity.Business.Game.Release;
 
 namespace GameFrameX.Core.Tests.SqlSugar;
 
@@ -76,8 +76,8 @@ public sealed class MainDatabaseVersionDefinitionTests
 
     private static async Task<GameAppVersionDefinitionService> CreateServiceAsync(ClientApiTestDb database)
     {
-        database.InitTenantTables(typeof(TenantGameAppVersionDefinitionEntity));
-        var service = new GameAppVersionDefinitionService(new SqlSugarRepository<TenantGameAppVersionDefinitionEntity>
+        database.InitBusinessTables(typeof(GameAppVersionDefinitionEntity));
+        var service = new GameAppVersionDefinitionService(new SqlSugarRepository<GameAppVersionDefinitionEntity>
         {
             Context = database.MainDb,
         });

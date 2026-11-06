@@ -1,5 +1,5 @@
 using GameFrameX.Application.ClientDelivery.Device.DeviceGroup.Dto;
-using GameFrameX.Entity.Tenant.Device;
+using GameFrameX.Entity.Business.Device;
 
 namespace GameFrameX.Application.ClientDelivery.Device.DeviceGroup;
 
@@ -8,14 +8,14 @@ namespace GameFrameX.Application.ClientDelivery.Device.DeviceGroup;
 /// <para>分组绑定主库中真实存在的设备。</para>
 /// </summary>
 [ApiDescriptionSettings(Order = 100)]
-public class DeviceGroupService : GenericCrudSelectService<TenantGameAppDeviceGroupEntity, AddTenantDeviceGroupRequest, UpdateTenantDeviceGroupRequest, DeviceGroupResponse, DeviceGroupRequest>
+public class DeviceGroupService : GenericCrudSelectService<GameAppDeviceGroupEntity, AddDeviceGroupRequest, UpdateDeviceGroupRequest, DeviceGroupResponse, DeviceGroupRequest>
 {
 
     /// <summary>
     /// 设备码分组服务
     /// </summary>
     /// <param name="repository"></param>
-    public DeviceGroupService(SqlSugarRepository<TenantGameAppDeviceGroupEntity> repository)
+    public DeviceGroupService(SqlSugarRepository<GameAppDeviceGroupEntity> repository)
         : base(repository)
     {
     }
@@ -25,11 +25,11 @@ public class DeviceGroupService : GenericCrudSelectService<TenantGameAppDeviceGr
     /// </summary>
     /// <param name="input"></param>
     /// <returns></returns>
-    public override async Task<DeviceGroupResponse> AddAsync(AddTenantDeviceGroupRequest input)
+    public override async Task<DeviceGroupResponse> AddAsync(AddDeviceGroupRequest input)
     {
         await EnsureDevicesExistAsync(input.DeviceIds);
 
-        var diviceGroup = new TenantGameAppDeviceGroupEntity
+        var diviceGroup = new GameAppDeviceGroupEntity
         {
             Name = input.Name ?? string.Empty,
             Description = input.Description,
@@ -37,7 +37,7 @@ public class DeviceGroupService : GenericCrudSelectService<TenantGameAppDeviceGr
         var result = await Repository.InsertAsync(diviceGroup);
         if (result && input.DeviceIds != null && input.DeviceIds.Count > 0)
         {
-            var relation = input.DeviceIds.Select(did => new TenantGameAppDeviceGroupRelationEntity
+            var relation = input.DeviceIds.Select(did => new GameAppDeviceGroupRelationEntity
             {
                 DeviceGroupId = diviceGroup.Id,
                 DeviceId = did,
@@ -51,7 +51,7 @@ public class DeviceGroupService : GenericCrudSelectService<TenantGameAppDeviceGr
     /// <summary>
     /// 更新前：校验记录存在及分组设备存在。
     /// </summary>
-    protected override async Task OnUpdatingAsync(UpdateTenantDeviceGroupRequest input)
+    protected override async Task OnUpdatingAsync(UpdateDeviceGroupRequest input)
     {
         var existing = await Repository.GetFirstAsync(g => g.Id == input.Id);
         if (existing == null)
@@ -65,15 +65,15 @@ public class DeviceGroupService : GenericCrudSelectService<TenantGameAppDeviceGr
     /// <summary>
     /// 更新后（主表已走统一 <c>InnerUpdateAsync</c> 乐观锁）：重建分组关系，只绑定有效设备。
     /// </summary>
-    protected override async Task OnUpdatedAsync(UpdateTenantDeviceGroupRequest input, TenantGameAppDeviceGroupEntity before, TenantGameAppDeviceGroupEntity after)
+    protected override async Task OnUpdatedAsync(UpdateDeviceGroupRequest input, GameAppDeviceGroupEntity before, GameAppDeviceGroupEntity after)
     {
         //删除旧的关系
-        await Repository.AsSugarClient().Deleteable<TenantGameAppDeviceGroupRelationEntity>()
+        await Repository.AsSugarClient().Deleteable<GameAppDeviceGroupRelationEntity>()
                         .Where(g => g.DeviceGroupId == input.Id).ExecuteCommandAsync();
         //插入新关系
         if (input.DeviceIds != null && input.DeviceIds.Count > 0)
         {
-            var relation = input.DeviceIds.Select(did => new TenantGameAppDeviceGroupRelationEntity
+            var relation = input.DeviceIds.Select(did => new GameAppDeviceGroupRelationEntity
             {
                 DeviceGroupId = input.Id,
                 DeviceId = did,
@@ -97,7 +97,7 @@ public class DeviceGroupService : GenericCrudSelectService<TenantGameAppDeviceGr
         }
 
         //查询分组关联设备
-        var devices = await Repository.AsSugarClient().Queryable<TenantGameAppDeviceGroupRelationEntity>()
+        var devices = await Repository.AsSugarClient().Queryable<GameAppDeviceGroupRelationEntity>()
                                       .Where(d => d.DeviceGroupId == deviceGroup.Id).Select(x => x.DeviceId).ToListAsync();
 
         var returndeviceGroup = new DeviceGroupResponse
@@ -155,7 +155,7 @@ public class DeviceGroupService : GenericCrudSelectService<TenantGameAppDeviceGr
 
         var distinctIds = deviceIds.Distinct().ToList();
         var matchCount = await Repository.AsSugarClient()
-                                         .Queryable<TenantGameAppDeviceEntity>()
+                                         .Queryable<GameAppDeviceEntity>()
                                          .Where(u => distinctIds.Contains(u.Id))
                                          .CountAsync();
         if (matchCount != distinctIds.Count)

@@ -8,18 +8,18 @@ namespace GameFrameX.Application.NoticeCenter.GameRewardTemplateGroup;
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
 public class GameRewardTemplateGroupService
-    : GenericCrudSelectService<Entity.Tenant.Game.TenantGameRewardTemplateGroupEntity,
-        AddTenantGameRewardTemplateGroupEntityRequest, UpdateTenantGameRewardTemplateGroupEntityRequest,
-        GameRewardTemplateGroupResponse, PageTenantGameRewardTemplateGroupEntityRequest>
+    : GenericCrudSelectService<Entity.Business.Game.GameRewardTemplateGroupEntity,
+        AddGameRewardTemplateGroupEntityRequest, UpdateGameRewardTemplateGroupEntityRequest,
+        GameRewardTemplateGroupResponse, PageGameRewardTemplateGroupEntityRequest>
 {
 
     public GameRewardTemplateGroupService(
-        SqlSugarRepository<Entity.Tenant.Game.TenantGameRewardTemplateGroupEntity> repository)
+        SqlSugarRepository<Entity.Business.Game.GameRewardTemplateGroupEntity> repository)
         : base(repository)
     {
     }
 
-    protected override ISugarQueryable<GameRewardTemplateGroupResponse> BuildPageQuery(PageTenantGameRewardTemplateGroupEntityRequest input)
+    protected override ISugarQueryable<GameRewardTemplateGroupResponse> BuildPageQuery(PageGameRewardTemplateGroupEntityRequest input)
     {
         return Repository.AsQueryable()
                          .WhereIF(!string.IsNullOrWhiteSpace(input.SearchKey), u => u.Name.Contains(input.SearchKey.Trim()))
@@ -49,7 +49,7 @@ public class GameRewardTemplateGroupService
         return rows.Select(u => new BaseSelectPageResponse { Id = u.Id, Value = u.Name, Label = u.Name, }).ToList();
     }
 
-    protected override async Task OnUpdatingAsync(UpdateTenantGameRewardTemplateGroupEntityRequest input)
+    protected override async Task OnUpdatingAsync(UpdateGameRewardTemplateGroupEntityRequest input)
     {
         var existing = await Repository.GetFirstAsync(u => u.Id == input.Id);
         if (existing == null)

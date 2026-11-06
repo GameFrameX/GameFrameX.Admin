@@ -33,7 +33,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1793808000,
                 UpdateTime = 1793808000,
                 SuperAdminOnly = false,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -55,7 +55,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1793808000,
                 UpdateTime = 1793808000,
                 SuperAdminOnly = false,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -77,7 +77,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1793808000,
                 UpdateTime = 1793808000,
                 SuperAdminOnly = false,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -99,7 +99,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1793808000,
                 UpdateTime = 1793808000,
                 SuperAdminOnly = false,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -121,7 +121,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1793808000,
                 UpdateTime = 1793808000,
                 SuperAdminOnly = false,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -143,7 +143,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1793808000,
                 UpdateTime = 1793808000,
                 SuperAdminOnly = false,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
         };

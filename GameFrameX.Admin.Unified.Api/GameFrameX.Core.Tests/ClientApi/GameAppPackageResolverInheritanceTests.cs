@@ -4,7 +4,7 @@ using GameFrameX.Core.Enum;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Entity.Enum;
 using GameFrameX.Entity.System;
-using GameFrameX.Entity.Tenant.Game.App;
+using GameFrameX.Entity.Business.Game.App;
 using SqlSugar;
 
 namespace GameFrameX.Core.Tests.ClientApi;
@@ -129,17 +129,17 @@ public sealed class GameAppPackageResolverInheritanceTests : IDisposable
         Assert.Equal("com.test.master.b", fixture.Resolver.Resolve("com.test.child"));
     }
 
-    private ResolverFixture BuildFixture(long tenantId)
+    private ResolverFixture BuildFixture(long id)
     {
         var mainConfig = CreateConfig("main");
-        var tenantConfig = CreateConfig(tenantId.ToString());
+        var config = CreateConfig(id.ToString());
         var scope = new SqlSugarScope(mainConfig);
 
         var provider = scope;
-        var tenantDb = provider;
-        tenantDb.CodeFirst.InitTables(typeof(TenantGameAppPackageEntity));
+        var db = provider;
+        db.CodeFirst.InitTables(typeof(GameAppPackageEntity));
 
-        return new ResolverFixture(scope, provider, tenantDb, tenantId);
+        return new ResolverFixture(scope, provider, db, id);
     }
 
     private ConnectionConfig CreateConfig(string configId)
@@ -175,11 +175,11 @@ public sealed class GameAppPackageResolverInheritanceTests : IDisposable
         private readonly ISqlSugarClient _tenantDb;
         private readonly long _tenantId;
 
-        public ResolverFixture(SqlSugarScope scope, ISqlSugarClient provider, ISqlSugarClient tenantDb, long tenantId)
+        public ResolverFixture(SqlSugarScope scope, ISqlSugarClient provider, ISqlSugarClient db, long id)
         {
             _scope = scope;
-            _tenantDb = tenantDb;
-            _tenantId = tenantId;
+            _tenantDb = db;
+            _tenantId = id;
             Resolver = new GameAppPackageResolver(provider);
         }
 
@@ -199,7 +199,7 @@ public sealed class GameAppPackageResolverInheritanceTests : IDisposable
 
         public void UpdatePackage(long id, string? packageName = null, long? parentPackageId = null, InheritanceModeEnum? mode = null, long updateTime = 0)
         {
-            var existing = _tenantDb.Queryable<TenantGameAppPackageEntity>().First(p => p.Id == id);
+            var existing = _tenantDb.Queryable<GameAppPackageEntity>().First(p => p.Id == id);
             if (existing == null)
             {
                 return;
@@ -224,9 +224,9 @@ public sealed class GameAppPackageResolverInheritanceTests : IDisposable
             _tenantDb.Updateable(existing).ExecuteCommand();
         }
 
-        private TenantGameAppPackageEntity BuildEntity(long id, string packageName, long? parentPackageId, PackageKindEnum kind, InheritanceModeEnum mode, bool isEnabled, long updateTime)
+        private GameAppPackageEntity BuildEntity(long id, string packageName, long? parentPackageId, PackageKindEnum kind, InheritanceModeEnum mode, bool isEnabled, long updateTime)
         {
-            return new TenantGameAppPackageEntity
+            return new GameAppPackageEntity
             {
                 Id = id,
                 Name = $"pkg-{id}",

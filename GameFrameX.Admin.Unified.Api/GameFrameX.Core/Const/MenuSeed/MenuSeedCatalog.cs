@@ -60,12 +60,12 @@ public static class MenuSeedCatalog
     /// <summary>
     /// 获取 SuperAdmin-only 树下允许租户调用的只读辅助按钮 ID。
     /// </summary>
-    public static IReadOnlySet<long> TenantReadableSuperAdminOnlyMenuIds
+    public static IReadOnlySet<long> AdminReadableSuperAdminOnlyMenuIds
     {
         get
         {
             return Definitions
-                   .Where(u => u.SuperAdminOnly && u.AllowTenantWhenSuperAdminOnly)
+                   .Where(u => u.SuperAdminOnly && u.AllowAdminWhenSuperAdminOnly)
                    .Select(u => StableSeedId.Menu(u.Key))
                    .ToHashSet();
         }
@@ -178,7 +178,7 @@ public static class MenuSeedCatalog
                 dbMenu.CreatedTime,
                 dbMenu.UpdateTime ?? dbMenu.CreatedTime,
                 dbMenu.SuperAdminOnly,
-                dbMenu.AllowTenantWhenSuperAdminOnly,
+                dbMenu.AllowAdminWhenSuperAdminOnly,
                 dbMenu.AppScope);
         }).ToArray();
 

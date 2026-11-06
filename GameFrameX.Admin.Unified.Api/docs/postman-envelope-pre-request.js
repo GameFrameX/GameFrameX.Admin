@@ -7,7 +7,7 @@
 // 依赖 Postman 环境变量（在 Postman Environment / Collection Variables 里配置）：
 //   session_kid      信封 kid（SessionKeyService Add/Rotate 响应的 Kid）
 //   session_key_hex  会话密钥明文（64 位 hex，Add/Rotate 一次性回显；未配置则跳过信封、仅签名）
-//   sig_key_id       v2 签名 keyId（TenantAppSignatureKeyEntity 的 Kid）
+//   sig_key_id       v2 签名 keyId（AppSignatureKeyEntity 的 Kid）
 //   sig_key_secret   v2 签名密钥明文（HMAC-SHA256）
 //
 // 约定：

@@ -261,6 +261,6 @@ public class SystemDatabaseService : IAdminApiController
             return DatabaseOwnership.System;
         }
 
-        return DatabaseOwnership.Tenant;
+        return DatabaseOwnership.Business;
     }
 }

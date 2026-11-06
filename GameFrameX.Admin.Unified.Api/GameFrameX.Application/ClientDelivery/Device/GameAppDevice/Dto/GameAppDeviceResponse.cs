@@ -3,9 +3,9 @@ namespace GameFrameX.Application.ClientDelivery.Device.GameAppDevice.Dto;
 /// <summary>
 /// 机器码输出参数
 /// </summary>
-// 纯 POCO 投影（C228）：属性名与 TenantGameAppDeviceEntity（含 EntityBasicSelect 的 Name/Description）保持一致，
+// 纯 POCO 投影（C228）：属性名与 GameAppDeviceEntity（含 EntityBasicSelect 的 Name/Description）保持一致，
 // 供 .Select&lt;GameAppDeviceResponse&gt;() 自动投影与 Mapster 按名映射。
-public class GameAppDeviceResponse : IBasePageResponse<global::GameFrameX.Entity.Tenant.Device.TenantGameAppDeviceEntity>
+public class GameAppDeviceResponse : IBasePageResponse<global::GameFrameX.Entity.Business.Device.GameAppDeviceEntity>
 {
     /// <summary>
     /// Id

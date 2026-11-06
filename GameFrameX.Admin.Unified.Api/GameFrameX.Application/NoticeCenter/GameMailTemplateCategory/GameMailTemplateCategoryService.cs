@@ -8,18 +8,18 @@ namespace GameFrameX.Application.NoticeCenter.GameMailTemplateCategory;
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
 public class GameMailTemplateCategoryService
-    : GenericCrudSelectService<Entity.Tenant.Game.TenantGameMailTemplateCategoryEntity,
-        AddTenantGameMailTemplateCategoryEntityRequest, UpdateTenantGameMailTemplateCategoryEntityRequest,
-        GameMailTemplateCategoryResponse, PageTenantGameMailTemplateCategoryEntityRequest>
+    : GenericCrudSelectService<Entity.Business.Game.GameMailTemplateCategoryEntity,
+        AddGameMailTemplateCategoryEntityRequest, UpdateGameMailTemplateCategoryEntityRequest,
+        GameMailTemplateCategoryResponse, PageGameMailTemplateCategoryEntityRequest>
 {
 
     public GameMailTemplateCategoryService(
-        SqlSugarRepository<Entity.Tenant.Game.TenantGameMailTemplateCategoryEntity> repository)
+        SqlSugarRepository<Entity.Business.Game.GameMailTemplateCategoryEntity> repository)
         : base(repository)
     {
     }
 
-    protected override ISugarQueryable<GameMailTemplateCategoryResponse> BuildPageQuery(PageTenantGameMailTemplateCategoryEntityRequest input)
+    protected override ISugarQueryable<GameMailTemplateCategoryResponse> BuildPageQuery(PageGameMailTemplateCategoryEntityRequest input)
     {
         return Repository.AsQueryable()
                          .WhereIF(!string.IsNullOrWhiteSpace(input.Name), u => u.Name.Contains(input.Name.Trim()))
@@ -30,7 +30,7 @@ public class GameMailTemplateCategoryService
     /// <summary>
     /// 更新前校验记录存在。
     /// </summary>
-    protected override async Task OnUpdatingAsync(UpdateTenantGameMailTemplateCategoryEntityRequest input)
+    protected override async Task OnUpdatingAsync(UpdateGameMailTemplateCategoryEntityRequest input)
     {
         var existing = await Repository.GetFirstAsync(u => u.Id == input.Id);
         if (existing == null)

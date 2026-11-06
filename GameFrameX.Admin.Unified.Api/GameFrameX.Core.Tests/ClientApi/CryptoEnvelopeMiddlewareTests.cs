@@ -4,7 +4,7 @@ using System.Text;
 using System.Text.Json;
 using GameFrameX.Core.Middleware;
 using GameFrameX.Core.SqlSugar;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
@@ -72,7 +72,7 @@ public sealed class CryptoEnvelopeMiddlewareTests
         };
     }
 
-    private static DefaultHttpContext CreateEnvelopeContext(string envelopeJson, string path = E1Path, string? query = "?op=BLLogin&userid=10086", string? cryptoHeader = "1", long? appId = TestAppId, long? tenantId = null)
+    private static DefaultHttpContext CreateEnvelopeContext(string envelopeJson, string path = E1Path, string? query = "?op=BLLogin&userid=10086", string? cryptoHeader = "1", long? appId = TestAppId, long? id = null)
     {
         var context = new DefaultHttpContext();
         context.Response.Body = new MemoryStream();
@@ -94,9 +94,9 @@ public sealed class CryptoEnvelopeMiddlewareTests
             context.Request.Headers["GameFrameX-App-Id"] = appId.Value.ToString();
         }
 
-        if (tenantId.HasValue)
+        if (id.HasValue)
         {
-            context.Items["TenantId"] = tenantId.Value;
+            context.Items["Id"] = id.Value;
         }
 
         return context;
@@ -591,7 +591,7 @@ public sealed class CryptoEnvelopeMiddlewareTests
     [Fact]
     public async Task LegacyTenantContext_DoesNotBypassDecryption()
     {
-        var context = CreateEnvelopeContext("{}", tenantId: 999);
+        var context = CreateEnvelopeContext("{}", id: 999);
         var nextCalled = false;
         await InvokeAsync(context, CreateOptions(true), () =>
         {
@@ -669,9 +669,9 @@ public sealed class CryptoEnvelopeMiddlewareTests
         Assert.Equal(SessionKeyLookupResult.Expired, SessionKeyResolver.Judge(Key(0, now, true), now));
         return;
 
-        static TenantSessionKeyEntity Key(long? notBefore, long? expire, bool enabled)
+        static SessionKeyEntity Key(long? notBefore, long? expire, bool enabled)
         {
-            return new TenantSessionKeyEntity { NotBeforeTime = notBefore, ExpireTime = expire, IsEnabled = enabled, };
+            return new SessionKeyEntity { NotBeforeTime = notBefore, ExpireTime = expire, IsEnabled = enabled, };
         }
     }
 
@@ -689,12 +689,12 @@ public sealed class CryptoEnvelopeMiddlewareTests
     /// </summary>
     private sealed class FakeSessionKeyResolver : ISessionKeyResolver
     {
-        private readonly List<TenantSessionKeyEntity> _keys = new();
+        private readonly List<SessionKeyEntity> _keys = new();
 
         public void AddKey(long appId, string kid, string secret, bool enabled, long? notBefore, long? expire)
         {
             _keys.RemoveAll(x => x.Kid == kid);
-            _keys.Add(new TenantSessionKeyEntity
+            _keys.Add(new SessionKeyEntity
             {
                 Kid = kid,
                 Secret = secret,

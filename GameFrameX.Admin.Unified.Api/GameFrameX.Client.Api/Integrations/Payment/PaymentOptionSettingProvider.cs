@@ -1,9 +1,9 @@
 using GameFrameX.Client.Api.Services.PublicCallback;
-using GameFrameX.Entity.Tenant.Game.App;
+using GameFrameX.Entity.Business.Game.App;
 using System.Text.Json;
 using GameFrameX.Application.ClientDelivery.GamePaymentConfig;
 using GameFrameX.Client.Api.Services;
-using GameFrameX.Core.Service.Tenant;
+using GameFrameX.Core.Service.Business;
 using GameFrameX.Payment.Abstract;
 using GameFrameX.Payment.AliPay;
 using GameFrameX.Payment.Wechat;
@@ -42,9 +42,9 @@ public class PaymentOptionSettingProvider : IPaymentOptionSettingProvider
     /// <summary>
     /// 支付配置提供器实现
     /// </summary>
-    public PaymentOptionSettingProvider(ISqlSugarClient tenantDbProvider, IHttpContextAccessor httpContextAccessor)
+    public PaymentOptionSettingProvider(ISqlSugarClient dbProvider, IHttpContextAccessor httpContextAccessor)
     {
-        _tenantDbProvider = tenantDbProvider;
+        _tenantDbProvider = dbProvider;
         _httpContextAccessor = httpContextAccessor;
     }
 
@@ -117,14 +117,14 @@ public class PaymentOptionSettingProvider : IPaymentOptionSettingProvider
     /// <param name="channelName">渠道名称（已小写规范化）。</param>
     /// <param name="packageId">当前上下文分包标识。</param>
     /// <returns>候选支付配置列表。</returns>
-    private List<TenantGamePaymentConfigEntity> GetPaymentConfigs(string channelName, long? packageId)
+    private List<GamePaymentConfigEntity> GetPaymentConfigs(string channelName, long? packageId)
     {
         var context = _httpContextAccessor.HttpContext;
         var db = _tenantDbProvider;
         var environments = GetRequestedEnvironments(context);
         var hasPackageId = packageId.HasValue;
         var packageIdValue = packageId.GetValueOrDefault();
-        var query = db.Queryable<TenantGamePaymentConfigEntity>()
+        var query = db.Queryable<GamePaymentConfigEntity>()
                       .Where(u => u.PayChannel == channelName && u.IsEnabled == true &&
                                   (u.PackageIdNormalized == 0 ||
                                    (hasPackageId && u.PackageIdNormalized == packageIdValue)));
@@ -137,7 +137,7 @@ public class PaymentOptionSettingProvider : IPaymentOptionSettingProvider
         return query.ToList()
                     .GroupBy(u => u.IsSandbox)
                     .Select(group => GamePaymentConfigService.PickBestConfig(group, packageId))
-                    .OfType<TenantGamePaymentConfigEntity>()
+                    .OfType<GamePaymentConfigEntity>()
                     .OrderBy(u => u.IsSandbox)
                     .ToList();
     }
@@ -163,7 +163,7 @@ public class PaymentOptionSettingProvider : IPaymentOptionSettingProvider
 
     /// <summary>
     /// 按公开回调路由规范化支付渠道的回调通知地址（C401，GFX-1213）：站点根地址自动补全路由段
-    /// （含当前分包段），旧「回调/{tenantId}/{appId}/{packageId}」三段地址自动去段重建；
+    /// （含当前分包段），旧「回调/{id}/{appId}/{packageId}」三段地址自动去段重建；
     /// 无法识别的地址置空并由支付处理器按「通知地址未配置」拒绝下单，避免网关回调打在无法命中的地址上
     /// 导致已付款订单不发货。其余渠道地址原样透传。
     /// </summary>
@@ -223,7 +223,7 @@ public class PaymentOptionSettingProvider : IPaymentOptionSettingProvider
         var packageId = GetCurrentPackageId(context);
         if (packageId.HasValue)
         {
-            var package = db.Queryable<TenantGameAppPackageEntity>()
+            var package = db.Queryable<GameAppPackageEntity>()
                             .First(u => u.Id == packageId.Value && u.IsEnabled == true);
             return PackageMatchesScope(package) ? packageId : null;
         }
@@ -234,12 +234,12 @@ public class PaymentOptionSettingProvider : IPaymentOptionSettingProvider
             return null;
         }
 
-        var namedPackage = db.Queryable<TenantGameAppPackageEntity>()
+        var namedPackage = db.Queryable<GameAppPackageEntity>()
                              .First(u => u.PackageName == packageName.Trim() && u.IsEnabled == true);
         return PackageMatchesScope(namedPackage) ? namedPackage.Id : null;
     }
 
-    public static bool PackageMatchesScope(TenantGameAppPackageEntity? package)
+    public static bool PackageMatchesScope(GameAppPackageEntity? package)
     {
         return package != null && package.IsEnabled == true;
     }

@@ -1,8 +1,8 @@
 using System.ComponentModel;
-using GameFrameX.Entity.Tenant.Game.App;
+using GameFrameX.Entity.Business.Game.App;
 using System.Security.Cryptography;
 using GameFrameX.Application.Platform.OpenAccess.GameAppOpenAccess.Dto;
-using GameFrameX.Core.Service.Tenant;
+using GameFrameX.Core.Service.Business;
 
 namespace GameFrameX.Application.Platform.OpenAccess.GameAppOpenAccess;
 
@@ -15,15 +15,15 @@ namespace GameFrameX.Application.Platform.OpenAccess.GameAppOpenAccess;
 [ApiDescriptionSettings(Order = 185)]
 public class GameAppOpenAccessService : IAdminApiController
 {
-    private readonly SqlSugarRepository<TenantGameAppOpenAccessEntity> _repository;
-    private readonly SqlSugarRepository<TenantUserEntity> _userRepository;
+    private readonly SqlSugarRepository<GameAppOpenAccessEntity> _repository;
+    private readonly SqlSugarRepository<UserEntity> _userRepository;
 
     /// <summary>
     /// 应用开放访问凭证管理服务构造函数。
     /// </summary>
     public GameAppOpenAccessService(
-        SqlSugarRepository<TenantGameAppOpenAccessEntity> repository,
-        SqlSugarRepository<TenantUserEntity> userRepository)
+        SqlSugarRepository<GameAppOpenAccessEntity> repository,
+        SqlSugarRepository<UserEntity> userRepository)
     {
         _repository = repository;
         _userRepository = userRepository;
@@ -36,14 +36,14 @@ public class GameAppOpenAccessService : IAdminApiController
     /// <returns>凭证分页（含绑定用户账号 / 姓名回显）。</returns>
     [DisplayName("获取应用开放访问凭证分页列表")]
     [ApiDescriptionSettings(Name = "Page")]
-    public async Task<SqlSugarPagedList<GameAppOpenAccessResponse>> PageAsync(PageTenantGameAppOpenAccessRequest input)
+    public async Task<SqlSugarPagedList<GameAppOpenAccessResponse>> PageAsync(PageGameAppOpenAccessRequest input)
     {
         var accessKey = input.AccessKey?.Trim() ?? string.Empty;
         var scenario = input.Scenario?.Trim() ?? string.Empty;
         var subjectName = input.SubjectName?.Trim() ?? string.Empty;
 
         return await _repository.AsQueryable().ClearFilter().Where(u => u.IsDeleted == false)
-                         .LeftJoin<TenantUserEntity>((u, t) => u.BindUserId == t.Id)
+                         .LeftJoin<UserEntity>((u, t) => u.BindUserId == t.Id)
                          .WhereIF(!string.IsNullOrWhiteSpace(accessKey), (u, t) => u.AccessKey.Contains(accessKey))
                          .WhereIF(!string.IsNullOrWhiteSpace(scenario), (u, t) => u.Scenario == scenario)
                          .WhereIF(!string.IsNullOrWhiteSpace(subjectName), (u, t) => u.SubjectName.Contains(subjectName))
@@ -81,7 +81,7 @@ public class GameAppOpenAccessService : IAdminApiController
     [ApiDescriptionSettings(Name = "Add")]
     [HttpPost]
     [DisplayName("签发应用开放访问凭证")]
-    public async Task<GameAppOpenAccessSecretResponse> AddAsync(AddTenantGameAppOpenAccessRequest input)
+    public async Task<GameAppOpenAccessSecretResponse> AddAsync(AddGameAppOpenAccessRequest input)
     {
         await EnsureBindUserExistsAsync(input.BindUserId);
         var scopes = EnsureValidScopes(input.ScopesJson);
@@ -94,7 +94,7 @@ public class GameAppOpenAccessService : IAdminApiController
 
         var accessSecret = GenerateAccessSecret();
 
-        var entity = new TenantGameAppOpenAccessEntity
+        var entity = new GameAppOpenAccessEntity
         {
             BindUserId = input.BindUserId,
             Scenario = input.Scenario.Trim(),
@@ -102,7 +102,7 @@ public class GameAppOpenAccessService : IAdminApiController
             SubjectName = input.SubjectName.Trim(),
             ScopesJson = NormalizeScopesJson(scopes),
             AccessKey = accessKey,
-            AccessSecret = TenantSecretCrypto.Encrypt(accessSecret) ?? string.Empty,
+            AccessSecret = SecretCrypto.Encrypt(accessSecret) ?? string.Empty,
             ExpiresTime = input.ExpiresTime,
         };
         await _repository.InsertAsync(entity);
@@ -123,7 +123,7 @@ public class GameAppOpenAccessService : IAdminApiController
     [ApiDescriptionSettings(Name = "Update")]
     [HttpPost]
     [DisplayName("更新应用开放访问凭证")]
-    public async Task UpdateAsync(UpdateTenantGameAppOpenAccessRequest input)
+    public async Task UpdateAsync(UpdateGameAppOpenAccessRequest input)
     {
         var existing = await GetCredentialAsync(input.Id);
         await EnsureBindUserExistsAsync(input.BindUserId);
@@ -226,7 +226,7 @@ public class GameAppOpenAccessService : IAdminApiController
         var existing = await GetCredentialAsync(input.Id);
 
         var plainSecret = GenerateAccessSecret();
-        existing.AccessSecret = TenantSecretCrypto.Encrypt(plainSecret) ?? string.Empty;
+        existing.AccessSecret = SecretCrypto.Encrypt(plainSecret) ?? string.Empty;
         existing.RowVersion = input.RowVersion;
 
         await _repository.Context.UpdateWithOptimisticLockAsync(existing);
@@ -322,7 +322,7 @@ public class GameAppOpenAccessService : IAdminApiController
     /// </summary>
     /// <param name="id">凭证 Id。</param>
     /// <returns>凭证实体。</returns>
-    private async Task<TenantGameAppOpenAccessEntity> GetCredentialAsync(long id)
+    private async Task<GameAppOpenAccessEntity> GetCredentialAsync(long id)
     {
         var entity = await _repository.AsQueryable().ClearFilter().Where(u => u.IsDeleted == false).FirstAsync(u => u.Id == id);
         if (entity == null)
