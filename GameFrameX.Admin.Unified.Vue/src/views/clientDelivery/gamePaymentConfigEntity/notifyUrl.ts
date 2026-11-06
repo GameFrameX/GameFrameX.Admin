@@ -7,7 +7,7 @@
  * 其中 `{action}` 为 lowerCamelCase（`notifyApple` 等）。后端为 `BaseController` token 路由
  * `api/[controller]/[action]`，ASP.NET Core literal 路由段匹配大小写不敏感（C298 已实测：
  * 小写 / PascalCase 回调 URL 均命中路由），故前端统一输出小写 camel 规范形态，
- * 不要求与后端 action 方法名逐字符一致。公开回调只从 URL 路由段解析租户上下文，
+ * 不要求与后端 action 方法名逐字符一致。公开回调只从 URL 路由段解析业务上下文，
  * 不得退化回旧 `/client/gameOrder/...` 或 query 形式。
  *
  * 本文件不依赖任何 `/@/` 别名或 Vue 运行时，可被 node:test 直接加载（Node 24 原生 type stripping）。

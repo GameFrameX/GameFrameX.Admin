@@ -1,6 +1,6 @@
 using System.Security.Cryptography;
 using System.Text;
-using GameFrameX.Core.Service.Tenant;
+using GameFrameX.Core.Service.Business;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace GameFrameX.Core.Middleware;
@@ -12,13 +12,13 @@ internal static class RuntimeKeyMaterialCache
 
     internal static string Decrypt(string storedSecret)
     {
-        var environmentKey = Environment.GetEnvironmentVariable(TenantSecretCrypto.KeyEnvironmentVariable) ?? string.Empty;
+        var environmentKey = Environment.GetEnvironmentVariable(SecretCrypto.KeyEnvironmentVariable) ?? string.Empty;
         var fingerprint = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(environmentKey + "\0" + storedSecret)));
         return Materials.GetOrCreate(fingerprint, entry =>
         {
             entry.Size = 1;
             entry.SlidingExpiration = TimeSpan.FromMinutes(10);
-            return TenantSecretCrypto.Decrypt(storedSecret) ?? string.Empty;
+            return SecretCrypto.Decrypt(storedSecret) ?? string.Empty;
         })!;
     }
 }

@@ -4,7 +4,7 @@
 import type { BaseSelectPageResponse, BaseSelectPageStringResponse } from "../_shared/data-contracts";
 
 /** 游戏道具分类增加输入参数 */
-export interface AddTenantGameGoodsCatalogueEntityRequest {
+export interface AddGameGoodsCatalogueEntityRequest {
   /**
    * 名称
    * @minLength 1
@@ -60,7 +60,7 @@ export interface GameGoodsCatalogueResponseSqlSugarPagedList {
 }
 
 /** 游戏道具分类分页查询输入参数 */
-export interface PageTenantGameGoodsCatalogueEntityRequest {
+export interface PageGameGoodsCatalogueEntityRequest {
   searchKey?: string | null;
   /**
    * @format int32
@@ -83,7 +83,7 @@ export interface PageTenantGameGoodsCatalogueEntityRequest {
 }
 
 /** 游戏道具分类更新输入参数 */
-export interface UpdateTenantGameGoodsCatalogueEntityRequest {
+export interface UpdateGameGoodsCatalogueEntityRequest {
   /**
    * @min 1
    * @max 9223372036854776000

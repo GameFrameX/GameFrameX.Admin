@@ -5,7 +5,7 @@ using GameFrameX.Core.Service.Role;
 using GameFrameX.Core.Service.User;
 using GameFrameX.Core.Const.MenuSeed;
 using GameFrameX.Core.Extension.Const;
-using GameFrameX.Core.Service.Tenant;
+using GameFrameX.Core.Service.Business;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Entity.Enum;
 using GameFrameX.Entity.Global;
@@ -67,9 +67,9 @@ public class GlobalMenuService : IAdminApiController
         else
         {
             var menuIdList = await GetMenuIdListAsync();
-            // B5: 过滤整棵 SuperAdmin-only 子树（而非仅 AllowTenant 子集）。
-            // 旧逻辑只剔除 TenantReadableSuperAdminOnlyMenuIds，当某菜单由"租户可见"改为"超管专属"(SuperAdminOnly=true, AllowTenant=false)后，
-            // 既有租户的 tenant_role_menu 仍残留旧授权，且不在 AllowTenant 集合内，导致菜单仍出现在租户导航中（点击后端 403）。改为剔除整棵超管子树可防御性修复。
+            // B5: 过滤整棵 SuperAdmin-only 子树（而非仅 Allow 子集）。
+            // 旧逻辑只剔除 AdminReadableSuperAdminOnlyMenuIds，当某菜单由"管理员可见"改为"超管专属"(SuperAdminOnly=true, Allow=false)后，
+            // 既有管理员的 role_menu 仍残留旧授权，且不在 Allow 集合内，导致菜单仍出现在管理员导航中（点击后端 403）。改为剔除整棵超管子树可防御性修复。
             var menuTreeIds = menuIdList
                               .Where(u => !MenuSeedCatalog.SuperAdminOnlySubtreeMenuIds.Contains(u))
                               .ToArray();
@@ -244,12 +244,12 @@ public class GlobalMenuService : IAdminApiController
     }
 
     /// <summary>
-    /// 从主库删除指定菜单的角色授权（tenant_role_menu）。
+    /// 从主库删除指定菜单的角色授权（role_menu）。
     /// </summary>
     private async Task CascadeDeleteRoleMenusAsync(List<long> menuIdList)
     {
         var mainDb = _sqlSugarClient.AsTenant().GetConnectionScope(SqlSugarConst.MainConfigId);
-        await mainDb.Deleteable<TenantRoleMenuEntity>().Where(u => menuIdList.Contains(u.MenuId)).ExecuteCommandAsync();
+        await mainDb.Deleteable<RoleMenuEntity>().Where(u => menuIdList.Contains(u.MenuId)).ExecuteCommandAsync();
     }
 
     /// <summary>
@@ -309,7 +309,7 @@ public class GlobalMenuService : IAdminApiController
     }
 
     /// <summary>
-    /// 获取当前用户已授权的菜单Id集合（缓存，含目录/菜单/按钮，来自 TenantRoleMenuEntity）。
+    /// 获取当前用户已授权的菜单Id集合（缓存，含目录/菜单/按钮，来自 RoleMenuEntity）。
     /// <para>供基于稳定身份（Key）的鉴权使用：<see cref="GameFrameX.Core.Const.MenuSeed.StableSeedId.Menu(string)"/> 由 Key 派生的 Id 与本集合比对。</para>
     /// </summary>
     /// <returns>非超管返回其角色已授权的 MenuId 集合；超管本不应被调用（JwtHandler 提前放行），此处仍返回空集以保证安全。</returns>
@@ -447,7 +447,7 @@ public class GlobalMenuService : IAdminApiController
     /// <returns></returns>
     private async Task<List<long>> GetMenuIdListAsync()
     {
-        var roleIdList = await _serviceProvider.GetRequiredService<TenantUserRoleService>().GetUserRoleIdListAsync(_currentUserContext.UserId);
-        return await _serviceProvider.GetRequiredService<TenantRoleMenuService>().GetRoleMenuIdListAsync(roleIdList);
+        var roleIdList = await _serviceProvider.GetRequiredService<UserRoleService>().GetUserRoleIdListAsync(_currentUserContext.UserId);
+        return await _serviceProvider.GetRequiredService<RoleMenuService>().GetRoleMenuIdListAsync(roleIdList);
     }
 }

@@ -67,7 +67,7 @@ Client API 和 Hub API 都更"瘦"：Client API 只引用 Entity + Payment，不
 
 1. **写个 Service 就自动有接口**（Admin API）。实现 `IDynamicApiController`，类里的 public 方法会自动变成 REST 端点，你不用手写 Controller、不用手贴 `[Route]`。这是 Admin API 的灵魂。
 2. **写个实体就自动建表**。SqlSugar Code-First：启动时扫实体类 → 建表 → 填种子数据。你不用写一行建表 SQL，改了字段重启一下，表结构就跟上了。
-3. **三宿主共用单主库**。仓储固定使用 `ConfigId=main`，登录和业务数据不再包含租户或应用维度；软删除和创建者数据权限继续生效。
+3. **三宿主共用单主库**。仓储固定使用 `ConfigId=main`，登录和业务数据没有多库维度；软删除和创建者数据权限继续生效。
 
 ---
 
@@ -107,7 +107,7 @@ Admin API（20802）              Client API（20808）            Hub API（208
 依赖关系长这样（左到右是引用方向）：
 
 ```
-Web.Api → Web.Core → Application.{System, Game, Client, Tenant} → Core → Entity → Core.Enum
+Web.Api → Web.Core → Application.{System, Game, Client, Business} → Core → Entity → Core.Enum
 Client.Api（独立，仅引用 Entity + Payment）
 Hub.Api（独立，引用 Application.Game + Core + Entity，但 Controller 不调 Application Service）
 ```
@@ -134,7 +134,7 @@ GameFrameX.Admin.Unified.Api/
 ├── GameFrameX.Application.System/ # 系统管理服务（用户/角色/菜单/日志...）
 ├── GameFrameX.Application.Game/   # 游戏管理服务（区服/订单/邮件/兑换码...）
 ├── GameFrameX.Application.Client/ # 客户端管理服务（版本/渠道/资源包...）
-├── GameFrameX.Application.Tenant/ # 业务服务（设备 / 设备分组，项目名待后续调整）
+├── GameFrameX.Application.Business/ # 业务服务（设备 / 设备分组）
 ├── GameFrameX.Entity/             # 实体层（Base / System / Game / Client）
 ├── GameFrameX.Core/               # 核心层（仓储、服务基类、认证、SignalR）
 ├── GameFrameX.Core.Enum/          # 枚举定义
@@ -176,13 +176,12 @@ GameFrameX.Admin.Unified.Api/
 **生产 / 容器（PostgreSQL，环境变量成对覆盖）**：覆盖数据库时类型和连接串必须**成对**设置，半套覆盖会在启动期直接报错。三个 host（Web / Client / Hub）用**同一对变量**：
 
 - `GFX_MAIN_DB_TYPE=PostgreSQL` + `GFX_MAIN_DB_CONNECTION_STRING=Host=...`
-- 三宿主仅使用 `ConfigId=main`，不再自动创建或推导租户数据库。
+- 三宿主仅使用 `ConfigId=main`，单主库即全部数据库，不存在其他库的创建或推导。
 - 存量部署的裸 `DbType` / `ConnectionString` 启动参数仍可用（兼容层），启动会打迁移警告，请尽快切换
 - 换其他数据库（MySQL / Oracle / 达梦……全部 34 种 DbType）的连接串写法与示例：[`GameFrameX.Application/Configuration/Database-ConnectionStrings.md`](GameFrameX.Application/Configuration/Database-ConnectionStrings.md)
 
 关于数据库，还有几个约定你要知道：
 
-- **默认自托管实例升级**：停写并备份两个数据库，先运行 `db/single-main/migrate-default-instance.sh --dry-run`，再用 `--execute` 提交。设置 `GFX_MIGRATION_DATABASE_TYPE`、`GFX_MIGRATION_SOURCE` 和 `GFX_MIGRATION_TARGET`。脚本拒绝多租户、多应用和数据冲突；dry-run 回滚，重复执行幂等。
 - **Compose 内置 PostgreSQL**。在仓库根执行 `docker compose up` 会自带起一个 `postgres:16-alpine`（首次启动自动建库，见 `docker/postgres/init.sql`，数据落在仓库根 `postgres-data/` bind mount）。要复用宿主机已有的 postgres 容器，在仓库根 `.env` 里设 `POSTGRES_HOST=host.docker.internal` 等变量并移除 api 服务对 `postgres` 的 `depends_on` 即可。
 - **三个 host 共读同一份默认配置**。Client / Hub 启动时自动加载 `Database.json`（与 Admin 同源，改一处三处生效）；环境变量覆盖写法与 compose 一致。
 
@@ -288,7 +287,7 @@ public class MyService : ITransient, IDynamicApiController
 
 ### 仓储与单主库
 
-`SqlSugarRepository<T>` 固定使用主库连接（`ConfigId=main`），实体特性不再决定租户分库。
+`SqlSugarRepository<T>` 固定使用主库连接（`ConfigId=main`），三个 host 共用单主库。
 
 ### 认证体系：JWT 共用，外加签名
 
@@ -320,7 +319,7 @@ SqlSugar AOP 在 `SqlSugarSetup.SetDbAop()` 里帮你干了这事：
 | Insert | `CreatedTime`、`CreatedId`、`CreatedName` |
 | Update | `UpdateTime`、`UpdatedId`、`UpdatedName` |
 
-同时顺手把数据变更写进审计日志（`SystemLogDiff` / `TenantLogDiff`）。所以你建实体的时候，审计字段不用自己赋值，框架替你填。
+同时顺手把数据变更写进审计日志（`SystemLogDiff` / `LogDiff`）。所以你建实体的时候，审计字段不用自己赋值，框架替你填。
 
 ### 雪花 ID
 
@@ -359,7 +358,7 @@ Admin API 的 `AdminResultProvider` 把所有响应统一套了一层壳：
 ### SignalR 实时通信
 
 - Hub：`OnlineUserHub`，路径 `/hubs/onlineUser`
-- 连接使用已认证用户身份，不再按租户建立消息组。
+- 连接使用已认证用户身份。
 - 能干：在线用户列表、强制下线、消息发送（单播 / 广播 / 排除自己 / 指定用户）
 - 多实例部署时可选 Redis Backplane + Data Protection Key 持久化，让消息跨实例推送
 
@@ -390,12 +389,12 @@ Hub API（`GameFrameX.Hub.Api`，端口 `20806`）是给**外部系统**用的�
 |------|----------|-----------|------|
 | 登录用户 | JWT（各控制器显式声明 `[Authorize]`） | 已认证用户 | 容器编排 / 资源版本回写 |
 | 匿名 WebHook | - | - | 当前宿主无编译中的 WebHook |
-| 机器对机器 | `[AllowAnonymous]` + `TenantGameAppOpenAccessAuthMiddleware` | 凭证绑定用户 | `PackageBuildReportController` / `FeatureSwitchSyncController` |
+| 机器对机器 | `[AllowAnonymous]` + 开放接入 HMAC 鉴权中间件（机器通道） | 凭证绑定用户 | `PackageBuildReportController` / `FeatureSwitchSyncController` |
 
 机器凭证那套校验的是 AccessKey + 签名 + scope，**不是 JWT**，所以 Controller 标 `[AllowAnonymous]` 跳过 JWT，由专用中间件接管。
 
 **4. 主库与凭证绑定身份。**
-JWT 请求使用已认证用户；机器请求继续校验 AccessKey、HMAC 签名、scope、撤销状态及绑定用户，凭证不再选择租户或应用。
+JWT 请求使用已认证用户；机器请求继续校验 AccessKey、HMAC 签名、scope、撤销状态及绑定用户，凭证只绑定用户，不再选择其他作用域。
 
 **5. 自带乐观锁中间件和健康检查。**
 `OptimisticConcurrencyMiddleware` 在管道最前面，给需要并发控制的写操作兜底。健康检查端点有三个：`/health`、`/health/live`、`/health/ready`（compose 用它做存活探测）。
@@ -407,7 +406,7 @@ OptimisticConcurrencyMiddleware
   → Swagger（开关控制）
   → CORS
   → Authentication → Authorization
-  → TenantGameAppOpenAccessAuthMiddleware（/api/PackageBuildReport / /api/FeatureSwitchSync）
+  → 开放接入 HMAC 鉴权中间件（/api/PackageBuildReport / /api/FeatureSwitchSync）
   → HealthChecks / MapControllers
 ```
 
@@ -438,14 +437,14 @@ Admin API 的独立 JSON 配置都在 `GameFrameX.Application/Configuration/`，
 | 功能 | 服务类 | 干啥的 |
 |------|--------|--------|
 | 认证登录 | `SystemAuthService` | 账号密码登录，签发 JWT + 自动续签，验证码 |
-| 用户管理 | `SystemUserService` | 用户增删改查、密码重置、用户-角色绑定（注意：这个服务实际管的是 `TenantUser`，命名有点误导） |
-| 角色管理 | `TenantRoleService` | 角色 CRUD、数据范围控制、角色-菜单权限绑定 |
+| 用户管理 | `SystemUserService` | 用户增删改查、密码重置、用户-角色绑定 |
+| 角色管理 | `RoleService` | 角色 CRUD、数据范围控制、角色-菜单权限绑定 |
 | 菜单权限 | `GlobalMenuService` | 树形菜单、按钮级权限解析、路由与 API 映射 |
 | 字典管理 | `GlobalDictTypeService` / `GlobalDictDataService` | 字典类型与字典值 CRUD、状态切换 |
-| 文件管理 | `TenantFileService` | 文件上传下载、OSS 对象存储 |
+| 文件管理 | `FileService` | 文件上传下载、OSS 对象存储 |
 | 定时任务 | `SystemJobService` | 作业与触发器 CRUD、暂停 / 启动 / 立即执行、集群协调 |
 | 数据库管理 | `SystemDatabaseService` | 表 / 列 CRUD、库表结构在线管理 |
-| 在线用户 | `TenantOnlineUserService` | 实时在线列表、强制下线、单点登录 |
+| 在线用户 | `OnlineUserService` | 实时在线列表、强制下线、单点登录 |
 | 日志系统 | `LogOperationService` / `LogExceptionService` / `LogVisitService` / `LogDiffService` | 操作日志、异常日志、访问日志、数据变更审计，支持 Excel 导出 |
 | 缓存管理 | `SystemCacheService` | 统一缓存抽象（Memory / Redis），缓存键管理 |
 | 系统配置 | `SystemConfigService` | 键值对配置 CRUD |
@@ -489,9 +488,9 @@ Admin API 的独立 JSON 配置都在 `GameFrameX.Application/Configuration/`，
 | 资源包 | `GameAppAssetPackageService` | AssetBundle / 资源包管理 |
 | 资源版本 | `GameAppAssetPackageVersionService` | 资源包版本追踪 |
 | 资源历史 | `GameAppAssetPackageVersionHistoryService` | 资源版本变更记录 |
-| 渠道定义 | `GlobalChannelDefinitionService` / `TenantChannelDefinitionService` | 分发渠道（App Store、Google Play 等） |
-| 设备管理 | `TenantDeviceService` | 设备注册与识别（位于 `Application.Tenant`） |
-| 设备分组 | `TenantDeviceGroupService` | 设备分组（灰度 / A/B 测试，位于 `Application.Tenant`） |
+| 渠道定义 | `GlobalChannelDefinitionService` / `ChannelDefinitionService` | 分发渠道（App Store、Google Play 等） |
+| 设备管理 | `DeviceService` | 设备注册与识别（位于 `Application.Business`） |
+| 设备分组 | `DeviceGroupService` | 设备分组（灰度 / A/B 测试，位于 `Application.Business`） |
 | 多语言 | `GlobalLanguageService` | 支持语言配置 |
 | 分包管理 | `GameAppPackageService` | 应用分包、渠道绑定与母包继承管理 |
 | 平台管理 | `GlobalPlatformService` | 运行平台（iOS、Android 等） |
@@ -552,7 +551,7 @@ public class GameItemEntity : EntityBasic
 
 | 基类 | 特点 | 适用场景 |
 |------|------|----------|
-| `EntityBaseId` | 只有 `Id` | 关联表、无租户实体 |
+| `EntityBaseId` | 只有 `Id` | 关联表、无创建者/审计列的实体 |
 | `EntityBase` | Id + 审计字段 + 软删除 | 主库实体 |
 | `EntityBasic` | 继承 `EntityBase` | 通用业务实体（最常用） |
 | `EntityBasicData` | 创建者数据权限 | 按 `CreatedId` 过滤 |
@@ -579,7 +578,7 @@ public class GameItemSeedData : ISqlSugarEntitySeedData<GameItemEntity>
 
 ### 3. 写 Service
 
-在 `GameFrameX.Application.Game/Service/`（或 System / Client / Tenant）下建服务：
+在 `GameFrameX.Application.Game/Service/`（或 System / Client / Business）下建服务：
 
 ```csharp
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
@@ -729,7 +728,7 @@ SuperAdmin 保留权限绕过。三宿主共用主库，Hub 机器通道仍执�
 Hub 复用 Admin 的 JWT 密钥，但读的是自己 `appsettings.json` 里的 `JWTSettings` 节点。两边密钥（`IssuerSigningKey` / `ValidIssuer` / `ValidAudience`）必须一致。不一致就签出来的 token 互相不认。
 
 **打包上报（PackageBuildReport）报 401？**
-机器通道通过 `TenantGameAppOpenAccessAuthMiddleware` 校验 AccessKey、HMAC 签名、scope 与绑定用户。
+机器通道通过开放接入 HMAC 鉴权中间件校验 AccessKey、HMAC 签名、scope 与绑定用户。
 
 ### 踩坑
 
@@ -772,13 +771,26 @@ cd .. && docker compose up --build   # 统一编排位于仓库根（含前端�
 
 > 历史命名：compose 服务曾名 `web-entry`（沿用旧版 "Web.Entry"），2026-10-20 起更名 `web-api`，与 GameFrameX.Web.Api 对齐。
 
+### 首次部署：超管密码与首个业务管理员
+
+全新数据库首次启动时，web-api 在建表与种子之后执行「首个业务管理员种子引导」（C406 / F3）。两个初始账号各走各的环境变量，职责不同：
+
+| 环境变量 | 作用 | 生效条件 |
+|---|---|---|
+| `GFX_SUPERADMIN_INITIAL_PASSWORD` | 平台超级管理员 `superadmin` 的初始密码；不设则密码留空，首次打开登录页走首装向导设置 | 仅首装种子插入时 |
+| `GAMEFRAMEX_ADMIN_INITIAL_ACCOUNT` + `GAMEFRAMEX_ADMIN_INITIAL_PASSWORD` | **首个业务管理员**账号与初始密码：启动期自动创建该账号，绑定内置 `sys_admin` 角色（授权全部非超管菜单，超管专属子树不授予），之后即可用它登录业务后台 | 两变量成对设置，且主库中尚无任何业务管理员账号；密码须满足平台密码强度策略，否则启动直接失败 |
+
+幂等语义：账号已存在时不重建、不覆盖密码；`sys_admin` 的菜单授权每次启动只补新增的种子菜单、不删除已有授权（运营在角色管理里手工收窄后重启不会被冲掉）。两个变量都没设且库中无业务管理员时，启动日志会输出「尚未初始化业务管理员」警告。任何日志都不输出密码。
+
+> 密码强度：新装的「平台密码策略」默认关闭（`strongPassword=false`），两个初始账号的密码此时不做强度校验；开启后要求 6–16 位且同时包含大写字母、小写字母、数字与特殊字符。建议初始密码直接按该规则设置（12 位以上），并在对外提供服务前开启策略。
+
 ### 发布前清单：数据库重灌与紧凑短 ID
 
-本节仅说明 2026-09-15 的历史长 ID → 紧凑短 ID 升级，该升级不提供数据转换脚本。已经使用短 ID 的默认实例可按上文执行单主库迁移；该工具不转换历史长 ID。
+本节仅说明 2026-09-15 的历史长 ID → 紧凑短 ID 升级，该升级不提供数据转换脚本。C406 起不再提供任何迁移工具：2.0 只支持单主库全新初始化，旧库只能靠发布前的完整备份整体回滚。
 
-紧凑短 ID 布局的发布口径是**可重置、无迁移脚本**（决策 2026-09-15）：新旧 ID 布局不兼容，生产 PG 主库 / 租户库按「清空重灌」发布，不允许新旧 ID 混写。发布前过一遍：
+紧凑短 ID 布局的发布口径是**可重置、无迁移脚本**（决策 2026-09-15）：新旧 ID 布局不兼容，生产 PG 主库按「清空重灌」发布，不允许新旧 ID 混写。发布前过一遍：
 
-1. **清空重灌**：生产 PG 主库 + 全部租户库清空，由各 host 启动重建（CodeFirst 建表 + 种子数据重灌）。旧库里 18-19 位长 Id 的数据不要往新布局迁——新旧 Id 空间重叠是数据完整性事故。
+1. **清空重灌**：生产 PG 主库清空，由各 host 启动重建（CodeFirst 建表 + 种子数据重灌）。旧库里 18-19 位长 Id 的数据不要往新布局迁——新旧 Id 空间重叠是数据完整性事故。
 2. **WorkerId 互斥核对**：同库写入的所有实例（Web.Api 副本 / Hub / Client）`SnowFlake__WorkerId` 两两不同且在 0-7。默认值 1/2/3 只保证单机部署不撞；扩副本前必须显式分配。
 3. **量级抽查**：重灌后抽查业务表主键应为 13-14 位数字（< 2^53）。看到 18-19 位说明有路径没走 Foundation 取号，停下来排查。
 

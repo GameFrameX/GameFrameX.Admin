@@ -4,7 +4,7 @@
 import type { BaseSelectPageResponse, BaseSelectPageStringResponse } from "../_shared/data-contracts";
 
 /** 兑换码渠道增加输入参数 */
-export interface AddTenantGameRedeemCodeChannelEntityRequest {
+export interface AddGameRedeemCodeChannelEntityRequest {
   /** 主键Id */
   id: string;
   /**
@@ -74,7 +74,7 @@ export interface GameRedeemCodeChannelResponseSqlSugarPagedList {
 }
 
 /** 兑换码渠道分页查询输入参数 */
-export interface PageTenantGameRedeemCodeChannelEntityRequest {
+export interface PageGameRedeemCodeChannelEntityRequest {
   searchKey?: string | null;
   /**
    * @format int32
@@ -95,7 +95,7 @@ export interface PageTenantGameRedeemCodeChannelEntityRequest {
 }
 
 /** 兑换码渠道更新输入参数 */
-export interface UpdateTenantGameRedeemCodeChannelEntityRequest {
+export interface UpdateGameRedeemCodeChannelEntityRequest {
   /**
    * @min 1
    * @max 9223372036854776000

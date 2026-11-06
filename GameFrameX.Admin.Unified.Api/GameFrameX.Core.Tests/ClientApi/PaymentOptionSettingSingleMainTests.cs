@@ -1,6 +1,6 @@
 using System.Reflection;
 using GameFrameX.Client.Api.Integrations.Payment;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 using GameFrameX.Payment.Apple.Option;
 using Microsoft.AspNetCore.Http;
 
@@ -13,7 +13,7 @@ public sealed class PaymentOptionSettingSingleMainTests : IDisposable
     public PaymentOptionSettingSingleMainTests()
     {
         _ = Assembly.Load("GameFrameX.Payment.Apple");
-        _database.InitTenantTables(typeof(TenantGamePaymentConfigEntity));
+        _database.InitBusinessTables(typeof(GamePaymentConfigEntity));
     }
 
     [Fact]
@@ -58,7 +58,7 @@ public sealed class PaymentOptionSettingSingleMainTests : IDisposable
     public void DisabledConfiguration_IsNeverReturned()
     {
         Seed(1, false, 0, "disabled");
-        _database.MainDb.Updateable<TenantGamePaymentConfigEntity>().SetColumns(row => row.IsEnabled == false).Where(row => row.Id == 1).ExecuteCommand();
+        _database.MainDb.Updateable<GamePaymentConfigEntity>().SetColumns(row => row.IsEnabled == false).Where(row => row.Id == 1).ExecuteCommand();
         Assert.Empty(Provider(null).GetOptionSettings("apple"));
     }
 
@@ -69,7 +69,7 @@ public sealed class PaymentOptionSettingSingleMainTests : IDisposable
 
     private void Seed(long id, bool sandbox, long packageId, string secret)
     {
-        _database.MainDb.Insertable(new TenantGamePaymentConfigEntity
+        _database.MainDb.Insertable(new GamePaymentConfigEntity
         {
             Id = id, PayChannel = "apple", IsSandbox = sandbox, PackageIdNormalized = packageId,
             ConfigJson = "{\"ApplePaymentSharedSecret\":\"" + secret + "\"}", IsEnabled = true,

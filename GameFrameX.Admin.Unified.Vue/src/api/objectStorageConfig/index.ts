@@ -10,7 +10,7 @@
  */
 
 import {
-  AddTenantObjectStorageConfigRequest,
+  AddObjectStorageConfigRequest,
   ObjectStorageConfigAddPostData,
   ObjectStorageConfigDeletePostData,
   ObjectStorageConfigDetailGetData,
@@ -19,8 +19,8 @@ import {
   ObjectStorageConfigSchemaGetData,
   ObjectStorageConfigTestConnectionGetData,
   ObjectStorageConfigUpdatePostData,
-  PageTenantObjectStorageConfigRequest,
-  UpdateTenantObjectStorageConfigRequest,
+  PageObjectStorageConfigRequest,
+  UpdateObjectStorageConfigRequest,
 } from "./types";
 import {
   BaseDeleteRequest,
@@ -40,11 +40,11 @@ export class ObjectStorageConfig<SecurityDataType = unknown> {
    *
    * @tags objectStorageConfig
    * @name ObjectStorageConfigAddPost
-   * @summary 新增配置。校验 Provider 已注册、规范化 ConfigJson；若启用则在事务内停用同租户其它配置。
+   * @summary 新增配置。校验 Provider 已注册、规范化 ConfigJson；若启用则在事务内停用其它配置。
    * @request POST:/api/objectStorageConfig/add
    */
   objectStorageConfigAddPost = (
-    data: AddTenantObjectStorageConfigRequest,
+    data: AddObjectStorageConfigRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<ObjectStorageConfigAddPostData, any>({
@@ -109,7 +109,7 @@ export class ObjectStorageConfig<SecurityDataType = unknown> {
    * @request POST:/api/objectStorageConfig/page
    */
   objectStorageConfigPagePost = (
-    data: PageTenantObjectStorageConfigRequest,
+    data: PageObjectStorageConfigRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<ObjectStorageConfigPagePostData, any>({
@@ -191,7 +191,7 @@ export class ObjectStorageConfig<SecurityDataType = unknown> {
    * @request POST:/api/objectStorageConfig/update
    */
   objectStorageConfigUpdatePost = (
-    data: UpdateTenantObjectStorageConfigRequest,
+    data: UpdateObjectStorageConfigRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<ObjectStorageConfigUpdatePostData, any>({

@@ -45,8 +45,8 @@
 import {reactive, ref, computed} from 'vue';
 
 import {systemOpenAccessUpdatePost, systemOpenAccessAddPost, systemOpenAccessCreateSecretPost} from '../../../../api/systemOpenAccess';
-import {tenantUserPagePost} from '../../../../api/tenantUser';
-import type {TenantUserResponse} from '../../../../api/tenantUser/types';
+import {userPagePost} from '../../../../api/user';
+import type {UserResponse} from '../../../../api/user/types';
 import {UpdateOpenAccessInput} from '../../../../api/_shared/data-contracts.ts';
 import {MAX_PAGE_SIZE} from '../../../../constants/pagination.ts';
 
@@ -58,7 +58,7 @@ const ruleFormRef = ref();
 const state = reactive({
   dialogVisible: false,
   ruleForm: {} as UpdateOpenAccessInput,
-  userData: [] as Array<TenantUserResponse>,
+  userData: [] as Array<UserResponse>,
 });
 
 const userDataOptions = computed(() => {
@@ -99,11 +99,11 @@ const submit = () => {
 };
 
 const loadUsers = async () => {
-  const users: TenantUserResponse[] = [];
+  const users: UserResponse[] = [];
   let page = 1;
   let hasNextPage = true;
   while (hasNextPage) {
-    const response = await tenantUserPagePost({page, pageSize: MAX_PAGE_SIZE, orderBy: 'Id'});
+    const response = await userPagePost({page, pageSize: MAX_PAGE_SIZE, orderBy: 'Id'});
     const result = response.data.data;
     users.push(...(result?.items ?? []));
     hasNextPage = result?.hasNextPage ?? page < (result?.totalPages ?? 0);

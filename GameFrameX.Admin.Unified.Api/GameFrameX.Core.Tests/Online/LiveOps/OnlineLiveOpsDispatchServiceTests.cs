@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Globalization;
-using System.Security.Claims;
 using GameFrameX.Application.GmCenter.LiveOps.Dispatch;
 using GameFrameX.Application.GmCenter.LiveOps.Dispatch.Dto;
 using GameFrameX.Application.ServerCenter.Online;
@@ -10,11 +9,11 @@ using GameFrameX.Core.Service.User;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Entity.Game.Mail;
 using GameFrameX.Entity.Game.Online;
-using GameFrameX.Entity.Tenant.Device;
-using GameFrameX.Entity.Tenant.Game;
-using GameFrameX.Entity.Tenant.Game.Announcement;
-using GameFrameX.Entity.Tenant.Game.Online;
-using GameFrameX.Entity.Tenant.Game.RemoteConfig;
+using GameFrameX.Entity.Business.Device;
+using GameFrameX.Entity.Business.Game;
+using GameFrameX.Entity.Business.Game.Announcement;
+using GameFrameX.Entity.Business.Game.Online;
+using GameFrameX.Entity.Business.Game.RemoteConfig;
 using GameFrameX.Foundation.Orm.Entity;
 using Microsoft.AspNetCore.Http;
 using SqlSugar;
@@ -25,13 +24,10 @@ namespace GameFrameX.Core.Tests.Online.LiveOps;
 // C343 / GFX-755（vault:C8 S7.7）：统一下发服务行为测试（mock-first：fake IOnlineServerClient，联调延后）。
 // 覆盖：四类配置来源路由到冻结命令名 + 载荷键断言、越枚举拒绝、来源不存在拒绝、应用归属不符拒绝、
 // 邮件方案C（Published 同目标合并返回首次回执 / Draft 拒绝并指引 / ServerId≠AreaId 拒绝 / 合并路径不发起 Online 调用）、
-// 分群同步通道回执映射。作用域走真实 OnlineScopeContextFactory（含租户归属校验）。
+// 分群同步通道回执映射。作用域走真实 OnlineScopeContextFactory（含区服归属校验）。
 public sealed class OnlineLiveOpsDispatchServiceTests : IDisposable
 {
-    private const long TenantA = 1001;
-    private const long App100 = 100;
-    private const long App200 = 200;
-    private const long Area1001 = 2001; // 归属 App100
+    private const long Area1001 = 2001;
 
     private readonly string _dbPath = Path.Combine(Path.GetTempPath(), $"online_liveops_{Guid.NewGuid():N}.db");
     private readonly SqlSugarScope _scopeOwner;
@@ -53,12 +49,12 @@ public sealed class OnlineLiveOpsDispatchServiceTests : IDisposable
         SqlSugarUnifiedConfig.ConfigureBaseFilters(_db);
         _db.CodeFirst.InitTables(
 
-            typeof(TenantGameAreaEntity),
-            typeof(TenantGameAppRemoteConfigEntity),
-            typeof(TenantGameAppDeviceGroupEntity),
-            typeof(TenantGameTimeJobEntity),
-            typeof(TenantGameAnnouncementEntity),
-            typeof(TenantGameMailCampaignEntity));
+            typeof(GameAreaEntity),
+            typeof(GameAppRemoteConfigEntity),
+            typeof(GameAppDeviceGroupEntity),
+            typeof(GameTimeJobEntity),
+            typeof(GameAnnouncementEntity),
+            typeof(GameMailCampaignEntity));
     }
 
     /// <summary>
@@ -197,7 +193,7 @@ public sealed class OnlineLiveOpsDispatchServiceTests : IDisposable
         var service = CreateService();
         _client.RespondWith = action => new OnlineLiveOpsResponse { ConfirmVersion = "seg-cv", SegmentId = 501, };
 
-        var segment = new TenantGameOnlinePlayerSegmentEntity
+        var segment = new GameOnlinePlayerSegmentEntity
         {
             Id = 7001,
             Name = "七日活跃",
@@ -229,25 +225,12 @@ public sealed class OnlineLiveOpsDispatchServiceTests : IDisposable
     {
         return new OnlineLiveOpsDispatchService(
             _client,
-            new OnlineScopeContextFactory(Repository<TenantGameAreaEntity>()),
-            Repository<TenantGameAppRemoteConfigEntity>(),
-            Repository<TenantGameAppDeviceGroupEntity>(),
-            Repository<TenantGameTimeJobEntity>(),
-            Repository<TenantGameAnnouncementEntity>(),
-            Repository<TenantGameMailCampaignEntity>());
-    }
-
-    private static CurrentUserContext CreateUserContext(long? tenantId)
-    {
-        var identity = new ClaimsIdentity("TestAuth");
-        if (tenantId.HasValue)
-        {
-            identity.AddClaim(new Claim("TenantId", tenantId.Value.ToString()));
-        }
-
-        var httpContext = new DefaultHttpContext { User = new ClaimsPrincipal(identity), };
-        var accessor = new HttpContextAccessor { HttpContext = httpContext, };
-        return new CurrentUserContext(accessor);
+            new OnlineScopeContextFactory(Repository<GameAreaEntity>()),
+            Repository<GameAppRemoteConfigEntity>(),
+            Repository<GameAppDeviceGroupEntity>(),
+            Repository<GameTimeJobEntity>(),
+            Repository<GameAnnouncementEntity>(),
+            Repository<GameMailCampaignEntity>());
     }
 
     private SqlSugarRepository<T> Repository<T>() where T : EntityBase, new()
@@ -259,17 +242,17 @@ public sealed class OnlineLiveOpsDispatchServiceTests : IDisposable
     {
         var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
-        await _db.Insertable(NewArea(Area1001, App100, now)).ExecuteCommandAsync();
+        await _db.Insertable(NewArea(Area1001, now)).ExecuteCommandAsync();
 
-        // 四类配置来源各一行（归属 App100）；公告 9005 归属 App200（构造跨应用场景）
-        await _db.Insertable(FillStrings(new TenantGameAppRemoteConfigEntity { Id = 9001, })).ExecuteCommandAsync();
-        await _db.Insertable(FillStrings(new TenantGameAppDeviceGroupEntity { Id = 9002, })).ExecuteCommandAsync();
-        await _db.Insertable(FillStrings(new TenantGameTimeJobEntity { Id = 9003, })).ExecuteCommandAsync();
-        await _db.Insertable(FillStrings(new TenantGameAnnouncementEntity { Id = 9004, })).ExecuteCommandAsync();
-        await _db.Insertable(FillStrings(new TenantGameAnnouncementEntity { Id = 9005, })).ExecuteCommandAsync();
+        // 四类配置来源各一行；公告 9005 为独立记录
+        await _db.Insertable(FillStrings(new GameAppRemoteConfigEntity { Id = 9001, })).ExecuteCommandAsync();
+        await _db.Insertable(FillStrings(new GameAppDeviceGroupEntity { Id = 9002, })).ExecuteCommandAsync();
+        await _db.Insertable(FillStrings(new GameTimeJobEntity { Id = 9003, })).ExecuteCommandAsync();
+        await _db.Insertable(FillStrings(new GameAnnouncementEntity { Id = 9004, })).ExecuteCommandAsync();
+        await _db.Insertable(FillStrings(new GameAnnouncementEntity { Id = 9005, })).ExecuteCommandAsync();
 
         // 邮件方案C 场景：9101 Published（Area1001 / v3 / CampaignId 77），9102 Draft
-        await _db.Insertable(FillStrings(new TenantGameMailCampaignEntity
+        await _db.Insertable(FillStrings(new GameMailCampaignEntity
         {
             Id = 9101,
             AreaId = Area1001,
@@ -280,7 +263,7 @@ public sealed class OnlineLiveOpsDispatchServiceTests : IDisposable
             CreatedTime = now,
             IsDeleted = false,
         })).ExecuteCommandAsync();
-        await _db.Insertable(FillStrings(new TenantGameMailCampaignEntity
+        await _db.Insertable(FillStrings(new GameMailCampaignEntity
         {
             Id = 9102,
             AreaId = Area1001,
@@ -291,9 +274,9 @@ public sealed class OnlineLiveOpsDispatchServiceTests : IDisposable
         })).ExecuteCommandAsync();
     }
 
-    private static TenantGameAreaEntity NewArea(long id, long gameAppId, long now)
+    private static GameAreaEntity NewArea(long id, long now)
     {
-        return FillStrings(new TenantGameAreaEntity
+        return FillStrings(new GameAreaEntity
         {
             Id = id,
             CreatedTime = now,
@@ -302,7 +285,7 @@ public sealed class OnlineLiveOpsDispatchServiceTests : IDisposable
     }
 
     /// <summary>
-    /// 反射填充全部 string 属性为空串（绕开实体 NOT NULL 列的种子样板；测试只关心 Id/AppId/状态字段）。
+    /// 反射填充全部 string 属性为空串（绕开实体 NOT NULL 列的种子样板；测试只关心 Id/状态字段）。
     /// </summary>
     private static T FillStrings<T>(T entity) where T : class
     {

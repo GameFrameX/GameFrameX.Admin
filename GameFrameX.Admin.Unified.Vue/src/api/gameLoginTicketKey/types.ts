@@ -1,7 +1,7 @@
 /* eslint-disable */
 /* tslint:disable */
 
-/** 租户 Game 登录票据签名密钥输出参数（仅公钥与元数据，私钥永不回显）。 */
+/** Game 登录票据签名密钥输出参数（仅公钥与元数据，私钥永不回显）。 */
 export interface GameLoginTicketKeyResponse {
   /** 主键 ID。 */
   id?: string;
@@ -68,8 +68,8 @@ export interface GameLoginTicketKeyRotateRequest {
   oldKeyExpireTime?: number | null;
 }
 
-/** 租户 Game 登录票据签名密钥分页查询输入参数。 */
-export interface PageTenantGameLoginTicketKeyRequest {
+/** Game 登录票据签名密钥分页查询输入参数。 */
+export interface PageGameLoginTicketKeyRequest {
   searchKey?: string | null;
   /**
    * @format int32
@@ -98,7 +98,7 @@ export interface GameLoginTicketKeyDetailGetData {
   code: number;
   /** 错误或提示信息 */
   message: string;
-  /** 租户 Game 登录票据签名密钥输出参数（仅公钥与元数据，私钥永不回显）。 */
+  /** Game 登录票据签名密钥输出参数（仅公钥与元数据，私钥永不回显）。 */
   data: GameLoginTicketKeyResponse;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;

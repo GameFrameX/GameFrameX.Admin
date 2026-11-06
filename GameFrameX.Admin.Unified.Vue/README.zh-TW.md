@@ -28,7 +28,7 @@
 
 GameFrameX 遊戲管理平台的前端工程，基於 Vue 3 + TypeScript + Vite + PrimeVue 構建。
 
-> 本項目 fork 自 [vue-next-admin](https://gitee.com/lyt-top/vue-next-admin)，按 GameFrameX 的多租戶 / 應用作用域模型做了改造。當前版本 ![version](https://img.shields.io/github/package-json/v/GameFrameX/Admin?filename=GameFrameX.Admin.Unified.Vue/package.json)（取自 package.json，自動同步）。
+> 本項目 fork 自 [vue-next-admin](https://gitee.com/lyt-top/vue-next-admin)，按 GameFrameX 單遊戲管理後台模型做了改造。當前版本 ![version](https://img.shields.io/github/package-json/v/GameFrameX/Admin?filename=GameFrameX.Admin.Unified.Vue/package.json)（取自 package.json，自動同步）。
 
 ## 目錄
 
@@ -144,11 +144,8 @@ src/
 │   ├── useCrudTable.ts             表格分頁 / 排序 / loading 封裝
 │   ├── useEditDialog.ts            新增 / 編輯彈窗（剝離審計欄位、isEnabled 預設）
 │   ├── useTableColumnPersistence.ts  列寬 / 列順序 / 列顯隱本地持久化
-│   ├── useCurrentApp.ts            當前應用（AppId）狀態 + 載入 / 切換
-│   ├── useConfigAppScope.ts        應用作用域變更
 │   ├── useRequiredFields.ts        必填欄位集合
 │   ├── usePrimeTablePage.ts        表格分頁 hook
-│   ├── useRouteAppIdQuerySync.ts   AppId query 與表格同步
 │   ├── formResolver.ts             表單校驗規則適配
 │   └── types/                      組合式函式的 TS 型別
 │
@@ -160,7 +157,6 @@ src/
 │   ├── time-column/                表格列：long 秒自動格式化
 │   ├── form-label / form-help-text 表單欄位標籤 / 說明文字
 │   ├── app-confirm-dialog          全域確認彈窗
-│   ├── config-app-scope-picker     應用作用域選擇器
 │   ├── narrow-screen-hint          窄屏提示
 │   ├── notice-bar                  通知條
 │   ├── cropper / drag-verify / editor / icon-selector / reward-items-editor / svg-icon / table
@@ -190,7 +186,6 @@ src/
 │   ├── index.ts                    路由實例 + 守衛
 │   ├── frontEnd.ts                 前端控制路由（兜底，目前用不到）
 │   ├── backEnd.ts                  後端動態路由核心
-│   ├── appWorkspaceRoutes.ts       應用工作台路由
 │   ├── globalConfigRoutes.ts       全域組態路由
 │   └── route.ts                    靜態 / 兜底路由（/login / 404 / 401）
 │
@@ -220,7 +215,6 @@ src/
 │   ├── watermark.ts                浮水印
 │   ├── isEnabled.ts                IsEnabled 歸一化與新增預設值
 │   ├── rowVersion.ts               行版本讀取（相容 rowVersion / RowVersion）
-│   ├── targetTenant.ts             跨租戶 header（X-Target-Tenant-Id）
 │   ├── primevue-locale.ts          PrimeVue 元件按語言切換
 │   ├── formatTime.ts               日期 / 時間格式化
 │   ├── download.ts / exportExcel.ts  匯出
@@ -228,15 +222,13 @@ src/
 │   ├── fontawesome.ts              FA 自動按需
 │   ├── icons.ts                    FA 名稱映射
 │   ├── build.ts                    CDN 組態
-│   ├── appWorkspace.ts             ※ 應用作用域工具（resolveRouteScope 等）
 │   ├── arrayOperation.ts / commonFunction.ts / base64Conver.ts / crudConfig.ts / getStyleSheets.ts / loading.ts / mitt.ts / other.ts / template-utils.ts
 │   └── http/                       攔截器拆分
 │
 ├── views/                        # 業務頁面
-│   ├── system/                     系統管理（使用者 / 角色 / 選單 / 組織 / 租戶 / 字典 / 日誌 / 組態 / 通知 / 外掛 / 列印 / 區域 / 線上使用者 ……）
+│   ├── system/                     系統管理（使用者 / 角色 / 選單 / 字典 / 日誌 / 組態 / 通知 ……）
 │   ├── game/                       遊戲管理（區服 / 商品 / 訂單 / 郵件 / 兌換碼 / 商城 / 公告 / 物品 / 道具 ……）
 │   ├── client/                     客戶端管理（平台 / 版本 / 渠道 / 裝置 / 語言 / 資源包 / 開放介面 ……）
-│   ├── appCenter/                  應用中心（appEntry / appSelector / appWorkspace / gameAppEntity 等）
 │   ├── contentCenter / chart / chartCenter / chartCenter / opsCenter / trustCenter / automationCenter / goodsCenter / redeemCenter / webShopCenter / playerCenter
 │   ├── home/                       首頁儀表板
 │   ├── login/                      登入
@@ -293,6 +285,12 @@ pnpm run dev    # 預設 http://localhost:20800
 ```
 
 打開瀏覽器 → 看到登入頁 → 找後端同學要帳號。
+
+首次部署的帳號從哪來（後端側兩個環境變數，見倉庫根 `.env.example`）：
+
+- `GFX_SUPERADMIN_INITIAL_PASSWORD`：超級管理員 `superadmin` 的初始密碼；不設則首次開啟登入頁走首裝嚮導設定。
+- `GAMEFRAMEX_ADMIN_INITIAL_ACCOUNT` + `GAMEFRAMEX_ADMIN_INITIAL_PASSWORD`：成對設定時，後端啟動會自動建立**首個業務管理員**帳號（綁定 `sys_admin` 角色、授權全部非超管選單），前端用它登入即可進業務後台；只在主庫還沒有任何業務管理員時生效一次。
+另注意「平台密碼策略」預設關閉：開啟後口令需 6–16 位並含大小寫字母、數字與特殊字元，建議初始口令按此設定並在上線前開啟策略。
 
 ### 卡住了？
 
@@ -366,9 +364,9 @@ Vite 啟動時會把這些值寫入 `public/config/config.js` 的 `window.__env_
 **請求攔截**（4 步）：
 
 1. 自動加 `Authorization: Bearer <access-token>`；如 JWT 即將過期，同時加 `X-Authorization: Bearer <x-refresh-token>`，讓後端靜默換發
-2. 自動加 `X-Target-Tenant-Id`（跨租戶切換時由 `utils/targetTenant.ts` 控制）
-3. `request.ts` 額外把 GET 請求的 `data` 序列化為 query string（`tansParams`）
-4. `axios-utils.ts` 額外加 `Accept-Language: <globalI18n>`
+2. `request.ts` 額外把 GET 請求的 `data` 序列化為 query string（`tansParams`）
+3. `axios-utils.ts` 額外加 `Accept-Language: <globalI18n>`
+4. 頁面請求從全域區服選擇器讀取 `ServerId` 並附帶業務參數
 
 **回應攔截**（4 步）：
 
@@ -380,17 +378,6 @@ Vite 啟動時會把這些值寫入 `public/config/config.js` 的 `window.__env_
    - 其它 → 顯示後端 `message`
 4. 駝峰化（首字母大寫 → 小寫）+ 錯誤提示走 PrimeVue Toast
 
-### 應用作用域（多租戶）
-
-後端選單每項帶 `app_scope`（`platform` / `tenant` / `app`）與 `menu_context`。前端用 `meta.appScope` + `meta.menuContext` 標記：
-
-| Scope | 含義 | 路由示例 |
-|---|---|---|
-| `platform` | 平台級（超管可見，跨租戶） | `/platform/*` |
-| `tenant` | 租戶級（所有應用共有，無 appId query） | `/dashboard/*`、`/system/*` |
-| `app` | 應用工作台內（必須帶 `appId` query） | `/gameCenter/*` |
-
-跳轉邏輯在 `src/utils/appWorkspace.ts` 的 `decideTenantAppEntry()` / `resolveRouteScope()`，由 `router/index.ts` 的 `resolveTenantAppRedirect()` 在守衛裡觸發。
 
 ### Pinia 持久化
 
@@ -694,7 +681,7 @@ git push
 - **page / list / query / search / filter 類介面禁止用 GET 傳 params / data**——`pnpm run check:frontend api-query-get` 會卡
 - 後端生成 API 必須用 `xxxPagePost` / `xxxListPost` / `xxxQueryPost`
 - 手寫 API 用 `request({ method: 'post', data: params })`
-- **不要**在業務程式碼裡手動加 `Authorization` / `Accept-Language` / `X-Tenant-Id`——攔截器自動處理
+- **不要**在業務程式碼裡手動加 `Authorization` / `Accept-Language`——攔截器自動處理
 - **不要**在回應裡手動 `showError`——攔截器自動處理業務碼
 
 ### 提交流程
@@ -976,7 +963,6 @@ echo "wrote ${FRONTEND_REPO}/openapi.json"
 - `src/utils/http/shared.ts` — HTTP 攔截器
 - `src/stores/userInfo.ts` — 使用者資訊 / 按鈕權限
 - `src/composables/useEditDialog.ts` — 彈窗核心
-- `src/utils/appWorkspace.ts` — 多租戶應用作用域
 - `scripts/check-frontend-standards.mjs` — 跨端規範門禁
 
 ## 文檔與資源

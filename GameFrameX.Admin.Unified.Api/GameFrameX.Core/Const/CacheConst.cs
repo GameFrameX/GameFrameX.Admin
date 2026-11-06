@@ -11,7 +11,7 @@ public sealed class CacheConst
     public const string KeyUser = "cache:user:";
 
     /// <summary>
-    /// 用户已授权菜单Id集合缓存（来自 TenantRoleMenuEntity，含目录/菜单/按钮，Id 化）
+    /// 用户已授权菜单Id集合缓存（来自 RoleMenuEntity，含目录/菜单/按钮，Id 化）
     /// </summary>
     public const string KeyUserMenu = "cache:user_menu:";
 
@@ -19,11 +19,6 @@ public sealed class CacheConst
     /// 用户权限缓存（按钮集合）
     /// </summary>
     public const string KeyUserButton = "cache:user_button:";
-
-    /// <summary>
-    /// 用户机构缓存
-    /// </summary>
-    public const string KeyUserOrganization = "cache:user_org:";
 
     /// <summary>
     /// 角色最大数据范围缓存
@@ -39,11 +34,6 @@ public sealed class CacheConst
     /// 图形验证码缓存
     /// </summary>
     public const string KeyVerCode = "cache:ver_code:";
-
-    /// <summary>
-    /// 租户缓存
-    /// </summary>
-    public const string KeyTenant = "cache:tenant";
 
     /// <summary>
     /// 常量下拉框

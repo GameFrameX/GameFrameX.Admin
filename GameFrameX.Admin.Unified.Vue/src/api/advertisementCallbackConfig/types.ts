@@ -1,8 +1,10 @@
 /* eslint-disable */
 /* tslint:disable */
 
-/** 租户广告回调配置新增输入参数 */
-export interface AddTenantAdvertisementCallbackConfigRequest {
+/** 广告回调配置新增输入参数 */
+export interface AddAdvertisementCallbackConfigRequest {
+  /** 关联的游戏应用分包 Id。 */
+  packageId?: string | null;
   /**
    * 广告平台 Provider。当前首批配置支持 `TopOn`、`GoogleAdMob`、`Pangle`、`UnityAds`。
    * @minLength 1
@@ -43,8 +45,10 @@ export interface AdvertisementCallbackConfigOption {
   label?: string | null;
 }
 
-/** 租户广告回调配置输出参数（敏感字段已脱敏） */
+/** 广告回调配置输出参数（敏感字段已脱敏） */
 export interface AdvertisementCallbackConfigResponse {
+  /** 关联的游戏应用分包 Id。 */
+  packageId?: string;
   /** Id */
   id?: string;
   /** 广告平台 Provider。当前首批配置支持 TopOn、GoogleAdMob、Pangle、UnityAds。 */
@@ -106,8 +110,8 @@ export interface AdvertisementCallbackProviderItem {
   label?: string | null;
 }
 
-/** 租户广告回调验签配置分页查询输入参数 */
-export interface PageTenantAdvertisementCallbackConfigRequest {
+/** 广告回调验签配置分页查询输入参数 */
+export interface PageAdvertisementCallbackConfigRequest {
   searchKey?: string | null;
   /**
    * @format int32
@@ -124,16 +128,18 @@ export interface PageTenantAdvertisementCallbackConfigRequest {
   orderBy?: string | null;
   isDescending?: boolean;
   isActive?: boolean | null;
+  /** 按游戏应用分包 Id 过滤。 */
+  packageId?: string | null;
   /** 广告平台 Provider。 */
   provider?: string | null;
 }
 
 /**
- * 租户广告回调配置更新输入参数。
+ * 广告回调配置更新输入参数。
  *
  * 敏感字段提交 `******` 时表示保留原值。
  */
-export interface UpdateTenantAdvertisementCallbackConfigRequest {
+export interface UpdateAdvertisementCallbackConfigRequest {
   /**
    * @min 1
    * @max 9223372036854776000
@@ -144,6 +150,8 @@ export interface UpdateTenantAdvertisementCallbackConfigRequest {
    * @max 9223372036854776000
    */
   rowVersion: string;
+  /** 关联的游戏应用分包 Id。 */
+  packageId?: string | null;
   /**
    * 广告平台 Provider。当前首批配置支持 `TopOn`、`GoogleAdMob`、`Pangle`、`UnityAds`。
    * @minLength 1
@@ -176,7 +184,7 @@ export interface AdvertisementCallbackConfigAddPostData {
   code: number;
   /** 错误或提示信息 */
   message: string;
-  /** 租户广告回调配置输出参数（敏感字段已脱敏） */
+  /** 广告回调配置输出参数（敏感字段已脱敏） */
   data: AdvertisementCallbackConfigResponse;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
@@ -202,7 +210,7 @@ export interface AdvertisementCallbackConfigDetailGetData {
   code: number;
   /** 错误或提示信息 */
   message: string;
-  /** 租户广告回调配置输出参数（敏感字段已脱敏） */
+  /** 广告回调配置输出参数（敏感字段已脱敏） */
   data: AdvertisementCallbackConfigResponse;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;

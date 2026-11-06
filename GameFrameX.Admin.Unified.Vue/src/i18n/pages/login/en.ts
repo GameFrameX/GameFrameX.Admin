@@ -7,7 +7,7 @@ export default {
         forgotHint: 'Lost your credentials? Contact your system administrator',
         account: {
             accountLabel: 'Account',
-            accountPlaceholder: "admin{'@'}tenantId",
+            accountPlaceholder: "Enter operator account",
             passwordLabel: 'Password',
             passwordPlaceholder: '123456',
             codeLabel: 'Verification code',

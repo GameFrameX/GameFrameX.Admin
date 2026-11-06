@@ -3,8 +3,8 @@ using GameFrameX.Client.Api.GameFeatureSwitch;
 using GameFrameX.Client.Api.GameFeatureSwitch.Dto;
 using GameFrameX.Client.Api.Services.PackageVersion;
 using GameFrameX.Core.Const;
-using GameFrameX.Entity.Tenant.Game.App;
-using GameFrameX.Entity.Tenant.Game.FeatureSwitch;
+using GameFrameX.Entity.Business.Game.App;
+using GameFrameX.Entity.Business.Game.FeatureSwitch;
 
 namespace GameFrameX.Core.Tests.ClientApi;
 
@@ -32,7 +32,7 @@ public sealed class ClientApiFeatureSwitchEndpointTests
         };
     }
 
-    private static TenantGameAppFeatureSwitchEntity Row(
+    private static GameAppFeatureSwitchEntity Row(
         long id,
         string switchKey,
         string valueJson = "{}",
@@ -42,7 +42,7 @@ public sealed class ClientApiFeatureSwitchEndpointTests
         int rolloutPercent = 100,
         string? deviceWhitelistJson = null)
     {
-        return new TenantGameAppFeatureSwitchEntity
+        return new GameAppFeatureSwitchEntity
         {
             Id = id,
             SwitchKey = switchKey,
@@ -63,8 +63,8 @@ public sealed class ClientApiFeatureSwitchEndpointTests
 
     private static GameFeatureSwitchController CreateController(ClientApiTestDb db)
     {
-        var resolver = new FeatureSwitchDeliveryResolver(db.Repository<TenantGameAppFeatureSwitchEntity>());
-        var packageResolver = new GameAppPackageResolver(db.TenantDbProvider);
+        var resolver = new FeatureSwitchDeliveryResolver(db.Repository<GameAppFeatureSwitchEntity>());
+        var packageResolver = new GameAppPackageResolver(db.MainDb);
         return new GameFeatureSwitchController(resolver, packageResolver);
     }
 
@@ -75,7 +75,7 @@ public sealed class ClientApiFeatureSwitchEndpointTests
     public async Task GetInfo_FirstPull_ReturnsFullSwitchesWithVersion()
     {
         using var db = new ClientApiTestDb();
-        db.InitTenantTables(typeof(TenantGameAppFeatureSwitchEntity), typeof(TenantGameAppPackageEntity));
+        db.InitBusinessTables(typeof(GameAppFeatureSwitchEntity), typeof(GameAppPackageEntity));
         db.SeedFeatureSwitch(Row(1, "activity.summer", "{\"enabled\":true}", audience: FeatureSwitchAudienceValues.Client));
         db.SeedFeatureSwitch(Row(2, "login.banner", "{\"v\":1}", audience: FeatureSwitchAudienceValues.Both));
         var controller = CreateController(db);
@@ -106,7 +106,7 @@ public sealed class ClientApiFeatureSwitchEndpointTests
     public async Task GetInfo_SameVersion_ReturnsUnchangedWithEmptySwitches()
     {
         using var db = new ClientApiTestDb();
-        db.InitTenantTables(typeof(TenantGameAppFeatureSwitchEntity), typeof(TenantGameAppPackageEntity));
+        db.InitBusinessTables(typeof(GameAppFeatureSwitchEntity), typeof(GameAppPackageEntity));
         db.SeedFeatureSwitch(Row(1, "login.banner", "{\"v\":1}"));
         var controller = CreateController(db);
         db.AttachContext(controller);
@@ -128,7 +128,7 @@ public sealed class ClientApiFeatureSwitchEndpointTests
     public async Task GetInfo_AfterConfigChange_VersionChangesAndReturnsFullList()
     {
         using var db = new ClientApiTestDb();
-        db.InitTenantTables(typeof(TenantGameAppFeatureSwitchEntity), typeof(TenantGameAppPackageEntity));
+        db.InitBusinessTables(typeof(GameAppFeatureSwitchEntity), typeof(GameAppPackageEntity));
         var row = db.SeedFeatureSwitch(Row(1, "login.banner", "{\"v\":1}"));
         var controller = CreateController(db);
         db.AttachContext(controller);
@@ -137,7 +137,7 @@ public sealed class ClientApiFeatureSwitchEndpointTests
         var oldVersion = first.GetProperty("Version").GetString();
 
         row.ValueJson = "{\"v\":2}";
-        db.TenantDb.Updateable(row).ExecuteCommand();
+        db.MainDb.Updateable(row).ExecuteCommand();
 
         var second = ClientApiResultReader.Data(ClientApiResultReader.Read(await controller.GetInfo(Request(version: oldVersion))));
 
@@ -155,7 +155,7 @@ public sealed class ClientApiFeatureSwitchEndpointTests
     public async Task GetInfo_OutOfTimeWindow_NotDelivered()
     {
         using var db = new ClientApiTestDb();
-        db.InitTenantTables(typeof(TenantGameAppFeatureSwitchEntity), typeof(TenantGameAppPackageEntity));
+        db.InitBusinessTables(typeof(GameAppFeatureSwitchEntity), typeof(GameAppPackageEntity));
         var now = DateTimeOffset.UtcNow;
         db.SeedFeatureSwitch(Row(1, "activity.ended", endTime: now.AddSeconds(-10).ToUnixTimeSeconds()));
         db.SeedFeatureSwitch(Row(2, "activity.future", startTime: now.AddSeconds(3600).ToUnixTimeSeconds()));
@@ -180,7 +180,7 @@ public sealed class ClientApiFeatureSwitchEndpointTests
     public async Task GetInfo_AudienceServerRow_NotDeliveredOnClientChannel()
     {
         using var db = new ClientApiTestDb();
-        db.InitTenantTables(typeof(TenantGameAppFeatureSwitchEntity), typeof(TenantGameAppPackageEntity));
+        db.InitBusinessTables(typeof(GameAppFeatureSwitchEntity), typeof(GameAppPackageEntity));
         db.SeedFeatureSwitch(Row(1, "economy.drop_rate", "{\"rate\":2}", audience: FeatureSwitchAudienceValues.Server));
         db.SeedFeatureSwitch(Row(2, "login.banner", "{\"v\":1}", audience: FeatureSwitchAudienceValues.Both));
         var controller = CreateController(db);
@@ -200,7 +200,7 @@ public sealed class ClientApiFeatureSwitchEndpointTests
     public async Task GetInfo_RolloutZero_HiddenUnlessWhitelisted()
     {
         using var db = new ClientApiTestDb();
-        db.InitTenantTables(typeof(TenantGameAppFeatureSwitchEntity), typeof(TenantGameAppPackageEntity));
+        db.InitBusinessTables(typeof(GameAppFeatureSwitchEntity), typeof(GameAppPackageEntity));
         db.SeedFeatureSwitch(Row(1, "activity.gray", "{\"v\":1}", rolloutPercent: 0));
         db.SeedFeatureSwitch(Row(2, "activity.whitelist", "{\"v\":2}", rolloutPercent: 0, deviceWhitelistJson: "[\"Device-Alpha\"]"));
         var controller = CreateController(db);
@@ -220,7 +220,7 @@ public sealed class ClientApiFeatureSwitchEndpointTests
     public async Task GetInfo_MissingDeviceId_OnlyFullRolloutRowsDelivered()
     {
         using var db = new ClientApiTestDb();
-        db.InitTenantTables(typeof(TenantGameAppFeatureSwitchEntity), typeof(TenantGameAppPackageEntity));
+        db.InitBusinessTables(typeof(GameAppFeatureSwitchEntity), typeof(GameAppPackageEntity));
         db.SeedFeatureSwitch(Row(1, "activity.full", "{\"v\":1}", rolloutPercent: 100));
         db.SeedFeatureSwitch(Row(2, "activity.partial", "{\"v\":2}", rolloutPercent: 50));
         var controller = CreateController(db);
@@ -237,12 +237,12 @@ public sealed class ClientApiFeatureSwitchEndpointTests
     /// 无租户上下文仍从主库读取有效开关。
     /// </summary>
     [Fact]
-    public async Task GetInfo_WithoutTenantContext_ReadsMainDatabase()
+    public async Task GetInfo_WithoutRequestContext_ReadsMainDatabase()
     {
         using var db = new ClientApiTestDb();
-        db.InitTenantTables(typeof(TenantGameAppFeatureSwitchEntity), typeof(TenantGameAppPackageEntity));
+        db.InitBusinessTables(typeof(GameAppFeatureSwitchEntity), typeof(GameAppPackageEntity));
         var controller = CreateController(db);
-        db.AttachContext(controller, includeTenant: false);
+        db.AttachContext(controller);
 
         db.SeedFeatureSwitch(Row(1, "activity.main"));
         var result = ClientApiResultReader.Read(await controller.GetInfo(Request()));
@@ -257,9 +257,9 @@ public sealed class ClientApiFeatureSwitchEndpointTests
     public async Task GetInfo_WithoutApplicationContext_ReadsMainDatabase()
     {
         using var db = new ClientApiTestDb();
-        db.InitTenantTables(typeof(TenantGameAppFeatureSwitchEntity), typeof(TenantGameAppPackageEntity));
+        db.InitBusinessTables(typeof(GameAppFeatureSwitchEntity), typeof(GameAppPackageEntity));
         var controller = CreateController(db);
-        db.AttachContext(controller, includeApp: false);
+        db.AttachContext(controller);
 
         db.SeedFeatureSwitch(Row(1, "activity.main"));
         var result = ClientApiResultReader.Read(await controller.GetInfo(Request()));

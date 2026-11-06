@@ -7,11 +7,11 @@ namespace GameFrameX.Application.Platform.TimeJob.GameTimeJob;
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
 public class GameTimeJobService
-    : GenericCrudSelectService<Entity.Tenant.Game.TenantGameTimeJobEntity,
-        AddTenantGameTimeJobEntityRequest, UpdateTenantGameTimeJobEntityRequest,
-        GameTimeJobResponse, PageTenantGameTimeJobEntityRequest>
+    : GenericCrudSelectService<Entity.Business.Game.GameTimeJobEntity,
+        AddGameTimeJobEntityRequest, UpdateGameTimeJobEntityRequest,
+        GameTimeJobResponse, PageGameTimeJobEntityRequest>
 {
-    public GameTimeJobService(SqlSugarRepository<Entity.Tenant.Game.TenantGameTimeJobEntity> repository)
+    public GameTimeJobService(SqlSugarRepository<Entity.Business.Game.GameTimeJobEntity> repository)
         : base(repository)
     {
     }
@@ -19,7 +19,7 @@ public class GameTimeJobService
     /// <summary>
     /// 手动新增时由服务端固定任务来源。
     /// </summary>
-    protected override Task OnAddingAsync(AddTenantGameTimeJobEntityRequest input)
+    protected override Task OnAddingAsync(AddGameTimeJobEntityRequest input)
     {
         // 任务来源是系统标记非用户输入字段，手动新增固定 Manual，否则实体 NOT NULL 列 insert 500
         input.Source = "Manual";
@@ -29,7 +29,7 @@ public class GameTimeJobService
     /// <summary>
     /// 更新前验证记录存在。
     /// </summary>
-    protected override async Task OnUpdatingAsync(UpdateTenantGameTimeJobEntityRequest input)
+    protected override async Task OnUpdatingAsync(UpdateGameTimeJobEntityRequest input)
     {
         var existing = await Repository.GetFirstAsync(u => u.Id == input.Id);
         if (existing == null)
@@ -38,7 +38,7 @@ public class GameTimeJobService
         }
     }
 
-    protected override ISugarQueryable<GameTimeJobResponse> BuildPageQuery(PageTenantGameTimeJobEntityRequest input)
+    protected override ISugarQueryable<GameTimeJobResponse> BuildPageQuery(PageGameTimeJobEntityRequest input)
     {
         return Repository.AsQueryable()
                          .WhereIF(!string.IsNullOrWhiteSpace(input.Name), u => u.Name.Contains(input.Name.Trim()))

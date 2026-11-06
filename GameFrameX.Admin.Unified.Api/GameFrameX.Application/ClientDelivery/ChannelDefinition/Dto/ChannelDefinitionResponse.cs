@@ -28,7 +28,7 @@ public class ChannelDefinitionResponse : IBaseResponse
     /// <summary>
     /// 渠道作用域
     /// </summary>
-    public ChannelScopeEnum Scope { get; set; } = ChannelScopeEnum.Tenant;
+    public ChannelScopeEnum Scope { get; set; } = ChannelScopeEnum.Business;
 
     /// <summary>
     /// 适用平台编码

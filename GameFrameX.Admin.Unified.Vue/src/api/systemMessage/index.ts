@@ -51,7 +51,7 @@ export class SystemMessage<SecurityDataType = unknown> {
    *
    * @tags systemMessage
    * @name SystemMessageSendEmailPost
-   * @summary 发送平台系统邮件。 从主库 `SystemEmailProviderEntity` 读取配置（按 `SystemEmailPurpose.PlatformOps` 默认）；缺配置返回 `false`，禁止静默成功或 fallback 到租户玩家邮件。 缺省收件人：使用当前命中的 `SystemEmailProviderEntity` 配置的 `DefaultToEmail`；若配置也未提供则发送失败。
+   * @summary 发送平台系统邮件。 从主库 `SystemEmailProviderEntity` 读取配置（按 `SystemEmailPurpose.PlatformOps` 默认）；缺配置返回 `false`，禁止静默成功或 fallback 到玩家邮件。 缺省收件人：使用当前命中的 `SystemEmailProviderEntity` 配置的 `DefaultToEmail`；若配置也未提供则发送失败。
    * @request POST:/api/systemMessage/sendEmail
    */
   systemMessageSendEmailPost = (

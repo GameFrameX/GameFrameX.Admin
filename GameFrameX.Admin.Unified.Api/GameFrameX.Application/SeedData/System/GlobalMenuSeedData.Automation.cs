@@ -25,7 +25,6 @@ public partial class GlobalMenuSeedData
                 Type = MenuTypeEnum.Menu,
                 Name = "gameTimeJobEntity",
                 Path = "/system/gameTimeJobEntity",
-                AppScope = MenuAppScopeEnum.Console,
                 Component = "/system/gameTimeJobEntity/index",
                 Redirect = null,
                 Permission = null,
@@ -43,7 +42,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1774228858,
                 UpdateTime = 1774228858,
                 SuperAdminOnly = false,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -71,7 +70,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1774228858,
                 UpdateTime = 1774228858,
                 SuperAdminOnly = false,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -99,7 +98,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1774228858,
                 UpdateTime = 1774228858,
                 SuperAdminOnly = false,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -127,7 +126,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1774228858,
                 UpdateTime = 1774228858,
                 SuperAdminOnly = false,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -155,7 +154,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1774228858,
                 UpdateTime = 1774228858,
                 SuperAdminOnly = false,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -183,7 +182,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1774228858,
                 UpdateTime = 1774228858,
                 SuperAdminOnly = false,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
         };

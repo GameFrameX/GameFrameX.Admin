@@ -7,7 +7,7 @@ namespace GameFrameX.Application.CommerceCenter.GameWebShop;
 /// 游戏角色服务
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
-public class GameWebShopService : GenericCrudSelectService<Entity.Tenant.Game.TenantGameWebShopEntity, AddTenantGameWebShopEntityRequest, UpdateTenantGameWebShopEntityRequest, GameWebShopResponse, PageTenantGameWebShopEntityRequest>
+public class GameWebShopService : GenericCrudSelectService<Entity.Business.Game.GameWebShopEntity, AddGameWebShopEntityRequest, UpdateGameWebShopEntityRequest, GameWebShopResponse, PageGameWebShopEntityRequest>
 {
     private readonly HttpClient _httpClient;
 
@@ -17,7 +17,7 @@ public class GameWebShopService : GenericCrudSelectService<Entity.Tenant.Game.Te
     /// <param name="repository"></param>
     /// <param name="httpClient"></param>
     /// <returns></returns>
-    public GameWebShopService(SqlSugarRepository<Entity.Tenant.Game.TenantGameWebShopEntity> repository, HttpClient httpClient) : base(repository)
+    public GameWebShopService(SqlSugarRepository<Entity.Business.Game.GameWebShopEntity> repository, HttpClient httpClient) : base(repository)
     {
         _httpClient = httpClient;
     }
@@ -25,7 +25,7 @@ public class GameWebShopService : GenericCrudSelectService<Entity.Tenant.Game.Te
     /// <summary>
     /// 构建分页查询条件
     /// </summary>
-    protected override ISugarQueryable<GameWebShopResponse> BuildPageQuery(PageTenantGameWebShopEntityRequest input)
+    protected override ISugarQueryable<GameWebShopResponse> BuildPageQuery(PageGameWebShopEntityRequest input)
     {
         return Repository.AsQueryable()
                          .WhereIF(!string.IsNullOrWhiteSpace(input.SearchKey), u =>
@@ -38,7 +38,7 @@ public class GameWebShopService : GenericCrudSelectService<Entity.Tenant.Game.Te
     /// <summary>
     /// 更新前验证记录存在。
     /// </summary>
-    protected override async Task OnUpdatingAsync(UpdateTenantGameWebShopEntityRequest input)
+    protected override async Task OnUpdatingAsync(UpdateGameWebShopEntityRequest input)
     {
         var existing = await Repository.GetFirstAsync(u => u.Id == input.Id);
         if (existing == null)

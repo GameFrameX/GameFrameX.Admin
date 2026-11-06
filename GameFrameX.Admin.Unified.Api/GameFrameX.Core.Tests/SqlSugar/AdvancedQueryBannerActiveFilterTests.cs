@@ -1,5 +1,5 @@
 using GameFrameX.Core.SqlSugar;
-using GameFrameX.Entity.Tenant.Game.Announcement;
+using GameFrameX.Entity.Business.Game.Announcement;
 using SqlSugar;
 
 namespace GameFrameX.Core.Tests.SqlSugar;
@@ -18,7 +18,7 @@ public sealed class AdvancedQueryBannerActiveFilterTests : IDisposable
         SqlSugarUnifiedConfig.ConfigureBaseSettings(config);
         _db = new SqlSugarScope(config);
         SqlSugarUnifiedConfig.ConfigureBaseFilters(_db);
-        _db.CodeFirst.InitTables(typeof(TenantGameBannerAnnouncementEntity));
+        _db.CodeFirst.InitTables(typeof(GameBannerAnnouncementEntity));
     }
 
     [Fact]
@@ -30,18 +30,18 @@ public sealed class AdvancedQueryBannerActiveFilterTests : IDisposable
         Assert.All(active, b => Assert.True(b.IsActive));
     }
 
-    private ISugarQueryable<TenantGameBannerAnnouncementEntity> BuildQuery(bool? isActive)
+    private ISugarQueryable<GameBannerAnnouncementEntity> BuildQuery(bool? isActive)
     {
-        return _db.Queryable<TenantGameBannerAnnouncementEntity>()
+        return _db.Queryable<GameBannerAnnouncementEntity>()
                   .WhereIF(isActive.HasValue, u => u.IsActive == isActive!.Value);
     }
 
     private async Task SeedAsync()
     {
         var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-        await _db.Insertable(new TenantGameBannerAnnouncementEntity { Id = 1, Content = "b1", ContentLocalizationKey = "", IsActive = true, IsDeleted = false, CreatedTime = now, }).ExecuteCommandAsync();
-        await _db.Insertable(new TenantGameBannerAnnouncementEntity { Id = 2, Content = "b2", ContentLocalizationKey = "", IsActive = false, IsDeleted = false, CreatedTime = now, }).ExecuteCommandAsync();
-        await _db.Insertable(new TenantGameBannerAnnouncementEntity { Id = 3, Content = "b3", ContentLocalizationKey = "", IsActive = true, IsDeleted = false, CreatedTime = now, }).ExecuteCommandAsync();
+        await _db.Insertable(new GameBannerAnnouncementEntity { Id = 1, Content = "b1", ContentLocalizationKey = "", IsActive = true, IsDeleted = false, CreatedTime = now, }).ExecuteCommandAsync();
+        await _db.Insertable(new GameBannerAnnouncementEntity { Id = 2, Content = "b2", ContentLocalizationKey = "", IsActive = false, IsDeleted = false, CreatedTime = now, }).ExecuteCommandAsync();
+        await _db.Insertable(new GameBannerAnnouncementEntity { Id = 3, Content = "b3", ContentLocalizationKey = "", IsActive = true, IsDeleted = false, CreatedTime = now, }).ExecuteCommandAsync();
     }
 
     public void Dispose()

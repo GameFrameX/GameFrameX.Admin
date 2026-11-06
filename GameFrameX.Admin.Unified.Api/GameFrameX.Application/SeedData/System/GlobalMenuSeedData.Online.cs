@@ -17,7 +17,7 @@ namespace GameFrameX.Application.SeedData.System;
 /// <summary>
 /// Online LiveOps 域菜单种子（partial；由 <see cref="GlobalMenuSeedData.BuildData"/> 聚合；来源 change C343 / vault:C8 S7.7 + C340 资产三页 / vault:C4 S3.7（2026-09-13 rebase 并集））。
 /// <para>C366（2026-09-16）：容器 route:onlineCenter 归入在线运维顶层根（Pid=0、Path=/gmCenter），全部叶子前缀收敛为 /gmCenter/*；
-/// Key/Id 不变，存量租户 role-menu 绑定无感。</para>
+/// Key/Id 不变，存量 role-menu 绑定无感。</para>
 /// <para>容器行 route:onlineCenter 与 C340（Online 平台管理）§3 规格逐字段一致——并行 change 同定义时 seed upsert 按 StableSeedId 幂等合并；
 /// 三个既有运营域页面的 dispatchOnline 按钮行也集中在本文件（C343 增量），避免散插多域 partial 加剧并行冲突。</para>
 /// </summary>
@@ -35,7 +35,6 @@ public partial class GlobalMenuSeedData
                 Type = MenuTypeEnum.Menu,
                 Name = "onlinePlayerSegment",
                 Path = "/gmCenter/onlinePlayerSegment",
-                AppScope = MenuAppScopeEnum.Console,
                 Component = "/gmCenter/onlinePlayerSegment/index",
                 Redirect = null,
                 Permission = null,
@@ -53,7 +52,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1789257600,
                 UpdateTime = 1789257600,
                 SuperAdminOnly = false,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -81,7 +80,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1789257600,
                 UpdateTime = 1789257600,
                 SuperAdminOnly = false,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -109,7 +108,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1789257600,
                 UpdateTime = 1789257600,
                 SuperAdminOnly = false,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -137,7 +136,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1789257600,
                 UpdateTime = 1789257600,
                 SuperAdminOnly = false,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -165,7 +164,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1789257600,
                 UpdateTime = 1789257600,
                 SuperAdminOnly = false,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -193,7 +192,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1789257600,
                 UpdateTime = 1789257600,
                 SuperAdminOnly = false,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -204,7 +203,6 @@ public partial class GlobalMenuSeedData
                 Type = MenuTypeEnum.Menu,
                 Name = "onlineConfigRollout",
                 Path = "/gmCenter/onlineConfigRollout",
-                AppScope = MenuAppScopeEnum.Console,
                 Component = "/gmCenter/onlineConfigRollout/index",
                 Redirect = null,
                 Permission = null,
@@ -222,7 +220,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1789257600,
                 UpdateTime = 1789257600,
                 SuperAdminOnly = false,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -250,7 +248,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1789257600,
                 UpdateTime = 1789257600,
                 SuperAdminOnly = false,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -278,7 +276,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1789257600,
                 UpdateTime = 1789257600,
                 SuperAdminOnly = false,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -306,7 +304,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1789257600,
                 UpdateTime = 1789257600,
                 SuperAdminOnly = false,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             // ---- 三个既有运营域页面的 dispatchOnline 按钮（C343 增量，集中本文件）----
@@ -335,7 +333,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1789257600,
                 UpdateTime = 1789257600,
                 SuperAdminOnly = false,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -363,7 +361,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1789257600,
                 UpdateTime = 1789257600,
                 SuperAdminOnly = false,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -391,7 +389,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1789257600,
                 UpdateTime = 1789257600,
                 SuperAdminOnly = false,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -402,7 +400,6 @@ public partial class GlobalMenuSeedData
                 Type = MenuTypeEnum.Menu,
                 Name = "walletLedger",
                 Path = "/gmCenter/walletLedger",
-                AppScope = MenuAppScopeEnum.Console,
                 Component = "/gmCenter/walletLedger/index",
                 Redirect = null,
                 Permission = null,
@@ -420,7 +417,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1783612800,
                 UpdateTime = 1783612800,
                 SuperAdminOnly = false,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -431,7 +428,6 @@ public partial class GlobalMenuSeedData
                 Type = MenuTypeEnum.Menu,
                 Name = "transactionDetail",
                 Path = "/gmCenter/transactionDetail",
-                AppScope = MenuAppScopeEnum.Console,
                 Component = "/gmCenter/transactionDetail/index",
                 Redirect = null,
                 Permission = null,
@@ -449,7 +445,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1783612800,
                 UpdateTime = 1783612800,
                 SuperAdminOnly = false,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -460,7 +456,6 @@ public partial class GlobalMenuSeedData
                 Type = MenuTypeEnum.Menu,
                 Name = "assetAudit",
                 Path = "/gmCenter/assetAudit",
-                AppScope = MenuAppScopeEnum.Console,
                 Component = "/gmCenter/assetAudit/index",
                 Redirect = null,
                 Permission = null,
@@ -478,7 +473,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1783612800,
                 UpdateTime = 1783612800,
                 SuperAdminOnly = false,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -506,12 +501,12 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1783612800,
                 UpdateTime = 1783612800,
                 SuperAdminOnly = false,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
             {
-                // 高危：人工发放入口（vault:C4 六类来源之 Admin 人工；仅租户管理员可见可执行）。
+                // 高危：人工发放入口（vault:C4 六类来源之 Admin 人工；仅管理员角色可见可执行）。
                 Id = StableSeedId.Menu("onlineWalletLedger:grant"),
                 Key = "onlineWalletLedger:grant",
                 Pid = StableSeedId.Menu("route:onlineWalletLedger"),
@@ -535,12 +530,12 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1783612800,
                 UpdateTime = 1783612800,
                 SuperAdminOnly = false,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
             {
-                // 高危：人工撤销入口（按交易 Id 撤销已生效变更；仅租户管理员可见可执行）。
+                // 高危：人工撤销入口（按交易 Id 撤销已生效变更；仅管理员角色可见可执行）。
                 Id = StableSeedId.Menu("onlineWalletLedger:revoke"),
                 Key = "onlineWalletLedger:revoke",
                 Pid = StableSeedId.Menu("route:onlineWalletLedger"),
@@ -564,7 +559,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1783612800,
                 UpdateTime = 1783612800,
                 SuperAdminOnly = false,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -592,7 +587,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1783612800,
                 UpdateTime = 1783612800,
                 SuperAdminOnly = false,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -620,7 +615,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1783612800,
                 UpdateTime = 1783612800,
                 SuperAdminOnly = false,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             // ---- C344 控制台三页面（在线总览 / 玩家时间线 / 统一审计检索）----
@@ -632,7 +627,6 @@ public partial class GlobalMenuSeedData
                 Type = MenuTypeEnum.Menu,
                 Name = "onlineDashboard",
                 Path = "/gmCenter/onlineDashboard",
-                AppScope = MenuAppScopeEnum.Console,
                 Component = "/gmCenter/onlineDashboard/index",
                 Redirect = null,
                 Permission = null,
@@ -651,7 +645,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1789257600,
                 UpdateTime = 1789257600,
                 SuperAdminOnly = false,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -662,7 +656,6 @@ public partial class GlobalMenuSeedData
                 Type = MenuTypeEnum.Menu,
                 Name = "onlinePlayerTimeline",
                 Path = "/gmCenter/onlinePlayerTimeline",
-                AppScope = MenuAppScopeEnum.Console,
                 Component = "/gmCenter/onlinePlayerTimeline/index",
                 Redirect = null,
                 Permission = null,
@@ -680,7 +673,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1789257600,
                 UpdateTime = 1789257600,
                 SuperAdminOnly = false,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -691,7 +684,6 @@ public partial class GlobalMenuSeedData
                 Type = MenuTypeEnum.Menu,
                 Name = "onlineAuditSearch",
                 Path = "/gmCenter/onlineAuditSearch",
-                AppScope = MenuAppScopeEnum.Console,
                 Component = "/gmCenter/onlineAuditSearch/index",
                 Redirect = null,
                 Permission = null,
@@ -709,7 +701,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1789257600,
                 UpdateTime = 1789257600,
                 SuperAdminOnly = false,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -722,7 +714,6 @@ public partial class GlobalMenuSeedData
                 Type = MenuTypeEnum.Menu,
                 Name = "controlledOperation",
                 Path = "/gmCenter/controlledOperation",
-                AppScope = MenuAppScopeEnum.Console,
                 Component = "/gmCenter/controlledOperation/index",
                 Redirect = null,
                 Permission = null,
@@ -739,9 +730,9 @@ public partial class GlobalMenuSeedData
                 Remark = null,
                 CreatedTime = 1789603200,
                 UpdateTime = 1789603200,
-                // 高危命令台：与 onlinePlayerTimeline:execute（OnlineControlledCommandService.ExecuteAsync）同口径，仅租户管理员。
+                // 高危命令台：与 onlinePlayerTimeline:execute（OnlineControlledCommandService.ExecuteAsync）同口径，仅管理员角色。
                 SuperAdminOnly = false,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -769,7 +760,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1789257600,
                 UpdateTime = 1789257600,
                 SuperAdminOnly = false,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -797,7 +788,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1789257600,
                 UpdateTime = 1789257600,
                 SuperAdminOnly = false,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -825,9 +816,9 @@ public partial class GlobalMenuSeedData
                 Remark = null,
                 CreatedTime = 1789257600,
                 UpdateTime = 1789257600,
-                // 高危：仅租户管理员可见可执行（与资产人工发放/撤销按钮口径一致）；既有处罚/资产操作经各自页面端点直调，不经本按钮。
+                // 高危：仅管理员角色可见可执行（与资产人工发放/撤销按钮口径一致）；既有处罚/资产操作经各自页面端点直调，不经本按钮。
                 SuperAdminOnly = false,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -855,7 +846,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1789257600,
                 UpdateTime = 1789257600,
                 SuperAdminOnly = false,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
         };

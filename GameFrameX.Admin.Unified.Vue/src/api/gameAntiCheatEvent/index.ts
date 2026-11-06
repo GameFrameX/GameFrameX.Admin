@@ -10,14 +10,14 @@
  */
 
 import {
-  AddTenantGameAntiCheatEventRequest,
+  AddGameAntiCheatEventRequest,
   GameAntiCheatEventDeletePostData,
   GameAntiCheatEventDetailGetData,
   GameAntiCheatEventPagePostData,
   GameAntiCheatEventReviewPostData,
   GameAntiCheatEventSubmitPostData,
-  PageTenantGameAntiCheatEventRequest,
-  UpdateTenantGameAntiCheatEventReviewRequest,
+  PageGameAntiCheatEventRequest,
+  UpdateGameAntiCheatEventReviewRequest,
 } from "./types";
 import {
   BaseDeleteRequest,
@@ -86,7 +86,7 @@ export class GameAntiCheatEvent<SecurityDataType = unknown> {
    * @request POST:/api/gameAntiCheatEvent/page
    */
   gameAntiCheatEventPagePost = (
-    data: PageTenantGameAntiCheatEventRequest,
+    data: PageGameAntiCheatEventRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameAntiCheatEventPagePostData, any>({
@@ -106,7 +106,7 @@ export class GameAntiCheatEvent<SecurityDataType = unknown> {
    * @request POST:/api/gameAntiCheatEvent/review
    */
   gameAntiCheatEventReviewPost = (
-    data: UpdateTenantGameAntiCheatEventReviewRequest,
+    data: UpdateGameAntiCheatEventReviewRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameAntiCheatEventReviewPostData, any>({
@@ -125,7 +125,7 @@ export class GameAntiCheatEvent<SecurityDataType = unknown> {
    * @request POST:/api/gameAntiCheatEvent/submit
    */
   gameAntiCheatEventSubmitPost = (
-    data: AddTenantGameAntiCheatEventRequest,
+    data: AddGameAntiCheatEventRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameAntiCheatEventSubmitPostData, any>({

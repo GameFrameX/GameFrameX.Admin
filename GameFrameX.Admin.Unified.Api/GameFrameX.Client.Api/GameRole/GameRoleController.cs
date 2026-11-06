@@ -16,13 +16,19 @@ namespace GameFrameX.Client.Api.GameRole;
 /// <summary>
 /// 程序版本控制器
 /// </summary>
-public class GameRoleController : BaseController<TenantGameRoleEntity>
+public class GameRoleController : BaseController<GameRoleEntity>
 {
+    private static readonly string[] IdentityOverrideFieldNames =
+    {
+        "userId", // 覆盖令牌解析出的账号身份
+        "accountId", // 覆盖同一账号身份的别名
+    };
+
     private readonly HttpClient _httpClientFactory;
     private readonly ClientApiTokenIssuer _clientApiTokenIssuer;
     private readonly GameLoginTicketIssuer _gameLoginTicketIssuer;
-    private readonly Repository<TenantGameAreaEntity> _areaService;
-    private readonly IGamePenaltyEnforcementService _tenantGamePenaltyEnforcementService;
+    private readonly Repository<GameAreaEntity> _areaService;
+    private readonly IGamePenaltyEnforcementService _gamePenaltyEnforcementService;
 
     /// <summary>
     /// </summary>
@@ -31,19 +37,19 @@ public class GameRoleController : BaseController<TenantGameRoleEntity>
     /// <param name="clientApiTokenIssuer"></param>
     /// <param name="gameLoginTicketIssuer"></param>
     /// <param name="areaService"></param>
-    /// <param name="tenantGamePenaltyEnforcementService"></param>
+    /// <param name="gamePenaltyEnforcementService"></param>
     public GameRoleController(HttpClient httpClientFactory,
-        SqlSugarRepository<TenantGameRoleEntity> service,
-        Repository<TenantGameAreaEntity> areaService,
+        SqlSugarRepository<GameRoleEntity> service,
+        Repository<GameAreaEntity> areaService,
         ClientApiTokenIssuer clientApiTokenIssuer,
         GameLoginTicketIssuer gameLoginTicketIssuer,
-        IGamePenaltyEnforcementService tenantGamePenaltyEnforcementService) : base(service)
+        IGamePenaltyEnforcementService gamePenaltyEnforcementService) : base(service)
     {
         _httpClientFactory = httpClientFactory;
         _clientApiTokenIssuer = clientApiTokenIssuer;
         _gameLoginTicketIssuer = gameLoginTicketIssuer;
         _areaService = areaService;
-        _tenantGamePenaltyEnforcementService = tenantGamePenaltyEnforcementService;
+        _gamePenaltyEnforcementService = gamePenaltyEnforcementService;
     }
 
     /// <summary>
@@ -101,15 +107,15 @@ public class GameRoleController : BaseController<TenantGameRoleEntity>
     /// <returns></returns>
     [HttpPost]
     [ProducesResponseType(200, Type = typeof(GameRoleResponse))]
-    public async Task<HttpJsonResultData<GameRoleResponse>> Add([FromBody] AddTenantGameRoleEntityRequest input)
+    public async Task<HttpJsonResultData<GameRoleResponse>> Add([FromBody] AddGameRoleEntityRequest input)
     {
-        var user = await PRepository.AsSugarClient().Queryable<TenantGameUserEntity>().Where(u => u.Id == input.UserId).FirstAsync();
+        var user = await PRepository.AsSugarClient().Queryable<GameUserEntity>().Where(u => u.Id == input.UserId).FirstAsync();
         if (user == null)
         {
             return GameApiResult.Error<GameRoleResponse>(AccountErrorCode.AccountExists, "账号不存在");
         }
 
-        var gameAreaEntity = await PRepository.AsSugarClient().Queryable<TenantGameAreaEntity>().Filter(null, true).Where(u => u.IsDeleted == false).Where(u => u.Id == input.AreaId).FirstAsync();
+        var gameAreaEntity = await PRepository.AsSugarClient().Queryable<GameAreaEntity>().Filter(null, true).Where(u => u.IsDeleted == false).Where(u => u.Id == input.AreaId).FirstAsync();
         if (gameAreaEntity == null)
         {
             return GameApiResult.Error<GameRoleResponse>(AreaErrorCode.AreaNotFound, "区服不存在");
@@ -141,7 +147,7 @@ public class GameRoleController : BaseController<TenantGameRoleEntity>
         var respPlayerCreate = content.ToHttpJsonResult<PlayerCreateResponse>();
         if (respPlayerCreate.IsSuccess)
         {
-            var entity = input.Adapt<TenantGameRoleEntity>();
+            var entity = input.Adapt<GameRoleEntity>();
             entity.Id = respPlayerCreate.Data.PlayerInfo.Id;
             entity.Level = (int)respPlayerCreate.Data.PlayerInfo.Level;
             entity.CreatedTime = TimerHelper.UnixTimeSeconds();
@@ -165,7 +171,7 @@ public class GameRoleController : BaseController<TenantGameRoleEntity>
     /// <param name="input"></param>
     /// <returns></returns>
     [HttpPost]
-    public async Task<HttpJsonResultData<BaseOperationAckResponse>> Delete([FromBody] DeleteTenantGameRoleEntityRequest input)
+    public async Task<HttpJsonResultData<BaseOperationAckResponse>> Delete([FromBody] DeleteGameRoleEntityRequest input)
     {
         var entity = await PRepository.GetFirstAsync(u => u.Id == input.Id);
         if (entity == null)
@@ -185,9 +191,9 @@ public class GameRoleController : BaseController<TenantGameRoleEntity>
     /// <returns></returns>
     [HttpPost]
     [ProducesResponseType(200, Type = typeof(GameRoleResponse))]
-    public async Task<HttpJsonResultData<GameRoleResponse>> Update([FromBody] UpdateTenantGameRoleEntityRequest input)
+    public async Task<HttpJsonResultData<GameRoleResponse>> Update([FromBody] UpdateGameRoleEntityRequest input)
     {
-        var entity = input.Adapt<TenantGameRoleEntity>();
+        var entity = input.Adapt<GameRoleEntity>();
         var res = await PRepository.AsUpdateable(entity).IgnoreColumns(true).ExecuteCommandWithOptLockAsync(true);
         var result = entity.Adapt<GameRoleResponse>();
         return HttpJsonResultData<GameRoleResponse>.Success(result);
@@ -201,7 +207,7 @@ public class GameRoleController : BaseController<TenantGameRoleEntity>
     /// <returns></returns>
     [HttpPost]
     [ProducesResponseType(200, Type = typeof(List<GameRoleResponse>))]
-    public async Task<HttpJsonResultData<List<GameRoleResponse>>> GetList([FromBody] GetListTenantGameRoleEntityRequest input)
+    public async Task<HttpJsonResultData<List<GameRoleResponse>>> GetList([FromBody] GetListGameRoleEntityRequest input)
     {
         var gameRoleEntities = await PRepository.GetListAsync(a => a.UserId == input.UserId);
         var result = new List<GameRoleResponse>(gameRoleEntities.Count);
@@ -222,9 +228,9 @@ public class GameRoleController : BaseController<TenantGameRoleEntity>
     [ProducesResponseType(200, Type = typeof(GameLoginTicketResponse))]
     public async Task<HttpJsonResultData<GameLoginTicketResponse>> Login([FromBody] GamePlayerLoginRequest input)
     {
-        if (HasForbiddenContextField(input))
+        if (HasForbiddenIdentityOverrideField(input))
         {
-            return GameApiResult.Error<GameLoginTicketResponse>(AuthErrorCode.AuthorizeInvalid, "请求体不能包含租户、应用或账号上下文字段");
+            return GameApiResult.Error<GameLoginTicketResponse>(AuthErrorCode.AuthorizeInvalid, "请求体不能包含身份覆盖字段");
         }
 
         var tokenValidation = await _clientApiTokenIssuer.ValidateAsync(input.AccessToken);
@@ -233,7 +239,7 @@ public class GameRoleController : BaseController<TenantGameRoleEntity>
             return GameApiResult.Error<GameLoginTicketResponse>(AuthErrorCode.AuthorizeInvalid, "授权无效");
         }
 
-        var user = await PRepository.AsSugarClient().Queryable<TenantGameUserEntity>().Where(u => u.Id == tokenValidation.UserId).FirstAsync();
+        var user = await PRepository.AsSugarClient().Queryable<GameUserEntity>().Where(u => u.Id == tokenValidation.UserId).FirstAsync();
         if (user == null)
         {
             _gameLoginTicketIssuer.AuditRejected(tokenValidation.UserId, input.PlayerId, input.AreaId, "account_not_found");
@@ -253,7 +259,7 @@ public class GameRoleController : BaseController<TenantGameRoleEntity>
         }
 
         // 处罚事实源登录阻断漏斗：账号级封禁/限制登录命中即拦截
-        var accountBlocking = await _tenantGamePenaltyEnforcementService.GetLoginBlockingPenaltyAsync(PenaltyTargetTypeEnum.Account, user.Id.ToString());
+        var accountBlocking = await _gamePenaltyEnforcementService.GetLoginBlockingPenaltyAsync(PenaltyTargetTypeEnum.Account, user.Id.ToString());
         if (accountBlocking != null)
         {
             _gameLoginTicketIssuer.AuditRejected(user.Id, input.PlayerId, input.AreaId, "account_banned");
@@ -261,7 +267,7 @@ public class GameRoleController : BaseController<TenantGameRoleEntity>
         }
 
         //区服状态判断
-        var gameAreaEntity = await PRepository.AsSugarClient().Queryable<TenantGameAreaEntity>().Filter(null, true).Where(u => u.IsDeleted == false).Where(u => u.Id == input.AreaId).FirstAsync();
+        var gameAreaEntity = await PRepository.AsSugarClient().Queryable<GameAreaEntity>().Filter(null, true).Where(u => u.IsDeleted == false).Where(u => u.Id == input.AreaId).FirstAsync();
         if (gameAreaEntity == null)
         {
             _gameLoginTicketIssuer.AuditRejected(user.Id, input.PlayerId, input.AreaId, "area_not_found");
@@ -291,7 +297,7 @@ public class GameRoleController : BaseController<TenantGameRoleEntity>
         }
 
         // 处罚事实源登录阻断漏斗：角色级封禁/限制登录命中即拦截（按区服作用域过滤）
-        var roleBlocking = await _tenantGamePenaltyEnforcementService.GetLoginBlockingPenaltyAsync(PenaltyTargetTypeEnum.Role, entity.Id.ToString(), input.AreaId);
+        var roleBlocking = await _gamePenaltyEnforcementService.GetLoginBlockingPenaltyAsync(PenaltyTargetTypeEnum.Role, entity.Id.ToString(), input.AreaId);
         if (roleBlocking != null)
         {
             _gameLoginTicketIssuer.AuditRejected(user.Id, input.PlayerId, input.AreaId, "role_banned");
@@ -318,7 +324,7 @@ public class GameRoleController : BaseController<TenantGameRoleEntity>
         return HttpJsonResultData<GameLoginTicketResponse>.Success(output);
     }
 
-    private async Task TryRefreshPlayerInfo(TenantGameRoleEntity entity, TenantGameAreaEntity gameAreaEntity)
+    private async Task TryRefreshPlayerInfo(GameRoleEntity entity, GameAreaEntity gameAreaEntity)
     {
         var areaAddress = GameServerEndpointUrlBuilder.Build(gameAreaEntity, GameServerEndpointKindEnum.ClientDispatch, "req_player_get_info");
         var request = new PlayerGetInfoRequest
@@ -359,20 +365,17 @@ public class GameRoleController : BaseController<TenantGameRoleEntity>
         return long.TryParse(item.ToString(), out value);
     }
 
-    private static bool HasForbiddenContextField(GamePlayerLoginRequest input)
+    private static bool HasForbiddenIdentityOverrideField(GamePlayerLoginRequest input)
     {
         if (input.ExtraFields == null)
         {
             return false;
         }
 
-        return input.ExtraFields.Keys.Any(k =>
-                                              string.Equals(k, "tenantId", StringComparison.OrdinalIgnoreCase) ||
-                                              string.Equals(k, "appId", StringComparison.OrdinalIgnoreCase) ||
-                                              string.Equals(k, "userId", StringComparison.OrdinalIgnoreCase));
+        return input.ExtraFields.Keys.Any(key => IdentityOverrideFieldNames.Contains(key, StringComparer.OrdinalIgnoreCase));
     }
 
-    private static string BuildRouteTarget(TenantGameAreaEntity area)
+    private static string BuildRouteTarget(GameAreaEntity area)
     {
         if (area.WebSocketUrl.IsNotNullOrEmpty())
         {
@@ -406,7 +409,7 @@ public class GameRoleController : BaseController<TenantGameRoleEntity>
     /// <returns></returns>
     [HttpPost]
     [ProducesResponseType(200, Type = typeof(GameRoleResponse))]
-    public async Task<HttpJsonResultData<GameRoleResponse>> Get([FromBody] GetTenantGameRoleEntityRequest input)
+    public async Task<HttpJsonResultData<GameRoleResponse>> Get([FromBody] GetGameRoleEntityRequest input)
     {
         var entity = await PRepository.GetSingleAsync(a => a.UserId == input.UserId && a.AreaId == input.AreaId);
         var result = entity.Adapt<GameRoleResponse>();
@@ -420,7 +423,7 @@ public class GameRoleController : BaseController<TenantGameRoleEntity>
     /// <returns></returns>
     [HttpPost]
     [ProducesResponseType(200, Type = typeof(GameRoleResponse))]
-    public async Task<HttpJsonResultData<GameRoleResponse>> GetById([FromBody] GetByIdTenantGameRoleEntityRequest input)
+    public async Task<HttpJsonResultData<GameRoleResponse>> GetById([FromBody] GetByIdGameRoleEntityRequest input)
     {
         if (long.TryParse(input.Id, out var id))
         {

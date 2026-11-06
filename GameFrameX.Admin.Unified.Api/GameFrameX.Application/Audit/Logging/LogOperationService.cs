@@ -8,16 +8,16 @@ namespace GameFrameX.Application.Audit.Logging;
 /// 系统操作日志服务。统一查询主库新日志与历史日志。
 /// </summary>
 [ApiDescriptionSettings(Order = 360)]
-public class LogOperationService : BaseLogService<SystemLogOperationEntity, TenantLogOperationEntity, LogOperationFields>
+public class LogOperationService : BaseLogService<SystemLogOperationEntity, LogOperationEntity, LogOperationFields>
 {
     /// <summary>
     /// 构造函数
     /// </summary>
     /// <param name="systemLogOperationRepository">平台操作日志仓储（主库）</param>
-    /// <param name="tenantLogOperationRepository">租户操作日志仓储（当前租户库）</param>
+    /// <param name="logOperationRepository">管理员操作日志仓储（主库）</param>
     /// <param name="currentUserContext">当前登录用户</param>
-    public LogOperationService(SqlSugarRepository<SystemLogOperationEntity> systemLogOperationRepository, SqlSugarRepository<TenantLogOperationEntity> tenantLogOperationRepository, CurrentUserContext currentUserContext)
-        : base(systemLogOperationRepository, tenantLogOperationRepository, currentUserContext)
+    public LogOperationService(SqlSugarRepository<SystemLogOperationEntity> systemLogOperationRepository, SqlSugarRepository<LogOperationEntity> logOperationRepository, CurrentUserContext currentUserContext)
+        : base(systemLogOperationRepository, logOperationRepository, currentUserContext)
     {
     }
 

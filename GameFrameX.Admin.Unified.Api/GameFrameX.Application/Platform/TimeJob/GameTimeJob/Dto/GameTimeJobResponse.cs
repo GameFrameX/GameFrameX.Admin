@@ -3,7 +3,7 @@ namespace GameFrameX.Application.Platform.TimeJob.GameTimeJob.Dto;
 /// <summary>
 /// 游戏定时任务输出参数
 /// </summary>
-public class GameTimeJobResponse : IBasePageResponse<Entity.Tenant.Game.TenantGameTimeJobEntity>
+public class GameTimeJobResponse : IBasePageResponse<Entity.Business.Game.GameTimeJobEntity>
 {
     /// <summary>
     /// Id

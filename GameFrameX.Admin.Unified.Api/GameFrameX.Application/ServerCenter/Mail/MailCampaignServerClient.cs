@@ -44,30 +44,30 @@ public sealed class MailCampaignServerClient : IMailCampaignServerClient
     }
 
     /// <inheritdoc />
-    public async Task<PublishMailCampaignResponse> PublishAsync(TenantGameAreaEntity area, PublishMailCampaignRequest request)
+    public async Task<PublishMailCampaignResponse> PublishAsync(GameAreaEntity area, PublishMailCampaignRequest request)
     {
         return await PostAsync<PublishMailCampaignRequest, PublishMailCampaignResponse>(area, PublishAction, request);
     }
 
     /// <inheritdoc />
-    public async Task<PreviewMailCampaignResponse> PreviewAsync(TenantGameAreaEntity area, PreviewMailCampaignRequest request)
+    public async Task<PreviewMailCampaignResponse> PreviewAsync(GameAreaEntity area, PreviewMailCampaignRequest request)
     {
         return await PostAsync<PreviewMailCampaignRequest, PreviewMailCampaignResponse>(area, PreviewAction, request);
     }
 
     /// <inheritdoc />
-    public async Task<RevokeMailCampaignResponse> RevokeAsync(TenantGameAreaEntity area, RevokeMailCampaignRequest request)
+    public async Task<RevokeMailCampaignResponse> RevokeAsync(GameAreaEntity area, RevokeMailCampaignRequest request)
     {
         return await PostAsync<RevokeMailCampaignRequest, RevokeMailCampaignResponse>(area, RevokeAction, request);
     }
 
     /// <inheritdoc />
-    public async Task<QueryMailCampaignResponse> QueryAsync(TenantGameAreaEntity area, QueryMailCampaignRequest request)
+    public async Task<QueryMailCampaignResponse> QueryAsync(GameAreaEntity area, QueryMailCampaignRequest request)
     {
         return await PostAsync<QueryMailCampaignRequest, QueryMailCampaignResponse>(area, QueryAction, request);
     }
 
-    private async Task<TResponse> PostAsync<TRequest, TResponse>(TenantGameAreaEntity area, string action, TRequest request)
+    private async Task<TResponse> PostAsync<TRequest, TResponse>(GameAreaEntity area, string action, TRequest request)
         where TResponse : class
     {
         var url = GameServerEndpointUrlBuilder.Build(area, GameServerEndpointKindEnum.Fulfillment, action);

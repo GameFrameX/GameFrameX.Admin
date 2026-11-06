@@ -1,7 +1,7 @@
 using GameFrameX.Client.Api.GameUserArchive;
 using GameFrameX.Client.Api.GameUserMisc;
 using GameFrameX.Core.Tests.ClientApi;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 using GameFrameX.Client.Api.GameUserArchive.Dto;
 using GameFrameX.Client.Api.GameUserMisc.Dto;
 using GameFrameX.Core.SqlSugar;
@@ -26,7 +26,7 @@ public sealed class GameUserMiscTests
         var data = ClientApiResultReader.Data(ClientApiResultReader.Read(result));
         Assert.Equal(0, data.GetProperty("Rcode").GetInt64());
 
-        var records = db.TenantDb.Queryable<TenantGameUserLogoutRecordEntity>().Where(x => x.UserId == 4001).ToList();
+        var records = db.MainDb.Queryable<GameUserLogoutRecordEntity>().Where(x => x.UserId == 4001).ToList();
         Assert.Single(records);
         Assert.Equal("1.0.0", records[0].ClientVersion);
         Assert.True(records[0].LogoutTime > 0);
@@ -36,7 +36,7 @@ public sealed class GameUserMiscTests
     public async Task RandomRobots_FillsRequestedCount_AndRespectsExclusions()
     {
         using var db = new ClientApiTestDb();
-        db.InitTenantTables(typeof(TenantGameUserArchiveEntity));
+        db.InitBusinessTables(typeof(GameUserArchiveEntity));
         var archiveController = CreateArchiveController(db);
         // 真实档 2 个（4101/4102），exclude 4101 → 请 3 个：真实 1 + 合成 2 凑满
         await archiveController.Upload(MakeUpload(4101, "real_one"));
@@ -67,18 +67,18 @@ public sealed class GameUserMiscTests
 
     private static GameUserMiscController CreateController(ClientApiTestDb db)
     {
-        db.InitTenantTables(typeof(TenantGameUserLogoutRecordEntity));
-        db.InitTenantTables(typeof(TenantGameUserArchiveEntity));
-        var tenantDbProvider = db.MainDb;
-        var logoutRepository = new Repository<TenantGameUserLogoutRecordEntity>(db.MainDb);
-        var archiveRepository = new Repository<TenantGameUserArchiveEntity>(db.MainDb);
+        db.InitBusinessTables(typeof(GameUserLogoutRecordEntity));
+        db.InitBusinessTables(typeof(GameUserArchiveEntity));
+        var dbProvider = db.MainDb;
+        var logoutRepository = new Repository<GameUserLogoutRecordEntity>(db.MainDb);
+        var archiveRepository = new Repository<GameUserArchiveEntity>(db.MainDb);
         return new GameUserMiscController(logoutRepository, archiveRepository);
     }
 
     private static GameUserArchiveController CreateArchiveController(ClientApiTestDb db)
     {
-        var tenantDbProvider = db.MainDb;
-        var archiveRepository = new Repository<TenantGameUserArchiveEntity>(db.MainDb);
+        var dbProvider = db.MainDb;
+        var archiveRepository = new Repository<GameUserArchiveEntity>(db.MainDb);
         return new GameUserArchiveController(archiveRepository);
     }
 

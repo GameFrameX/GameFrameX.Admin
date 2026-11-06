@@ -1,4 +1,4 @@
-using GameFrameX.Entity.Tenant.Game.App;
+using GameFrameX.Entity.Business.Game.App;
 using GameFrameX.Application.ClientDelivery.ChannelDefinition.Dto;
 using GameFrameX.Core.Export;
 using GameFrameX.Core.Service.User;
@@ -8,21 +8,21 @@ using GameFrameX.Entity.Global;
 namespace GameFrameX.Application.ClientDelivery.ChannelDefinition;
 
 /// <summary>
-/// 租户渠道定义服务，仅管理当前租户渠道
+/// 业务渠道定义服务，仅管理业务渠道
 /// </summary>
 [ApiDescriptionSettings(Order = 101)]
 public class ChannelDefinitionService
-    : ChannelDefinitionManagementServiceBase<TenantChannelDefinitionEntity>
+    : ChannelDefinitionManagementServiceBase<ChannelDefinitionEntity>
 {
-    private readonly SqlSugarRepository<TenantGameAppPackageEntity> _packageRepository;
+    private readonly SqlSugarRepository<GameAppPackageEntity> _packageRepository;
 
     /// <summary>
-    /// 租户渠道定义服务
+    /// 业务渠道定义服务
     /// </summary>
     public ChannelDefinitionService(
-        SqlSugarRepository<TenantChannelDefinitionEntity> repository,
+        SqlSugarRepository<ChannelDefinitionEntity> repository,
         SqlSugarRepository<GlobalChannelDefinitionEntity> globalChannelRepository,
-        SqlSugarRepository<TenantGameAppPackageEntity> packageRepository,
+        SqlSugarRepository<GameAppPackageEntity> packageRepository,
         CurrentUserContext currentUserContext)
         : base(repository, globalChannelRepository, currentUserContext)
     {
@@ -32,7 +32,7 @@ public class ChannelDefinitionService
     /// <inheritdoc />
     protected override ChannelScopeEnum ManagedScope
     {
-        get { return ChannelScopeEnum.Tenant; }
+        get { return ChannelScopeEnum.Business; }
     }
 
     /// <inheritdoc />
@@ -61,9 +61,9 @@ public class ChannelDefinitionService
     [HttpPost(CrudActionRoutes.Export)]
     [ApiDescriptionSettings(Name = "Export")]
     [NonUnify]
-    [DisplayName("导出租户渠道定义")]
+    [DisplayName("导出业务渠道定义")]
     public Task<IActionResult> ExportAsync(DataExportRequest<PageChannelDefinitionRequest> input)
     {
-        return ExportCoreAsync(input.Query, input.Columns, input.Range, "租户渠道定义");
+        return ExportCoreAsync(input.Query, input.Columns, input.Range, "业务渠道定义");
     }
 }

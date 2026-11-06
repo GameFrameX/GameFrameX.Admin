@@ -5,8 +5,8 @@ namespace GameFrameX.Entity.System;
 
 /// <summary>
 /// 平台系统邮件 Provider 配置。
-/// <para>存储边界：主库 / SuperAdmin-only；与租户业务邮件（<c>TenantEmailConfigEntity</c>）完全独立，互不 fallback。</para>
-/// <para>典型用途：租户生命周期、账单、平台安全、平台运维、异常事件通知；调用方不依赖当前请求租户上下文。</para>
+/// <para>存储边界：主库 / SuperAdmin-only；与业务邮件（<c>EmailConfigEntity</c>）完全独立，互不 fallback。</para>
+/// <para>典型用途：平台安全、平台运维、异常事件通知；调用方不依赖请求上下文。</para>
 /// <para>同一 <see>
 ///     <cref>SystemEmailPurpose</cref>
 /// </see>

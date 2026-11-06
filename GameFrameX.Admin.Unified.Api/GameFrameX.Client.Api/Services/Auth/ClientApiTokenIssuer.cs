@@ -1,7 +1,7 @@
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using GameFrameX.Client.Api.Services.ClientApiTenantOptions;
+using GameFrameX.Client.Api.Services.ClientApiOptions;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 
@@ -9,7 +9,7 @@ namespace GameFrameX.Client.Api.Services.Auth;
 
 /// <summary>
 /// Client API 账号访问令牌签发服务。
-/// <para>签名密钥与有效期从主库 <see cref="IClientApiTenantOptionsProvider"/> 读取；未配置密钥时抛出异常。</para>
+/// <para>签名密钥与有效期从主库 <see cref="IClientApiOptionsProvider"/> 读取；未配置密钥时抛出异常。</para>
 /// </summary>
 public sealed class ClientApiTokenIssuer
 {
@@ -18,12 +18,12 @@ public sealed class ClientApiTokenIssuer
     public const string ClientApiAccessTokenUse = "client_api_access";
     public const string ClientApiTokenAudience = "client-api";
 
-    private readonly IClientApiTenantOptionsProvider _optionsProvider;
+    private readonly IClientApiOptionsProvider _optionsProvider;
     private readonly JsonWebTokenHandler _handler = new();
 
     /// <summary>
     /// </summary>
-    public ClientApiTokenIssuer(IClientApiTenantOptionsProvider optionsProvider)
+    public ClientApiTokenIssuer(IClientApiOptionsProvider optionsProvider)
     {
         _optionsProvider = optionsProvider;
     }
@@ -31,7 +31,7 @@ public sealed class ClientApiTokenIssuer
     /// <summary>
     /// 为登录后的游戏账号签发 Client API 访问令牌。
     /// </summary>
-    public async Task<ClientApiTokenResponse> IssueAsync(TenantGameUserEntity user, string provider)
+    public async Task<ClientApiTokenResponse> IssueAsync(GameUserEntity user, string provider)
     {
         var policy = await _optionsProvider.GetTokenPolicyAsync();
         var signingKey = policy.SigningKey
@@ -74,7 +74,7 @@ public sealed class ClientApiTokenIssuer
         var policy = await _optionsProvider.GetTokenPolicyAsync();
         if (policy.SigningKey == null)
         {
-            // 当前租户未配置签名密钥，无法校验任何令牌
+            // 当前策略行未配置签名密钥，无法校验任何令牌
             return ClientApiTokenValidationResponse.Fail;
         }
 

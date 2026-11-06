@@ -1,6 +1,6 @@
 using GameFrameX.Application.CommerceCenter.GameRedeemCodeUseRecord.Dto;
 using GameFrameX.Core.SqlSugar;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 using SqlSugar;
 
 namespace GameFrameX.Core.Tests.SqlSugar;
@@ -26,9 +26,9 @@ public sealed class GameRedeemCodeUseRecordChannelTests : IDisposable
         _db = new SqlSugarScope(config);
         SqlSugarUnifiedConfig.ConfigureBaseFilters(_db);
         _db.CodeFirst.InitTables(
-            typeof(TenantGameRedeemCodeChannelEntity),
-            typeof(TenantGameRedeemCodeEntity),
-            typeof(TenantGameRedeemCodeUseRecordEntity));
+            typeof(GameRedeemCodeChannelEntity),
+            typeof(GameRedeemCodeEntity),
+            typeof(GameRedeemCodeUseRecordEntity));
     }
 
     /// <summary>
@@ -100,12 +100,12 @@ public sealed class GameRedeemCodeUseRecordChannelTests : IDisposable
         // 复刻 GameRedeemCodeUseRecordEntityService.BuildPageQuery 的 BLA-32 增量部分（兑换码 + 渠道 join、ChannelId 过滤与投影）。
         // 注：区服 LeftJoin 是 BuildPageQuery 既有逻辑（非 BLA-32 范围）且本测试不校验区服列，此处不复刻；
         // 同时可避免与 GameOrderShipServiceTests（不以 ConfigureBaseSettings 初始化、PascalCase 表名）共享 SqlSugar 静态实体缓存导致的 join 表名漂移。
-        return _db.Queryable<TenantGameRedeemCodeUseRecordEntity>()
+        return _db.Queryable<GameRedeemCodeUseRecordEntity>()
                   .WhereIF(areaId > 0, u => u.AreaId == areaId)
                   .WhereIF(!string.IsNullOrWhiteSpace(code), u => u.Code == code)
                   .WhereIF(playerId > 0, u => u.PlayerId == playerId)
-                  .LeftJoin<TenantGameRedeemCodeEntity>((u, c) => u.Code == c.Code && u.AreaId == c.AreaId)
-                  .LeftJoin<TenantGameRedeemCodeChannelEntity>((u, c, channel) => c.ChannelId == channel.Id)
+                  .LeftJoin<GameRedeemCodeEntity>((u, c) => u.Code == c.Code && u.AreaId == c.AreaId)
+                  .LeftJoin<GameRedeemCodeChannelEntity>((u, c, channel) => c.ChannelId == channel.Id)
                   .WhereIF(channelId > 0, (u, c, channel) => c.ChannelId == channelId)
                   .Select((u, c, channel) => new GameRedeemCodeUseRecordResponse
                   {
@@ -127,41 +127,41 @@ public sealed class GameRedeemCodeUseRecordChannelTests : IDisposable
         // 注：区服表仅 InitTables 建表，不 seed：area 为 LEFT JOIN，测试不依赖区服列；
         // 区服实体含多个 NOT NULL 列，seed 会触发约束，故略过。
 
-        await _db.Insertable(new TenantGameRedeemCodeChannelEntity
+        await _db.Insertable(new GameRedeemCodeChannelEntity
         {
             Id = 10, Name = "渠道A", IsDeleted = false, CreatedTime = now,
         }).ExecuteCommandAsync();
-        await _db.Insertable(new TenantGameRedeemCodeChannelEntity
+        await _db.Insertable(new GameRedeemCodeChannelEntity
         {
             Id = 11, Name = "渠道B", IsDeleted = false, CreatedTime = now,
         }).ExecuteCommandAsync();
 
-        await _db.Insertable(new TenantGameRedeemCodeEntity
+        await _db.Insertable(new GameRedeemCodeEntity
         {
             Id = 100, AreaId = 1, Code = "CODE1", ChannelId = 10, IsActive = true, UsageLimit = 100, UsedCount = 0, StartTime = nowDt, EndTime = nowDt, Description = "d1", Contents = "[]", IsDeleted = false, CreatedTime = now,
         }).ExecuteCommandAsync();
-        await _db.Insertable(new TenantGameRedeemCodeEntity
+        await _db.Insertable(new GameRedeemCodeEntity
         {
             Id = 101, AreaId = 1, Code = "CODE2", ChannelId = null, IsActive = true, UsageLimit = 100, UsedCount = 0, StartTime = nowDt, EndTime = nowDt, Description = "d2", Contents = "[]", IsDeleted = false, CreatedTime = now,
         }).ExecuteCommandAsync();
-        await _db.Insertable(new TenantGameRedeemCodeEntity
+        await _db.Insertable(new GameRedeemCodeEntity
         {
             Id = 102, AreaId = 2, Code = "CODE3", ChannelId = 11, IsActive = true, UsageLimit = 100, UsedCount = 0, StartTime = nowDt, EndTime = nowDt, Description = "d3", Contents = "[]", IsDeleted = false, CreatedTime = now,
         }).ExecuteCommandAsync();
 
-        await _db.Insertable(new TenantGameRedeemCodeUseRecordEntity
+        await _db.Insertable(new GameRedeemCodeUseRecordEntity
         {
             Id = 1, AreaId = 1, Code = "CODE1", PlayerId = 1, IsDeleted = false, CreatedTime = now,
         }).ExecuteCommandAsync();
-        await _db.Insertable(new TenantGameRedeemCodeUseRecordEntity
+        await _db.Insertable(new GameRedeemCodeUseRecordEntity
         {
             Id = 2, AreaId = 1, Code = "CODE2", PlayerId = 2, IsDeleted = false, CreatedTime = now,
         }).ExecuteCommandAsync();
-        await _db.Insertable(new TenantGameRedeemCodeUseRecordEntity
+        await _db.Insertable(new GameRedeemCodeUseRecordEntity
         {
             Id = 3, AreaId = 2, Code = "CODE3", PlayerId = 3, IsDeleted = false, CreatedTime = now,
         }).ExecuteCommandAsync();
-        await _db.Insertable(new TenantGameRedeemCodeUseRecordEntity
+        await _db.Insertable(new GameRedeemCodeUseRecordEntity
         {
             Id = 4, AreaId = 1, Code = "CODE1", PlayerId = 4, IsDeleted = false, CreatedTime = now,
         }).ExecuteCommandAsync();

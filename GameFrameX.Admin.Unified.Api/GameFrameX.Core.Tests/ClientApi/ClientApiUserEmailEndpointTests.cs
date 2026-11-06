@@ -1,7 +1,7 @@
 using GameFrameX.Client.Api.GameUserEmail;
 using GameFrameX.Client.Api.GameUserEmail.Dto;
 using GameFrameX.Client.Api.Services.Email;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 
 namespace GameFrameX.Core.Tests.ClientApi;
 
@@ -12,7 +12,7 @@ public sealed class ClientApiUserEmailEndpointTests
     {
         using (var database = new ClientApiTestDb())
         {
-            database.InitTenantTables(typeof(TenantGameUserEmailEntity), typeof(TenantGameUserEntity));
+            database.InitBusinessTables(typeof(GameUserEmailEntity), typeof(GameUserEntity));
             var sender = new RecordingEmailSender();
             var controller = CreateController(database, sender);
             var request = new GameUserMailRegisterEntityRequest
@@ -24,10 +24,10 @@ public sealed class ClientApiUserEmailEndpointTests
             Assert.Equal(0, ClientApiResultReader.Code(first));
             Assert.NotEqual(0, ClientApiResultReader.Code(second));
             Assert.Equal(1, sender.SendCount);
-            var record = await database.MainDb.Queryable<TenantGameUserEmailEntity>().SingleAsync();
+            var record = await database.MainDb.Queryable<GameUserEmailEntity>().SingleAsync();
             Assert.Equal(request.Email, record.UserName);
             Assert.Equal(6, record.Code.Length);
-            Assert.Equal(TenantEmailPurpose.PlayerRegisterCode, sender.Purpose);
+            Assert.Equal(EmailPurpose.PlayerRegisterCode, sender.Purpose);
         }
     }
 
@@ -36,7 +36,7 @@ public sealed class ClientApiUserEmailEndpointTests
     {
         using (var database = new ClientApiTestDb())
         {
-            database.InitTenantTables(typeof(TenantGameUserEmailEntity), typeof(TenantGameUserEntity));
+            database.InitBusinessTables(typeof(GameUserEmailEntity), typeof(GameUserEntity));
             var sender = new RecordingEmailSender();
             var controller = CreateController(database, sender);
             var result = ClientApiResultReader.Read(await controller.SendReset(new GameUserMailResetEntityRequest
@@ -45,24 +45,24 @@ public sealed class ClientApiUserEmailEndpointTests
             }));
             Assert.Equal(0, ClientApiResultReader.Code(result));
             Assert.Equal(0, sender.SendCount);
-            Assert.Equal(0, await database.MainDb.Queryable<TenantGameUserEmailEntity>().CountAsync());
+            Assert.Equal(0, await database.MainDb.Queryable<GameUserEmailEntity>().CountAsync());
         }
     }
 
     private static GameUserEmailController CreateController(ClientApiTestDb database, RecordingEmailSender sender)
     {
-        var controller = new GameUserEmailController(database.Repository<TenantGameUserEmailEntity>(),
-            database.Repository<TenantGameUserEntity>(), sender);
-        database.AttachContext(controller, includeTenant: false, includeApp: false);
+        var controller = new GameUserEmailController(database.Repository<GameUserEmailEntity>(),
+            database.Repository<GameUserEntity>(), sender);
+        database.AttachContext(controller);
         return controller;
     }
 
-    private sealed class RecordingEmailSender : ITenantEmailSender
+    private sealed class RecordingEmailSender : IEmailSender
     {
         public int SendCount { get; private set; }
-        public TenantEmailPurpose Purpose { get; private set; }
+        public EmailPurpose Purpose { get; private set; }
 
-        public Task<bool> SendTemplateAsync(TenantEmailPurpose purpose, string receiverEmail, ulong templateId,
+        public Task<bool> SendTemplateAsync(EmailPurpose purpose, string receiverEmail, ulong templateId,
             string subject, IDictionary<string, string> templateData)
         {
             SendCount++;
@@ -71,7 +71,7 @@ public sealed class ClientApiUserEmailEndpointTests
         }
 
         public Task<string?> GetFromEmailAddressAsync() => Task.FromResult<string?>(null);
-        public Task<TenantEmailOptionsSnapshot?> GetSnapshotAsync(TenantEmailPurpose purpose) =>
-            Task.FromResult<TenantEmailOptionsSnapshot?>(null);
+        public Task<EmailOptionsSnapshot?> GetSnapshotAsync(EmailPurpose purpose) =>
+            Task.FromResult<EmailOptionsSnapshot?>(null);
     }
 }

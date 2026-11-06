@@ -174,7 +174,7 @@ public sealed class ThirdPartyContractWireRoundTripTests
     public void WebShop_zlpay_QueryBindingNames_AreLockedToNotifyContract()
     {
         // zlpay（易支付口径）notify 回传为 GET query 绑定，参数名与验签字典 key（BuildNotifySignParameters）一一对应
-        AssertQueryBindingLocked<TenantGameWebShopEntityBuyNotifyRequest>(new Dictionary<string, string>
+        AssertQueryBindingLocked<GameWebShopEntityBuyNotifyRequest>(new Dictionary<string, string>
         {
             { "Pid", "pid" },
             { "TradeNo", "trade_no" },

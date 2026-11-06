@@ -1,4 +1,4 @@
-using GameFrameX.Core.Service.Tenant;
+using GameFrameX.Core.Service.Business;
 using GameFrameX.Entity.System;
 using GameFrameX.Core.Service.Cache;
 using GameFrameX.Entity.Enum;
@@ -24,7 +24,7 @@ public class OnlineUserJob : IJob
         using (var serviceScope = _scopeFactory.CreateScope())
         {
             var database = serviceScope.ServiceProvider.GetRequiredService<ISqlSugarClient>();
-            await database.Deleteable<TenantOnlineUserEntity>().ExecuteCommandAsync(stoppingToken);
+            await database.Deleteable<OnlineUserEntity>().ExecuteCommandAsync(stoppingToken);
         }
 
         Console.WriteLine("服务重启清空在线用户");

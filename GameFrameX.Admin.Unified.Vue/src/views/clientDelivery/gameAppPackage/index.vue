@@ -1,5 +1,5 @@
 <template>
-  <div class="tenantGameAppPackage-container">
+  <div class="gameAppPackage-container">
     <Card>
       <template #content>
         <SearchForm v-model="queryParams" :fields="searchFields" :defaultSearchKey="false"
@@ -40,7 +40,7 @@
   </div>
 </template>
 
-<script lang="ts" setup name="gameTenantGameAppPackage">
+<script lang="ts" setup name="gameGameAppPackage">
 import { computed, ref } from 'vue'
 import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import type { CrudAction, CrudColumnConfig } from '../../../components/crud-data-table/types.ts'

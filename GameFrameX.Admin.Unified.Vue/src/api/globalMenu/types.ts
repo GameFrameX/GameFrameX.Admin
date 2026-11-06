@@ -11,15 +11,9 @@ export enum MenuTypeEnum {
   Button = 3,
 }
 
-/** @format int32 */
-export enum MenuAppScopeEnum {
-  /** 控制台 */
-  Console = 0,
-}
-
 /**
  * 新增/编辑菜单输入参数。
- * 显式声明前端表单可填字段，不再继承 GameFrameX.Entity.Global.GlobalMenuEntity，避免种子安全元数据（SuperAdminOnly、AllowTenantWhenSuperAdminOnly、Key）与子节点导航属性被前端批量赋值。
+ * 显式声明前端表单可填字段，不再继承 GameFrameX.Entity.Global.GlobalMenuEntity，避免种子安全元数据（SuperAdminOnly、AllowAdminWhenSuperAdminOnly、Key）与子节点导航属性被前端批量赋值。
  */
 export interface AddMenuRequest {
   /** 主键Id（新增为 0，编辑由前端回填） */
@@ -145,9 +139,8 @@ export interface GlobalMenuResponse {
   remark?: string | null;
   /** 是否仅超管可见（种子元数据，DB 驱动授权读取） */
   superAdminOnly?: boolean;
-  /** 超管专属菜单下允许租户只读访问 */
-  allowTenantWhenSuperAdminOnly?: boolean;
-  appScope?: MenuAppScopeEnum;
+  /** 超管专属菜单下允许管理员只读访问 */
+  allowAdminWhenSuperAdminOnly?: boolean;
   /** 菜单子项 */
   children?: GlobalMenuResponse[] | null;
   /** 是否启用 */
@@ -224,8 +217,6 @@ export interface SystemMenuMetaResponse {
   isAffix?: boolean;
   /** 菜单上下文：console。 */
   menuContext?: string | null;
-  /** 菜单作用域：console。 */
-  appScope?: string | null;
 }
 
 export interface UpdateMenuRequest {

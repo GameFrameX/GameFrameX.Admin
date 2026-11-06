@@ -3,7 +3,7 @@ using GameFrameX.Application.CommerceCenter.GameOrder;
 using GameFrameX.Client.Api.Integrations.Advertisement;
 using GameFrameX.Core.Tests.ClientApi;
 using GameFrameX.Entity.Enum;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 using GameFrameX.Foundation.Idempotency;
 using GameFrameX.Foundation.Utility;
 
@@ -22,28 +22,28 @@ public sealed class BusinessTableIdempotencyStoreTests : IDisposable
     [Fact]
     public async Task AntiCheatStore_RepeatedOccupation_ExactlyOneSucceeds()
     {
-        _db.InitTenantTables(typeof(TenantGameAntiCheatEventEntity));
+        _db.InitBusinessTables(typeof(GameAntiCheatEventEntity));
 
         // 顺序重复占位：仅首次成功（并发恰一由 ux_anticheat_idempotency 唯一索引在库层仲裁，
         // SQLite 测试库为单连接不支持多线程并发，真并发验证依赖 PG 环境）
         var results = new List<bool>();
         for (var i = 0; i < 8; i++)
         {
-            var store = new AntiCheatEventIdempotencyStore(_db.Repository<TenantGameAntiCheatEventEntity>(), BuildAntiCheatTemplate("anticheat-key-concurrent"));
+            var store = new AntiCheatEventIdempotencyStore(_db.Repository<GameAntiCheatEventEntity>(), BuildAntiCheatTemplate("anticheat-key-concurrent"));
             results.Add(await store.TryBeginProcessingAsync(BuildRecord(AntiCheatEventIdempotencyStore.IdempotencyScope, "anticheat-key-concurrent")));
         }
 
         Assert.Single(results, succeeded => succeeded);
-        var rows = await _db.TenantDb.Queryable<TenantGameAntiCheatEventEntity>().Where(u => u.IdempotencyKey == "anticheat-key-concurrent").ToListAsync();
+        var rows = await _db.MainDb.Queryable<GameAntiCheatEventEntity>().Where(u => u.IdempotencyKey == "anticheat-key-concurrent").ToListAsync();
         Assert.Single(rows);
     }
 
     [Fact]
     public async Task AntiCheatStore_ExistingEvent_ReplaysAsCompleted()
     {
-        _db.InitTenantTables(typeof(TenantGameAntiCheatEventEntity));
+        _db.InitBusinessTables(typeof(GameAntiCheatEventEntity));
 
-        var store = new AntiCheatEventIdempotencyStore(_db.Repository<TenantGameAntiCheatEventEntity>(), BuildAntiCheatTemplate("anticheat-key-replay"));
+        var store = new AntiCheatEventIdempotencyStore(_db.Repository<GameAntiCheatEventEntity>(), BuildAntiCheatTemplate("anticheat-key-replay"));
         Assert.True(await store.TryBeginProcessingAsync(BuildRecord(AntiCheatEventIdempotencyStore.IdempotencyScope, "anticheat-key-replay")));
 
         var record = await store.TryGetRecordAsync(new IdempotencyRecordIdentifier(AntiCheatEventIdempotencyStore.IdempotencyScope, "anticheat-key-replay"));
@@ -57,9 +57,9 @@ public sealed class BusinessTableIdempotencyStoreTests : IDisposable
     [Fact]
     public async Task AntiCheatStore_FailAsync_RemovesOccupationRow()
     {
-        _db.InitTenantTables(typeof(TenantGameAntiCheatEventEntity));
+        _db.InitBusinessTables(typeof(GameAntiCheatEventEntity));
 
-        var store = new AntiCheatEventIdempotencyStore(_db.Repository<TenantGameAntiCheatEventEntity>(), BuildAntiCheatTemplate("anticheat-key-fail"));
+        var store = new AntiCheatEventIdempotencyStore(_db.Repository<GameAntiCheatEventEntity>(), BuildAntiCheatTemplate("anticheat-key-fail"));
         Assert.True(await store.TryBeginProcessingAsync(BuildRecord(AntiCheatEventIdempotencyStore.IdempotencyScope, "anticheat-key-fail")));
 
         await store.FailAsync(new IdempotencyFailureRequest(new IdempotencyRecordIdentifier(AntiCheatEventIdempotencyStore.IdempotencyScope, "anticheat-key-fail"), 0));
@@ -70,9 +70,9 @@ public sealed class BusinessTableIdempotencyStoreTests : IDisposable
     [Fact]
     public async Task AdvertisementRewardStore_ClaimsPendingRow_AndBlocksReOccupation()
     {
-        _db.InitTenantTables(typeof(TenantGameAdvertisementRewardEntity));
+        _db.InitBusinessTables(typeof(GameAdvertisementRewardEntity));
 
-        var store = new AdvertisementRewardLedgerIdempotencyStore(_db.Repository<TenantGameAdvertisementRewardEntity>(), BuildAdvertisementRewardTemplate("adreward-key-claim"));
+        var store = new AdvertisementRewardLedgerIdempotencyStore(_db.Repository<GameAdvertisementRewardEntity>(), BuildAdvertisementRewardTemplate("adreward-key-claim"));
         Assert.True(await store.TryBeginProcessingAsync(BuildRecord(AdvertisementRewardLedgerIdempotencyStore.IdempotencyScope, "adreward-key-claim")));
 
         // Pending 占用中：占位失败 → 协调器判 Busy / 等待
@@ -85,16 +85,16 @@ public sealed class BusinessTableIdempotencyStoreTests : IDisposable
     [Fact]
     public async Task AdvertisementRewardStore_FailedRow_AllowsLegalReOccupation()
     {
-        _db.InitTenantTables(typeof(TenantGameAdvertisementRewardEntity));
+        _db.InitBusinessTables(typeof(GameAdvertisementRewardEntity));
 
-        var store = new AdvertisementRewardLedgerIdempotencyStore(_db.Repository<TenantGameAdvertisementRewardEntity>(), BuildAdvertisementRewardTemplate("adreward-key-retry"));
+        var store = new AdvertisementRewardLedgerIdempotencyStore(_db.Repository<GameAdvertisementRewardEntity>(), BuildAdvertisementRewardTemplate("adreward-key-retry"));
         Assert.True(await store.TryBeginProcessingAsync(BuildRecord(AdvertisementRewardLedgerIdempotencyStore.IdempotencyScope, "adreward-key-retry")));
         await store.FailAsync(new IdempotencyFailureRequest(new IdempotencyRecordIdentifier(AdvertisementRewardLedgerIdempotencyStore.IdempotencyScope, "adreward-key-retry"), 0));
 
         // 法定覆盖：存量 Failed 重试复用同一行（翻回 Pending）
         Assert.True(await store.TryBeginProcessingAsync(BuildRecord(AdvertisementRewardLedgerIdempotencyStore.IdempotencyScope, "adreward-key-retry")));
 
-        var rows = await _db.TenantDb.Queryable<TenantGameAdvertisementRewardEntity>().Where(u => u.IdempotencyKey == "adreward-key-retry").ToListAsync();
+        var rows = await _db.MainDb.Queryable<GameAdvertisementRewardEntity>().Where(u => u.IdempotencyKey == "adreward-key-retry").ToListAsync();
         Assert.Single(rows);
         Assert.Equal(AdvertisementRewardStatusEnum.Pending, rows[0].Status);
     }
@@ -102,10 +102,10 @@ public sealed class BusinessTableIdempotencyStoreTests : IDisposable
     [Fact]
     public async Task AdvertisementRewardStore_CompleteSettlesSuccess_AndReplaysAsCompleted()
     {
-        _db.InitTenantTables(typeof(TenantGameAdvertisementRewardEntity));
+        _db.InitBusinessTables(typeof(GameAdvertisementRewardEntity));
         var identifier = new IdempotencyRecordIdentifier(AdvertisementRewardLedgerIdempotencyStore.IdempotencyScope, "adreward-key-complete");
 
-        var store = new AdvertisementRewardLedgerIdempotencyStore(_db.Repository<TenantGameAdvertisementRewardEntity>(), BuildAdvertisementRewardTemplate("adreward-key-complete"));
+        var store = new AdvertisementRewardLedgerIdempotencyStore(_db.Repository<GameAdvertisementRewardEntity>(), BuildAdvertisementRewardTemplate("adreward-key-complete"));
         Assert.True(await store.TryBeginProcessingAsync(BuildRecord(identifier.IdempotencyScope, identifier.IdempotencyKey)));
         await store.CompleteAsync(new IdempotencyCompletionRequest(identifier, ReadOnlyMemory<byte>.Empty, 0));
 
@@ -119,9 +119,9 @@ public sealed class BusinessTableIdempotencyStoreTests : IDisposable
     [Fact]
     public async Task AdvertisementRewardStore_SettleWithoutRecord_Throws()
     {
-        _db.InitTenantTables(typeof(TenantGameAdvertisementRewardEntity));
+        _db.InitBusinessTables(typeof(GameAdvertisementRewardEntity));
 
-        var store = new AdvertisementRewardLedgerIdempotencyStore(_db.Repository<TenantGameAdvertisementRewardEntity>(), BuildAdvertisementRewardTemplate("adreward-key-missing"));
+        var store = new AdvertisementRewardLedgerIdempotencyStore(_db.Repository<GameAdvertisementRewardEntity>(), BuildAdvertisementRewardTemplate("adreward-key-missing"));
         await Assert.ThrowsAsync<InvalidOperationException>(
             () => store.CompleteAsync(new IdempotencyCompletionRequest(new IdempotencyRecordIdentifier(AdvertisementRewardLedgerIdempotencyStore.IdempotencyScope, "adreward-key-missing"), ReadOnlyMemory<byte>.Empty, 0)));
     }
@@ -129,9 +129,9 @@ public sealed class BusinessTableIdempotencyStoreTests : IDisposable
     [Fact]
     public async Task FulfillmentStore_ClaimsPendingRow_FailedReOccupation_AndVoidedMapsCompleted()
     {
-        _db.InitTenantTables(typeof(TenantGameOrderFulfillmentEntity));
+        _db.InitBusinessTables(typeof(GameOrderFulfillmentEntity));
 
-        var store = new FulfillmentLedgerIdempotencyStore(_db.TenantDb, BuildFulfillmentTemplate("fulfillment-key-claim"));
+        var store = new FulfillmentLedgerIdempotencyStore(_db.MainDb, BuildFulfillmentTemplate("fulfillment-key-claim"));
         Assert.True(await store.TryBeginProcessingAsync(BuildRecord(FulfillmentLedgerIdempotencyStore.OrderShipIdempotencyScope, "fulfillment-key-claim")));
 
         // Pending 占用中：占位失败（协调器等待后回忙碌）
@@ -141,7 +141,7 @@ public sealed class BusinessTableIdempotencyStoreTests : IDisposable
         var identifier = new IdempotencyRecordIdentifier(FulfillmentLedgerIdempotencyStore.OrderShipIdempotencyScope, "fulfillment-key-claim");
         await store.FailAsync(new IdempotencyFailureRequest(identifier, 0));
         Assert.True(await store.TryBeginProcessingAsync(BuildRecord(identifier.IdempotencyScope, identifier.IdempotencyKey)));
-        var rows = await _db.TenantDb.Queryable<TenantGameOrderFulfillmentEntity>().Where(u => u.IdempotencyKey == "fulfillment-key-claim").ToListAsync();
+        var rows = await _db.MainDb.Queryable<GameOrderFulfillmentEntity>().Where(u => u.IdempotencyKey == "fulfillment-key-claim").ToListAsync();
         Assert.Single(rows);
         Assert.Equal(FulfillmentStatusEnum.Pending, rows[0].Status);
 
@@ -155,13 +155,13 @@ public sealed class BusinessTableIdempotencyStoreTests : IDisposable
     [Fact]
     public async Task FulfillmentStore_VoidedTerminal_MapsCompleted_AndBlocksReOccupation()
     {
-        _db.InitTenantTables(typeof(TenantGameOrderFulfillmentEntity));
+        _db.InitBusinessTables(typeof(GameOrderFulfillmentEntity));
 
-        var store = new FulfillmentLedgerIdempotencyStore(_db.TenantDb, BuildFulfillmentTemplate("fulfillment-key-voided"));
+        var store = new FulfillmentLedgerIdempotencyStore(_db.MainDb, BuildFulfillmentTemplate("fulfillment-key-voided"));
         Assert.True(await store.TryBeginProcessingAsync(BuildRecord(FulfillmentLedgerIdempotencyStore.OrderRefundIdempotencyScope, "fulfillment-key-voided")));
 
         // 作废为业务终态：服务侧落 Voided 后 Complete 做存在性校验（不抛错）
-        await _db.TenantDb.Updateable<TenantGameOrderFulfillmentEntity>()
+        await _db.MainDb.Updateable<GameOrderFulfillmentEntity>()
                  .SetColumns(u => u.Status == FulfillmentStatusEnum.Voided)
                  .Where(u => u.IdempotencyKey == "fulfillment-key-voided")
                  .ExecuteCommandAsync();
@@ -178,9 +178,9 @@ public sealed class BusinessTableIdempotencyStoreTests : IDisposable
         return new IdempotencyRecord(scope, key, "digest-" + key, IdempotencyStatus.Processing, null, now, now + 86_400_000L, null);
     }
 
-    private static TenantGameAntiCheatEventEntity BuildAntiCheatTemplate(string idempotencyKey)
+    private static GameAntiCheatEventEntity BuildAntiCheatTemplate(string idempotencyKey)
     {
-        return new TenantGameAntiCheatEventEntity
+        return new GameAntiCheatEventEntity
         {
             Provider = AntiCheatProviderEnum.Custom,
             ProviderName = "test",
@@ -199,9 +199,9 @@ public sealed class BusinessTableIdempotencyStoreTests : IDisposable
         };
     }
 
-    private static TenantGameAdvertisementRewardEntity BuildAdvertisementRewardTemplate(string idempotencyKey)
+    private static GameAdvertisementRewardEntity BuildAdvertisementRewardTemplate(string idempotencyKey)
     {
-        return new TenantGameAdvertisementRewardEntity
+        return new GameAdvertisementRewardEntity
         {
             Provider = "TopOn",
             TransactionId = "tx-" + idempotencyKey,
@@ -221,10 +221,10 @@ public sealed class BusinessTableIdempotencyStoreTests : IDisposable
         };
     }
 
-    private static TenantGameOrderFulfillmentEntity BuildFulfillmentTemplate(string idempotencyKey)
+    private static GameOrderFulfillmentEntity BuildFulfillmentTemplate(string idempotencyKey)
     {
         var now = TimerHelper.UnixTimeSeconds();
-        return new TenantGameOrderFulfillmentEntity
+        return new GameOrderFulfillmentEntity
         {
             OrderId = 9001,
             PayChannel = "google",

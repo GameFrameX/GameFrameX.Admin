@@ -47,13 +47,14 @@ internal static class Program
         // 主库连接统一走 DbConnection 节 + GFX_MAIN_DB_* 单一入口（C269）；LauncherOptions 裸参数仅作兼容兜底
         var mainDbConfig = HostMainDbConnectionResolver.Resolve(builder.Configuration, launcherOptions);
         var sqlSugar = SqlSugarClientConfig.AddSqlSugarClientService(mainDbConfig, HubUserAuditHandler.Handle(httpContextAccessor));
+        LegacySchemaStartupGuard.EnsureNotLegacySchema(sqlSugar, mainDbConfig);
 
         builder.Services.AddSingleton<ISqlSugarClient>(sqlSugar); // 主库
-        builder.Services.AddScoped(typeof(Repository<>)); // 仓储（按租户路由数据库）
+        builder.Services.AddScoped(typeof(Repository<>)); // 仓储（主库）
         // 基类服务面：FeatureSwitchDeliveryResolver 等共享实现以 SqlSugarRepository<T> 为构造参数（C345 冻结契约），
         // DI 不做基类向上匹配，须显式注册开放泛型基类 -> Repository<T> 实现（与上行为不同 descriptor，仓储无状态可各自实例化）
         builder.Services.AddScoped(typeof(SqlSugarRepository<>), typeof(Repository<>));
-        // 活动/功能开关投放解析器（C345 共享实现，依赖 Scoped 租户仓储，FeatureSwitchSync 端点消费）
+        // 活动/功能开关投放解析器（C345 共享实现，依赖 Scoped 仓储，FeatureSwitchSync 端点消费）
         builder.Services.AddScoped<GameFrameX.Application.ClientDelivery.FeatureSwitch.FeatureSwitchDeliveryResolver>();
         // OpenAccess 机器凭证中间件 nonce 去重依赖链（与 Client.Api 同款注册）：ICache + SystemCacheService（仅依赖 ICache + IOptions<CacheOptions>）
         builder.Services.AddCache();
@@ -90,11 +91,11 @@ internal static class Program
         app.UseAuthorization();
         // 机器凭证、签名和授权范围校验。
         app.UseWhen(context => context.Request.Path.StartsWithSegments("/api/PackageBuildReport", StringComparison.OrdinalIgnoreCase),
-                    branch => branch.UseMiddleware<TenantGameAppOpenAccessAuthMiddleware>());
+                    branch => branch.UseMiddleware<GameAppOpenAccessAuthMiddleware>());
 
         // 功能开关服务器同步（C347）：游戏服务器机器凭证同步通道，同一 OpenAccess 中间件鉴权（scope = FeatureSwitchSync 路由前缀）
         app.UseWhen(context => context.Request.Path.StartsWithSegments("/api/" + GameFrameX.Hub.Api.Const.OpenAccessScopeConst.FeatureSwitchSync, StringComparison.OrdinalIgnoreCase),
-                    branch => branch.UseMiddleware<TenantGameAppOpenAccessAuthMiddleware>());
+                    branch => branch.UseMiddleware<GameAppOpenAccessAuthMiddleware>());
 
         app.MapHostHealthChecks();
         app.MapControllers();

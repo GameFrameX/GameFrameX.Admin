@@ -82,7 +82,7 @@ pnpm install
 pnpm run dev    # 預設 http://localhost:20800（hash 路由）
 ```
 
-打開瀏覽器 → 看到登入頁 → 帳號 `admin` / 密碼 `123456` / 租戶 `1300000000001`（首次啟動 SqlSugar Code-First 會自動建表 + 灌種子）。
+打開瀏覽器 → 看到登入頁 → 帳號 `admin` / 密碼 `123456`（首次啟動 SqlSugar Code-First 會自動建表 + 灌種子）。
 
 ### 一條命令全棧（倉庫根統一 compose）
 
@@ -102,7 +102,7 @@ Compose 內建 PostgreSQL + 三個 host（20802/20806/20808）+ Admin 前端（2
 |---|---|
 | 獨立 / 小團隊遊戲，需要一套能跑起來的營運後台 | 你已經有完整後台只想要其中一個模組 |
 | 多端（管理 / 客戶端 / 外部系統）需要清晰邊界 | 單端簡單後台（直接用 Admin.NET / vue-next-admin 更輕） |
-| 多租戶 SaaS 化遊戲服務 | 單租戶自營不打算對外開放 |
+| 單遊戲自營運（區服 / 玩家 / 商業化 / 客戶端交付一體化） | 多遊戲專案集中營運、SaaS 多租戶化需求 |
 | 強需求 .NET + SqlSugar 技術棧 | 團隊只熟悉 Java / Go / Node |
 | 需要多語言（5 語 i18n）+ AI Agent 友善倉庫 | — |
 | 想要可演進到微服務的單體起步 | — |
@@ -131,25 +131,18 @@ Compose 內建 PostgreSQL + 三個 host（20802/20806/20808）+ Admin 前端（2
 
 > **URL 裡嚴禁出現 `Service` 後綴**。這是新人 100% 會踩的坑——前端按這個約定生成調用，類名一變，前端全炸。
 
-## 多租戶 + 應用作用域
+## 身分與作用域
 
-三層模型，從外到內：
+單遊戲管理後台，兩套身分（各自獨立的使用者表，登入查找順序固定）：
 
-```
-SuperAdmin（平台級）── 可存取全域配置、跨租戶查詢
-    ↓
-Tenant 租戶（多租戶 SaaS 化）── 跨應用共享
-    ↓
-App 應用（租戶下的具體遊戲 / 產品）── AppId 作用域
-```
+| 身分 | 說明 |
+|---|---|
+| SuperAdmin（平台超管） | 系統級身分，負責全域配置與系統管理，首裝精靈建立 |
+| 管理員 | 日常營運身分，角色權限控制功能，區服範圍控制業務資料範圍 |
 
-| Scope | 含義 | 路由示例 |
-|---|---|---|
-| `platform` | 平台級（超管可見，跨租戶） | `/platform/*` |
-| `tenant` | 租戶級（所有應用共有，無 appId query） | `/dashboard/*`、`/system/*` |
-| `app` | 應用工作台內（必須帶 `appId` query） | `/gameCenter/*` |
-
-多租戶與資料庫邊界由實體特性自動生效：`[Tenant]` 自動加 `TenantId` 過濾 + 軟刪除；`[SystemTable]` 路由主庫、`[LogTable]` 路由日誌庫、無標記按 JWT `TenantId` 路由。細節見 [後端 README · 倉儲與多資料庫路由](GameFrameX.Admin.Unified.Api/README.zh-TW.md#倉儲與多資料庫路由)。
+- `ServerId` 是唯一的營運範圍：後台與遊戲伺服器的通訊、查詢、寫入和回呼契約都不依賴租戶或應用身分。
+- 資料庫為單主庫：平台表前綴 `system_`、全域定義表前綴 `global_`、業務表不帶前綴；沒有租戶庫，也沒有按租戶或應用的分庫路由。
+- 公開回呼（支付 / 廣告 / WebShop）位址只有 `{packageId}` 形態；舊版含租戶 / 應用段的位址直接 404，不提供相容解析。
 
 ## 30 個功能模組
 
@@ -159,19 +152,16 @@ App 應用（租戶下的具體遊戲 / 產品）── AppId 作用域
 
 | 模組 | 用途 |
 |---|---|
-| 使用者管理 | 租戶使用者 / 系統管理員維護，可綁定使用者職務、機構、角色、資料權限 |
-| 機構管理 | 多層級樹形組織架構 |
-| 職位管理 | 使用者職務標籤 |
+| 使用者管理 | 管理員帳號維護，可綁定角色、資料權限 |
 | 選單管理 | 目錄 / 選單 / 按鈕 三級權限 |
 | 角色管理 | 角色綁定選單 + 資料授權範圍 |
-| 字典管理 | 全域 / 租戶兩級字典 |
+| 字典管理 | 全域字典 |
 | 開放授權 | AccessKey / Secret + HMAC 簽名認證（外部介面） |
 
 **平台配置（僅 SuperAdmin 可見）**
 
 | 模組 | 用途 |
 |---|---|
-| 平台租戶管理 | 租戶 CRUD、租戶庫自動開通 / 停用 / 到期 |
 | 全域平台 / 語言 / 渠道定義 | 平台級枚舉與多語言基線 |
 | 系統配置 | 鍵值對；高頻配置遷入主庫 `SystemConfig`（JWT / 密碼策略 / 圖形驗證碼） |
 | 資料庫管理 | 表 / 列 CRUD、庫表結構線上管理 |
@@ -200,7 +190,7 @@ App 應用（租戶下的具體遊戲 / 產品）── AppId 作用域
 | 道具 / 商品 | 道具目錄、消耗品 / 永久品管理 |
 | 公告 / 橫幅 | 遊戲內 + 登入後公告 |
 | 應用版本 / 資源包 | App 版本 + 強制更新 + 資源包版本與歷史回滾 |
-| 應用作用域配置 | 遠端參數、應用校驗、客戶端 KV |
+| 應用配置 | 遠端參數、應用校驗、客戶端 KV |
 | 郵件營運 | 模板 + Campaign + 多語言 |
 | 廣告回調 | TopOn / AdMob / UnityAds 多 provider |
 | 遊戲服對接 | 玩家註冊 / 登入 / 訂單回調 |
@@ -218,7 +208,6 @@ App 應用（租戶下的具體遊戲 / 產品）── AppId 作用域
 
 - **後端驅動選單**：選單、權限、文案 全部由後端控制。前端不寫選單，加選單要去後端選單管理裡加；前端只負責渲染後端回傳的選單樹。
 - **JWT 自動續期**：登入拿到的 token 過期前自動加 `X-Authorization`，讓後端靜悄悄換發，登入一次能爽很久。
-- **應用作用域**：路由 `meta.appScope` + `meta.menuContext` 標注 platform / tenant / app 三種 scope，前端按 scope 決定選單可見性。
 - **i18n 完整性門禁**：`pnpm run lint:i18n` 檢查 5 語言鍵完整，缺一個直接 fail。
 
 ## 安全基線
@@ -229,7 +218,7 @@ App 應用（租戶下的具體遊戲 / 產品）── AppId 作用域
 |---|---|
 | 弱密碼 | 全項目統一 **Argon2id**（C214 系統使用者 / C215 玩家）；舊 PBKDF2 僅保留 `AppSecretHasher`（高熵隨機密鑰場景，不需要 Argon2id） |
 | SQL 注入 | SqlSugar 全參數化，無字串拼接 |
-| 越權存取 | 多租戶過濾 + 軟刪除過濾；SuperAdmin 繞過但 Hub API 拒絕超管 |
+| 越權存取 | 軟刪除過濾 + 角色權限 / 區服範圍；SuperAdmin 繞過權限檢查但 Hub API 拒絕超管 |
 | 重放攻擊 | HMAC 簽名 + nonce 快取 + 5 分鐘時間偏差 |
 | 資訊洩露 | Response DTO 必含 Id/RowVersion/CreatedTime；敏感欄位（密碼雜湊 / AccessSecret）**禁止**出現在任何 Response；契約測試守護 |
 | 介面變更回潮 | `ThreeHostApiRoutingContractTests` + `AdminEndpointReturnContractTests` + `AdminActionStyleContractTests` + `NamingAbbreviationGuardTests` 防回潮 |
@@ -238,8 +227,8 @@ App 應用（租戶下的具體遊戲 / 產品）── AppId 作用域
 
 **預設零配置**：本地源碼直跑預設 SQLite（倉庫根 `db/` 下），生產用 PostgreSQL（也支援 MySQL / Oracle 等共 34 種 DbType）。`GameFrameX.Application/Configuration/Database.json` 是單一連線字串來源（三 host 共享，改一處三處生效）。
 
-- 主庫 / 租戶庫 / 日誌庫按實體特性自動路由（見上文多租戶一節）。
-- 租戶庫自動建立：按租戶 ID 生成 `gameframex_admin_tenant_<TenantId>`，無需手填連線字串；預設租戶庫同樣自動推導。
+- 單主庫模型：三個 host 共用一個主庫，實體歸屬由邊界規則決定（見上文「身分與作用域」）。
+- 2.0 為斷代版本：不提供舊庫升級或資料遷移，偵測到舊租戶結構（如 `tenant_` 前綴表）時啟動直接失敗；只支援新庫初始化或發布前整體回滾備份。
 - 換庫連線字串寫法見 [`Database-ConnectionStrings.md`](GameFrameX.Admin.Unified.Api/GameFrameX.Application/Configuration/Database-ConnectionStrings.md)；環境變數成對覆蓋（`GFX_MAIN_DB_TYPE` + `GFX_MAIN_DB_CONNECTION_STRING`）等部署細節見 [後端 README · 資料庫](GameFrameX.Admin.Unified.Api/README.zh-TW.md#資料庫預設零配置生產用-postgresql)。
 
 > SQLite 只面向本地開發。生產禁用——併發寫入弱、無獨立服務程序、備份恢復與維運監控能力不足。
@@ -295,12 +284,11 @@ CI 門禁（防回潮）：
 ![快取管理](doc/img/8.png)
 ![開放介面](doc/img/11.png)
 ![驗證碼配置](doc/img/12.png)
-![租戶管理](doc/img/13.png)
 ![庫表管理](doc/img/14.png)
 
 ### 應用工作台核心功能（中英雙語對照）
 
-進入租戶應用工作台後的 5 個核心功能頁面。同一頁面在中英文介面語言下的實際效果（右上角語言切換器即時切換，無需重新整理）：
+登入後的 5 個核心營運頁面。同一頁面在中英文介面語言下的實際效果（右上角語言切換器即時切換，無需重新整理）：
 
 | 功能 | 簡體中文 | English |
 |------|----------|---------|
@@ -367,7 +355,7 @@ flowchart TB
 |------|------|------|------|
 | [Unity](https://github.com/GameFrameX/GameFrameX.Unity) | Unity 用戶端工程：從 GameFrameX UPM 源按需組裝 90+ 框架元件，HybridCLR 熱更新，內建登入、背包、房間等範例 | Unity 2019.4.40+, HybridCLR, YooAsset, FairyGUI, UniTask | 使用 Protobuf / Config / FairyGUIProject 產物；TCP 29100 + HTTP 28080 連線 Server，HTTP 20808 連線 Admin Client API |
 | [Server](https://github.com/GameFrameX/GameFrameX.Server) | Actor 模型遊戲伺服器：Apps 持久化狀態層與 Hotfix 可熱更邏輯層嚴格分離，支援單程序與多程序部署 | .NET 10, MongoDB, Docker | 監聽 TCP 29100 / WebSocket 29110 / HTTP 28080；為 Admin 提供郵件、發道具、玩家管理等 HTTP 管理介面 |
-| [Admin](https://github.com/GameFrameX/GameFrameX.Admin) | 多租戶營運後台：Admin（20802）/ Client（20808）/ Hub（20806）三個 host + Vue 管理端，涵蓋區服、公告、郵件、訂單支付、遠端配置、線上營運 | .NET 10, SqlSugar, PostgreSQL, Vue 3.5, PrimeVue | 依區服 `HttpManageUrl` 呼叫 Server；Client API 為遊戲用戶端提供全域資訊、登入與支付回呼 |
+| [Admin](https://github.com/GameFrameX/GameFrameX.Admin) | 單遊戲營運後台：Admin（20802）/ Client（20808）/ Hub（20806）三個 host + Vue 管理端，涵蓋區服、公告、郵件、訂單支付、遠端配置、線上營運 | .NET 10, SqlSugar, PostgreSQL, Vue 3.5, PrimeVue | 依區服 `HttpManageUrl` 呼叫 Server；Client API 為遊戲用戶端提供全域資訊、登入與支付回呼 |
 | [luban](https://github.com/GameFrameX/luban) | Luban 配置工具的 GameFrameX 分支：合入官方 v5.1.0，新增 `gameframex` 表匯入器與 `cs-dotnet-json` / `cs-dotnet-bin` 等產生目標 | .NET 10, Scriban | 發佈 Luban tar.gz 與 Docker 映像；每日同步至 Config 的 `Tools/` |
 | [Config](https://github.com/GameFrameX/GameFrameX.Config) | 配置表倉庫：Excel 資料表 + schema + 在地化表，一鍵腳本產生前後端程式碼與資料 | Excel, Luban | `gen-client-*` → Unity; `gen-server-json` → Server; `gen-server-bin` → Server.Source; `gen-godot-json` / `gen-cocos-json` / `gen-laya-json` → Godot / CocosCreator / LayaBox |
 | [Protobuf](https://github.com/GameFrameX/GameFrameX.Protobuf) | 統一網路協議定義：proto3，依檔名中的數字模組 ID 組織訊息與錯誤碼（正數為用戶端↔伺服器，負數為伺服器內部） | proto3 | `Proto2CsExport_Server` → Server; `Proto2CsExport_Client` → Unity; `Proto2CsExport_Godot` / `Proto2TsExport_CocosCreator` / `Proto2TsExport_LayaBox` → 其他用戶端；每次 push 由 CI 發佈六種語言的 Release |

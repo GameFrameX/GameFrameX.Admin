@@ -5,7 +5,7 @@ using GameFrameX.Entity.Global;
 namespace GameFrameX.Entity.System;
 
 /// <summary>
-/// 配置字段基类。不要直接映射数据库表，平台私有配置使用 <see cref="SystemConfigEntity"/>，租户只读全局配置使用 <see cref="GlobalConfigEntity"/>。
+/// 配置字段基类。不要直接映射数据库表，平台私有配置使用 <see cref="SystemConfigEntity"/>，业务侧只读全局配置使用 <see cref="GlobalConfigEntity"/>。
 /// </summary>
 public abstract class SystemConfigBase : EntityBasic
 {

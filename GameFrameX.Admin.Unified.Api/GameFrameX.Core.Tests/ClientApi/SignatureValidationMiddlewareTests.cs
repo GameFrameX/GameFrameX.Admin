@@ -8,7 +8,7 @@ using GameFrameX.Core.Cache;
 using GameFrameX.Core.Enum;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Entity.Enum;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -38,7 +38,8 @@ public sealed class SignatureValidationMiddlewareTests
     private const string KeyA = "GFX-C2-VECTOR-TEST-KEY-A";
     private const string KeyBId = "sk-vector-b-002";
     private const string KeyB = "GFX-C2-VECTOR-TEST-KEY-B";
-    private const long TestAppId = 1001;
+    /// <summary>旧应用鉴权头的样本值（负向断言：该头不再参与验签，仅作存在性干扰）。</summary>
+    private const long LegacyAppHeaderValue = 1001;
     private const string W1Signature = "gpRxwTuAYGBKjsCeTYqx7IWhTjp07AsjUL9d5Wz8RfA=";
     private const string W2Signature = "Su1Np4XQN4CisUiAdf1JbIxZBzgSsZJH+nDHWlTf5GQ=";
     private const string W3Signature = "OrisTusDdIuqJtg8THzKBjQmC0CXD/4dFvgARPTmezw=";
@@ -58,15 +59,10 @@ public sealed class SignatureValidationMiddlewareTests
 
     private static DefaultHttpContext CreateContext(string? signature, string body = V1Body)
     {
-        return CreateContext("POST", "/cola", "?op=BLLogin&userid=10086", signature, body, null);
+        return CreateContext("POST", "/cola", "?op=BLLogin&userid=10086", signature, body);
     }
 
-    private static DefaultHttpContext CreateContext(string? signature, string body, long? appId)
-    {
-        return CreateContext("POST", "/cola", "?op=BLLogin&userid=10086", signature, body, appId);
-    }
-
-    private static DefaultHttpContext CreateContext(string method, string path, string? query, string? signature, string body, long? appId)
+    private static DefaultHttpContext CreateContext(string method, string path, string? query, string? signature, string body)
     {
         var context = new DefaultHttpContext();
         context.Response.Body = new MemoryStream(); // 默认 Stream.Null 会吞掉错误信封，无法断言
@@ -81,11 +77,6 @@ public sealed class SignatureValidationMiddlewareTests
         if (signature != null)
         {
             context.Request.Headers[SignatureValidationMiddleware.ColaSignatureHeader] = signature;
-        }
-
-        if (appId.HasValue)
-        {
-            context.Request.Headers["GameFrameX-App-Id"] = appId.Value.ToString();
         }
 
         return context;
@@ -113,7 +104,7 @@ public sealed class SignatureValidationMiddlewareTests
         return Encoding.ASCII.GetBytes(string.Concat(Enumerable.Repeat("0123456789abcdef", 128)));
     }
 
-    private static DefaultHttpContext CreateV2Context(string keyId, long ts, ulong mid, string signatureBase64, string method = "POST", string path = "/cola", string? query = "?op=BLLogin&userid=10086", byte[]? body = null, long? appId = TestAppId)
+    private static DefaultHttpContext CreateV2Context(string keyId, long ts, ulong mid, string signatureBase64, string method = "POST", string path = "/cola", string? query = "?op=BLLogin&userid=10086", byte[]? body = null)
     {
         var context = new DefaultHttpContext();
         context.Response.Body = new MemoryStream();
@@ -126,10 +117,6 @@ public sealed class SignatureValidationMiddlewareTests
 
         context.Request.Body = new MemoryStream(body ?? Encoding.UTF8.GetBytes(V1Body));
         context.Request.Headers[SignatureValidationMiddleware.ColaSignatureHeader] = V2Header(keyId, ts, mid, signatureBase64);
-        if (appId.HasValue)
-        {
-            context.Request.Headers["GameFrameX-App-Id"] = appId.Value.ToString();
-        }
 
         return context;
     }
@@ -141,8 +128,8 @@ public sealed class SignatureValidationMiddlewareTests
     private static FakeSignatureKeyResolver CreateDualKeyRing()
     {
         var resolver = new FakeSignatureKeyResolver();
-        resolver.AddKey(TestAppId, KeyAId, KeyA, true, 0, null);
-        resolver.AddKey(TestAppId, KeyBId, KeyB, true, 0, null);
+        resolver.AddKey(KeyAId, KeyA, true, 0, null);
+        resolver.AddKey(KeyBId, KeyB, true, 0, null);
         return resolver;
     }
 
@@ -296,6 +283,20 @@ public sealed class SignatureValidationMiddlewareTests
     }
 
     [Fact]
+    public async Task V2_LegacyAppHeaderPresent_DoesNotChangeValidationOutcome()
+    {
+        // 负向契约：附带旧应用鉴权头时验签结果与不带时完全一致（旧头不参与解析、不改变结果）
+        var nextCalled = false;
+        var context = CreateV2Context(KeyAId, 1755244800, 1, W1Signature);
+        context.Request.Headers["GameFrameX-App-Id"] = LegacyAppHeaderValue.ToString(); // c406-keep（负向断言：旧应用头被忽略）
+
+        await InvokeAsync(context, CreateOptions(true), new MemoryCacheService(), () => nextCalled = true, CreateDualKeyRing());
+
+        Assert.True(nextCalled);
+        Assert.Equal(StatusCodes.Status200OK, context.Response.StatusCode);
+    }
+
+    [Fact]
     public async Task V2_W2Vector_KeyB_SameParams_Passes()
     {
         // 双密钥共存锚：与 W1 完全同参数（method/path/query/ts/mid/body），仅 key 不同，两把 key 均须验签通过
@@ -415,7 +416,7 @@ public sealed class SignatureValidationMiddlewareTests
     public async Task V2_WithoutAppHeader_ValidSignatureUsesMainKey()
     {
         var nextCalled = false;
-        var context = CreateV2Context(KeyAId, 1755244800, 1, W1Signature, appId: null);
+        var context = CreateV2Context(KeyAId, 1755244800, 1, W1Signature);
         await InvokeAsync(context, CreateOptions(true), new MemoryCacheService(), () => nextCalled = true, CreateDualKeyRing());
         Assert.True(nextCalled);
     }
@@ -424,7 +425,7 @@ public sealed class SignatureValidationMiddlewareTests
     public async Task V2_DisabledKey_RejectedWith60103()
     {
         var ring = CreateDualKeyRing();
-        ring.AddKey(TestAppId, KeyAId, KeyA, false, 0, null); // keyA 禁用（同 Kid 覆写）
+        ring.AddKey(KeyAId, KeyA, false, 0, null); // keyA 禁用（同 Kid 覆写）
         var nextCalled = false;
         var context = CreateV2Context(KeyAId, 1755244800, 1, W1Signature);
 
@@ -439,7 +440,7 @@ public sealed class SignatureValidationMiddlewareTests
     public async Task V2_ExpiredKey_RejectedWith60103()
     {
         var ring = CreateDualKeyRing();
-        ring.AddKey(TestAppId, KeyAId, KeyA, true, 0, 1755244800); // 到期时刻 = 向量 ts（已过）
+        ring.AddKey(KeyAId, KeyA, true, 0, 1755244800); // 到期时刻 = 向量 ts（已过）
         var nextCalled = false;
         var context = CreateV2Context(KeyAId, 1755244800, 1, W1Signature);
 
@@ -502,7 +503,8 @@ public sealed class SignatureValidationMiddlewareTests
         // v1 无 keyId：中间件应在 App 域生效密钥集合内遍历（非 C1 常量签的名也要能过）
         var signature = SignV1(KeyA, "POST", "/cola", "op=BLLogin&userid=10086", 1755244800, 20, V1Body);
         var nextCalled = false;
-        var context = CreateContext("v1;1755244800;20;" + signature, V1Body, TestAppId);
+        var context = CreateContext("v1;1755244800;20;" + signature, V1Body);
+        context.Request.Headers["GameFrameX-App-Id"] = LegacyAppHeaderValue.ToString(); // c406-keep（负向断言：旧应用头存在不影响验签结果）
 
         await InvokeAsync(context, CreateOptions(true), new MemoryCacheService(), () => nextCalled = true, CreateDualKeyRing());
 
@@ -516,7 +518,8 @@ public sealed class SignatureValidationMiddlewareTests
         // ring 内没有能验过这把签名的 key，也不匹配 C1 常量 → 60101（常量回退不豁免失败签名）
         var signature = SignV1("GFX-UNKNOWN-KEY", "POST", "/cola", "op=BLLogin&userid=10086", 1755244800, 21, V1Body);
         var nextCalled = false;
-        var context = CreateContext("v1;1755244800;21;" + signature, V1Body, TestAppId);
+        var context = CreateContext("v1;1755244800;21;" + signature, V1Body);
+        context.Request.Headers["GameFrameX-App-Id"] = LegacyAppHeaderValue.ToString(); // c406-keep（负向断言：旧应用头存在不豁免失败签名）
 
         await InvokeAsync(context, CreateOptions(true), new MemoryCacheService(), () => nextCalled = true, CreateDualKeyRing());
 
@@ -532,7 +535,7 @@ public sealed class SignatureValidationMiddlewareTests
     {
         // 禁用 keyA 不影响 keyB 验签（单 key 失效不殃及全应用）
         var ring = CreateDualKeyRing();
-        ring.AddKey(TestAppId, KeyAId, KeyA, false, 0, null);
+        ring.AddKey(KeyAId, KeyA, false, 0, null);
         var nextCalled = false;
         var context = CreateV2Context(KeyBId, 1755244800, 1, W2Signature);
 
@@ -689,9 +692,9 @@ public sealed class SignatureValidationMiddlewareTests
         Assert.Equal(SignatureKeyLookupResult.Expired, SignatureKeyResolver.Judge(Key(0, now, true), now)); // now == Expire 即到期
         return;
 
-        static TenantAppSignatureKeyEntity Key(long? notBefore, long? expire, bool enabled)
+        static AppSignatureKeyEntity Key(long? notBefore, long? expire, bool enabled)
         {
-            return new TenantAppSignatureKeyEntity { NotBeforeTime = notBefore, ExpireTime = expire, IsEnabled = enabled, };
+            return new AppSignatureKeyEntity { NotBeforeTime = notBefore, ExpireTime = expire, IsEnabled = enabled, };
         }
     }
 
@@ -705,16 +708,16 @@ public sealed class SignatureValidationMiddlewareTests
     }
 
     /// <summary>
-    /// 密钥环内存桩：按 (AppId, Kid) 查找，租约/启用判定复用 <see cref="SignatureKeyResolver.Judge"/>（与生产同一路径）。
+    /// 密钥环内存桩：按 Kid 查找，租约/启用判定复用 <see cref="SignatureKeyResolver.Judge"/>（与生产同一路径）。
     /// </summary>
     private sealed class FakeSignatureKeyResolver : ISignatureKeyResolver
     {
-        private readonly List<TenantAppSignatureKeyEntity> _keys = new();
+        private readonly List<AppSignatureKeyEntity> _keys = new();
 
-        public void AddKey(long appId, string kid, string secret, bool enabled, long? notBefore, long? expire)
+        public void AddKey(string kid, string secret, bool enabled, long? notBefore, long? expire)
         {
             _keys.RemoveAll(x => x.Kid == kid);
-            _keys.Add(new TenantAppSignatureKeyEntity
+            _keys.Add(new AppSignatureKeyEntity
             {
                 Kid = kid,
                 Secret = secret,

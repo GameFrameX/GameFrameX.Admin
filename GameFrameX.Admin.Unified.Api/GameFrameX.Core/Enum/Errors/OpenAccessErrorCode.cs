@@ -12,15 +12,9 @@ public enum OpenAccessErrorCode
     IdentityAlreadyExists = 31300001,
 
     /// <summary>
-    /// 应用不存在或不属于当前租户
+    /// 绑定用户不存在
     /// </summary>
-    [ErrorText("应用不存在或不属于当前租户", "App does not exist or does not belong to the current tenant")]
-    AppNotFoundOrNotOwned = 31300002,
-
-    /// <summary>
-    /// 绑定用户不存在或不属于当前租户
-    /// </summary>
-    [ErrorText("绑定用户不存在或不属于当前租户", "Bound user does not exist or does not belong to the current tenant")]
+    [ErrorText("绑定用户不存在", "Bound user does not exist")]
     BoundUserNotFoundOrNotOwned = 31300003,
 
     /// <summary>

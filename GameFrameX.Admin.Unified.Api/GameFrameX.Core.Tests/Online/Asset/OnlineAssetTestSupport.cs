@@ -2,7 +2,7 @@ using GameFrameX.Application.ServerCenter.Online;
 using GameFrameX.Core.Const;
 using GameFrameX.Core.Service.User;
 using GameFrameX.Core.SqlSugar;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 using GameFrameX.Foundation.Orm.Entity;
 using Microsoft.AspNetCore.Http;
 using SqlSugar;
@@ -10,14 +10,12 @@ using SqlSugar;
 namespace GameFrameX.Core.Tests.Online.Asset;
 
 // C340 / GFX-752（vault:C4）资产域 Service 单测共享基座：SQLite 专属 ConfigId 隔离 + IOnlineServerClient fake +
-// TenantGameApp/Area 作用域种子 + 当前用户上下文构造。各 Service 测试只关心断言本身，不重复构造基座。
+// GameApp/Area 作用域种子 + 当前用户上下文构造。各 Service 测试只关心断言本身，不重复构造基座。
 //
 // C283 命名对齐守护：本文件以「共享基座」单一类型 `OnlineAssetTestSupport` 立名；
 // IOnlineServerClient fake 与 OnlineCall 记录类都内嵌为私有嵌套类型，避免平级多类型破规。
 internal static class OnlineAssetTestSupport
 {
-    public const long TenantA = 4001;
-    public const long App100 = 100;
     public const long Area1001 = 2001;
     public const long Area1002 = 2002;
 
@@ -63,18 +61,17 @@ internal static class OnlineAssetTestSupport
         return new SqlSugarRepository<T> { Context = db, };
     }
 
-    public static CurrentUserContext CreateUserContext(long tenantId = TenantA)
+    public static CurrentUserContext CreateUserContext()
     {
         var identity = new global::System.Security.Claims.ClaimsIdentity("TestAuth");
-        identity.AddClaim(new global::System.Security.Claims.Claim("TenantId", tenantId.ToString()));
         var httpContext = new DefaultHttpContext { User = new global::System.Security.Claims.ClaimsPrincipal(identity), };
         var accessor = new HttpContextAccessor { HttpContext = httpContext, };
         return new CurrentUserContext(accessor);
     }
 
-    public static TenantGameAreaEntity NewArea(long id, long appId, long now)
+    public static GameAreaEntity NewArea(long id, long now)
     {
-        return new TenantGameAreaEntity
+        return new GameAreaEntity
         {
             Id = id,
             Name = $"area-{id}",
@@ -102,10 +99,10 @@ internal static class OnlineAssetTestSupport
     public static async Task SeedScopeAsync(SqlSugarScopeProvider db, bool secondArea = false)
     {
         var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-        await db.Insertable(NewArea(Area1001, App100, now)).ExecuteCommandAsync();
+        await db.Insertable(NewArea(Area1001, now)).ExecuteCommandAsync();
         if (secondArea)
         {
-            await db.Insertable(NewArea(Area1002, App100, now)).ExecuteCommandAsync();
+            await db.Insertable(NewArea(Area1002, now)).ExecuteCommandAsync();
         }
     }
 }

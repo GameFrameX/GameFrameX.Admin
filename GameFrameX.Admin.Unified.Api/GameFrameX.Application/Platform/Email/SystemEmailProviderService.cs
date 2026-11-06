@@ -1,6 +1,6 @@
 using GameFrameX.Application.Platform.Email.Dto;
 using GameFrameX.Core.Service;
-using GameFrameX.Core.Service.Tenant;
+using GameFrameX.Core.Service.Business;
 using GameFrameX.Email.Abstract;
 using Microsoft.Extensions.Logging;
 
@@ -9,7 +9,7 @@ namespace GameFrameX.Application.Platform.Email;
 
 /// <summary>
 /// 平台系统邮件 Provider 配置管理服务。
-/// <para>主库 / SuperAdmin-only；与租户业务邮件（<c>TenantEmailConfigEntity</c>）分域，禁止互相 fallback。</para>
+/// <para>主库 / SuperAdmin-only；与业务邮件（<c>EmailConfigEntity</c>）分域，禁止互相 fallback。</para>
 /// <para>敏感字段（UserName / Password / SecretId / SecretKey）输出脱敏 <c>******</c>；更新时回传 <c>******</c> 保留原值。</para>
 /// <para>调用方必须显式传入 <c>SystemEmailPurpose</c>；缺配置时 <see cref="SendTestEmailAsync"/> 与 <c>SystemMessageService.SendEmailAsync</c> 均返回明确错误，禁止静默成功。</para>
 /// </summary>
@@ -222,15 +222,15 @@ public class SystemEmailProviderService
     }
 
     /// <summary>
-    /// 凭证敏感字段落库前静态加密（C370 <see cref="TenantSecretCrypto"/> 收口）：新明文加密为 <c>enc:sec:v1:</c> 密文，
+    /// 凭证敏感字段落库前静态加密（C370 <see cref="SecretCrypto"/> 收口）：新明文加密为 <c>enc:sec:v1:</c> 密文，
     /// <see cref="SensitiveFieldMask.PreserveIfMasked"/> 保留的库中旧值已是密文则幂等透传。
     /// </summary>
     private static void EncryptProviderSecrets(GameFrameX.Entity.System.SystemEmailProviderEntity entity)
     {
-        entity.UserName = TenantSecretCrypto.Encrypt(entity.UserName);
-        entity.Password = TenantSecretCrypto.Encrypt(entity.Password);
-        entity.SecretId = TenantSecretCrypto.Encrypt(entity.SecretId);
-        entity.SecretKey = TenantSecretCrypto.Encrypt(entity.SecretKey);
+        entity.UserName = SecretCrypto.Encrypt(entity.UserName);
+        entity.Password = SecretCrypto.Encrypt(entity.Password);
+        entity.SecretId = SecretCrypto.Encrypt(entity.SecretId);
+        entity.SecretKey = SecretCrypto.Encrypt(entity.SecretKey);
     }
 
     /// <summary>

@@ -5,7 +5,7 @@ using GameFrameX.Core.Cache;
 using GameFrameX.Core.Extension.Cache;
 using GameFrameX.Core.Option;
 using GameFrameX.Core.Service.Cache;
-using GameFrameX.Core.Service.Tenant;
+using GameFrameX.Core.Service.Business;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Core.Tests.System;
 using GameFrameX.Core.Extension.Const;
@@ -34,10 +34,10 @@ public sealed class SqlSugarRepositoryDiResolutionTests : IDisposable
 
     /// <summary>
     /// DI 解析平台表仓储：无租户上下文（superadmin 语义）下不抛异常，Context 路由主库且查询可用。
-    /// 对应 AddTenantAsync 中 adminAccount 查重的修复路径。
+    /// 对应 AddAsync 中 adminAccount 查重的修复路径。
     /// </summary>
     [Fact]
-    public void DiResolution_PlatformTableRepository_RoutesMainDatabase_WithoutTenantContext()
+    public void DiResolution_PlatformTableRepository_RoutesMainDatabaseWithoutLegacyContext()
     {
         var services = BuildServices();
 

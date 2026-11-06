@@ -13,7 +13,7 @@ public enum ChannelScopeEnum
     [Description("系统")] System = 1,
 
     /// <summary>
-    /// 租户自定义渠道
+    /// 业务自定义渠道
     /// </summary>
-    [Description("租户")] Tenant = 2,
+    [Description("业务")] Business = 2,
 }

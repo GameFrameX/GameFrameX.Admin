@@ -8,7 +8,7 @@ namespace GameFrameX.Core.Tests.Bootstrap;
 public class HostMainDbConnectionResolverTests
 {
     [Fact]
-    public void Resolve_BindsDbConnectionSectionAndDerivesDefaultTenant()
+    public void Resolve_BindsDbConnectionSectionAndDerivesMainDatabase()
     {
         var configuration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
         {

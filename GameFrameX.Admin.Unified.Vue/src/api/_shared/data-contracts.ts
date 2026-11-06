@@ -109,8 +109,8 @@ export enum ChannelTypeEnum {
 export enum ChannelScopeEnum {
   /** 系统 */
   System = 1,
-  /** 租户 */
-  Tenant = 2,
+  /** 业务 */
+  Business = 2,
 }
 
 /** @format int32 */
@@ -476,7 +476,6 @@ export interface LogOperationFields {
   rowVersion?: string | null;
   /** 是否启用,true:启用，false:禁用，null:未设置(启用) */
   isEnabled?: boolean | null;
-  tenantId?: string | null;
   controllerName?: string | null;
   actionName?: string | null;
   displayTitle?: string | null;
@@ -729,6 +728,7 @@ export * from "../appSignatureKey/types";
 export * from "../channelDefinition/types";
 export * from "../clientApiPolicy/types";
 export * from "../deviceGroup/types";
+export * from "../file/types";
 export * from "../gameAdvertisementReward/types";
 export * from "../gameAnnouncement/types";
 export * from "../gameAntiCheatEvent/types";
@@ -808,6 +808,7 @@ export * from "../platformJwtConfig/types";
 export * from "../platformLoggingConfig/types";
 export * from "../platformPasswordPolicyConfig/types";
 export * from "../platformRateLimitConfig/types";
+export * from "../role/types";
 export * from "../sessionKey/types";
 export * from "../systemAuth/types";
 export * from "../systemCache/types";
@@ -819,6 +820,4 @@ export * from "../systemEnum/types";
 export * from "../systemJob/types";
 export * from "../systemMessage/types";
 export * from "../systemOpenAccess/types";
-export * from "../tenantFile/types";
-export * from "../tenantRole/types";
-export * from "../tenantUser/types";
+export * from "../user/types";

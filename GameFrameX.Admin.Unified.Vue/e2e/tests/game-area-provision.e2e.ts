@@ -4,7 +4,7 @@ import { test, expect } from '@playwright/test';
 import { ADMIN_STATE, navigateByMenu, shot, signIn } from './helpers';
 import { installApiRecorder, readApiRecords } from './module-coverage';
 import { globalServerSelector, selectServerOption } from './server-selection';
-import { readField } from './admin-menu-fixture';
+import { readField } from './admin-stack';
 
 // 环境准备见 notes-provision.md：隔离库模板“E2E 开服模板”的分类 HttpManagerUrl 指向本桩。
 // 用例只通过真实表单与菜单操作，不主动调用管理 API 或 SQL。
@@ -62,7 +62,8 @@ for (const registrationFailures of [0, 1]) {
     const name = `开服回归-${identifier}`;
     await wizard.getByLabel('新区服编号', { exact: true }).fill(identifier);
     await wizard.getByLabel('新区服名称', { exact: true }).fill(name);
-    await wizard.getByLabel('游戏服 HTTP 管理地址', { exact: true }).fill(`http://127.0.0.1:${port}`);
+    // 容器化 Web.Api 经 host.docker.internal 回连宿主桩；宿主进程跑法保持 127.0.0.1
+    await wizard.getByLabel('游戏服 HTTP 管理地址', { exact: true }).fill(`http://${process.env.E2E_PROVISION_STUB_HOST ?? '127.0.0.1'}:${port}`);
     await wizard.getByLabel('TCP 连接地址', { exact: true }).fill('tcp://127.0.0.1:22241');
     await wizard.getByLabel('WebSocket 连接地址', { exact: true }).fill('ws://127.0.0.1:22242');
     await wizard.getByLabel('容器环境变量覆盖项（JSON 字符串字典）', { exact: true }).fill(JSON.stringify({ ServerId: identifier }));

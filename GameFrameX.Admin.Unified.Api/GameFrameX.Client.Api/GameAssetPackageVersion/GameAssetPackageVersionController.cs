@@ -1,6 +1,6 @@
 using GameFrameX.Client.Api.Services.PackageVersion;
-using GameFrameX.Entity.Tenant.Game.Release;
-using GameFrameX.Entity.Tenant.Device;
+using GameFrameX.Entity.Business.Game.Release;
+using GameFrameX.Entity.Business.Device;
 using GameFrameX.Client.Api.GameAssetPackageVersion.Dto;
 using GameFrameX.Client.Api.Services;
 using GameFrameX.Core.Middleware;
@@ -12,10 +12,10 @@ namespace GameFrameX.Client.Api.GameAssetPackageVersion;
 /// <summary>
 /// 资源包版本控制器
 /// </summary>
-public class GameAssetPackageVersionController : BaseController<TenantGameAppAssetPackageVersionEntity>
+public class GameAssetPackageVersionController : BaseController<GameAppAssetPackageVersionEntity>
 {
-    private readonly Repository<TenantGameAppDeviceEntity> _deviceUniqueIdentifier;
-    private readonly IFallbackMatcher<AssetPackageVersionRequest, TenantGameAppAssetPackageVersionEntity> _matcher;
+    private readonly Repository<GameAppDeviceEntity> _deviceUniqueIdentifier;
+    private readonly IFallbackMatcher<AssetPackageVersionRequest, GameAppAssetPackageVersionEntity> _matcher;
 
     /// <summary>
     ///
@@ -23,7 +23,7 @@ public class GameAssetPackageVersionController : BaseController<TenantGameAppAss
     /// <param name="service"></param>
     /// <param name="deviceUniqueIdentifier"></param>
     /// <param name="matcher"></param>
-    public GameAssetPackageVersionController(SqlSugarRepository<TenantGameAppAssetPackageVersionEntity> service, Repository<TenantGameAppDeviceEntity> deviceUniqueIdentifier, IFallbackMatcher<AssetPackageVersionRequest, TenantGameAppAssetPackageVersionEntity> matcher) : base(service)
+    public GameAssetPackageVersionController(SqlSugarRepository<GameAppAssetPackageVersionEntity> service, Repository<GameAppDeviceEntity> deviceUniqueIdentifier, IFallbackMatcher<AssetPackageVersionRequest, GameAppAssetPackageVersionEntity> matcher) : base(service)
     {
         _deviceUniqueIdentifier = deviceUniqueIdentifier;
         _matcher = matcher;
@@ -82,13 +82,13 @@ public class GameAssetPackageVersionController : BaseController<TenantGameAppAss
             return HttpJsonResultData<DeviceRegisterResponse>.Success(new DeviceRegisterResponse { DeviceId = hasExist.Id, });
         }
 
-        var tenantDeviceUniqueIdentifier = new TenantGameAppDeviceEntity
+        var deviceUniqueIdentifier = new GameAppDeviceEntity
         {
             Name = "",
             Description = "",
             DeviceUniqueIdentifier = request.DeviceUniqueIdentifier,
         };
-        await _deviceUniqueIdentifier.InsertAsync(tenantDeviceUniqueIdentifier);
-        return HttpJsonResultData<DeviceRegisterResponse>.Success(new DeviceRegisterResponse { DeviceId = tenantDeviceUniqueIdentifier.Id, });
+        await _deviceUniqueIdentifier.InsertAsync(deviceUniqueIdentifier);
+        return HttpJsonResultData<DeviceRegisterResponse>.Success(new DeviceRegisterResponse { DeviceId = deviceUniqueIdentifier.Id, });
     }
 }

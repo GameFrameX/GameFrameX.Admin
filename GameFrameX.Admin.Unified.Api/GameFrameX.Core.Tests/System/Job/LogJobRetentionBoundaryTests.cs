@@ -9,7 +9,7 @@ namespace GameFrameX.Core.Tests.System.Job;
 
 /// <summary>
 /// C404 裁定 §9.4：LogJob 不再删除 SystemLogVisit / SystemLogOperation（移交审计留存归档），
-/// 仍清理 SystemLogDiff 与租户历史日志表。行为级断言，防止有人回退修剪。
+/// 仍清理 SystemLogDiff 与管理员历史日志表。行为级断言，防止有人回退修剪。
 /// </summary>
 public sealed class LogJobRetentionBoundaryTests : IDisposable
 {
@@ -17,8 +17,8 @@ public sealed class LogJobRetentionBoundaryTests : IDisposable
 
     public LogJobRetentionBoundaryTests()
     {
-        _database.InitTenantTables(typeof(SystemLogVisitEntity), typeof(SystemLogOperationEntity), typeof(SystemLogDiffEntity),
-                                   typeof(TenantLogVisitEntity), typeof(TenantLogOperationEntity), typeof(TenantLogDiffEntity));
+        _database.InitBusinessTables(typeof(SystemLogVisitEntity), typeof(SystemLogOperationEntity), typeof(SystemLogDiffEntity),
+                                   typeof(LogVisitEntity), typeof(LogOperationEntity), typeof(LogDiffEntity));
     }
 
     public void Dispose()
@@ -27,7 +27,7 @@ public sealed class LogJobRetentionBoundaryTests : IDisposable
     }
 
     [Fact]
-    public async Task LogJob_KeepsSystemVisitAndOperation_DeletesDiffAndTenantHistory()
+    public async Task LogJob_KeepsSystemVisitAndOperation_DeletesDiffAndBusinessHistory()
     {
         var cutoff = DateTimeOffset.UtcNow.ToUnixTimeSeconds() - 40 * 24 * 60 * 60;
         foreach (var entity in new object[]
@@ -35,9 +35,9 @@ public sealed class LogJobRetentionBoundaryTests : IDisposable
                      new SystemLogVisitEntity { Id = 501, CreatedTime = cutoff - 100, },
                      new SystemLogOperationEntity { Id = 502, CreatedTime = cutoff - 100, },
                      new SystemLogDiffEntity { Id = 503, CreatedTime = cutoff - 100, },
-                     new TenantLogVisitEntity { Id = 504, CreatedTime = cutoff - 100, },
-                     new TenantLogOperationEntity { Id = 505, CreatedTime = cutoff - 100, },
-                     new TenantLogDiffEntity { Id = 506, CreatedTime = cutoff - 100, },
+                     new LogVisitEntity { Id = 504, CreatedTime = cutoff - 100, },
+                     new LogOperationEntity { Id = 505, CreatedTime = cutoff - 100, },
+                     new LogDiffEntity { Id = 506, CreatedTime = cutoff - 100, },
                  })
         {
             _database.MainDb.InsertableByObject(entity).ExecuteCommand();
@@ -48,9 +48,9 @@ public sealed class LogJobRetentionBoundaryTests : IDisposable
         BackfillCreatedTime<SystemLogVisitEntity>(501, cutoff);
         BackfillCreatedTime<SystemLogOperationEntity>(502, cutoff);
         BackfillCreatedTime<SystemLogDiffEntity>(503, cutoff);
-        BackfillCreatedTime<TenantLogVisitEntity>(504, cutoff);
-        BackfillCreatedTime<TenantLogOperationEntity>(505, cutoff);
-        BackfillCreatedTime<TenantLogDiffEntity>(506, cutoff);
+        BackfillCreatedTime<LogVisitEntity>(504, cutoff);
+        BackfillCreatedTime<LogOperationEntity>(505, cutoff);
+        BackfillCreatedTime<LogDiffEntity>(506, cutoff);
 
         var services = new ServiceCollection();
         services.AddSingleton<ISqlSugarClient>(_database.MainDb);
@@ -61,11 +61,11 @@ public sealed class LogJobRetentionBoundaryTests : IDisposable
         // §9.4：两张 System 表保留（审计留存负责归档）。
         Assert.Equal(1, _database.MainDb.Queryable<SystemLogVisitEntity>().Count());
         Assert.Equal(1, _database.MainDb.Queryable<SystemLogOperationEntity>().Count());
-        // 差异日志与租户历史日志仍按保留期清理。
+        // 差异日志与管理员历史日志仍按保留期清理。
         Assert.Equal(0, _database.MainDb.Queryable<SystemLogDiffEntity>().Count());
-        Assert.Equal(0, _database.MainDb.Queryable<TenantLogVisitEntity>().Count());
-        Assert.Equal(0, _database.MainDb.Queryable<TenantLogOperationEntity>().Count());
-        Assert.Equal(0, _database.MainDb.Queryable<TenantLogDiffEntity>().Count());
+        Assert.Equal(0, _database.MainDb.Queryable<LogVisitEntity>().Count());
+        Assert.Equal(0, _database.MainDb.Queryable<LogOperationEntity>().Count());
+        Assert.Equal(0, _database.MainDb.Queryable<LogDiffEntity>().Count());
     }
 
     private void BackfillCreatedTime<TEntity>(long rowId, long cutoff) where TEntity : class, new()

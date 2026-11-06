@@ -29,9 +29,9 @@ public sealed class LogPagePostgresTests
         using (var scope = new SqlSugarScope(postgres!.BuildDbConfig("main", false)))
         {
             var database = scope.GetConnectionScope("main");
-            database.CodeFirst.InitTables<SystemLogOperationEntity, TenantLogOperationEntity, SystemUserEntity>();
+            database.CodeFirst.InitTables<SystemLogOperationEntity, LogOperationEntity, SystemUserEntity>();
             database.Insertable(CreateLog<SystemLogOperationEntity>(1, 100, "current-admin")).ExecuteCommand();
-            database.Insertable(CreateLog<TenantLogOperationEntity>(2, 50, "historical-admin")).ExecuteCommand();
+            database.Insertable(CreateLog<LogOperationEntity>(2, 50, "historical-admin")).ExecuteCommand();
             var administrator = new SystemUserEntity { Id = 999, Account = "root-account", AccountType = AccountTypeEnum.SuperAdmin, IsDeleted = true };
             foreach (var property in administrator.GetType().GetProperties().Where(property => property.PropertyType == typeof(string) && property.CanWrite && property.GetValue(administrator) == null))
             {
@@ -43,7 +43,7 @@ public sealed class LogPagePostgresTests
             rootRow.CreatedId = 999;
             rootRow.Message = "root-private-record";
             database.Insertable(rootRow).ExecuteCommand();
-            var loginRow = CreateLog<TenantLogOperationEntity>(4, 20, "superadmin");
+            var loginRow = CreateLog<LogOperationEntity>(4, 20, "superadmin");
             loginRow.CreatedId = 0;
             loginRow.Message = "root-login-private-record";
             database.Insertable(loginRow).ExecuteCommand();

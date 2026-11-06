@@ -10,7 +10,7 @@
  */
 
 import {
-  AddTenantGameDockerTagEntityRequest,
+  AddGameDockerTagEntityRequest,
   GameDockerTagAddPostData,
   GameDockerTagDeletePostData,
   GameDockerTagDetailGetData,
@@ -18,8 +18,8 @@ import {
   GameDockerTagSelectPostData,
   GameDockerTagSelectStringPostData,
   GameDockerTagUpdatePostData,
-  PageTenantGameDockerTagEntityRequest,
-  UpdateTenantGameDockerTagEntityRequest,
+  PageGameDockerTagEntityRequest,
+  UpdateGameDockerTagEntityRequest,
 } from "./types";
 import {
   BaseDeleteRequest,
@@ -44,7 +44,7 @@ export class GameDockerTag<SecurityDataType = unknown> {
    * @request POST:/api/gameDockerTag/add
    */
   gameDockerTagAddPost = (
-    data: AddTenantGameDockerTagEntityRequest,
+    data: AddGameDockerTagEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameDockerTagAddPostData, any>({
@@ -109,7 +109,7 @@ export class GameDockerTag<SecurityDataType = unknown> {
    * @request POST:/api/gameDockerTag/page
    */
   gameDockerTagPagePost = (
-    data: PageTenantGameDockerTagEntityRequest,
+    data: PageGameDockerTagEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameDockerTagPagePostData, any>({
@@ -169,7 +169,7 @@ export class GameDockerTag<SecurityDataType = unknown> {
    * @request POST:/api/gameDockerTag/update
    */
   gameDockerTagUpdatePost = (
-    data: UpdateTenantGameDockerTagEntityRequest,
+    data: UpdateGameDockerTagEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameDockerTagUpdatePostData, any>({

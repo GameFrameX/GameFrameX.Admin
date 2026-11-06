@@ -10,13 +10,13 @@ namespace GameFrameX.Client.Api.GameUserRace;
 /// </summary>
 public class GameUserRaceController : BaseController
 {
-    private readonly Repository<TenantGameUserArchiveEntity> _archiveRepository;
+    private readonly Repository<GameUserArchiveEntity> _archiveRepository;
 
     /// <summary>
     ///
     /// </summary>
     /// <param name="archiveRepository">存档仓储（机器人从真实玩家档抽样）</param>
-    public GameUserRaceController(Repository<TenantGameUserArchiveEntity> archiveRepository)
+    public GameUserRaceController(Repository<GameUserArchiveEntity> archiveRepository)
     {
         _archiveRepository = archiveRepository;
     }
@@ -36,7 +36,7 @@ public class GameUserRaceController : BaseController
         // ponytail: 真实档候选全量取回内存随机（同 RandomRobots）；玩家量上来后改 SQL 随机抽样或机器人池配置
         var candidates = await _archiveRepository.GetListAsync(x => x.NickName != string.Empty && x.Icon != string.Empty);
         Shuffle(candidates);
-        var pool = new Queue<TenantGameUserArchiveEntity>(candidates.Where(x => !exclude.Contains(x.UserId)));
+        var pool = new Queue<GameUserArchiveEntity>(candidates.Where(x => !exclude.Contains(x.UserId)));
         var round = Math.Max(request.Round ?? 1, 1);
         var seq = 1;
         var stamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
@@ -150,7 +150,7 @@ public class GameUserRaceController : BaseController
     /// <summary>
     /// Fisher-Yates 洗牌（机器人候选随机化）
     /// </summary>
-    private static void Shuffle(List<TenantGameUserArchiveEntity> list)
+    private static void Shuffle(List<GameUserArchiveEntity> list)
     {
         for (var i = list.Count - 1; i > 0; i--)
         {

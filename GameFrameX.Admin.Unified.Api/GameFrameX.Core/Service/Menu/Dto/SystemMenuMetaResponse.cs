@@ -50,8 +50,4 @@ public class SystemMenuMetaResponse
     /// </summary>
     public string MenuContext { get; set; } = null!;
 
-    /// <summary>
-    /// 菜单作用域：console。
-    /// </summary>
-    public string AppScope { get; set; } = null!;
 }

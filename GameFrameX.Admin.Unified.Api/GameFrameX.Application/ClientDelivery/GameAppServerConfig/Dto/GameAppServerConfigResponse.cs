@@ -1,11 +1,11 @@
-using GameFrameX.Entity.Tenant.Game.ServerConfig;
+using GameFrameX.Entity.Business.Game.ServerConfig;
 
 namespace GameFrameX.Application.ClientDelivery.GameAppServerConfig.Dto;
 
 /// <summary>
 /// 游戏运营配置管理输出参数
 /// </summary>
-public class GameAppServerConfigResponse : IBasePageResponse<TenantGameAppServerConfigEntity>
+public class GameAppServerConfigResponse : IBasePageResponse<GameAppServerConfigEntity>
 {
     /// <summary>
     /// Id

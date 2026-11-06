@@ -47,7 +47,7 @@ public class SystemMessageService : IAdminApiController
     [ApiDescriptionSettings(Name = "SendOtherUser")]
     public async Task SendOtherUserAsync(MessageRequest input)
     {
-        var user = _systemCacheService.Get<TenantOnlineUserEntity>(CacheConst.KeyUserOnline + input.UserId);
+        var user = _systemCacheService.Get<OnlineUserEntity>(CacheConst.KeyUserOnline + input.UserId);
         if (user != null && !string.IsNullOrEmpty(user.ConnectionId))
         {
             await _chatHubContext.Clients.AllExcept(user.ConnectionId).ReceiveMessageAsync(input);
@@ -63,7 +63,7 @@ public class SystemMessageService : IAdminApiController
     [ApiDescriptionSettings(Name = "SendUser")]
     public async Task SendUserAsync(MessageRequest input)
     {
-        var user = _systemCacheService.Get<TenantOnlineUserEntity>(CacheConst.KeyUserOnline + input.UserId);
+        var user = _systemCacheService.Get<OnlineUserEntity>(CacheConst.KeyUserOnline + input.UserId);
         if (user == null || string.IsNullOrEmpty(user.ConnectionId))
         {
             return;
@@ -89,7 +89,7 @@ public class SystemMessageService : IAdminApiController
         var userlist = new List<string>();
         foreach (var userid in input.UserIds)
         {
-            var user = _systemCacheService.Get<TenantOnlineUserEntity>(CacheConst.KeyUserOnline + userid);
+            var user = _systemCacheService.Get<OnlineUserEntity>(CacheConst.KeyUserOnline + userid);
             if (user != null && !string.IsNullOrEmpty(user.ConnectionId))
             {
                 userlist.Add(user.ConnectionId);
@@ -101,7 +101,7 @@ public class SystemMessageService : IAdminApiController
 
     /// <summary>
     /// 发送平台系统邮件。
-    /// <para>从主库 <c>SystemEmailProviderEntity</c> 读取配置（按 <c>SystemEmailPurpose.PlatformOps</c> 默认）；缺配置返回 <c>false</c>，禁止静默成功或 fallback 到租户玩家邮件。</para>
+    /// <para>从主库 <c>SystemEmailProviderEntity</c> 读取配置（按 <c>SystemEmailPurpose.PlatformOps</c> 默认）；缺配置返回 <c>false</c>，禁止静默成功或 fallback 到玩家邮件。</para>
     /// <para>缺省收件人：使用当前命中的 <c>SystemEmailProviderEntity</c> 配置的 <c>DefaultToEmail</c>；若配置也未提供则发送失败。</para>
     /// </summary>
     /// <param name="message">邮件正文。</param>

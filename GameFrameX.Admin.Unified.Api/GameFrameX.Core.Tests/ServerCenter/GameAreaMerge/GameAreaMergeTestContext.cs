@@ -7,7 +7,7 @@ using GameFrameX.Application.ServerCenter.Online;
 using GameFrameX.Core.Const;
 using GameFrameX.Core.Service.User;
 using GameFrameX.Core.SqlSugar;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 using GameFrameX.Foundation.Http.Normalization;
 using GameFrameX.Foundation.Json;
 using GameFrameX.Foundation.Orm.Entity;
@@ -33,11 +33,11 @@ internal sealed class GameAreaMergeTestContext : IDisposable
         _owner = new SqlSugarScope(new List<ConnectionConfig> { configuration });
         Database = _owner.GetConnectionScope("game-area-merge-tests");
         SqlSugarUnifiedConfig.ConfigureBaseFilters(Database);
-        Database.CodeFirst.InitTables(typeof(TenantGameAreaMergePlanEntity), typeof(TenantGameAreaEntity), typeof(TenantGameAreaClassifyEntity));
-        Database.Insertable(new TenantGameAreaClassifyEntity { Id = 10, Name = "合服测试分类", LocalizationKey = "area", DockerRegister = "", ImageName = "", DockerUserName = "", DockerPassword = "", ContainerNetName = "", ContainerSubnet = "", ContainerGateway = "", IsEnabled = true, IsDeleted = false }).ExecuteCommand();
+        Database.CodeFirst.InitTables(typeof(GameAreaMergePlanEntity), typeof(GameAreaEntity), typeof(GameAreaClassifyEntity));
+        Database.Insertable(new GameAreaClassifyEntity { Id = 10, Name = "合服测试分类", LocalizationKey = "area", DockerRegister = "", ImageName = "", DockerUserName = "", DockerPassword = "", ContainerNetName = "", ContainerSubnet = "", ContainerGateway = "", IsEnabled = true, IsDeleted = false }).ExecuteCommand();
         foreach (var identifier in new long[] { 101, 102, 103, 104 })
         {
-            Database.Insertable(new TenantGameAreaEntity
+            Database.Insertable(new GameAreaEntity
             {
                 Id = identifier, Name = $"合服区服{identifier}", ClassifyId = 10, IsDeleted = false,
                 HttpManageUrl = "http://127.0.0.1:22390", TcpSocketUrl = "tcp://localhost", WebSocketUrl = "ws://localhost",
@@ -48,9 +48,9 @@ internal sealed class GameAreaMergeTestContext : IDisposable
         }
         Login(11);
         _httpClient = new HttpClient(Handler);
-        var client = new GameAreaMergeClient(_httpClient, new OnlineServerEndpointResolver(), Repository<TenantGameAreaEntity>(),
-            new OnlineScopeContextFactory(Repository<TenantGameAreaEntity>()));
-        Service = new GameAreaMergeService(Repository<TenantGameAreaMergePlanEntity>(), Repository<TenantGameAreaEntity>(), client, new CurrentUserContext(Accessor));
+        var client = new GameAreaMergeClient(_httpClient, new OnlineServerEndpointResolver(), Repository<GameAreaEntity>(),
+            new OnlineScopeContextFactory(Repository<GameAreaEntity>()));
+        Service = new GameAreaMergeService(Repository<GameAreaMergePlanEntity>(), Repository<GameAreaEntity>(), client, new CurrentUserContext(Accessor));
     }
 
     public SqlSugarRepository<T> Repository<T>() where T : EntityBase, new() => new() { Context = Database };

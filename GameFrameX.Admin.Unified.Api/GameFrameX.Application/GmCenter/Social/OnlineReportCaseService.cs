@@ -10,9 +10,9 @@ namespace GameFrameX.Application.GmCenter.Social;
 
 /// <summary>
 /// Online 举报案件处置服务。路由前缀 /api/onlineReportCase（change C350 / vault:C7）。
-/// <para>案件数据实时透传 Online（Admin 不落镜像）；处置流三步：事实源写入（Mute/Ban 落 TenantGamePenaltyEntity）
+/// <para>案件数据实时透传 Online（Admin 不落镜像）；处置流三步：事实源写入（Mute/Ban 落 GamePenaltyEntity）
 /// → 联动命令（经 <see cref="OnlinePenaltyLinkCommandService"/>，失败不回滚事实源、可重试）→ 当事人通知 + 案件状态回写
-/// （失败不阻断处置，原因分别落响应字段）。三步状态经 MonitorLogging 自动落租户操作审计。</para>
+/// （失败不阻断处置，原因分别落响应字段）。三步状态经 MonitorLogging 自动落管理员操作审计。</para>
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 130)]
 public class OnlineReportCaseService : IAdminApiController
@@ -178,7 +178,7 @@ public class OnlineReportCaseService : IAdminApiController
             throw BusinessError.Oh(CommonErrorCode.ParameterValidationFailed, new { field = "DurationMinutes", });
         }
 
-        return await _penaltyEntityService.AddAsync(new AddTenantGamePenaltyEntityRequest
+        return await _penaltyEntityService.AddAsync(new AddGamePenaltyEntityRequest
         {
             AreaId = input.ServerId,
             TargetType = PenaltyTargetTypeEnum.Account,

@@ -15,7 +15,7 @@ public sealed class SignatureValidationOptions
     /// <summary>
     /// v1 常量签名密钥。默认值与客户端 NetLib.ApiServerHttpRequest.SignatureSecret 同源
     /// （C1 决策：密钥维持常量模式）。C2 起仅为 v1 过渡期回退路径，App 级 v2 密钥环
-    /// （TenantAppSignatureKeyEntity）是正式密钥来源；C3 全量切换后本常量退役。
+    /// （AppSignatureKeyEntity）是正式密钥来源；C3 全量切换后本常量退役。
     /// </summary>
     public string Secret { get; set; } = "iwyWDopevzWv7zyriHi3DDtuwpKMOzfFPq0lkNITV44cPGD_";
 

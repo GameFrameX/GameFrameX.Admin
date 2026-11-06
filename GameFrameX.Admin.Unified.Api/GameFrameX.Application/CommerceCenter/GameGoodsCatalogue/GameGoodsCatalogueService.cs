@@ -8,21 +8,21 @@ namespace GameFrameX.Application.CommerceCenter.GameGoodsCatalogue;
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
 public class GameGoodsCatalogueService
-    : GenericCrudSelectService<Entity.Tenant.Game.TenantGameGoodsCatalogueEntity,
-        AddTenantGameGoodsCatalogueEntityRequest, UpdateTenantGameGoodsCatalogueEntityRequest,
-        GameGoodsCatalogueResponse, PageTenantGameGoodsCatalogueEntityRequest>
+    : GenericCrudSelectService<Entity.Business.Game.GameGoodsCatalogueEntity,
+        AddGameGoodsCatalogueEntityRequest, UpdateGameGoodsCatalogueEntityRequest,
+        GameGoodsCatalogueResponse, PageGameGoodsCatalogueEntityRequest>
 {
-    public GameGoodsCatalogueService(SqlSugarRepository<Entity.Tenant.Game.TenantGameGoodsCatalogueEntity> repository)
+    public GameGoodsCatalogueService(SqlSugarRepository<Entity.Business.Game.GameGoodsCatalogueEntity> repository)
         : base(repository)
     {
     }
 
-    protected override async Task OnAddingAsync(AddTenantGameGoodsCatalogueEntityRequest input)
+    protected override async Task OnAddingAsync(AddGameGoodsCatalogueEntityRequest input)
     {
         await CheckNameUniqueAsync(input.Name);
     }
 
-    protected override async Task OnUpdatingAsync(UpdateTenantGameGoodsCatalogueEntityRequest input)
+    protected override async Task OnUpdatingAsync(UpdateGameGoodsCatalogueEntityRequest input)
     {
         var existing = await Repository.GetFirstAsync(u => u.Id == input.Id);
         if (existing == null)
@@ -33,7 +33,7 @@ public class GameGoodsCatalogueService
         await CheckNameUniqueAsync(input.Name, input.Id);
     }
 
-    protected override ISugarQueryable<GameGoodsCatalogueResponse> BuildPageQuery(PageTenantGameGoodsCatalogueEntityRequest input)
+    protected override ISugarQueryable<GameGoodsCatalogueResponse> BuildPageQuery(PageGameGoodsCatalogueEntityRequest input)
     {
         return Repository.AsQueryable()
                          .WhereIF(!string.IsNullOrWhiteSpace(input.Name), u => u.Name.Contains(input.Name.Trim()))

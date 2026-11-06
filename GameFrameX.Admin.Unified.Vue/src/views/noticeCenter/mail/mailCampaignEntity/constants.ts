@@ -41,7 +41,7 @@ export interface MailCampaignAttachment {
   iconId?: number;
 }
 
-// Campaign 行（对齐 C134 TenantGameMailCampaignEntityOutput，camelCase）
+// Campaign 行（对齐 C134 GameMailCampaignEntityOutput，camelCase）
 export interface MailCampaignRow {
   id?: number;
   areaId: number;

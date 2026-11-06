@@ -1,7 +1,7 @@
 using GameFrameX.Application.PlayerCenter.GamePenalty;
 using GameFrameX.Core.Enum;
 using GameFrameX.Entity.Enum;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 
 namespace GameFrameX.Core.Tests.ClientApi;
 
@@ -10,16 +10,16 @@ namespace GameFrameX.Core.Tests.ClientApi;
 /// </summary>
 internal sealed class FakeGamePenaltyEnforcementService : IGamePenaltyEnforcementService
 {
-    private readonly TenantGamePenaltyEntity _blocking = null!;
+    private readonly GamePenaltyEntity _blocking = null!;
 
-    public FakeGamePenaltyEnforcementService(TenantGamePenaltyEntity? blocking = null)
+    public FakeGamePenaltyEnforcementService(GamePenaltyEntity? blocking = null)
     {
 #pragma warning disable CS8601 // 测试替身：blocking 显式允许 null（"无阻断"语义），与 _blocking = null! 初始化器配合
         _blocking = blocking;
 #pragma warning restore CS8601
     }
 
-    public Task<TenantGamePenaltyEntity> GetLoginBlockingPenaltyAsync(
+    public Task<GamePenaltyEntity> GetLoginBlockingPenaltyAsync(
         PenaltyTargetTypeEnum targetType, string targetId, long? areaId = null)
     {
         return Task.FromResult(_blocking);

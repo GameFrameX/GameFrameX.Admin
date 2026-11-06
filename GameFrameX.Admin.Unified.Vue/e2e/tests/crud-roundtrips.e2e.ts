@@ -65,7 +65,7 @@ const ENTITIES: EntitySpec[] = [
   },
   {
     name: '设备定义',
-    menuTitle: '设备', // tenantDevice 的 zh-cn 渲染标签（树 Title「设备定义」已漂移）
+    menuTitle: '设备', // device 的 zh-cn 渲染标签（树 Title「设备定义」已漂移）
     menuRoot: 'C 端交付',
     fields: ['text', 'text', 'text'],
     createApi: /gameAppDevice\/add/,
@@ -322,6 +322,8 @@ test.describe('CRUD 功能闭环（首批）', () => {
             // editable/只读 Select 点输入框不开面板：兜底点专用下拉钮
             await page.locator(`.p-dialog >> .p-select-dropdown >> nth=${selectIndex}`).click();
           }
+          // 选项异步懒加载（如分组列表）：先等首项可见再点，避免空面板竞态
+          await firstOption.first().waitFor({ state: 'visible', timeout: 8_000 });
           await firstOption.first().click();
           selectIndex += 1;
         } else if (field === 'unique-number') {
@@ -387,4 +389,96 @@ test.describe('CRUD 功能闭环（首批）', () => {
       if (ownContext) await page.close();
     });
   }
+});
+
+// 广告回调配置闭环（F2 / R5：配置按分包绑定）：该页对话框是 schema 驱动（Provider 参数区 + 密钥 Password 框），
+// 不进通用 CRUD 矩阵（fields 引擎不覆盖 password 型字段），此处专项覆盖：
+// 新增必须先选分包 → 提交链带 packageId；编辑弹窗回显所选分包标签；更新与删除闭环。
+// 权限口径（协调者裁定）：跨页选择器沿用 gameAppPackage Select 现有消费约定（同 remoteConfig / gamePaymentConfigEntity），
+// 不为本页单独补按钮权限；e2e 的 admin 夹具授予全部非超管菜单，包含 gameAppPackage:Select。
+test.describe('广告回调配置分包闭环（F2）', () => {
+  test('广告回调配置 选分包新增 编辑回显 更新删除', async ({ page }) => {
+    const token = `GFX_E2E_ADCB_${Date.now().toString(36)}`;
+
+    let created = false;
+    let updated = false;
+    let deleted = false;
+    await page.route(/advertisementCallbackConfig\/add/, async (route) => {
+      created = true;
+      await route.continue();
+    });
+    await page.route(/advertisementCallbackConfig\/update/, async (route) => {
+      updated = true;
+      await route.continue();
+    });
+    await page.route(/advertisementCallbackConfig\/delete/, async (route) => {
+      deleted = true;
+      await route.continue();
+    });
+
+    await page.goto('/');
+    await expectOverview(page);
+    await navigateByMenu(page, '广告回调验签', 'C 端交付');
+    await expect(page.locator('.p-datatable-tbody')).toBeVisible({ timeout: 20_000 });
+
+    // 前置清理：失败重跑可能留下 (PackageId, Provider) 配置，唯一约束会令新增被拒；
+    // 只清本用例会选中的选项 0（分包夹具 com.e2e.pkg.alpha）上的遗留行
+    for (let guard = 0; guard < 5; guard += 1) {
+      const stale = page.locator('.p-datatable-tbody tr').filter({ hasText: 'com.e2e.pkg.alpha' }).first();
+      if (await stale.count() === 0) {
+        break;
+      }
+      await stale.getByText('删除', { exact: true }).click();
+      await page.locator('role=button[name="确定"]').first().click();
+      await page.waitForTimeout(500);
+    }
+
+    // —— 新增：Provider 默认 TopOn（schema 参数区异步加载后出现）；分包选择器在 Provider 之后 ——
+    await page.locator('role=button[name="新增"]').first().click();
+    await expect(page.locator('.p-dialog')).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('.p-dialog .parameter-panel')).toBeVisible({ timeout: 10_000 });
+
+    await page.locator('.p-dialog >> role=combobox >> nth=1').click();
+    const firstPackageOption = page.locator('role=option >> nth=0');
+    await firstPackageOption.first().waitFor({ state: 'visible', timeout: 8_000 });
+    await firstPackageOption.first().click();
+    // 记录所选分包标签，供编辑回显断言
+    const chosenPackageLabel = await page.locator('.p-dialog >> role=combobox >> nth=1').evaluate((el) => {
+      const label = el.closest('.p-select')?.querySelector('.p-select-label');
+      return (label?.textContent ?? '').trim();
+    });
+    expect(chosenPackageLabel.length, '分包选择器未回显所选标签').toBeGreaterThan(0);
+
+    // schema 参数区：首个文本框为回调 URL（承载 token 锚点），TopOn 的 sec_key 是 Password 框
+    await page.locator('.p-dialog >> role=textbox >> nth=0').fill(`https://cb.example.test/${token}`);
+    await page.locator('.p-dialog .p-password input').first().fill('e2e-adcb-secret');
+
+    await page.locator('role=button[name="确定"]').first().click();
+    await expect.poll(() => created, '广告回调配置新增请求未发出').toBe(true);
+    await expect(page.locator('.p-datatable-tbody')).toContainText(token, { timeout: 20_000 });
+
+    // —— 编辑：分包选择器必须回显新增时所选分包（R5 绑定后 packageId 是配置身份的一部分）——
+    await page.locator(`tr:has-text("${token}") >> text=编辑`).first().click();
+    await expect(page.locator('.p-dialog')).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('.p-dialog .parameter-panel')).toBeVisible({ timeout: 10_000 });
+    const echoedPackageLabel = await page.locator('.p-dialog >> role=combobox >> nth=1').evaluate((el) => {
+      const label = el.closest('.p-select')?.querySelector('.p-select-label');
+      return (label?.textContent ?? '').trim();
+    });
+    expect(echoedPackageLabel, '编辑弹窗未回显新增时所选分包').toBe(chosenPackageLabel);
+    const echoedUrl = await page.locator('.p-dialog >> role=textbox >> nth=0').inputValue();
+    expect(echoedUrl, '编辑弹窗未回显回调 URL').toContain(token);
+
+    await page.locator('role=button[name="确定"]').first().click();
+    await expect.poll(() => updated, '广告回调配置更新请求未发出').toBe(true);
+    await expect(page.locator('.p-datatable-tbody')).toContainText(token, { timeout: 20_000 });
+
+    // —— 删除闭环 ——
+    await page.locator(`tr:has-text("${token}") >> text=删除`).first().click();
+    await page.locator('role=button[name="确定"]').first().click();
+    await expect.poll(() => deleted, '广告回调配置删除请求未发出').toBe(true);
+    await expect(page.locator('.p-datatable-tbody')).not.toContainText(token, { timeout: 20_000 });
+
+    await shot(page, 'crud-roundtrip-广告回调配置');
+  });
 });

@@ -2,7 +2,7 @@
 /* tslint:disable */
 
 /** App 会话密钥分页查询输入参数。 */
-export interface PageTenantSessionKeyRequest {
+export interface PageSessionKeyRequest {
   searchKey?: string | null;
   /**
    * @format int32

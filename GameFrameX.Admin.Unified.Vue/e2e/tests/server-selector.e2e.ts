@@ -2,7 +2,7 @@ import { test, expect, type Route } from '@playwright/test';
 import { expectOverview, navigateByMenu, shot } from './helpers';
 import { installApiRecorder, readApiRecords, apiAnomalies } from './module-coverage';
 import { globalServerSelector, selectServerOption } from './server-selection';
-import { readField } from './admin-menu-fixture';
+import { readField } from './admin-stack';
 
 // 区服选项来自真实页面发出的 gameArea/page；只 mock 在线业务响应，避免依赖游戏服在线状态。
 // mock 不发请求也不改变 serverId，记录器与 DOM 指标共同验证页面实际使用的上下文。

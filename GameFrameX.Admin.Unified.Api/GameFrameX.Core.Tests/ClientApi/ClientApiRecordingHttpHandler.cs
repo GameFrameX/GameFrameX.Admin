@@ -19,12 +19,18 @@ internal sealed class ClientApiRecordingHttpHandler : HttpMessageHandler
         get { return _requestPaths; }
     }
 
+    public IReadOnlyList<string> RequestUris
+    {
+        get { return _requestUris; }
+    }
+
     public IReadOnlyList<string> RequestBodies
     {
         get { return _requestBodies; }
     }
 
     private readonly List<string> _requestPaths = new();
+    private readonly List<string> _requestUris = new();
     private readonly List<string> _requestBodies = new();
 
     public static ClientApiRecordingHttpHandler WithGameServerDefaults(long createdPlayerId = 501001)
@@ -95,6 +101,7 @@ internal sealed class ClientApiRecordingHttpHandler : HttpMessageHandler
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
         var uri = request.RequestUri;
+        _requestUris.Add(uri?.ToString() ?? string.Empty);
         var path = uri?.AbsolutePath ?? string.Empty;
         _requestPaths.Add(path);
         if (request.Content != null)

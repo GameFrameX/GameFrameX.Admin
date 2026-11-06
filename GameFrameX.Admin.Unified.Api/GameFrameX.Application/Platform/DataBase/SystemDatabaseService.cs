@@ -250,7 +250,7 @@ public class SystemDatabaseService : IAdminApiController
         var databaseOwnership = ResolveDatabaseOwnership(configId);
         if (!SqlSugarEntityBoundary.IsPhysicalTableNameAllowedForDatabase(databaseOwnership, tableName))
         {
-            throw BusinessError.Oh($"表名 {tableName} 不符合当前数据库 {configId} 的物理前缀边界。主库只能操作 system_/global_，租户库只能操作 tenant_。");
+            throw BusinessError.Oh($"表名 {tableName} 不符合当前数据库 {configId} 的物理前缀边界。主库可操作 system_/global_ 前缀表与无前缀业务表。");
         }
     }
 
@@ -261,6 +261,6 @@ public class SystemDatabaseService : IAdminApiController
             return DatabaseOwnership.System;
         }
 
-        return DatabaseOwnership.Tenant;
+        return DatabaseOwnership.Business;
     }
 }

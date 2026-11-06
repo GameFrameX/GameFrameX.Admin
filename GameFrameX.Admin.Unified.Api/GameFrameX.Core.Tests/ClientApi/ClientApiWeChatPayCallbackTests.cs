@@ -13,7 +13,7 @@ using GameFrameX.Client.Api.Integrations.Payment;
 using GameFrameX.Client.Api.Services;
 using GameFrameX.Client.Api.Services.PayVerification;
 using GameFrameX.Entity.Enum;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 using GameFrameX.Payment.Abstract;
 using GameFrameX.Payment.Google.Option;
 using GameFrameX.Payment.Wechat;
@@ -34,7 +34,7 @@ public sealed class ClientApiWeChatPayCallbackTests
     /// 平台证书只在首个用例注册一次，后续用例复用（模拟生产常驻进程行为）
     /// </summary>
     private const string TestMerchantId = "1900000109";
-    private const string TestAppId = "wx4a4b5c6d7e8f9012";
+    private const string WechatApplicationId = "wx4a4b5c6d7e8f9012";
     private const string TestMerchantCertSerial = "C108-WECHAT-MERCHANT-SERIAL";
     private const string TestTransactionId = "4200001234567890123456789012";
 
@@ -54,8 +54,8 @@ public sealed class ClientApiWeChatPayCallbackTests
         var contentResult = Assert.IsType<ContentResult>(result);
         Assert.Equal(200, contentResult.StatusCode);
         Assert.Contains("\"code\":\"SUCCESS\"", contentResult.Content);
-        var order = await db.TenantDb.Queryable<TenantGameOrderEntity>().FirstAsync(u => u.Id == 7101);
-        var role = await db.TenantDb.Queryable<TenantGameRoleEntity>().FirstAsync(u => u.Id == 3001);
+        var order = await db.MainDb.Queryable<GameOrderEntity>().FirstAsync(u => u.Id == 7101);
+        var role = await db.MainDb.Queryable<GameRoleEntity>().FirstAsync(u => u.Id == 3001);
         Assert.Equal(OrderStatusEnum.Shipped, order.Status);
         Assert.Equal(TestTransactionId, order.ProviderTransactionId);
         Assert.Equal(650, role.AllRecharge);
@@ -80,7 +80,7 @@ public sealed class ClientApiWeChatPayCallbackTests
         var contentResult = Assert.IsType<ContentResult>(result);
         Assert.Equal(500, contentResult.StatusCode);
         Assert.Contains("\"code\":\"FAIL\"", contentResult.Content);
-        var order = await db.TenantDb.Queryable<TenantGameOrderEntity>().FirstAsync(u => u.Id == 7101);
+        var order = await db.MainDb.Queryable<GameOrderEntity>().FirstAsync(u => u.Id == 7101);
         Assert.Equal(OrderStatusEnum.Unpaid, order.Status);
     }
 
@@ -100,7 +100,7 @@ public sealed class ClientApiWeChatPayCallbackTests
         var contentResult = Assert.IsType<ContentResult>(result);
         Assert.Equal(500, contentResult.StatusCode);
         Assert.Contains("\"code\":\"FAIL\"", contentResult.Content);
-        var order = await db.TenantDb.Queryable<TenantGameOrderEntity>().FirstAsync(u => u.Id == 7101);
+        var order = await db.MainDb.Queryable<GameOrderEntity>().FirstAsync(u => u.Id == 7101);
         Assert.Equal(OrderStatusEnum.Unpaid, order.Status);
     }
 
@@ -123,7 +123,7 @@ public sealed class ClientApiWeChatPayCallbackTests
         // 微信重试通知：两次均 200 SUCCESS（避免继续重试），但发货与累充恰一次（ShipAsync 幂等 + 状态前置守卫）
         Assert.Contains("\"code\":\"SUCCESS\"", Assert.IsType<ContentResult>(first).Content);
         Assert.Contains("\"code\":\"SUCCESS\"", Assert.IsType<ContentResult>(second).Content);
-        var role = await db.TenantDb.Queryable<TenantGameRoleEntity>().FirstAsync(u => u.Id == 3001);
+        var role = await db.MainDb.Queryable<GameRoleEntity>().FirstAsync(u => u.Id == 3001);
         Assert.Equal(650, role.AllRecharge);
         Assert.Equal(1, handler.Count("/game/api/req_player_send_item"));
     }
@@ -133,14 +133,14 @@ public sealed class ClientApiWeChatPayCallbackTests
         ClientApiRecordingHttpHandler handler,
         WechatPayOptionSetting setting)
     {
-        db.InitTenantTables(typeof(TenantGameAreaEntity), typeof(TenantGameRoleEntity), typeof(TenantGameOrderEntity), typeof(TenantGameOrderFulfillmentEntity));
+        db.InitBusinessTables(typeof(GameAreaEntity), typeof(GameRoleEntity), typeof(GameOrderEntity), typeof(GameOrderFulfillmentEntity));
 #pragma warning disable CS8625 // 测试桩：微信回调链路不使用 Google 验证服务，传 null 与其它渠道回调用例一致
         return new GameOrderController(
-            db.Repository<TenantGameOrderEntity>(),
+            db.Repository<GameOrderEntity>(),
             FakeOptionsProvider.WithAreaPolicy(false),
-            db.Repository<TenantGameRoleEntity>(),
+            db.Repository<GameRoleEntity>(),
             new HttpClient(handler, false),
-            new GameOrderShipService(db.TenantDb, new ClientApiTestHttpClientFactory(handler)),
+            new GameOrderShipService(db.MainDb, new ClientApiTestHttpClientFactory(handler)),
             new WechatCallbackPaymentFactory(setting),
             new TestGooglePubSubPushAuthenticator(false),
             new TestGooglePlayPurchaseService(null));
@@ -205,7 +205,7 @@ public sealed class ClientApiWeChatPayCallbackTests
             var setting = new WechatPayOptionSetting
             {
                 WechatPayMerchantId = TestMerchantId,
-                WechatPayAppId = TestAppId,
+                WechatPayAppId = WechatApplicationId,
                 WechatPayApiV3Secret = ApiV3Secret,
                 WechatPayCertificateSerialNumber = TestMerchantCertSerial,
                 WechatPayCertificatePrivateKey = _platformRsa.ExportPkcs8PrivateKeyPem(),

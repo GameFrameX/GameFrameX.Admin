@@ -11,12 +11,12 @@ using GameFrameX.Application.GmCenter.RolloutSemanticMap;
 using GameFrameX.Core.Enum.Errors;
 using GameFrameX.Core.Service.User;
 using GameFrameX.Entity.Game.Online;
-using GameFrameX.Entity.Tenant.Game.Online;
+using GameFrameX.Entity.Business.Game.Online;
 
 namespace GameFrameX.Application.GmCenter.LiveOps.ConfigRollout;
 
 /// <summary>
-/// 配置灰度发布（Rollout）版本行管理服务（来源 change C343 / vault:C8 S7.7-S7.8）。路由前缀 /api/tenantGameOnlineConfigRollout（去后缀 + lowerCamelCase）。
+/// 配置灰度发布（Rollout）版本行管理服务（来源 change C343 / vault:C8 S7.7-S7.8）。路由前缀 /api/gameOnlineConfigRollout（去后缀 + lowerCamelCase）。
 /// <para>版本化铁律：版本行只由 publish / rollback 两个动作追加，历史行不可修改不可删除（无 add/update/delete action）；
 /// <c>ConfigVersion</c> 按 ConfigKind + ConfigKey 维度递增分配（发布与回滚共用序列）；
 /// 回滚 = 版本化新下发（新行 + TargetVersion 指向恢复目标，语义对照见 <c>OnlineRolloutSemanticMap</c>），
@@ -27,8 +27,8 @@ namespace GameFrameX.Application.GmCenter.LiveOps.ConfigRollout;
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
 public class GameOnlineConfigRolloutService : IAdminApiController
 {
-    private readonly SqlSugarRepository<TenantGameOnlineConfigRolloutEntity> _repository;
-    private readonly SqlSugarRepository<TenantGameOnlinePlayerSegmentEntity> _segmentRepository;
+    private readonly SqlSugarRepository<GameOnlineConfigRolloutEntity> _repository;
+    private readonly SqlSugarRepository<GameOnlinePlayerSegmentEntity> _segmentRepository;
     private readonly IOnlineLiveOpsDispatchService _dispatchService;
     private readonly CurrentUserContext _currentUserContext;
 
@@ -39,8 +39,8 @@ public class GameOnlineConfigRolloutService : IAdminApiController
     /// <param name="segmentRepository"></param>
     /// <param name="dispatchService"></param>
     /// <param name="currentUserContext"></param>
-    public GameOnlineConfigRolloutService(SqlSugarRepository<TenantGameOnlineConfigRolloutEntity> repository,
-        SqlSugarRepository<TenantGameOnlinePlayerSegmentEntity> segmentRepository,
+    public GameOnlineConfigRolloutService(SqlSugarRepository<GameOnlineConfigRolloutEntity> repository,
+        SqlSugarRepository<GameOnlinePlayerSegmentEntity> segmentRepository,
         IOnlineLiveOpsDispatchService dispatchService,
         CurrentUserContext currentUserContext)
     {
@@ -56,7 +56,7 @@ public class GameOnlineConfigRolloutService : IAdminApiController
     [HttpPost(CrudActionRoutes.Page)]
     [ApiDescriptionSettings(Name = "Page")]
     [DisplayName("分页查询灰度版本行")]
-    public async Task<SqlSugarPagedList<GameOnlineConfigRolloutResponse>> PageAsync(PageTenantGameOnlineConfigRolloutRequest input)
+    public async Task<SqlSugarPagedList<GameOnlineConfigRolloutResponse>> PageAsync(PageGameOnlineConfigRolloutRequest input)
     {
         return await _repository.AsQueryable()
                          .WhereIF(input.ConfigKind.HasValue, u => u.ConfigKind == input.ConfigKind.Value)
@@ -81,7 +81,7 @@ public class GameOnlineConfigRolloutService : IAdminApiController
         await EnsureConfigSourceAsync(input.ConfigKind, input.ConfigKey);
         var segment = await EnsureSegmentSyncedAsync(input.SegmentId);
 
-        var entity = new TenantGameOnlineConfigRolloutEntity
+        var entity = new GameOnlineConfigRolloutEntity
         {
             ServerId = input.ServerId,
             ConfigKind = input.ConfigKind,
@@ -133,7 +133,7 @@ public class GameOnlineConfigRolloutService : IAdminApiController
                 new { input.ConfigKind, configKey, input.TargetVersion, message = "回滚目标版本不存在", });
         }
 
-        var entity = new TenantGameOnlineConfigRolloutEntity
+        var entity = new GameOnlineConfigRolloutEntity
         {
             ServerId = input.ServerId,
             ConfigKind = input.ConfigKind,
@@ -202,7 +202,7 @@ public class GameOnlineConfigRolloutService : IAdminApiController
     /// <summary>
     /// 分群校验：必须存在且已同步 Online（未同步分群 Online 无法解释命中）。
     /// </summary>
-    private async Task<TenantGameOnlinePlayerSegmentEntity> EnsureSegmentSyncedAsync(long segmentId)
+    private async Task<GameOnlinePlayerSegmentEntity> EnsureSegmentSyncedAsync(long segmentId)
     {
         var segment = await _segmentRepository.GetFirstAsync(u => u.Id == segmentId);
         if (segment == null)
@@ -234,14 +234,14 @@ public class GameOnlineConfigRolloutService : IAdminApiController
     /// <summary>
     /// 下发确认收尾：回写 Online 确认版本 + 将同配置其余生效行（Published）置 RolledBack（新版本替代，历史行不可变仅状态流转）。
     /// </summary>
-    private async Task ConfirmDispatchedAsync(TenantGameOnlineConfigRolloutEntity entity, string? confirmVersion)
+    private async Task ConfirmDispatchedAsync(GameOnlineConfigRolloutEntity entity, string? confirmVersion)
     {
         entity.OnlineConfirmVersion = confirmVersion;
         await _repository.Context.Updateable(entity)
             .UpdateColumns(p => new { p.OnlineConfirmVersion, })
             .ExecuteCommandAsync();
 
-        await _repository.Context.Updateable<TenantGameOnlineConfigRolloutEntity>()
+        await _repository.Context.Updateable<GameOnlineConfigRolloutEntity>()
             .SetColumns(p => p.Status == OnlineConfigRolloutStatus.RolledBack)
             .Where(u => u.ConfigKind == entity.ConfigKind
                      && u.ConfigKey == entity.ConfigKey

@@ -9,21 +9,21 @@ using GameFrameX.Entity.Enum;
 namespace GameFrameX.Application.PlayerCenter.GamePenalty;
 
 /// <summary>
-/// 处罚事实源管理服务。路由前缀 /api/tenantGamePenaltyEntity（历史框架 去后缀 + lowerCamelCase）。
+/// 处罚事实源管理服务。路由前缀 /api/gamePenaltyEntity（历史框架 去后缀 + lowerCamelCase）。
 /// <para>AddAsync：服务端强制 Status=Active、OperatorId=当前操作人，忽略请求体审计字段（防越权）。</para>
 /// <para>RevokeAsync：撤销生效中处罚，写 RevokeOperatorId / RevokeReason / RevokeTime 审计。</para>
 /// <para>SyncOnlineRuntimeAsync：把生效中处罚同步到 Online 运行时（经 OnlinePenaltyLinkCommandService 唯一联动入口，change C350）。</para>
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
 public class GamePenaltyService
-    : GenericCrudService<Entity.Tenant.Game.TenantGamePenaltyEntity,
-        AddTenantGamePenaltyEntityRequest, UpdateTenantGamePenaltyEntityRequest,
-        GamePenaltyResponse, PageTenantGamePenaltyEntityRequest>
+    : GenericCrudService<Entity.Business.Game.GamePenaltyEntity,
+        AddGamePenaltyEntityRequest, UpdateGamePenaltyEntityRequest,
+        GamePenaltyResponse, PageGamePenaltyEntityRequest>
 {
     private readonly CurrentUserContext _currentUserContext;
     private readonly OnlinePenaltyLinkCommandService _penaltyLinkCommandService;
 
-    public GamePenaltyService(SqlSugarRepository<Entity.Tenant.Game.TenantGamePenaltyEntity> repository,
+    public GamePenaltyService(SqlSugarRepository<Entity.Business.Game.GamePenaltyEntity> repository,
         CurrentUserContext currentUserContext,
         OnlinePenaltyLinkCommandService penaltyLinkCommandService)
         : base(repository)
@@ -35,7 +35,7 @@ public class GamePenaltyService
     /// <summary>
     /// 新增处罚。审计字段服务端强制。
     /// </summary>
-    public override async Task<GamePenaltyResponse> AddAsync(AddTenantGamePenaltyEntityRequest input)
+    public override async Task<GamePenaltyResponse> AddAsync(AddGamePenaltyEntityRequest input)
     {
         if (string.IsNullOrWhiteSpace(input.TargetId))
         {
@@ -47,7 +47,7 @@ public class GamePenaltyService
             throw BusinessError.Oh("处罚原因不能为空");
         }
 
-        var entity = input.Adapt<Entity.Tenant.Game.TenantGamePenaltyEntity>();
+        var entity = input.Adapt<Entity.Business.Game.GamePenaltyEntity>();
         entity.Status = PenaltyStatusEnum.Active;
         entity.OperatorId = _currentUserContext.UserId;
         await Repository.InsertWithDiffLogAsync(entity);
@@ -57,7 +57,7 @@ public class GamePenaltyService
     /// <summary>
     /// 分页查询：按 TargetType / TargetId / Status / ActionType 过滤。
     /// </summary>
-    protected override ISugarQueryable<GamePenaltyResponse> BuildPageQuery(PageTenantGamePenaltyEntityRequest input)
+    protected override ISugarQueryable<GamePenaltyResponse> BuildPageQuery(PageGamePenaltyEntityRequest input)
     {
         return Repository.AsQueryable()
 
@@ -74,7 +74,7 @@ public class GamePenaltyService
     /// <param name="input"></param>
     [HttpPost("revoke")]
     [ApiDescriptionSettings(Name = "Revoke")]
-    public async Task RevokeAsync(RevokeTenantGamePenaltyEntityRequest input)
+    public async Task RevokeAsync(RevokeGamePenaltyEntityRequest input)
     {
         var entity = await Repository.GetFirstAsync(p => p.Id == input.Id);
         if (entity == null)
@@ -105,7 +105,7 @@ public class GamePenaltyService
     [HttpPost("syncOnlineRuntime")]
     [ApiDescriptionSettings(Name = "SyncOnlineRuntime")]
     [DisplayName("同步Online运行时")]
-    public async Task<OnlinePenaltyLinkResponse> SyncOnlineRuntimeAsync(SyncOnlineRuntimeTenantGamePenaltyRequest input)
+    public async Task<OnlinePenaltyLinkResponse> SyncOnlineRuntimeAsync(SyncOnlineRuntimeGamePenaltyRequest input)
     {
         var command = await MapActionTypeToLinkCommand(input.Id);
         return await _penaltyLinkCommandService.ExecuteLinkAsync(input.Id, command);

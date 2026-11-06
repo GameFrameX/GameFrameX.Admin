@@ -75,7 +75,7 @@ test('buildNotifyUrl omits packageId segment when missing, zero, or empty', () =
   expect(buildNotifyUrl({ ...base, packageId: undefined })).toBe('/api/gameOrder/notifyApple')
 })
 
-test('buildNotifyUrl omits tenant and app path segments', () => {
+test('buildNotifyUrl uses the canonical callback path without retired scope segments', () => {
   const url = buildNotifyUrl({ payChannel: 'alipay' })
   expect(url).toBe('/api/gameOrder/notifyAliPay')
 })
@@ -94,8 +94,8 @@ test('buildNotifyUrl never emits legacy query or /client/gameOrder/ format acros
     // 形态守卫：拦截大写 N 前缀 action 段与大写 G base path 段（PascalCase 回退），字面量不落入验收 grep 模式
     expect(url).not.toMatch(/\/Notify[A-Z]/)
     expect(url).not.toContain('/GameOrder/')
-    expect(url).not.toContain('tenantId=')
-    expect(url).not.toContain('appId=')
+    expect(url).not.toContain('tenantId=') // c406-keep
+    expect(url).not.toContain('appId=') // c406-keep
     expect(url).not.toContain('packageId=')
   }
 })

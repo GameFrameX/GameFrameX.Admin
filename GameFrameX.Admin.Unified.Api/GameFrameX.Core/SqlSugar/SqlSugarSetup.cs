@@ -1,16 +1,17 @@
+using GameFrameX.Core.Bootstrap;
 using GameFrameX.Core.Logging;
 using GameFrameX.Foundation.Orm.Attribute;
 using GameFrameX.Core.Const.MenuSeed;
 using GameFrameX.Core.Extension.Cache;
 using GameFrameX.Core.Extension.Const;
 using GameFrameX.Core.Extension.Option;
-using GameFrameX.Core.Service.Tenant;
+using GameFrameX.Core.Service.Business;
 using GameFrameX.Entity.Base;
 using GameFrameX.Entity.Enum;
 using GameFrameX.Entity.System;
 using GameFrameX.Entity.Global;
 using GameFrameX.Entity.Log;
-using GameFrameX.Entity.Tenant.ObjectStorage;
+using GameFrameX.Entity.Business.ObjectStorage;
 using GameFrameX.Foundation.Orm.Entity;
 using Microsoft.Extensions.Hosting;
 using MySqlConnector;
@@ -61,10 +62,11 @@ public static class SqlSugarSetup
         });
         services.AddSingleton<ISqlSugarClient>(sqlSugar); // 单例注册
         services.AddScoped(typeof(SqlSugarRepository<>)); // 仓储注册
-
-        // 初始化数据库表结构及种子数据
+        // 初始化数据库表结构及种子数据；建库/建表/种子前先做旧库拒绝检查（C406 / D7），
+        // 命中旧 schema 标志（tenant_ 前缀表或旧租户登记表）即 fail-closed 终止启动。
         foreach (var config in dbOptions.ConnectionConfigs)
         {
+            LegacySchemaStartupGuard.EnsureNotLegacySchema(sqlSugar, config);
             InitDatabase(sqlSugar, config, effectiveTypes);
 
         }
@@ -253,7 +255,7 @@ public static class SqlSugarSetup
     }
 
     /// <summary>
-    /// 填充差异日志实体公共字段。SystemLogDiffEntity 与 TenantLogDiffEntity 共享 <see cref="LogDiffFields"/> 字段，
+    /// 填充差异日志实体公共字段。SystemLogDiffEntity 与 LogDiffEntity 共享 <see cref="LogDiffFields"/> 字段，
     /// 调用方按当前操作库归属决定具体实体类型与写入连接。
     /// </summary>
     private static void FillDiffLogFields(LogDiffFields target, DiffLogModel u, DbConnectionConfig config, List<DiffLogTableInfo>? beforeList, List<DiffLogTableInfo>? afterList, string? snapshot)
@@ -503,10 +505,10 @@ public static class SqlSugarSetup
             if (config.ConfigId.ToString() == SqlSugarConst.MainConfigId)
             {
                 // 新装主库空配置时提供本地存储；已有配置（包括停用或软删）不覆盖。
-                if (effectiveTypes.Contains(typeof(TenantObjectStorageConfigEntity))
-                    && dbProvider.DbMaintenance.IsAnyTable(dbProvider.EntityMaintenance.GetEntityInfo<TenantObjectStorageConfigEntity>().DbTableName, false))
+                if (effectiveTypes.Contains(typeof(ObjectStorageConfigEntity))
+                    && dbProvider.DbMaintenance.IsAnyTable(dbProvider.EntityMaintenance.GetEntityInfo<ObjectStorageConfigEntity>().DbTableName, false))
                 {
-                    DefaultTenantDatabaseSeeder.SeedDefaultObjectStorageConfigIfEmpty(dbProvider);
+                    DefaultDatabaseSeeder.SeedDefaultObjectStorageConfigIfEmpty(dbProvider);
                 }
 
                 // C117 (GFX-117)：8 棵游戏业务菜单路径已收敛到新前缀（appCenter/playerCenter/goodsCenter/

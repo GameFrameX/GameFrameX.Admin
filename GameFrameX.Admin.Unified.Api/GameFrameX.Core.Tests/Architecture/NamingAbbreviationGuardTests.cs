@@ -108,7 +108,7 @@ public sealed class NamingAbbreviationGuardTests
 
         // 完整词不误伤。
         Assert.Empty(FindProhibitedWords("Dictionary"));
-        Assert.Empty(FindProhibitedWords("TenantAdvertisementCallbackConfigEntity"));
+        Assert.Empty(FindProhibitedWords("AdvertisementCallbackConfigEntity"));
         Assert.Empty(FindProhibitedWords("ButtonPermissionList"));
 
         // 通用技术缩写白名单放行。

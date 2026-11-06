@@ -6,9 +6,8 @@ namespace GameFrameX.Core.Middleware;
 /// （守护测试 <c>MiddlewareErrorResponseWriterGuardTests</c> 锁定防回潮）。
 /// <para>两种 wire 形态（历史契约并存，不可合并为单一形态）：</para>
 /// <list type="bullet">
-/// <item><see cref="WriteRejectedAsync"/>：PascalCase <c>{Code, Message}</c>，未传 errorCode 时 Code 回退 HTTP 状态码 ——
-/// Client.Api（AppResolution / PublicCallbackTenantResolution / TenantExpiration）与 Hub.Api（HubTenant / TenantGameAppOpenAccessAuth）
-/// 的拒绝出口；errorCode 参数直接消费 C262 统一错误码枚举数值（如 <c>TenantErrorCode.TenantDisabled</c>）。</item>
+/// <item><see cref="WriteRejectedAsync"/>：PascalCase <c>{Code, Message}</c>，Code 恒为 HTTP 状态码 ——
+/// Client.Api（PublicCallbackResolution）与 Hub.Api（GameAppOpenAccessAuth）及协议版本中间件的拒绝出口。</item>
 /// <item><see cref="WriteEnvelopeRejectedAsync"/>：camelCase <c>{code, message}</c>，601xx 信封码
 /// （签名 60101-60103 / 加密信封 60104-60106）—— 与 MVC 主信封 camelCase 一致、客户端 Lua 读 <c>tbErr.code</c> 的双端冻结契约。</item>
 /// </list>
@@ -16,17 +15,16 @@ namespace GameFrameX.Core.Middleware;
 public static class MiddlewareResponseWriter
 {
     /// <summary>
-    /// 写 PascalCase <c>{Code, Message}</c> JSON 拒绝响应；未传 errorCode 时 Code 回退为 HTTP 状态码。
+    /// 写 PascalCase <c>{Code, Message}</c> JSON 拒绝响应；Code 恒等于 <paramref name="statusCode"/>。
     /// </summary>
     /// <param name="context">HTTP 上下文。</param>
-    /// <param name="statusCode">HTTP 状态码（响应状态，兼作 Code 缺省值）。</param>
+    /// <param name="statusCode">HTTP 状态码（响应状态，兼作 Code 值）。</param>
     /// <param name="message">拒绝原因。</param>
-    /// <param name="errorCode">C262 统一错误码数值（可选；缺省回退 <paramref name="statusCode"/>）。</param>
-    public static async Task WriteRejectedAsync(HttpContext context, int statusCode, string message, int? errorCode = null)
+    public static async Task WriteRejectedAsync(HttpContext context, int statusCode, string message)
     {
         context.Response.StatusCode = statusCode;
         context.Response.ContentType = "application/json";
-        var result = JsonSerializer.Serialize(new { Code = errorCode ?? statusCode, Message = message, });
+        var result = JsonSerializer.Serialize(new { Code = statusCode, Message = message, });
         await context.Response.WriteAsync(result);
     }
 

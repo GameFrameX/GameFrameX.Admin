@@ -8,7 +8,7 @@ using GameFrameX.Core.SqlSugar;
 using GameFrameX.Core.Tests;
 using GameFrameX.Core.Tests.ClientApi;
 using GameFrameX.Entity.Enum;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 using GameFrameX.Foundation.Http.Normalization;
 using GameFrameX.Foundation.Json;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,7 +31,7 @@ public sealed class EmailTaskTests : IDisposable
 
     public EmailTaskTests()
     {
-        _database.InitTenantTables(typeof(TenantGameMailEntity), typeof(TenantGameAreaEntity), typeof(TenantGameRoleEntity));
+        _database.InitBusinessTables(typeof(GameMailEntity), typeof(GameAreaEntity), typeof(GameRoleEntity));
         SeedArea(91);
 
         var services = new ServiceCollection();
@@ -59,7 +59,7 @@ public sealed class EmailTaskTests : IDisposable
         var innerTask = await task.ExecuteAsync(CancellationToken.None);
         await innerTask!;
 
-        var mail = _database.MainDb.Queryable<TenantGameMailEntity>().Single(u => u.Id == 601);
+        var mail = _database.MainDb.Queryable<GameMailEntity>().Single(u => u.Id == 601);
         Assert.Equal(GameMailStatus.Sent, mail.Status);
         // MailId 通道键已清除（与旧引擎行为一致）。
         Assert.False(_cache.ContainsKey("MailId"));
@@ -83,7 +83,7 @@ public sealed class EmailTaskTests : IDisposable
         }
 
         Assert.Empty(_httpHandler.Requests);
-        Assert.Equal(GameMailStatus.Sent, _database.MainDb.Queryable<TenantGameMailEntity>().Single(u => u.Id == 602).Status);
+        Assert.Equal(GameMailStatus.Sent, _database.MainDb.Queryable<GameMailEntity>().Single(u => u.Id == 602).Status);
         Assert.False(_cache.ContainsKey("MailId"));
     }
 
@@ -105,9 +105,9 @@ public sealed class EmailTaskTests : IDisposable
         using (var scope = scopeFactory.CreateScope())
         {
             return new EmailTask(NullLogger<EmailTask>.Instance,
-                                 scope.ServiceProvider.GetRequiredService<SqlSugarRepository<TenantGameMailEntity>>(),
-                                 scope.ServiceProvider.GetRequiredService<SqlSugarRepository<TenantGameAreaEntity>>(),
-                                 scope.ServiceProvider.GetRequiredService<SqlSugarRepository<TenantGameRoleEntity>>(),
+                                 scope.ServiceProvider.GetRequiredService<SqlSugarRepository<GameMailEntity>>(),
+                                 scope.ServiceProvider.GetRequiredService<SqlSugarRepository<GameAreaEntity>>(),
+                                 scope.ServiceProvider.GetRequiredService<SqlSugarRepository<GameRoleEntity>>(),
                                  new HttpClient(_httpHandler),
                                  scope.ServiceProvider.GetRequiredService<SystemCacheService>());
         }
@@ -115,7 +115,7 @@ public sealed class EmailTaskTests : IDisposable
 
     private void SeedArea(long areaId)
     {
-        _database.MainDb.Insertable(new TenantGameAreaEntity
+        _database.MainDb.Insertable(new GameAreaEntity
         {
             Id = areaId,
             Name = $"EmailTaskArea-{areaId}",
@@ -145,7 +145,7 @@ public sealed class EmailTaskTests : IDisposable
 
     private void InsertMail(long mailId, GameMailStatus status, bool isAllPost, string playerIdListJson)
     {
-        _database.MainDb.Insertable(new TenantGameMailEntity
+        _database.MainDb.Insertable(new GameMailEntity
         {
             Id = mailId,
             AreaId = 91,

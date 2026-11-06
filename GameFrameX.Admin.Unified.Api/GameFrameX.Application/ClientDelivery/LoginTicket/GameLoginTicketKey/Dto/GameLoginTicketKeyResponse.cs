@@ -1,7 +1,7 @@
 namespace GameFrameX.Application.ClientDelivery.LoginTicket.GameLoginTicketKey.Dto;
 
 /// <summary>
-/// 租户 Game 登录票据签名密钥输出参数（仅公钥与元数据，私钥永不回显）。
+/// Game 登录票据签名密钥输出参数（仅公钥与元数据，私钥永不回显）。
 /// </summary>
 public class GameLoginTicketKeyResponse
 {

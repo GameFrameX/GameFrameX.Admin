@@ -42,7 +42,7 @@ export default {
 
         // Current application context (game business pages)
 
-        // Config scope (tenant default / app override)
+        // 配置作用域（預設 / 覆蓋）
         configScope: {
             gameDefault: '預設設定',
             scope: '作用域',
@@ -55,7 +55,7 @@ export default {
         pleaseSelectEndTime: '請選擇結束時間',
         pleaseSelectOrderStatus: '請選擇訂單狀態',
         pleaseEnterGameVersion: '請輸入遊戲版本號',
-        pleaseSelectTenantGameAppVersionDefinition: '請選擇客戶端版本',
+        pleaseSelectGameAppVersionDefinition: '請選擇客戶端版本',
         pleaseEnterAttachmentList: '請輸入附件列表',
         pleaseSelectMailExpiry: '請選擇郵件過期日期',
         pleaseEnterTitleTemplate: '請輸入標題模板',
@@ -123,7 +123,7 @@ export default {
             pleaseSelectPlatform: '請選擇平台',
             package: '分包（可選）',
             pleaseSelectPackage: '請選擇分包（可選）',
-            tenantGameAppVersionDefinition: '客戶端版本',
+            gameAppVersionDefinition: '客戶端版本',
             allowedPlayerProfile: '指定可以加入此伺服器的玩家類型',
             pleaseEnterAllowedPlayerProfile: '請輸入指定可以加入此伺服器的玩家類型',
             serverEvents: '特定伺服器舉行的事件或活動信息',
@@ -364,7 +364,7 @@ export default {
             addSenderName: '新增發件人名稱',
             addAttachment: '新增附件',
             name: '活動名稱',
-            namePlaceholder: '請輸入活動名稱（同一 appId+areaId 下唯一）',
+            namePlaceholder: '請輸入活動名稱（同一區服下唯一）',
             nameRequired: '請輸入活動名稱',
             areaId: '區服 ID',
             areaIdRequired: '請選擇區服',

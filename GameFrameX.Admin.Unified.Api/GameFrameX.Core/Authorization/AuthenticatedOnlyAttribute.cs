@@ -6,9 +6,9 @@ namespace GameFrameX.Core.Authorization;
 /// 仅登录档 <c>[AuthenticatedOnly]</c>。
 /// 方法删除或改名时登记随之自动消失/更新，不再依赖集中手写路由清单（GFX-684 / C277，
 /// 取代 ApiEndpointCatalogSync.AuthenticatedOnlyRouteNames 手写数组 + global_authenticated_only_route 中转表）。</para>
-/// <para>成员必须是「登录即可访问」的登录态基础数据端点：不按角色授权、不暴露越租户数据；
+/// <para>成员必须是「登录即可访问」的登录态基础数据端点：不按角色授权、不暴露越权数据；
 /// 标注后 <c>ApiEndpointCatalogSync</c> 会把活端点登记为 <c>IsAuthenticatedOnly=true</c>，
-/// 避免被自动隐藏按钮挡成 403（自动按钮默认不授权任何租户角色）。</para>
+/// 避免被自动隐藏按钮挡成 403（自动按钮默认不授权任何角色）。</para>
 /// </summary>
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
 public sealed class AuthenticatedOnlyAttribute : Attribute, IFilterMetadata

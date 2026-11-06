@@ -36,7 +36,7 @@ export function useDashboardData() {
         state.areaMaintenance = d.areaMaintenanceCount ?? 0;
       }
     } catch {
-      // 聚合接口失败静默降级为 —（部分上下文无租户业务数据）
+      // 聚合接口失败静默降级为 —（部分上下文无业务数据）
       state.overviewFailed = true;
     } finally {
       state.overviewLoaded = true;

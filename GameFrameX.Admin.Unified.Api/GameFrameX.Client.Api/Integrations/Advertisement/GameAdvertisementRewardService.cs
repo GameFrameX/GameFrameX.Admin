@@ -1,6 +1,6 @@
 using GameFrameX.Advertisement.Abstract;
 using GameFrameX.Application.ServerCenter;
-using GameFrameX.Client.Api.Services.ClientApiTenantOptions;
+using GameFrameX.Client.Api.Services.ClientApiOptions;
 using GameFrameX.Entity.Enum;
 using GameFrameX.Foundation.Idempotency;
 
@@ -27,18 +27,18 @@ public sealed class GameAdvertisementRewardService
     /// </summary>
     private const int CodeGeneral = 0;
 
-    private readonly IClientApiTenantOptionsProvider _optionsProvider;
-    private readonly Repository<TenantGameAdvertisementRewardEntity> _rewardRepository;
-    private readonly Repository<TenantGameAreaEntity> _areaRepository;
+    private readonly IClientApiOptionsProvider _optionsProvider;
+    private readonly Repository<GameAdvertisementRewardEntity> _rewardRepository;
+    private readonly Repository<GameAreaEntity> _areaRepository;
     private readonly HttpClient _httpClient;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IAdvertisementCallbackFactory _advertisementCallbackFactory;
 
     /// <summary>
     /// </summary>
-    public GameAdvertisementRewardService(IClientApiTenantOptionsProvider optionsProvider,
-        Repository<TenantGameAdvertisementRewardEntity> rewardRepository,
-        Repository<TenantGameAreaEntity> areaRepository,
+    public GameAdvertisementRewardService(IClientApiOptionsProvider optionsProvider,
+        Repository<GameAdvertisementRewardEntity> rewardRepository,
+        Repository<GameAreaEntity> areaRepository,
         HttpClient httpClient,
         IHttpContextAccessor httpContextAccessor,
         IAdvertisementCallbackFactory advertisementCallbackFactory)
@@ -93,7 +93,7 @@ public sealed class GameAdvertisementRewardService
     /// 三 Provider 同构处理流程（fail closed，顺序严格按 change.md §3；幂等判定统一走 Foundation 接口）。
     /// </summary>
     private async Task<AdvertisementRewardReceiveResult> ReceiveAsyncCore(string providerCanonical,
-        Func<TenantAdvertisementCallbackOptions, IQueryCollection, OptionVerification> verify,
+        Func<AdvertisementCallbackOptions, IQueryCollection, OptionVerification> verify,
         Func<object, IQueryCollection, Task<RoleResolution?>> resolveRole)
     {
         // 1. 取配置
@@ -134,9 +134,9 @@ public sealed class GameAdvertisementRewardService
         }
 
         // 4. 幂等判定（Foundation 协调器 + 账本表即 Store）：占位 → 执行 → 完成落定 / 失败落定
-        var normalizedProvider = ClientApiTenantOptionsProvider.NormalizeAdvertisementProvider(providerCanonical);
+        var normalizedProvider = ClientApiOptionsProvider.NormalizeAdvertisementProvider(providerCanonical);
         var idempotencyKey = "adreward:" + normalizedProvider + ":" + payload.TransactionId;
-        var ledgerTemplate = BuildLedger(providerCanonical, idempotencyKey, payload, null, TimerHelper.UnixTimeSeconds());
+        var ledgerTemplate = BuildLedger(providerCanonical, advertisementOptions.PackageId, idempotencyKey, payload, null, TimerHelper.UnixTimeSeconds());
         var store = new AdvertisementRewardLedgerIdempotencyStore(_rewardRepository, ledgerTemplate);
         var coordinator = new IdempotencyCoordinator(store, SystemClock.Instance, AdvertisementRewardLedgerIdempotencyStore.CreateCoordinatorOptions());
         var identifier = new IdempotencyRecordIdentifier(AdvertisementRewardLedgerIdempotencyStore.IdempotencyScope, idempotencyKey);
@@ -252,14 +252,16 @@ public sealed class GameAdvertisementRewardService
                                .ExecuteCommandAsync();
     }
 
-    private static TenantGameAdvertisementRewardEntity BuildLedger(string providerCanonical,
+    private static GameAdvertisementRewardEntity BuildLedger(string providerCanonical,
+        long packageId,
         string idempotencyKey,
         VerifiedPayload payload,
         RoleResolution? resolution,
         long createdTime)
     {
-        return new TenantGameAdvertisementRewardEntity
+        return new GameAdvertisementRewardEntity
         {
+            PackageId = packageId,
             Provider = providerCanonical,
             TransactionId = payload.TransactionId,
             AdvertisementUnit = payload.AdvertisementUnit,

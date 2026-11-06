@@ -28,7 +28,7 @@ All-in-One Solution for Indie Game Development · Empowering Indie Developers' D
 
 The frontend project of the GameFrameX game management platform, built on Vue 3 + TypeScript + Vite + PrimeVue.
 
-> This project is forked from [vue-next-admin](https://gitee.com/lyt-top/vue-next-admin) and reworked for GameFrameX's multi-tenant / app-scope model. Current version ![version](https://img.shields.io/github/package-json/v/GameFrameX/Admin?filename=GameFrameX.Admin.Unified.Vue/package.json) (sourced from package.json, kept in sync automatically).
+> This project is forked from [vue-next-admin](https://gitee.com/lyt-top/vue-next-admin) and reworked for GameFrameX's single-game admin model. Current version ![version](https://img.shields.io/github/package-json/v/GameFrameX/Admin?filename=GameFrameX.Admin.Unified.Vue/package.json) (sourced from package.json, kept in sync automatically).
 
 ## Table of Contents
 
@@ -144,11 +144,8 @@ src/
 │   ├── useCrudTable.ts             Table pagination / sorting / loading wrapper
 │   ├── useEditDialog.ts            Add / edit dialog (strips audit fields, isEnabled default)
 │   ├── useTableColumnPersistence.ts  Local persistence of column width / order / visibility
-│   ├── useCurrentApp.ts            Current app (AppId) state + load / switch
-│   ├── useConfigAppScope.ts        App-scope changes
 │   ├── useRequiredFields.ts        Required-field sets
 │   ├── usePrimeTablePage.ts        Table pagination hook
-│   ├── useRouteAppIdQuerySync.ts   Syncs AppId query with the table
 │   ├── formResolver.ts             Form validation rule adapter
 │   └── types/                      TS types for composables
 │
@@ -160,7 +157,6 @@ src/
 │   ├── time-column/                Table column: auto-formats long seconds
 │   ├── form-label / form-help-text Form field label / help text
 │   ├── app-confirm-dialog          Global confirm dialog
-│   ├── config-app-scope-picker     App-scope picker
 │   ├── narrow-screen-hint          Narrow-screen hint
 │   ├── notice-bar                  Notice bar
 │   ├── cropper / drag-verify / editor / icon-selector / reward-items-editor / svg-icon / table
@@ -190,7 +186,6 @@ src/
 │   ├── index.ts                    Router instance + guards
 │   ├── frontEnd.ts                 Frontend-controlled routes (fallback, currently unused)
 │   ├── backEnd.ts                  Core of backend dynamic routing
-│   ├── appWorkspaceRoutes.ts       App workspace routes
 │   ├── globalConfigRoutes.ts       Global config routes
 │   └── route.ts                    Static / fallback routes (/login / 404 / 401)
 │
@@ -220,7 +215,6 @@ src/
 │   ├── watermark.ts                Watermark
 │   ├── isEnabled.ts                IsEnabled normalization and add defaults
 │   ├── rowVersion.ts               Row version reading (supports rowVersion / RowVersion)
-│   ├── targetTenant.ts             Cross-tenant header (X-Target-Tenant-Id)
 │   ├── primevue-locale.ts          PrimeVue components switch by language
 │   ├── formatTime.ts               Date / time formatting
 │   ├── download.ts / exportExcel.ts  Exports
@@ -228,15 +222,13 @@ src/
 │   ├── fontawesome.ts              FA automatic on-demand loading
 │   ├── icons.ts                    FA name mapping
 │   ├── build.ts                    CDN config
-│   ├── appWorkspace.ts             ※ App-scope utilities (resolveRouteScope, etc.)
 │   ├── arrayOperation.ts / commonFunction.ts / base64Conver.ts / crudConfig.ts / getStyleSheets.ts / loading.ts / mitt.ts / other.ts / template-utils.ts
 │   └── http/                       Interceptor split
 │
 ├── views/                        # Business pages
-│   ├── system/                     System management (users / roles / menus / orgs / tenants / dictionaries / logs / config / notifications / online users …)
+│   ├── system/                     System management (users / roles / menus / dictionaries / logs / config / notifications …)
 │   ├── game/                       Game management (zones / goods / orders / mail / redeem codes / shop / announcements / items / props …)
 │   ├── client/                     Client management (platforms / versions / channels / devices / languages / asset packages / open APIs …)
-│   ├── appCenter/                  App center (appEntry / appSelector / appWorkspace / gameAppEntity, etc.)
 │   ├── contentCenter / chart / chartCenter / chartCenter / opsCenter / trustCenter / automationCenter / goodsCenter / redeemCenter / webShopCenter / playerCenter
 │   ├── home/                       Home dashboard
 │   ├── login/                      Login
@@ -294,6 +286,13 @@ pnpm run dev    # defaults to http://localhost:20800
 ```
 
 Open the browser → see the login page → ask a backend colleague for an account.
+
+Where the first-deployment accounts come from (two backend-side environment variables, see the repo-root `.env.example`):
+
+- `GFX_SUPERADMIN_INITIAL_PASSWORD`: initial password of the superadmin `superadmin`; if unset, the first visit to the login page goes through the first-install wizard to set one.
+- `GAMEFRAMEX_ADMIN_INITIAL_ACCOUNT` + `GAMEFRAMEX_ADMIN_INITIAL_PASSWORD`: when set together, backend startup automatically creates the **first business administrator** account (bound to the `sys_admin` role with all non-superadmin menus granted); sign in with it to enter the business back office. Takes effect only once, while the main database has no business administrator yet.
+
+The platform password policy is off by default; once enabled, passwords need 6–16 characters with upper/lower case, digits and a special character — set the initial password that way and enable the policy before go-live.
 
 ### Stuck?
 
@@ -367,9 +366,9 @@ Two axios instances share the same interceptor factory:
 **Request interception** (4 steps):
 
 1. Automatically adds `Authorization: Bearer <access-token>`; if the JWT is about to expire, also adds `X-Authorization: Bearer <x-refresh-token>` so the backend silently reissues it
-2. Automatically adds `X-Target-Tenant-Id` (controlled by `utils/targetTenant.ts` on cross-tenant switches)
-3. `request.ts` additionally serializes `data` of GET requests into a query string (`tansParams`)
-4. `axios-utils.ts` additionally adds `Accept-Language: <globalI18n>`
+2. `request.ts` additionally serializes `data` of GET requests into a query string (`tansParams`)
+3. `axios-utils.ts` additionally adds `Accept-Language: <globalI18n>`
+4. Page requests read `ServerId` from the global server selector and attach it as a business parameter
 
 **Response interception** (4 steps):
 
@@ -381,17 +380,6 @@ Two axios instances share the same interceptor factory:
    - otherwise → show the backend `message`
 4. Camelization (initial uppercase → lowercase) + error toasts via PrimeVue Toast
 
-### App scope (multi-tenancy)
-
-Each backend menu item carries `app_scope` (`platform` / `tenant` / `app`) and `menu_context`. The frontend marks them with `meta.appScope` + `meta.menuContext`:
-
-| Scope | Meaning | Route example |
-|---|---|---|
-| `platform` | Platform level (visible to super admins, cross-tenant) | `/platform/*` |
-| `tenant` | Tenant level (shared by all apps, no appId query) | `/dashboard/*`, `/system/*` |
-| `app` | Inside an app workspace (must carry the `appId` query) | `/gameCenter/*` |
-
-The redirect logic lives in `decideTenantAppEntry()` / `resolveRouteScope()` in `src/utils/appWorkspace.ts`, triggered inside the guard by `resolveTenantAppRedirect()` in `router/index.ts`.
 
 ### Pinia persistence
 
@@ -695,7 +683,7 @@ If `pnpm run quality` fails, fix per the errors: missing i18n keys → add trans
 - **page / list / query / search / filter style endpoints must not pass params / data via GET** — `pnpm run check:frontend api-query-get` will block it
 - Backend-generated APIs must use `xxxPagePost` / `xxxListPost` / `xxxQueryPost`
 - Handwritten APIs use `request({ method: 'post', data: params })`
-- **Do not** manually add `Authorization` / `Accept-Language` / `X-Tenant-Id` in business code — the interceptors handle it automatically
+- **Do not** manually add `Authorization` / `Accept-Language` in business code — the interceptors handle it automatically
 - **Do not** manually call `showError` on responses — the interceptors handle business codes automatically
 
 ### Commit workflow
@@ -977,7 +965,6 @@ To read concrete code, jump to:
 - `src/utils/http/shared.ts` — HTTP interceptors
 - `src/stores/userInfo.ts` — user info / button permissions
 - `src/composables/useEditDialog.ts` — dialog core
-- `src/utils/appWorkspace.ts` — multi-tenant app scope
 - `scripts/check-frontend-standards.mjs` — cross-end standards gate
 
 ## Documentation & Resources

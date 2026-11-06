@@ -33,10 +33,10 @@ namespace GameFrameX.Entity.Routing;
 /// 标记主库全局定义表（物理前缀 <c>global_</c>）。
 /// </summary>
 /// <remarks>
-/// 归属：主数据库，承载租户可通过白名单只读访问的全局定义（菜单、字典、语言、平台、渠道定义、租户套餐模板等）。
-/// 访问：租户代码只能通过显式白名单 Provider/API 只读访问，写入仅限平台；禁止租户任意查询主库。
-/// 路由：必须解析到主库，与 <c>system_</c> 同属主库初始化集合，禁止 fallback 到租户库。
-/// 边界：与 <see cref="PlatformTableAttribute"/>、<see cref="TenantTableAttribute"/> 互斥。C34 新增，用于区分平台私有表（<c>system_</c>）与租户白名单只读全局定义表（<c>global_</c>）。
+/// 归属：主数据库，承载业务侧可通过白名单只读访问的全局定义（菜单、字典、语言、平台、渠道定义等）。
+/// 访问：业务代码只能通过显式白名单 Provider/API 只读访问，写入仅限平台；禁止任意查询主库。
+/// 路由：必须解析到主库，与 <c>system_</c> 同属主库初始化集合，禁止 fallback 到其他库。
+/// 边界：与 <see cref="PlatformTableAttribute"/>、<see cref="BusinessTableAttribute"/> 互斥。C34 新增，用于区分平台私有表（<c>system_</c>）与白名单只读全局定义表（<c>global_</c>）。
 /// </remarks>
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
 public sealed class GlobalTableAttribute : Attribute

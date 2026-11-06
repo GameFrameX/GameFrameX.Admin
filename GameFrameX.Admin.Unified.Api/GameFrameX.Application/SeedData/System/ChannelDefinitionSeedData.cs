@@ -16,7 +16,7 @@ public class ChannelDefinitionSeedData : ISqlSugarEntitySeedData<GlobalChannelDe
     /// <returns></returns>
     public IEnumerable<GlobalChannelDefinitionEntity> HasData()
     {
-        // 字段顺序约定：Code / Name / Description / Scope(1=System) / TenantId(0=系统) / PlatformCode / ChannelType(1=Official,2=Store,3=Ad,4=Custom) / IsSystemLocked / CreatedTime / UpdateTime / CreatedId / CreatedName / IsDeleted / IsDefault / Id
+        // 字段顺序约定：Code / Name / Description / Scope(1=System) / PlatformCode / ChannelType(1=Official,2=Store,3=Ad,4=Custom) / IsSystemLocked / CreatedTime / UpdateTime / CreatedId / CreatedName / IsDeleted / IsDefault / Id
         // 分组（每段之间空行）：缺省 / 官方 / 商店-iOS / 商店-Android 海外 / 商店-Android 国内厂商 / 商店-Android 国内第三方 / 商店-鸿蒙 / 商店-PC 桌面 / 商店-主机 / 商店-游戏聚合 / 商店-小游戏平台 / 广告-国内 / 广告-海外 / 广告-游戏广告网络
         var records = new List<GlobalChannelDefinitionEntity>
         {

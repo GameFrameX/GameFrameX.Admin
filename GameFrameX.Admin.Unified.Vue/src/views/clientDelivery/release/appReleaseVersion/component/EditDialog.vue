@@ -146,7 +146,7 @@ const beforeOpen = (form: any, isEditor: boolean) => {
   return form
 }
 
-// 切换应用：清空包名并按新应用重载候选，避免保留其它应用的包。
+// 清空包名并重新加载候选，避免保留无关包。
 
 const openDialog = (row: any) => {
   dialogRef.value.openDialog(row)

@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { ADMIN_STATE, anonPage, navigateByMenu, shot, signIn } from './helpers';
 import { installApiRecorder, readApiRecords } from './module-coverage';
 import { globalServerSelector } from './server-selection';
-import { readField } from './admin-menu-fixture';
+import { readField, readMergeReviewerCredentials } from './admin-stack';
 
 // 环境准备由集成轮执行：至少三个启用区服，目标 OnlineAdminApiPrefix=online/admin，
 // HttpManageUrl 指向 server-merge.mjs；两个不同普通运营账号均授予合服/区服菜单。
@@ -60,15 +60,17 @@ test('合服向导：取消计划释放区服并允许同范围再次建计划',
 test('合服向导：真实登录、预演、双人复核、执行与源服退场', async ({ browser }) => {
   const targetName = process.env.E2E_MERGE_TARGET_NAME;
   const sourceNames: string[] = JSON.parse(process.env.E2E_MERGE_SOURCE_NAMES ?? '[]');
-  const reviewerAccount = process.env.E2E_MERGE_REVIEWER_ACCOUNT;
-  const reviewerPassword = process.env.E2E_MERGE_REVIEWER_PASSWORD;
+  // C406 第 2 轮（R6）：复核人由 setup 在「账号管理」真实界面创建并重置口令（产品路径），
+  // 凭证优先取环境变量，回落 setup 写入的 state 文件；不再直接写库造账号。
+  const reviewer = process.env.E2E_MERGE_REVIEWER_ACCOUNT && process.env.E2E_MERGE_REVIEWER_PASSWORD
+    ? { account: process.env.E2E_MERGE_REVIEWER_ACCOUNT, password: process.env.E2E_MERGE_REVIEWER_PASSWORD }
+    : await readMergeReviewerCredentials();
   expect(targetName, '请准备隔离目标区服').toBeTruthy();
   expect(sourceNames.length, '请准备至少两个隔离源区服').toBeGreaterThanOrEqual(2);
-  expect(reviewerAccount, '请准备独立复核账号及菜单权限').toBeTruthy();
-  expect(reviewerPassword).toBeTruthy();
-  expect(reviewerAccount).not.toBe(process.env.E2E_ACCOUNT ?? 'admin');
+  expect(reviewer.account, '请准备独立复核账号及菜单权限').toBeTruthy();
+  expect(reviewer.account).not.toBe(process.env.E2E_ACCOUNT ?? 'admin');
   const applicant = await anonPage(browser);
-  const reviewer = await anonPage(browser);
+  const reviewerPage = await anonPage(browser);
   try {
     await installApiRecorder(applicant);
     await signIn(applicant, process.env.E2E_ACCOUNT ?? 'admin', process.env.E2E_PASSWORD ?? '123456');
@@ -103,55 +105,55 @@ test('合服向导：真实登录、预演、双人复核、执行与源服退�
     await expect(applicant.getByRole('button', { name: '批准', exact: true })).toBeDisabled();
     await shot(applicant, 'merge-dry-run-self-approval-blocked');
 
-    await installApiRecorder(reviewer);
-    await signIn(reviewer, reviewerAccount!, reviewerPassword!);
-    await navigateByMenu(reviewer, '合服', '区服');
+    await installApiRecorder(reviewerPage);
+    await signIn(reviewerPage, reviewer.account, reviewer.password);
+    await navigateByMenu(reviewerPage, '合服', '区服');
     // planId 由目标/源服确定，取消用例留下的已取消行与其同 planId：排除已取消行后定位。
-    await reviewer.getByRole('row').filter({ hasText: planId }).filter({ hasNotText: '已取消' }).getByRole('button', { name: '详情', exact: true }).click();
-    await reviewer.locator('#merge-review-reason').fill('已核查零全局域写入');
-    await reviewer.getByRole('button', { name: '批准', exact: true }).click();
-    await expect(reviewer.getByTestId('merge-status')).toHaveText('已批准');
-    await expect(reviewer.getByRole('button', { name: '执行合服', exact: true })).toBeDisabled();
-    await reviewer.locator('#merge-backup').fill(`backup-${Date.now()}`);
-    await reviewer.getByLabel('已完成备份', { exact: true }).check();
-    await reviewer.getByRole('button', { name: '执行合服', exact: true }).click();
-    await expect(reviewer.getByText('确认执行合服？成功后源服将停止对客户端和顶栏选服可见。')).toBeVisible();
-    await reviewer.getByRole('button', { name: '确定', exact: true }).click();
-    await expect(reviewer.getByTestId('merge-status')).toHaveText('已完成');
-    await expect(reviewer.getByTestId('merge-report')).toHaveCount(2);
-    await shot(reviewer, 'merge-completed-reports');
-    await reviewer.getByRole('dialog').getByRole('button', { name: /close|关闭/i }).click();
-    await globalServerSelector(reviewer).getByRole('combobox').click();
-    await expect(reviewer.getByRole('option', { name: targetName!, exact: true })).toBeVisible();
-    for (const source of sourceNames) await expect(reviewer.getByRole('option', { name: source, exact: true })).toHaveCount(0);
-    await reviewer.keyboard.press('Escape');
-    await shot(reviewer, 'merge-sources-removed-from-selector');
-    await navigateByMenu(reviewer, '游戏区服', '区服');
+    await reviewerPage.getByRole('row').filter({ hasText: planId }).filter({ hasNotText: '已取消' }).getByRole('button', { name: '详情', exact: true }).click();
+    await reviewerPage.locator('#merge-review-reason').fill('已核查零全局域写入');
+    await reviewerPage.getByRole('button', { name: '批准', exact: true }).click();
+    await expect(reviewerPage.getByTestId('merge-status')).toHaveText('已批准');
+    await expect(reviewerPage.getByRole('button', { name: '执行合服', exact: true })).toBeDisabled();
+    await reviewerPage.locator('#merge-backup').fill(`backup-${Date.now()}`);
+    await reviewerPage.getByLabel('已完成备份', { exact: true }).check();
+    await reviewerPage.getByRole('button', { name: '执行合服', exact: true }).click();
+    await expect(reviewerPage.getByText('确认执行合服？成功后源服将停止对客户端和顶栏选服可见。')).toBeVisible();
+    await reviewerPage.getByRole('button', { name: '确定', exact: true }).click();
+    await expect(reviewerPage.getByTestId('merge-status')).toHaveText('已完成');
+    await expect(reviewerPage.getByTestId('merge-report')).toHaveCount(2);
+    await shot(reviewerPage, 'merge-completed-reports');
+    await reviewerPage.getByRole('dialog').getByRole('button', { name: /close|关闭/i }).click();
+    await globalServerSelector(reviewerPage).getByRole('combobox').click();
+    await expect(reviewerPage.getByRole('option', { name: targetName!, exact: true })).toBeVisible();
+    for (const source of sourceNames) await expect(reviewerPage.getByRole('option', { name: source, exact: true })).toHaveCount(0);
+    await reviewerPage.keyboard.press('Escape');
+    await shot(reviewerPage, 'merge-sources-removed-from-selector');
+    await navigateByMenu(reviewerPage, '游戏区服', '区服');
     // 全量套件中区服行数超过一页，按源服名检索后再断言（管理查询保留禁用行并显示已合服）；
     // 名称输入在「高级」折叠区，先展开。
-    const advancedToggle = reviewer.locator('role=button[name=/高级/]').first();
+    const advancedToggle = reviewerPage.locator('role=button[name=/高级/]').first();
     if (await advancedToggle.isVisible().catch(() => false)) {
       await advancedToggle.click();
-      await reviewer.waitForTimeout(400);
+      await reviewerPage.waitForTimeout(400);
     }
-    const areaSearch = reviewer.locator('.search-form input:visible').first();
+    const areaSearch = reviewerPage.locator('.search-form input:visible').first();
     for (const source of sourceNames) {
       await areaSearch.fill(source);
-      await reviewer.getByRole('button', { name: '查询' }).first().click();
-      await reviewer.waitForTimeout(1200);
-      const row = reviewer.getByRole('row').filter({ hasText: source });
+      await reviewerPage.getByRole('button', { name: '查询' }).first().click();
+      await reviewerPage.waitForTimeout(1200);
+      const row = reviewerPage.getByRole('row').filter({ hasText: source });
       await expect(row).toContainText('已合服');
       await expect(row).toContainText(targetIdentifier);
     }
-    await shot(reviewer, 'merge-management-retains-retired-sources');
-    const records = [...await readApiRecords(applicant), ...await readApiRecords(reviewer)];
+    await shot(reviewerPage, 'merge-management-retains-retired-sources');
+    const records = [...await readApiRecords(applicant), ...await readApiRecords(reviewerPage)];
     for (const endpoint of ['add', 'page', 'detail', 'dryRun', 'approve', 'execute']) {
       expect(records.some(record => record.url.includes(`/api/gameAreaMerge/${endpoint}`)), `页面真实请求 ${endpoint}`).toBe(true);
     }
     expect(records.some(record => record.url.includes('/api/gameArea/page'))).toBe(true);
   } finally {
     await applicant.context().storageState({ path: ADMIN_STATE });
-    await reviewer.context().close();
+    await reviewerPage.context().close();
     await applicant.context().close();
   }
 });

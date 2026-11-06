@@ -5,7 +5,7 @@ using GameFrameX.Application.CommerceCenter.GameOrder;
 using GameFrameX.Client.Api.GameWebShop.Dto;
 using GameFrameX.Client.Api.Integrations.Payment.Dto;
 using GameFrameX.Client.Api.Services;
-using GameFrameX.Client.Api.Services.ClientApiTenantOptions;
+using GameFrameX.Client.Api.Services.ClientApiOptions;
 using GameFrameX.Core.Service;
 using GameFrameX.Entity.Enum;
 using GameFrameX.Payment.Abstract;
@@ -17,10 +17,10 @@ namespace GameFrameX.Client.Api.Integrations.Payment;
 /// <summary>
 /// 游戏订单控制器
 /// </summary>
-public partial class GameOrderController : BaseController<TenantGameOrderEntity>
+public partial class GameOrderController : BaseController<GameOrderEntity>
 {
-    private readonly IClientApiTenantOptionsProvider _optionsProvider;
-    private readonly Repository<TenantGameRoleEntity> _gameRoleService;
+    private readonly IClientApiOptionsProvider _optionsProvider;
+    private readonly Repository<GameRoleEntity> _gameRoleService;
     private readonly HttpClient _httpClient;
     private readonly GameOrderShipService _shipService;
     private readonly IPaymentChannelFactory _paymentChannelFactory;
@@ -37,9 +37,9 @@ public partial class GameOrderController : BaseController<TenantGameOrderEntity>
     /// <param name="paymentChannelFactory"></param>
     /// <param name="googlePubSubPushAuthenticator"></param>
     /// <param name="googlePlayPurchaseService"></param>
-    public GameOrderController(SqlSugarRepository<TenantGameOrderEntity> service,
-        IClientApiTenantOptionsProvider optionsProvider,
-        Repository<TenantGameRoleEntity> gameRoleService,
+    public GameOrderController(SqlSugarRepository<GameOrderEntity> service,
+        IClientApiOptionsProvider optionsProvider,
+        Repository<GameRoleEntity> gameRoleService,
         HttpClient httpClient,
         GameOrderShipService shipService,
         IPaymentChannelFactory paymentChannelFactory,
@@ -62,19 +62,19 @@ public partial class GameOrderController : BaseController<TenantGameOrderEntity>
     /// <param name="input"></param>
     /// <returns></returns>
     [HttpPost]
-    [ProducesResponseType(typeof(HttpJsonResultData<AddTenantGameOrderEntityResponse>), 200)]
-    public async Task<HttpJsonResultData<AddTenantGameOrderEntityResponse>> Create([FromBody] CreateTenantGameOrderEntityRequest input)
+    [ProducesResponseType(typeof(HttpJsonResultData<AddGameOrderEntityResponse>), 200)]
+    public async Task<HttpJsonResultData<AddGameOrderEntityResponse>> Create([FromBody] CreateGameOrderEntityRequest input)
     {
-        var gameAreaEntity = await PRepository.AsSugarClient().Queryable<TenantGameAreaEntity>().Filter(null, true).Where(u => u.IsDeleted == false).Where(u => u.Id == input.AreaId).FirstAsync();
+        var gameAreaEntity = await PRepository.AsSugarClient().Queryable<GameAreaEntity>().Filter(null, true).Where(u => u.IsDeleted == false).Where(u => u.Id == input.AreaId).FirstAsync();
         if (gameAreaEntity == null)
         {
-            return GameApiResult.Error<AddTenantGameOrderEntityResponse>(AreaErrorCode.AreaNotFound, "区服不存在");
+            return GameApiResult.Error<AddGameOrderEntityResponse>(AreaErrorCode.AreaNotFound, "区服不存在");
         }
 
-        var gameRoleEntity = await PRepository.AsSugarClient().Queryable<TenantGameRoleEntity>().Where(u => u.Id == input.RoleId).FirstAsync();
+        var gameRoleEntity = await PRepository.AsSugarClient().Queryable<GameRoleEntity>().Where(u => u.Id == input.RoleId).FirstAsync();
         if (gameRoleEntity == null)
         {
-            return GameApiResult.Error<AddTenantGameOrderEntityResponse>(GameRoleErrorCode.RoleNotFound, "角色不存在");
+            return GameApiResult.Error<AddGameOrderEntityResponse>(GameRoleErrorCode.RoleNotFound, "角色不存在");
         }
 
         // 调用游戏服务器验证商品ID相关
@@ -84,23 +84,23 @@ public partial class GameOrderController : BaseController<TenantGameOrderEntity>
 
         if (resultData.IsSuccess == false)
         {
-            return HttpJsonResultData<AddTenantGameOrderEntityResponse>.Error(resultData.Code, resultData.Message);
+            return HttpJsonResultData<AddGameOrderEntityResponse>.Error(resultData.Code, resultData.Message);
         }
 
         // 判断是否需要支付
         if (resultData.Data.IsNeedPay == false)
         {
             // 不需要支付，直接返回
-            var addTenantGameOrderEntityOutput = new AddTenantGameOrderEntityResponse
+            var addGameOrderEntityOutput = new AddGameOrderEntityResponse
             {
                 RoleId = input.RoleId,
                 Sku = input.Sku,
                 IsNeedPay = false,
             };
-            return HttpJsonResultData<AddTenantGameOrderEntityResponse>.Success(addTenantGameOrderEntityOutput);
+            return HttpJsonResultData<AddGameOrderEntityResponse>.Success(addGameOrderEntityOutput);
         }
 
-        var entity = input.Adapt<TenantGameOrderEntity>();
+        var entity = input.Adapt<GameOrderEntity>();
         entity.Id = SnowFlakeIdHelper.Instance.NextId();
 
         entity.PayChannel = input.PayChannel;
@@ -117,14 +117,14 @@ public partial class GameOrderController : BaseController<TenantGameOrderEntity>
         // 检查是否支持该支付渠道
         if (!_paymentChannelFactory.IsSupported(input.PayChannel))
         {
-            return GameApiResult.Error<AddTenantGameOrderEntityResponse>(PaymentErrorCode.PayChannelNotSupported, "不支持的支付渠道");
+            return GameApiResult.Error<AddGameOrderEntityResponse>(PaymentErrorCode.PayChannelNotSupported, "不支持的支付渠道");
         }
 
         // 获取支付渠道处理器
         var paymentHandler = _paymentChannelFactory.GetHandler(input.PayChannel);
         if (paymentHandler == null)
         {
-            return GameApiResult.Error<AddTenantGameOrderEntityResponse>(PaymentErrorCode.PayChannelNotSupported, "支付渠道处理器未找到");
+            return GameApiResult.Error<AddGameOrderEntityResponse>(PaymentErrorCode.PayChannelNotSupported, "支付渠道处理器未找到");
         }
 
         // 获取支付配置
@@ -136,11 +136,11 @@ public partial class GameOrderController : BaseController<TenantGameOrderEntity>
         catch (InvalidOperationException exception)
         {
             // S3/C401 断链修复点：把回调路由不完整的拒单原因返回给客户端。
-            return GameApiResult.Error<AddTenantGameOrderEntityResponse>(PaymentErrorCode.PayChannelNotSupported, exception.Message);
+            return GameApiResult.Error<AddGameOrderEntityResponse>(PaymentErrorCode.PayChannelNotSupported, exception.Message);
         }
         if (optionSetting == null)
         {
-            return GameApiResult.Error<AddTenantGameOrderEntityResponse>(PaymentErrorCode.PayChannelNotSupported, "支付渠道配置未找到");
+            return GameApiResult.Error<AddGameOrderEntityResponse>(PaymentErrorCode.PayChannelNotSupported, "支付渠道配置未找到");
         }
 
         var entityBase = new GameOrderBase
@@ -158,7 +158,7 @@ public partial class GameOrderController : BaseController<TenantGameOrderEntity>
         var paymentResult = await paymentHandler.CreateOrderAsync(entityBase, input, gameRoleEntity, _httpClient, optionSetting);
         if (!paymentResult.IsSuccess)
         {
-            return HttpJsonResultData<AddTenantGameOrderEntityResponse>.Fail(paymentResult.ErrorMessage);
+            return HttpJsonResultData<AddGameOrderEntityResponse>.Fail(paymentResult.ErrorMessage);
         }
 
         var orderEntity = paymentResult.OrderEntity;
@@ -167,7 +167,7 @@ public partial class GameOrderController : BaseController<TenantGameOrderEntity>
         var updatedEntity = await PRepository.InsertReturnEntityAsync(entity);
         // 注意：累充(AllRecharge)不在下单时递增，改为在发货确认支付成功后递增（见 GameOrderShipService.ShipAsync），避免下单刷 VIP 等级
         // 创建输出对象
-        var output = updatedEntity.Adapt<AddTenantGameOrderEntityResponse>();
+        var output = updatedEntity.Adapt<AddGameOrderEntityResponse>();
 
         // 如果支付结果包含额外信息，则合并
         if (paymentResult.Output != null)
@@ -200,7 +200,7 @@ public partial class GameOrderController : BaseController<TenantGameOrderEntity>
             }
         }
 
-        return HttpJsonResultData<AddTenantGameOrderEntityResponse>.Success(output);
+        return HttpJsonResultData<AddGameOrderEntityResponse>.Success(output);
     }
 
     /// <summary>
@@ -210,7 +210,7 @@ public partial class GameOrderController : BaseController<TenantGameOrderEntity>
     /// <param name="isRecharge">是否是充值发货</param>
     /// <param name="isSandBox">是否是沙盒充值</param>
     /// <returns></returns>
-    private async Task<HttpJsonResultData<BaseOperationAckResponse>> SendOutGoods(TenantGameOrderEntity gameOrderEntity, bool isRecharge = false, bool isSandBox = false)
+    private async Task<HttpJsonResultData<BaseOperationAckResponse>> SendOutGoods(GameOrderEntity gameOrderEntity, bool isRecharge = false, bool isSandBox = false)
     {
         return await _shipService.ShipAsync(gameOrderEntity.Id, isRecharge, isSandBox);
     }

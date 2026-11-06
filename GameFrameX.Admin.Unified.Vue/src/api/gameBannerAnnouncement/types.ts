@@ -2,7 +2,7 @@
 /* tslint:disable */
 
 /** 游戏内横幅公告增加输入参数 */
-export interface AddTenantGameBannerAnnouncementEntityRequest {
+export interface AddGameBannerAnnouncementEntityRequest {
   /**
    * @min 1
    * @max 9223372036854776000
@@ -125,7 +125,7 @@ export interface GameBannerAnnouncementResponseSqlSugarPagedList {
 }
 
 /** 游戏内横幅公告分页查询输入参数 */
-export interface PageTenantGameBannerAnnouncementEntityRequest {
+export interface PageGameBannerAnnouncementEntityRequest {
   searchKey?: string | null;
   /**
    * @format int32
@@ -178,7 +178,7 @@ export interface PageTenantGameBannerAnnouncementEntityRequest {
 }
 
 /** 游戏内横幅公告更新输入参数 */
-export interface UpdateTenantGameBannerAnnouncementEntityRequest {
+export interface UpdateGameBannerAnnouncementEntityRequest {
   /**
    * @min 1
    * @max 9223372036854776000

@@ -1,18 +1,18 @@
 using System.Collections.Concurrent;
 using System.Text.Json.Nodes;
-using GameFrameX.Core.Service.Tenant;
+using GameFrameX.Core.Service.Business;
 
 namespace GameFrameX.Advertisement.Abstract;
 
 /// <summary>
-/// 广告回调配置 ConfigJson 敏感字段级加解密收口（C371 / GFX-838，对齐 C370 TenantObjectStorageConfigCrypto）：
+/// 广告回调配置 ConfigJson 敏感字段级加解密收口（C371 / GFX-838，对齐 C370 ObjectStorageConfigCrypto）：
 /// 写入侧在 NormalizeConfigJson 规范化之后、落库之前调用 <see cref="EncryptConfigJson"/>；
 /// 读取侧在构建回调验签上下文之前调用 <see cref="DecryptConfigJson"/>。
 /// <para>敏感字段集合由 Provider Schema 的 <c>Sensitive</c> 标记或 <c>Type == "secret"</c> 驱动（与表单脱敏 / 必填校验同源判定），
 /// 非敏感字段（callbackUrl 等）保持明文可读；字段值为密文形态（<c>enc:sec:v1:</c> 前缀）时幂等跳过。</para>
 /// <para>性能约束：底层 PBKDF2 派生单次数百毫秒级——<see cref="DecryptConfigJson"/> 按「密文原文 → 明文 JSON」做进程级缓存，
 /// 同一密文只解密一次；任何配置写入都会产生新密文（每次加密随机 Salt + Nonce），缓存 key 随之失效。</para>
-/// <para>ponytail: 缓存字典无淘汰上限（key 为整段密文 JSON）；广告回调配置行数极少（每租户个位数），增长天花板可忽略。
+/// <para>ponytail: 缓存字典无淘汰上限（key 为整段密文 JSON）；广告回调配置行数极少（每作用域个位数），增长天花板可忽略。
 /// 升级路径：按配置行 Id 失效或换 LRU。</para>
 /// </summary>
 public static class AdvertisementCallbackConfigCrypto
@@ -40,7 +40,7 @@ public static class AdvertisementCallbackConfigCrypto
             return configJson;
         }
 
-        return TransformSensitiveFields(configJson, sensitiveKeys, TenantSecretCrypto.Encrypt);
+        return TransformSensitiveFields(configJson, sensitiveKeys, SecretCrypto.Encrypt);
     }
 
     /// <summary>
@@ -52,7 +52,7 @@ public static class AdvertisementCallbackConfigCrypto
     /// <returns>敏感字段为明文的 ConfigJson</returns>
     public static string DecryptConfigJson(string provider, string configJson)
     {
-        if (string.IsNullOrWhiteSpace(configJson) || !configJson.Contains(TenantSecretCrypto.EncryptedPrefix, StringComparison.Ordinal))
+        if (string.IsNullOrWhiteSpace(configJson) || !configJson.Contains(SecretCrypto.EncryptedPrefix, StringComparison.Ordinal))
         {
             return configJson;
         }
@@ -70,7 +70,7 @@ public static class AdvertisementCallbackConfigCrypto
             return configJson;
         }
 
-        return TransformSensitiveFields(configJson, sensitiveKeys, TenantSecretCrypto.Decrypt);
+        return TransformSensitiveFields(configJson, sensitiveKeys, SecretCrypto.Decrypt);
     }
 
     /// <summary>

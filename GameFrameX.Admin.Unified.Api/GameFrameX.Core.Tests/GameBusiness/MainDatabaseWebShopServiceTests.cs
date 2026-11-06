@@ -2,7 +2,7 @@ using GameFrameX.Application.CommerceCenter.GameWebShop;
 using GameFrameX.Application.CommerceCenter.GameWebShop.Dto;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Core.Tests.ClientApi;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 
 namespace GameFrameX.Core.Tests.GameBusiness;
 
@@ -14,12 +14,12 @@ public sealed class MainDatabaseWebShopServiceTests
         using (var database = new ClientApiTestDb())
         using (var client = new HttpClient())
         {
-            database.InitTenantTables(typeof(TenantGameWebShopEntity));
-            var service = new GameWebShopService(new SqlSugarRepository<TenantGameWebShopEntity>
+            database.InitBusinessTables(typeof(GameWebShopEntity));
+            var service = new GameWebShopService(new SqlSugarRepository<GameWebShopEntity>
             {
                 Context = database.MainDb,
             }, client);
-            var created = await service.AddAsync(new AddTenantGameWebShopEntityRequest
+            var created = await service.AddAsync(new AddGameWebShopEntityRequest
             {
                 Name = "gift", Description = "gift", Logo = "gift.png", KeyWords = "gift",
                 Price = "12", RealPrice = "10", ItemJson = "[]", IsUp = true, Weight = 3,

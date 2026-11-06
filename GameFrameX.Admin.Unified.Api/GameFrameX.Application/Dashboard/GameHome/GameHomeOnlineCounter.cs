@@ -12,14 +12,14 @@ namespace GameFrameX.Application.Dashboard.GameHome;
 public static class GameHomeOnlineCounter
 {
     /// <summary>
-    /// 按指定租户库连接聚合全服在线人数。无可用区服时返回 0。
+    /// 按指定主库连接聚合全服在线人数。无可用区服时返回 0。
     /// </summary>
-    /// <param name="tenantDb">租户业务库连接（必须已路由到目标租户库）。</param>
+    /// <param name="mainDb">主库业务连接。</param>
     /// <param name="httpClientFactory">HTTP 客户端工厂。</param>
     /// <returns>启用区服在线人数之和。</returns>
-    public static async Task<int> GetTotalOnlineAsync(ISqlSugarClient tenantDb, IHttpClientFactory httpClientFactory)
+    public static async Task<int> GetTotalOnlineAsync(ISqlSugarClient mainDb, IHttpClientFactory httpClientFactory)
     {
-        var areas = await tenantDb.Queryable<Entity.Tenant.Game.TenantGameAreaEntity>()
+        var areas = await mainDb.Queryable<Entity.Business.Game.GameAreaEntity>()
                                   .Where(u => u.IsEnabled == true && u.HttpManageUrl != null && u.HttpManageUrl != "")
                                   .ToListAsync();
 
@@ -43,7 +43,7 @@ public static class GameHomeOnlineCounter
     /// 查询单个区服在线人数。Control 能力前缀为空（构造器抛异常）或调用异常时降级为 0，
     /// 与历史「全局地址缺失 / 游戏服不可达降级 0」语义一致（来源 change C175）。
     /// </summary>
-    private static async Task<int> GetAreaOnlineAsync(HttpClient client, Entity.Tenant.Game.TenantGameAreaEntity area)
+    private static async Task<int> GetAreaOnlineAsync(HttpClient client, Entity.Business.Game.GameAreaEntity area)
     {
         string url;
         try

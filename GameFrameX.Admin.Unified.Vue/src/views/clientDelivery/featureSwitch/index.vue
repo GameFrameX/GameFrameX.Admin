@@ -1,5 +1,5 @@
 <template>
-  <div class="tenantGameAppFeatureSwitch-container">
+  <div class="gameAppFeatureSwitch-container">
     <Card>
       <template #content>
         <SearchForm
@@ -46,7 +46,7 @@
   </div>
 </template>
 
-<script lang="ts" setup="" name="tenantGameAppFeatureSwitch">
+<script lang="ts" setup="" name="gameAppFeatureSwitch">
 import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import {computed, onMounted, ref} from 'vue'
 import {useCrudTable} from '../../../composables/useCrudTable.ts'

@@ -9,7 +9,7 @@
             authPrefix="gameAppReleaseVersion"
             @query="onQuery"
 
-            @add="openAddTenantGameAppReleaseVersion"
+            @add="openAddGameAppReleaseVersion"
         />
       </template>
     </Card>
@@ -28,7 +28,7 @@
             <span v-else>{{ t('message.common.label.no') }}</span>
           </template>
         </CrudDataTable>
-        <editDialog ref="editDialogRef" :title="editTenantGameAppReleaseVersionTitle" @reloadTable="onQuery"/>
+        <editDialog ref="editDialogRef" :title="editGameAppReleaseVersionTitle" @reloadTable="onQuery"/>
       </template>
     </Card>
   </div>
@@ -54,7 +54,7 @@ import {MAX_SELECT_SIZE} from '../../../../constants/pagination.ts'
 
 
 const editDialogRef = ref()
-const editTenantGameAppReleaseVersionTitle = ref('')
+const editGameAppReleaseVersionTitle = ref('')
 const querySelections = ref<any>({
   platform: [],
   language: [],
@@ -144,25 +144,25 @@ const onPackageQuery = async () => {
 }
 
 // 打开新增页面
-const openAddTenantGameAppReleaseVersion = () => {
-  editTenantGameAppReleaseVersionTitle.value = t('message.client.addAppVersion')
+const openAddGameAppReleaseVersion = () => {
+  editGameAppReleaseVersionTitle.value = t('message.client.addAppVersion')
   editDialogRef.value.isEditor = false
   editDialogRef.value.openDialog({})
 }
 
 // 打开编辑页面
-const openEditTenantGameAppReleaseVersion = (row: any) => {
-  editTenantGameAppReleaseVersionTitle.value = t('message.client.editAppVersion')
+const openEditGameAppReleaseVersion = (row: any) => {
+  editGameAppReleaseVersionTitle.value = t('message.client.editAppVersion')
   editDialogRef.value.isEditor = true
   editDialogRef.value.openDialog(row)
 }
 
 const actions = {
-  edit: openEditTenantGameAppReleaseVersion,
+  edit: openEditGameAppReleaseVersion,
   delete: onDelete,
 }
 
-// 切换应用：清空包名筛选并按新应用重载包名候选，避免残留其它应用的包。
+// 载入包名候选并保持当前筛选值。
 
 onLanguageQuery()
 onPackageQuery()

@@ -19,7 +19,7 @@ public sealed class TriggerPersistenceWriteBackTests : IDisposable
 
     public TriggerPersistenceWriteBackTests()
     {
-        _database.InitTenantTables(typeof(SystemJobDetailEntity), typeof(SystemJobTriggerEntity));
+        _database.InitBusinessTables(typeof(SystemJobDetailEntity), typeof(SystemJobTriggerEntity));
 
         var services = new ServiceCollection();
         services.AddSingleton<ISqlSugarClient>(_database.MainDb);

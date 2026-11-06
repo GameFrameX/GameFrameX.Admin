@@ -16,7 +16,7 @@ namespace GameFrameX.Core.Tests.Architecture;
 //              单 Request DTO（类型名以 Request/Input 结尾；泛型取泛型定义名，如 DataExportRequest<TQuery>）
 //   违规形状 —— 参数 ≥ 2（散参数 / body+query 混合绑定）；
 //              入参为 object/dynamic/ExpandoObject/IDynamicMetaObjectProvider（动态参数零容忍）；
-//              入参为 *Entity（Entity 直传：TenantId/IsDeleted 等系统字段进入请求契约构成越权攻击面，C228 入参侧对偶）
+//              入参为 *Entity（Entity 直传：审计与软删除等系统字段进入请求契约构成越权攻击面，C228 入参侧对偶）
 // 扫描范围：三程序集（Application.Platform / Application.Platform / Core.Service）全部 concrete IAdminApiController 实现，
 //          方法枚举含继承链（覆盖 GenericCrudService<,,,,> 泛型族基类 action 的实例化入参），
 //          过滤 [NonAction] / IsSpecialName / object 声明；违规按声明类名归因（泛型取泛型定义名）。
@@ -30,11 +30,11 @@ public sealed class AdminEndpointParameterShapeContractTests
         // 裸 List<long> 入参（批量删除参数配置；整改须收敛 BatchDeleteConfigRequest 并同步前端）
         "SystemConfigService.BatchDeleteConfigAsync",
         // 文件 + query 元数据混合绑定（文件上传特例；整改需配套前端 multipart 适配）
-        "TenantFileService.UploadFileAsync",
+        "FileService.UploadFileAsync",
         // 3 散参（message/title/isHtml，平台系统邮件发送）
         "SystemMessageService.SendEmailAsync",
-        // Entity 直传入参（TenantUserEntity，与 GFX-770 已整改的 TenantWechatUser 同性质越权攻击面）
-        "TenantUserService.UpdateBaseInfoAsync",
+        // Entity 直传入参（UserEntity，与 GFX-770 已整改的 WechatUser 同性质越权攻击面）
+        "UserService.UpdateBaseInfoAsync",
     };
 
     [Fact]

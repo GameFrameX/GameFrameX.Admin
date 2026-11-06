@@ -10,7 +10,7 @@ using GameFrameX.Core.Exceptions;
 using GameFrameX.Core.Service.User;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Entity.Enum;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 using GameFrameX.Foundation.Orm.Entity;
 using Microsoft.AspNetCore.Http;
 using SqlSugar;
@@ -24,7 +24,6 @@ namespace GameFrameX.Core.Tests.Online.Social;
 // 案件回写失败落响应原因不阻断；Mute 缺时长服务端兜底拒绝；Page 过滤透传与游标往返。
 public sealed class OnlineReportCaseServiceTests : IDisposable
 {
-    private const long TenantA = 4001;
     private const long App100 = 100;
     private const long Area1001 = 2001;
     private const long OperatorUserId = 77;
@@ -48,8 +47,8 @@ public sealed class OnlineReportCaseServiceTests : IDisposable
         SqlSugarUnifiedConfig.ConfigureBaseFilters(_db);
         _db.CodeFirst.InitTables(
 
-            typeof(TenantGameAreaEntity),
-            typeof(TenantGamePenaltyEntity));
+            typeof(GameAreaEntity),
+            typeof(GamePenaltyEntity));
     }
 
     /// <summary>
@@ -73,7 +72,7 @@ public sealed class OnlineReportCaseServiceTests : IDisposable
         });
 
         // 事实源：Mute 处罚一行，审计字段由服务端强制（Active + 当前操作人）。
-        var penalty = await _db.Queryable<TenantGamePenaltyEntity>().FirstAsync(u => u.TargetId == "player-9");
+        var penalty = await _db.Queryable<GamePenaltyEntity>().FirstAsync(u => u.TargetId == "player-9");
         Assert.NotNull(penalty);
         Assert.Equal(Area1001, penalty.AreaId);
         Assert.Equal(PenaltyTargetTypeEnum.Account, penalty.TargetType);
@@ -118,7 +117,7 @@ public sealed class OnlineReportCaseServiceTests : IDisposable
             Reason = "证据不足",
         });
 
-        Assert.Equal(0, await _db.Queryable<TenantGamePenaltyEntity>().CountAsync(u => u.TargetId == "player-9"));
+        Assert.Equal(0, await _db.Queryable<GamePenaltyEntity>().CountAsync(u => u.TargetId == "player-9"));
         Assert.Equal(new[] { "update_report_case" }, fake.Calls.Select(u => u.Action).ToArray());
         Assert.Equal(OnlineReportCaseStatusKind.Rejected, Assert.IsType<OnlineReportCaseUpdateRequest>(fake.Calls[0].Request).Status);
 
@@ -150,7 +149,7 @@ public sealed class OnlineReportCaseServiceTests : IDisposable
         });
 
         Assert.NotNull(response.PenaltyId);
-        Assert.NotNull(await _db.Queryable<TenantGamePenaltyEntity>().FirstAsync(u => u.Id == response.PenaltyId!.Value));
+        Assert.NotNull(await _db.Queryable<GamePenaltyEntity>().FirstAsync(u => u.Id == response.PenaltyId!.Value));
         Assert.False(response.LinkCommand!.AllSucceeded);
         Assert.Contains("send_admin_notification", fake.Calls.Select(u => u.Action));
         Assert.Contains("update_report_case", fake.Calls.Select(u => u.Action));
@@ -265,15 +264,15 @@ public sealed class OnlineReportCaseServiceTests : IDisposable
 
     private OnlineReportCaseService CreateService(IOnlineServerClient onlineServerClient)
     {
-        var userContext = CreateUserContext(TenantA, OperatorUserId);
-        var factory = new OnlineScopeContextFactory(Repository<TenantGameAreaEntity>());
+        var userContext = CreateUserContext(OperatorUserId);
+        var factory = new OnlineScopeContextFactory(Repository<GameAreaEntity>());
         var linkService = new OnlinePenaltyLinkCommandService(
-            Repository<TenantGamePenaltyEntity>(),
-            Repository<TenantGameAreaEntity>(),
+            Repository<GamePenaltyEntity>(),
+            Repository<GameAreaEntity>(),
             onlineServerClient,
             factory);
         var penaltyService = new GamePenaltyService(
-            Repository<TenantGamePenaltyEntity>(),
+            Repository<GamePenaltyEntity>(),
             userContext,
             linkService);
         return new OnlineReportCaseService(onlineServerClient, factory, penaltyService, linkService);
@@ -283,7 +282,7 @@ public sealed class OnlineReportCaseServiceTests : IDisposable
     {
         var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
-        await _db.Insertable(new TenantGameAreaEntity
+        await _db.Insertable(new GameAreaEntity
         {
             Id = Area1001,
             Name = "area-1001",
@@ -313,10 +312,9 @@ public sealed class OnlineReportCaseServiceTests : IDisposable
         return new SqlSugarRepository<T> { Context = _db, };
     }
 
-    private static CurrentUserContext CreateUserContext(long tenantId, long userId)
+    private static CurrentUserContext CreateUserContext(long userId)
     {
         var identity = new ClaimsIdentity("TestAuth");
-        identity.AddClaim(new Claim("TenantId", tenantId.ToString()));
         identity.AddClaim(new Claim(ClaimConst.UserId, userId.ToString()));
         var httpContext = new DefaultHttpContext { User = new ClaimsPrincipal(identity), };
         var accessor = new HttpContextAccessor { HttpContext = httpContext, };

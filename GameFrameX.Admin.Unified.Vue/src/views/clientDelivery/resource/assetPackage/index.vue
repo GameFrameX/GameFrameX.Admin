@@ -1,5 +1,5 @@
 <template>
-  <div class="tenantGameAppAssetPackage-container">
+  <div class="gameAppAssetPackage-container">
     <Card>
       <template #content>
         <SearchForm
@@ -10,7 +10,7 @@
             :defaultSearchKey="false"
             @query="onQuery"
 
-            @add="openAddTenantGameAppAssetPackage"
+            @add="openAddGameAppAssetPackage"
         />
       </template>
     </Card>
@@ -25,13 +25,13 @@
                        :exportQuery="queryParams"
                        @page="onPage">
         </CrudDataTable>
-        <editDialog ref="editDialogRef" :title="editTenantGameAppAssetPackageTitle" @reloadTable="onQuery"/>
+        <editDialog ref="editDialogRef" :title="editGameAppAssetPackageTitle" @reloadTable="onQuery"/>
       </template>
     </Card>
   </div>
 </template>
 
-<script lang="ts" setup="" name="tenantGameAppAssetPackage">
+<script lang="ts" setup="" name="gameAppAssetPackage">
 import {computed, ref} from 'vue'
 import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import type {CrudColumnConfig} from '../../../../components/crud-data-table/types.ts'
@@ -43,7 +43,7 @@ import { gameAppAssetPackageDeletePost, gameAppAssetPackagePagePost } from '../.
 import {createdNameColumn, descriptionColumn, nameColumn, nameSearchField} from '../../../../utils/crudConfig.ts'
 
 const editDialogRef = ref()
-const editTenantGameAppAssetPackageTitle = ref('')
+const editGameAppAssetPackageTitle = ref('')
 
 const searchFields = computed(() => [
   nameSearchField({label: t('message.client.packageAssetName'), placeholder: t('message.client.packageAssetName')}),
@@ -64,14 +64,14 @@ queryParams.value = {
 const onPage = usePrimeTablePage(tableParams, onQuery)
 
 // 打开新增页面
-const openAddTenantGameAppAssetPackage = () => {
-  editTenantGameAppAssetPackageTitle.value = t('message.client.addAssetPackage')
+const openAddGameAppAssetPackage = () => {
+  editGameAppAssetPackageTitle.value = t('message.client.addAssetPackage')
   editDialogRef.value.isEditor = false
   editDialogRef.value.openDialog({})
 }
 
-const openEditTenantGameAppAssetPackage = (row: any) => {
-  editTenantGameAppAssetPackageTitle.value = t('message.client.editAssetPackage')
+const openEditGameAppAssetPackage = (row: any) => {
+  editGameAppAssetPackageTitle.value = t('message.client.editAssetPackage')
   editDialogRef.value.isEditor = true
   editDialogRef.value.openDialog(row)
 }
@@ -83,7 +83,7 @@ const columns = computed<CrudColumnConfig[]>(() => [
 ])
 
 const actions = {
-  edit: openEditTenantGameAppAssetPackage,
+  edit: openEditGameAppAssetPackage,
   delete: onDelete,
 }
 

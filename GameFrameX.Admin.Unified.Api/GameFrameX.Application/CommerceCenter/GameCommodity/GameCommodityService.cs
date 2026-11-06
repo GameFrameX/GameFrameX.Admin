@@ -8,11 +8,11 @@ namespace GameFrameX.Application.CommerceCenter.GameCommodity;
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
 public class GameCommodityService
-    : GenericCrudService<Entity.Tenant.Game.TenantGameCommodityEntity,
-        AddTenantGameCommodityEntityRequest, UpdateTenantGameCommodityEntityRequest,
-        GameCommodityResponse, PageTenantGameCommodityEntityRequest>
+    : GenericCrudService<Entity.Business.Game.GameCommodityEntity,
+        AddGameCommodityEntityRequest, UpdateGameCommodityEntityRequest,
+        GameCommodityResponse, PageGameCommodityEntityRequest>
 {
-    public GameCommodityService(SqlSugarRepository<Entity.Tenant.Game.TenantGameCommodityEntity> repository)
+    public GameCommodityService(SqlSugarRepository<Entity.Business.Game.GameCommodityEntity> repository)
         : base(repository)
     {
     }
@@ -20,7 +20,7 @@ public class GameCommodityService
     /// <summary>
     /// 更新前校验记录存在。
     /// </summary>
-    protected override async Task OnUpdatingAsync(UpdateTenantGameCommodityEntityRequest input)
+    protected override async Task OnUpdatingAsync(UpdateGameCommodityEntityRequest input)
     {
         var existing = await Repository.GetFirstAsync(u => u.Id == input.Id);
         if (existing == null)
@@ -29,7 +29,7 @@ public class GameCommodityService
         }
     }
 
-    protected override ISugarQueryable<GameCommodityResponse> BuildPageQuery(PageTenantGameCommodityEntityRequest input)
+    protected override ISugarQueryable<GameCommodityResponse> BuildPageQuery(PageGameCommodityEntityRequest input)
     {
         return Repository.AsQueryable()
                          .WhereIF(!string.IsNullOrWhiteSpace(input.SearchKey), u =>

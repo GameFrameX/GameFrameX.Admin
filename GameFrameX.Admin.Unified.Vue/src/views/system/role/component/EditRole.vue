@@ -2,8 +2,8 @@
   <BaseEditDialog
     ref="dialogRef"
     :title="props.title"
-    :addApi="(params: any) => tenantRoleAddPost(params)"
-    :updateApi="(params: any) => tenantRoleUpdatePost(params)"
+    :addApi="(params: any) => roleAddPost(params)"
+    :updateApi="(params: any) => roleUpdatePost(params)"
     :rules="rules"
     :beforeSubmit="beforeSubmit"
     idCheckMode="system"
@@ -44,7 +44,7 @@ import Message from 'primevue/message'
 import Tree from 'primevue/tree';
 import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import {globalMenuListGet} from '../../../../api/globalMenu';
-import {tenantRoleAddPost, tenantRoleUpdatePost, tenantRoleOwnMenuListGet} from '../../../../api/tenantRole';
+import {roleAddPost, roleUpdatePost, roleOwnMenuListGet} from '../../../../api/role';
 import {GlobalMenuEntity} from '../../../../api/_shared/data-contracts.ts'
 import {isEnabled} from '../../../../utils/isEnabled.ts'
 
@@ -119,7 +119,7 @@ defineExpose({
     selectedMenuKeys.value = {}
     await dialogRef.value?.openDialog(row)
     if (row.id != undefined) {
-      var res = await tenantRoleOwnMenuListGet(row.id)
+      var res = await roleOwnMenuListGet(row.id)
       setTimeout(() => {
         const keys: Record<string, boolean> = {};
         (res.data.data ?? []).forEach((id: any) => {

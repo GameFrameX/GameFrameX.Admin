@@ -1,5 +1,5 @@
 <template>
-  <div class="tenantGameMailCampaignEntity-container">
+  <div class="gameMailCampaignEntity-container">
     <Card>
       <template #content>
         <SearchForm
@@ -64,8 +64,8 @@
   </div>
 </template>
 
-<script lang="ts" setup name="tenantGameMailCampaignEntity">
-// authPrefix 用菜单 Key 前缀（mailCampaign，无 tenant 前缀）：权限下发的是 global_menu.key
+<script lang="ts" setup name="gameMailCampaignEntity">
+// authPrefix 使用菜单 Key 前缀（mailCampaign）：权限下发的是 global_menu.key
 // （GetOwnButtonPermListAsync 取 u.Key），Permission 字段是后端 API 鉴权用的另一套
 import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import SearchForm from '/@/components/search-form/index.vue'

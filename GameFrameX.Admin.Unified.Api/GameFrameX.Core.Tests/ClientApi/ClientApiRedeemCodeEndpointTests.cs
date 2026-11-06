@@ -1,7 +1,7 @@
 using GameFrameX.Client.Api.GameRedeemCode;
 using GameFrameX.Client.Api.GameRedeemCode.Dto;
 using GameFrameX.Client.Api.GameWebShop.Dto;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 using GameFrameX.Foundation.Json;
 
 namespace GameFrameX.Core.Tests.ClientApi;
@@ -30,8 +30,8 @@ public sealed class ClientApiRedeemCodeEndpointTests
         });
 
         var root = ClientApiResultReader.Read(result);
-        var usedRecordCount = await db.TenantDb.Queryable<TenantGameRedeemCodeUseRecordEntity>().CountAsync();
-        var code = await db.TenantDb.Queryable<TenantGameRedeemCodeEntity>().FirstAsync(u => u.Code == "C108-REDEEM");
+        var usedRecordCount = await db.MainDb.Queryable<GameRedeemCodeUseRecordEntity>().CountAsync();
+        var code = await db.MainDb.Queryable<GameRedeemCodeEntity>().FirstAsync(u => u.Code == "C108-REDEEM");
         Assert.Equal(0, ClientApiResultReader.Code(root));
         Assert.Equal(1, usedRecordCount);
         Assert.Equal(1, code.UsedCount);
@@ -88,8 +88,8 @@ public sealed class ClientApiRedeemCodeEndpointTests
         {
             new PropertyItemResponse { Id = 11, ItemId = 11, Count = 2, },
         }));
-        db.InitTenantTables(typeof(TenantGameRedeemCodeUseRecordEntity));
-        await db.TenantDb.Insertable(new TenantGameRedeemCodeUseRecordEntity
+        db.InitBusinessTables(typeof(GameRedeemCodeUseRecordEntity));
+        await db.MainDb.Insertable(new GameRedeemCodeUseRecordEntity
         {
             Id = 9001,
             AreaId = 2001,
@@ -116,7 +116,7 @@ public sealed class ClientApiRedeemCodeEndpointTests
     {
         using var db = new ClientApiTestDb();
         var controller = CreateController(db);
-        db.AttachContext(controller, includeApp: false);
+        db.AttachContext(controller);
 
         var result = await controller.Consume(new GameRedeemCodeConsumeEntityRequest
         {
@@ -154,7 +154,7 @@ public sealed class ClientApiRedeemCodeEndpointTests
 
         var root = ClientApiResultReader.Read(result);
         Assert.Equal(0, ClientApiResultReader.Code(root));
-        var usageCount = await db.TenantDb.Queryable<TenantGameRedeemCodeChannelRoleUsageEntity>().CountAsync();
+        var usageCount = await db.MainDb.Queryable<GameRedeemCodeChannelRoleUsageEntity>().CountAsync();
         Assert.Equal(0, usageCount);
     }
 
@@ -182,7 +182,7 @@ public sealed class ClientApiRedeemCodeEndpointTests
 
         var root = ClientApiResultReader.Read(result);
         Assert.Equal(0, ClientApiResultReader.Code(root));
-        var usageCount = await db.TenantDb.Queryable<TenantGameRedeemCodeChannelRoleUsageEntity>().CountAsync();
+        var usageCount = await db.MainDb.Queryable<GameRedeemCodeChannelRoleUsageEntity>().CountAsync();
         Assert.Equal(0, usageCount);
     }
 
@@ -203,8 +203,8 @@ public sealed class ClientApiRedeemCodeEndpointTests
         {
             new PropertyItemResponse { Id = 12, ItemId = 12, Count = 1, },
         }), channelId: 5001);
-        db.InitTenantTables(typeof(TenantGameRedeemCodeChannelRoleUsageEntity));
-        await db.TenantDb.Insertable(new TenantGameRedeemCodeChannelRoleUsageEntity
+        db.InitBusinessTables(typeof(GameRedeemCodeChannelRoleUsageEntity));
+        await db.MainDb.Insertable(new GameRedeemCodeChannelRoleUsageEntity
         {
             Id = 9001,
             ChannelId = 5001,
@@ -253,7 +253,7 @@ public sealed class ClientApiRedeemCodeEndpointTests
 
         var root = ClientApiResultReader.Read(result);
         Assert.Equal(0, ClientApiResultReader.Code(root));
-        var usage = await db.TenantDb.Queryable<TenantGameRedeemCodeChannelRoleUsageEntity>()
+        var usage = await db.MainDb.Queryable<GameRedeemCodeChannelRoleUsageEntity>()
                             .Where(u => u.ChannelId == 5001 && u.RoleId == 3001).FirstAsync();
         Assert.NotNull(usage);
         Assert.Equal(1, usage.UsedCount);
@@ -277,8 +277,8 @@ public sealed class ClientApiRedeemCodeEndpointTests
         {
             new PropertyItemResponse { Id = 12, ItemId = 12, Count = 1, },
         }), channelId: 5001);
-        db.InitTenantTables(typeof(TenantGameRedeemCodeChannelRoleUsageEntity));
-        await db.TenantDb.Insertable(new TenantGameRedeemCodeChannelRoleUsageEntity
+        db.InitBusinessTables(typeof(GameRedeemCodeChannelRoleUsageEntity));
+        await db.MainDb.Insertable(new GameRedeemCodeChannelRoleUsageEntity
         {
             Id = 9001,
             ChannelId = 5001,
@@ -299,7 +299,7 @@ public sealed class ClientApiRedeemCodeEndpointTests
 
         var root = ClientApiResultReader.Read(result);
         Assert.Equal(0, ClientApiResultReader.Code(root));
-        var usage = await db.TenantDb.Queryable<TenantGameRedeemCodeChannelRoleUsageEntity>()
+        var usage = await db.MainDb.Queryable<GameRedeemCodeChannelRoleUsageEntity>()
                             .Where(u => u.ChannelId == 5001 && u.RoleId == 3001).FirstAsync();
         Assert.Equal(2, usage.UsedCount);
         Assert.Equal("C108-INC-B", usage.LastCode);
@@ -340,9 +340,9 @@ public sealed class ClientApiRedeemCodeEndpointTests
 
         Assert.Equal(0, ClientApiResultReader.Code(ClientApiResultReader.Read(first)));
         Assert.Equal(0, ClientApiResultReader.Code(ClientApiResultReader.Read(second)));
-        var countA = await db.TenantDb.Queryable<TenantGameRedeemCodeChannelRoleUsageEntity>()
+        var countA = await db.MainDb.Queryable<GameRedeemCodeChannelRoleUsageEntity>()
                              .Where(u => u.ChannelId == 5001 && u.RoleId == 3001).CountAsync();
-        var countB = await db.TenantDb.Queryable<TenantGameRedeemCodeChannelRoleUsageEntity>()
+        var countB = await db.MainDb.Queryable<GameRedeemCodeChannelRoleUsageEntity>()
                              .Where(u => u.ChannelId == 5002 && u.RoleId == 3001).CountAsync();
         Assert.Equal(1, countA);
         Assert.Equal(1, countB);
@@ -414,18 +414,18 @@ public sealed class ClientApiRedeemCodeEndpointTests
 
     private static GameRedeemCodeController CreateController(ClientApiTestDb db, ClientApiRecordingHttpHandler? handler = null)
     {
-        db.InitTenantTables(
-            typeof(TenantGameRedeemCodeEntity),
-            typeof(TenantGameRedeemCodeUseRecordEntity),
-            typeof(TenantGameRedeemCodeChannelEntity),
-            typeof(TenantGameRedeemCodeChannelRoleUsageEntity),
-            typeof(TenantGameAreaEntity));
+        db.InitBusinessTables(
+            typeof(GameRedeemCodeEntity),
+            typeof(GameRedeemCodeUseRecordEntity),
+            typeof(GameRedeemCodeChannelEntity),
+            typeof(GameRedeemCodeChannelRoleUsageEntity),
+            typeof(GameAreaEntity));
         return new GameRedeemCodeController(
-            db.Repository<TenantGameRedeemCodeEntity>(),
-            db.Repository<TenantGameRedeemCodeUseRecordEntity>(),
-            db.Repository<TenantGameRedeemCodeChannelEntity>(),
-            db.Repository<TenantGameRedeemCodeChannelRoleUsageEntity>(),
-            db.Repository<TenantGameAreaEntity>(),
+            db.Repository<GameRedeemCodeEntity>(),
+            db.Repository<GameRedeemCodeUseRecordEntity>(),
+            db.Repository<GameRedeemCodeChannelEntity>(),
+            db.Repository<GameRedeemCodeChannelRoleUsageEntity>(),
+            db.Repository<GameAreaEntity>(),
             new HttpClient(handler ?? ClientApiRecordingHttpHandler.WithGameServerDefaults(), false));
     }
 }

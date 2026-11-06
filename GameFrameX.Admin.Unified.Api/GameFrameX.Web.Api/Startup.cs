@@ -70,7 +70,6 @@ public class Startup
         LocalObjectStorageAdapter.Configure(webHostEnvironment);
         // SqlSugar
         services.AddSqlSugar(configuration, webHostEnvironment, cache, httpContextAccessor);
-        // Admin 侧租户库连接提供器：Core 收敛层（Repository 租户表路由 / 签名密钥环 Resolver）依赖，与 Client.Api / Game.Api 的注册同口径
         // 支付配置 schema 提供器（供 GamePaymentConfigService 在 admin 主机解析）
         services.AddScoped<IPaymentConfigSchemaProvider, PaymentConfigSchemaProvider>();
         // 渠道退款管理器（C310 / GFX-718）：四渠道统一 IRefundManager 契约；Payment.* 工程不在自动扫描范围，须显式注册
@@ -84,7 +83,7 @@ public class Startup
         services.AddSingleton<ISystemEmailSender, GameFrameX.Application.Platform.Email.SystemEmailSender>();
         // 对象存储配置 schema 提供器（供 ObjectStorageConfigService 动态渲染和校验）
         services.AddScoped<IObjectStorageConfigSchemaProvider, ObjectStorageConfigSchemaProvider>();
-        // 对象存储 Adapter 工厂（单例；供 TenantFileService 与 TestConnectionAsync 端点解析租户存储配置）
+        // 对象存储 Adapter 工厂（单例；供 FileService 与 TestConnectionAsync 端点解析对象存储配置）
         services.AddSingleton<IObjectStorageAdapterFactory, ObjectStorage.Abstract.DefaultObjectStorageAdapterFactory>();
         services.AddHttpClient();
         services.AddHttpClient<IMailCampaignServerClient, MailCampaignServerClient>();
@@ -104,15 +103,15 @@ public class Startup
         services.AddSingleton<PlatformLoggingConfigProvider>();
         services.AddHostedService<PlatformLoggingStartupLoader>();
         // 平台密码策略运行时配置（C173）：快照由启动加载器填充并镜像同步 CryptogramUtility 密码策略静态属性，
-        // TenantUserService.ChangePwdAsync 读镜像实现保存后同 Host 动态生效
+        // UserService.ChangePwdAsync 读镜像实现保存后同 Host 动态生效
         services.AddSingleton<PlatformPasswordPolicyConfigProvider>();
         services.AddHostedService<PlatformPasswordPolicyStartupLoader>();
+        // C406 / F3：新装首个业务管理员种子引导（角色 + 菜单授权 + 环境变量账号）；须在密码策略加载之后注册
+        services.AddHostedService<InitialAdminStartupBootstrap>();
         // JWT
         services.AddHostedService<PlatformJwtStartupValidator>();
         // U6/C42：API 端点目录启动同步（端点登记→绑定迁移→自动隐藏按钮→预热权限缓存）。
         services.AddHostedService<ApiEndpointCatalogSync>();
-        // C353 / GFX-773：套餐驱动的存量租户菜单权限自动同步（队列单例 + Applier 作用域 + 后台工作器）。
-        // 注册顺序在 ApiEndpointCatalogSync 之后：Worker 启动扫描有目录就绪等待兜底，不依赖严格启动序。
         services.AddPlatformJwt();
         // 允许跨域（支持通过 CORS_ORIGINS 环境变量配置允许的域名列表，逗号分隔；未配置则允许所有来源）
         var corsOrigins = Environment.GetEnvironmentVariable("CORS_ORIGINS");

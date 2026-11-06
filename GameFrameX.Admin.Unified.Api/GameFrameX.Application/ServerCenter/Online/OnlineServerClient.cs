@@ -9,13 +9,26 @@ namespace GameFrameX.Application.ServerCenter.Online;
 /// </summary>
 public sealed class OnlineServerClient : IOnlineServerClient
 {
+    private static readonly HashSet<string> BusinessPayloadKeys = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "ServerId", "RequestId", "IdempotencyKey", "Reason", "ReasonCode", "Message", "MessageKey",
+        "PlayerId", "PlayerIds", "TargetPlayerId", "OperatorId", "PenaltyId", "TicketId", "TransactionId",
+        "BusinessOrderNumber", "CommandType", "Action", "OnlineAction", "SegmentId", "OnlineSegmentId",
+        "ConfirmVersion", "ConfigKey", "ConfigVersion", "ConfigKind", "Version", "Mode", "Region",
+        "StartTime", "EndTime", "Cursor", "PageSize", "AbnormalKind", "GrantItems", "Items",
+        "CurrencyOrItemType", "Source", "Status", "Summary", "NotifyContent", "Content", "Subject",
+        "MailId", "TemplateId", "MailTemplateId", "Title", "Body", "Language", "Channel", "Platform",
+        "Package", "DryRun", "BackupConfirmed", "PlanId", "TargetServerId", "SourceServerIds",
+        "ReviewerOperatorId", "RollbackReason", "IsEnabled", "ValueJson", "PublishVersion",
+    };
+
     private readonly HttpClient _httpClient;
     private readonly IOnlineServerEndpointResolver _endpointResolver;
-    private readonly SqlSugarRepository<TenantGameAreaEntity> _gameAreaRepository;
+    private readonly SqlSugarRepository<GameAreaEntity> _gameAreaRepository;
 
     public OnlineServerClient(HttpClient httpClient,
         IOnlineServerEndpointResolver endpointResolver,
-        SqlSugarRepository<TenantGameAreaEntity> gameAreaRepository)
+        SqlSugarRepository<GameAreaEntity> gameAreaRepository)
     {
         _httpClient = httpClient;
         _endpointResolver = endpointResolver;
@@ -95,7 +108,7 @@ public sealed class OnlineServerClient : IOnlineServerClient
         return response.Data;
     }
 
-    /// <summary>区服标识并入请求体，业务载荷不能覆盖已验证的区服。</summary>
+    /// <summary>区服标识并入请求体，业务载荷不能覆盖已验证的区服；未知字段不出站。</summary>
     private static Dictionary<string, object?> MergeScopeIntoPayload(object request, OnlineScopeContext scope)
     {
         var merged = new Dictionary<string, object?>(StringComparer.Ordinal);
@@ -104,8 +117,7 @@ public sealed class OnlineServerClient : IOnlineServerClient
         {
             foreach (var property in payload.EnumerateObject())
             {
-                if (string.Equals(property.Name, "TenantId", StringComparison.OrdinalIgnoreCase)
-                    || string.Equals(property.Name, "AppId", StringComparison.OrdinalIgnoreCase)
+                if (!BusinessPayloadKeys.Contains(property.Name)
                     || string.Equals(property.Name, "ServerId", StringComparison.OrdinalIgnoreCase))
                 {
                     continue;

@@ -1,5 +1,5 @@
 <template>
-  <div class="tenantGameAppAssetPackageVersion-container">
+  <div class="gameAppAssetPackageVersion-container">
     <Card>
       <template #content>
         <SearchForm
@@ -12,7 +12,7 @@
             :defaultSearchKey="false"
             @query="onQuery"
 
-            @add="openAddTenantGameAppAssetPackageVersion"
+            @add="openAddGameAppAssetPackageVersion"
         />
       </template>
     </Card>
@@ -39,17 +39,17 @@
         </CrudDataTable>
         <editDialog
             ref="editDialogRef"
-            :title="editTenantGameAppAssetPackageVersionTitle"
+            :title="editGameAppAssetPackageVersionTitle"
             @reloadTable="onQuery"
         />
-        <updateHistoryDialog ref="updateHistoryDialogRef" :title="historyTenantGameAppAssetPackageVersionTitle"
+        <updateHistoryDialog ref="updateHistoryDialogRef" :title="historyGameAppAssetPackageVersionTitle"
                              @reloadTable="onQuery"/>
       </template>
     </Card>
   </div>
 </template>
 
-<script lang="ts" setup="" name="tenantGameAppAssetPackageVersion">
+<script lang="ts" setup="" name="gameAppAssetPackageVersion">
 import {computed, ref} from 'vue'
 import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import type { CrudAction, CrudColumnConfig } from '../../../../components/crud-data-table/types.ts'
@@ -71,8 +71,8 @@ import { mapAvailableChannelDefinitions } from '../../../../utils/channelDefinit
 
 const editDialogRef = ref()
 const updateHistoryDialogRef = ref()
-const editTenantGameAppAssetPackageVersionTitle = ref('')
-const historyTenantGameAppAssetPackageVersionTitle = ref('')
+const editGameAppAssetPackageVersionTitle = ref('')
+const historyGameAppAssetPackageVersionTitle = ref('')
 const querySelectorParams = ref<any>({app: []})
 const packageInfoMap = ref<Record<string, { isMaster: boolean; masterName?: string }>>({})
 
@@ -137,27 +137,27 @@ const columns = computed<CrudColumnConfig[]>(() => [
 ])
 
 // 打开新增页面
-const openAddTenantGameAppAssetPackageVersion = () => {
-  editTenantGameAppAssetPackageVersionTitle.value = t('message.client.addAssetPackageVersion')
+const openAddGameAppAssetPackageVersion = () => {
+  editGameAppAssetPackageVersionTitle.value = t('message.client.addAssetPackageVersion')
   editDialogRef.value.isEditor = false
   editDialogRef.value.openDialog({})
 }
 
 // 打开编辑页面
-const openEditTenantGameAppAssetPackageVersion = (row: any) => {
-  editTenantGameAppAssetPackageVersionTitle.value = t('message.client.editAssetPackageVersion')
+const openEditGameAppAssetPackageVersion = (row: any) => {
+  editGameAppAssetPackageVersionTitle.value = t('message.client.editAssetPackageVersion')
   editDialogRef.value.isEditor = true
   editDialogRef.value.openDialog(row)
 }
 
 const actions = {
-  edit: openEditTenantGameAppAssetPackageVersion,
+  edit: openEditGameAppAssetPackageVersion,
   delete: onDelete,
 }
 
 // 打开历史记录页面（需要在 customActions 之前定义）
-const openTenantGameAppAssetPackageVersionHistory = (row: any) => {
-  historyTenantGameAppAssetPackageVersionTitle.value = t('message.client.historyRecord')
+const openGameAppAssetPackageVersionHistory = (row: any) => {
+  historyGameAppAssetPackageVersionTitle.value = t('message.client.historyRecord')
   updateHistoryDialogRef.value.openDialog(row)
 }
 
@@ -166,7 +166,7 @@ const customActions: CrudAction[] = [
     auth: 'history',
     label: t('message.client.history'),
     icon: 'fa-solid fa-file',
-    onClick: openTenantGameAppAssetPackageVersionHistory,
+    onClick: openGameAppAssetPackageVersionHistory,
   },
 ]
 
@@ -215,8 +215,6 @@ const onQuerySelectorAssetPackageName = async () => {
   const res = await gameAppAssetPackageSelectPost({pageSize: MAX_SELECT_SIZE})
   querySelectorParams.value.assetPackageName = res.data.data
 }
-
-// 切换应用：清空包名筛选并按新应用重载包名候选，避免残留其它应用的包。
 
 onQuerySelectorChannel()
 onQuerySelectorPlatform()

@@ -35,9 +35,9 @@ public class MailCampaignEntityServiceContractTests
     [Fact]
     public void PageInput_Carries_Required_Filter_Fields()
     {
-        var props = PropNames<PageTenantGameMailCampaignEntityRequest>();
+        var props = PropNames<PageGameMailCampaignEntityRequest>();
 
-        Assert.DoesNotContain("AppId", props);
+        Assert.DoesNotContain("AppId", props); // c406-keep（负向断言：旧应用作用域字段不得回归）
         Assert.Contains("AreaId", props);
         Assert.Contains("Name", props);
         Assert.Contains("MailType", props);
@@ -49,9 +49,9 @@ public class MailCampaignEntityServiceContractTests
     [Fact]
     public void AddInput_Carries_Server_Contract_Fields()
     {
-        var props = PropNames<AddTenantGameMailCampaignEntityRequest>();
+        var props = PropNames<AddGameMailCampaignEntityRequest>();
 
-        Assert.DoesNotContain("AppId", props);
+        Assert.DoesNotContain("AppId", props); // c406-keep（负向断言：旧应用作用域字段不得回归）
         Assert.Contains("AreaId", props);
         Assert.Contains("Name", props);
         Assert.Contains("TemplateId", props);

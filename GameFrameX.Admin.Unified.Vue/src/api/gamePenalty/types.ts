@@ -28,7 +28,7 @@ export enum PenaltyActionTypeEnum {
 }
 
 /** 处罚新增输入参数。审计字段（Status / OperatorId / RevokeAsync*）由服务端强制写入，不在此暴露。 */
-export interface AddTenantGamePenaltyEntityRequest {
+export interface AddGamePenaltyEntityRequest {
   /** 区服作用域。null = 全区服生效。 */
   areaId?: string | null;
   targetType: PenaltyTargetTypeEnum;
@@ -122,7 +122,7 @@ export interface GamePenaltyResponseSqlSugarPagedList {
 }
 
 /** 处罚分页查询输入参数。 */
-export interface PageTenantGamePenaltyEntityRequest {
+export interface PageGamePenaltyEntityRequest {
   searchKey?: string | null;
   /**
    * @format int32
@@ -146,7 +146,7 @@ export interface PageTenantGamePenaltyEntityRequest {
 }
 
 /** 撤销处罚输入参数。 */
-export interface RevokeTenantGamePenaltyEntityRequest {
+export interface RevokeGamePenaltyEntityRequest {
   /**
    * 处罚 Id。
    * @min 1
@@ -162,7 +162,7 @@ export interface RevokeTenantGamePenaltyEntityRequest {
 }
 
 /** 处罚同步 Online 运行时输入参数（联动命令按 ActionType 服务端推导，不暴露给请求体）。 */
-export interface SyncOnlineRuntimeTenantGamePenaltyRequest {
+export interface SyncOnlineRuntimeGamePenaltyRequest {
   /**
    * 处罚事实源行 Id（必须处于生效中）。
    * @min 1
@@ -172,7 +172,7 @@ export interface SyncOnlineRuntimeTenantGamePenaltyRequest {
 }
 
 /** 处罚更新输入参数。处罚为事实源，不支持直接编辑；保留此类型仅为满足通用 CRUD 基类泛型约束。 */
-export interface UpdateTenantGamePenaltyEntityRequest {
+export interface UpdateGamePenaltyEntityRequest {
   /**
    * @min 1
    * @max 9223372036854776000

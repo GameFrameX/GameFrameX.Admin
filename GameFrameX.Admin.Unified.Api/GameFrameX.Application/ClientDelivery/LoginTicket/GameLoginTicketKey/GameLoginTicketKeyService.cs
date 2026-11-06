@@ -1,24 +1,24 @@
 using System.Security.Cryptography;
 using GameFrameX.Foundation.Logger;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 using GameFrameX.Application.ClientDelivery.LoginTicket.GameLoginTicketKey.Dto;
-using GameFrameX.Core.Service.Tenant;
+using GameFrameX.Core.Service.Business;
 using GameFrameX.Core.Service.User;
 
 #pragma warning disable CS8629 // SqlSugar WhereIF(condition, lambda)：lambda 仅在 condition=true 时执行；NRT 无法跨方法传播条件守卫，lambda 内 .Trim()/.Value 实际安全
 namespace GameFrameX.Application.ClientDelivery.LoginTicket.GameLoginTicketKey;
 
 /// <summary>
-/// 租户 Game 登录票据签名密钥管理服务。
+/// Game 登录票据签名密钥管理服务。
 /// <para>私钥永不回显：所有输出仅含公钥与元数据。密钥由系统签发或手动轮换生成，不支持手动新增 / 删除。</para>
 /// <para>作用域：主库。</para>
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 114)]
-public class GameLoginTicketKeyService : BaseService<TenantGameLoginTicketKeyEntity>
+public class GameLoginTicketKeyService : BaseService<GameLoginTicketKeyEntity>
 {
     private readonly CurrentUserContext _currentUserContext;
 
-    public GameLoginTicketKeyService(SqlSugarRepository<TenantGameLoginTicketKeyEntity> repository, CurrentUserContext currentUserContext)
+    public GameLoginTicketKeyService(SqlSugarRepository<GameLoginTicketKeyEntity> repository, CurrentUserContext currentUserContext)
         : base(repository)
     {
         _currentUserContext = currentUserContext;
@@ -29,7 +29,7 @@ public class GameLoginTicketKeyService : BaseService<TenantGameLoginTicketKeyEnt
     /// </summary>
     [HttpPost("page")]
     [ApiDescriptionSettings(Name = "Page")]
-    public async Task<SqlSugarPagedList<GameLoginTicketKeyResponse>> PageAsync(PageTenantGameLoginTicketKeyRequest input)
+    public async Task<SqlSugarPagedList<GameLoginTicketKeyResponse>> PageAsync(PageGameLoginTicketKeyRequest input)
     {
         return await Repository.AsQueryable()
                                .Where(u => u.IsDeleted == false)
@@ -78,11 +78,11 @@ public class GameLoginTicketKeyService : BaseService<TenantGameLoginTicketKeyEnt
 
         using (var rsa = RSA.Create(2048))
         {
-            var entity = new TenantGameLoginTicketKeyEntity
+            var entity = new GameLoginTicketKeyEntity
             {
                 Kid = $"admin-rotate-{TimerHelper.TimestampSecondsToDateTime(now, true):yyyyMMddHHmmss}-{Convert.ToHexString(RandomNumberGenerator.GetBytes(4)).ToLowerInvariant()}",
                 Algorithm = "RS256",
-                PrivateKeyPem = TenantSecretCrypto.Encrypt(rsa.ExportPkcs8PrivateKeyPem()) ?? string.Empty,
+                PrivateKeyPem = SecretCrypto.Encrypt(rsa.ExportPkcs8PrivateKeyPem()) ?? string.Empty,
                 PublicKeyPem = rsa.ExportSubjectPublicKeyInfoPem(),
                 NotBeforeTime = now,
                 ExpireTime = input.ExpireTime,

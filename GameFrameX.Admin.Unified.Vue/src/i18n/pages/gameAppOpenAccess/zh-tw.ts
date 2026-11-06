@@ -33,7 +33,8 @@ export default {
       subjectNameRequired: '責任主體不能為空',
       scopesRequired: '請至少選擇一個接口範圍',
 
-      scopePackageReport: '分包上報 (package-report)',
+      scopePackageBuildReport: '分包上報 (PackageBuildReport)',
+      scopeFeatureSwitchSync: '功能開關伺服器同步 (FeatureSwitchSync)',
       revoke: '吊銷',
       enable: '啟用',
       disable: '禁用',

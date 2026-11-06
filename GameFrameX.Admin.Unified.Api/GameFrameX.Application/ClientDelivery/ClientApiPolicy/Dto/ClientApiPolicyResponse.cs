@@ -1,9 +1,9 @@
 namespace GameFrameX.Application.ClientDelivery.ClientApiPolicy.Dto;
 
 /// <summary>
-/// 租户 Client API 运行策略输出参数
+/// Client API 运行策略输出参数
 /// </summary>
-public class ClientApiPolicyResponse : IBasePageResponse<GameFrameX.Entity.Tenant.ClientApiConfig.TenantClientApiPolicyEntity>
+public class ClientApiPolicyResponse : IBasePageResponse<GameFrameX.Entity.Business.ClientApiConfig.ClientApiPolicyEntity>
 {
     /// <summary>
     /// 是否要求请求签名。
@@ -41,7 +41,7 @@ public class ClientApiPolicyResponse : IBasePageResponse<GameFrameX.Entity.Tenan
     public long TicketExpireTime { get; set; }
 
     /// <summary>
-    /// 是否允许首次签发时自动创建租户应用级 RSA key。
+    /// 是否允许首次签发时自动创建应用级 RSA key。
     /// </summary>
     public bool EnableKeyAutoCreate { get; set; } = true;
 

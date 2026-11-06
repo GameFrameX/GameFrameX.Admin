@@ -5,7 +5,7 @@ using GameFrameX.Core.Service.User;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Core.Tests.ClientApi;
 using GameFrameX.Entity.Enum;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 using Microsoft.AspNetCore.Http;
 
 namespace GameFrameX.Core.Tests.C116;
@@ -17,9 +17,9 @@ public sealed class MainDatabaseGovernanceServiceTests
     {
         using (var database = new ClientApiTestDb())
         {
-            database.InitTenantTables(typeof(TenantGamePenaltyEntity), typeof(TenantGamePenaltyAppealEntity));
-            var penalties = new SqlSugarRepository<TenantGamePenaltyEntity> { Context = database.MainDb };
-            var appeals = new SqlSugarRepository<TenantGamePenaltyAppealEntity> { Context = database.MainDb };
+            database.InitBusinessTables(typeof(GamePenaltyEntity), typeof(GamePenaltyAppealEntity));
+            var penalties = new SqlSugarRepository<GamePenaltyEntity> { Context = database.MainDb };
+            var appeals = new SqlSugarRepository<GamePenaltyAppealEntity> { Context = database.MainDb };
             var user = new CurrentUserContext(new HttpContextAccessor());
             var penaltyService = new GamePenaltyService(penalties, user, null!);
             var appealService = new GamePenaltyAppealService(appeals, penalties, user);
@@ -39,10 +39,10 @@ public sealed class MainDatabaseGovernanceServiceTests
     {
         using (var database = new ClientApiTestDb())
         {
-            database.InitTenantTables(typeof(TenantGamePenaltyEntity), typeof(TenantGameReportEntity));
-            var reports = new SqlSugarRepository<TenantGameReportEntity> { Context = database.MainDb };
+            database.InitBusinessTables(typeof(GamePenaltyEntity), typeof(GameReportEntity));
+            var reports = new SqlSugarRepository<GameReportEntity> { Context = database.MainDb };
             var service = new GameReportService(reports,
-                new SqlSugarRepository<TenantGamePenaltyEntity> { Context = database.MainDb },
+                new SqlSugarRepository<GamePenaltyEntity> { Context = database.MainDb },
                 new CurrentUserContext(new HttpContextAccessor()));
             var report = await service.AddAsync(new() { ReporterId = 1, TargetId = "account-1", EvidenceJson = "{}" });
             Assert.Equal(ReportStatusEnum.Pending, report.Status);

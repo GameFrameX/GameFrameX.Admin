@@ -1,4 +1,4 @@
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 using GameFrameX.Core.Enum.Errors;
 using GameFrameX.Core.Exceptions;
 using GameFrameX.Entity.Enum;
@@ -25,7 +25,7 @@ public sealed class GameAreaMergeServiceTests
             context.Handler.OnExecute = () =>
             {
                 disconnected.Cancel();
-                Assert.Equal(GameAreaMergePlanStatus.Executing, context.Database.Queryable<TenantGameAreaMergePlanEntity>().InSingle(plan.Id).Status);
+                Assert.Equal(GameAreaMergePlanStatus.Executing, context.Database.Queryable<GameAreaMergePlanEntity>().InSingle(plan.Id).Status);
             };
             plan = await context.Service.ExecuteAsync(new() { Id = plan.Id, BackupConfirmed = true, BackupIdentifier = "backup-001" });
             Assert.Equal(GameAreaMergePlanStatus.Completed, plan.Status);
@@ -139,7 +139,7 @@ public sealed class GameAreaMergeServiceTests
         using (var context = new GameAreaMergeTestContext())
         {
             var plan = await context.CreateAsync();
-            await context.Database.Updateable<TenantGameAreaMergePlanEntity>().SetColumns(item => item.Status == state).Where(item => item.Id == plan.Id).ExecuteCommandAsync();
+            await context.Database.Updateable<GameAreaMergePlanEntity>().SetColumns(item => item.Status == state).Where(item => item.Id == plan.Id).ExecuteCommandAsync();
             if (state != GameAreaMergePlanStatus.Draft && state != GameAreaMergePlanStatus.Failed)
             {
                 await Assert.ThrowsAsync<BusinessException>(() => context.Service.DryRunAsync(new() { Id = plan.Id }));
@@ -171,12 +171,12 @@ public sealed class GameAreaMergeServiceTests
     }
 
     [Fact]
-    public void PlanEntity_UsesMainDatabaseAndExplicitTenantPhysicalOwnership()
+    public void PlanEntity_UsesMainDatabaseAndExplicitBusinessOwnership()
     {
-        var entityType = typeof(TenantGameAreaMergePlanEntity);
+        var entityType = typeof(GameAreaMergePlanEntity);
         Assert.True(GameFrameX.Core.SqlSugar.SqlSugarEntityBoundary.IsMainDatabaseTable(entityType));
-        Assert.Equal(GameFrameX.Core.SqlSugar.DatabaseOwnership.Tenant, GameFrameX.Core.SqlSugar.SqlSugarEntityBoundary.GetOwnership(entityType));
-        Assert.Equal("tenant_game_area_merge_plan_entity", GameFrameX.Core.SqlSugar.SqlSugarEntityBoundary.GetPhysicalTableName(entityType, entityType.Name));
+        Assert.Equal(GameFrameX.Core.SqlSugar.DatabaseOwnership.Business, GameFrameX.Core.SqlSugar.SqlSugarEntityBoundary.GetOwnership(entityType));
+        Assert.Equal("game_area_merge_plan_entity", GameFrameX.Core.SqlSugar.SqlSugarEntityBoundary.GetPhysicalTableName(entityType, entityType.Name));
     }
 
     [Fact]

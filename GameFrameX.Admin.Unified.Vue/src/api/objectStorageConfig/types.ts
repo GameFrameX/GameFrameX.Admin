@@ -1,8 +1,8 @@
 /* eslint-disable */
 /* tslint:disable */
 
-/** 新增租户对象存储配置入参。 */
-export interface AddTenantObjectStorageConfigRequest {
+/** 新增对象存储配置入参。 */
+export interface AddObjectStorageConfigRequest {
   /** 存储提供商名称（local / aliyun / tencent-cos / qiniu）。 */
   provider?: string | null;
   /** 对象键路径模板。 */
@@ -35,7 +35,7 @@ export interface ObjectStorageConfigField {
   sensitive?: boolean;
 }
 
-/** 租户对象存储配置列表项。 */
+/** 对象存储配置列表项。 */
 export interface ObjectStorageConfigResponse {
   id?: string;
   /** 存储提供商名称。 */
@@ -91,8 +91,8 @@ export interface ObjectStorageProviderItem {
   label?: string | null;
 }
 
-/** 租户对象存储配置分页查询入参。 */
-export interface PageTenantObjectStorageConfigRequest {
+/** 对象存储配置分页查询入参。 */
+export interface PageObjectStorageConfigRequest {
   searchKey?: string | null;
   /**
    * @format int32
@@ -114,8 +114,8 @@ export interface PageTenantObjectStorageConfigRequest {
   isEnabled?: boolean | null;
 }
 
-/** 更新租户对象存储配置入参。Provider 必须与既有记录一致。 */
-export interface UpdateTenantObjectStorageConfigRequest {
+/** 更新对象存储配置入参。Provider 必须与既有记录一致。 */
+export interface UpdateObjectStorageConfigRequest {
   /**
    * @min 1
    * @max 9223372036854776000
@@ -155,7 +155,7 @@ export interface ObjectStorageConfigAddPostData {
   code: number;
   /** 错误或提示信息 */
   message: string;
-  /** 租户对象存储配置列表项。 */
+  /** 对象存储配置列表项。 */
   data: ObjectStorageConfigResponse;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
@@ -181,7 +181,7 @@ export interface ObjectStorageConfigDetailGetData {
   code: number;
   /** 错误或提示信息 */
   message: string;
-  /** 租户对象存储配置列表项。 */
+  /** 对象存储配置列表项。 */
   data: ObjectStorageConfigResponse;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;

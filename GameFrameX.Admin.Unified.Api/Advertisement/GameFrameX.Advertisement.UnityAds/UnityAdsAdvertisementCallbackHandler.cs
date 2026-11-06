@@ -2,7 +2,7 @@ using System.Text;
 using GameFrameX.Advertisement.Abstract;
 using GameFrameX.Core.SignatureAuth;
 using GameFrameX.Core.SqlSugar;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 using Microsoft.AspNetCore.Http;
 
 namespace GameFrameX.Advertisement.UnityAds;
@@ -17,11 +17,11 @@ public sealed class UnityAdsAdvertisementCallbackHandler : AdvertisementCallback
         get { return "UnityAds"; }
     }
 
-    public UnityAdsAdvertisementCallbackHandler(Repository<TenantGameRoleEntity> roleRepository) : base(roleRepository)
+    public UnityAdsAdvertisementCallbackHandler(Repository<GameRoleEntity> roleRepository) : base(roleRepository)
     {
     }
 
-    public OptionVerification Verify(TenantAdvertisementCallbackOptions advertisementOptions, IQueryCollection query)
+    public OptionVerification Verify(AdvertisementCallbackOptions advertisementOptions, IQueryCollection query)
     {
         var option = DeserializeOption<UnityAdsAdvertisementCallbackOption>(advertisementOptions);
         if (option == null || string.IsNullOrWhiteSpace(option.signingSecret))

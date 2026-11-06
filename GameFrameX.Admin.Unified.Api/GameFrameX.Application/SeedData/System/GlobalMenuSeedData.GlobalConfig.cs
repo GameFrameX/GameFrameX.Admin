@@ -29,7 +29,6 @@ public partial class GlobalMenuSeedData
                 Type = MenuTypeEnum.Dir,
                 Name = "globalConfig",
                 Path = "/system/globalConfig",
-                AppScope = MenuAppScopeEnum.Console,
                 Component = "Layout",
                 Redirect = null,
                 Permission = null,
@@ -47,7 +46,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1706793684,
                 UpdateTime = 1706793684,
                 SuperAdminOnly = true,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -58,7 +57,6 @@ public partial class GlobalMenuSeedData
                 Type = MenuTypeEnum.Menu,
                 Name = "platformJwtConfig",
                 Path = "/system/platformJwtConfig",
-                AppScope = MenuAppScopeEnum.Console,
                 Component = "/system/platformJwtConfig/index",
                 Redirect = null,
                 Permission = null,
@@ -76,7 +74,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1783612800,
                 UpdateTime = 1783612800,
                 SuperAdminOnly = true,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -104,7 +102,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1783612800,
                 UpdateTime = 1783612800,
                 SuperAdminOnly = true,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -132,7 +130,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1783612800,
                 UpdateTime = 1783612800,
                 SuperAdminOnly = true,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -143,7 +141,6 @@ public partial class GlobalMenuSeedData
                 Type = MenuTypeEnum.Menu,
                 Name = "platformRateLimitConfig",
                 Path = "/system/platformRateLimitConfig",
-                AppScope = MenuAppScopeEnum.Console,
                 Component = "/system/platformRateLimitConfig/index",
                 Redirect = null,
                 Permission = null,
@@ -161,7 +158,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1785168000,
                 UpdateTime = 1785168000,
                 SuperAdminOnly = true,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -189,7 +186,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1785168000,
                 UpdateTime = 1785168000,
                 SuperAdminOnly = true,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -217,7 +214,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1785168000,
                 UpdateTime = 1785168000,
                 SuperAdminOnly = true,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -228,7 +225,6 @@ public partial class GlobalMenuSeedData
                 Type = MenuTypeEnum.Menu,
                 Name = "platformLoggingConfig",
                 Path = "/system/platformLoggingConfig",
-                AppScope = MenuAppScopeEnum.Console,
                 Component = "/system/platformLoggingConfig/index",
                 Redirect = null,
                 Permission = null,
@@ -246,7 +242,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1792377600,
                 UpdateTime = 1792377600,
                 SuperAdminOnly = true,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -274,7 +270,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1792377600,
                 UpdateTime = 1792377600,
                 SuperAdminOnly = true,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -302,7 +298,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1792377600,
                 UpdateTime = 1792377600,
                 SuperAdminOnly = true,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -313,7 +309,6 @@ public partial class GlobalMenuSeedData
                 Type = MenuTypeEnum.Menu,
                 Name = "platformPasswordPolicyConfig",
                 Path = "/system/platformPasswordPolicyConfig",
-                AppScope = MenuAppScopeEnum.Console,
                 Component = "/system/platformPasswordPolicyConfig/index",
                 Redirect = null,
                 Permission = null,
@@ -331,7 +326,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1792377600,
                 UpdateTime = 1792377600,
                 SuperAdminOnly = true,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -359,7 +354,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1792377600,
                 UpdateTime = 1792377600,
                 SuperAdminOnly = true,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -387,12 +382,12 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1792377600,
                 UpdateTime = 1792377600,
                 SuperAdminOnly = true,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
             {
-                // 平台/语言定义管理页已退场；本按钮仍是租户可读的下拉数据源（发布版本、分包、功能开关等页），改挂全局配置目录保留授权。
+                // 平台/语言定义管理页已退场；本按钮仍是管理员可读的下拉数据源（发布版本、分包、功能开关等页），改挂全局配置目录保留授权。
                 Id = StableSeedId.Menu("globalPlatform:Select"),
                 Key = "globalPlatform:Select",
                 Pid = StableSeedId.Menu("route:globalConfig"),
@@ -416,12 +411,12 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1783612800,
                 UpdateTime = 1783612800,
                 SuperAdminOnly = true,
-                AllowTenantWhenSuperAdminOnly = true,
+                AllowAdminWhenSuperAdminOnly = true,
                 IsDeleted = false,
             },
             new()
             {
-                // 平台/语言定义管理页已退场；本按钮仍是租户可读的下拉数据源（发布版本、分包、功能开关等页），改挂全局配置目录保留授权。
+                // 平台/语言定义管理页已退场；本按钮仍是管理员可读的下拉数据源（发布版本、分包、功能开关等页），改挂全局配置目录保留授权。
                 Id = StableSeedId.Menu("globalLanguage:Select"),
                 Key = "globalLanguage:Select",
                 Pid = StableSeedId.Menu("route:globalConfig"),
@@ -445,7 +440,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1783612800,
                 UpdateTime = 1783612800,
                 SuperAdminOnly = true,
-                AllowTenantWhenSuperAdminOnly = true,
+                AllowAdminWhenSuperAdminOnly = true,
                 IsDeleted = false,
             },
         };

@@ -4,15 +4,11 @@ using Microsoft.Extensions.Logging;
 namespace GameFrameX.Entity.Log;
 
 /// <summary>
-/// 访问日志公共字段基类。不映射物理表，仅供 <see cref="SystemLogVisitEntity"/> 与 <see cref="TenantLogVisitEntity"/> 复用字段，
+/// 访问日志公共字段基类。不映射物理表，仅供 <see cref="SystemLogVisitEntity"/> 与 <see cref="LogVisitEntity"/> 复用字段，
 /// 避免单个 CLR 实体按运行上下文切换物理表。
 /// </summary>
 public class LogVisitFields : EntityBase
 {
-    /// <summary>历史审计归属，仅保留既有记录，不参与路由或自动填充。</summary>
-    [SugarColumn(ColumnDescription = "历史租户标识", IsNullable = true)]
-    public long? TenantId { get; set; }
-
     /// <summary>
     /// 模块名称
     /// </summary>

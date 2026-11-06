@@ -15,7 +15,7 @@ export enum AdvertisementRewardStatusEnum {
  * 广告奖励发放账本新增输入参数。仅满足 GenericCrudService 的 TAddRequest 泛型约束；
  * AddAsync 端点已由 OnAddingAsync 抛错关闭（账本由广告回调链路产生，不支持管理后台直接创建）。
  */
-export type AddTenantGameAdvertisementRewardEntityRequest = object;
+export type AddGameAdvertisementRewardEntityRequest = object;
 
 /**
  * 广告奖励发放账本输出参数（C114 / GFX-111 后端跟进）。投影暴露实体全字段：
@@ -30,7 +30,7 @@ export interface GameAdvertisementRewardResponse {
   transactionId?: string | null;
   /** 广告位/单元。UnityAds 无则空。 */
   advertisementUnit?: string | null;
-  /** 角色 Id。反查自 TenantGameRoleEntity。 */
+  /** 角色 Id。反查自 GameRoleEntity。 */
   roleId?: string | null;
   /** 用户 Id。来自平台 userId 参数。 */
   userId?: string;
@@ -84,7 +84,7 @@ export interface GameAdvertisementRewardResponseSqlSugarPagedList {
  *
  * 过滤字段对齐前端检索表单：Provider/Status/RoleId 常用 + TransactionId/AdvertisementUnit/AreaId/时间范围 高级。
  */
-export interface PageTenantGameAdvertisementRewardEntityRequest {
+export interface PageGameAdvertisementRewardEntityRequest {
   searchKey?: string | null;
   /**
    * @format int32
@@ -120,7 +120,7 @@ export interface PageTenantGameAdvertisementRewardEntityRequest {
  * 广告奖励发放账本更新输入参数。仅满足 GenericCrudService 的 TUpdateRequest 泛型约束；
  * UpdateAsync 端点已由 OnUpdatingAsync 抛错关闭（账本为事实数据，不支持管理后台修改）。
  */
-export interface UpdateTenantGameAdvertisementRewardEntityRequest {
+export interface UpdateGameAdvertisementRewardEntityRequest {
   /**
    * @min 1
    * @max 9223372036854776000

@@ -1,4 +1,4 @@
-using GameFrameX.Entity.Tenant.Game.RemoteConfig;
+using GameFrameX.Entity.Business.Game.RemoteConfig;
 
 namespace GameFrameX.Client.Api.Services.RemoteConfig;
 
@@ -7,4 +7,4 @@ namespace GameFrameX.Client.Api.Services.RemoteConfig;
 /// </summary>
 /// <param name="Record">候选远程配置记录。</param>
 /// <param name="Score">作用域精确度分数。</param>
-public sealed record RemoteConfigScoredCandidate(TenantGameAppRemoteConfigEntity Record, int Score);
+public sealed record RemoteConfigScoredCandidate(GameAppRemoteConfigEntity Record, int Score);

@@ -1,0 +1,13 @@
+namespace GameFrameX.Application.ClientDelivery.ObjectStorageConfig;
+
+/// <summary>
+/// 对象存储配置分页查询入参。
+/// </summary>
+public class PageObjectStorageConfigRequest : BasePageRequest
+{
+    /// <summary>按提供商过滤。</summary>
+    public string? Provider { get; set; }
+
+    /// <summary>按启用状态过滤。</summary>
+    public bool? IsEnabled { get; set; }
+}

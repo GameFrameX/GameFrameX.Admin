@@ -81,7 +81,7 @@ export interface GameOnlineConfigRolloutResponseSqlSugarPagedList {
 }
 
 /** 配置灰度版本行分页查询输入（来源 change C343 / vault:C8 S7.7）。 */
-export interface PageTenantGameOnlineConfigRolloutRequest {
+export interface PageGameOnlineConfigRolloutRequest {
   searchKey?: string | null;
   /**
    * @format int32

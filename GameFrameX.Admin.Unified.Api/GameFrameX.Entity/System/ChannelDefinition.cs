@@ -22,7 +22,7 @@ public abstract class ChannelDefinition : EntityBasic, ISelectFilter
     /// 渠道作用域
     /// </summary>
     [SugarColumn(ColumnDescription = "渠道作用域", DefaultValue = "0")]
-    public ChannelScopeEnum Scope { get; set; } = ChannelScopeEnum.Tenant;
+    public ChannelScopeEnum Scope { get; set; } = ChannelScopeEnum.Business;
 
     /// <summary>
     /// 适用平台编码

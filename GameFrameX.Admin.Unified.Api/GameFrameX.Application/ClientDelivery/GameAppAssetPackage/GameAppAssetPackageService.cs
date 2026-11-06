@@ -6,9 +6,9 @@ namespace GameFrameX.Application.ClientDelivery.GameAppAssetPackage;
 /// 资源包服务
 /// </summary>
 [ApiDescriptionSettings(ClientConst.GroupName, Order = 100)]
-public class GameAppAssetPackageService : GenericCrudSelectService<Entity.Tenant.Game.Resource.TenantGameAppAssetPackageEntity, AddGameAppAssetPackageRequest, UpdateGameAppAssetPackageRequest, GameAppAssetPackageResponse, PageGameAppAssetPackageRequest>
+public class GameAppAssetPackageService : GenericCrudSelectService<Entity.Business.Game.Resource.GameAppAssetPackageEntity, AddGameAppAssetPackageRequest, UpdateGameAppAssetPackageRequest, GameAppAssetPackageResponse, PageGameAppAssetPackageRequest>
 {
-    public GameAppAssetPackageService(SqlSugarRepository<Entity.Tenant.Game.Resource.TenantGameAppAssetPackageEntity> repository) : base(repository)
+    public GameAppAssetPackageService(SqlSugarRepository<Entity.Business.Game.Resource.GameAppAssetPackageEntity> repository) : base(repository)
     {
     }
 

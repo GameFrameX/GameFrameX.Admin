@@ -105,7 +105,8 @@ test('请求组装：command 数字 + 恰好一个目标字段 + 开关型带 di
     }),
   )
   expect(req.command).toBe(3)
-  expect('appId' in req).toBe(false)
+  // 负向契约：运营命令出站请求不得携带已删除的 AppId 作用域字段。
+  expect('appId' in req).toBe(false) // c406-keep
   expect(req.serverId).toBe('srv-1')
   expect(req.playerId).toBe('player-100')
   expect(req.direction).toBe(2)

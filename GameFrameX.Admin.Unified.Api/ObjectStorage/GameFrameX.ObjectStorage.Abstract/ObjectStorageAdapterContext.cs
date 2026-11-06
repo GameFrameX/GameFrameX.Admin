@@ -1,7 +1,7 @@
 namespace GameFrameX.ObjectStorage.Abstract;
 
 /// <summary>
-/// 对象存储 Adapter 运行时上下文。由 Factory 从租户配置解析得到，承载 Provider 名、
+/// 对象存储 Adapter 运行时上下文。由 Factory 从对象存储配置解析得到，承载 Provider 名、
 /// 反序列化后的 Option 实例、Bucket、公共访问域名与路径模板。
 /// </summary>
 public sealed class ObjectStorageAdapterContext

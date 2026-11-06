@@ -56,7 +56,7 @@ export enum MailCampaignExpirePolicy {
 }
 
 /** 新增 Campaign 输入。 */
-export interface AddTenantGameMailCampaignEntityRequest {
+export interface AddGameMailCampaignEntityRequest {
   /**
    * @min 1
    * @max 9223372036854776000
@@ -202,7 +202,7 @@ export interface GameMailCampaignResponseSqlSugarPagedList {
 }
 
 /** Campaign 分页查询输入。 */
-export interface PageTenantGameMailCampaignEntityRequest {
+export interface PageGameMailCampaignEntityRequest {
   searchKey?: string | null;
   /**
    * @format int32
@@ -303,7 +303,7 @@ export interface RevokeMailCampaignEntityResponse {
 }
 
 /** 更新 Campaign 输入。仅 Draft 可更新（Published/Revoked 主体不可变 B1）。 */
-export interface UpdateTenantGameMailCampaignEntityRequest {
+export interface UpdateGameMailCampaignEntityRequest {
   /**
    * @min 1
    * @max 9223372036854776000

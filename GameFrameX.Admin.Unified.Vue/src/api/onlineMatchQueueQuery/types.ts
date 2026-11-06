@@ -4,7 +4,7 @@
 /** 匹配队列总览查询输入参数，ServerId 为调用前置条件。 */
 export interface OnlineMatchOverviewRequest {
   /**
-   * 区服作用域（必填，经 OnlineScopeContextFactory 校验租户与应用归属）。
+   * 区服作用域（必填，经 OnlineScopeContextFactory 校验区服归属）。
    * @min 1
    * @max 9223372036854776000
    */

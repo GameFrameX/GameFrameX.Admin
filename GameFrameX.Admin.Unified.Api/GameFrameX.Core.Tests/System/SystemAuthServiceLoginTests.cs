@@ -9,7 +9,7 @@ namespace GameFrameX.Core.Tests.System;
 /// <summary>
 /// SystemAuthService 登录端到端集成测试。
 /// <para>C217 part 2a 覆盖核心场景 ①②③（不存在/错误/响应一致——C216 枚举防护端到端）。</para>
-/// <para>C218 补充 4 场景：③正确密码成功（CreateTokenAsync + Claim）/ ④账号冻结 D1017 / ⑤租户禁用 Z1003 / ⑥连续失败锁定。</para>
+/// <para>C218 补充 4 场景：③正确密码成功（CreateTokenAsync + Claim）/ ④账号冻结 D1017 / ⑤普通账号登录 / ⑥连续失败锁定。</para>
 /// </summary>
 public class SystemAuthServiceLoginTests
 {

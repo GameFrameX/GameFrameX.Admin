@@ -14,7 +14,7 @@ using GameFrameX.Core.Option;
 using GameFrameX.Core.Service.Cache;
 using GameFrameX.Core.Service.Config;
 using GameFrameX.Core.Service.PlatformLogging;
-using GameFrameX.Core.Service.Tenant;
+using GameFrameX.Core.Service.Business;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Core.Tests.System;
 using GameFrameX.Entity;
@@ -37,16 +37,16 @@ namespace GameFrameX.Core.Tests.Logging;
 /// <summary>
 /// Monitor 日志采集与调度管线回归守护测试（C363 / T5，真实 HTTP → 行落库）：
 /// TestServer 挂真实 <see cref="LoggingSetup.AddLoggingSetup"/>（Monitor 过滤器 + 调度队列 + 文件/数据库/ES Sink），
-/// SqlSugar sqlite 主库（main）+ 租户库（1001）双连接，覆盖三表分流、C156 分表路由、C171 动态开关、
+/// SqlSugar sqlite 主库（main）+ 第二业务库（1001）双连接，覆盖三表分流、C156 分表路由、C171 动态开关、
 /// sys_oplog 门控、[SuppressMonitor] 豁免、数据校验短路与 data/logs 文件生成。防复发锚点：
 /// 历史框架退役（2026-07-27）后全库 *_log_* 表零写入的事故不允许再次静默发生。
 /// </summary>
 public sealed class MonitorLoggingPipelineTests : IAsyncLifetime
 {
     private const string MainConfigId = "main";
-    private const string TenantConfigId = "1001";
+    private const string ConfigId = "1001";
     private const string SuperAdminIdentity = "superadmin";
-    private const string TenantIdentity = "tenant";
+    private const string Identity = "operator";
     private const string AnonymousIdentity = "anonymous";
     private const string TestSchemaName = "TestScheme";
 
@@ -65,8 +65,8 @@ public sealed class MonitorLoggingPipelineTests : IAsyncLifetime
     {
         SqlSugarCache.Configure(new FakeCache());
         var mainConfig = CreateDbConfig(MainConfigId);
-        var tenantConfig = CreateDbConfig(TenantConfigId);
-        _db = new SqlSugarScope(new List<ConnectionConfig> { mainConfig, tenantConfig, });
+        var config = CreateDbConfig(ConfigId);
+        _db = new SqlSugarScope(new List<ConnectionConfig> { mainConfig, config, });
         SqlSugarSetup.InitDatabase(_db, mainConfig, new[]
         {
             typeof(SystemLogOperationEntity),
@@ -74,13 +74,13 @@ public sealed class MonitorLoggingPipelineTests : IAsyncLifetime
             typeof(SystemLogExceptionEntity),
             typeof(SystemConfigEntity),
             typeof(SystemUserEntity),
-            typeof(TenantLogOperationEntity),
+            typeof(LogOperationEntity),
         });
-        SqlSugarSetup.InitDatabase(_db, tenantConfig, new[]
+        SqlSugarSetup.InitDatabase(_db, config, new[]
         {
-            typeof(TenantLogOperationEntity),
-            typeof(TenantLogVisitEntity),
-            typeof(TenantLogExceptionEntity),
+            typeof(LogOperationEntity),
+            typeof(LogVisitEntity),
+            typeof(LogExceptionEntity),
         });
         _db.GetConnectionScope(MainConfigId).Aop.DataExecuting = SqlSugarAopHelper.HandleBaseAudit;
         await SeedSysOpLogEnabledAsync();
@@ -160,35 +160,34 @@ public sealed class MonitorLoggingPipelineTests : IAsyncLifetime
     }
 
     /// <summary>
-    /// 验收 5（C156）：租户上下文操作日志路由到租户库 TenantLog*，主库不落任何该调用行。
+    /// 验收 5（C156）：管理员上下文操作日志路由到业务库 Log*，平台库不落任何该调用行。
     /// </summary>
     [Fact]
     public async Task Page_WithUserIdentity_WritesOperationRowToMainDatabase()
     {
-        var statusCode = await PostAsync("/api/monitorPipeline/page", TenantIdentity, "{\"keyword\":\"tenant-query\"}");
+        var statusCode = await PostAsync("/api/monitorPipeline/page", Identity, "{\"keyword\":\"query\"}");
 
         Assert.Equal(HttpStatusCode.OK, statusCode);
-        var tenantDb = _db.GetConnectionScope(MainConfigId);
-        var tenantRows = await tenantDb.Queryable<SystemLogOperationEntity>()
+        var db = _db.GetConnectionScope(MainConfigId);
+        var rows = await db.Queryable<SystemLogOperationEntity>()
             .Where(u => u.RequestUrl.Contains("/api/monitorPipeline/page"))
             .ToListAsync();
 
-        var row = Assert.Single(tenantRows);
-        Assert.Null(row.TenantId);
-        Assert.Equal("tenant-admin", row.Account);
+        var row = Assert.Single(rows);
+        Assert.Equal("admin", row.Account);
         Assert.Equal("GetPage", row.ActionName);
-        Assert.Contains("tenant-query", row.RequestParam);
+        Assert.Contains("query", row.RequestParam);
         var context = new CurrentUserContext(new HttpContextAccessor
         {
-            HttpContext = new DefaultHttpContext { User = BuildTestPrincipal(TenantIdentity) },
+            HttpContext = new DefaultHttpContext { User = BuildTestPrincipal(Identity) },
         });
-        var service = new LogOperationService(new() { Context = tenantDb }, new() { Context = tenantDb }, context);
-        var page = await service.PageAsync(new PageLogRequest { Page = 1, PageSize = 20, SearchKey = "tenant-admin" });
+        var service = new LogOperationService(new() { Context = db }, new() { Context = db }, context);
+        var page = await service.PageAsync(new PageLogRequest { Page = 1, PageSize = 20, SearchKey = "admin" });
         Assert.Equal(row.Id, Assert.Single(page.Items).Id);
 
         var mainDb = _db.GetConnectionScope(MainConfigId);
         Assert.Single(await mainDb.Queryable<SystemLogOperationEntity>().Where(u => u.RequestUrl.Contains("/api/monitorPipeline/page")).ToListAsync());
-        Assert.Empty(await tenantDb.Queryable<SystemLogVisitEntity>().Where(u => u.ActionName == "GetPage").ToListAsync());
+        Assert.Empty(await db.Queryable<SystemLogVisitEntity>().Where(u => u.ActionName == "GetPage").ToListAsync());
     }
 
     /// <summary>
@@ -225,17 +224,16 @@ public sealed class MonitorLoggingPipelineTests : IAsyncLifetime
     [Fact]
     public async Task UserInfoAndLogout_WriteVisitRowsOnly()
     {
-        var userInfoStatus = await PostAsync("/api/monitorPipeline/userInfo", TenantIdentity, "{}");
+        var userInfoStatus = await PostAsync("/api/monitorPipeline/userInfo", Identity, "{}");
         var logoutStatus = await PostAsync("/api/monitorPipeline/logout", AnonymousIdentity, "{}");
 
         Assert.Equal(HttpStatusCode.OK, userInfoStatus);
         Assert.Equal(HttpStatusCode.OK, logoutStatus);
 
-        var tenantDb = _db.GetConnectionScope(MainConfigId);
-        var tenantVisitRows = await tenantDb.Queryable<SystemLogVisitEntity>().Where(u => u.ActionName == "GetUserInfo").ToListAsync();
-        Assert.Single(tenantVisitRows);
-        Assert.Null(tenantVisitRows[0].TenantId);
-        Assert.Equal("tenant-admin", tenantVisitRows[0].Account);
+        var db = _db.GetConnectionScope(MainConfigId);
+        var visitRows = await db.Queryable<SystemLogVisitEntity>().Where(u => u.ActionName == "GetUserInfo").ToListAsync();
+        Assert.Single(visitRows);
+        Assert.Equal("admin", visitRows[0].Account);
 
         var mainDb = _db.GetConnectionScope(MainConfigId);
         var mainVisitRows = await mainDb.Queryable<SystemLogVisitEntity>().Where(u => u.ActionName == "Logout").ToListAsync();
@@ -243,7 +241,7 @@ public sealed class MonitorLoggingPipelineTests : IAsyncLifetime
         Assert.True(mainVisitRows[0].LogDateTime > 0, "visit 行 LogDateTime 必须写入");
 
         // visit 不落 operation / exception
-        Assert.Empty(await tenantDb.Queryable<SystemLogOperationEntity>().Where(u => u.RequestUrl.Contains("/api/monitorPipeline/userInfo")).ToListAsync());
+        Assert.Empty(await db.Queryable<SystemLogOperationEntity>().Where(u => u.RequestUrl.Contains("/api/monitorPipeline/userInfo")).ToListAsync());
         Assert.Empty(await mainDb.Queryable<SystemLogOperationEntity>().Where(u => u.RequestUrl.Contains("/api/monitorPipeline/logout")).ToListAsync());
     }
 
@@ -257,11 +255,11 @@ public sealed class MonitorLoggingPipelineTests : IAsyncLifetime
 
         Assert.Equal(HttpStatusCode.OK, statusCode);
         var mainDb = _db.GetConnectionScope(MainConfigId);
-        var tenantDb = _db.GetConnectionScope(MainConfigId);
+        var db = _db.GetConnectionScope(MainConfigId);
         Assert.Empty(await mainDb.Queryable<SystemLogOperationEntity>().Where(u => u.RequestUrl.Contains("/api/monitorPipeline/suppressed")).ToListAsync());
         Assert.Empty(await mainDb.Queryable<SystemLogVisitEntity>().Where(u => u.ActionName == "Suppressed").ToListAsync());
         Assert.Empty(await mainDb.Queryable<SystemLogExceptionEntity>().Where(u => u.RequestUrl.Contains("/api/monitorPipeline/suppressed")).ToListAsync());
-        Assert.Empty(await tenantDb.Queryable<SystemLogOperationEntity>().ToListAsync());
+        Assert.Empty(await db.Queryable<SystemLogOperationEntity>().ToListAsync());
     }
 
     /// <summary>
@@ -281,12 +279,12 @@ public sealed class MonitorLoggingPipelineTests : IAsyncLifetime
 
     /// <summary>
     /// 验收 7（C171）：platform_logging_config database.enabled=false 保存 + 刷新快照后，
-    /// 同 Host 内后续调用立即停止落库（无租户上下文 → 平台库的既有语义同时得到验证）。
+    /// 同 Host 内后续调用立即停止落库（匿名上下文 → 平台库的既有语义同时得到验证）。
     /// </summary>
     [Fact]
     public async Task DatabaseSwitchDisabled_StopsWritingImmediately()
     {
-        // 基线：无租户上下文调用 → 主库平台操作日志行存在（平台兜底路由）
+        // 基线：匿名上下文调用 → 主库平台操作日志行存在（平台兜底路由）
         var baselineStatus = await PostAsync("/api/monitorPipeline/page", AnonymousIdentity, "{\"keyword\":\"before-switch\"}");
         Assert.Equal(HttpStatusCode.OK, baselineStatus);
         var mainDb = _db.GetConnectionScope(MainConfigId);
@@ -343,34 +341,34 @@ public sealed class MonitorLoggingPipelineTests : IAsyncLifetime
     [InlineData("systemAuth/setupSuperAdminPassword", "ConfirmPassword")]
     [InlineData("systemAuth/refreshToken", "accessToken")]
     [InlineData("swagger/submitUrl", "Password")]
-    [InlineData("tenantUser/changePwd", "PasswordOld")]
-    [InlineData("tenantUser/resetPwd", "NewPassword")]
-    [InlineData("tenantUser/add", "initialPassword")]
-    [InlineData("tenantUser/update", "Password")]
-    [InlineData("tenantUser/baseInfo", "Password")]
-    [InlineData("tenantSessionKeyEntity/add", "Secret")]
-    [InlineData("tenantSessionKeyEntity/rotate", "Secret")]
-    [InlineData("tenantAppSignatureKeyEntity/add", "Secret")]
-    [InlineData("tenantAppSignatureKeyEntity/rotate", "Secret")]
-    [InlineData("tenantGameLoginTicketKeyEntity/rotate", "PrivateKey")]
-    [InlineData("tenantGameAppOpenAccess/add", "AccessSecret")]
-    [InlineData("tenantGameAppOpenAccess/refresh", "AccessSecret")]
+    [InlineData("user/changePwd", "PasswordOld")]
+    [InlineData("user/resetPwd", "NewPassword")]
+    [InlineData("user/add", "initialPassword")]
+    [InlineData("user/update", "Password")]
+    [InlineData("user/baseInfo", "Password")]
+    [InlineData("sessionKeyEntity/add", "Secret")]
+    [InlineData("sessionKeyEntity/rotate", "Secret")]
+    [InlineData("appSignatureKeyEntity/add", "Secret")]
+    [InlineData("appSignatureKeyEntity/rotate", "Secret")]
+    [InlineData("gameLoginTicketKeyEntity/rotate", "PrivateKey")]
+    [InlineData("gameAppOpenAccess/add", "AccessSecret")]
+    [InlineData("gameAppOpenAccess/refresh", "AccessSecret")]
     [InlineData("systemOpenAccess/add", "AccessSecret")]
     [InlineData("systemOpenAccess/update", "AccessSecret")]
     [InlineData("systemOpenAccess/createSecret", "Secret")]
-    [InlineData("tenantClientApiPolicyEntity/add", "SigningKey")]
-    [InlineData("tenantClientApiPolicyEntity/update", "SigningKey")]
-    [InlineData("tenantClientApiPolicyEntity/rotate", "SigningKey")]
+    [InlineData("clientApiPolicyEntity/add", "SigningKey")]
+    [InlineData("clientApiPolicyEntity/update", "SigningKey")]
+    [InlineData("clientApiPolicyEntity/rotate", "SigningKey")]
     [InlineData("platformJwtConfig/update", "IssuerSigningKey")]
     [InlineData("systemEmailProvider/add", "Password")]
     [InlineData("systemEmailProvider/update", "SecretKey")]
-    [InlineData("tenantAdvertisementCallbackConfigEntity/add", "SigningSecret")]
-    [InlineData("tenantAdvertisementCallbackConfigEntity/update", "VerificationKeys")]
-    [InlineData("tenantGameUserEntity/add", "Password")]
-    [InlineData("tenantGameUserEntity/update", "Password")]
-    [InlineData("tenantGameUserEntity/addByMail", "EmailPassword")]
-    [InlineData("tenantGameAreaClassifyEntity/add", "DockerPassword")]
-    [InlineData("tenantGameAreaClassifyEntity/update", "DockerPassword")]
+    [InlineData("advertisementCallbackConfigEntity/add", "SigningSecret")]
+    [InlineData("advertisementCallbackConfigEntity/update", "VerificationKeys")]
+    [InlineData("gameUserEntity/add", "Password")]
+    [InlineData("gameUserEntity/update", "Password")]
+    [InlineData("gameUserEntity/addByMail", "EmailPassword")]
+    [InlineData("gameAreaClassifyEntity/add", "DockerPassword")]
+    [InlineData("gameAreaClassifyEntity/update", "DockerPassword")]
     public async Task CredentialEndpointSnapshot_NeverPersistsRequestOrResponseCredentials(string endpoint, string field)
     {
         var plain = "unique-credential-material-12345";
@@ -485,7 +483,7 @@ public sealed class MonitorLoggingPipelineTests : IAsyncLifetime
                 });
                 webBuilder.Configure(app =>
                 {
-                    // 测试身份：按请求头注入 Claims（无 JWT），覆盖 SuperAdmin / 租户 / 匿名三种上下文
+                    // 测试身份：按请求头注入 Claims（无 JWT），覆盖 SuperAdmin / 管理员 / 匿名三种上下文
                     app.Use(async (context, next) =>
                     {
                         context.User = BuildTestPrincipal(context.Request.Headers["X-Test-Identity"].ToString());
@@ -540,12 +538,12 @@ public sealed class MonitorLoggingPipelineTests : IAsyncLifetime
             claims.Add(new Claim(ClaimConst.UserId, "1"));
             claims.Add(new Claim(ClaimConst.AccountType, ((int)AccountTypeEnum.SuperAdmin).ToString()));
         }
-        else if (identity == TenantIdentity)
+        else if (identity == Identity)
         {
-            claims.Add(new Claim(ClaimConst.Account, "tenant-admin"));
-            claims.Add(new Claim(ClaimConst.RealName, "租户管理员"));
+            claims.Add(new Claim(ClaimConst.Account, "admin"));
+            claims.Add(new Claim(ClaimConst.RealName, "管理员角色"));
             claims.Add(new Claim(ClaimConst.UserId, "2001"));
-            claims.Add(new Claim("TenantId", TenantConfigId));
+            claims.Add(new Claim("Id", ConfigId));
             claims.Add(new Claim(ClaimConst.AccountType, ((int)AccountTypeEnum.NormalUser).ToString()));
         }
 

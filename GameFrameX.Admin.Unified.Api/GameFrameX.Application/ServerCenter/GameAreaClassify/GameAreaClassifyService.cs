@@ -8,18 +8,18 @@ namespace GameFrameX.Application.ServerCenter.GameAreaClassify;
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
 public class GameAreaClassifyService
-    : GenericCrudSelectService<Entity.Tenant.Game.TenantGameAreaClassifyEntity,
-        AddTenantGameAreaClassifyEntityRequest, UpdateTenantGameAreaClassifyEntityRequest,
-        GameAreaClassifyResponse, PageTenantGameAreaClassifyEntityRequest>
+    : GenericCrudSelectService<Entity.Business.Game.GameAreaClassifyEntity,
+        AddGameAreaClassifyEntityRequest, UpdateGameAreaClassifyEntityRequest,
+        GameAreaClassifyResponse, PageGameAreaClassifyEntityRequest>
 {
 
     public GameAreaClassifyService(
-        SqlSugarRepository<Entity.Tenant.Game.TenantGameAreaClassifyEntity> repository)
+        SqlSugarRepository<Entity.Business.Game.GameAreaClassifyEntity> repository)
         : base(repository)
     {
     }
 
-    protected override ISugarQueryable<GameAreaClassifyResponse> BuildPageQuery(PageTenantGameAreaClassifyEntityRequest input)
+    protected override ISugarQueryable<GameAreaClassifyResponse> BuildPageQuery(PageGameAreaClassifyEntityRequest input)
     {
         return Repository.AsQueryable()
                          .WhereIF(!string.IsNullOrWhiteSpace(input.Name), u => u.Name.Contains(input.Name.Trim()))
@@ -30,7 +30,7 @@ public class GameAreaClassifyService
     /// 更新前验证记录存在。
     /// <para>DockerPassword 已不在 Output 回显（C228 敏感字段剔除），编辑弹窗回传空值时保留 DB 原值，避免误清空。</para>
     /// </summary>
-    protected override async Task OnUpdatingAsync(UpdateTenantGameAreaClassifyEntityRequest input)
+    protected override async Task OnUpdatingAsync(UpdateGameAreaClassifyEntityRequest input)
     {
         var existing = await Repository.GetFirstAsync(u => u.Id == input.Id);
         if (existing == null)

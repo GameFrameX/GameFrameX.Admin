@@ -6,21 +6,21 @@ using GameFrameX.Entity.Enum;
 namespace GameFrameX.Application.GmCenter.GameReport;
 
 /// <summary>
-/// 举报事实源管理服务。路由前缀 /api/tenantGameReportEntity。
+/// 举报事实源管理服务。路由前缀 /api/gameReportEntity。
 /// <para>AddAsync：服务端强制 Status=Pending、HandlerId=null。</para>
 /// <para>LinkPenaltyAsync：仅 Confirmed 举报可关联已存在处罚；写 ResultPenaltyId + HandlerId，不自动创建处罚。</para>
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
 public class GameReportService
-    : GenericCrudService<Entity.Tenant.Game.TenantGameReportEntity,
-        AddTenantGameReportEntityRequest, UpdateTenantGameReportEntityRequest,
-        GameReportResponse, PageTenantGameReportEntityRequest>
+    : GenericCrudService<Entity.Business.Game.GameReportEntity,
+        AddGameReportEntityRequest, UpdateGameReportEntityRequest,
+        GameReportResponse, PageGameReportEntityRequest>
 {
     private readonly CurrentUserContext _currentUserContext;
-    private readonly SqlSugarRepository<Entity.Tenant.Game.TenantGamePenaltyEntity> _penaltyRepository;
+    private readonly SqlSugarRepository<Entity.Business.Game.GamePenaltyEntity> _penaltyRepository;
 
-    public GameReportService(SqlSugarRepository<Entity.Tenant.Game.TenantGameReportEntity> repository,
-        SqlSugarRepository<Entity.Tenant.Game.TenantGamePenaltyEntity> penaltyRepository,
+    public GameReportService(SqlSugarRepository<Entity.Business.Game.GameReportEntity> repository,
+        SqlSugarRepository<Entity.Business.Game.GamePenaltyEntity> penaltyRepository,
         CurrentUserContext currentUserContext)
         : base(repository)
     {
@@ -31,7 +31,7 @@ public class GameReportService
     /// <summary>
     /// 录入举报：Status/HandlerId 服务端强制。
     /// </summary>
-    public override async Task<GameReportResponse> AddAsync(AddTenantGameReportEntityRequest input)
+    public override async Task<GameReportResponse> AddAsync(AddGameReportEntityRequest input)
     {
         if (string.IsNullOrWhiteSpace(input.TargetId))
         {
@@ -43,7 +43,7 @@ public class GameReportService
             throw BusinessError.Oh("证据JSON不能为空");
         }
 
-        var entity = input.Adapt<Entity.Tenant.Game.TenantGameReportEntity>();
+        var entity = input.Adapt<Entity.Business.Game.GameReportEntity>();
         entity.Status = ReportStatusEnum.Pending;
         entity.HandlerId = null;
         await Repository.InsertWithDiffLogAsync(entity);
@@ -53,7 +53,7 @@ public class GameReportService
     /// <summary>
     /// 分页查询：按 TargetType / TargetId / ReportType / Status 过滤。
     /// </summary>
-    protected override ISugarQueryable<GameReportResponse> BuildPageQuery(PageTenantGameReportEntityRequest input)
+    protected override ISugarQueryable<GameReportResponse> BuildPageQuery(PageGameReportEntityRequest input)
     {
         return Repository.AsQueryable()
 
@@ -70,7 +70,7 @@ public class GameReportService
     /// <param name="input"></param>
     [HttpPost("linkPenalty")]
     [ApiDescriptionSettings(Name = "LinkPenalty")]
-    public async Task LinkPenaltyAsync(LinkPenaltyTenantGameReportEntityRequest input)
+    public async Task LinkPenaltyAsync(LinkPenaltyGameReportEntityRequest input)
     {
         var report = await Repository.GetFirstAsync(r => r.Id == input.Id);
         if (report == null)

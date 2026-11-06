@@ -1,4 +1,4 @@
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 
 namespace GameFrameX.Advertisement.Abstract;
 
@@ -7,6 +7,6 @@ namespace GameFrameX.Advertisement.Abstract;
 /// </summary>
 public sealed class RoleResolution
 {
-    public TenantGameRoleEntity Role { get; set; } = null!;
+    public GameRoleEntity Role { get; set; } = null!;
     public long UserId { get; set; }
 }

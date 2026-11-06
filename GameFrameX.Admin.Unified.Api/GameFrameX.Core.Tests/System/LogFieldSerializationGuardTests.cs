@@ -31,7 +31,7 @@ public class LogFieldSerializationGuardTests
     ""parameters"": [
         {
             ""name"": ""input"",
-            ""value"": { ""account"": ""admin"", ""password"": ""secret"", ""tenantId"": 1300000000001 }
+            ""value"": { ""account"": ""admin"", ""password"": ""secret"", ""serverId"": 1300000000001 }
         }
     ],
     ""returnInformation"": {
@@ -106,7 +106,7 @@ public class LogFieldSerializationGuardTests
     public void SerializedReturnInformation_RoundTripsThroughSuccessDetection()
     {
         // 落盘得到的 returnInformation JSON 喂回 IsSuccessfulUnifiedReturn 必须仍判为成功，
-        // 登录租户回填依赖这条链路（lesson 2026-07-11：损坏的 [] 会让回填全 miss）。
+        // 登录范围回填依赖这条链路（lesson 2026-07-11：损坏的 [] 会让回填全 miss）。
         var monitor = ParseMonitor();
         var returnResult = monitor["returnInformation"]?.ToJsonString();
 

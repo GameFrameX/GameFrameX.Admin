@@ -2,7 +2,7 @@ using GameFrameX.Application.CommerceCenter.GameOrder;
 using GameFrameX.Core.Enum;
 using GameFrameX.Application.CommerceCenter.GameOrder.Dto;
 using GameFrameX.Entity.Enum;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 using GameFrameX.Foundation.Http.Normalization;
 using GameFrameX.Foundation.Json;
 using SqlSugar;
@@ -25,7 +25,7 @@ public class GameOrderShipServiceTests : IDisposable
             InitKeyType = InitKeyType.Attribute,
             IsAutoCloseConnection = true,
         });
-        _db.CodeFirst.InitTables<TenantGameAreaEntity, TenantGameRoleEntity, TenantGameOrderEntity, TenantGameOrderFulfillmentEntity>();
+        _db.CodeFirst.InitTables<GameAreaEntity, GameRoleEntity, GameOrderEntity, GameOrderFulfillmentEntity>();
         _service = new GameOrderShipService(_db, new TestHttpClientFactory(_handler));
     }
 
@@ -37,7 +37,7 @@ public class GameOrderShipServiceTests : IDisposable
         var first = await _service.ShipAsync(orderId, true);
         var second = await _service.ShipAsync(orderId, true);
 
-        var order = await _db.Queryable<TenantGameOrderEntity>().FirstAsync(u => u.Id == orderId);
+        var order = await _db.Queryable<GameOrderEntity>().FirstAsync(u => u.Id == orderId);
         Assert.True(first.IsSuccess);
         Assert.True(second.IsSuccess);
         Assert.Equal(OrderStatusEnum.Shipped, order.Status);
@@ -61,7 +61,7 @@ public class GameOrderShipServiceTests : IDisposable
         var failed = await _service.ShipAsync(orderId, true);
         Assert.False(failed.IsSuccess);
 
-        var afterFail = await _db.Queryable<TenantGameOrderEntity>().FirstAsync(u => u.Id == orderId);
+        var afterFail = await _db.Queryable<GameOrderEntity>().FirstAsync(u => u.Id == orderId);
         Assert.Equal(OrderStatusEnum.NotShipped, afterFail.Status);
 
         var failedRows = await FulfillmentsAsync(orderId);
@@ -72,7 +72,7 @@ public class GameOrderShipServiceTests : IDisposable
         var recovered = await _service.ShipAsync(orderId, true);
         Assert.True(recovered.IsSuccess);
 
-        var order = await _db.Queryable<TenantGameOrderEntity>().FirstAsync(u => u.Id == orderId);
+        var order = await _db.Queryable<GameOrderEntity>().FirstAsync(u => u.Id == orderId);
         Assert.Equal(OrderStatusEnum.Shipped, order.Status);
 
         var finalRows = await FulfillmentsAsync(orderId);
@@ -90,7 +90,7 @@ public class GameOrderShipServiceTests : IDisposable
         var first = await _service.RefundAsync(orderId, "test");
         var second = await _service.RefundAsync(orderId, "test");
 
-        var order = await _db.Queryable<TenantGameOrderEntity>().FirstAsync(u => u.Id == orderId);
+        var order = await _db.Queryable<GameOrderEntity>().FirstAsync(u => u.Id == orderId);
         Assert.True(first.IsSuccess);
         Assert.True(second.IsSuccess);
         Assert.Equal(OrderStatusEnum.Refunded, order.Status);
@@ -111,7 +111,7 @@ public class GameOrderShipServiceTests : IDisposable
 
         var result = await _service.RefundAsync(orderId, "test");
 
-        var order = await _db.Queryable<TenantGameOrderEntity>().FirstAsync(u => u.Id == orderId);
+        var order = await _db.Queryable<GameOrderEntity>().FirstAsync(u => u.Id == orderId);
         Assert.True(result.IsSuccess);
         Assert.Equal(OrderStatusEnum.Voided, order.Status);
         Assert.Empty(_handler.RequestPaths);
@@ -130,7 +130,7 @@ public class GameOrderShipServiceTests : IDisposable
             _service.ShipAsync(orderId, true),
             _service.RefundAsync(orderId, "concurrent"));
 
-        var order = await _db.Queryable<TenantGameOrderEntity>().FirstAsync(u => u.Id == orderId);
+        var order = await _db.Queryable<GameOrderEntity>().FirstAsync(u => u.Id == orderId);
         Assert.True(order.Status is OrderStatusEnum.Voided or OrderStatusEnum.Refunded);
         Assert.True(_handler.Count("/game/api/req_player_send_item") <= 1);
         Assert.True(_handler.Count("/game/api/req_player_refund_order") <= 1);
@@ -143,7 +143,7 @@ public class GameOrderShipServiceTests : IDisposable
 
         var result = await _service.CompensateAsync(orderId, "测试补发", 42);
 
-        var order = await _db.Queryable<TenantGameOrderEntity>().FirstAsync(u => u.Id == orderId);
+        var order = await _db.Queryable<GameOrderEntity>().FirstAsync(u => u.Id == orderId);
         Assert.True(result.IsSuccess);
         // 人工补偿不改订单状态
         Assert.Equal(OrderStatusEnum.Shipped, order.Status);
@@ -184,9 +184,9 @@ public class GameOrderShipServiceTests : IDisposable
         Assert.Empty(fulfillments);
     }
 
-    private async Task<List<TenantGameOrderFulfillmentEntity>> FulfillmentsAsync(long orderId)
+    private async Task<List<GameOrderFulfillmentEntity>> FulfillmentsAsync(long orderId)
     {
-        return await _db.Queryable<TenantGameOrderFulfillmentEntity>()
+        return await _db.Queryable<GameOrderFulfillmentEntity>()
                         .Where(u => u.OrderId == orderId)
                         .ToListAsync();
     }
@@ -198,7 +198,7 @@ public class GameOrderShipServiceTests : IDisposable
         var orderId = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() + (long)status;
         var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
-        await _db.Insertable(new TenantGameAreaEntity
+        await _db.Insertable(new GameAreaEntity
         {
             Id = areaId,
             CreatedId = 1,
@@ -233,7 +233,7 @@ public class GameOrderShipServiceTests : IDisposable
             AppVersion = "test",
         }).ExecuteCommandAsync();
 
-        await _db.Insertable(new TenantGameRoleEntity
+        await _db.Insertable(new GameRoleEntity
         {
             Id = roleId,
             CreatedId = 1,
@@ -266,7 +266,7 @@ public class GameOrderShipServiceTests : IDisposable
             OnlineTime = 0,
         }).ExecuteCommandAsync();
 
-        await _db.Insertable(new TenantGameOrderEntity
+        await _db.Insertable(new GameOrderEntity
         {
             Id = orderId,
             CreatedId = 1,

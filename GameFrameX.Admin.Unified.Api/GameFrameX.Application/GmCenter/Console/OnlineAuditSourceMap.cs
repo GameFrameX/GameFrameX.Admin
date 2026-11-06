@@ -1,8 +1,8 @@
 using System.Text.Json;
 using GameFrameX.Application.GmCenter.Console.Dto;
 using GameFrameX.Entity.Log;
-using GameFrameX.Entity.Tenant.Game;
-using GameFrameX.Entity.Tenant.Game.Online;
+using GameFrameX.Entity.Business.Game;
+using GameFrameX.Entity.Business.Game.Online;
 
 namespace GameFrameX.Application.GmCenter.Console;
 
@@ -11,12 +11,12 @@ namespace GameFrameX.Application.GmCenter.Console;
 /// <para>
 /// 三来源口径（Admin 侧零事件镜像，全部实时读取原表/透传 Online）：
 /// <list type="number">
-/// <item><description><b>AdminOperation</b>：<see cref="TenantLogOperationEntity"/>（租户操作日志，
+/// <item><description><b>AdminOperation</b>：<see cref="LogOperationEntity"/>（管理员操作日志，
 /// MonitorLogging 全 action 自动落库）——操作者取账号，目标对象/作用域从 <c>RequestParam</c> JSON 尽力提取
 /// （提取不到即 null，不伪造）；命令类型取 Controller.Action；时间取 LogDateTime。</description></item>
 /// <item><description><b>OnlineAuditEvent</b>：Online 审计事件（经 <c>IOnlineServerClient</c> 实时透传）——五维直映。</description></item>
-/// <item><description><b>DomainCommandRecord</b>：各域命令事实源表——处罚落账（<see cref="TenantGamePenaltyEntity"/>，C350）
-/// 与配置灰度发布记录（<see cref="TenantGameOnlineConfigRolloutEntity"/>，C343）；资产人工发放/撤销的审计在 Online 侧，
+/// <item><description><b>DomainCommandRecord</b>：各域命令事实源表——处罚落账（<see cref="GamePenaltyEntity"/>，C350）
+/// 与配置灰度发布记录（<see cref="GameOnlineConfigRolloutEntity"/>，C343）；资产人工发放/撤销的审计在 Online 侧，
 /// 由 OnlineAuditEvent 来源覆盖（本地无镜像表）。</description></item>
 /// </list>
 /// 禁止在 Service 内散落第二套映射——新增来源必须回到本文件登记并同步守护说明。
@@ -45,7 +45,7 @@ public static class OnlineAuditSourceMap
     };
 
     /// <summary>
-    /// RequestParam JSON 中探测作用域的已知键（appId/serverId 双形态）。
+    /// RequestParam JSON 中探测区服作用域的已知键（serverId 双形态）。
     /// </summary>
     private static readonly string[] ScopeKeys = { "serverId", "ServerId", };
 
@@ -89,7 +89,7 @@ public static class OnlineAuditSourceMap
     /// <summary>
     /// 处罚落账行（C350 事实源）→ 统一审计行。
     /// </summary>
-    public static OnlineAuditSearchEntryResponse FromPenaltyRecord(TenantGamePenaltyEntity penalty)
+    public static OnlineAuditSearchEntryResponse FromPenaltyRecord(GamePenaltyEntity penalty)
     {
         return new OnlineAuditSearchEntryResponse
         {
@@ -107,7 +107,7 @@ public static class OnlineAuditSourceMap
     /// <summary>
     /// 配置灰度发布记录行（C343 事实源）→ 统一审计行。
     /// </summary>
-    public static OnlineAuditSearchEntryResponse FromConfigRolloutRecord(TenantGameOnlineConfigRolloutEntity rollout)
+    public static OnlineAuditSearchEntryResponse FromConfigRolloutRecord(GameOnlineConfigRolloutEntity rollout)
     {
         return new OnlineAuditSearchEntryResponse
         {
@@ -234,7 +234,7 @@ public static class OnlineAuditSourceMap
     }
 
     /// <summary>
-    /// 作用域数字键探测：先根层，miss 再下钻一层对象值（appId/serverId 常在 {"input":{...}} 包裹内，与目标键同形态）。
+    /// 区服数字键探测：先根层，miss 再下钻一层对象值（serverId 常在 {"input":{...}} 包裹内，与目标键同形态）。
     /// </summary>
     private static long? ProbeInt64Deep(JsonElement container, string camelKey, string pascalKey)
     {

@@ -76,9 +76,9 @@
         <Select filter v-bind="fProps" v-model="ruleForm.platformId" :options="platformOptions" optionLabel="label" optionValue="value" :placeholder="t('message.gameBusiness.area.pleaseSelectPlatform')" class="w-full" showClear/>
         <Message v-if="invalid" severity="error" size="small" variant="simple">{{ error }}</Message>
       </FormField>
-      <FormLabel name="appVersion">{{ t('message.gameBusiness.area.tenantGameAppVersionDefinition') }}</FormLabel>
+      <FormLabel name="appVersion">{{ t('message.gameBusiness.area.gameAppVersionDefinition') }}</FormLabel>
       <FormField name="appVersion" v-slot="{ props: fProps, invalid, error }">
-        <Select filter v-bind="fProps" v-model="ruleForm.appVersion" :options="tenantGameAppVersionDefinitionOptions" optionLabel="label" optionValue="value" :placeholder="t('message.gameBusiness.area.tenantGameAppVersionDefinition')" class="w-full" showClear/>
+        <Select filter v-bind="fProps" v-model="ruleForm.appVersion" :options="gameAppVersionDefinitionOptions" optionLabel="label" optionValue="value" :placeholder="t('message.gameBusiness.area.gameAppVersionDefinition')" class="w-full" showClear/>
         <Message v-if="invalid" severity="error" size="small" variant="simple">{{ error }}</Message>
       </FormField>
       <TextareaField v-model="ruleForm.description" name="description" :label="t('message.gameBusiness.description')" :placeholder="t('message.gameBusiness.pleaseEnterDescription')" maxlength="512" :autoResize="true" rows="3"/>
@@ -122,7 +122,7 @@ const getEnumChannelData = ref<any>([])
 const getEnumPlatformData = ref<any>([])
 const getEnumPackageData = ref<any>([])
 const getEnumDockerTag = ref<any>([])
-const getTenantGameAppVersionDefinitionData = ref<any>([])
+const getGameAppVersionDefinitionData = ref<any>([])
 const gameAreaClassifyEntityClassifyIdDropdownList = ref<any>([])
 
 const serverStatusOptions = computed(() =>
@@ -164,8 +164,8 @@ const dockerTagOptions = computed(() =>
       value: item.value
     }))
 )
-const tenantGameAppVersionDefinitionOptions = computed(() =>
-    getTenantGameAppVersionDefinitionData.value
+const gameAppVersionDefinitionOptions = computed(() =>
+    getGameAppVersionDefinitionData.value
 
         .map((item: any) => ({
           label: `[${item.name}] ${item.description}`,
@@ -188,7 +188,7 @@ const rules = {
   capacity: [{required: true, message: t('message.gameBusiness.area.pleaseEnterMaxPlayers'), trigger: 'blur'}],
   serverVersion: [{required: true, message: t('message.gameBusiness.pleaseEnterGameVersion'), trigger: 'blur'}],
   serverType: [{required: true, message: t('message.gameBusiness.area.pleaseEnterServerType'), trigger: 'blur'}],
-  appVersion: [{required: true, message: t('message.gameBusiness.pleaseSelectTenantGameAppVersionDefinition'), trigger: 'blur'}],
+  appVersion: [{required: true, message: t('message.gameBusiness.pleaseSelectGameAppVersionDefinition'), trigger: 'blur'}],
 }
 
 const loadScopedOptions = async () => {
@@ -196,7 +196,7 @@ const loadScopedOptions = async () => {
   const params = {page: 1, pageSize: MAX_PAGE_SIZE}
   getEnumPackageData.value = (await gameAppPackagePagePost(params)).data.data?.items ?? []
   getEnumDockerTag.value = (await gameDockerTagSelectPost({pageSize: MAX_SELECT_SIZE})).data.data ?? []
-  getTenantGameAppVersionDefinitionData.value = (await gameAppVersionDefinitionPagePost(params)).data.data?.items ?? []
+  getGameAppVersionDefinitionData.value = (await gameAppVersionDefinitionPagePost(params)).data.data?.items ?? []
   const classifyList = await gameAreaClassifySelectPost({searchKey: '', pageSize: MAX_SELECT_SIZE})
   gameAreaClassifyEntityClassifyIdDropdownList.value = classifyList.data.data ?? []
 }

@@ -82,7 +82,7 @@ pnpm install
 pnpm run dev    # Defaults to http://localhost:20800 (hash routing)
 ```
 
-Open your browser → you should see the login page → account `admin` / password `123456` / tenant `1300000000001` (on first startup, SqlSugar Code-First automatically creates the tables and seeds the data).
+Open your browser → you should see the login page → account `admin` / password `123456` (on first startup, SqlSugar Code-First automatically creates the tables and seeds the data).
 
 ### Full Stack with One Command (unified compose at the repository root)
 
@@ -102,7 +102,7 @@ For finer-grained commands and pitfalls, see [`GameFrameX.Admin.Unified.Api/READ
 |---|---|
 | Indie / small-team games that need a working operations backend | You already have a complete backend and only want one module |
 | Multi-end (admin / client / external systems) scenarios needing clear boundaries | Simple single-end backends (Admin.NET / vue-next-admin directly is lighter) |
-| Multi-tenant SaaS-style game services | Single-tenant in-house products with no plans to open up |
+| Single-game self-operated backends (game areas / players / monetization / client delivery in one place) | Multi-game centralized operations or SaaS multi-tenancy |
 | Teams that require the .NET + SqlSugar stack | Teams only familiar with Java / Go / Node |
 | Need multi-language (5-language i18n) + AI-Agent-friendly repository | — |
 | Want a monolith starting point that can evolve toward microservices | — |
@@ -131,25 +131,18 @@ One repository, three hosts, deployed on separate databases so they never drag e
 
 > **The `Service` suffix must NEVER appear in URLs.** This is a trap 100% of newcomers hit — the frontend generates calls based on this convention; change the class name and the frontend breaks everywhere.
 
-## Multi-Tenancy + App Scopes
+## Identity and Scope
 
-A three-layer model, from the outside in:
+A single-game operations backend with two identity families (separate user tables, fixed login lookup order):
 
-```
-SuperAdmin (platform level) ── can access global config, cross-tenant queries
-    ↓
-Tenant (multi-tenant SaaS) ── shared across apps
-    ↓
-App (a specific game / product under a tenant) ── AppId scope
-```
+| Identity | Description |
+|---|---|
+| SuperAdmin (platform) | System-level identity for global configuration and system management; created by the first-install wizard |
+| Admin | Day-to-day operations identity; role permissions control features, server scope controls business data range |
 
-| Scope | Meaning | Route examples |
-|---|---|---|
-| `platform` | Platform level (visible to super admins, cross-tenant) | `/platform/*` |
-| `tenant` | Tenant level (shared by all apps, no appId query) | `/dashboard/*`, `/system/*` |
-| `app` | Inside an app workspace (must carry the `appId` query) | `/gameCenter/*` |
-
-Multi-tenancy and database boundaries take effect automatically via entity attributes: `[Tenant]` automatically adds `TenantId` filtering + soft delete; `[SystemTable]` routes to the main database, `[LogTable]` routes to the log database, and unmarked entities route by the JWT `TenantId`. For details see [Backend README · Repositories and Multi-Database Routing](GameFrameX.Admin.Unified.Api/README.md#repositories-and-multi-database-routing).
+- `ServerId` is the only operational scope: admin-to-game-server communication, queries, writes and callback contracts never depend on tenant or application identity.
+- Single main database: platform tables use the `system_` prefix, global definition tables use `global_`, business tables have no prefix. There is no tenant database and no per-tenant/per-app routing.
+- Public callbacks (payment / ads / WebShop) only use the `{packageId}` URL form; legacy URLs with tenant/app segments return 404 with no compatibility parsing.
 
 ## 30 Feature Modules
 
@@ -159,19 +152,16 @@ Grouped by "the scenarios you'll actually use", not by directory structure.
 
 | Module | What it does |
 |---|---|
-| User management | Tenant user / system admin maintenance; can bind user positions, orgs, roles, data permissions |
-| Org management | Multi-level tree-shaped organization structure |
-| Position management | User job title tags |
+| User management | Admin account maintenance, role and data-permission binding |
 | Menu management | Three-level permissions: directory / menu / button |
 | Role management | Roles bound to menus + data authorization scope |
-| Dictionary management | Global / tenant two-level dictionaries |
+| Dictionary management | Global dictionaries |
 | Open authorization | AccessKey / Secret + HMAC signature authentication (external APIs) |
 
 **Platform Configuration (visible to SuperAdmin only)**
 
 | Module | What it does |
 |---|---|
-| Platform tenant management | Tenant CRUD, automatic tenant database provisioning / disabling / expiry |
 | Global platform / language / channel definitions | Platform-level enums and multilingual baselines |
 | System config | Key-value pairs; high-frequency configs migrated into the main database `SystemConfig` (JWT / password policy / captcha) |
 | Database management | Table / column CRUD, online schema management |
@@ -200,7 +190,7 @@ Grouped by "the scenarios you'll actually use", not by directory structure.
 | Items / goods | Item catalog, consumable / permanent item management |
 | Announcements / banners | In-game + post-login announcements |
 | App versions / resource packs | App versions + force update + resource pack versions and history rollback |
-| App-scoped config | Remote parameters, app validation, client KV |
+| App config | Remote parameters, app validation, client KV |
 | Mail operations | Templates + campaigns + multilingual |
 | Ad callbacks | TopOn / AdMob / UnityAds multi-provider |
 | Game server integration | Player registration / login / order callbacks |
@@ -218,7 +208,6 @@ Grouped by "the scenarios you'll actually use", not by directory structure.
 
 - **Backend-driven menus**: menus, permissions, and copy are all controlled by the backend. The frontend doesn't define menus — add them in the backend menu management; the frontend only renders the menu tree returned by the backend.
 - **Automatic JWT renewal**: before the token from login expires, the frontend automatically adds `X-Authorization` so the backend silently reissues it — one login lasts a long time.
-- **App scopes**: routes tagged with `meta.appScope` + `meta.menuContext` for the platform / tenant / app scopes; the frontend decides menu visibility based on the scope.
 - **i18n completeness gate**: `pnpm run lint:i18n` checks that all 5 languages have complete keys; one missing key fails immediately.
 
 ## Security Baseline
@@ -229,7 +218,7 @@ Not "recommendations" — hard constraints that **take effect by default**.
 |---|---|
 | Weak passwords | Project-wide **Argon2id** (C214 system users / C215 players); legacy PBKDF2 kept only for `AppSecretHasher` (high-entropy random key scenarios where Argon2id isn't needed) |
 | SQL injection | Fully parameterized SqlSugar, no string concatenation |
-| Unauthorized access | Multi-tenant filtering + soft-delete filtering; SuperAdmin bypasses them, but Hub API rejects super admins |
+| Unauthorized access | Soft-delete filtering + role permissions / server scope; SuperAdmin bypasses permission checks, but Hub API rejects super admins |
 | Replay attacks | HMAC signatures + nonce cache + 5-minute clock skew tolerance |
 | Information leakage | Response DTOs must include Id/RowVersion/CreatedTime; sensitive fields (password hashes / AccessSecret) are **forbidden** in any Response; guarded by contract tests |
 | API regression | `ThreeHostApiRoutingContractTests` + `AdminEndpointReturnContractTests` + `AdminActionStyleContractTests` + `NamingAbbreviationGuardTests` prevent regressions |
@@ -238,8 +227,8 @@ Not "recommendations" — hard constraints that **take effect by default**.
 
 **Zero-config by default**: running from local source defaults to SQLite (under `db/` at the repository root); production uses PostgreSQL (MySQL / Oracle and 34 DbTypes in total are also supported). `GameFrameX.Application/Configuration/Database.json` is the single source of connection strings (shared by the three hosts — change it once and all three pick it up).
 
-- Main / tenant / log databases are routed automatically by entity attributes (see the multi-tenancy section above).
-- Tenant databases are created automatically: named `gameframex_admin_tenant_<TenantId>` by tenant ID, no manual connection strings needed; the default tenant database is likewise derived automatically.
+- Single main database: all three hosts share one main database; entity ownership is decided by boundary rules (see Identity and Scope above).
+- 2.0 is a breaking release: no old-database upgrade or data migration. Startup fails fast when legacy tenant structures are detected (e.g. `tenant_`-prefixed tables); only fresh initialization or a full pre-release backup rollback is supported.
 - For connection-string syntax when switching databases, see [`Database-ConnectionStrings.md`](GameFrameX.Admin.Unified.Api/GameFrameX.Application/Configuration/Database-ConnectionStrings.md); for paired environment variable overrides (`GFX_MAIN_DB_TYPE` + `GFX_MAIN_DB_CONNECTION_STRING`) and other deployment details, see [Backend README · Database](GameFrameX.Admin.Unified.Api/README.md#database-zero-config-by-default-postgresql-for-production).
 
 > SQLite is for local development only. Forbidden in production — weak concurrent writes, no standalone service process, and insufficient backup/restore and ops monitoring capabilities.
@@ -295,12 +284,11 @@ CI gates (anti-regression):
 ![Cache management](doc/img/8.png)
 ![Open APIs](doc/img/11.png)
 ![Captcha config](doc/img/12.png)
-![Tenant management](doc/img/13.png)
 ![Table management](doc/img/14.png)
 
-### App Workspace Core Features (Chinese/English side by side)
+### Core Operations Features (Chinese/English side by side)
 
-The 5 core feature pages you see after entering a tenant app workspace. The same pages shown under Chinese and English UI languages (switch instantly via the language switcher in the top-right corner, no refresh needed):
+The 5 core operations pages you see after logging in. The same pages shown under Chinese and English UI languages (switch instantly via the language switcher in the top-right corner, no refresh needed):
 
 | Feature | 简体中文 | English |
 |------|----------|---------|
@@ -367,7 +355,7 @@ flowchart TB
 |------|------|------|------|
 | [Unity](https://github.com/GameFrameX/GameFrameX.Unity) | Unity client project: assembles 90+ framework packages from the GameFrameX UPM registry, HybridCLR hot update, login / bag / room samples | Unity 2019.4.40+, HybridCLR, YooAsset, FairyGUI, UniTask | Consumes Protobuf / Config / FairyGUIProject output; TCP 29100 + HTTP 28080 to Server, HTTP 20808 to Admin Client API |
 | [Server](https://github.com/GameFrameX/GameFrameX.Server) | Actor-model game server: persistent Apps state layer strictly separated from the hot-updatable Hotfix logic layer; single- or multi-process deployment | .NET 10, MongoDB, Docker | Listens on TCP 29100 / WebSocket 29110 / HTTP 28080; HTTP management endpoints (mail, item grants, player management) for Admin |
-| [Admin](https://github.com/GameFrameX/GameFrameX.Admin) | Multi-tenant operations backend: Admin (20802) / Client (20808) / Hub (20806) hosts + Vue console, covering game areas, announcements, mail, orders & payment, remote config, LiveOps | .NET 10, SqlSugar, PostgreSQL, Vue 3.5, PrimeVue | Calls Server through each game area's `HttpManageUrl`; Client API serves global info, login and payment callbacks to game clients |
+| [Admin](https://github.com/GameFrameX/GameFrameX.Admin) | Single-game operations backend: Admin (20802) / Client (20808) / Hub (20806) hosts + Vue console, covering game areas, announcements, mail, orders & payment, remote config, LiveOps | .NET 10, SqlSugar, PostgreSQL, Vue 3.5, PrimeVue | Calls Server through each game area's `HttpManageUrl`; Client API serves global info, login and payment callbacks to game clients |
 | [luban](https://github.com/GameFrameX/luban) | GameFrameX fork of Luban: merged upstream v5.1.0, adds the `gameframex` table importer and `cs-dotnet-json` / `cs-dotnet-bin` code targets | .NET 10, Scriban | Publishes Luban tar.gz and Docker image; synced daily into Config `Tools/` |
 | [Config](https://github.com/GameFrameX/GameFrameX.Config) | Config table repository: Excel data tables + schema + localization tables, one-click scripts generate client and server code and data | Excel, Luban | `gen-client-*` → Unity; `gen-server-json` → Server; `gen-server-bin` → Server.Source; `gen-godot-json` / `gen-cocos-json` / `gen-laya-json` → Godot / CocosCreator / LayaBox |
 | [Protobuf](https://github.com/GameFrameX/GameFrameX.Protobuf) | Unified network protocol definitions: proto3, messages and error codes grouped by the numeric module ID in each file name (positive = client↔server, negative = server-internal) | proto3 | `Proto2CsExport_Server` → Server; `Proto2CsExport_Client` → Unity; `Proto2CsExport_Godot` / `Proto2TsExport_CocosCreator` / `Proto2TsExport_LayaBox` → other clients; CI publishes a six-language Release on every push |

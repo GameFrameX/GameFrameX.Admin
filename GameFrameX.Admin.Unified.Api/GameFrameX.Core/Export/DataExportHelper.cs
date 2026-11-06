@@ -23,9 +23,9 @@ public static class DataExportHelper
     /// 按列白名单投影数据行并生成 Excel 文件结果。
     /// </summary>
     /// <typeparam name="T">行数据类型（通常为实体 Output DTO）。</typeparam>
-    /// <param name="rows">已查询并通过租户/权限过滤的数据行。</param>
+    /// <param name="rows">已查询并通过权限过滤的数据行。</param>
     /// <param name="columns">前端可见列白名单。</param>
-    /// <param name="fileSuffix">文件名后缀（业务名，如「租户渠道定义」）。</param>
+    /// <param name="fileSuffix">文件名后缀（业务名，如「业务渠道定义」）。</param>
     /// <returns>可直接返回的 .xlsx FileStreamResult。</returns>
     public static async Task<IActionResult> BuildExcelResultAsync<T>(
         IEnumerable<T> rows,

@@ -68,9 +68,6 @@ public class AdminEnumVisibilityTests
         "GameFrameX.Core.Enum.Errors.RoleMenuErrorCode",
         "GameFrameX.Core.Enum.Errors.DictionaryErrorCode",
         "GameFrameX.Core.Enum.Errors.PlatformConfigErrorCode",
-        "GameFrameX.Core.Enum.Errors.TenantErrorCode",
-        "GameFrameX.Core.Enum.Errors.OrganizationErrorCode",
-        "GameFrameX.Core.Enum.Errors.PositionErrorCode",
         "GameFrameX.Core.Enum.Errors.FileErrorCode",
         "GameFrameX.Core.Enum.Errors.JobErrorCode",
         "GameFrameX.Core.Enum.Errors.DatabaseErrorCode",
@@ -80,6 +77,8 @@ public class AdminEnumVisibilityTests
         "GameFrameX.Core.Enum.Errors.OnlineErrorCode",
         // C350（GFX-754）：Online 社交治理 317 段业务错误码同规则豁免（错误码枚举不进前端枚举下拉）。
         "GameFrameX.Core.Enum.Errors.OnlineModerationErrorCode",
+        // F2（GFX-1232）：广告回调配置 318 段错误码同规则豁免（错误码枚举不进前端枚举下拉）。
+        "GameFrameX.Core.Enum.Errors.AdvertisementCallbackConfigErrorCode",
         // Core.Enum 程序集并入 GameFrameX.Entity 后，Entity 域内邮件营销 4 个内部枚举
         // 进入白名单程序集 public enum 全集；现状即不带 [AdminEnum]（不暴露给前端下拉），如实豁免。
         "GameFrameX.Entity.Game.Mail.MailCampaignMailType",

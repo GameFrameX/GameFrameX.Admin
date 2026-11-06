@@ -24,7 +24,7 @@ export enum OrderStatusEnum {
 }
 
 /** 游戏支付订单增加输入参数 */
-export interface AddTenantGameOrderEntityRequest {
+export interface AddGameOrderEntityRequest {
   /** 主键Id */
   id: string;
 }
@@ -176,7 +176,7 @@ export interface GameOrderSummaryResponse {
 }
 
 /** 游戏支付订单分页查询输入参数 */
-export interface PageTenantGameOrderEntityRequest {
+export interface PageGameOrderEntityRequest {
   searchKey?: string | null;
   /**
    * @format int32
@@ -230,7 +230,7 @@ export interface PageTenantGameOrderEntityRequest {
 }
 
 /** 游戏支付订单更新输入参数 */
-export interface UpdateTenantGameOrderEntityRequest {
+export interface UpdateGameOrderEntityRequest {
   /**
    * @min 1
    * @max 9223372036854776000

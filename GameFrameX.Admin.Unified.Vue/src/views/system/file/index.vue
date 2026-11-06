@@ -121,8 +121,8 @@ import {useCrudTable} from '../../../composables/useCrudTable.ts'
 import {usePrimeTablePage} from '../../../composables'
 import EditSysFile from '/@/views/system/file/component/EditSysFile.vue'
 import {downloadByUrl} from '../../../utils/download.ts'
-import {tenantFilePagePost, tenantFileDeletePost, tenantFileUploadFilePost} from '../../../api/tenantFile';
-import {TenantFileEntity} from '../../../api/_shared/data-contracts.ts'
+import {filePagePost, fileDeletePost, fileUploadFilePost} from '../../../api/file';
+import {FileEntity} from '../../../api/_shared/data-contracts.ts'
 import type {CrudAction, CrudColumnConfig} from '../../../components/crud-data-table/types.ts'
 import {formatUnix} from '../../../utils/formatTime.ts'
 
@@ -153,8 +153,8 @@ const {
   onQuery: doQuery, onDelete,
 } = useCrudTable({
   api: {
-    pageApi: (params) => tenantFilePagePost(params),
-    deleteApi: (params) => tenantFileDeletePost({id: params.id}),
+    pageApi: (params) => filePagePost(params),
+    deleteApi: (params) => fileDeletePost({id: params.id}),
   },
   deleteConfirmMessage: (row: any) => t('system.file.deleteFileConfirm') + `：【${row.fileName}】?`,
   immediate: false,
@@ -217,7 +217,7 @@ const onFileSelect = (event: Event) => {
 
 const uploadFile = async () => {
   if (!selectedFile.value) return
-  await tenantFileUploadFilePost(selectedFile.value)
+  await fileUploadFilePost(selectedFile.value)
   onQuery()
   showSuccess(t('system.file.uploadSuccess'))
   dialogUploadVisible.value = false
@@ -260,7 +260,7 @@ const openFilePreviewDialog = async (row: any) => {
   }
 }
 
-const getFileUrl = (row: TenantFileEntity): string => {
+const getFileUrl = (row: FileEntity): string => {
   if (row.bucketName == 'Local') {
     return `/${row.filePath}/${row.id}${row.suffix}`
   } else {

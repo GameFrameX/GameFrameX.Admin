@@ -2,7 +2,7 @@ using GameFrameX.Application.Platform.TimeJob.GameTimeJob;
 using GameFrameX.Application.Platform.TimeJob.GameTimeJob.Dto;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Core.Tests.ClientApi;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 
 namespace GameFrameX.Core.Tests.GameBusiness;
 
@@ -13,12 +13,12 @@ public sealed class MainDatabaseTimeJobServiceTests
     {
         using (var database = new ClientApiTestDb())
         {
-            database.InitTenantTables(typeof(TenantGameTimeJobEntity));
-            var service = new GameTimeJobService(new SqlSugarRepository<TenantGameTimeJobEntity>
+            database.InitBusinessTables(typeof(GameTimeJobEntity));
+            var service = new GameTimeJobService(new SqlSugarRepository<GameTimeJobEntity>
             {
                 Context = database.MainDb,
             });
-            var created = await service.AddAsync(new AddTenantGameTimeJobEntityRequest
+            var created = await service.AddAsync(new AddGameTimeJobEntityRequest
             {
                 Name = "daily", Description = "daily", Cron = "0 0 1 * * ?", Source = "forged",
             });

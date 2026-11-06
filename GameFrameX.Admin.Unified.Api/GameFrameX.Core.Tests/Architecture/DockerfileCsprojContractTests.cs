@@ -7,7 +7,7 @@ namespace GameFrameX.Core.Tests.Architecture;
 // 清单必须与对应 host 的 ProjectReference 传递闭包完全一致，否则：
 //   - 清单缺项（新增项目未同步）→ dotnet restore 找不到引用目标，构建失败；
 //   - 清单多项（项目已删除/合并未同步）→ COPY 不存在的文件，构建直接报错。
-// 2026-08-22 曾因 Application 重组（Application.Client/Tenant/Core.Enum 归位删除、Advertisement 引入）
+// 2026-08-22 曾因 Application 重组（Application.Client/Business/Core.Enum 归位删除、Advertisement 引入）
 // 三清单集体漂移，下一次 main push 构建必挂，由本测试族防止回潮。
 public sealed class DockerfileCsprojContractTests
 {

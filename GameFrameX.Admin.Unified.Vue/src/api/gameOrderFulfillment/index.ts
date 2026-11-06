@@ -20,8 +20,8 @@ import {
   GameOrderFulfillmentRefundPostData,
   GameOrderFulfillmentResendPostData,
   GameOrderFulfillmentUpdatePostData,
-  PageTenantGameOrderFulfillmentEntityRequest,
-  UpdateTenantGameOrderFulfillmentEntityRequest,
+  PageGameOrderFulfillmentEntityRequest,
+  UpdateGameOrderFulfillmentEntityRequest,
 } from "./types";
 import {
   BaseDeleteRequest,
@@ -130,7 +130,7 @@ export class GameOrderFulfillment<SecurityDataType = unknown> {
    * @request POST:/api/gameOrderFulfillment/export
    */
   gameOrderFulfillmentExportPost = (
-    data: PageTenantGameOrderFulfillmentEntityRequest,
+    data: PageGameOrderFulfillmentEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameOrderFulfillmentExportPostData, any>({
@@ -150,7 +150,7 @@ export class GameOrderFulfillment<SecurityDataType = unknown> {
    * @request POST:/api/gameOrderFulfillment/page
    */
   gameOrderFulfillmentPagePost = (
-    data: PageTenantGameOrderFulfillmentEntityRequest,
+    data: PageGameOrderFulfillmentEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameOrderFulfillmentPagePostData, any>({
@@ -210,7 +210,7 @@ export class GameOrderFulfillment<SecurityDataType = unknown> {
    * @request POST:/api/gameOrderFulfillment/update
    */
   gameOrderFulfillmentUpdatePost = (
-    data: UpdateTenantGameOrderFulfillmentEntityRequest,
+    data: UpdateGameOrderFulfillmentEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameOrderFulfillmentUpdatePostData, any>({

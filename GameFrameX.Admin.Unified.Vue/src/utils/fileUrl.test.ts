@@ -17,7 +17,7 @@ afterEach(() => {
   window.__env__ = originalEnv;
 });
 
-test('resolves tenant avatar object key (no leading slash) against the API origin', () => {
+test('resolves user avatar object key (no leading slash) against the API origin', () => {
   expect(resolveBackendFileUrl('Upload/Avatar/1300000000111.png')).toBe(
     'http://127.0.0.1:20802/Upload/Avatar/1300000000111.png'
   );

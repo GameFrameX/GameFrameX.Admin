@@ -2,7 +2,7 @@ using GameFrameX.Application.ClientDelivery.FeatureSwitch;
 using GameFrameX.Core.Const;
 using GameFrameX.Core.Extension;
 using GameFrameX.Core.SqlSugar;
-using GameFrameX.Entity.Tenant.Game.FeatureSwitch;
+using GameFrameX.Entity.Business.Game.FeatureSwitch;
 using SqlSugar;
 
 namespace GameFrameX.Core.Tests.GameBusiness;
@@ -15,9 +15,6 @@ namespace GameFrameX.Core.Tests.GameBusiness;
 /// </summary>
 public sealed class FeatureSwitchDeliveryResolverTests : IDisposable
 {
-    private const long TenantId = 1001;
-    private const long App100 = 100;
-    private const long App200 = 200;
 
     private static readonly DateTime NowUtc = new DateTime(2026, 9, 14, 12, 0, 0, DateTimeKind.Utc);
 
@@ -34,7 +31,7 @@ public sealed class FeatureSwitchDeliveryResolverTests : IDisposable
         SqlSugarUnifiedConfig.ConfigureBaseSettings(config);
         _db = new SqlSugarScope(config);
         SqlSugarUnifiedConfig.ConfigureBaseFilters(_db);
-        _db.CodeFirst.InitTables(typeof(TenantGameAppFeatureSwitchEntity));
+        _db.CodeFirst.InitTables(typeof(GameAppFeatureSwitchEntity));
     }
 
     /// <summary>
@@ -43,10 +40,10 @@ public sealed class FeatureSwitchDeliveryResolverTests : IDisposable
     [Fact]
     public void Resolve_NewerRowWinsRegardlessOfLegacyApplication()
     {
-        var tenantDefault = Row("login.banner", id: 1, appId: null, valueJson: "{\"v\":\"tenant\"}");
-        var appRow = Row("login.banner", id: 2, appId: App100, valueJson: "{\"v\":\"app\"}");
+        var defaultRow = Row("login.banner", id: 1, valueJson: "{\"v\":\"base\"}");
+        var appRow = Row("login.banner", id: 2, valueJson: "{\"v\":\"app\"}");
 
-        var result = FeatureSwitchDeliveryResolver.Resolve(new[] { tenantDefault, appRow, }, Query());
+        var result = FeatureSwitchDeliveryResolver.Resolve(new[] { defaultRow, appRow, }, Query());
 
         var item = Assert.Single(result.Switches);
         Assert.Equal("{\"v\":\"app\"}", item.ValueJson);
@@ -368,9 +365,9 @@ public sealed class FeatureSwitchDeliveryResolverTests : IDisposable
     [Fact]
     public async Task ResolveAsync_ReadsMainDatabaseCandidates()
     {
-        await InsertAsync(Row("switch.app", id: 900001, appId: App100));
-        await InsertAsync(Row("switch.default", id: 900002, appId: null));
-        await InsertAsync(Row("switch.other", id: 900003, appId: App200));
+        await InsertAsync(Row("switch.app", id: 900001));
+        await InsertAsync(Row("switch.default", id: 900002));
+        await InsertAsync(Row("switch.other", id: 900003));
 
         var result = await CreateResolver().ResolveAsync(Query());
 
@@ -396,10 +393,10 @@ public sealed class FeatureSwitchDeliveryResolverTests : IDisposable
 
     private FeatureSwitchDeliveryResolver CreateResolver()
     {
-        return new FeatureSwitchDeliveryResolver(new SqlSugarRepository<TenantGameAppFeatureSwitchEntity> { Context = _db, });
+        return new FeatureSwitchDeliveryResolver(new SqlSugarRepository<GameAppFeatureSwitchEntity> { Context = _db, });
     }
 
-    private async Task InsertAsync(TenantGameAppFeatureSwitchEntity row)
+    private async Task InsertAsync(GameAppFeatureSwitchEntity row)
     {
         row.CreatedTime = ToUnixSeconds(NowUtc);
         row.IsDeleted = false;
@@ -413,7 +410,6 @@ public sealed class FeatureSwitchDeliveryResolverTests : IDisposable
 
     private static FeatureSwitchDeliveryQuery Query(
         FeatureSwitchAudience audience = FeatureSwitchAudience.Client,
-        long? appId = App100,
         string? platform = null,
         IReadOnlyList<string>? packageCandidates = null,
         string? language = null,
@@ -433,10 +429,9 @@ public sealed class FeatureSwitchDeliveryResolverTests : IDisposable
         };
     }
 
-    private static TenantGameAppFeatureSwitchEntity Row(
+    private static GameAppFeatureSwitchEntity Row(
         string switchKey,
         long id,
-        long? appId = App100,
         string audience = FeatureSwitchAudienceValues.Both,
         string valueJson = "{}",
         long? startTime = null,
@@ -450,7 +445,7 @@ public sealed class FeatureSwitchDeliveryResolverTests : IDisposable
         string? deviceWhitelistJson = null,
         bool? isEnabled = true)
     {
-        return new TenantGameAppFeatureSwitchEntity
+        return new GameAppFeatureSwitchEntity
         {
             Id = id,
             SwitchKey = switchKey,

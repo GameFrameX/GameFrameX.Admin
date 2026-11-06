@@ -41,7 +41,7 @@ public class AliPayOptionSetting : IPaymentOptionSetting
     /// <summary>
     /// 异步通知地址。运行期由 PaymentOptionSettingProvider 按当前公开回调端点
     /// （api/GameOrder/NotifyAliPay/{packageId}）自动补全路由段：配置时只需填写站点根地址；
-    /// 完整新路由地址与旧「租户/应用/分包」三段地址会自动规范化，无法识别的地址下单时拒绝。
+    /// 完整新路由地址可直接使用；旧「租户/应用/分包」三段地址不再重建（C406），无法识别的地址下单时拒绝。
     /// </summary>
     [PaymentField(Label = "异步通知地址", Help = "填写站点根地址即可，系统自动追加回调路由段（含分包标识）")]
     public string AliPayNotifyUrl { get; set; } = null!;

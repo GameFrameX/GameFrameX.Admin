@@ -1,5 +1,5 @@
 <template>
-  <div class="tenantGameAppServerConfig-container">
+  <div class="gameAppServerConfig-container">
     <Card>
       <template #content>
         <SearchForm
@@ -9,7 +9,7 @@
             authPrefix="gameAppServerConfig"
             @query="runScopedQuery"
 
-            @add="openAddTenantGameAppServerConfig"
+            @add="openAddGameAppServerConfig"
         />
       </template>
     </Card>
@@ -34,7 +34,7 @@
         </CrudDataTable>
         <editDialog
             ref="editDialogRef"
-            :title="editTenantGameAppServerConfigTitle"
+            :title="editGameAppServerConfigTitle"
             @reloadTable="runScopedQuery"
         />
       </template>
@@ -42,7 +42,7 @@
   </div>
 </template>
 
-<script lang="ts" setup="" name="tenantGameAppServerConfig">
+<script lang="ts" setup="" name="gameAppServerConfig">
 import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import {computed, onMounted, ref} from 'vue'
 import {useCrudTable} from '../../../composables/useCrudTable.ts'
@@ -54,7 +54,7 @@ import { gameAppServerConfigPagePost, gameAppServerConfigDeletePost } from '../.
 import type {CrudColumnConfig} from '../../../components/crud-data-table/types.ts'
 
 const editDialogRef = ref()
-const editTenantGameAppServerConfigTitle = ref('')
+const editGameAppServerConfigTitle = ref('')
 
 
 const {
@@ -88,18 +88,18 @@ const shortenMd5 = (md5: any) => {
 }
 
 // 打开新增页面
-const openAddTenantGameAppServerConfig = () => {
+const openAddGameAppServerConfig = () => {
 
 
-  editTenantGameAppServerConfigTitle.value = t('message.client.addServerConfig')
+  editGameAppServerConfigTitle.value = t('message.client.addServerConfig')
   editDialogRef.value.isEditor = false
   editDialogRef.value.openDialog({})
 }
 
 // 打开编辑页面
-const openEditTenantGameAppServerConfig = (row: any) => {
+const openEditGameAppServerConfig = (row: any) => {
 
-  editTenantGameAppServerConfigTitle.value = t('message.client.editServerConfig')
+  editGameAppServerConfigTitle.value = t('message.client.editServerConfig')
   editDialogRef.value.isEditor = true
   editDialogRef.value.openDialog(row)
 }
@@ -121,7 +121,7 @@ const columns = computed<CrudColumnConfig[]>(() => [
 ])
 
 const actions = {
-  edit: openEditTenantGameAppServerConfig,
+  edit: openEditGameAppServerConfig,
   delete: onScopedDelete,
 }
 

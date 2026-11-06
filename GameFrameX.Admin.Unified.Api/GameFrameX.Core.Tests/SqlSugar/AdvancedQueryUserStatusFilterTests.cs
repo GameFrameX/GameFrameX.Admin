@@ -1,7 +1,7 @@
 using GameFrameX.Core.Enum;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Entity.Enum;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 using SqlSugar;
 
 namespace GameFrameX.Core.Tests.SqlSugar;
@@ -25,7 +25,7 @@ public sealed class AdvancedQueryUserStatusFilterTests : IDisposable
         SqlSugarUnifiedConfig.ConfigureBaseSettings(config);
         _db = new SqlSugarScope(config);
         SqlSugarUnifiedConfig.ConfigureBaseFilters(_db);
-        _db.CodeFirst.InitTables(typeof(TenantGameUserEntity));
+        _db.CodeFirst.InitTables(typeof(GameUserEntity));
     }
 
     [Fact]
@@ -45,9 +45,9 @@ public sealed class AdvancedQueryUserStatusFilterTests : IDisposable
         Assert.Equal(3, all.Count);
     }
 
-    private ISugarQueryable<TenantGameUserEntity> BuildQuery(GameUserStatus? status)
+    private ISugarQueryable<GameUserEntity> BuildQuery(GameUserStatus? status)
     {
-        return _db.Queryable<TenantGameUserEntity>()
+        return _db.Queryable<GameUserEntity>()
                   .WhereIF(status.HasValue, u => u.Status == status!.Value);
     }
 
@@ -59,10 +59,10 @@ public sealed class AdvancedQueryUserStatusFilterTests : IDisposable
         await _db.Insertable(BuildUser(3, "u3", GameUserStatus.New, now)).ExecuteCommandAsync();
     }
 
-    private static TenantGameUserEntity BuildUser(long id, string name, GameUserStatus status, long now)
+    private static GameUserEntity BuildUser(long id, string name, GameUserStatus status, long now)
     {
         // 非空字符串列全部给占位值，满足 Sqlite NOT NULL 约束（本测试只断言 Status 过滤形状）。
-        return new TenantGameUserEntity
+        return new GameUserEntity
         {
             Id = id, UserName = name, Name = name, Password = "p", Email = name + "@e", EmailPassword = "ep",
             Phone = "", Avatar = "", GoogleId = "", AppleId = "", FacebookId = "", TwitterId = "",

@@ -2,8 +2,8 @@ namespace GameFrameX.Core.Service.Message;
 
 /// <summary>
 /// 平台系统邮件发送服务。
-/// <para>配置存主库 / SuperAdmin-only，不依赖当前请求租户上下文。</para>
-/// <para>关键约束：本服务不得用于租户玩家邮件，也不得作为租户业务邮件的 fallback。</para>
+/// <para>配置存主库 / SuperAdmin-only，不依赖请求上下文。</para>
+/// <para>关键约束：本服务不得用于玩家邮件，也不得作为业务邮件的 fallback。</para>
 /// <para>缺配置 / 缺凭据 / 发送失败返回 <c>false</c> 并记录警告，不抛业务异常；测试发送由 <c>SystemEmailProviderService.SendTestEmail</c> 暴露。</para>
 /// </summary>
 public interface ISystemEmailSender

@@ -2,8 +2,8 @@
   <BaseEditDialog
     ref="dialogRef"
     :title="props.title"
-    :addApi="(params: any) => tenantFileUpdatePost(params)"
-    :updateApi="(params: any) => tenantFileUpdatePost(params)"
+    :addApi="(params: any) => fileUpdatePost(params)"
+    :updateApi="(params: any) => fileUpdatePost(params)"
     idCheckMode="system"
     @reloadTable="emits('query')"
   >
@@ -18,7 +18,7 @@
 
 import {ref} from 'vue'
 import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
-import {tenantFileUpdatePost} from '../../../../api/tenantFile';
+import {fileUpdatePost} from '../../../../api/file';
 
 const props = defineProps({title: String, systemFileId: Number})
 const emits = defineEmits(['query'])

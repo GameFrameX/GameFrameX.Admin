@@ -67,7 +67,7 @@ Client API and Hub API are both "leaner": Client API only references Entity + Pa
 
 1. **Write a Service and you get APIs for free** (Admin API). Implement `IDynamicApiController`, and the public methods in your class automatically become REST endpoints — no hand-written Controllers, no hand-pasted `[Route]`. This is the soul of Admin API.
 2. **Write an entity and tables get created for free**. SqlSugar Code-First: at startup it scans entity classes → creates tables → fills seed data. You never write a line of DDL SQL; change a field, restart, and the table schema catches up.
-3. **One main database for all hosts**. Repositories use `ConfigId=main`; login and business data have no tenant or application dimension. Soft deletion and creator data permissions remain.
+3. **One main database for all hosts**. Repositories use `ConfigId=main`; login and business data have no multi-database dimension. Soft deletion and creator data permissions remain.
 
 ---
 
@@ -107,7 +107,7 @@ Admin API (20802)                Client API (20808)              Hub API (20806)
 The dependency graph looks like this (arrows point left to right, i.e. reference direction):
 
 ```
-Web.Api → Web.Core → Application.{System, Game, Client, Tenant} → Core → Entity → Core.Enum
+Web.Api → Web.Core → Application.{System, Game, Client, Business} → Core → Entity → Core.Enum
 Client.Api (independent, only references Entity + Payment)
 Hub.Api (independent, references Application.Game + Core + Entity, but its Controllers do not call Application Services)
 ```
@@ -134,7 +134,7 @@ GameFrameX.Admin.Unified.Api/
 ├── GameFrameX.Application.System/ # System management services (users/roles/menus/logs...)
 ├── GameFrameX.Application.Game/   # Game management services (zones/orders/mails/redeem codes...)
 ├── GameFrameX.Application.Client/ # Client management services (versions/channels/asset packages...)
-├── GameFrameX.Application.Tenant/ # Business services (devices / device groups; legacy project name)
+├── GameFrameX.Application.Business/ # Business services (devices / device groups)
 ├── GameFrameX.Entity/             # Entity layer (Base / System / Game / Client)
 ├── GameFrameX.Core/               # Core layer (repositories, service base classes, auth, SignalR)
 ├── GameFrameX.Core.Enum/          # Enum definitions
@@ -176,13 +176,12 @@ Note: SQLite is for local development/debugging only. SQLite is forbidden in liv
 **Production / containers (PostgreSQL, override env vars in pairs)**: when overriding the database, the type and the connection string must be set **as a pair**; a half override fails outright at startup. All three hosts (Web / Client / Hub) use **the same pair of variables**:
 
 - `GFX_MAIN_DB_TYPE=PostgreSQL` + `GFX_MAIN_DB_CONNECTION_STRING=Host=...`
-- All three hosts use only `ConfigId=main`. There is no automatic tenant database creation or derivation.
+- All three hosts use only `ConfigId=main`; the single main database is the entire database estate — no other databases are created or derived.
 - The legacy bare `DbType` / `ConnectionString` startup parameters still work (compatibility layer); startup prints a migration warning — switch soon
 - For other databases (MySQL / Oracle / DM… all 34 DbTypes), connection string syntax and examples: [`GameFrameX.Application/Configuration/Database-ConnectionStrings.md`](GameFrameX.Application/Configuration/Database-ConnectionStrings.md)
 
 A few more database conventions worth knowing:
 
-- **Upgrade a default self-hosted instance**: stop writes and back up both databases, then run `db/single-main/migrate-default-instance.sh --dry-run` before `--execute`. Set `GFX_MIGRATION_DATABASE_TYPE`, `GFX_MIGRATION_SOURCE`, and `GFX_MIGRATION_TARGET`. The tool rejects multiple tenants/applications and conflicting data; dry-run rolls back, and repeated execution is idempotent.
 - **Compose ships PostgreSQL**. Running `docker compose up` from the repository root starts a `postgres:16-alpine` (first startup creates the databases automatically, see `docker/postgres/init.sql`; data lands in the repository root `postgres-data/` bind mount). To reuse an existing postgres container on the host, set `POSTGRES_HOST=host.docker.internal` etc. in the repository root `.env` and remove the api services' `depends_on` on `postgres`.
 - **All three hosts read the same default config**. Client / Hub automatically load `Database.json` at startup (same source as Admin; change it once and all three pick it up); environment variable overrides work the same way as compose.
 
@@ -288,7 +287,7 @@ Infrastructure components (SqlSugar, JWT, SignalR, EventBus and friends) are reg
 
 ### Repositories and the Main Database
 
-`SqlSugarRepository<T>` always uses the main connection (`ConfigId=main`). Entity attributes no longer select a tenant database.
+`SqlSugarRepository<T>` always uses the main connection (`ConfigId=main`); all three hosts share the single main database.
 
 ### Authentication: Shared JWT, Plus Signatures
 
@@ -320,7 +319,7 @@ SqlSugar AOP does this for you in `SqlSugarSetup.SetDbAop()`:
 | Insert | `CreatedTime`, `CreatedId`, `CreatedName` |
 | Update | `UpdateTime`, `UpdatedId`, `UpdatedName` |
 
-It also writes data changes into the audit log (`SystemLogDiff` / `TenantLogDiff`) along the way. So when you create entities you never assign audit fields yourself — the framework fills them in.
+It also writes data changes into the audit log (`SystemLogDiff` / `LogDiff`) along the way. So when you create entities you never assign audit fields yourself — the framework fills them in.
 
 ### Snowflake IDs
 
@@ -359,7 +358,7 @@ The frontend only recognizes this structure: `Code === 200` passes, everything e
 ### SignalR Real-Time Communication
 
 - Hub: `OnlineUserHub`, path `/hubs/onlineUser`
-- Connections use authenticated user identities; there are no tenant message groups.
+- Connections use authenticated user identities.
 - Capabilities: online user list, force logout, message sending (unicast / broadcast / exclude-self / target user)
 - For multi-instance deployment, optional Redis Backplane + Data Protection Key persistence lets messages fan out across instances
 
@@ -390,12 +389,12 @@ This is the iron law of Hub.Api. Controllers inject repositories in their constr
 |------|----------|-----------|------|
 | Logged-in user | JWT (`[Authorize]`) | Authenticated user | Container orchestration / asset-version writeback |
 | Anonymous WebHook | - | - | None compiled in this host |
-| Machine to machine | `[AllowAnonymous]` + `TenantGameAppOpenAccessAuthMiddleware` | Credential-bound user | `PackageBuildReportController` / `FeatureSwitchSyncController` |
+| Machine to machine | `[AllowAnonymous]` + open-access HMAC auth middleware (machine channel) | Credential-bound user | `PackageBuildReportController` / `FeatureSwitchSyncController` |
 
 The machine-credential path validates AccessKey + signature + scope, **not JWT**, so the Controller is marked `[AllowAnonymous]` to skip JWT and a dedicated middleware takes over.
 
 **4. Main database and credential-bound identity.**
-JWT requests use the authenticated user. Machine requests validate AccessKey, HMAC signature, scope, revocation and the bound user; credentials no longer select a tenant or application.
+JWT requests use the authenticated user. Machine requests validate AccessKey, HMAC signature, scope, revocation and the bound user; credentials bind a user directly and select nothing else.
 
 **5. Ships its own optimistic-lock middleware and health checks.**
 `OptimisticConcurrencyMiddleware` sits at the very front of the pipeline, backstopping write operations that need concurrency control. There are three health check endpoints: `/health`, `/health/live`, `/health/ready` (compose uses them for liveness probes).
@@ -407,7 +406,7 @@ OptimisticConcurrencyMiddleware
   → Swagger (switch-controlled)
   → CORS
   → Authentication → Authorization
-  → TenantGameAppOpenAccessAuthMiddleware (/api/PackageBuildReport / /api/FeatureSwitchSync)
+  → Open-access HMAC auth middleware (/api/PackageBuildReport / /api/FeatureSwitchSync)
   → HealthChecks / MapControllers
 ```
 
@@ -438,14 +437,14 @@ A complete back-office management module built on the in-house dynamic API routi
 | Feature | Service Class | What It Does |
 |------|--------|--------|
 | Auth login | `SystemAuthService` | Account/password login, JWT issuance + auto renewal, captcha |
-| User management | `SystemUserService` | User CRUD, password reset, user-role binding (note: this service actually manages `TenantUser`; the naming is a bit misleading) |
-| Role management | `TenantRoleService` | Role CRUD, data-scope control, role-menu permission binding |
+| User management | `SystemUserService` | User CRUD, password reset, user-role binding |
+| Role management | `RoleService` | Role CRUD, data-scope control, role-menu permission binding |
 | Menu permissions | `GlobalMenuService` | Tree menus, button-level permission resolution, route-to-API mapping |
 | Dictionary management | `GlobalDictTypeService` / `GlobalDictDataService` | Dictionary type and value CRUD, status toggling |
-| File management | `TenantFileService` | File upload/download, OSS object storage |
+| File management | `FileService` | File upload/download, OSS object storage |
 | Scheduled jobs | `SystemJobService` | Job and trigger CRUD, pause / start / run now, cluster coordination |
 | Database management | `SystemDatabaseService` | Table / column CRUD, online schema management |
-| Online users | `TenantOnlineUserService` | Real-time online list, force logout, single sign-on |
+| Online users | `OnlineUserService` | Real-time online list, force logout, single sign-on |
 | Logging | `LogOperationService` / `LogExceptionService` / `LogVisitService` / `LogDiffService` | Operation, exception, visit logs and data-change audits, with Excel export |
 | Cache management | `SystemCacheService` | Unified cache abstraction (Memory / Redis), cache key management |
 | System config | `SystemConfigService` | Key-value config CRUD |
@@ -489,9 +488,9 @@ Configuration management modules for client apps.
 | Asset packages | `GameAppAssetPackageService` | AssetBundle / asset package management |
 | Asset versions | `GameAppAssetPackageVersionService` | Asset package version tracking |
 | Asset history | `GameAppAssetPackageVersionHistoryService` | Asset version change history |
-| Channel definitions | `GlobalChannelDefinitionService` / `TenantChannelDefinitionService` | Distribution channels (App Store, Google Play, etc.) |
-| Device management | `TenantDeviceService` | Device registration and identification (in `Application.Tenant`) |
-| Device groups | `TenantDeviceGroupService` | Device grouping (grayscale / A/B testing, in `Application.Tenant`) |
+| Channel definitions | `GlobalChannelDefinitionService` / `ChannelDefinitionService` | Distribution channels (App Store, Google Play, etc.) |
+| Device management | `DeviceService` | Device registration and identification (in `Application.Business`) |
+| Device groups | `DeviceGroupService` | Device grouping (grayscale / A/B testing, in `Application.Business`) |
 | Languages | `GlobalLanguageService` | Supported language configuration |
 | Package splitting | `GameAppPackageService` | App package splitting, channel binding and base-package inheritance |
 | Platform management | `GlobalPlatformService` | Runtime platforms (iOS, Android, etc.) |
@@ -552,7 +551,7 @@ Pick an entity base class as needed:
 
 | Base Class | Characteristics | Use Case |
 |------|------|----------|
-| `EntityBaseId` | Only `Id` | Join tables, non-tenant entities |
+| `EntityBaseId` | Only `Id` | Join tables, entities without creator/audit columns |
 | `EntityBase` | Id + audit fields + soft delete | Main-database entities |
 | `EntityBasic` | Inherits `EntityBase` | General-purpose business entities (most common) |
 | `EntityBasicData` | Creator-based data permissions | Filter by `CreatedId` |
@@ -579,7 +578,7 @@ Seed data uses `StorageableByObject` to InsertOrUpdate by primary key, so repeat
 
 ### 3. Write the Service
 
-Create the service under `GameFrameX.Application.Game/Service/` (or System / Client / Tenant):
+Create the service under `GameFrameX.Application.Game/Service/` (or System / Client / Business):
 
 ```csharp
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
@@ -729,7 +728,7 @@ Seeds upsert by primary key. If the key didn't change, existing rows aren't over
 Hub reuses Admin's JWT key but reads the `JWTSettings` node from its own `appsettings.json`. The key settings (`IssuerSigningKey` / `ValidIssuer` / `ValidAudience`) must match on both sides. If they don't, the tokens each side issues aren't accepted by the other.
 
 **Build reporting (PackageBuildReport) returns 401?**
-Machine channels use AccessKey, HMAC signature, scope and the bound user through `TenantGameAppOpenAccessAuthMiddleware`.
+Machine channels use AccessKey, HMAC signature, scope and the bound user through the open-access HMAC auth middleware.
 
 ### Pitfalls
 
@@ -772,13 +771,26 @@ All three Dockerfiles are multi-stage builds (`sdk:10.0` for packaging → `aspn
 
 > Naming history: the compose service was once named `web-entry` (carried over from the old "Web.Entry"); renamed to `web-api` as of 2026-10-20 to align with GameFrameX.Web.Api.
 
+### First Deployment: Superadmin Password and the First Business Administrator
+
+On the very first startup against an empty database, web-api runs the "first business administrator bootstrap" (C406 / F3) after table creation and seeding. The two initial accounts come from separate environment variables with different responsibilities:
+
+| Environment variable | Purpose | When it takes effect |
+|---|---|---|
+| `GFX_SUPERADMIN_INITIAL_PASSWORD` | Initial password of the platform superadmin `superadmin`; if unset the password stays empty and the first visit to the login page goes through the first-install wizard | Only when the first-install seed inserts it |
+| `GAMEFRAMEX_ADMIN_INITIAL_ACCOUNT` + `GAMEFRAMEX_ADMIN_INITIAL_PASSWORD` | Account and initial password of the **first business administrator**: created automatically at startup, bound to the built-in `sys_admin` role (all non-superadmin menus granted; the superadmin-only subtree excluded), then used to sign in to the business back office | Both variables set together, and the main database contains no business administrator yet; the password must satisfy the platform password-strength policy, otherwise startup fails |
+
+Idempotency: once the account exists it is neither recreated nor is its password overwritten; on every startup the `sys_admin` menu grants only add newly introduced seed menus and never remove existing grants (manual narrowing done by operators in role management survives restarts). When neither variable is set and no business administrator exists, startup logs a "business administrator not initialized" warning. No log line ever prints a password.
+
+> Password strength: the platform password policy is **off by default** on a fresh install (`strongPassword=false`), so neither initial password is strength-checked. Once enabled it requires 6–16 characters including upper case, lower case, digits and a special character. Set the initial passwords to that shape (12+ characters) and enable the policy before exposing the service.
+
 ### Pre-Release Checklist: Database Re-Seeding and Compact Short IDs
 
-This section describes only the historical long-ID to compact-ID upgrade (2026-09-15), which has no data conversion script. Instances already using compact IDs can use the default-instance single-main migration described above; it does not convert long IDs.
+This section describes only the historical long-ID to compact-ID upgrade (2026-09-15), which has no data conversion script. Since C406 there is no migration tooling at all: 2.0 only supports fresh single-main-database initialization; legacy databases must be rolled back wholesale from a pre-release backup.
 
-The compact short ID layout ships with a **resettable, no-migration-script policy** (decision 2026-09-15): old and new ID layouts are incompatible; production PG main / tenant databases ship by "wipe and re-seed", and mixing old and new IDs is not allowed. Go through this before release:
+The compact short ID layout ships with a **resettable, no-migration-script policy** (decision 2026-09-15): old and new ID layouts are incompatible; the production PG main database ships by "wipe and re-seed", and mixing old and new IDs is not allowed. Go through this before release:
 
-1. **Wipe and re-seed**: empty the production PG main database and all tenant databases; each host rebuilds on startup (CodeFirst table creation + seed re-insertion). Do not migrate data with 18-19 digit long Ids from old databases into the new layout — overlapping old/new Id spaces is a data-integrity incident.
+1. **Wipe and re-seed**: empty the production PG main database; each host rebuilds on startup (CodeFirst table creation + seed re-insertion). Do not migrate data with 18-19 digit long Ids from old databases into the new layout — overlapping old/new Id spaces is a data-integrity incident.
 2. **WorkerId mutual-exclusion check**: all instances writing to the same database (Web.Api replicas / Hub / Client) must have pairwise-different `SnowFlake__WorkerId` values in 0-7. The defaults 1/2/3 only guarantee no collisions on a single-machine deployment; assign explicitly before scaling replicas.
 3. **Magnitude spot-check**: after re-seeding, spot-check business-table primary keys — they should be 13-14 digit numbers (< 2^53). Seeing 18-19 digits means some path skipped Foundation's ID generation; stop and investigate.
 

@@ -1,6 +1,6 @@
 using GameFrameX.Application.ClientDelivery.AppScope;
 using GameFrameX.Core.SqlSugar;
-using GameFrameX.Entity.Tenant.Game.Resource;
+using GameFrameX.Entity.Business.Game.Resource;
 using SqlSugar;
 
 namespace GameFrameX.Core.Tests.AppScope;
@@ -23,7 +23,7 @@ public sealed class AssetPackageScopeValidatorTests : IDisposable
         SqlSugarUnifiedConfig.ConfigureBaseSettings(config);
         _db = new SqlSugarScope(config);
         SqlSugarUnifiedConfig.ConfigureBaseFilters(_db);
-        _db.CodeFirst.InitTables(typeof(TenantGameAppAssetPackageEntity));
+        _db.CodeFirst.InitTables(typeof(GameAppAssetPackageEntity));
     }
 
     /// <summary>
@@ -66,22 +66,22 @@ public sealed class AssetPackageScopeValidatorTests : IDisposable
                                         AssetPackageScopeValidator.ValidateAsync(assetPackageName, Query()).GetAwaiter().GetResult());
     }
 
-    private ISugarQueryable<TenantGameAppAssetPackageEntity> Query()
+    private ISugarQueryable<GameAppAssetPackageEntity> Query()
     {
-        return _db.Queryable<TenantGameAppAssetPackageEntity>();
+        return _db.Queryable<GameAppAssetPackageEntity>();
     }
 
     private async Task SeedAsync()
     {
         var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
-        await _db.Insertable(BuildAssetPackage(1, 100, "base", now)).ExecuteCommandAsync();
-        await _db.Insertable(BuildAssetPackage(2, 200, "patch", now)).ExecuteCommandAsync();
+        await _db.Insertable(BuildAssetPackage(1, "base", now)).ExecuteCommandAsync();
+        await _db.Insertable(BuildAssetPackage(2, "patch", now)).ExecuteCommandAsync();
     }
 
-    private static TenantGameAppAssetPackageEntity BuildAssetPackage(long id, long gameAppId, string name, long now)
+    private static GameAppAssetPackageEntity BuildAssetPackage(long id, string name, long now)
     {
-        return new TenantGameAppAssetPackageEntity
+        return new GameAppAssetPackageEntity
         {
             Id = id,
             Name = name,

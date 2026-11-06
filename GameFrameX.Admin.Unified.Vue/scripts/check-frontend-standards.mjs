@@ -846,7 +846,7 @@ function selfTest() {
     assert(splitArgs('"a,b", null, Flag.A | Flag.B').length === 3, 'splitArgs should ignore commas inside strings')
     assert(changedSourceFiles().every((file) => file.startsWith(ROOT)), 'changed source files should be absolute paths')
     assert(isQueryOperationName('pageGameEntity'), 'page operation should be treated as a query')
-    assert(isGeneratedFilterGetCall('apiTenantOrgListGet', 'state.queryParams.name'), 'generated list GET with queryParams should be blocked')
+    assert(isGeneratedFilterGetCall('apiOrgListGet', 'state.queryParams.name'), 'generated list GET with queryParams should be blocked')
     assert(!isGeneratedFilterGetCall('apiSysEnumEnumDataListGet', '"GameLanguage"'), 'plain dictionary GET should not be blocked')
     const requestSample = "export const pageX = (params) => request({\n  url: Api.Page,\n  method: 'get',\n  params,\n})"
     const requestIndex = requestSample.indexOf('request(')
@@ -867,18 +867,19 @@ function selfTest() {
     const additionDiff = diffFrozenAgainstSnapshot(['src/a/One.vue', 'src/b/Two.vue'], ['src/a/One.vue'])
     assert(additionDiff.additions.length === 1 && additionDiff.additions[0] === 'src/b/Two.vue', 'unregistered frozen entry should be flagged as addition')
     assert(diffFrozenAgainstSnapshot(['src/a/One.vue'], ['src/a/One.vue', 'src/c/Gone.vue']).stale.length === 1, 'shrunk entry should surface as stale snapshot hint, not a failure')
-    // GFX-734 守卫：views 顶层白名单 + 静态路由 appScope↔文件首段（先红后绿构造样本）
+    // GFX-734 守卫：views 顶层白名单 + 静态路由文件首段（先红后绿构造样本）
+    // c406-keep: retired audience segment remains a negative whitelist assertion.
     assert(viewsTopLevelViolation('tenant') !== null, 'retired audience segment should fail views whitelist')
     assert(viewsTopLevelViolation('system') === null, 'flat system directory should pass views whitelist')
     assert(viewsTopLevelViolation('unknownCenter') !== null, 'unknown directory should violate views whitelist')
-    assert(staticRouteScopeViolation('dashboard/home/index.vue', null) === null, 'flat dashboard needs no audience scope')
-    assert(staticRouteScopeViolation('gmCenter/onlineDashboard/index.vue', 'app') !== null, 'flat directory rejects retired scope metadata')
-    assert(staticRouteScopeViolation('app/appCenter/appWorkspace/index.vue', 'app') !== null, 'appScope=app with app/ first segment should pass')
-    assert(staticRouteScopeViolation('tenant/appCenter/appEntry/index.vue', 'app') !== null, 'appScope=app with tenant/ first segment should violate')
-    assert(staticRouteScopeViolation('tenant/appHome/AppHomeBoard.vue', 'tenant') !== null, 'appScope=tenant with tenant/ first segment should pass')
-    assert(staticRouteScopeViolation('platform/global/platformJwtConfig/index.vue', null) !== null, 'scopeless platform page should pass shared whitelist')
-    assert(staticRouteScopeViolation('login/index.vue', null) === null, 'scopeless shared page should pass shared whitelist')
-    assert(staticRouteScopeViolation('global/platform/index.vue', null) !== null, 'scopeless page outside shared whitelist should violate')
+    assert(staticRouteScopeViolation('dashboard/home/index.vue') === null, 'flat dashboard page should pass')
+    assert(staticRouteScopeViolation('gmCenter/onlineDashboard/index.vue') === null, 'flat operations page should pass')
+    assert(staticRouteScopeViolation('app/appCenter/appWorkspace/index.vue') !== null, 'retired app directory should violate')
+    assert(staticRouteScopeViolation('appCenter/appEntry/index.vue') !== null, 'unknown first segment should violate')
+    assert(staticRouteScopeViolation('appHome/AppHomeBoard.vue') !== null, 'retired app home directory should violate')
+    assert(staticRouteScopeViolation('platform/global/platformJwtConfig/index.vue') !== null, 'platform directory outside whitelist should violate')
+    assert(staticRouteScopeViolation('login/index.vue') === null, 'shared login page should pass')
+    assert(staticRouteScopeViolation('global/platform/index.vue') !== null, 'unknown global directory should violate')
     console.log('[self-test] pass')
     return true
 }
@@ -907,17 +908,15 @@ function checkViewsLayout() {
     return failures.length === 0
 }
 
-// ── 静态路由 appScope ↔ 文件首段一致性守护（GFX-734 / C325）────────────────────
-// route.ts / appWorkspaceRoutes.ts 中静态路由的 meta.appScope
-// 必须与 component 文件路径首段一致：app→app、tenant→tenant、无 appScope⇒platform 或共享目录。
+// ── 静态路由文件首段一致性守护（GFX-734 / C325）────────────────────
+// route.ts 中静态路由的 component 文件路径首段必须属于当前运营中心或共享目录。
 const STATIC_ROUTE_SCOPE_FILES = ['src/router/route.ts']
 const SHARED_ROUTE_FIRST_SEGMENTS = new Set(['login', 'error', ...OPERATION_CENTER_DIRECTORIES])
 
-function staticRouteScopeViolation(viewPath, appScope) {
+function staticRouteScopeViolation(viewPath) {
     const firstSegment = viewPath.split('/')[0]
-    if (appScope != null) return `退役的 appScope 元数据仍存在：${appScope}`
     if (!SHARED_ROUTE_FIRST_SEGMENTS.has(firstSegment)) {
-        return `无 appScope（平台/共享页）但 component 文件首段 "${firstSegment}" 不在共享白名单 [${[...SHARED_ROUTE_FIRST_SEGMENTS].join(', ')}]（/@/views/${viewPath}）`
+        return `component 文件首段 "${firstSegment}" 不在运营中心和共享白名单 [${[...SHARED_ROUTE_FIRST_SEGMENTS].join(', ')}]（/@/views/${viewPath}）`
     }
     return null
 }
@@ -934,11 +933,9 @@ function checkStaticRouteScopes() {
             const compMatch = chunk.match(/import\('\/@\/views\/([^']+)'\)/)
             if (!compMatch) continue
             const viewPath = compMatch[1]
-            const scopeMatch = chunk.match(/appScope:\s*'([^']+)'/)
-            const appScope = scopeMatch ? scopeMatch[1] : null
-            const label = `${relFile}: /@/views/${viewPath} (appScope=${appScope ?? 'none'})`
+            const label = `${relFile}: /@/views/${viewPath}`
             checked.push(label)
-            const violation = staticRouteScopeViolation(viewPath, appScope)
+            const violation = staticRouteScopeViolation(viewPath)
             if (violation) failures.push(`${label} — ${violation}`)
         }
     }
@@ -1073,7 +1070,7 @@ function checkComponentNames() {
     return failures.length === 0
 }
 
-// 反向守护（2026-09-17，tenantAppSignatureKeyEntity 菜单缺失事故防回潮）：
+// 反向守护（2026-09-17，appSignatureKeyEntity 菜单缺失事故防回潮）：
 // checkRoutes 只校验「种子 → 页面文件」方向；本检查补上「页面文件 → 种子/静态路由」方向——
 // src/views 下每个目录式页面入口（index.vue）必须被某条菜单种子 Component 引用，或被
 // src/router/*.ts 静态路由 import，否则该页面在任何租户的动态菜单里都不可达（孤儿页）。
@@ -1112,7 +1109,7 @@ function checkOrphanPages() {
         if (reason) {
             details.push(`allowed: ${module.rel} (${reason})`)
         } else {
-            failures.push(`${module.rel}: directory-style page entry referenced by no GlobalMenuSeedData component and no static route import — unreachable for every tenant; add the menu seed or register an orphanPages allowlist reason`)
+            failures.push(`${module.rel}: directory-style page entry referenced by no GlobalMenuSeedData component and no static route import — unreachable for every admin session; add the menu seed or register an orphanPages allowlist reason`)
         }
     }
 

@@ -40,7 +40,7 @@ export interface OnlineAssetGrantItemRequest {
  */
 export interface OnlineAssetGrantRequest {
   /**
-   * 区服作用域（必填，经 OnlineScopeContextFactory 校验租户与应用归属）。
+   * 区服作用域（必填，经 OnlineScopeContextFactory 校验区服归属）。
    * @min 1
    * @max 9223372036854776000
    */
@@ -73,7 +73,7 @@ export interface OnlineAssetGrantRequest {
  */
 export interface OnlineAssetRevokeRequest {
   /**
-   * 区服作用域（必填，经 OnlineScopeContextFactory 校验租户与应用归属）。
+   * 区服作用域（必填，经 OnlineScopeContextFactory 校验区服归属）。
    * @min 1
    * @max 9223372036854776000
    */

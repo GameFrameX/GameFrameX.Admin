@@ -1,5 +1,5 @@
 <template>
-  <div class="tenantGameAppRemoteConfig-container">
+  <div class="gameAppRemoteConfig-container">
     <Card>
       <template #content>
         <SearchForm
@@ -9,7 +9,7 @@
             authPrefix="gameAppRemoteConfig"
             @query="runScopedQuery"
 
-            @add="openAddTenantGameAppRemoteConfig"
+            @add="openAddGameAppRemoteConfig"
         />
       </template>
     </Card>
@@ -38,7 +38,7 @@
         </CrudDataTable>
         <editDialog
             ref="editDialogRef"
-            :title="editTenantGameAppRemoteConfigTitle"
+            :title="editGameAppRemoteConfigTitle"
             @reloadTable="runScopedQuery"
         />
         <contentEditDialog
@@ -51,7 +51,7 @@
   </div>
 </template>
 
-<script lang="ts" setup="" name="tenantGameAppRemoteConfig">
+<script lang="ts" setup="" name="gameAppRemoteConfig">
 import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import {computed, onMounted, ref} from 'vue'
 import {useCrudTable} from '../../../composables/useCrudTable.ts'
@@ -74,7 +74,7 @@ import { mapAvailableChannelDefinitions } from '../../../utils/channelDefinition
 
 const editDialogRef = ref()
 const contentEditDialogRef = ref()
-const editTenantGameAppRemoteConfigTitle = ref('')
+const editGameAppRemoteConfigTitle = ref('')
 const contentEditTitle = ref('')
 const modeMap = ref<Record<string, any>>({})
 
@@ -160,7 +160,7 @@ const onVersionQuery = async () => {
 }
 
 // 包名候选按当前应用加载：gameAppPackageListGet 已按应用过滤、默认包置顶。
-// 当前应用未确认时不展示候选，避免展示其它应用包名。
+// 当前产品未确认时不展示候选，避免展示无关包名。
 const buildPackageOptions = (packages: any[]) => {
   const options: any[] = [{label: t('message.client.appDefaultPackage'), value: 'default'}]
   for (const p of packages || []) {
@@ -185,18 +185,18 @@ const onPackageQuery = async () => {
 }
 
 // 打开新增页面
-const openAddTenantGameAppRemoteConfig = () => {
+const openAddGameAppRemoteConfig = () => {
 
 
-  editTenantGameAppRemoteConfigTitle.value = t('message.client.addRemoteConfig')
+  editGameAppRemoteConfigTitle.value = t('message.client.addRemoteConfig')
   editDialogRef.value.isEditor = false
   editDialogRef.value.openDialog({})
 }
 
 // 打开编辑页面
-const openEditTenantGameAppRemoteConfig = (row: any) => {
+const openEditGameAppRemoteConfig = (row: any) => {
 
-  editTenantGameAppRemoteConfigTitle.value = t('message.client.editRemoteConfig')
+  editGameAppRemoteConfigTitle.value = t('message.client.editRemoteConfig')
   editDialogRef.value.isEditor = true
   editDialogRef.value.openDialog(row)
 }
@@ -226,7 +226,7 @@ const columns = computed<CrudColumnConfig[]>(() => [
 ])
 
 const actions = {
-  edit: openEditTenantGameAppRemoteConfig,
+  edit: openEditGameAppRemoteConfig,
   delete: onScopedDelete,
 }
 

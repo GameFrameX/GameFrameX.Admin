@@ -38,7 +38,8 @@ export default {
       scopesRequired: '请至少选择一个接口范围',
 
       // Scopes 选项
-      scopePackageReport: '分包上报 (package-report)',
+      scopePackageBuildReport: '分包上报 (PackageBuildReport)',
+      scopeFeatureSwitchSync: '功能开关服务器同步 (FeatureSwitchSync)',
       revoke: '吊销',
       enable: '启用',
       disable: '禁用',

@@ -25,7 +25,7 @@ public sealed class AuthenticatedOnlyRouteWhitelistTests
 
     /// <summary>
     /// 仅登录端点必须显式标注 [AuthenticatedOnly]，
-    /// 端点仍需落在「仅需登录」档，否则 tenant admin 会被自动隐藏按钮挡成 403（GFX-683 回潮）。
+    /// 端点仍需落在「仅需登录」档，否则普通管理员会被自动隐藏按钮挡成 403（GFX-683 回潮）。
     /// </summary>
     [Theory]
     [MemberData(nameof(EscapeHatchActions))]

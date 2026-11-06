@@ -42,7 +42,7 @@ export default {
 
         // Current application context (game business pages)
 
-        // Config scope (tenant default / app override)
+        // Configuration scope (default / override)
         configScope: {
             gameDefault: 'Default configuration',
             scope: 'Scope',
@@ -55,7 +55,7 @@ export default {
         pleaseSelectEndTime: 'Please select end time',
         pleaseSelectOrderStatus: 'Please select order status',
         pleaseEnterGameVersion: 'Please enter game version',
-        pleaseSelectTenantGameAppVersionDefinition: 'Please select client version',
+        pleaseSelectGameAppVersionDefinition: 'Please select client version',
         pleaseEnterAttachmentList: 'Please enter attachment list',
         pleaseSelectMailExpiry: 'Please select mail expiry date',
         pleaseEnterTitleTemplate: 'Please enter title template',
@@ -123,7 +123,7 @@ export default {
             pleaseSelectPlatform: 'Please select platform',
             package: 'Package (optional)',
             pleaseSelectPackage: 'Please select package (optional)',
-            tenantGameAppVersionDefinition: 'Client Version',
+            gameAppVersionDefinition: 'Client Version',
             allowedPlayerProfile: 'Allowed Player Profile',
             pleaseEnterAllowedPlayerProfile: 'Please enter allowed player profile',
             serverEvents: 'Server Events',
@@ -364,7 +364,7 @@ export default {
             addSenderName: 'Add Sender Name',
             addAttachment: 'Add Attachment',
             name: 'Campaign Name',
-            namePlaceholder: 'Enter campaign name (unique per appId+areaId)',
+            namePlaceholder: 'Enter campaign name (unique per area)',
             nameRequired: 'Please enter campaign name',
             areaId: 'Area ID',
             areaIdRequired: 'Please select area',

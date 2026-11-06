@@ -174,7 +174,6 @@ const openDialog = async (row: any) => {
 }
 
 const beforeSubmit = (ruleForm: any) => {
-  delete ruleForm.appId
   ruleForm.content = ruleForm.content || '{}'
   ruleForm.modeContents = ruleForm.modeContents || '{}'
   ruleForm.isEnabled = ruleForm.isEnabled !== false

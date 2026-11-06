@@ -9,7 +9,7 @@
 #   （第三方契约例外已由 GFX-698（C292）登记）+ Payment.Abstract IOrderParamsGet*（支付 SDK 抽象接口）+ ServerParams
 #   （游戏区服参数，wire 字段联动）+ 散点（TemplateParamJson/CheckMenuParam/RequestParam/LogFieldSerialization）
 #   -> 待 Param 清理批次（外部契约面逐项评估改名成本）。
-#   -> 2026-09-17 广告域命名批次已执行：账本实体/管理面 Service+DTO/表列已全拼 Advertisement（tenant_game_advertisement_reward_entity），剩余为第三方 wire 镜像与枚举值专项。
+#   -> 2026-09-17 广告域命名批次已执行：账本实体/管理面 Service+DTO/表列已全拼 Advertisement（game_advertisement_reward_entity），剩余为第三方 wire 镜像与枚举值专项。
 # - Msg：LogMsg/PasswordStrengthValidationMsg 散点 -> 散点批次。
 # - Btn：已清零（GFX-711（C307）路由层 + GlobalMenuService 方法 3 个与 MenuTypeEnum.Btn 枚举成员随 Org 批次清理），无条目。
 # - Img：CaptchaResponse.Img（验证码图片字段，Admin wire 联动评估）-> 散点批次。
@@ -48,7 +48,7 @@ GameFrameX.Client.Api|GameFrameX.Client.Api.GameUserArchive.Dto.GameUserArchiveU
 GameFrameX.Client.Api|GameFrameX.Client.Api.GameUserSession.Dto.GameUserSessionLoginRequest|Property|AdGroup # Ad
 GameFrameX.Client.Api|GameFrameX.Client.Api.GameUserSession.Dto.GameUserSessionLoginRequest|Property|AdGroupId # Ad
 GameFrameX.Client.Api|GameFrameX.Client.Api.GameUserSession.Dto.GameUserSessionLoginRequest|Property|AdId # Ad
-GameFrameX.Client.Api|GameFrameX.Client.Api.GameWebShop.Dto.TenantGameWebShopEntityBuyNotifyRequest|Property|Param # Param
+GameFrameX.Client.Api|GameFrameX.Client.Api.GameWebShop.Dto.GameWebShopEntityBuyNotifyRequest|Property|Param # Param
 GameFrameX.Client.Api|GameFrameX.Client.Api.Integrations.Advertisement.Dto.AdMobCallbackRequest|Property|AdNetwork # Ad
 GameFrameX.Client.Api|GameFrameX.Client.Api.Integrations.Advertisement.Dto.AdMobCallbackRequest|Property|AdUnit # Ad
 GameFrameX.Client.Api|GameFrameX.Client.Api.Integrations.Advertisement.GameAdWebHookController+PlayerSendAdvertisementItemRequest|Property|AdPackageId # Ad
@@ -66,7 +66,7 @@ GameFrameX.Core|GameFrameX.Core.Service.PlatformPasswordPolicy.PlatformPasswordP
 GameFrameX.Core|GameFrameX.Core.Service.PlatformPasswordPolicy.PlatformPasswordPolicySettings|Property|PasswordStrengthValidationMsg # Msg
 GameFrameX.Entity|GameFrameX.Entity.Enum.ChannelTypeEnum|Field|Ad # Ad
 GameFrameX.Entity|GameFrameX.Entity.Log.LogOperationFields|Property|RequestParam # Param
-GameFrameX.Entity|GameFrameX.Entity.Tenant.Game.TenantGameAreaEntity|Property|ServerParams # Params
+GameFrameX.Entity|GameFrameX.Entity.Business.Game.GameAreaEntity|Property|ServerParams # Params
 GameFrameX.Payment.Abstract|GameFrameX.Payment.Abstract.IOrderParamsGetList|Type|IOrderParamsGetList # Params
 GameFrameX.Payment.Abstract|GameFrameX.Payment.Abstract.IOrderParamsGet|Type|IOrderParamsGet # Params
 GameFrameX.Payment.Xsolla|GameFrameX.Payment.Xsolla.Models.OrderParamsGetList|Type|OrderParamsGetList # Params

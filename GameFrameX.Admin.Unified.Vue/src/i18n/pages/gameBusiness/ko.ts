@@ -42,7 +42,7 @@ export default {
 
         // Current application context (game business pages)
 
-        // Config scope (tenant default / app override)
+        // 설정 범위（기본 / 재정의）
         configScope: {
             gameDefault: '기본 설정',
             scope: '스코프',
@@ -55,7 +55,7 @@ export default {
         pleaseSelectEndTime: '종료 시간을 선택하세요',
         pleaseSelectOrderStatus: '주문 상태를 선택하세요',
         pleaseEnterGameVersion: '게임 버전을 입력하세요',
-        pleaseSelectTenantGameAppVersionDefinition: '클라이언트 버전을 선택하세요',
+        pleaseSelectGameAppVersionDefinition: '클라이언트 버전을 선택하세요',
         pleaseEnterAttachmentList: '첨부 목록을 입력하세요',
         pleaseSelectMailExpiry: '메일 만료 날짜를 선택하세요',
         pleaseEnterTitleTemplate: '제목 템플릿을 입력하세요',
@@ -123,7 +123,7 @@ export default {
             pleaseSelectPlatform: '플랫폼을 선택하세요',
             package: '패키지(선택)',
             pleaseSelectPackage: '패키지를 선택하세요(선택)',
-            tenantGameAppVersionDefinition: '클라이언트 버전',
+            gameAppVersionDefinition: '클라이언트 버전',
             allowedPlayerProfile: '허용 플레이어 프로필',
             pleaseEnterAllowedPlayerProfile: '허용 플레이어 프로필을 입력하세요',
             serverEvents: '서버 이벤트',
@@ -364,7 +364,7 @@ export default {
             addSenderName: '발신자 이름 추가',
             addAttachment: '첨부 추가',
             name: '캠페인 이름',
-            namePlaceholder: '캠페인 이름 입력 (appId+areaId 단위 고유)',
+            namePlaceholder: '캠페인 이름 입력 (영역 서버별 고유)',
             nameRequired: '캠페인 이름을 입력하세요',
             areaId: '영역 ID',
             areaIdRequired: '영역을 선택하세요',

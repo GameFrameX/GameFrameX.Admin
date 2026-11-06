@@ -4,7 +4,7 @@ using System.Text;
 using System.Text.Json;
 using GameFrameX.Core.Middleware;
 using GameFrameX.Core.SqlSugar;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
@@ -24,8 +24,6 @@ namespace GameFrameX.Core.Tests.ClientApi;
 /// </summary>
 public sealed class CryptoEnvelopeMiddlewareTests
 {
-    private const long TestAppId = 1001;
-
     // ===== HKDF RFC 5869 A.1 官方向量（test-vectors.json hkdf_rfc5869_a1） =====
     private const string A1IkmHex = "0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b";
     private const string A1SaltHex = "000102030405060708090a0b0c";
@@ -72,7 +70,7 @@ public sealed class CryptoEnvelopeMiddlewareTests
         };
     }
 
-    private static DefaultHttpContext CreateEnvelopeContext(string envelopeJson, string path = E1Path, string? query = "?op=BLLogin&userid=10086", string? cryptoHeader = "1", long? appId = TestAppId, long? tenantId = null)
+    private static DefaultHttpContext CreateEnvelopeContext(string envelopeJson, string path = E1Path, string? query = "?op=BLLogin&userid=10086", string? cryptoHeader = "1")
     {
         var context = new DefaultHttpContext();
         context.Response.Body = new MemoryStream();
@@ -89,15 +87,6 @@ public sealed class CryptoEnvelopeMiddlewareTests
             context.Request.Headers[CryptoEnvelopeMiddleware.CryptoHeader] = cryptoHeader;
         }
 
-        if (appId.HasValue)
-        {
-            context.Request.Headers["GameFrameX-App-Id"] = appId.Value.ToString();
-        }
-
-        if (tenantId.HasValue)
-        {
-            context.Items["TenantId"] = tenantId.Value;
-        }
 
         return context;
     }
@@ -108,7 +97,7 @@ public sealed class CryptoEnvelopeMiddlewareTests
     private static FakeSessionKeyResolver CreateKeyRing()
     {
         var resolver = new FakeSessionKeyResolver();
-        resolver.AddKey(TestAppId, VectorKid, DeriveSessionKeyHex, true, 0, null);
+        resolver.AddKey(VectorKid, DeriveSessionKeyHex, true, 0, null);
         return resolver;
     }
 
@@ -506,7 +495,7 @@ public sealed class CryptoEnvelopeMiddlewareTests
     public async Task WithoutAppHeader_ValidEnvelopeUsesMainKey()
     {
         var nextCalled = false;
-        var context = CreateEnvelopeContext(BuildEnvelopeJson(E1Path, E1Mid, E1Ts, HexToBytes(E1PayloadHex), false), appId: null);
+        var context = CreateEnvelopeContext(BuildEnvelopeJson(E1Path, E1Mid, E1Ts, HexToBytes(E1PayloadHex), false));
         await InvokeAsync(context, CreateOptions(true), () =>
         {
             nextCalled = true;
@@ -520,7 +509,7 @@ public sealed class CryptoEnvelopeMiddlewareTests
     public async Task DisabledKey_RejectedWith60105()
     {
         var ring = CreateKeyRing();
-        ring.AddKey(TestAppId, VectorKid, DeriveSessionKeyHex, false, 0, null);
+        ring.AddKey(VectorKid, DeriveSessionKeyHex, false, 0, null);
         var nextCalled = false;
         var context = CreateEnvelopeContext(BuildEnvelopeJson(E1Path, E1Mid, E1Ts, HexToBytes(E1PayloadHex), false));
 
@@ -539,7 +528,7 @@ public sealed class CryptoEnvelopeMiddlewareTests
     public async Task ExpiredKey_RejectedWith60105()
     {
         var ring = CreateKeyRing();
-        ring.AddKey(TestAppId, VectorKid, DeriveSessionKeyHex, true, 0, 1755244800); // 到期时刻 = 向量 ts（已过）
+        ring.AddKey(VectorKid, DeriveSessionKeyHex, true, 0, 1755244800); // 到期时刻 = 向量 ts（已过）
         var nextCalled = false;
         var context = CreateEnvelopeContext(BuildEnvelopeJson(E1Path, E1Mid, E1Ts, HexToBytes(E1PayloadHex), false));
 
@@ -589,9 +578,10 @@ public sealed class CryptoEnvelopeMiddlewareTests
     }
 
     [Fact]
-    public async Task LegacyTenantContext_DoesNotBypassDecryption()
+    public async Task LegacyScopeContext_DoesNotBypassDecryption()
     {
-        var context = CreateEnvelopeContext("{}", tenantId: 999);
+        var context = CreateEnvelopeContext("{}");
+        context.Items["tenantId"] = 999; // c406-keep
         var nextCalled = false;
         await InvokeAsync(context, CreateOptions(true), () =>
         {
@@ -669,9 +659,9 @@ public sealed class CryptoEnvelopeMiddlewareTests
         Assert.Equal(SessionKeyLookupResult.Expired, SessionKeyResolver.Judge(Key(0, now, true), now));
         return;
 
-        static TenantSessionKeyEntity Key(long? notBefore, long? expire, bool enabled)
+        static SessionKeyEntity Key(long? notBefore, long? expire, bool enabled)
         {
-            return new TenantSessionKeyEntity { NotBeforeTime = notBefore, ExpireTime = expire, IsEnabled = enabled, };
+            return new SessionKeyEntity { NotBeforeTime = notBefore, ExpireTime = expire, IsEnabled = enabled, };
         }
     }
 
@@ -685,16 +675,16 @@ public sealed class CryptoEnvelopeMiddlewareTests
     }
 
     /// <summary>
-    /// 密钥环内存桩：按 (AppId, Kid) 查找，租约/启用判定复用 <see cref="SessionKeyResolver.Judge"/>（与生产同一路径）。
+    /// 密钥环内存桩：按 Kid 查找，租约/启用判定复用 <see cref="SessionKeyResolver.Judge"/>（与生产同一路径）。
     /// </summary>
     private sealed class FakeSessionKeyResolver : ISessionKeyResolver
     {
-        private readonly List<TenantSessionKeyEntity> _keys = new();
+        private readonly List<SessionKeyEntity> _keys = new();
 
-        public void AddKey(long appId, string kid, string secret, bool enabled, long? notBefore, long? expire)
+        public void AddKey(string kid, string secret, bool enabled, long? notBefore, long? expire)
         {
             _keys.RemoveAll(x => x.Kid == kid);
-            _keys.Add(new TenantSessionKeyEntity
+            _keys.Add(new SessionKeyEntity
             {
                 Kid = kid,
                 Secret = secret,

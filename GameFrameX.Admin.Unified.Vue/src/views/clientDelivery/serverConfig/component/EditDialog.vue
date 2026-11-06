@@ -73,7 +73,6 @@ const openDialog = (row: any) => {
 }
 
 const beforeSubmit = (ruleForm: any) => {
-  delete ruleForm.appId
   ruleForm.enabled = ruleForm.enabled !== false
   ruleForm.description = ruleForm.description ?? ''
   try {

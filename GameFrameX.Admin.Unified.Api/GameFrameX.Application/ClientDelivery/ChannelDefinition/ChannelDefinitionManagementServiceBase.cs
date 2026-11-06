@@ -39,9 +39,8 @@ public abstract class ChannelDefinitionManagementServiceBase<TEntity>
     protected abstract ChannelScopeEnum ManagedScope { get; }
 
     /// <summary>
-    /// 渠道是否已被分包引用。租户作用域由派生类用本租户分包仓储判定；
-    /// 系统作用域（SuperAdmin、无租户上下文）默认不拦截——租户分包表分布在各租户库，
-    /// 构造租户仓储本身就会因缺少租户上下文抛错，且超管侧从未有过可达的单租户判定路径。
+    /// 渠道是否已被分包引用。业务作用域由派生类用分包仓储判定；
+    /// 系统作用域（SuperAdmin）默认不拦截——超管侧无单一业务归属可判定。
     /// </summary>
     /// <param name="channelId">渠道 Id。</param>
     /// <returns>被引用返回 true。</returns>
@@ -63,7 +62,7 @@ public abstract class ChannelDefinitionManagementServiceBase<TEntity>
 
         return Repository.AsQueryable()
                          .Filter(null, true)
-                         // Filter(null,true) 绕过租户过滤的同时也关掉了软删全局过滤，显式恢复（Api#287）
+                         // Filter(null,true) 绕过作用域过滤的同时也关掉了软删全局过滤，显式恢复（Api#287）
                          .Where(u => u.IsDeleted == false)
                          .Where(u => u.Scope == ManagedScope)
                          .WhereIF(!string.IsNullOrWhiteSpace(searchKey), u =>
@@ -114,7 +113,7 @@ public abstract class ChannelDefinitionManagementServiceBase<TEntity>
 
         if (ManagedScope == ChannelScopeEnum.System && !_currentUserContext.SuperAdmin)
         {
-            throw BusinessError.Oh("租户不能编辑系统渠道");
+            throw BusinessError.Oh("业务侧不能编辑系统渠道");
         }
 
         EnsureScopePermission();
@@ -161,7 +160,7 @@ public abstract class ChannelDefinitionManagementServiceBase<TEntity>
         var searchKey = input?.SearchKey?.Trim();
         var pageSize = Math.Min(input.PageSize > 0 ? input.PageSize : BaseSelectPageRequest.DefaultPageSize, BaseSelectPageRequest.MaxPageSize);
         var channels = new List<GameFrameX.Entity.System.ChannelDefinition>();
-        if (ManagedScope == ChannelScopeEnum.Tenant && _globalChannelRepository != null)
+        if (ManagedScope == ChannelScopeEnum.Business && _globalChannelRepository != null)
         {
             channels.AddRange(await _globalChannelRepository.AsQueryable()
                                                             .Filter(null, true)
@@ -214,7 +213,7 @@ public abstract class ChannelDefinitionManagementServiceBase<TEntity>
 
         if (ManagedScope == ChannelScopeEnum.System && !_currentUserContext.SuperAdmin)
         {
-            throw BusinessError.Oh("租户不能删除系统渠道");
+            throw BusinessError.Oh("业务侧不能删除系统渠道");
         }
 
         var referenced = await IsPackageReferencedAsync(input.Id);
@@ -267,20 +266,20 @@ public abstract class ChannelDefinitionManagementServiceBase<TEntity>
 
         if (existsSystemCode)
         {
-            throw BusinessError.Oh("租户渠道编码不能与系统渠道重复");
+            throw BusinessError.Oh("业务渠道编码不能与系统渠道重复");
         }
 
-        var existsTenantCode = excludeId.HasValue
+        var existsCode = excludeId.HasValue
                                    ? await Repository.AsQueryable().Filter(null, true)
-                                                     .AnyAsync(u => u.Scope == ChannelScopeEnum.Tenant &&
+                                                     .AnyAsync(u => u.Scope == ChannelScopeEnum.Business &&
                                                                     u.Code == code &&
                                                                     u.Id != excludeId.Value)
                                    : await Repository.AsQueryable().Filter(null, true)
-                                                     .AnyAsync(u => u.Scope == ChannelScopeEnum.Tenant &&
+                                                     .AnyAsync(u => u.Scope == ChannelScopeEnum.Business &&
                                                                     u.Code == code);
-        if (existsTenantCode)
+        if (existsCode)
         {
-            throw BusinessError.Oh("租户渠道编码已存在");
+            throw BusinessError.Oh("业务渠道编码已存在");
         }
     }
 
