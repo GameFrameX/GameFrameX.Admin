@@ -287,6 +287,11 @@ pnpm run dev    # 기본 http://localhost:20800
 
 브라우저를 열고 → 로그인 페이지가 보이면 → 백엔드 담당자에게 계정을 요청하세요.
 
+최초 배포 계정의 출처(백엔드 측 환경 변수 2개, 저장소 루트의 `.env.example` 참조):
+
+- `GFX_SUPERADMIN_INITIAL_PASSWORD`: superadmin `superadmin`의 초기 비밀번호. 설정하지 않으면 로그인 페이지 첫 접속 시 초기 설치 마법사에서 설정합니다.
+- `GAMEFRAMEX_ADMIN_INITIAL_ACCOUNT` + `GAMEFRAMEX_ADMIN_INITIAL_PASSWORD`: 쌍으로 설정하면 백엔드 기동 시 **첫 번째 업무 관리자** 계정을 자동 생성합니다(`sys_admin` 역할에 바인딩, 모든 non-superadmin 메뉴 부여). 이 계정으로 로그인하면 업무 관리 화면에 진입할 수 있습니다. 메인 DB에 업무 관리자가 아직 없는 동안에만 한 번 적용됩니다.
+
 ### 막혔다면?
 
 | 증상 | 가장 유력한 원인 |

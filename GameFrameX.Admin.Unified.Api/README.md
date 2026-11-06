@@ -771,6 +771,17 @@ All three Dockerfiles are multi-stage builds (`sdk:10.0` for packaging → `aspn
 
 > Naming history: the compose service was once named `web-entry` (carried over from the old "Web.Entry"); renamed to `web-api` as of 2026-10-20 to align with GameFrameX.Web.Api.
 
+### First Deployment: Superadmin Password and the First Business Administrator
+
+On the very first startup against an empty database, web-api runs the "first business administrator bootstrap" (C406 / F3) after table creation and seeding. The two initial accounts come from separate environment variables with different responsibilities:
+
+| Environment variable | Purpose | When it takes effect |
+|---|---|---|
+| `GFX_SUPERADMIN_INITIAL_PASSWORD` | Initial password of the platform superadmin `superadmin`; if unset the password stays empty and the first visit to the login page goes through the first-install wizard | Only when the first-install seed inserts it |
+| `GAMEFRAMEX_ADMIN_INITIAL_ACCOUNT` + `GAMEFRAMEX_ADMIN_INITIAL_PASSWORD` | Account and initial password of the **first business administrator**: created automatically at startup, bound to the built-in `sys_admin` role (all non-superadmin menus granted; the superadmin-only subtree excluded), then used to sign in to the business back office | Both variables set together, and the main database contains no business administrator yet; the password must satisfy the platform password-strength policy, otherwise startup fails |
+
+Idempotency: once the account exists it is neither recreated nor is its password overwritten; on every startup the `sys_admin` menu grants only add newly introduced seed menus and never remove existing grants (manual narrowing done by operators in role management survives restarts). When neither variable is set and no business administrator exists, startup logs a "business administrator not initialized" warning. No log line ever prints a password.
+
 ### Pre-Release Checklist: Database Re-Seeding and Compact Short IDs
 
 This section describes only the historical long-ID to compact-ID upgrade (2026-09-15), which has no data conversion script. Since C406 there is no migration tooling at all: 2.0 only supports fresh single-main-database initialization; legacy databases must be rolled back wholesale from a pre-release backup.

@@ -286,6 +286,11 @@ pnpm run dev    # 預設 http://localhost:20800
 
 打開瀏覽器 → 看到登入頁 → 找後端同學要帳號。
 
+首次部署的帳號從哪來（後端側兩個環境變數，見倉庫根 `.env.example`）：
+
+- `GFX_SUPERADMIN_INITIAL_PASSWORD`：超級管理員 `superadmin` 的初始密碼；不設則首次開啟登入頁走首裝嚮導設定。
+- `GAMEFRAMEX_ADMIN_INITIAL_ACCOUNT` + `GAMEFRAMEX_ADMIN_INITIAL_PASSWORD`：成對設定時，後端啟動會自動建立**首個業務管理員**帳號（綁定 `sys_admin` 角色、授權全部非超管選單），前端用它登入即可進業務後台；只在主庫還沒有任何業務管理員時生效一次。
+
 ### 卡住了？
 
 | 現象 | 大機率原因 |

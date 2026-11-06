@@ -287,6 +287,11 @@ pnpm run dev    # defaults to http://localhost:20800
 
 Open the browser → see the login page → ask a backend colleague for an account.
 
+Where the first-deployment accounts come from (two backend-side environment variables, see the repo-root `.env.example`):
+
+- `GFX_SUPERADMIN_INITIAL_PASSWORD`: initial password of the superadmin `superadmin`; if unset, the first visit to the login page goes through the first-install wizard to set one.
+- `GAMEFRAMEX_ADMIN_INITIAL_ACCOUNT` + `GAMEFRAMEX_ADMIN_INITIAL_PASSWORD`: when set together, backend startup automatically creates the **first business administrator** account (bound to the `sys_admin` role with all non-superadmin menus granted); sign in with it to enter the business back office. Takes effect only once, while the main database has no business administrator yet.
+
 ### Stuck?
 
 | Symptom | Most likely cause |
