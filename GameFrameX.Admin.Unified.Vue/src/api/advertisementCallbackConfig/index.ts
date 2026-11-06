@@ -39,7 +39,7 @@ export class AdvertisementCallbackConfig<SecurityDataType = unknown> {
    *
    * @tags advertisementCallbackConfig
    * @name AdvertisementCallbackConfigAddPost
-   * @summary 新增广告回调配置（主库内 Provider 唯一）。
+   * @summary 新增广告回调配置（同一分组的 (PackageId, Provider) 唯一）。
    * @request POST:/api/advertisementCallbackConfig/add
    */
   advertisementCallbackConfigAddPost = (
