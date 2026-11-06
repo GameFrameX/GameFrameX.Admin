@@ -106,6 +106,8 @@ public class Startup
         // UserService.ChangePwdAsync 读镜像实现保存后同 Host 动态生效
         services.AddSingleton<PlatformPasswordPolicyConfigProvider>();
         services.AddHostedService<PlatformPasswordPolicyStartupLoader>();
+        // C406 / F3：新装首个业务管理员种子引导（角色 + 菜单授权 + 环境变量账号）；须在密码策略加载之后注册
+        services.AddHostedService<InitialAdminStartupBootstrap>();
         // JWT
         services.AddHostedService<PlatformJwtStartupValidator>();
         // U6/C42：API 端点目录启动同步（端点登记→绑定迁移→自动隐藏按钮→预热权限缓存）。

@@ -50,6 +50,9 @@ services:
       ASPNETCORE_ENVIRONMENT: Production
       TZ: Asia/Shanghai
       Swagger__Enabled: "true"
+      # 新装首个业务管理员种子引导（C406 / F3）：成对设置且库中无业务管理员时启动期创建账号
+      GAMEFRAMEX_ADMIN_INITIAL_ACCOUNT: ${GAMEFRAMEX_ADMIN_INITIAL_ACCOUNT:-}
+      GAMEFRAMEX_ADMIN_INITIAL_PASSWORD: ${GAMEFRAMEX_ADMIN_INITIAL_PASSWORD:-}
     volumes:
       - ./GameFrameX.Admin.Unified.Api/GameFrameX.Web.Api/appsettings.json:/app/appsettings.json:ro
     extra_hosts:

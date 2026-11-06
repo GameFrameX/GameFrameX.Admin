@@ -7,6 +7,7 @@ GameFrameX.Admin.Unified.Api/GameFrameX.Core/Job/LogJob.cs	AsTenant	SqlSugar 原
 GameFrameX.Admin.Unified.Api/GameFrameX.Core/Service/Menu/GlobalMenuService.cs	AsTenant	SqlSugar 原生多库客户端 API，D2.5 不改名
 GameFrameX.Admin.Unified.Api/GameFrameX.Core/Logging/DatabaseLoggingWriter.cs	AsTenant	SqlSugar 原生多库客户端 API，D2.5 不改名
 GameFrameX.Admin.Unified.Api/GameFrameX.Application/Platform/DataBase/SystemDatabaseService.cs	AsTenant	SqlSugar 原生多库客户端 API（按 ConfigId 取连接），D2.5 不改名
+GameFrameX.Admin.Unified.Api/GameFrameX.Core/Bootstrap/InitialAdminBootstrap.cs	AsTenant	SqlSugar 原生多库客户端 API（GetConnectionScope(MainConfigId)），D2.5 不改名
 GameFrameX.Admin.Unified.Api/GameFrameX.Application/Audit/Retention/AuditRetentionService.cs	AsTenant	SqlSugar 原生多库客户端 API（GetConnectionScope(MainConfigId)），D2.5 不改名
 # D2.5：SqlSugar 原生 [Tenant] 特性反射（仅这两处 GetCustomAttribute<TenantAttribute>）
 GameFrameX.Admin.Unified.Api/GameFrameX.Core/SqlSugar/SqlSugarFilter.cs	Tenant	SqlSugar 原生 TenantAttribute 反射判断，D2.5 不改名

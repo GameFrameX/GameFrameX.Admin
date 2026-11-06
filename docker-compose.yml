@@ -143,6 +143,10 @@ services:
       # Swagger 在 Production 容器内显式开启（代码默认仅 Development 暴露，见 Startup.Configure）
       # 访问地址 http://localhost:20802/swagger；对外正式部署如不想暴露接口文档，删除本行即可
       Swagger__Enabled: "true"
+      # 新装首个业务管理员种子引导（C406 / F3）：两个变量成对设置且库中尚无业务管理员时，
+      # web-api 启动期自动创建该账号并绑定 sys_admin 角色；不设默认值，取值见 .env 注释
+      GAMEFRAMEX_ADMIN_INITIAL_ACCOUNT: ${GAMEFRAMEX_ADMIN_INITIAL_ACCOUNT:-}
+      GAMEFRAMEX_ADMIN_INITIAL_PASSWORD: ${GAMEFRAMEX_ADMIN_INITIAL_PASSWORD:-}
     volumes:
       # 把后端仓库里的 appsettings.json 只读挂载进容器（覆盖镜像内同名文件）：
       # 好处是改配置后 docker compose restart web-api 即生效，无需重新构建镜像
