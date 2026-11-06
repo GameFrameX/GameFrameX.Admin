@@ -25,7 +25,7 @@ public sealed class PublicStartupEndpointGuardTests
         var assemblies = new[]
         {
             typeof(GameRemoteConfigController).Assembly,                      // GameFrameX.Client.Api
-            typeof(GameFrameX.Hub.Api.Controllers.GameAssetPackageVersionController).Assembly, // GameFrameX.Hub.Api
+            typeof(GameFrameX.Hub.Api.Controllers.PackageBuildReportController).Assembly, // GameFrameX.Hub.Api
             typeof(GameFrameX.Web.Api.ApiRouting.AdminApiControllerConvention).Assembly,       // GameFrameX.Web.Api
         };
 

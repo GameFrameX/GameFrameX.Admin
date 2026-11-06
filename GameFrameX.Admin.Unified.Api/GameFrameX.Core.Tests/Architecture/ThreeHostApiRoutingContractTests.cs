@@ -15,10 +15,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ActionConstraints;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Routing;
-// Client / Hub 存在同名控制器（GameArea / GameAssetPackageVersion），Hub 侧用别名消歧
-using HubGameAreaController = GameFrameX.Hub.Api.Controllers.GameAreaController;
-using HubGameAssetPackageVersionController = GameFrameX.Hub.Api.Controllers.GameAssetPackageVersionController;
-
 namespace GameFrameX.Core.Tests.Architecture;
 
 /// <summary>
@@ -59,7 +55,7 @@ public sealed class ThreeHostApiRoutingContractTests
     {
         // C236：Hub 本地 BaseController 副本已回收，token 路由模板唯一来源为 Core 共享版，Client/Hub 控制器经继承链取用
         AssertTokenRoute(typeof(Service.BaseController));
-        AssertTokenRoute(typeof(HubGameAreaController));
+        AssertTokenRoute(typeof(PackageBuildReportController));
     }
 
     [Fact]
@@ -78,14 +74,28 @@ public sealed class ThreeHostApiRoutingContractTests
     }
 
     [Fact]
-    public void Hub_Controllers_RequireAuthorizationByDefault()
+    public void Hub_MachineChannels_UseOpenAccessAuthentication()
     {
-        // C236：Hub BaseController 副本回收后，JWT 默认鉴权显式化到各非匿名控制器类；共享基类不带 [Authorize]（Client 无 auth handler）
+        // C405：Hub 仅保留机器通道，两个控制器均由 TenantGameAppOpenAccessAuthMiddleware 使用 HMAC 鉴权；JWT 不应进入信任域。
         Assert.False(typeof(Service.BaseController).IsDefined(typeof(AuthorizeAttribute), true));
-        Assert.True(typeof(HubGameAreaController).IsDefined(typeof(AuthorizeAttribute), true));
-        Assert.True(typeof(HubGameAssetPackageVersionController).IsDefined(typeof(AuthorizeAttribute), true));
-        // PackageBuildReport：类级 [AllowAnonymous] + OpenAccess 中间件鉴权
+        Assert.True(typeof(FeatureSwitchSyncController).IsDefined(typeof(AllowAnonymousAttribute), false));
         Assert.True(typeof(PackageBuildReportController).IsDefined(typeof(AllowAnonymousAttribute), false));
+    }
+
+    [Fact]
+    public void Hub_ExposesOnlyMachineChannelControllers()
+    {
+        var controllerNames = typeof(PackageBuildReportController).Assembly
+            .GetTypes()
+            .Where(type => type.Namespace == typeof(PackageBuildReportController).Namespace)
+            .Where(type => typeof(ControllerBase).IsAssignableFrom(type) && type.IsPublic && !type.IsAbstract)
+            .Select(type => type.Name)
+            .Order(StringComparer.Ordinal)
+            .ToArray();
+
+        Assert.Equal(
+            new[] { nameof(FeatureSwitchSyncController), nameof(PackageBuildReportController) }.Order(StringComparer.Ordinal),
+            controllerNames);
     }
 
     [Theory]
@@ -94,7 +104,7 @@ public sealed class ThreeHostApiRoutingContractTests
     [InlineData(typeof(GameWebShopController), nameof(GameWebShopController.NotifyWebShop), "GET", "{packageId:long?}")]
     [InlineData(typeof(GameOrderController), nameof(GameOrderController.Create), "POST", null)]
     [InlineData(typeof(GameLoginTicketKeyController), nameof(GameLoginTicketKeyController.PublicKeys), "GET", null)]
-    [InlineData(typeof(HubGameAreaController), nameof(HubGameAreaController.ServerVersionAdd), "POST", null)]
+    [InlineData(typeof(FeatureSwitchSyncController), nameof(FeatureSwitchSyncController.Sync), "POST", null)]
     [InlineData(typeof(PackageBuildReportController), nameof(PackageBuildReportController.Report), "POST", null)]
     public void ClientHub_SampleEndpoints_DeclareExplicitVerbAndTemplate(Type controllerType, string methodName, string expectedVerb, string? expectedTemplate)
     {

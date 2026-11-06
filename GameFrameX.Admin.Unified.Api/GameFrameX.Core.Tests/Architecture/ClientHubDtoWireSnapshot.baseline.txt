@@ -31,7 +31,6 @@ class|Amount,OrderId,Paid,ProductId,Status
 class|AotCodeList,CheckAppVersionUrl,CheckResourceVersionUrl,Content,Location
 class|AppDownloadUrl,IsForce,IsUpgrade,UpdateAnnouncement,UpdateTitle
 class|AppVersion,AssetPackageName,AssetPackagePath,Channel,Language,PackageName,Platform,RootPath,Version
-class|AppVersion,AssetPackageName,AssetPackageVersion,Channel,Language,PackageName,Platform
 class|AppVersion,AssetPackageName,Channel,DeviceUniqueIdentifier,Language,PackageName,Platform
 class|AppVersion,AssetPackageName,DownloadUrl,Language,PackageId,ReportType,ResourceVersion,RootPath
 class|AppVersion,Channel,DeviceId,Language,PackageName,Platform
@@ -60,7 +59,6 @@ class|Channel,ClientVersion,DeviceId,ExtraFields,InstallId,Platform,VendorId
 class|Channel,Currency,Level,OrderId,PayChannel,ProductId,RealMoney,StrScene,UserId
 class|CheckExist,Key,Token,UserId
 class|City,Country,CountryLong,CountryShort,Currency,Ip,Region,TimeZone
-class|ClassifyId,Description,HttpManageUrl,Id,IsEnabled,Name,ServerContainerId,ServerType,ServerVersion,TcpSocketUrl,WebSocketUrl
 class|Code,Email
 class|Code,Email,Password,UserId
 class|Code,IdempotencyKey,IsValid,Message,Status
@@ -93,8 +91,6 @@ class|GroupId,RankType,UserId
 class|HairstyleConfigId,HeroConfigId,Name,UserId
 class|Html,OrderId
 class|HttpManageUrl,Id,IsRecommend,LocalizationKey,Name,ServerStatus,TcpSocketUrl,WebSocketUrl
-class|Id
-class|Id
 class|Id
 class|Id
 class|Id
