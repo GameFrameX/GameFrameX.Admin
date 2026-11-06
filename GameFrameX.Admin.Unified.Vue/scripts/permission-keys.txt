@@ -24,6 +24,12 @@ clientApiPolicy:delete
 clientApiPolicy:page
 clientApiPolicy:rotate
 clientApiPolicy:update
+device:add
+device:delete
+device:detail
+device:page
+device:select
+device:update
 deviceGroup:add
 deviceGroup:delete
 deviceGroup:detail
@@ -384,9 +390,3 @@ systemUser:page
 systemUser:resetPwd
 systemUser:setStatus
 systemUser:update
-device:add
-device:delete
-device:detail
-device:page
-device:select
-device:update

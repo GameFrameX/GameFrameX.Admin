@@ -4,7 +4,7 @@ export default {
         channelCode: '채널 코드',
         channelScope: '채널 범위',
         channelScopeSystem: '시스템',
-        channelScope: '사용자 지정',
+        channelScopeCustom: '사용자 지정',
         channelType: '채널 유형',
         channelTypeOfficial: '공식',
         channelTypeStore: '스토어',

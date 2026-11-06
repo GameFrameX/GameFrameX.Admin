@@ -57,14 +57,13 @@ const namingConventionRule = [
 // eslint-plugin-vue 该规则的文件名分支报告位置硬编码为 1:1（Program:exit），早于任何注释位置，
 // 行内 eslint-disable 无法压制，故只能在此按精确路径冻结（精确路径而非 ignores 名称白名单：
 // 同目录今后新增同名文件仍会被主规则拦截，防增量语义最严）。
-// 命名治理已完成（C296 改名 132 个单词名/camelCase 文件），本清单仅剩 119 个约定豁免文件
+// 命名治理已完成（C296 改名 132 个单词名/camelCase 文件），本清单仅剩 118 个约定豁免文件
 // （117 个 index.vue 目录式组件 + 401/404 错误页），不再是 TODO；新增非 index.vue 文件必须 multi-word。
 // 本清单只减不增（GFX-717 / C305）：与 scripts/frontend-standards-allowlist.json 的 componentNames
 // 上限快照比对，新增条目未扩快照会被 pnpm run check:frontend 拦截；收缩后请同步删快照条目。
 const frozenMultiWordComponentFiles = [
     'src/components/app-confirm-dialog/index.vue',
     'src/components/base-edit-dialog/index.vue',
-    'src/components/config-app-scope-picker/index.vue',
     'src/components/image-cropper/index.vue',
     'src/components/OnlineCursorList/index.vue',
     'src/components/crud-data-table/index.vue',

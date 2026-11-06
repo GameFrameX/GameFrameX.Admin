@@ -17,7 +17,7 @@
     "systemDictType:delete": "dict page buttons missing from backend GlobalMenuSeedData; backend seed follow-up required",
     "systemDictType:page": "dict page buttons missing from backend GlobalMenuSeedData; backend seed follow-up required",
     "systemDictType:update": "dict page buttons missing from backend GlobalMenuSeedData; backend seed follow-up required",
-    "systemPackageEntity:page": "legacy frontend prefix differs from seeded tenant package key",
+    "systemPackageEntity:page": "legacy frontend prefix differs from seeded package key",
     "onlineAssetLedgerQuery:page": "C349 Online ledger query: backend Api#229 seed not yet landed; admin-api-worker follow-up",
     "onlineAssetTransactionQuery:detail": "C349 Online transaction detail: backend Api#229 seed not yet landed; admin-api-worker follow-up",
     "onlineAssetAuditQuery:page": "C349 Online audit query: backend Api#229 seed not yet landed; admin-api-worker follow-up",
@@ -58,7 +58,6 @@
   "componentNames": {
     "src/components/app-confirm-dialog/index.vue": "C296 convention exemption: directory-style index.vue component",
     "src/components/base-edit-dialog/index.vue": "C296 convention exemption: directory-style index.vue component",
-    "src/components/config-app-scope-picker/index.vue": "C296 convention exemption: directory-style index.vue component",
     "src/components/crud-data-table/index.vue": "C296 convention exemption: directory-style index.vue component",
     "src/components/form-help-text/index.vue": "C296 convention exemption: directory-style index.vue component",
     "src/components/form-label/index.vue": "C296 convention exemption: directory-style index.vue component",
