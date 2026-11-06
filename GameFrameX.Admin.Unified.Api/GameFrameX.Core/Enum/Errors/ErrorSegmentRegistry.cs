@@ -21,7 +21,7 @@ public static class ErrorSegmentRegistry
         new(303, ErrorDomain.AdminBusiness, "PayConfig", null, false, "Admin 支付配置（预留：暂无错误码成员）"),
         new(304, ErrorDomain.AdminBusiness, "Wechat", null, false, "Admin 微信生态配置（预留：暂无错误码成员）"),
         new(305, ErrorDomain.AdminBusiness, "PlatformConfig", nameof(PlatformConfigErrorCode), false, "Admin 平台配置"),
-        new(306, ErrorDomain.AdminBusiness, "Tenant", nameof(TenantErrorCode), false, "Admin 租户管理"),
+        new(306, ErrorDomain.AdminBusiness, "Tenant", null, false, "Admin 租户管理（已退役，号段永久保留，禁止复用）"),
         new(307, ErrorDomain.AdminBusiness, "Organization", nameof(OrganizationErrorCode), false, "Admin 组织架构"),
         new(308, ErrorDomain.AdminBusiness, "Region", null, false, "Admin 区域（已退役，号段永久保留，禁止复用）"),
         new(309, ErrorDomain.AdminBusiness, "Position", nameof(PositionErrorCode), false, "Admin 职位"),
