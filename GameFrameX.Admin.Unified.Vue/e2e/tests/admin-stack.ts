@@ -46,11 +46,12 @@ export async function ensureMergeReviewer(page: Page, account: string, realName:
     await page.getByRole('button', { name: '新增', exact: true }).click();
     const dialog = page.locator('.p-dialog:visible').first();
     await expect(dialog).toBeVisible();
-    await dialog.locator('input').nth(0).fill(account);        // 账号名称
-    await dialog.locator('input').nth(1).fill(realName);       // 真实姓名
-    await dialog.locator('input').nth(2).fill('13800000002');  // 手机号（必填）
-    // 生日（必填）：DatePicker 直接键入固定日期后失焦
-    const birthday = dialog.locator('.p-datepicker-input');
+    // BaseEditDialog 自带隐藏 id 输入，按占位符定位可见业务输入
+    await dialog.getByPlaceholder('账号名称').fill(account);
+    await dialog.getByPlaceholder('真实姓名').fill(realName);
+    await dialog.getByPlaceholder('手机号码').fill('13800000002');
+    // 生日（必填）：DatePicker 直接键入固定日期后失焦（对话框含出生/入职两个日期框，按占位符区分）
+    const birthday = dialog.getByRole('combobox', { name: '出生日期' });
     await birthday.fill('1990-01-01');
     await birthday.press('Enter');
     // 角色集合：绑定种子引导出的 sys_admin（全部非超管菜单）
@@ -68,7 +69,19 @@ export async function ensureMergeReviewer(page: Page, account: string, realName:
   await page.waitForTimeout(600);
   const row = table.locator('tr').filter({ hasText: account }).first();
   await expect(row).toBeVisible();
-  await row.getByRole('button', { name: '重置密码', exact: true }).click();
+  // 重置密码在行内「更多」弹出菜单（图标按钮无可访问名，是行内第二个按钮）；
+  // PrimeVue popup 菜单带过渡动画，偶发开合竞态，允许再点一次按钮重开
+  const menuItem = page.getByRole('menuitem', { name: '重置密码' });
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    await row.getByRole('button').nth(1).click();
+    try {
+      await menuItem.click({ timeout: 5_000 });
+      break;
+    } catch {
+      if (attempt === 1) throw new Error('重置密码菜单项无法点击');
+      await page.waitForTimeout(400);
+    }
+  }
   await page.getByRole('button', { name: '确定', exact: true }).click();
   const toast = page.locator('.p-toast-message-text');
   await expect(toast.first()).toBeVisible({ timeout: 15_000 });

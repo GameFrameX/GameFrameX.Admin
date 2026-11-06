@@ -421,6 +421,18 @@ test.describe('广告回调配置分包闭环（F2）', () => {
     await navigateByMenu(page, '广告回调验签', 'C 端交付');
     await expect(page.locator('.p-datatable-tbody')).toBeVisible({ timeout: 20_000 });
 
+    // 前置清理：失败重跑可能留下 (PackageId, Provider) 配置，唯一约束会令新增被拒；
+    // 只清本用例会选中的选项 0（分包夹具 com.e2e.pkg.alpha）上的遗留行
+    for (let guard = 0; guard < 5; guard += 1) {
+      const stale = page.locator('.p-datatable-tbody tr').filter({ hasText: 'com.e2e.pkg.alpha' }).first();
+      if (await stale.count() === 0) {
+        break;
+      }
+      await stale.getByText('删除', { exact: true }).click();
+      await page.locator('role=button[name="确定"]').first().click();
+      await page.waitForTimeout(500);
+    }
+
     // —— 新增：Provider 默认 TopOn（schema 参数区异步加载后出现）；分包选择器在 Provider 之后 ——
     await page.locator('role=button[name="新增"]').first().click();
     await expect(page.locator('.p-dialog')).toBeVisible({ timeout: 10_000 });

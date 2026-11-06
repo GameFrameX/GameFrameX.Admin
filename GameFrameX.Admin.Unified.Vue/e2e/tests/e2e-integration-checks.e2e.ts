@@ -10,8 +10,8 @@ const HUB_API = process.env.E2E_HUB_API_URL;
 const CLIENT_API = process.env.E2E_CLIENT_API_URL;
 
 // 第 2 轮 (i)/(j) 的分包夹具（evidence-integration-2 环境准备 SQL 预置，is_enabled=true）
-const FIXTURE_PACKAGE_A = { id: 9200000000101, label: 'E2E 分包甲' };
-const FIXTURE_PACKAGE_B = { id: 9200000000102, label: 'E2E 分包乙' };
+const FIXTURE_PACKAGE_A = { id: 9200000000101, label: 'com.e2e.pkg.alpha' };
+const FIXTURE_PACKAGE_B = { id: 9200000000102, label: 'com.e2e.pkg.beta' };
 
 // —— (a) 登录页没有租户字段，admin 与超管都能通过表单登录 ——
 test('a 登录表单无租户字段且双身份表单登录', async ({ browser }) => {
@@ -275,7 +275,8 @@ test('g Hub 机器通道 HMAC 鉴权与旧租户头被忽略', async ({ page }) 
   await page.locator('.p-dialog input[placeholder="请输入责任主体"]').fill('集成轮回归');
   await page.locator('.p-dialog textarea[placeholder="请输入使用目的"]').fill('C406 集成轮机器通道验证');
   await page.locator('.p-dialog .p-select').first().click();
-  await page.locator('.p-select-option', { hasText: 'admin(集成测试管理员)' }).first().click();
+  // 绑定用户选项文本为「账号(真实姓名)」；真实姓名随引导账号不同（新装为「初始业务管理员」），按账号前缀匹配
+  await page.locator('.p-select-option', { hasText: `${process.env.E2E_ACCOUNT ?? 'admin'}(` }).first().click();
   await page.locator('.p-dialog .p-multiselect').first().click();
   await page.locator('.p-multiselect-option', { hasText: 'FeatureSwitchSync' }).first().click();
   await page.keyboard.press('Escape');
@@ -335,6 +336,21 @@ test('h 引导业务管理员首启表单登录成功且九根齐全', async ({ 
   await context.close();
 });
 
+// 清理夹具分包上遗留的广告回调配置（历史失败运行的残留），保证唯一约束可重跑
+async function deleteExistingAdConfigs(page: Page, packagePrefixes: string[]): Promise<void> {
+  for (const prefix of packagePrefixes) {
+    for (let guard = 0; guard < 5; guard += 1) {
+      const row = page.locator('.p-datatable-tbody tr').filter({ hasText: prefix }).first();
+      if (await row.count() === 0) {
+        break;
+      }
+      await row.getByText('删除', { exact: true }).click();
+      await page.locator('role=button[name="确定"]').first().click();
+      await page.waitForTimeout(500);
+    }
+  }
+}
+
 // —— (i) 广告回调配置：真实界面选分包新增、编辑回显；回调地址只有 {packageId} 一种形态 ——
 test('i 广告回调配置分包选择回显且回调地址单 packageId 形态', async ({ page, request }) => {
   if (!CLIENT_API) {
@@ -346,6 +362,8 @@ test('i 广告回调配置分包选择回显且回调地址单 packageId 形态'
   await expectOverview(page);
   await navigateByMenu(page, '广告回调验签', 'C 端交付');
   await expect(page.locator('.p-datatable-tbody')).toBeVisible({ timeout: 20_000 });
+  // 前置清理：失败重跑可能留下夹具分包上的配置，(PackageId, Provider) 唯一会令新增被拒
+  await deleteExistingAdConfigs(page, [FIXTURE_PACKAGE_A.label, FIXTURE_PACKAGE_B.label]);
 
   // 新增：真实界面选择分包（R5：分包是配置身份的一部分）
   await page.locator('role=button[name="新增"]').first().click();
@@ -382,7 +400,9 @@ test('i 广告回调配置分包选择回显且回调地址单 packageId 形态'
   // 缺分包段直接 404——不存在旧的多段路由形态。
   const withPackage = await request.get(`${CLIENT_API}/api/GameAdWebHook/TopOnNotify/${FIXTURE_PACKAGE_A.id}`);
   expect(withPackage.status(), '带 packageId 的回调地址必须命中端点').toBe(601);
-  const withoutPackage = await request.get(`${CLIENT_API}/api/GameAdWebHook/TopOnNotify`);
+  // Client.Api 协议头守卫先于路由执行：不带 X-Proto-Ver 的非回调路径先得 400，
+  // 带上协议头才走到路由层验证「缺 packageId 段 → 404」。
+  const withoutPackage = await request.get(`${CLIENT_API}/api/GameAdWebHook/TopOnNotify`, { headers: { 'X-Proto-Ver': 'cola/1.0.0' } });
   expect(withoutPackage.status(), '缺 packageId 的回调地址必须 404').toBe(404);
   await shot(page, 'c406-i-adconfig-callback-url-form');
 
@@ -425,6 +445,7 @@ test('j 广告回调跨包密钥被拒且缺分包 404', async ({ page, request 
   await expectOverview(page);
   await navigateByMenu(page, '广告回调验签', 'C 端交付');
   await expect(page.locator('.p-datatable-tbody')).toBeVisible({ timeout: 20_000 });
+  await deleteExistingAdConfigs(page, [FIXTURE_PACKAGE_A.label, FIXTURE_PACKAGE_B.label]);
 
   // 同一 provider（TopOn）下两个分包各配一条不同密钥的配置（真实界面）
   for (const [fixture, urlToken, secret] of [
@@ -455,7 +476,7 @@ test('j 广告回调跨包密钥被拒且缺分包 404', async ({ page, request 
   expect(ownKey.status(), '本包密钥签名应通过验签（结果不应再是 601）').not.toBe(601);
 
   // 3. 缺 packageId → 404（路由必填，唯一 URL 形态）
-  const missingPackage = await request.get(`${CLIENT_API}/api/GameAdWebHook/TopOnNotify?trans_id=tx`);
+  const missingPackage = await request.get(`${CLIENT_API}/api/GameAdWebHook/TopOnNotify?trans_id=tx`, { headers: { 'X-Proto-Ver': 'cola/1.0.0' } });
   expect(missingPackage.status(), '缺 packageId 必须返回 404').toBe(404);
 
   // 清理两条配置
