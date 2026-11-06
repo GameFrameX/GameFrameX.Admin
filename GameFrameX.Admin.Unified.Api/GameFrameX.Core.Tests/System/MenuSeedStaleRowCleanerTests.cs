@@ -144,7 +144,7 @@ public class MenuSeedStaleRowCleanerTests
             Assert.Contains("global_menu.Permission 重复: advertisementCallbackConfig:page", before.Message);
 
             var removedKeys = MenuSeedStaleRowCleaner.RemoveStaleRows(db, seedIdsByKey);
-            Assert.Equal(new[] { "route:adCallbackConfigEntity", "adCallbackConfigEntity:page", }, removedKeys.OrderBy(u => u, StringComparer.Ordinal).ToArray());
+            Assert.Equal(new[] { "adCallbackConfigEntity:page", "route:adCallbackConfigEntity", }, removedKeys.OrderBy(u => u, StringComparer.Ordinal).ToArray());
 
             // 清理后加载通过，且该 Permission 只剩一条有效定义（种子全称 Key 行）
             MenuSeedCatalog.LoadFromDb(db);

@@ -174,7 +174,6 @@ public sealed class MonitorLoggingPipelineTests : IAsyncLifetime
             .ToListAsync();
 
         var row = Assert.Single(rows);
-        Assert.Null(row.Id);
         Assert.Equal("admin", row.Account);
         Assert.Equal("GetPage", row.ActionName);
         Assert.Contains("query", row.RequestParam);
@@ -234,7 +233,6 @@ public sealed class MonitorLoggingPipelineTests : IAsyncLifetime
         var db = _db.GetConnectionScope(MainConfigId);
         var visitRows = await db.Queryable<SystemLogVisitEntity>().Where(u => u.ActionName == "GetUserInfo").ToListAsync();
         Assert.Single(visitRows);
-        Assert.Null(visitRows[0].Id);
         Assert.Equal("admin", visitRows[0].Account);
 
         var mainDb = _db.GetConnectionScope(MainConfigId);

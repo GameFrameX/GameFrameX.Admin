@@ -79,7 +79,7 @@ public class EntityTableNameAlignmentTests
                            item.ClassName,
                            ExpectedPrefix = ClassExpectedPrefix(item.Ownership),
                        })
-                       .Where(item => !item.ClassName.StartsWith(item.ExpectedPrefix, StringComparison.Ordinal))
+                       .Where(item => item.ExpectedPrefix.Length > 0 && !item.ClassName.StartsWith(item.ExpectedPrefix, StringComparison.Ordinal))
                        .Select(item => $"{item.ClassName}|ownership={item.Ownership}|expectedPrefix={item.ExpectedPrefix}")
                        .ToList();
 
@@ -120,7 +120,8 @@ public class EntityTableNameAlignmentTests
         {
             DatabaseOwnership.System => "System",
             DatabaseOwnership.Global => "Global",
-            DatabaseOwnership.Business => "Business",
+            // D3/C406：业务表无物理前缀，类名不再要求 Business 前缀（如 UserEntity、LogOperationEntity）。
+            DatabaseOwnership.Business => string.Empty,
             _                        => string.Empty,
         };
     }

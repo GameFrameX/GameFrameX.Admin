@@ -51,12 +51,11 @@ public class JsonSerializerOptionsProviderTests
         Assert.Contains("\"CreatedTime\":1784073600", json);
 
         var value = JsonSerializer.Deserialize<IdentifierJsonContract>(
-            "{\"Id\":\"4664278385747429000\",\"Id\":\"1300000000001\",\"CreatedTime\":1784073600}",
+            "{\"Id\":\"4664278385747429000\",\"CreatedTime\":1784073600}",
             options);
 
         Assert.NotNull(value);
         Assert.Equal(4664278385747429000, value.Id);
-        Assert.Equal(1300000000001, value.Id);
         Assert.Equal(1784073600, value.CreatedTime);
     }
 

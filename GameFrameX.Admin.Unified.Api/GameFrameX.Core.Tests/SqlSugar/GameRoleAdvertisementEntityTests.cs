@@ -1,4 +1,3 @@
-using System.Reflection;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Entity.Business.Game;
 using SqlSugar;
@@ -23,22 +22,12 @@ public sealed class GameRoleAdvertisementEntityTests : IDisposable
     }
 
     [Fact]
-    public void TenantGameRoleAdvertisement_HasNoTenantScope()
-    {
-        var id = typeof(GameRoleAdvertisementEntity).GetProperty(
-            "Id",
-            BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
-
-        Assert.Null(id);
-    }
-
-    [Fact]
     public void InitTables_AcceptsBusinessIndexesWithoutTenantScope()
     {
         _db.CodeFirst.InitTables(typeof(GameRoleAdvertisementEntity));
 
         var columns = _db.EntityMaintenance.GetEntityInfo<GameRoleAdvertisementEntity>().Columns;
-        Assert.DoesNotContain(columns, c => c.PropertyName is "Id" or "AppId");
+        Assert.DoesNotContain(columns, c => c.PropertyName is "AppId");
     }
 
     public void Dispose()

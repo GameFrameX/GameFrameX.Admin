@@ -46,7 +46,7 @@ public sealed class FeatureSwitchDeliveryResolverTests : IDisposable
         var defaultRow = Row("login.banner", id: 1, appId: null, valueJson: "{\"v\":\"base\"}");
         var appRow = Row("login.banner", id: 2, appId: App100, valueJson: "{\"v\":\"app\"}");
 
-        var result = FeatureSwitchDeliveryResolver.Resolve(new[] { default, appRow, }, Query());
+        var result = FeatureSwitchDeliveryResolver.Resolve(new[] { defaultRow, appRow, }, Query());
 
         var item = Assert.Single(result.Switches);
         Assert.Equal("{\"v\":\"app\"}", item.ValueJson);
