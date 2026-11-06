@@ -153,11 +153,11 @@ public class SystemOpenAccessService : IAdminApiController
     [NonAction]
     public BoundUser GetBoundUser(SystemOpenAccessEntity openAccess)
     {
-        var tenantDb = _dbConnectionProvider;
-        tenantDb.QueryFilter.ClearAndBackup();
+        var mainDb = _dbConnectionProvider;
+        mainDb.QueryFilter.ClearAndBackup();
         try
         {
-            var user = tenantDb.Queryable<UserEntity>().First(u => u.Id == openAccess.BindUserId);
+            var user = mainDb.Queryable<UserEntity>().First(u => u.Id == openAccess.BindUserId);
             if (user == null)
             {
                 throw BusinessError.Oh(SystemUserErrorCode.AccountNotFound);
@@ -167,7 +167,7 @@ public class SystemOpenAccessService : IAdminApiController
         }
         finally
         {
-            tenantDb.QueryFilter.Restore();
+            mainDb.QueryFilter.Restore();
         }
     }
 }

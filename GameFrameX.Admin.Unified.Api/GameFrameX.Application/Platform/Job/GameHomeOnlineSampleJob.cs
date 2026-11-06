@@ -41,19 +41,19 @@ public class GameHomeOnlineSampleJob : IJob
     /// 采样落表（桶起点唯一）。
     /// 用普通 Insertable/Updateable 而非 DiffLog 变体（lesson：2026-07-13-sqlsugar-insertwithdifflog-prefix-loss）。
     /// </summary>
-    private static async Task UpsertSampleAsync(ISqlSugarClient tenantDb, long bucketTime, int onlineCount, CancellationToken stoppingToken)
+    private static async Task UpsertSampleAsync(ISqlSugarClient mainDb, long bucketTime, int onlineCount, CancellationToken stoppingToken)
     {
-        var existing = await tenantDb.Queryable<Entity.Business.Game.GameHomeOnlineSampleEntity>()
+        var existing = await mainDb.Queryable<Entity.Business.Game.GameHomeOnlineSampleEntity>()
                                      .Where(u => u.SampleTime == bucketTime)
                                      .FirstAsync(stoppingToken);
         if (existing != null)
         {
             existing.OnlineCount = onlineCount;
-            await tenantDb.Updateable(existing).ExecuteCommandAsync(stoppingToken);
+            await mainDb.Updateable(existing).ExecuteCommandAsync(stoppingToken);
             return;
         }
 
-        await tenantDb.Insertable(new Entity.Business.Game.GameHomeOnlineSampleEntity
+        await mainDb.Insertable(new Entity.Business.Game.GameHomeOnlineSampleEntity
         {
             SampleTime = bucketTime,
             OnlineCount = onlineCount,

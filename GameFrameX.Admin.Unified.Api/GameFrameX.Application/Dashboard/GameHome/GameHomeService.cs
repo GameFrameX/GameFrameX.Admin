@@ -35,8 +35,8 @@ public class GameHomeService : IAdminApiController
         // C175：从全局 GameServerOptions.HttpRootUrl 改为区服级聚合。仅统计启用且配置了管理地址的区服，
         // 每个区服按 Control 能力前缀调用 GetOnlinePlayer，求和返回全服在线人数。
         // C321：区服表是租户库表，经租户库连接路由查询；平台面（无租户上下文）返回明确业务错误而非裸 500。
-        var tenantDb = ResolveDb("首页在线人数");
-        var total = await GameHomeOnlineCounter.GetTotalOnlineAsync(tenantDb, _httpClientFactory);
+        var mainDb = ResolveDb("首页在线人数");
+        var total = await GameHomeOnlineCounter.GetTotalOnlineAsync(mainDb, _httpClientFactory);
         return HttpJsonResultData<GameHomeOnlineResponse>.Success(new GameHomeOnlineResponse { OnlineCount = total, });
     }
 
@@ -49,31 +49,31 @@ public class GameHomeService : IAdminApiController
     [DisplayName("首页运营驾驶舱聚合读数")]
     public async Task<HttpJsonResultData<GameHomeOverviewResponse>> OverviewAsync()
     {
-        var tenantDb = ResolveDb("首页运营驾驶舱聚合读数");
+        var mainDb = ResolveDb("首页运营驾驶舱聚合读数");
 
         // 今日 0 点（服务器本地时区，运营视角）转 Unix 秒；CreatedTime 审计列为 Unix 秒，同为绝对时间可直接比较
         var todayStart = new DateTimeOffset(DateTime.Now.Date).ToUnixTimeSeconds();
 
         // 订单读数：今日订单数 + 待办细分（待发货/退款中为全量待办视角，不限下单日期）
-        var todayOrderCount = await tenantDb.Queryable<Entity.Business.Game.GameOrderEntity>()
+        var todayOrderCount = await mainDb.Queryable<Entity.Business.Game.GameOrderEntity>()
                                            .Where(u => u.CreatedTime >= todayStart)
                                            .CountAsync();
-        var pendingShipmentCount = await tenantDb.Queryable<Entity.Business.Game.GameOrderEntity>()
+        var pendingShipmentCount = await mainDb.Queryable<Entity.Business.Game.GameOrderEntity>()
                                                 .Where(u => u.Status == OrderStatusEnum.NotShipped)
                                                 .CountAsync();
-        var refundingCount = await tenantDb.Queryable<Entity.Business.Game.GameOrderEntity>()
+        var refundingCount = await mainDb.Queryable<Entity.Business.Game.GameOrderEntity>()
                                            .Where(u => u.Status == OrderStatusEnum.InitiateRefund || u.Status == OrderStatusEnum.RefundAgreement)
                                            .CountAsync();
 
         // 玩家读数：总数 + 今日新增（CreatedTime 索引见实体 SugarIndex）
-        var playerTotalCount = await tenantDb.Queryable<Entity.Business.Game.GameUserEntity>()
+        var playerTotalCount = await mainDb.Queryable<Entity.Business.Game.GameUserEntity>()
                                              .CountAsync();
-        var playerTodayNewCount = await tenantDb.Queryable<Entity.Business.Game.GameUserEntity>()
+        var playerTodayNewCount = await mainDb.Queryable<Entity.Business.Game.GameUserEntity>()
                                                 .Where(u => u.CreatedTime >= todayStart)
                                                 .CountAsync();
 
         // 区服读数：按 ServerStatus 分组计数（全局 ISafeEnabledFilter 已隐藏禁用区服，AreaTotalCount 即启用区服总数）
-        var areaStatusCounts = await tenantDb.Queryable<Entity.Business.Game.GameAreaEntity>()
+        var areaStatusCounts = await mainDb.Queryable<Entity.Business.Game.GameAreaEntity>()
                                              .GroupBy(u => u.ServerStatus)
                                              .Select(u => new { ServerStatus = u.ServerStatus, Count = SqlFunc.AggregateCount(u.Id), })
                                              .ToListAsync();
@@ -93,7 +93,7 @@ public class GameHomeService : IAdminApiController
             }
         }
 
-        var onlineCount = await GameHomeOnlineCounter.GetTotalOnlineAsync(tenantDb, _httpClientFactory);
+        var onlineCount = await GameHomeOnlineCounter.GetTotalOnlineAsync(mainDb, _httpClientFactory);
 
         return HttpJsonResultData<GameHomeOverviewResponse>.Success(new GameHomeOverviewResponse
         {
@@ -118,14 +118,14 @@ public class GameHomeService : IAdminApiController
     [DisplayName("首页 24h 在线人数时序")]
     public async Task<HttpJsonResultData<GameHomeOnlineTrendResponse>> OnlineTrendAsync()
     {
-        var tenantDb = ResolveDb("首页在线趋势");
+        var mainDb = ResolveDb("首页在线趋势");
 
         // 当前整点桶（Unix 秒整点值与时区无关）往前共 24 个桶，含当前进行中桶
         var currentBucket = DateTimeOffset.UtcNow.ToUnixTimeSeconds() / 3600 * 3600;
         var earliestBucket = currentBucket - 23 * 3600;
 
         // 一次回读窗口内全部采样，内存中按桶归并取每桶最后采样
-        var samples = await tenantDb.Queryable<Entity.Business.Game.GameHomeOnlineSampleEntity>()
+        var samples = await mainDb.Queryable<Entity.Business.Game.GameHomeOnlineSampleEntity>()
                                     .Where(u => u.SampleTime >= earliestBucket && u.SampleTime < currentBucket + 3600)
                                     .OrderBy(u => u.SampleTime)
                                     .ToListAsync();
@@ -157,12 +157,12 @@ public class GameHomeService : IAdminApiController
     /// </summary>
     private ISqlSugarClient ResolveDb(string operationName)
     {
-        var tenantDb = _dbConnectionProvider;
-        if (tenantDb == null)
+        var mainDb = _dbConnectionProvider;
+        if (mainDb == null)
         {
             throw BusinessError.Oh(GameHomeErrorCode.DbUnavailable);
         }
 
-        return tenantDb;
+        return mainDb;
     }
 }
