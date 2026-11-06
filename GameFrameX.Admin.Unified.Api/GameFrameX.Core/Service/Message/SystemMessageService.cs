@@ -101,7 +101,7 @@ public class SystemMessageService : IAdminApiController
 
     /// <summary>
     /// 发送平台系统邮件。
-    /// <para>从主库 <c>SystemEmailProviderEntity</c> 读取配置（按 <c>SystemEmailPurpose.PlatformOps</c> 默认）；缺配置返回 <c>false</c>，禁止静默成功或 fallback 到租户玩家邮件。</para>
+    /// <para>从主库 <c>SystemEmailProviderEntity</c> 读取配置（按 <c>SystemEmailPurpose.PlatformOps</c> 默认）；缺配置返回 <c>false</c>，禁止静默成功或 fallback 到玩家邮件。</para>
     /// <para>缺省收件人：使用当前命中的 <c>SystemEmailProviderEntity</c> 配置的 <c>DefaultToEmail</c>；若配置也未提供则发送失败。</para>
     /// </summary>
     /// <param name="message">邮件正文。</param>

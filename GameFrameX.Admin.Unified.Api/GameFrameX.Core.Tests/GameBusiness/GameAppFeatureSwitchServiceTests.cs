@@ -13,7 +13,7 @@ namespace GameFrameX.Core.Tests.GameBusiness;
 /// C345 活动/功能开关管理服务测试。
 /// <para>覆盖：写入侧事实固化（作用域维度归一为 Default 哨兵、消费方标记收小写、时间窗不倒置、
 /// ValueJson 合法性、灰度与白名单形状）、同作用域组合查重与自身排除、应用作用域锁定、
-/// 租户默认层不得携带具体包名（C80）、分页按应用作用域收口，以及物理表名落 tenant_ 前缀。</para>
+/// 默认层不得携带具体包名（C80）、分页按应用作用域收口，以及物理表名落无前缀业务表。</para>
 /// </summary>
 public sealed class GameAppFeatureSwitchServiceTests : IDisposable
 {
@@ -38,10 +38,10 @@ public sealed class GameAppFeatureSwitchServiceTests : IDisposable
     }
 
     /// <summary>
-    /// 实体落库物理表名带 tenant_ 前缀（写后读一致性前提，避免租户表名分叉）。
+    /// 实体落库物理表名为无前缀业务表（D3：业务表不再带 tenant_ 前缀）。 // c406-keep（描述已退场的前缀）
     /// </summary>
     [Fact]
-    public async Task PhysicalTableName_CarriesTenantPrefix()
+    public async Task PhysicalTableName_IsPrefixFreeBusinessTable()
     {
         var service = CreateService();
         await service.AddAsync(NewRequest("switch.table"));

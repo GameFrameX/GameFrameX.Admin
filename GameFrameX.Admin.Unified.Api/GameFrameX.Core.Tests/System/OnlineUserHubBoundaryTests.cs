@@ -6,7 +6,7 @@ namespace GameFrameX.Core.Tests.System;
 public class OnlineUserHubBoundaryTests
 {
     [Fact]
-    public void Constructor_DoesNotResolveTenantOnlineUserRepository()
+    public void Constructor_DoesNotResolveOnlineUserRepository()
     {
         var constructorParameterTypes = typeof(OnlineUserHub)
                                         .GetConstructors()

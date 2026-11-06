@@ -9,7 +9,7 @@ using GameFrameX.Core.Service.User;
 namespace GameFrameX.Application.ClientDelivery.LoginTicket.GameLoginTicketKey;
 
 /// <summary>
-/// 租户 Game 登录票据签名密钥管理服务。
+/// Game 登录票据签名密钥管理服务。
 /// <para>私钥永不回显：所有输出仅含公钥与元数据。密钥由系统签发或手动轮换生成，不支持手动新增 / 删除。</para>
 /// <para>作用域：主库。</para>
 /// </summary>

@@ -28,7 +28,7 @@ public abstract class BaseLogService<TSystemLog, TLog, TDto> : IAdminApiControll
     protected readonly SqlSugarRepository<TSystemLog> SystemLogRepository;
 
     /// <summary>
-    /// 租户日志仓储（主库 log_* 历史表）
+    /// 管理员日志仓储（主库 log_* 历史表）
     /// </summary>
     protected readonly SqlSugarRepository<TLog> LogRepository;
 
@@ -41,7 +41,7 @@ public abstract class BaseLogService<TSystemLog, TLog, TDto> : IAdminApiControll
     /// 构造函数
     /// </summary>
     /// <param name="systemLogRepository">平台日志仓储</param>
-    /// <param name="logRepository">租户日志仓储</param>
+    /// <param name="logRepository">管理员日志仓储</param>
     /// <param name="currentUserContext">当前登录用户</param>
     protected BaseLogService(SqlSugarRepository<TSystemLog> systemLogRepository, SqlSugarRepository<TLog> logRepository, CurrentUserContext currentUserContext)
     {
@@ -197,7 +197,7 @@ public abstract class BaseLogService<TSystemLog, TLog, TDto> : IAdminApiControll
     /// 按 <see cref="SearchableTextColumns"/> 拼接 OR Contains 表达式，用于 SearchKey 模糊匹配。
     /// 表达式树按 <c>u =&gt; u.Col1.Contains(key) OR u.Col2.Contains(key) OR ...</c> 形式构建，
     /// 所有节点均为简单属性访问 + <see cref="string.Contains(string)"/> + 单一 <paramref name="searchKey"/> 参数，
-    /// SqlSugar 可正确翻译为 SQL（参考 4952fbe6 修复租户用户/角色列表 SqlSugar NotSupportedException 的教训：
+    /// SqlSugar 可正确翻译为 SQL（参考 4952fbe6 修复用户/角色列表 SqlSugar NotSupportedException 的教训：
     /// lambda 内禁止 <c>?? new List</c> 等不可翻译的兜底写法）。
     /// </summary>
     /// <param name="searchKey">已 trim 的非空关键字</param>

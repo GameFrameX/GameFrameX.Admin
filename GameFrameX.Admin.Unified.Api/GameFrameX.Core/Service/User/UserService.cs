@@ -6,7 +6,7 @@ using GameFrameX.Foundation.Http.Normalization;
 namespace GameFrameX.Core.Service.User;
 
 /// <summary>
-/// 租户用户服务
+/// 用户服务
 /// </summary>
 [ApiDescriptionSettings(Order = 490)]
 public class UserService : BaseSystemService

@@ -24,7 +24,7 @@ namespace GameFrameX.Web.Api.Handlers;
 /// <para>Host 启动后：枚举 ASP.NET Core MVC 发现的全部 Admin API 端点 → 与 <see cref="GlobalApiEndpointEntity"/> 对账（匹配/孤儿/新增）
 /// → 按 DB <c>global_menu.Permission</c>（routeName）一次性回填 <see cref="GlobalMenuEndpointEntity"/> 绑定
 /// → 为未绑定且非公开端点自动挂隐藏按钮 → 构建并预热请求期端点权限缓存。</para>
-/// <para>异常上抛让 Host fail-fast：避免目录空导致 JwtHandler 静默锁死全部租户请求。</para>
+/// <para>异常上抛让 Host fail-fast：避免目录空导致 JwtHandler 静默锁死全部已登录请求。</para>
 /// </summary>
 public sealed class ApiEndpointCatalogSync : IHostedService
 {
@@ -259,7 +259,7 @@ public sealed class ApiEndpointCatalogSync : IHostedService
                     var storage = storageable.ToStorage();
                     await storage.AsInsertable.ExecuteCommandAsync();
                     await storage.AsUpdateable.ExecuteCommandAsync();
-                    _logger.LogInformation("新增端点权限点：{Route}（{Ctrl}.{Act}）—— 默认不授权任何租户角色。", live.RoutePath, live.Controller, live.Action);
+                    _logger.LogInformation("新增端点权限点：{Route}（{Ctrl}.{Act}）—— 默认不授权任何角色。", live.RoutePath, live.Controller, live.Action);
                 }
             }
 

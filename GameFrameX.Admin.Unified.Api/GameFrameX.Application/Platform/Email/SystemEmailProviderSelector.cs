@@ -4,7 +4,7 @@ namespace GameFrameX.Application.Platform.Email;
 /// 平台系统邮件 Provider 配置选择器。
 /// <para>选择策略：<c>Purpose</c> 精确匹配 &gt; 默认（<c>Purpose = 0</c> / <see cref="GameFrameX.Core.Service.Message.SystemEmailPurpose.Default"/>）。</para>
 /// <para>同匹配层按 <c>Priority</c> 降序，再按 <c>UpdateTime DESC, Id DESC</c>，保证选择结果确定。</para>
-/// <para>本选择器不识别租户上下文；调用方负责传入正确的主库 <see cref="ISqlSugarClient"/>。</para>
+/// <para>本选择器不依赖请求上下文；调用方负责传入正确的主库 <see cref="ISqlSugarClient"/>。</para>
 /// </summary>
 public static class SystemEmailProviderSelector
 {

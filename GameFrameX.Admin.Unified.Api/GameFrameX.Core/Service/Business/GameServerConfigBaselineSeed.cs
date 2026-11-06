@@ -7,7 +7,7 @@ namespace GameFrameX.Core.Service.Business;
 /// <summary>
 /// 游戏运营配置出厂基线行工厂（C314）。
 /// <para>单一事实源为嵌入资源 GameServerConfigs.json（原厂实测 10 键 + 原厂 md5），
-/// 供两条种子渠道共享：租户库建库种子（DefaultDatabaseSeeder，自动推导租户连接 EnableInitSeed=false
+/// 供两条种子渠道共享：建库种子（DefaultDatabaseSeeder，自动推导连接的库 EnableInitSeed=false
 /// 时 ISqlSugarEntitySeedData 渠道不生效，故走本工厂）与框架种子（GameAppServerConfigSeedData 薄壳）。</para>
 /// <para>md5 沿用原厂值不重算——拉过原厂配置的老客户端 md5 自洽不重传；行 Id 用固定基数保证跨环境稳定。</para>
 /// </summary>

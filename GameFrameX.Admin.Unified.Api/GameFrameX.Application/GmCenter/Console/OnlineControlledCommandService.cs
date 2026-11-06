@@ -7,7 +7,7 @@ using GameFrameX.Core.Enum;
 namespace GameFrameX.Application.GmCenter.Console;
 
 /// <summary>
-/// Online 控制台受控操作命令服务（高危；权限码 onlineControlledCommand:execute 仅同步 Admin）。
+/// Online 控制台受控操作命令服务（高危；权限码 onlineControlledCommand:execute 仅同步管理员角色）。
 /// <para>
 /// 路由前缀 /api/onlineControlledCommand（change C344 / vault:C9 S8.1）。
 /// 只承载四条新命令（<see cref="OnlineControlledCommandKind"/> 严格四值），经 <see cref="IOnlineServerClient"/>

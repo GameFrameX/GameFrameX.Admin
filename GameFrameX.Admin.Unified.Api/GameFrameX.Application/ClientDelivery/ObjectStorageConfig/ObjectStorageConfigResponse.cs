@@ -1,7 +1,7 @@
 namespace GameFrameX.Application.ClientDelivery.ObjectStorageConfig;
 
 /// <summary>
-/// 租户对象存储配置列表项。
+/// 对象存储配置列表项。
 /// </summary>
 public class ObjectStorageConfigResponse
 {

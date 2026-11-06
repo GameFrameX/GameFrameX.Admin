@@ -8,7 +8,7 @@ using GameFrameX.Application.ClientDelivery.AdvertisementCallbackConfig.Dto;
 namespace GameFrameX.Application.ClientDelivery.AdvertisementCallbackConfig;
 
 /// <summary>
-/// 租户广告回调配置管理服务。
+/// 广告回调配置管理服务。
 /// <para>只管理各广告平台服务端回调所需的最小配置材料，不实现广告回调接收和发奖处理。</para>
 /// <para>敏感字段（SigningSecret / VerificationKeys）输出脱敏，更新回传 <c>******</c> 保留原值。</para>
 /// </summary>

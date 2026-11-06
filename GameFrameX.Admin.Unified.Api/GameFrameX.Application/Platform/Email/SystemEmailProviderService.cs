@@ -9,7 +9,7 @@ namespace GameFrameX.Application.Platform.Email;
 
 /// <summary>
 /// 平台系统邮件 Provider 配置管理服务。
-/// <para>主库 / SuperAdmin-only；与租户业务邮件（<c>EmailConfigEntity</c>）分域，禁止互相 fallback。</para>
+/// <para>主库 / SuperAdmin-only；与业务邮件（<c>EmailConfigEntity</c>）分域，禁止互相 fallback。</para>
 /// <para>敏感字段（UserName / Password / SecretId / SecretKey）输出脱敏 <c>******</c>；更新时回传 <c>******</c> 保留原值。</para>
 /// <para>调用方必须显式传入 <c>SystemEmailPurpose</c>；缺配置时 <see cref="SendTestEmailAsync"/> 与 <c>SystemMessageService.SendEmailAsync</c> 均返回明确错误，禁止静默成功。</para>
 /// </summary>

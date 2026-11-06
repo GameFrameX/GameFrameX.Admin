@@ -4,7 +4,7 @@ using GameFrameX.Entity.Global;
 namespace GameFrameX.Core.Const.MenuSeed;
 
 /// <summary>
-/// 菜单、按钮和租户默认授权的 DB 缓存入口。
+/// 菜单、按钮和管理员默认授权的 DB 缓存入口。
 /// </summary>
 public static class MenuSeedCatalog
 {
@@ -58,7 +58,7 @@ public static class MenuSeedCatalog
     }
 
     /// <summary>
-    /// 获取 SuperAdmin-only 树下允许租户调用的只读辅助按钮 ID。
+    /// 获取 SuperAdmin-only 树下允许管理员调用的只读辅助按钮 ID。
     /// </summary>
     public static IReadOnlySet<long> AdminReadableSuperAdminOnlyMenuIds
     {
@@ -73,7 +73,7 @@ public static class MenuSeedCatalog
 
     /// <summary>
     /// 获取 SuperAdmin 可见菜单 ID。
-    /// <para>规则: SuperAdminOnly 菜单(含整棵子树)及其目录祖先 + 公共总览与运营首页(dashboard/home)。只补目录祖先，不引入祖先下的租户业务菜单。</para>
+    /// <para>规则: SuperAdminOnly 菜单(含整棵子树)及其目录祖先 + 公共总览与运营首页(dashboard/home)。只补目录祖先，不引入祖先下的业务菜单。</para>
     /// </summary>
     public static IReadOnlyList<long> SuperAdminVisibleMenuIds
     {
@@ -109,7 +109,7 @@ public static class MenuSeedCatalog
 
     /// <summary>
     /// 获取 SuperAdmin-only 整棵子树的菜单 ID（根 + 所有后代）。
-    /// <para>供租户登录菜单树过滤：任何落入超管专属子树的菜单（含历史残留授权，如某菜单由租户可见改为超管专属后旧租户仍残留 role-menu 授权）都不应出现在租户导航中。</para>
+    /// <para>供管理员登录菜单树过滤：任何落入超管专属子树的菜单（含历史残留授权，如某菜单由管理员可见改为超管专属后仍残留 role-menu 授权）都不应出现在管理员导航中。</para>
     /// </summary>
     public static IReadOnlySet<long> SuperAdminOnlySubtreeMenuIds
     {

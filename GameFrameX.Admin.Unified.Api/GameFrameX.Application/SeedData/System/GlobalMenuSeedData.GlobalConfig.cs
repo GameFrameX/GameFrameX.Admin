@@ -387,7 +387,7 @@ public partial class GlobalMenuSeedData
             },
             new()
             {
-                // 平台/语言定义管理页已退场；本按钮仍是租户可读的下拉数据源（发布版本、分包、功能开关等页），改挂全局配置目录保留授权。
+                // 平台/语言定义管理页已退场；本按钮仍是管理员可读的下拉数据源（发布版本、分包、功能开关等页），改挂全局配置目录保留授权。
                 Id = StableSeedId.Menu("globalPlatform:Select"),
                 Key = "globalPlatform:Select",
                 Pid = StableSeedId.Menu("route:globalConfig"),
@@ -416,7 +416,7 @@ public partial class GlobalMenuSeedData
             },
             new()
             {
-                // 平台/语言定义管理页已退场；本按钮仍是租户可读的下拉数据源（发布版本、分包、功能开关等页），改挂全局配置目录保留授权。
+                // 平台/语言定义管理页已退场；本按钮仍是管理员可读的下拉数据源（发布版本、分包、功能开关等页），改挂全局配置目录保留授权。
                 Id = StableSeedId.Menu("globalLanguage:Select"),
                 Key = "globalLanguage:Select",
                 Pid = StableSeedId.Menu("route:globalConfig"),

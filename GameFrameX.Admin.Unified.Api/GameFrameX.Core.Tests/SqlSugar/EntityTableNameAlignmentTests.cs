@@ -59,7 +59,7 @@ public class EntityTableNameAlignmentTests
 
     /// <summary>
     /// 实体类名前缀必须与其边界归属的物理前缀一致：
-    /// System* -> system_、Global* -> global_、Business* -> tenant_、Log* -> log_。
+    /// System* -> system_、Global* -> global_、业务实体与 Log* -> 无前缀。
     /// 阶段 A 预期 RED：阶段 B 完成实体重命名 + Attribute 补齐后转 GREEN。
     /// </summary>
     [Fact]

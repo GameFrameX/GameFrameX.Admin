@@ -2,7 +2,7 @@ namespace GameFrameX.Entity.Log;
 
 /// <summary>
 /// 操作/异常日志公共字段基类。不映射物理表，供 <see cref="SystemLogOperationEntity"/>、<see cref="SystemLogExceptionEntity"/>
-/// 及对应租户日志实体复用 HTTP 请求与异常字段。
+/// 及对应管理员日志实体复用 HTTP 请求与异常字段。
 /// </summary>
 public class LogOperationFields : LogVisitFields
 {

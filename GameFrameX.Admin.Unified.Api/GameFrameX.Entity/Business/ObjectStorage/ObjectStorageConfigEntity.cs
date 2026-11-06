@@ -3,9 +3,9 @@ using GameFrameX.Entity.Base;
 namespace GameFrameX.Entity.Business.ObjectStorage;
 
 /// <summary>
-/// 租户对象存储配置。每个租户维护若干存储提供商配置，其中至多一条处于启用状态。
+/// 对象存储配置。维护若干存储提供商配置，其中至多一条处于启用状态。
 /// </summary>
-[SugarTable(null, "租户对象存储配置")]
+[SugarTable(null, "对象存储配置")]
 [BusinessTable]
 [IncrementTable]
 public class ObjectStorageConfigEntity : EntityBasic

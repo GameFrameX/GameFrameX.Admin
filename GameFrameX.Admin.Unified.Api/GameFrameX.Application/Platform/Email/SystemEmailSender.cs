@@ -6,7 +6,7 @@ namespace GameFrameX.Application.Platform.Email;
 /// <summary>
 /// 平台系统邮件发送实现。
 /// <para>从主库 <c>SystemEmailProviderEntity</c> 读取 Provider 配置；缺配置 / 缺凭据返回 <c>false</c> 并记录警告。</para>
-/// <para>不得用于租户玩家邮件，也不得作为租户业务邮件的 fallback。</para>
+/// <para>不得用于玩家邮件，也不得作为业务邮件的 fallback。</para>
 /// </summary>
 public sealed class SystemEmailSender : ISystemEmailSender
 {

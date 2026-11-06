@@ -12,7 +12,7 @@ namespace GameFrameX.Core.Tests.Enum;
 public class EnumContractTests
 {
     private const string ExpectedContractSha256 =
-        "D294D85EE2EA7555952C00E443692F587896043B7B8A068199AB7891440ADAC4";
+        "913F5040351BB3B57444FE0F25F09753B6566B78C621874F85E683E0DD01554E";
 
     private static readonly JsonSerializerOptions StringEnumOptions = new()
     {

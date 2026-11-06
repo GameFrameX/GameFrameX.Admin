@@ -6,7 +6,7 @@ using GameFrameX.Application.ServerCenter.Online;
 namespace GameFrameX.Application.GmCenter.Asset;
 
 /// <summary>
-/// Online 资产人工发放/撤销受限命令服务（高危；权限码 onlineAssetGrantCommand:grant / :revoke 仅同步 Admin）。
+/// Online 资产人工发放/撤销受限命令服务（高危；权限码 onlineAssetGrantCommand:grant / :revoke 仅同步管理员角色）。
 /// <para>
 /// 路由前缀 /api/onlineAssetGrantCommand（change C340 / vault:C4 S3.6「Admin 人工发放或撤销」六类来源之一）。
 /// 经 <see cref="IOnlineServerClient"/> 调 Online Grant API——Admin 侧零直写（守护测试 OnlineAssetCommandWhitelistTests）；

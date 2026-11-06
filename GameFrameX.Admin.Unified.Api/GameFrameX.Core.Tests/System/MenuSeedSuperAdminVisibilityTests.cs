@@ -15,7 +15,7 @@ public class MenuSeedSuperAdminVisibilityTests
     }
 
     [Fact]
-    public void ProtectedSubtrees_IncludeDirectoryAncestorsWithoutTenantLeaves()
+    public void ProtectedSubtrees_IncludeDirectoryAncestorsWithoutBusinessLeaves()
     {
         MenuSeedCatalogTestData.LoadSampleMenus();
         var definitions = MenuSeedCatalog.AllDefinitions.ToDictionary(definition => definition.Key);

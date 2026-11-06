@@ -32,7 +32,7 @@ using GameFrameX.Entity.Routing;
 namespace GameFrameX.Entity.System;
 
 /// <summary>
-/// 平台私有配置表，保存默认密码、Token、登录安全、日志、水印等不可暴露给租户的系统配置。
+/// 平台私有配置表，保存默认密码、Token、登录安全、日志、水印等不可暴露给业务侧的系统配置。
 /// </summary>
 [SugarTable(null, "平台私有配置表")]
 [PlatformTable]

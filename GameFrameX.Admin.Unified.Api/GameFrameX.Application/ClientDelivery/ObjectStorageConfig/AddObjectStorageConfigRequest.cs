@@ -1,7 +1,7 @@
 namespace GameFrameX.Application.ClientDelivery.ObjectStorageConfig;
 
 /// <summary>
-/// 新增租户对象存储配置入参。
+/// 新增对象存储配置入参。
 /// </summary>
 public class AddObjectStorageConfigRequest : BaseAddRequest
 {

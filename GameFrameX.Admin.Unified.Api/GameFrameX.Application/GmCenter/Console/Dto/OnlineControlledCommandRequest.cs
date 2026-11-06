@@ -3,7 +3,7 @@ namespace GameFrameX.Application.GmCenter.Console.Dto;
 /// <summary>
 /// 受控操作命令输入参数（高危端点；change C344 / vault:C9 S8.1）。
 /// <para>
-/// 高危复核口径（A0 锁定）：本端点整体高危（权限码仅同步 Admin），<c>Reason</c> 与
+/// 高危复核口径（A0 锁定）：本端点整体高危（权限码仅同步管理员角色），<c>Reason</c> 与
 /// <c>ReviewerOperatorId</c> 对全部四命令必填——双人复核字段落地 vault「审批（如需）」，不做通用审批流。
 /// 目标标识按命令取值：CancelTicket → TicketId；EndAbnormalMatch → MatchId；SuspendResumePlayer / MatchIsolation → PlayerId。
 /// </para>
@@ -12,7 +12,7 @@ public class OnlineControlledCommandRequest
 {
 
     /// <summary>
-    /// 区服作用域（必填，经 OnlineScopeContextFactory 校验租户与应用归属）。
+    /// 区服作用域（必填，经 OnlineScopeContextFactory 校验区服归属）。
     /// </summary>
     [Required(ErrorMessage = "区服Id不能为空")]
     [Range(1, long.MaxValue, ErrorMessage = "区服Id必须大于0")]

@@ -21,11 +21,6 @@ public sealed class CacheConst
     public const string KeyUserButton = "cache:user_button:";
 
     /// <summary>
-    /// 用户机构缓存
-    /// </summary>
-    public const string KeyUserOrganization = "cache:user_org:";
-
-    /// <summary>
     /// 角色最大数据范围缓存
     /// </summary>
     public const string KeyRoleMaxDataScope = "cache:role_max_data_scope:";
@@ -39,11 +34,6 @@ public sealed class CacheConst
     /// 图形验证码缓存
     /// </summary>
     public const string KeyVerCode = "cache:ver_code:";
-
-    /// <summary>
-    /// 租户缓存
-    /// </summary>
-    public const string KeyTenant = "cache:tenant";
 
     /// <summary>
     /// 常量下拉框

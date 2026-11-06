@@ -114,28 +114,28 @@ public class SeedInsertOnlyTests : IDisposable
     }
 
     [Fact]
-    public void DefaultTenantSeeder_Upsert_InsertsMissingRowsOnly()
+    public void DefaultDatabaseSeeder_Upsert_InsertsMissingRowsOnly()
     {
-        using (var scope = CreateScope("tenant_2001"))
+        using (var scope = CreateScope("2001"))
         {
-            var tenantConfig = CreateConfig("tenant_2001");
-            SqlSugarSetup.InitDatabase(scope, tenantConfig, new[] { typeof(RoleEntity), });
+            var dbConfig = CreateConfig("2001");
+            SqlSugarSetup.InitDatabase(scope, dbConfig, new[] { typeof(RoleEntity), });
 
-            var tenantDb = scope.GetConnectionScope("tenant_2001");
+            var db = scope.GetConnectionScope("2001");
             var role = new RoleEntity { Id = 99001, Name = "初始角色", Code = "init_role", };
-            DefaultDatabaseSeeder.Upsert(tenantDb, new[] { role, });
+            DefaultDatabaseSeeder.Upsert(db, new[] { role, });
 
             // 模拟用户在管理端改名
-            tenantDb.Updateable<RoleEntity>()
+            db.Updateable<RoleEntity>()
                     .SetColumns(u => u.Name == "用户改过")
                     .Where(u => u.Id == 99001)
                     .ExecuteCommand();
 
             // 二次 seed（如默认租户库重复初始化）：同名主键行不再覆盖
             var seedAgain = new RoleEntity { Id = 99001, Name = "seed 新值", Code = "init_role", };
-            DefaultDatabaseSeeder.Upsert(tenantDb, new[] { seedAgain, });
+            DefaultDatabaseSeeder.Upsert(db, new[] { seedAgain, });
 
-            var name = tenantDb.Queryable<RoleEntity>().First(u => u.Id == 99001).Name;
+            var name = db.Queryable<RoleEntity>().First(u => u.Id == 99001).Name;
             Assert.Equal("用户改过", name);
         }
     }

@@ -128,9 +128,9 @@ public sealed class GlobalMenuEntity : EntityBasic
 
 
     /// <summary>
-    /// 超管专属菜单下允许租户只读访问
+    /// 超管专属菜单下允许管理员只读访问
     /// </summary>
-    [SugarColumn(ColumnDescription = "超管专属允许租户只读", DefaultValue = "false")]
+    [SugarColumn(ColumnDescription = "超管专属允许管理员只读", DefaultValue = "false")]
     public bool AllowAdminWhenSuperAdminOnly { get; set; }
 
 

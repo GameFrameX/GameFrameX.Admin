@@ -7,7 +7,7 @@ using GameFrameX.Entity.Enum;
 namespace GameFrameX.Application.GmCenter.Social;
 
 /// <summary>
-/// Online 处罚联动命令服务（高危；权限码 onlinePenaltyLinkCommand:execute 仅同步 Admin）。
+/// Online 处罚联动命令服务（高危；权限码 onlinePenaltyLinkCommand:execute 仅同步管理员角色）。
 /// <para>
 /// 路由前缀 /api/onlinePenaltyLinkCommand（change C350 / vault:C7、vault:C2 S1.4）。
 /// 经 <see cref="IOnlineServerClient"/> 调 Online 显式命令接口（踢下线 / 吊销 Token / 禁言，三命令硬白名单，X3 红线）；

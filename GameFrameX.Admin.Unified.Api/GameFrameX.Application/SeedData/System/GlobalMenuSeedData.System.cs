@@ -1587,8 +1587,8 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1705984444,
                 UpdateTime = 1706793684,
                 // B5: 渠道定义为全局配置，仅超管可见（与 route:appplatform 一致）。
-                // 2026-10-20 修正：父级原挂租户侧 route:system（租户系统管理组），SuperAdminOnly 过滤后
-                // 租户树与超管树均不可达（超管树不含 route:system 组）——改挂 route:globalConfig 全局配置组。
+                // 2026-10-20 修正：父级原挂业务侧 route:system（业务系统管理组），SuperAdminOnly 过滤后
+                // 管理员树与超管树均不可达（超管树不含 route:system 组）——改挂 route:globalConfig 全局配置组。
                 SuperAdminOnly = true,
                 AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,

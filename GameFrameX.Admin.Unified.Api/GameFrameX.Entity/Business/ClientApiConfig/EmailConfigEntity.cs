@@ -3,19 +3,19 @@ using GameFrameX.Entity.Base;
 namespace GameFrameX.Entity.Business.ClientApiConfig;
 
 /// <summary>
-/// 租户业务邮件配置。
-/// <para>承载玩家注册验证码、找回密码、玩家运营触达等租户品牌发信；与平台系统邮件（<c>SystemEmailProviderEntity</c>）完全独立，互不 fallback。</para>
+/// 业务邮件配置。
+/// <para>承载玩家注册验证码、找回密码、玩家运营触达等本游戏品牌发信；与平台系统邮件（<c>SystemEmailProviderEntity</c>）完全独立，互不 fallback。</para>
 /// </summary>
-[SugarTable(null, "租户业务邮件配置")]
+[SugarTable(null, "业务邮件配置")]
 [BusinessTable]
 [IncrementTable]
 public class EmailConfigEntity : EntityBasic
 {
 
     /// <summary>
-    /// 租户业务邮件用途（<c>EmailPurpose</c>）。0 表示通配该租户 / 应用下所有租户业务邮件。
+    /// 业务邮件用途（<c>EmailPurpose</c>）。0 表示通配该应用下所有业务邮件。
     /// </summary>
-    [SugarColumn(ColumnDescription = "租户业务邮件用途", DefaultValue = "0")]
+    [SugarColumn(ColumnDescription = "业务邮件用途", DefaultValue = "0")]
     public int Purpose { get; set; }
 
     /// <summary>

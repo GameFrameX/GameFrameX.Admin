@@ -4,21 +4,21 @@ using GameFrameX.Entity.Enum;
 namespace GameFrameX.Entity.Business;
 
 /// <summary>
-/// 租户微信用户绑定表
+/// 微信用户绑定表
 /// </summary>
-[SugarTable(null, "租户微信用户绑定表")]
+[SugarTable(null, "微信用户绑定表")]
 [BusinessTable]
 [IncrementTable]
 public sealed class WechatUserEntity : EntityBasic
 {
     /// <summary>
-    /// 租户用户Id
+    /// 用户Id
     /// </summary>
-    [SugarColumn(ColumnDescription = "租户用户Id", DefaultValue = "0")]
+    [SugarColumn(ColumnDescription = "用户Id", DefaultValue = "0")]
     public long UserId { get; set; }
 
     /// <summary>
-    /// 租户用户
+    /// 用户
     /// </summary>
     [Navigate(NavigateType.OneToOne, nameof(UserId))]
     public UserEntity User { get; set; } = null!;

@@ -3,11 +3,11 @@ using GameFrameX.Entity.Base;
 namespace GameFrameX.Entity.Business.ClientApiConfig;
 
 /// <summary>
-/// 租户 Client API 运行策略合并配置（C378 四表合一：Token / 登录票据 / 区服输出 / 订单策略）。
-/// <para>节划分理由：令牌节是服务端内部签名密钥语义，天然租户级（不区分应用）；票据节与输出节均为应用作用域的运行窗口 / 开关，随行作用域回退。</para>
+/// Client API 运行策略合并配置（C378 四表合一：Token / 登录票据 / 区服输出 / 订单策略）。
+/// <para>节划分理由：令牌节是服务端内部签名密钥语义，天然全局级（不区分应用）；票据节与输出节均为应用作用域的运行窗口 / 开关，随行作用域回退。</para>
 /// <para>存量数据由启动期迁移执行器从原四表幂等迁入（同键 Id 大者优先），迁移后原四表停写。</para>
 /// </summary>
-[SugarTable(null, "租户ClientAPI运行策略")]
+[SugarTable(null, "ClientAPI运行策略")]
 [BusinessTable]
 [IncrementTable]
 public class ClientApiPolicyEntity : EntityBasic
@@ -50,7 +50,7 @@ public class ClientApiPolicyEntity : EntityBasic
     public long TicketExpireTime { get; set; }
 
     /// <summary>
-    /// 【票据节】是否允许首次签发时自动创建租户应用级 RSA key。实际值可被平台默认覆盖。
+    /// 【票据节】是否允许首次签发时自动创建应用级 RSA key。实际值可被平台默认覆盖。
     /// </summary>
     [SugarColumn(ColumnDescription = "是否允许首次签发自动建Key", DefaultValue = "false")]
     public bool EnableKeyAutoCreate { get; set; } = true;

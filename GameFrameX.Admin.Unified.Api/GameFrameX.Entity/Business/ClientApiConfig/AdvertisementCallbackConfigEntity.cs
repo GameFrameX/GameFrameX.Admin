@@ -4,10 +4,10 @@ using GameFrameX.Foundation.Orm.Entity;
 namespace GameFrameX.Entity.Business.ClientApiConfig;
 
 /// <summary>
-/// 租户广告回调配置。
+/// 广告回调配置。
 /// <para>承载广告服务端回调用于验签和参数识别的最小配置材料，Client API 公开回调入口按 Provider 读取该配置。</para>
 /// </summary>
-[SugarTable(null, "租户广告回调配置")]
+[SugarTable(null, "广告回调配置")]
 [BusinessTable]
 [IncrementTable]
 public class AdvertisementCallbackConfigEntity : EntityBasic

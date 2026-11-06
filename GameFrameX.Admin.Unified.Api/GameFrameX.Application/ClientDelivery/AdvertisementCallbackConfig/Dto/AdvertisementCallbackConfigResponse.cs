@@ -3,7 +3,7 @@ using GameFrameX.Entity.Business.ClientApiConfig;
 namespace GameFrameX.Application.ClientDelivery.AdvertisementCallbackConfig.Dto;
 
 /// <summary>
-/// 租户广告回调配置输出参数（敏感字段已脱敏）
+/// 广告回调配置输出参数（敏感字段已脱敏）
 /// </summary>
 public class AdvertisementCallbackConfigResponse : IBasePageResponse<AdvertisementCallbackConfigEntity>
 {

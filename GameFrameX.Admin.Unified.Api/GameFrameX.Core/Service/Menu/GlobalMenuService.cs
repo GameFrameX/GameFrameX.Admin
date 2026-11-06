@@ -68,8 +68,8 @@ public class GlobalMenuService : IAdminApiController
         {
             var menuIdList = await GetMenuIdListAsync();
             // B5: 过滤整棵 SuperAdmin-only 子树（而非仅 Allow 子集）。
-            // 旧逻辑只剔除 AdminReadableSuperAdminOnlyMenuIds，当某菜单由"租户可见"改为"超管专属"(SuperAdminOnly=true, Allow=false)后，
-            // 既有租户的 role_menu 仍残留旧授权，且不在 Allow 集合内，导致菜单仍出现在租户导航中（点击后端 403）。改为剔除整棵超管子树可防御性修复。
+            // 旧逻辑只剔除 AdminReadableSuperAdminOnlyMenuIds，当某菜单由"管理员可见"改为"超管专属"(SuperAdminOnly=true, Allow=false)后，
+            // 既有管理员的 role_menu 仍残留旧授权，且不在 Allow 集合内，导致菜单仍出现在管理员导航中（点击后端 403）。改为剔除整棵超管子树可防御性修复。
             var menuTreeIds = menuIdList
                               .Where(u => !MenuSeedCatalog.SuperAdminOnlySubtreeMenuIds.Contains(u))
                               .ToArray();

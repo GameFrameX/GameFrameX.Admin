@@ -5,7 +5,7 @@ namespace GameFrameX.Entity.Business;
 /// <summary>
 /// 系统在线用户表
 /// </summary>
-[SugarTable(null, "租户库在线用户表")]
+[SugarTable(null, "在线用户表")]
 [BusinessTable]
 [IncrementTable]
 public sealed class OnlineUserEntity : EntityBase

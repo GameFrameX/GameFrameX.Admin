@@ -6,14 +6,8 @@ namespace GameFrameX.Core.Enum.Errors;
 public enum GameHomeErrorCode
 {
     /// <summary>
-    /// 首页读数仅租户上下文可用
+    /// 数据库连接不可用
     /// </summary>
-    [ErrorText("首页读数仅租户上下文可用：请以管理员角色登录，或由平台管理员显式切换目标租户后重试", "Home metrics require a tenant context: sign in as a tenant administrator, or switch the target tenant explicitly")]
-    ContextRequired = 60500001,
-
-    /// <summary>
-    /// 目标租户库连接不可用
-    /// </summary>
-    [ErrorText("目标租户库连接不可用，无法读取首页读数", "Target tenant database connection is unavailable for home metrics")]
+    [ErrorText("数据库连接不可用，无法读取首页读数", "The database connection is unavailable for home metrics")]
     DbUnavailable = 60500002,
 }

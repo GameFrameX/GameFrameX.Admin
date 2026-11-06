@@ -3,7 +3,7 @@ using GameFrameX.Entity.Enum;
 namespace GameFrameX.Core.Service.User.Dto;
 
 /// <summary>
-/// 租户用户输出参数
+/// 用户输出参数
 /// </summary>
 public class UserResponse
 {

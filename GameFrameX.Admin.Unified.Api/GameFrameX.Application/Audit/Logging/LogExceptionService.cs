@@ -14,7 +14,7 @@ public class LogExceptionService : BaseLogService<SystemLogExceptionEntity, LogE
     /// 构造函数
     /// </summary>
     /// <param name="systemLogExceptionRepository">平台异常日志仓储（主库）</param>
-    /// <param name="logExceptionRepository">租户异常日志仓储（当前租户库）</param>
+    /// <param name="logExceptionRepository">管理员异常日志仓储（主库）</param>
     /// <param name="currentUserContext">当前登录用户</param>
     public LogExceptionService(SqlSugarRepository<SystemLogExceptionEntity> systemLogExceptionRepository, SqlSugarRepository<LogExceptionEntity> logExceptionRepository, CurrentUserContext currentUserContext)
         : base(systemLogExceptionRepository, logExceptionRepository, currentUserContext)

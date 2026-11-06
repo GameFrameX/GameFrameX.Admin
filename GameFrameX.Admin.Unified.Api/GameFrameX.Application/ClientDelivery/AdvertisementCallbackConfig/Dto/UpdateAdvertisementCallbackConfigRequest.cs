@@ -1,7 +1,7 @@
 namespace GameFrameX.Application.ClientDelivery.AdvertisementCallbackConfig.Dto;
 
 /// <summary>
-/// 租户广告回调配置更新输入参数。
+/// 广告回调配置更新输入参数。
 /// <para>敏感字段提交 <c>******</c> 时表示保留原值。</para>
 /// </summary>
 public class UpdateAdvertisementCallbackConfigRequest : BaseUpdateRequest

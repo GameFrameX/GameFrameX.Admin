@@ -15,7 +15,6 @@ namespace GameFrameX.Core.Tests.GameBusiness;
 /// </summary>
 public sealed class FeatureSwitchDeliveryResolverTests : IDisposable
 {
-    private const long TenantId = 1001;
     private const long App100 = 100;
     private const long App200 = 200;
 

@@ -5,7 +5,7 @@ namespace GameFrameX.Entity.Business;
 /// <summary>
 /// 系统文件表
 /// </summary>
-[SugarTable(null, "租户库文件表")]
+[SugarTable(null, "文件表")]
 [BusinessTable]
 [IncrementTable]
 public class FileEntity : EntityBasic
@@ -17,7 +17,7 @@ public class FileEntity : EntityBasic
     public string? Provider { get; set; }
 
     /// <summary>
-    /// 关联的租户对象存储配置 ID（ObjectStorageConfigEntity.Id）。
+    /// 关联的对象存储配置 ID（ObjectStorageConfigEntity.Id）。
     /// 新上传文件必填，用于按精确配置解析下载/删除路径；历史记录为 null 时按本地 legacy 行为兜底。
     /// </summary>
     [SugarColumn(ColumnDescription = "对象存储配置ID", IsNullable = true)]
