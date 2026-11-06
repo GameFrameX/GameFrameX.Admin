@@ -1,4 +1,3 @@
-using GameFrameX.Core.Extension.Const;
 using GameFrameX.Foundation.Orm.Entity;
 
 namespace GameFrameX.Core.SqlSugar;
@@ -16,7 +15,7 @@ public class SqlSugarRepository<T> : SimpleClient<T> where T : EntityBase, new()
     public SqlSugarRepository(ISqlSugarClient sqlSugarClient)
     {
         ArgumentNullException.ThrowIfNull(sqlSugarClient);
-        Context = sqlSugarClient.AsTenant().GetConnectionScope(SqlSugarConst.MainConfigId);
+        Context = sqlSugarClient.GetMainDatabaseScope();
     }
 
     /// <summary>

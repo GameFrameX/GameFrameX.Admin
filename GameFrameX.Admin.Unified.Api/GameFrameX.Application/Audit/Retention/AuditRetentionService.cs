@@ -1,5 +1,5 @@
 using GameFrameX.Core.Service.Business;
-using GameFrameX.Core.Extension.Const;
+using GameFrameX.Core.SqlSugar;
 using GameFrameX.Entity.Log;
 using GameFrameX.Foundation.Orm.Entity;
 using Mapster;
@@ -51,7 +51,7 @@ public class AuditRetentionService
 
         var nowSeconds = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
         var batchLimit = Math.Max(1, _options.BatchSize);
-        var db = _sqlSugarClient.AsTenant().GetConnectionScope(SqlSugarConst.MainConfigId);
+        var db = _sqlSugarClient.GetMainDatabaseScope();
 
         result.Tables.Add(await ArchiveSourceAsync<SystemLogVisitEntity, SystemLogVisitArchiveEntity>(db, "访问日志", nowSeconds - (long)_options.VisitHotDataDays * SecondsPerDay, batchLimit, cancellationToken));
         result.Tables.Add(await ArchiveSourceAsync<SystemLogOperationEntity, SystemLogOperationArchiveEntity>(db, "操作日志", nowSeconds - (long)_options.OperationHotDataDays * SecondsPerDay, batchLimit, cancellationToken));

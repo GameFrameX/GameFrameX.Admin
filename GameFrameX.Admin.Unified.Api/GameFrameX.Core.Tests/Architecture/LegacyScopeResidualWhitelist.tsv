@@ -1,17 +1,8 @@
 # path_glob	token	reason
 # C406 D13 残留白名单（R2-a token 精确匹配；只允许 D2.5 第三方原生、D7 断代说明、R3-a 协议镜像、D12 负向测试）
-# D2.5：SqlSugar 原生多库 API（R2-a：仅放行实际调用 AsTenant() 的文件）
-GameFrameX.Admin.Unified.Api/GameFrameX.Core/SqlSugar/SqlSugarRepository.cs	AsTenant	SqlSugar 原生多库客户端 API（GetConnectionScope(MainConfigId)），D2.5 不改名
-GameFrameX.Admin.Unified.Api/GameFrameX.Core/SqlSugar/SqlSugarTransactionRunner.cs	AsTenant	SqlSugar 原生多库事务 API（BeginTran/CommitTran/RollbackTran），D2.5 不改名
-GameFrameX.Admin.Unified.Api/GameFrameX.Core/Job/LogJob.cs	AsTenant	SqlSugar 原生多库客户端 API，D2.5 不改名
-GameFrameX.Admin.Unified.Api/GameFrameX.Core/Service/Menu/GlobalMenuService.cs	AsTenant	SqlSugar 原生多库客户端 API，D2.5 不改名
-GameFrameX.Admin.Unified.Api/GameFrameX.Core/Logging/DatabaseLoggingWriter.cs	AsTenant	SqlSugar 原生多库客户端 API，D2.5 不改名
-GameFrameX.Admin.Unified.Api/GameFrameX.Application/Platform/DataBase/SystemDatabaseService.cs	AsTenant	SqlSugar 原生多库客户端 API（按 ConfigId 取连接），D2.5 不改名
-GameFrameX.Admin.Unified.Api/GameFrameX.Core/Bootstrap/InitialAdminBootstrap.cs	AsTenant	SqlSugar 原生多库客户端 API（GetConnectionScope(MainConfigId)），D2.5 不改名
-GameFrameX.Admin.Unified.Api/GameFrameX.Application/Audit/Retention/AuditRetentionService.cs	AsTenant	SqlSugar 原生多库客户端 API（GetConnectionScope(MainConfigId)），D2.5 不改名
-# D2.5：SqlSugar 原生 [Tenant] 特性反射（仅这两处 GetCustomAttribute<TenantAttribute>）
-GameFrameX.Admin.Unified.Api/GameFrameX.Core/SqlSugar/SqlSugarFilter.cs	Tenant	SqlSugar 原生 TenantAttribute 反射判断，D2.5 不改名
-GameFrameX.Admin.Unified.Api/GameFrameX.Core.Extension/RepositoryExtension.cs	Tenant	SqlSugar 原生 TenantAttribute 反射判断，D2.5 不改名
+# D2.5：SqlSugar 原生多库 API 唯一收口（全仓仅本文件允许出现 AsTenant/ITenant；业务代码经 SqlSugarConnectionScopes 的 GetMainDatabaseScope/GetDatabaseScope/GetMultiDatabaseClient 转发）
+GameFrameX.Admin.Unified.Api/GameFrameX.Core/SqlSugar/SqlSugarConnectionScopes.cs	AsTenant	SqlSugar 原生多库客户端 API 唯一收口（连接作用域与跨库事务链路），D2.5 不改名
+GameFrameX.Admin.Unified.Api/GameFrameX.Core/SqlSugar/SqlSugarConnectionScopes.cs	ITenant	SqlSugar 原生多库客户端接口（跨库事务客户端返回类型），D2.5 不改名
 # D2.5：第三方支付生态原生 AppId（微信/支付宝/Apple/Google 协议字段）
 GameFrameX.Admin.Unified.Api/Payment/GameFrameX.Payment.AliPay/AliPayOptionSetting.cs	AppId	支付宝原生 AppId 协议配置，D2.5 保留（R2-a：目录级 Payment/** 收窄为实际命中文件）
 GameFrameX.Admin.Unified.Api/Payment/GameFrameX.Payment.AliPay/AliPayPaymentHandler.cs	AppId	支付宝原生 AppId 协议字段，D2.5 保留

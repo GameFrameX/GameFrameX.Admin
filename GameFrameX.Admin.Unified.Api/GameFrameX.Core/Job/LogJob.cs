@@ -1,5 +1,5 @@
-using GameFrameX.Core.Extension.Const;
 using GameFrameX.Core.Service.Business;
+using GameFrameX.Core.SqlSugar;
 using GameFrameX.Entity.Enum;
 using GameFrameX.Entity.System;
 using GameFrameX.Entity.Log;
@@ -32,7 +32,7 @@ public class LogJob : IJob
             var cutoffTimestamp = TimerHelper.UnixTimeSeconds() - daysAgo * 24 * 60 * 60;
 
             var provider = serviceScope.ServiceProvider;
-            var mainDb = provider.GetRequiredService<ISqlSugarClient>().AsTenant().GetConnectionScope(SqlSugarConst.MainConfigId);
+            var mainDb = provider.GetRequiredService<ISqlSugarClient>().GetMainDatabaseScope();
             // §9.4：SystemLogVisit / SystemLogOperation 的删除已移交审计留存（job_auditRetention 归档）；
             // 此处仅保留差异日志与管理员历史日志（C400 后只读）的清理。
             await mainDb.Deleteable<SystemLogDiffEntity>().Where(u => u.CreatedTime < cutoffTimestamp).ExecuteCommandAsync(stoppingToken);

@@ -45,7 +45,7 @@ public sealed class SqlSugarTransactionRunner
             return;
         }
 
-        var multiDatabaseClient = _sqlSugarClient.AsTenant(); // SqlSugar 多库事务客户端（D2.5 原生 API）
+        var multiDatabaseClient = _sqlSugarClient.GetMultiDatabaseClient(); // SqlSugar 多库事务客户端：事务操作同步纳入全部已注册连接
         multiDatabaseClient.BeginTran();
         CurrentDepth.Value++;
         try

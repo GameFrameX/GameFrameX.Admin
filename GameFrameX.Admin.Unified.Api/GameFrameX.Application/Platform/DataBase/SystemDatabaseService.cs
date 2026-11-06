@@ -1,6 +1,7 @@
 using GameFrameX.Application.Platform.DataBase.Dto;
 using GameFrameX.Core.Extension.Const;
 using GameFrameX.Core.Option;
+using GameFrameX.Core.SqlSugar;
 using Microsoft.Extensions.Options;
 
 namespace GameFrameX.Application.Platform.DataBase;
@@ -41,7 +42,7 @@ public class SystemDatabaseService : IAdminApiController
     [HttpGet("columnList")]
     public List<DbColumnResponse> GetColumnList([FromQuery] GetColumnListRequest input)
     {
-        var db = _db.AsTenant().GetConnectionScope(input.ConfigId);
+        var db = _db.GetDatabaseScope(input.ConfigId);
         if (string.IsNullOrWhiteSpace(input.TableName))
         {
             return new List<DbColumnResponse>();
@@ -59,7 +60,7 @@ public class SystemDatabaseService : IAdminApiController
     [DisplayName("获取数据库数据类型列表")]
     public List<string> GetDbTypeList(string configId = SqlSugarConst.MainConfigId)
     {
-        var db = _db.AsTenant().GetConnectionScope(configId);
+        var db = _db.GetDatabaseScope(configId);
         return db.DbMaintenance.GetDbTypes().OrderBy(u => u).ToList();
     }
 
@@ -135,7 +136,7 @@ public class SystemDatabaseService : IAdminApiController
     [DisplayName("获取表列表")]
     public List<DbTableInfo> GetTableList(string configId = SqlSugarConst.MainConfigId)
     {
-        var db = _db.AsTenant().GetConnectionScope(configId);
+        var db = _db.GetDatabaseScope(configId);
         return db.DbMaintenance.GetTableInfoList(false);
     }
 
@@ -242,7 +243,7 @@ public class SystemDatabaseService : IAdminApiController
             throw BusinessError.Oh("数据库连接配置不存在");
         }
 
-        return _db.AsTenant().GetConnectionScope(configId);
+        return _db.GetDatabaseScope(configId);
     }
 
     private static void EnsurePhysicalTableAllowed(string configId, string tableName)

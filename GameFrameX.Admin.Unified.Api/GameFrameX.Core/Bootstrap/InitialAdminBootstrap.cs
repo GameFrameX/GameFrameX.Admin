@@ -1,7 +1,6 @@
 using GameFrameX.Core.Const;
 using GameFrameX.Core.Const.MenuSeed;
 using GameFrameX.Core.SqlSugar;
-using GameFrameX.Core.Extension.Const;
 using GameFrameX.Core.Service.User;
 using GameFrameX.Core.Utility;
 using SqlSugar;
@@ -41,7 +40,7 @@ public static class InitialAdminBootstrap
     /// <param name="sqlSugarClient">SqlSugar 客户端（取主库连接）。</param>
     public static async Task RunAsync(ISqlSugarClient sqlSugarClient)
     {
-        var db = sqlSugarClient.AsTenant().GetConnectionScope(SqlSugarConst.MainConfigId);
+        var db = sqlSugarClient.GetMainDatabaseScope();
 
         var roleId = await EnsureSysAdminRoleAsync(db);
         await GrantAdminMenusAsync(db, roleId);

@@ -4,7 +4,6 @@ using GameFrameX.Core.Service.Menu.Dto;
 using GameFrameX.Core.Service.Role;
 using GameFrameX.Core.Service.User;
 using GameFrameX.Core.Const.MenuSeed;
-using GameFrameX.Core.Extension.Const;
 using GameFrameX.Core.Service.Business;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Entity.Enum;
@@ -248,7 +247,7 @@ public class GlobalMenuService : IAdminApiController
     /// </summary>
     private async Task CascadeDeleteRoleMenusAsync(List<long> menuIdList)
     {
-        var mainDb = _sqlSugarClient.AsTenant().GetConnectionScope(SqlSugarConst.MainConfigId);
+        var mainDb = _sqlSugarClient.GetMainDatabaseScope();
         await mainDb.Deleteable<RoleMenuEntity>().Where(u => menuIdList.Contains(u.MenuId)).ExecuteCommandAsync();
     }
 

@@ -1,7 +1,7 @@
 using System.Text.Json.Nodes;
-using GameFrameX.Core.Extension.Const;
 using GameFrameX.Core.Service.PlatformLogging;
 using GameFrameX.Core.Service.Business;
+using GameFrameX.Core.SqlSugar;
 using GameFrameX.Entity.Enum;
 using GameFrameX.Entity.System;
 using GameFrameX.Entity.Log;
@@ -122,7 +122,7 @@ public class DatabaseLoggingWriter : IDatabaseLoggingWriter, IDisposable
         };
 
         var sqlSugarClient = _serviceScope.ServiceProvider.GetRequiredService<ISqlSugarClient>();
-        var db = sqlSugarClient.AsTenant().GetConnectionScope(SqlSugarConst.MainConfigId);
+        var db = sqlSugarClient.GetMainDatabaseScope();
 
         // 异常日志优先记录，并继续发布错误邮件事件。
         if (logMsg.Exception != null || loggingMonitor["exception"] != null)
