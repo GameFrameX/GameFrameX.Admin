@@ -26,7 +26,7 @@ export enum GameUserStatus {
 }
 
 /** 根据邮箱添加账号 */
-export interface AddTenantGameUserEntityByMailRequest {
+export interface AddGameUserEntityByMailRequest {
   /** 账号 */
   userName?: string | null;
   /** 密码 */
@@ -53,7 +53,7 @@ export interface AddTenantGameUserEntityByMailRequest {
 }
 
 /** 游戏账号删除输入参数 */
-export interface DeleteTenantGameUserEntityRequest {
+export interface DeleteGameUserEntityRequest {
   /**
    * @min 1
    * @max 9223372036854776000
@@ -102,7 +102,7 @@ export interface GameUserResponseSqlSugarPagedList {
 }
 
 /** 游戏账号分页查询输入参数 */
-export interface PageTenantGameUserEntityRequest {
+export interface PageGameUserEntityRequest {
   searchKey?: string | null;
   /**
    * @format int32
@@ -128,7 +128,7 @@ export interface PageTenantGameUserEntityRequest {
 }
 
 /** 游戏账号更新输入参数 */
-export interface UpdateTenantGameUserEntityRequest {
+export interface UpdateGameUserEntityRequest {
   /**
    * @min 1
    * @max 9223372036854776000

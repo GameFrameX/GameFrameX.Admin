@@ -9,12 +9,12 @@ namespace GameFrameX.Application.CommerceCenter.GameOrder;
 /// 游戏支付订单服务
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
-public class GameOrderService : GenericCrudService<Entity.Tenant.Game.TenantGameOrderEntity, AddTenantGameOrderEntityRequest, UpdateTenantGameOrderEntityRequest, GameOrderResponse, PageTenantGameOrderEntityRequest>
+public class GameOrderService : GenericCrudService<Entity.Business.Game.GameOrderEntity, AddGameOrderEntityRequest, UpdateGameOrderEntityRequest, GameOrderResponse, PageGameOrderEntityRequest>
 {
     private readonly GameOrderShipService _shipService;
     private readonly CurrentUserContext _currentUserContext;
 
-    public GameOrderService(SqlSugarRepository<Entity.Tenant.Game.TenantGameOrderEntity> repository, GameOrderShipService shipService, CurrentUserContext currentUserContext) : base(repository)
+    public GameOrderService(SqlSugarRepository<Entity.Business.Game.GameOrderEntity> repository, GameOrderShipService shipService, CurrentUserContext currentUserContext) : base(repository)
     {
         _shipService = shipService;
         _currentUserContext = currentUserContext;
@@ -23,12 +23,12 @@ public class GameOrderService : GenericCrudService<Entity.Tenant.Game.TenantGame
     /// <summary>
     /// 订单由可信客户端下单和支付回调链路产生，禁止管理后台直接创建。
     /// </summary>
-    protected override Task OnAddingAsync(AddTenantGameOrderEntityRequest input)
+    protected override Task OnAddingAsync(AddGameOrderEntityRequest input)
     {
         throw new Exception("游戏订单由客户端下单链路产生，不支持通过管理后台直接创建");
     }
 
-    protected override ISugarQueryable<GameOrderResponse> BuildPageQuery(PageTenantGameOrderEntityRequest input)
+    protected override ISugarQueryable<GameOrderResponse> BuildPageQuery(PageGameOrderEntityRequest input)
     {
         return Repository.AsQueryable()
                          .WhereIF(input.Status.HasValue, u => u.Status == input.Status)
@@ -53,7 +53,7 @@ public class GameOrderService : GenericCrudService<Entity.Tenant.Game.TenantGame
     /// </summary>
     [HttpPost]
     [ApiDescriptionSettings(Name = "Summary")]
-    public async Task<GameOrderSummaryResponse> SummaryAsync(PageTenantGameOrderEntityRequest input)
+    public async Task<GameOrderSummaryResponse> SummaryAsync(PageGameOrderEntityRequest input)
     {
         var baseQuery = Repository.AsQueryable()
                                   .WhereIF(input.Status.HasValue, u => u.Status == input.Status)
@@ -117,7 +117,7 @@ public class GameOrderService : GenericCrudService<Entity.Tenant.Game.TenantGame
     /// </summary>
     [HttpPost]
     [ApiDescriptionSettings(Name = "Send")]
-    public async Task SendAsync(AddTenantGameOrderEntityRequest input)
+    public async Task SendAsync(AddGameOrderEntityRequest input)
     {
         await _shipService.CompensateAsync(input.Id, "人工补发", _currentUserContext.UserId);
     }

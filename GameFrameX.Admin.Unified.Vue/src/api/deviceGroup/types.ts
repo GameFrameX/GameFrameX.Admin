@@ -4,7 +4,7 @@
 import type { BaseSelectPageResponse, BaseSelectPageStringResponse } from "../_shared/data-contracts";
 
 /** 机器码分组增加输入参数 */
-export interface AddTenantDeviceGroupRequest {
+export interface AddDeviceGroupRequest {
   name?: string | null;
   description?: string | null;
   createdName?: string | null;
@@ -77,7 +77,7 @@ export interface DeviceGroupResponseSqlSugarPagedList {
 }
 
 /** 机器码分组更新输入参数 */
-export interface UpdateTenantDeviceGroupRequest {
+export interface UpdateDeviceGroupRequest {
   name?: string | null;
   description?: string | null;
   createdName?: string | null;

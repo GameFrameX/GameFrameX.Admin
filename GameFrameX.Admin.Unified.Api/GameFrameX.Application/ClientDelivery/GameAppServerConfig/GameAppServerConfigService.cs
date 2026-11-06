@@ -8,9 +8,9 @@ namespace GameFrameX.Application.ClientDelivery.GameAppServerConfig;
 /// 游戏运营配置管理服务（登录 Config md5 差异下发内容源的运营维护面）
 /// </summary>
 [ApiDescriptionSettings(ClientConst.GroupName, Order = 100)]
-public class GameAppServerConfigService : GenericCrudService<Entity.Tenant.Game.ServerConfig.TenantGameAppServerConfigEntity, AddGameAppServerConfigRequest, UpdateGameAppServerConfigRequest, GameAppServerConfigResponse, PageGameAppServerConfigRequest>
+public class GameAppServerConfigService : GenericCrudService<Entity.Business.Game.ServerConfig.GameAppServerConfigEntity, AddGameAppServerConfigRequest, UpdateGameAppServerConfigRequest, GameAppServerConfigResponse, PageGameAppServerConfigRequest>
 {
-    public GameAppServerConfigService(SqlSugarRepository<Entity.Tenant.Game.ServerConfig.TenantGameAppServerConfigEntity> repository) : base(repository)
+    public GameAppServerConfigService(SqlSugarRepository<Entity.Business.Game.ServerConfig.GameAppServerConfigEntity> repository) : base(repository)
     {
     }
 

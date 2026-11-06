@@ -1,5 +1,5 @@
 using GameFrameX.Client.Api.Services.RemoteConfig;
-using GameFrameX.Entity.Tenant.Game.RemoteConfig;
+using GameFrameX.Entity.Business.Game.RemoteConfig;
 using GameFrameX.Client.Api.RemoteConfig.Dto;
 using GameFrameX.Client.Api.Services;
 using GameFrameX.Core.Middleware;
@@ -10,7 +10,7 @@ namespace GameFrameX.Client.Api.RemoteConfig;
 /// <summary>
 /// 远程配置控制器
 /// </summary>
-public class GameRemoteConfigController : BaseController<TenantGameAppRemoteConfigEntity>
+public class GameRemoteConfigController : BaseController<GameAppRemoteConfigEntity>
 {
     private readonly RemoteConfigDeliveryService _deliveryService;
 
@@ -19,7 +19,7 @@ public class GameRemoteConfigController : BaseController<TenantGameAppRemoteConf
     /// </summary>
     /// <param name="service"></param>
     /// <param name="deliveryService">客户端远程配置投放解析服务</param>
-    public GameRemoteConfigController(SqlSugarRepository<TenantGameAppRemoteConfigEntity> service, RemoteConfigDeliveryService deliveryService) : base(service)
+    public GameRemoteConfigController(SqlSugarRepository<GameAppRemoteConfigEntity> service, RemoteConfigDeliveryService deliveryService) : base(service)
     {
         _deliveryService = deliveryService;
     }

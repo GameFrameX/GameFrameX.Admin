@@ -7,7 +7,7 @@ namespace GameFrameX.Core.Middleware;
 /// 热更 manifest）一律纯 HTTPS 无请求签名，且客户端本就不在启动期做签名——不豁免则签名灰度切 FailClosed
 /// 会打断所有存量客户端启动流程。</para>
 /// <para><b>豁免边界</b>：仅豁免传输签名强制，不等于匿名接口——仍要求租户 / 应用上下文解析
-/// （<c>RequireTenantAppContext</c>）+ TLS，也不豁免加密信封 opt-in 与其他中间件（如租户到期拦截）。</para>
+/// （<c>RequireAppContext</c>）+ TLS，也不豁免加密信封 opt-in 与其他中间件（如租户到期拦截）。</para>
 /// <para><b>扩围纪律</b>：新端点打标前必须先过分层判断口诀——「响应里有没有"这个人"的数据、请求有没有副作用」，
 /// 两个都没有才属 Tier 0；有写副作用或防滥用诉求（如 RegisterDevice、验证码发送）归 Tier 1，随 App 级
 /// RiskPolicy 进入签名灰度。扩围须同步更新守护测试 <c>PublicStartupEndpointGuardTests</c> 的预期端点集合。</para>

@@ -122,16 +122,16 @@ public class MenuSeedStaleRowCleanerTests
             // 复活 GFX-741 脏数据形态：旧简写 Key 子树（1 route + 1 按钮样本）与新全称 Key 行同 Permission 并存
             var legacyRoute = Normalize(new GlobalMenuEntity
             {
-                Id = StableSeedId.Menu("route:tenantAdCallbackConfigEntity"),
-                Key = "route:tenantAdCallbackConfigEntity",
+                Id = StableSeedId.Menu("route:adCallbackConfigEntity"),
+                Key = "route:adCallbackConfigEntity",
                 Pid = 0,
                 Type = MenuTypeEnum.Menu,
                 Title = "广告回调配置(旧)",
             });
             var legacyPage = Normalize(new GlobalMenuEntity
             {
-                Id = StableSeedId.Menu("tenantAdCallbackConfigEntity:page"),
-                Key = "tenantAdCallbackConfigEntity:page",
+                Id = StableSeedId.Menu("adCallbackConfigEntity:page"),
+                Key = "adCallbackConfigEntity:page",
                 Pid = legacyRoute.Id,
                 Type = MenuTypeEnum.Button,
                 Permission = "advertisementCallbackConfig:page",
@@ -144,7 +144,7 @@ public class MenuSeedStaleRowCleanerTests
             Assert.Contains("global_menu.Permission 重复: advertisementCallbackConfig:page", before.Message);
 
             var removedKeys = MenuSeedStaleRowCleaner.RemoveStaleRows(db, seedIdsByKey);
-            Assert.Equal(new[] { "route:tenantAdCallbackConfigEntity", "tenantAdCallbackConfigEntity:page", }, removedKeys.OrderBy(u => u, StringComparer.Ordinal).ToArray());
+            Assert.Equal(new[] { "adCallbackConfigEntity:page", "route:adCallbackConfigEntity", }, removedKeys.OrderBy(u => u, StringComparer.Ordinal).ToArray());
 
             // 清理后加载通过，且该 Permission 只剩一条有效定义（种子全称 Key 行）
             MenuSeedCatalog.LoadFromDb(db);
@@ -314,7 +314,7 @@ public class MenuSeedStaleRowCleanerTests
             OrderNo = source.OrderNo,
             Remark = source.Remark ?? string.Empty,
             SuperAdminOnly = source.SuperAdminOnly,
-            AllowTenantWhenSuperAdminOnly = source.AllowTenantWhenSuperAdminOnly,
+            AllowAdminWhenSuperAdminOnly = source.AllowAdminWhenSuperAdminOnly,
             IsEnabled = source.IsEnabled ?? true,
             IsDeleted = false,
             CreatedId = 0,

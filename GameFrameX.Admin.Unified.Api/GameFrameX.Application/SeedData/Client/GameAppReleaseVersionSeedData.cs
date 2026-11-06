@@ -1,4 +1,4 @@
-using GameFrameX.Entity.Tenant.Game.Release;
+using GameFrameX.Entity.Business.Game.Release;
 using GameFrameX.Core.SqlSugar;
 
 namespace GameFrameX.Application.SeedData.Client;
@@ -6,15 +6,15 @@ namespace GameFrameX.Application.SeedData.Client;
 /// <summary>
 /// 客户端程序版本配置表 表种子数据
 /// </summary>
-public class GameAppReleaseVersionSeedData : ISqlSugarEntitySeedData<TenantGameAppReleaseVersionEntity>
+public class GameAppReleaseVersionSeedData : ISqlSugarEntitySeedData<GameAppReleaseVersionEntity>
 {
     /// <summary>
     /// 种子数据
     /// </summary>
     /// <returns></returns>
-    public IEnumerable<TenantGameAppReleaseVersionEntity> HasData()
+    public IEnumerable<GameAppReleaseVersionEntity> HasData()
     {
-        var records = new List<TenantGameAppReleaseVersionEntity>
+        var records = new List<GameAppReleaseVersionEntity>
         {
             new()
             {

@@ -5,7 +5,7 @@ using GameFrameX.Entity.Global;
 
 namespace GameFrameX.Core.Tests.Online.Console;
 
-// C344 / GFX-760 菜单 seed 结构自检（vault:C9 S8.1 + C324 受众前缀化守护 + 高危按钮 TenantAdmin 独占）：
+// C344 / GFX-760 菜单 seed 结构自检（vault:C9 S8.1 + C324 受众前缀化守护 + 高危按钮 Admin 独占）：
 // 容器重定向到在线总览首屏 + 控制台三页面 + 四按钮（查询 ×3 + 受控操作 execute 高危）。
 // 本测试在 psql 不可用的环境（CI / 本机离线）下提供结构断言兜底；正式仓库以 psql 实测为铁证。
 public sealed class OnlineConsoleMenuSeedTests
@@ -32,7 +32,6 @@ public sealed class OnlineConsoleMenuSeedTests
         var page = Assert.Single(menus, m => m.Key == key);
 
         Assert.Equal(MenuTypeEnum.Menu, page.Type);
-        Assert.Equal(MenuAppScopeEnum.Console, page.AppScope);
         Assert.Equal(StableSeedId.Menu("route:gmCenter"), page.Pid);
         Assert.Equal(title, page.Title);
         Assert.Equal(titleCode, page.TitleCode);
@@ -40,7 +39,7 @@ public sealed class OnlineConsoleMenuSeedTests
         // C403：叶子路径和组件直接使用 gmCenter 前缀。
         Assert.Equal(path, page.Path);
         Assert.Equal(component, page.Component);
-        // 控制台查询受众：租户管理员 + 运营负责人 + 客服 GM + 数据分析。
+        // 控制台查询受众：管理员角色 + 运营负责人 + 客服 GM + 数据分析。
     }
 
     [Fact]
@@ -75,6 +74,6 @@ public sealed class OnlineConsoleMenuSeedTests
         Assert.Equal(StableSeedId.Menu("route:onlinePlayerTimeline"), execute.Pid);
         Assert.Equal("onlineControlledCommand:execute", execute.Permission);
         Assert.Equal("受控操作", execute.Title);
-        // 高危：仅租户管理员可见可执行（与资产人工发放/撤销按钮口径一致）。
+        // 高危：仅管理员角色可见可执行（与资产人工发放/撤销按钮口径一致）。
     }
 }

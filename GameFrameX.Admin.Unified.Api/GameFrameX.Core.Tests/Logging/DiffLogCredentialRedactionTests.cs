@@ -5,7 +5,7 @@ using GameFrameX.Core.Option;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Core.Tests.System;
 using GameFrameX.Entity.Log;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 using SqlSugar;
 
 namespace GameFrameX.Core.Tests.Logging;
@@ -29,10 +29,10 @@ public sealed class DiffLogCredentialRedactionTests
             using (var scope = new SqlSugarScope(configuration))
             {
                 var database = scope.GetConnectionScope("main");
-                database.CodeFirst.InitTables<TenantSessionKeyEntity, SystemLogDiffEntity>();
+                database.CodeFirst.InitTables<SessionKeyEntity, SystemLogDiffEntity>();
                 typeof(SqlSugarSetup).GetMethod("SetDbDiffLog", BindingFlags.NonPublic | BindingFlags.Static)!
                     .Invoke(null, new object[] { database, configuration });
-                await database.InsertWithDiffLogAsync(new TenantSessionKeyEntity { Id = 91, Kid = "audit-key", Secret = plain, Remark = "audit" });
+                await database.InsertWithDiffLogAsync(new SessionKeyEntity { Id = 91, Kid = "audit-key", Secret = plain, Remark = "audit" });
                 var row = Assert.Single(await database.Queryable<SystemLogDiffEntity>().ToListAsync());
                 var snapshots = string.Join("|", row.BeforeData, row.AfterData, row.Snapshot, row.BusinessData, row.Sql, row.Parameters);
                 Assert.DoesNotContain(plain, snapshots);

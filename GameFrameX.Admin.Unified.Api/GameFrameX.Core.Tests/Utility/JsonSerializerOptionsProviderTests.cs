@@ -44,21 +44,18 @@ public class JsonSerializerOptionsProviderTests
         var json = JsonSerializer.Serialize(new IdentifierJsonContract
         {
             Id = 4664278385747429000,
-            TenantId = 1300000000001,
             CreatedTime = 1784073600,
         }, options);
 
         Assert.Contains("\"Id\":\"4664278385747429000\"", json);
-        Assert.Contains("\"TenantId\":\"1300000000001\"", json);
         Assert.Contains("\"CreatedTime\":1784073600", json);
 
         var value = JsonSerializer.Deserialize<IdentifierJsonContract>(
-            "{\"Id\":\"4664278385747429000\",\"TenantId\":\"1300000000001\",\"CreatedTime\":1784073600}",
+            "{\"Id\":\"4664278385747429000\",\"CreatedTime\":1784073600}",
             options);
 
         Assert.NotNull(value);
         Assert.Equal(4664278385747429000, value.Id);
-        Assert.Equal(1300000000001, value.TenantId);
         Assert.Equal(1784073600, value.CreatedTime);
     }
 
@@ -79,8 +76,6 @@ public class JsonSerializerOptionsProviderTests
     private sealed class IdentifierJsonContract
     {
         public long Id { get; init; }
-
-        public long? TenantId { get; init; }
 
         public long CreatedTime { get; init; }
     }

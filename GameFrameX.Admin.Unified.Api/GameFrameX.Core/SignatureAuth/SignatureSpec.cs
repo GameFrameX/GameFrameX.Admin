@@ -2,7 +2,7 @@ namespace GameFrameX.Core.SignatureAuth;
 
 /// <summary>
 /// 传输签名规范常量（C267 单一权威）。消息串格式、字段顺序与分隔符的唯一代码事实源，
-/// 服务端验签（<c>SignatureValidationMiddleware</c> / <c>TenantGameAppOpenAccessAuthMiddleware</c>）、
+/// 服务端验签（<c>SignatureValidationMiddleware</c> / <c>GameAppOpenAccessAuthMiddleware</c>）、
 /// 客户端 SDK 与 Postman 预请求脚本均按此对齐。
 /// <para>规范正文（唯一权威 spec）：gfx-doc/dev/signature/spec.md。</para>
 /// <para>标准来源：RFC 2104（HMAC-SHA256）+ RFC 3986 §2.1/§3.4（percent-encoding + canonical query）

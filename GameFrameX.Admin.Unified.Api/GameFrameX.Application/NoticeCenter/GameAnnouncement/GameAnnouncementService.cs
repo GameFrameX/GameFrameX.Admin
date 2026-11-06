@@ -11,13 +11,13 @@ namespace GameFrameX.Application.NoticeCenter.GameAnnouncement;
 /// 游戏公告服务
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
-public class GameAnnouncementService : GenericCrudService<Entity.Tenant.Game.Announcement.TenantGameAnnouncementEntity, AddTenantGameAnnouncementEntityRequest, UpdateTenantGameAnnouncementEntityRequest, GameAnnouncementResponse, PageTenantGameAnnouncementEntityRequest>
+public class GameAnnouncementService : GenericCrudService<Entity.Business.Game.Announcement.GameAnnouncementEntity, AddGameAnnouncementEntityRequest, UpdateGameAnnouncementEntityRequest, GameAnnouncementResponse, PageGameAnnouncementEntityRequest>
 {
     private const string DefaultLanguage = "default";
     private readonly IOnlineLiveOpsDispatchService _dispatchService;
 
     public GameAnnouncementService(
-        SqlSugarRepository<Entity.Tenant.Game.Announcement.TenantGameAnnouncementEntity> repository,
+        SqlSugarRepository<Entity.Business.Game.Announcement.GameAnnouncementEntity> repository,
         IOnlineLiveOpsDispatchService dispatchService) : base(repository)
     {
         _dispatchService = dispatchService;
@@ -26,7 +26,7 @@ public class GameAnnouncementService : GenericCrudService<Entity.Tenant.Game.Ann
     /// <summary>
     /// 构建分页查询条件（含日期范围过滤）
     /// </summary>
-    protected override ISugarQueryable<GameAnnouncementResponse> BuildPageQuery(PageTenantGameAnnouncementEntityRequest input)
+    protected override ISugarQueryable<GameAnnouncementResponse> BuildPageQuery(PageGameAnnouncementEntityRequest input)
     {
         var language = input.Language?.Trim();
         var hasLanguage = !string.IsNullOrWhiteSpace(language);
@@ -48,7 +48,7 @@ public class GameAnnouncementService : GenericCrudService<Entity.Tenant.Game.Ann
     /// <summary>
     /// 新增前标准化多语言字段。
     /// </summary>
-    protected override Task OnAddingAsync(AddTenantGameAnnouncementEntityRequest input)
+    protected override Task OnAddingAsync(AddGameAnnouncementEntityRequest input)
     {
         NormalizeInput(input);
         return Task.CompletedTask;
@@ -57,7 +57,7 @@ public class GameAnnouncementService : GenericCrudService<Entity.Tenant.Game.Ann
     /// <summary>
     /// 更新前校验记录存在并标准化多语言字段。
     /// </summary>
-    protected override async Task OnUpdatingAsync(UpdateTenantGameAnnouncementEntityRequest input)
+    protected override async Task OnUpdatingAsync(UpdateGameAnnouncementEntityRequest input)
     {
         var existing = await Repository.GetFirstAsync(u => u.Id == input.Id);
         if (existing == null)

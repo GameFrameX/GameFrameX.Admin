@@ -4,7 +4,7 @@ using GameFrameX.Entity.Enum;
 namespace GameFrameX.Entity.Log;
 
 /// <summary>
-/// 审计日志公共字段基类。不映射物理表，供 <see cref="SystemLogAuditEntity"/> 与 <see cref="TenantLogAuditEntity"/> 复用字段。
+/// 审计日志公共字段基类。不映射物理表，供 <see cref="SystemLogAuditEntity"/> 与 <see cref="LogAuditEntity"/> 复用字段。
 /// </summary>
 public class LogAuditFields : EntityBasic
 {

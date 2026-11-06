@@ -10,14 +10,14 @@
  */
 
 import {
-  AddTenantGameCommodityEntityRequest,
+  AddGameCommodityEntityRequest,
   GameCommodityAddPostData,
   GameCommodityDeletePostData,
   GameCommodityDetailGetData,
   GameCommodityPagePostData,
   GameCommodityUpdatePostData,
-  PageTenantGameCommodityEntityRequest,
-  UpdateTenantGameCommodityEntityRequest,
+  PageGameCommodityEntityRequest,
+  UpdateGameCommodityEntityRequest,
 } from "./types";
 import {
   BaseDeleteRequest,
@@ -41,7 +41,7 @@ export class GameCommodity<SecurityDataType = unknown> {
    * @request POST:/api/gameCommodity/add
    */
   gameCommodityAddPost = (
-    data: AddTenantGameCommodityEntityRequest,
+    data: AddGameCommodityEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameCommodityAddPostData, any>({
@@ -106,7 +106,7 @@ export class GameCommodity<SecurityDataType = unknown> {
    * @request POST:/api/gameCommodity/page
    */
   gameCommodityPagePost = (
-    data: PageTenantGameCommodityEntityRequest,
+    data: PageGameCommodityEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameCommodityPagePostData, any>({
@@ -126,7 +126,7 @@ export class GameCommodity<SecurityDataType = unknown> {
    * @request POST:/api/gameCommodity/update
    */
   gameCommodityUpdatePost = (
-    data: UpdateTenantGameCommodityEntityRequest,
+    data: UpdateGameCommodityEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameCommodityUpdatePostData, any>({

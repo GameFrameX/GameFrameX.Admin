@@ -1,20 +1,20 @@
 using GameFrameX.Core.SqlSugar;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 
 namespace GameFrameX.Application.SeedData.Game;
 
 /// <summary>
 /// 游戏兑换码渠道 表种子数据
 /// </summary>
-public class GameRedeemCodeChannelSeedData : ISqlSugarEntitySeedData<TenantGameRedeemCodeChannelEntity>
+public class GameRedeemCodeChannelSeedData : ISqlSugarEntitySeedData<GameRedeemCodeChannelEntity>
 {
     /// <summary>
     /// 种子数据
     /// </summary>
     /// <returns></returns>
-    public IEnumerable<TenantGameRedeemCodeChannelEntity> HasData()
+    public IEnumerable<GameRedeemCodeChannelEntity> HasData()
     {
-        var records = new List<TenantGameRedeemCodeChannelEntity>
+        var records = new List<GameRedeemCodeChannelEntity>
         {
             new()
             {

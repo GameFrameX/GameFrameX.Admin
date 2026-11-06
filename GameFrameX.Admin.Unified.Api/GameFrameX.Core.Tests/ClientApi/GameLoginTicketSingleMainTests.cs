@@ -1,8 +1,8 @@
 using System.Security.Cryptography;
-using GameFrameX.Client.Api.Services.ClientApiTenantOptions;
+using GameFrameX.Client.Api.Services.ClientApiOptions;
 using GameFrameX.Client.Api.Services.GameLoginTicket;
-using GameFrameX.Entity.Tenant.Game;
-using GameFrameX.Core.Service.Tenant;
+using GameFrameX.Entity.Business.Game;
+using GameFrameX.Core.Service.Business;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 
@@ -10,16 +10,16 @@ namespace GameFrameX.Core.Tests.ClientApi;
 
 public sealed class GameLoginTicketSingleMainTests : IDisposable
 {
-    private readonly string? _originalKey = Environment.GetEnvironmentVariable(TenantSecretCrypto.KeyEnvironmentVariable);
+    private readonly string? _originalKey = Environment.GetEnvironmentVariable(SecretCrypto.KeyEnvironmentVariable);
 
     public GameLoginTicketSingleMainTests()
     {
-        Environment.SetEnvironmentVariable(TenantSecretCrypto.KeyEnvironmentVariable, "ticket-single-main-test-secret");
+        Environment.SetEnvironmentVariable(SecretCrypto.KeyEnvironmentVariable, "ticket-single-main-test-secret");
     }
 
     public void Dispose()
     {
-        Environment.SetEnvironmentVariable(TenantSecretCrypto.KeyEnvironmentVariable, _originalKey);
+        Environment.SetEnvironmentVariable(SecretCrypto.KeyEnvironmentVariable, _originalKey);
     }
 
     [Fact]
@@ -27,7 +27,7 @@ public sealed class GameLoginTicketSingleMainTests : IDisposable
     {
         using (var database = new ClientApiTestDb())
         {
-            database.InitTenantTables(typeof(TenantGameLoginTicketKeyEntity));
+            database.InitBusinessTables(typeof(GameLoginTicketKeyEntity));
             var options = FakeOptionsProvider.WithTicketPolicy(DateTimeOffset.UtcNow.ToUnixTimeSeconds() + 120);
             var resolver = new GameLoginTicketKeyResolver(database.MainDb, options);
             var issuer = new GameLoginTicketIssuer(resolver, options);
@@ -35,7 +35,7 @@ public sealed class GameLoginTicketSingleMainTests : IDisposable
             var publishedKey = Assert.Single(await resolver.GetPublicKeysAsync());
             Assert.Equal(ticket.Kid, publishedKey.Kid);
             Assert.True(Guid.TryParseExact(ticket.Kid, "N", out _));
-            var storedKey = await database.MainDb.Queryable<TenantGameLoginTicketKeyEntity>().FirstAsync();
+            var storedKey = await database.MainDb.Queryable<GameLoginTicketKeyEntity>().FirstAsync();
             Assert.DoesNotContain("PRIVATE KEY", storedKey.PrivateKeyPem);
             using (var rsa = RSA.Create())
             {
@@ -58,15 +58,15 @@ public sealed class GameLoginTicketSingleMainTests : IDisposable
         using (var database = new ClientApiTestDb())
         using (var rsa = RSA.Create(2048))
         {
-            database.InitTenantTables(typeof(TenantGameLoginTicketKeyEntity));
+            database.InitBusinessTables(typeof(GameLoginTicketKeyEntity));
             var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             var entities = new[]
             {
-                new TenantGameLoginTicketKeyEntity { Id = 1, Kid = "tenant-10-app-20-existing", IsEnabled = true },
-                new TenantGameLoginTicketKeyEntity { Id = 2, Kid = "disabled", IsEnabled = false },
-                new TenantGameLoginTicketKeyEntity { Id = 3, Kid = "expired", IsEnabled = true, ExpireTime = now - 1 },
-                new TenantGameLoginTicketKeyEntity { Id = 4, Kid = "future", IsEnabled = true, NotBeforeTime = now + 300 },
-                new TenantGameLoginTicketKeyEntity { Id = 5, Kid = "wrong-algorithm", IsEnabled = true },
+                new GameLoginTicketKeyEntity { Id = 1, Kid = "10-app-20-existing", IsEnabled = true },
+                new GameLoginTicketKeyEntity { Id = 2, Kid = "disabled", IsEnabled = false },
+                new GameLoginTicketKeyEntity { Id = 3, Kid = "expired", IsEnabled = true, ExpireTime = now - 1 },
+                new GameLoginTicketKeyEntity { Id = 4, Kid = "future", IsEnabled = true, NotBeforeTime = now + 300 },
+                new GameLoginTicketKeyEntity { Id = 5, Kid = "wrong-algorithm", IsEnabled = true },
             };
             foreach (var entity in entities)
             {
@@ -79,7 +79,7 @@ public sealed class GameLoginTicketSingleMainTests : IDisposable
             var resolver = new GameLoginTicketKeyResolver(database.MainDb, FakeOptionsProvider.WithTicketPolicy(now + 60));
             var signing = await resolver.ResolveSigningKeyAsync();
             var published = Assert.Single(await resolver.GetPublicKeysAsync());
-            Assert.Equal("tenant-10-app-20-existing", signing.Kid);
+            Assert.Equal("10-app-20-existing", signing.Kid);
             Assert.Equal(signing.Kid, published.Kid);
         }
     }

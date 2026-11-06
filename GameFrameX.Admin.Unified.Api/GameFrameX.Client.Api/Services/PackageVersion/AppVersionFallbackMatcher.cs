@@ -1,5 +1,5 @@
 using GameFrameX.Core.Const;
-using GameFrameX.Entity.Tenant.Game.Release;
+using GameFrameX.Entity.Business.Game.Release;
 using GameFrameX.Client.Api.GameAppVersion.Dto;
 using System.Linq.Expressions;
 
@@ -9,16 +9,16 @@ namespace GameFrameX.Client.Api.Services.PackageVersion;
 /// 应用版本 Fallback 匹配器实现
 /// </summary>
 /// <remarks>
-/// 针对 TenantGameAppReleaseVersionEntity 实体的 Fallback 匹配实现。
-/// 注意：TenantGameAppReleaseVersionEntity 使用 OldVersion 字段存储应用版本。
+/// 针对 GameAppReleaseVersionEntity 实体的 Fallback 匹配实现。
+/// 注意：GameAppReleaseVersionEntity 使用 OldVersion 字段存储应用版本。
 /// </remarks>
-public class AppVersionFallbackMatcher : GameAppPackageFallbackMatcher<GameAppVersionRequest, TenantGameAppReleaseVersionEntity>
+public class AppVersionFallbackMatcher : GameAppPackageFallbackMatcher<GameAppVersionRequest, GameAppReleaseVersionEntity>
 {
     /// <summary>
     /// 初始化匹配器
     /// </summary>
     public AppVersionFallbackMatcher(
-        Repository<TenantGameAppReleaseVersionEntity> repository,
+        Repository<GameAppReleaseVersionEntity> repository,
         GameAppPackageResolver resolver)
         : base(repository, resolver)
     {
@@ -27,7 +27,7 @@ public class AppVersionFallbackMatcher : GameAppPackageFallbackMatcher<GameAppVe
     /// <summary>
     /// 构建完全匹配所有参数的查询条件
     /// </summary>
-    protected override Expression<Func<TenantGameAppReleaseVersionEntity, bool>> BuildExactPredicates(GameAppVersionRequest request)
+    protected override Expression<Func<GameAppReleaseVersionEntity, bool>> BuildExactPredicates(GameAppVersionRequest request)
     {
         return m => m.Platform == request.Platform &&
                     m.Package == request.PackageName &&
@@ -39,7 +39,7 @@ public class AppVersionFallbackMatcher : GameAppPackageFallbackMatcher<GameAppVe
     /// <summary>
     /// 构建使用默认语言的查询条件
     /// </summary>
-    protected override Expression<Func<TenantGameAppReleaseVersionEntity, bool>> BuildPredicatesWithDefaultLanguage(GameAppVersionRequest request)
+    protected override Expression<Func<GameAppReleaseVersionEntity, bool>> BuildPredicatesWithDefaultLanguage(GameAppVersionRequest request)
     {
         return m => m.Platform == request.Platform &&
                     m.Package == request.PackageName &&
@@ -51,7 +51,7 @@ public class AppVersionFallbackMatcher : GameAppPackageFallbackMatcher<GameAppVe
     /// <summary>
     /// 构建使用默认渠道的查询条件
     /// </summary>
-    protected override Expression<Func<TenantGameAppReleaseVersionEntity, bool>> BuildPredicatesWithDefaultChannel(GameAppVersionRequest request)
+    protected override Expression<Func<GameAppReleaseVersionEntity, bool>> BuildPredicatesWithDefaultChannel(GameAppVersionRequest request)
     {
         return m => m.Platform == request.Platform &&
                     m.Package == request.PackageName &&
@@ -63,7 +63,7 @@ public class AppVersionFallbackMatcher : GameAppPackageFallbackMatcher<GameAppVe
     /// <summary>
     /// 构建使用默认版本的查询条件
     /// </summary>
-    protected override Expression<Func<TenantGameAppReleaseVersionEntity, bool>> BuildPredicatesWithDefaultVersion(GameAppVersionRequest request)
+    protected override Expression<Func<GameAppReleaseVersionEntity, bool>> BuildPredicatesWithDefaultVersion(GameAppVersionRequest request)
     {
         return m => m.Platform == request.Platform &&
                     m.Package == request.PackageName &&
@@ -75,7 +75,7 @@ public class AppVersionFallbackMatcher : GameAppPackageFallbackMatcher<GameAppVe
     /// <summary>
     /// 构建使用默认包名的查询条件
     /// </summary>
-    protected override Expression<Func<TenantGameAppReleaseVersionEntity, bool>> BuildPredicatesWithDefaultPackage(GameAppVersionRequest request)
+    protected override Expression<Func<GameAppReleaseVersionEntity, bool>> BuildPredicatesWithDefaultPackage(GameAppVersionRequest request)
     {
         return m => m.Platform == request.Platform &&
                     m.Package == GameDimensionConst.PackageNameDefault &&
@@ -87,7 +87,7 @@ public class AppVersionFallbackMatcher : GameAppPackageFallbackMatcher<GameAppVe
     /// <summary>
     /// 构建使用默认平台的查询条件
     /// </summary>
-    protected override Expression<Func<TenantGameAppReleaseVersionEntity, bool>> BuildPredicatesWithDefaultPlatform(GameAppVersionRequest request)
+    protected override Expression<Func<GameAppReleaseVersionEntity, bool>> BuildPredicatesWithDefaultPlatform(GameAppVersionRequest request)
     {
         return m => m.Platform == GameDimensionConst.PlatformDefault &&
                     m.Package == GameDimensionConst.PackageNameDefault &&

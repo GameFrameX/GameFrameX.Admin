@@ -4,7 +4,7 @@
 // 
 // 不得利用本项目从事危害国家安全、扰乱社会秩序、侵犯他人合法权益等法律法规禁止的活动！任何基于本项目二次开发而产生的一切法律纠纷和责任，我们不承担任何责任！
 
-namespace GameFrameX.Entity.Tenant.Game;
+namespace GameFrameX.Entity.Business.Game;
 
 /// <summary>
 /// 道具对象。非物理表映射：作为邮件附件 / 奖励明细 / 兑换码内容等 string 列的内嵌 JSON 值对象使用，不参与 SqlSugar 建表与仓储。

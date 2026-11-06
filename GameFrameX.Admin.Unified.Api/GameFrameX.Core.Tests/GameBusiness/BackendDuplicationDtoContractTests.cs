@@ -99,13 +99,13 @@ public class BackendDuplicationDtoContractTests
     [Fact]
     public void GameBusinessDtos_ShareEditFieldsAndKeepUpdateContract()
     {
-        AssertContainsExactly<AddTenantGameMailTemplateEntityRequest>(MailTemplateSharedFields.Concat(new[] { "Id", }));
-        AssertContainsExactly<UpdateTenantGameMailTemplateEntityRequest>(MailTemplateSharedFields.Concat(UpdateContractFields));
-        AssertUpdateContract<UpdateTenantGameMailTemplateEntityRequest>();
+        AssertContainsExactly<AddGameMailTemplateEntityRequest>(MailTemplateSharedFields.Concat(new[] { "Id", }));
+        AssertContainsExactly<UpdateGameMailTemplateEntityRequest>(MailTemplateSharedFields.Concat(UpdateContractFields));
+        AssertUpdateContract<UpdateGameMailTemplateEntityRequest>();
 
-        AssertContainsExactly<AddTenantGameAnnouncementEntityRequest>(AnnouncementSharedFields);
-        AssertContainsExactly<UpdateTenantGameAnnouncementEntityRequest>(AnnouncementSharedFields.Concat(UpdateContractFields));
-        AssertUpdateContract<UpdateTenantGameAnnouncementEntityRequest>();
+        AssertContainsExactly<AddGameAnnouncementEntityRequest>(AnnouncementSharedFields);
+        AssertContainsExactly<UpdateGameAnnouncementEntityRequest>(AnnouncementSharedFields.Concat(UpdateContractFields));
+        AssertUpdateContract<UpdateGameAnnouncementEntityRequest>();
     }
 
     [Fact]
@@ -113,8 +113,8 @@ public class BackendDuplicationDtoContractTests
     {
         AssertDeclaredOn<GameAppRemoteConfigEditRequest, UpdateGameAppRemoteConfigRequest>(RemoteConfigEditFields);
         AssertDeclaredOn<GameAppReleaseVersionEditRequest, UpdateGameAppReleaseVersionRequest>(ReleaseVersionEditFields);
-        AssertDeclaredOn<GameMailTemplateBaseRequest, UpdateTenantGameMailTemplateEntityRequest>(MailTemplateSharedFields);
-        AssertDeclaredOn<GameAnnouncementBaseRequest, UpdateTenantGameAnnouncementEntityRequest>(AnnouncementSharedFields);
+        AssertDeclaredOn<GameMailTemplateBaseRequest, UpdateGameMailTemplateEntityRequest>(MailTemplateSharedFields);
+        AssertDeclaredOn<GameAnnouncementBaseRequest, UpdateGameAnnouncementEntityRequest>(AnnouncementSharedFields);
     }
 
     private static readonly string[] UpdateContractFields = { "Id", "RowVersion", };

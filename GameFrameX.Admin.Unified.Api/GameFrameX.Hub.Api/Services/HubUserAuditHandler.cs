@@ -8,7 +8,7 @@ namespace GameFrameX.Hub.Api.Services;
 /// Hub API 操作人审计 handler：经共享层 SqlSugarClientConfig.AddSqlSugarClientService 的 userAuditHandler
 /// 挂点接入（ClaimConst 位于 GameFrameX.Core，共享层无法反向引用，故 Hub 差异留在 host 端参数化）。
 /// <para>依据当前 context.User claims 填充 CreatedId / CreatedName（插入）与 UpdatedId / UpdatedName（更新），
-/// 修 Hub.Api 既有 CreatedId 恒 0 缺陷；JWT 与 TenantGameAppOpenAccessEntity 机器凭证路径均受益。
+/// 修 Hub.Api 既有 CreatedId 恒 0 缺陷；JWT 与 GameAppOpenAccessEntity 机器凭证路径均受益。
 /// 逻辑承接自原 Hub.Api SqlSugarClientConfig（三 host 仓储收敛 C259）。</para>
 /// </summary>
 public static class HubUserAuditHandler
@@ -26,7 +26,7 @@ public static class HubUserAuditHandler
 
             if (entityInfo.OperationType == DataFilterType.InsertByObject)
             {
-                // CreatedId / CreatedName（对齐 Core SqlSugarSetup，修 Hub.Api 既有 CreatedId 恒 0 缺陷；JWT 与 TenantGameAppOpenAccessEntity 机器凭证路径均受益）
+                // CreatedId / CreatedName（对齐 Core SqlSugarSetup，修 Hub.Api 既有 CreatedId 恒 0 缺陷；JWT 与 GameAppOpenAccessEntity 机器凭证路径均受益）
                 if (user != null && entityInfo.PropertyName == nameof(EntityBasic.CreatedId))
                 {
                     var createdId = ((dynamic)entityInfo.EntityValue).CreatedId;

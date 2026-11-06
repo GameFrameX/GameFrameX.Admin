@@ -7,17 +7,17 @@ namespace GameFrameX.Application.NoticeCenter.GameBannerAnnouncement;
 /// 游戏内横幅公告服务
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
-public class GameBannerAnnouncementService : GenericCrudService<Entity.Tenant.Game.Announcement.TenantGameBannerAnnouncementEntity, AddTenantGameBannerAnnouncementEntityRequest, UpdateTenantGameBannerAnnouncementEntityRequest, GameBannerAnnouncementResponse, PageTenantGameBannerAnnouncementEntityRequest>
+public class GameBannerAnnouncementService : GenericCrudService<Entity.Business.Game.Announcement.GameBannerAnnouncementEntity, AddGameBannerAnnouncementEntityRequest, UpdateGameBannerAnnouncementEntityRequest, GameBannerAnnouncementResponse, PageGameBannerAnnouncementEntityRequest>
 {
     public GameBannerAnnouncementService(
-        SqlSugarRepository<Entity.Tenant.Game.Announcement.TenantGameBannerAnnouncementEntity> repository) : base(repository)
+        SqlSugarRepository<Entity.Business.Game.Announcement.GameBannerAnnouncementEntity> repository) : base(repository)
     {
     }
 
     /// <summary>
     /// 构建分页查询条件（含日期范围过滤）
     /// </summary>
-    protected override ISugarQueryable<GameBannerAnnouncementResponse> BuildPageQuery(PageTenantGameBannerAnnouncementEntityRequest input)
+    protected override ISugarQueryable<GameBannerAnnouncementResponse> BuildPageQuery(PageGameBannerAnnouncementEntityRequest input)
     {
         var query = Repository.AsQueryable()
                               .WhereIF(input.AreaId > 0, u => u.AreaId == input.AreaId)
@@ -38,7 +38,7 @@ public class GameBannerAnnouncementService : GenericCrudService<Entity.Tenant.Ga
     /// <summary>
     /// 新增前初始化本地化字段。
     /// </summary>
-    protected override Task OnAddingAsync(AddTenantGameBannerAnnouncementEntityRequest input)
+    protected override Task OnAddingAsync(AddGameBannerAnnouncementEntityRequest input)
     {
         // 实体列 NOT NULL 且前端无此字段：无本地化 key 语义 = 直接展示 Content，兜底空串
         input.ContentLocalizationKey ??= string.Empty;
@@ -48,7 +48,7 @@ public class GameBannerAnnouncementService : GenericCrudService<Entity.Tenant.Ga
     /// <summary>
     /// 更新前校验记录存在。
     /// </summary>
-    protected override async Task OnUpdatingAsync(UpdateTenantGameBannerAnnouncementEntityRequest input)
+    protected override async Task OnUpdatingAsync(UpdateGameBannerAnnouncementEntityRequest input)
     {
         var existing = await Repository.GetFirstAsync(u => u.Id == input.Id);
         if (existing == null)

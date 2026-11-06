@@ -10,7 +10,7 @@
  */
 
 import {
-  AddTenantGameMailTemplateCategoryEntityRequest,
+  AddGameMailTemplateCategoryEntityRequest,
   GameMailTemplateCategoryAddPostData,
   GameMailTemplateCategoryDeletePostData,
   GameMailTemplateCategoryDetailGetData,
@@ -18,8 +18,8 @@ import {
   GameMailTemplateCategorySelectPostData,
   GameMailTemplateCategorySelectStringPostData,
   GameMailTemplateCategoryUpdatePostData,
-  PageTenantGameMailTemplateCategoryEntityRequest,
-  UpdateTenantGameMailTemplateCategoryEntityRequest,
+  PageGameMailTemplateCategoryEntityRequest,
+  UpdateGameMailTemplateCategoryEntityRequest,
 } from "./types";
 import {
   BaseDeleteRequest,
@@ -44,7 +44,7 @@ export class GameMailTemplateCategory<SecurityDataType = unknown> {
    * @request POST:/api/gameMailTemplateCategory/add
    */
   gameMailTemplateCategoryAddPost = (
-    data: AddTenantGameMailTemplateCategoryEntityRequest,
+    data: AddGameMailTemplateCategoryEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameMailTemplateCategoryAddPostData, any>({
@@ -109,7 +109,7 @@ export class GameMailTemplateCategory<SecurityDataType = unknown> {
    * @request POST:/api/gameMailTemplateCategory/page
    */
   gameMailTemplateCategoryPagePost = (
-    data: PageTenantGameMailTemplateCategoryEntityRequest,
+    data: PageGameMailTemplateCategoryEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameMailTemplateCategoryPagePostData, any>({
@@ -169,7 +169,7 @@ export class GameMailTemplateCategory<SecurityDataType = unknown> {
    * @request POST:/api/gameMailTemplateCategory/update
    */
   gameMailTemplateCategoryUpdatePost = (
-    data: UpdateTenantGameMailTemplateCategoryEntityRequest,
+    data: UpdateGameMailTemplateCategoryEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameMailTemplateCategoryUpdatePostData, any>({

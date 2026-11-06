@@ -6,9 +6,9 @@ namespace GameFrameX.Application.ClientDelivery.GameAppAssetPackageVersionHistor
 /// 资源包版本记录服务
 /// </summary>
 [ApiDescriptionSettings(ClientConst.GroupName, Order = 100)]
-public class GameAppAssetPackageVersionHistoryService : GenericCrudService<Entity.Tenant.Game.Release.TenantGameAppAssetPackageVersionHistoryEntity, AddGameAppAssetPackageVersionHistoryRequest, BaseUpdateRequest, GameAppAssetPackageVersionHistoryResponse, PageGameAppAssetPackageVersionHistoryRequest>
+public class GameAppAssetPackageVersionHistoryService : GenericCrudService<Entity.Business.Game.Release.GameAppAssetPackageVersionHistoryEntity, AddGameAppAssetPackageVersionHistoryRequest, BaseUpdateRequest, GameAppAssetPackageVersionHistoryResponse, PageGameAppAssetPackageVersionHistoryRequest>
 {
-    public GameAppAssetPackageVersionHistoryService(SqlSugarRepository<Entity.Tenant.Game.Release.TenantGameAppAssetPackageVersionHistoryEntity> repository) : base(repository)
+    public GameAppAssetPackageVersionHistoryService(SqlSugarRepository<Entity.Business.Game.Release.GameAppAssetPackageVersionHistoryEntity> repository) : base(repository)
     {
     }
 

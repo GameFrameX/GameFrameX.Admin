@@ -4,7 +4,7 @@ using GameFrameX.Foundation.Orm.Entity;
 namespace GameFrameX.Entity.System;
 
 /// <summary>
-/// 用户字段基类，仅提供 system_user 与 tenant_user 共享字段，不直接映射物理表。
+/// 用户字段基类，仅提供 system_user 与 user 共享字段，不直接映射物理表。
 /// </summary>
 public abstract class SystemUserBase : EntityBase
 {
@@ -170,7 +170,7 @@ public abstract class SystemUserBase : EntityBase
     /// 直属主管
     /// </summary>
     [Navigate(NavigateType.OneToOne, nameof(ManagerUserId))]
-    public TenantUserEntity ManagerUser { get; set; } = null!;
+    public UserEntity ManagerUser { get; set; } = null!;
 
 
     /// <summary>

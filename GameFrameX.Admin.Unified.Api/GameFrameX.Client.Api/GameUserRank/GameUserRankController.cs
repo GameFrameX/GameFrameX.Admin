@@ -27,16 +27,16 @@ public class GameUserRankController : BaseController
     /// </summary>
     private static long _groupSeq;
 
-    private readonly Repository<TenantGameRankEntryEntity> _rankRepository;
-    private readonly Repository<TenantGameUserArchiveEntity> _archiveRepository;
+    private readonly Repository<GameRankEntryEntity> _rankRepository;
+    private readonly Repository<GameUserArchiveEntity> _archiveRepository;
 
     /// <summary>
     ///
     /// </summary>
     /// <param name="rankRepository">排行榜条目仓储</param>
     /// <param name="archiveRepository">存档仓储（机器人从真实玩家档抽样）</param>
-    public GameUserRankController(Repository<TenantGameRankEntryEntity> rankRepository,
-        Repository<TenantGameUserArchiveEntity> archiveRepository)
+    public GameUserRankController(Repository<GameRankEntryEntity> rankRepository,
+        Repository<GameUserArchiveEntity> archiveRepository)
     {
         _rankRepository = rankRepository;
         _archiveRepository = archiveRepository;
@@ -63,7 +63,7 @@ public class GameUserRankController : BaseController
         var own = entries.FirstOrDefault(x => x.GroupId == groupId && x.UserId == request.UserId);
         if (own == null)
         {
-            own = new TenantGameRankEntryEntity
+            own = new GameRankEntryEntity
             {
                 RankType = request.RankType,
                 GroupId = groupId,
@@ -153,7 +153,7 @@ public class GameUserRankController : BaseController
     /// <summary>
     /// 机器人补位到榜单固定规模（真实玩家档抽样 + 合成凑满，插入同表保证三视图一致）
     /// </summary>
-    private async Task PadRobotsAsync(GameUserRankJoinRequest request, string groupId, List<TenantGameRankEntryEntity> rows)
+    private async Task PadRobotsAsync(GameUserRankJoinRequest request, string groupId, List<GameRankEntryEntity> rows)
     {
         if (rows.Count >= BoardSize)
         {
@@ -164,11 +164,11 @@ public class GameUserRankController : BaseController
         // ponytail: 真实档候选全量取回内存随机（同 RandomRobots）；玩家量上来后改 SQL 随机抽样或机器人池配置
         var candidates = await _archiveRepository.GetListAsync(x => x.NickName != string.Empty && x.Icon != string.Empty);
         Shuffle(candidates);
-        var pool = new Queue<TenantGameUserArchiveEntity>(
+        var pool = new Queue<GameUserArchiveEntity>(
             candidates.Where(x => !memberIds.Contains(x.UserId) && x.UserId != request.UserId));
         var seq = 1;
         var stamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-        var robots = new List<TenantGameRankEntryEntity>();
+        var robots = new List<GameRankEntryEntity>();
         while (rows.Count + robots.Count < BoardSize)
         {
             long userId;
@@ -197,7 +197,7 @@ public class GameUserRankController : BaseController
             }
 
             // ponytail: 机器人分数围绕玩家 token 散布（伪随机 0.1x~1.9x）；旧服机器人难度曲线黑盒
-            robots.Add(new TenantGameRankEntryEntity
+            robots.Add(new GameRankEntryEntity
             {
                 RankType = request.RankType,
                 GroupId = groupId,
@@ -252,7 +252,7 @@ public class GameUserRankController : BaseController
     /// <summary>
     /// 组内按 Score 降序（同分按 UserId 升序稳定排序）就地重算名次
     /// </summary>
-    private static List<TenantGameRankEntryEntity> RecomputeRanks(List<TenantGameRankEntryEntity> rows)
+    private static List<GameRankEntryEntity> RecomputeRanks(List<GameRankEntryEntity> rows)
     {
         var ordered = rows.OrderByDescending(x => x.Score).ThenBy(x => x.UserId).ToList();
         for (var i = 0; i < ordered.Count; i++)
@@ -263,7 +263,7 @@ public class GameUserRankController : BaseController
         return ordered;
     }
 
-    private static List<GameRankInfo> ToRankInfos(List<TenantGameRankEntryEntity> ordered)
+    private static List<GameRankInfo> ToRankInfos(List<GameRankEntryEntity> ordered)
     {
         var result = new List<GameRankInfo>();
         foreach (var row in ordered)
@@ -291,7 +291,7 @@ public class GameUserRankController : BaseController
     /// <summary>
     /// Fisher-Yates 洗牌（机器人候选随机化）
     /// </summary>
-    private static void Shuffle(List<TenantGameUserArchiveEntity> list)
+    private static void Shuffle(List<GameUserArchiveEntity> list)
     {
         for (var i = list.Count - 1; i > 0; i--)
         {

@@ -25,16 +25,16 @@ public sealed class RoleAuthorizationCacheTests : IDisposable
 {
     private readonly ClientApiTestDb _database = new();
     private readonly SystemCacheService _cache = new(new MemoryCacheService(), Options.Create(new CacheOptions()));
-    private readonly TenantRoleMenuService _roleMenus;
-    private readonly TenantUserRoleService _userRoles;
-    private readonly TenantRoleService _roles;
+    private readonly RoleMenuService _roleMenus;
+    private readonly UserRoleService _userRoles;
+    private readonly RoleService _roles;
     private readonly ServiceProvider _services;
     private readonly GlobalMenuService _menus;
 
     public RoleAuthorizationCacheTests()
     {
         MenuSeedCatalogTestData.LoadSampleMenus();
-        _database.InitTenantTables(typeof(GlobalMenuEntity), typeof(TenantRoleEntity), typeof(TenantRoleMenuEntity), typeof(TenantUserRoleEntity));
+        _database.InitBusinessTables(typeof(GlobalMenuEntity), typeof(RoleEntity), typeof(RoleMenuEntity), typeof(UserRoleEntity));
         _database.MainDb.Insertable(new[]
         {
             new GlobalMenuEntity { Id = 101, Key = "cache-test:first", Title = "First", Type = MenuTypeEnum.Button, IsEnabled = true, IsDeleted = false },
@@ -42,26 +42,26 @@ public sealed class RoleAuthorizationCacheTests : IDisposable
         }).ExecuteCommand();
         _database.MainDb.Insertable(new[]
         {
-            new TenantRoleEntity { Id = 11, Name = "First role", IsEnabled = true, IsDeleted = false },
-            new TenantRoleEntity { Id = 12, Name = "Second role", IsEnabled = true, IsDeleted = false },
+            new RoleEntity { Id = 11, Name = "First role", IsEnabled = true, IsDeleted = false },
+            new RoleEntity { Id = 12, Name = "Second role", IsEnabled = true, IsDeleted = false },
         }).ExecuteCommand();
         _database.MainDb.Insertable(new[]
         {
-            new TenantRoleMenuEntity { Id = 21, RoleId = 11, MenuId = 101 },
-            new TenantRoleMenuEntity { Id = 22, RoleId = 12, MenuId = 102 },
+            new RoleMenuEntity { Id = 21, RoleId = 11, MenuId = 101 },
+            new RoleMenuEntity { Id = 22, RoleId = 12, MenuId = 102 },
         }).ExecuteCommand();
-        _database.MainDb.Insertable(new TenantUserRoleEntity { Id = 31, UserId = 1, RoleId = 11 }).ExecuteCommand();
+        _database.MainDb.Insertable(new UserRoleEntity { Id = 31, UserId = 1, RoleId = 11 }).ExecuteCommand();
         var transaction = new SqlSugarTransactionRunner(_database.MainDb);
         var menuRepository = new SqlSugarRepository<GlobalMenuEntity> { Context = _database.MainDb };
-        _roleMenus = new TenantRoleMenuService(new SqlSugarRepository<TenantRoleMenuEntity> { Context = _database.MainDb }, menuRepository, _cache, transaction);
-        _userRoles = new TenantUserRoleService(new SqlSugarRepository<TenantUserRoleEntity> { Context = _database.MainDb }, _cache, transaction);
+        _roleMenus = new RoleMenuService(new SqlSugarRepository<RoleMenuEntity> { Context = _database.MainDb }, menuRepository, _cache, transaction);
+        _userRoles = new UserRoleService(new SqlSugarRepository<UserRoleEntity> { Context = _database.MainDb }, _cache, transaction);
         var context = new CurrentUserContext(new HttpContextAccessor
         {
             HttpContext = new DefaultHttpContext { User = new ClaimsPrincipal(new ClaimsIdentity(new[] { new Claim(ClaimConst.UserId, "1") }, "test")) },
         });
         _services = new ServiceCollection().AddSingleton(_roleMenus).AddSingleton(_userRoles).AddSingleton(_cache).BuildServiceProvider();
         _menus = new GlobalMenuService(context, menuRepository, _cache, _services, _database.MainDb);
-        _roles = new TenantRoleService(context, new SqlSugarRepository<TenantRoleEntity> { Context = _database.MainDb }, _roleMenus, _userRoles, _services);
+        _roles = new RoleService(context, new SqlSugarRepository<RoleEntity> { Context = _database.MainDb }, _roleMenus, _userRoles, _services);
     }
 
     [Fact]
@@ -118,11 +118,11 @@ public sealed class RoleAuthorizationCacheTests : IDisposable
         {
             Id = 11, MenuIdList = seedMenus.Select(menu => menu.Id).ToList(),
         });
-        var granted = await _database.MainDb.Queryable<TenantRoleMenuEntity>()
+        var granted = await _database.MainDb.Queryable<RoleMenuEntity>()
                                      .Where(relation => relation.RoleId == 11)
                                      .Select(relation => relation.MenuId).ToListAsync();
         var protectedIdentifiers = MenuSeedCatalog.SuperAdminOnlySubtreeMenuIds;
-        var readableIdentifiers = MenuSeedCatalog.TenantReadableSuperAdminOnlyMenuIds;
+        var readableIdentifiers = MenuSeedCatalog.AdminReadableSuperAdminOnlyMenuIds;
         Assert.NotEmpty(protectedIdentifiers);
         Assert.All(protectedIdentifiers.Except(readableIdentifiers), identifier => Assert.DoesNotContain(identifier, granted));
         Assert.All(readableIdentifiers, identifier => Assert.Contains(identifier, granted));

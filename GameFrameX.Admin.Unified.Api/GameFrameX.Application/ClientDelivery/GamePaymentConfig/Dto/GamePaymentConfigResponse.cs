@@ -3,7 +3,7 @@ namespace GameFrameX.Application.ClientDelivery.GamePaymentConfig.Dto;
 /// <summary>
 /// 游戏支付配置输出参数
 /// </summary>
-public class GamePaymentConfigResponse : IBasePageResponse<Entity.Tenant.Game.TenantGamePaymentConfigEntity>
+public class GamePaymentConfigResponse : IBasePageResponse<Entity.Business.Game.GamePaymentConfigEntity>
 {
     /// <summary>
     /// Id

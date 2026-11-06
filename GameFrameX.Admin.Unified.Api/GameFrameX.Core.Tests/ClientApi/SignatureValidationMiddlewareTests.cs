@@ -8,7 +8,7 @@ using GameFrameX.Core.Cache;
 using GameFrameX.Core.Enum;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Entity.Enum;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -689,9 +689,9 @@ public sealed class SignatureValidationMiddlewareTests
         Assert.Equal(SignatureKeyLookupResult.Expired, SignatureKeyResolver.Judge(Key(0, now, true), now)); // now == Expire 即到期
         return;
 
-        static TenantAppSignatureKeyEntity Key(long? notBefore, long? expire, bool enabled)
+        static AppSignatureKeyEntity Key(long? notBefore, long? expire, bool enabled)
         {
-            return new TenantAppSignatureKeyEntity { NotBeforeTime = notBefore, ExpireTime = expire, IsEnabled = enabled, };
+            return new AppSignatureKeyEntity { NotBeforeTime = notBefore, ExpireTime = expire, IsEnabled = enabled, };
         }
     }
 
@@ -709,12 +709,12 @@ public sealed class SignatureValidationMiddlewareTests
     /// </summary>
     private sealed class FakeSignatureKeyResolver : ISignatureKeyResolver
     {
-        private readonly List<TenantAppSignatureKeyEntity> _keys = new();
+        private readonly List<AppSignatureKeyEntity> _keys = new();
 
         public void AddKey(long appId, string kid, string secret, bool enabled, long? notBefore, long? expire)
         {
             _keys.RemoveAll(x => x.Kid == kid);
-            _keys.Add(new TenantAppSignatureKeyEntity
+            _keys.Add(new AppSignatureKeyEntity
             {
                 Kid = kid,
                 Secret = secret,

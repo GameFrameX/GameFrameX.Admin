@@ -2,7 +2,7 @@ using System.Security.Cryptography;
 using System.Text;
 using GameFrameX.Application.ClientDelivery.Rollout;
 using GameFrameX.Core.Const;
-using GameFrameX.Entity.Tenant.Game.FeatureSwitch;
+using GameFrameX.Entity.Business.Game.FeatureSwitch;
 
 namespace GameFrameX.Application.ClientDelivery.FeatureSwitch;
 
@@ -36,13 +36,13 @@ public sealed class FeatureSwitchDeliveryResolver
     /// </summary>
     private const int ChannelScopeScore = 2;
 
-    private readonly SqlSugarRepository<TenantGameAppFeatureSwitchEntity> _repository;
+    private readonly SqlSugarRepository<GameAppFeatureSwitchEntity> _repository;
 
     /// <summary>
     /// 初始化活动/功能开关投放解析器。
     /// </summary>
     /// <param name="repository">主库开关注册表仓储（自带软删除过滤）。</param>
-    public FeatureSwitchDeliveryResolver(SqlSugarRepository<TenantGameAppFeatureSwitchEntity> repository)
+    public FeatureSwitchDeliveryResolver(SqlSugarRepository<GameAppFeatureSwitchEntity> repository)
     {
         _repository = repository;
     }
@@ -65,7 +65,7 @@ public sealed class FeatureSwitchDeliveryResolver
     /// <param name="candidates">候选行集合，顺序不参与计算。</param>
     /// <param name="query">投放解析入参。</param>
     /// <returns>投放版本号与生效开关集合。</returns>
-    public static FeatureSwitchDeliveryResult Resolve(IReadOnlyList<TenantGameAppFeatureSwitchEntity> candidates, FeatureSwitchDeliveryQuery query)
+    public static FeatureSwitchDeliveryResult Resolve(IReadOnlyList<GameAppFeatureSwitchEntity> candidates, FeatureSwitchDeliveryQuery query)
     {
         var effective = candidates.Where(row => IsEffective(row, query)).ToList();
         var switches = effective.Where(row => IsScopeMatch(row, query))
@@ -84,7 +84,7 @@ public sealed class FeatureSwitchDeliveryResolver
     /// <param name="row">候选行。</param>
     /// <param name="query">投放解析入参。</param>
     /// <returns>有效返回 true，否则返回 false。</returns>
-    private static bool IsEffective(TenantGameAppFeatureSwitchEntity row, FeatureSwitchDeliveryQuery query)
+    private static bool IsEffective(GameAppFeatureSwitchEntity row, FeatureSwitchDeliveryQuery query)
     {
         if (row.IsEnabled == false)
         {
@@ -127,7 +127,7 @@ public sealed class FeatureSwitchDeliveryResolver
     /// <param name="row">候选行。</param>
     /// <param name="nowUtc">本次判定的 UTC 服务器时间。</param>
     /// <returns>落在窗内返回 true，否则返回 false。</returns>
-    private static bool IsInTimeWindow(TenantGameAppFeatureSwitchEntity row, DateTime nowUtc)
+    private static bool IsInTimeWindow(GameAppFeatureSwitchEntity row, DateTime nowUtc)
     {
         if (row.StartTime.HasValue && nowUtc < ToUtc(row.StartTime.Value))
         {
@@ -149,7 +149,7 @@ public sealed class FeatureSwitchDeliveryResolver
     /// <param name="row">候选行。</param>
     /// <param name="query">投放解析入参。</param>
     /// <returns>四维全部匹配返回 true，否则返回 false。</returns>
-    private static bool IsScopeMatch(TenantGameAppFeatureSwitchEntity row, FeatureSwitchDeliveryQuery query)
+    private static bool IsScopeMatch(GameAppFeatureSwitchEntity row, FeatureSwitchDeliveryQuery query)
     {
         return IsDimensionMatch(row.Platform, query.Platform, GameDimensionConst.PlatformDefault)
                && IsDimensionMatch(row.Language, query.Language, GameDimensionConst.LanguageDefault)
@@ -196,7 +196,7 @@ public sealed class FeatureSwitchDeliveryResolver
     /// <param name="row">候选行。</param>
     /// <param name="query">投放解析入参。</param>
     /// <returns>命中返回 true，否则返回 false。</returns>
-    private static bool IsRolloutHit(TenantGameAppFeatureSwitchEntity row, FeatureSwitchDeliveryQuery query)
+    private static bool IsRolloutHit(GameAppFeatureSwitchEntity row, FeatureSwitchDeliveryQuery query)
     {
         if (query.Audience == FeatureSwitchAudience.Server)
         {
@@ -216,7 +216,7 @@ public sealed class FeatureSwitchDeliveryResolver
     /// <param name="group">同开关键的候选行（已通过作用域与灰度过滤）。</param>
     /// <param name="query">投放解析入参，提供评分所需的作用域上下文。</param>
     /// <returns>该开关键的投放投影。</returns>
-    private static FeatureSwitchEffectiveItem SelectWinner(IGrouping<string, TenantGameAppFeatureSwitchEntity> group, FeatureSwitchDeliveryQuery query)
+    private static FeatureSwitchEffectiveItem SelectWinner(IGrouping<string, GameAppFeatureSwitchEntity> group, FeatureSwitchDeliveryQuery query)
     {
         var winner = group.OrderByDescending(row => CalculateScore(row, query))
                           .ThenByDescending(row => row.Priority)
@@ -231,7 +231,7 @@ public sealed class FeatureSwitchDeliveryResolver
     /// <param name="row">候选行。</param>
     /// <param name="query">投放解析入参。</param>
     /// <returns>作用域评分。</returns>
-    private static int CalculateScore(TenantGameAppFeatureSwitchEntity row, FeatureSwitchDeliveryQuery query)
+    private static int CalculateScore(GameAppFeatureSwitchEntity row, FeatureSwitchDeliveryQuery query)
     {
         var score = 0;
 
@@ -265,7 +265,7 @@ public sealed class FeatureSwitchDeliveryResolver
     /// </summary>
     /// <param name="effective">有效候选行集合。</param>
     /// <returns>小写 32 位 hex 版本号。</returns>
-    private static string BuildVersion(IReadOnlyList<TenantGameAppFeatureSwitchEntity> effective)
+    private static string BuildVersion(IReadOnlyList<GameAppFeatureSwitchEntity> effective)
     {
         var projection = effective.OrderBy(row => row.SwitchKey, StringComparer.Ordinal)
                                   .ThenBy(row => row.Id)

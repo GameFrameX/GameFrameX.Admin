@@ -2,7 +2,7 @@ using GameFrameX.Core.Job;
 using GameFrameX.Application.Platform.Job;
 using GameFrameX.Core.Api;
 using GameFrameX.Core.DependencyInjection;
-using GameFrameX.Core.Service.Tenant;
+using GameFrameX.Core.Service.Business;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GameFrameX.Web.Api.DependencyInjection;

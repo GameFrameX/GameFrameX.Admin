@@ -7,7 +7,7 @@ using GameFrameX.Application.NoticeCenter.GameRewardTemplateGroup;
 using GameFrameX.Application.NoticeCenter.GameRewardTemplateGroup.Dto;
 using GameFrameX.Application.SeedData.System;
 using GameFrameX.Core.Service.Base;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GameFrameX.Core.Tests.GameBusiness;
@@ -17,8 +17,8 @@ public class RewardTemplateContractTests
     [Fact]
     public void RewardTemplateEntities_CarryBusinessFieldsWithoutApplication()
     {
-        var groupProps = PropNames<TenantGameRewardTemplateGroupEntity>();
-        var templateProps = PropNames<TenantGameRewardTemplateEntity>();
+        var groupProps = PropNames<GameRewardTemplateGroupEntity>();
+        var templateProps = PropNames<GameRewardTemplateEntity>();
 
         Assert.DoesNotContain("AppId", groupProps);
         Assert.DoesNotContain("Code", groupProps);
@@ -35,12 +35,12 @@ public class RewardTemplateContractTests
     [Fact]
     public void RewardTemplateInputs_ExposeRewardFieldsWithoutApplication()
     {
-        Assert.Null(typeof(AddTenantGameRewardTemplateGroupEntityRequest).GetProperty("AppId"));
-        Assert.Null(typeof(AddTenantGameRewardTemplateGroupEntityRequest).GetProperty("Code"));
-        Assert.Null(typeof(AddTenantGameRewardTemplateGroupEntityRequest).GetProperty("Icon"));
-        Assert.Null(typeof(AddTenantGameRewardTemplateEntityRequest).GetProperty("AppId"));
-        AssertRequired<AddTenantGameRewardTemplateEntityRequest>(nameof(AddTenantGameRewardTemplateEntityRequest.GroupId));
-        AssertRequired<AddTenantGameRewardTemplateEntityRequest>(nameof(AddTenantGameRewardTemplateEntityRequest.RewardItemsJson));
+        Assert.Null(typeof(AddGameRewardTemplateGroupEntityRequest).GetProperty("AppId"));
+        Assert.Null(typeof(AddGameRewardTemplateGroupEntityRequest).GetProperty("Code"));
+        Assert.Null(typeof(AddGameRewardTemplateGroupEntityRequest).GetProperty("Icon"));
+        Assert.Null(typeof(AddGameRewardTemplateEntityRequest).GetProperty("AppId"));
+        AssertRequired<AddGameRewardTemplateEntityRequest>(nameof(AddGameRewardTemplateEntityRequest.GroupId));
+        AssertRequired<AddGameRewardTemplateEntityRequest>(nameof(AddGameRewardTemplateEntityRequest.RewardItemsJson));
         Assert.Null(typeof(GameRewardTemplateSnapshotRequest).GetProperty("AppId"));
     }
 

@@ -10,7 +10,7 @@
  */
 
 import {
-  AddTenantGameGoodsCatalogueEntityRequest,
+  AddGameGoodsCatalogueEntityRequest,
   GameGoodsCatalogueAddPostData,
   GameGoodsCatalogueDeletePostData,
   GameGoodsCatalogueDetailGetData,
@@ -18,8 +18,8 @@ import {
   GameGoodsCatalogueSelectPostData,
   GameGoodsCatalogueSelectStringPostData,
   GameGoodsCatalogueUpdatePostData,
-  PageTenantGameGoodsCatalogueEntityRequest,
-  UpdateTenantGameGoodsCatalogueEntityRequest,
+  PageGameGoodsCatalogueEntityRequest,
+  UpdateGameGoodsCatalogueEntityRequest,
 } from "./types";
 import {
   BaseDeleteRequest,
@@ -44,7 +44,7 @@ export class GameGoodsCatalogue<SecurityDataType = unknown> {
    * @request POST:/api/gameGoodsCatalogue/add
    */
   gameGoodsCatalogueAddPost = (
-    data: AddTenantGameGoodsCatalogueEntityRequest,
+    data: AddGameGoodsCatalogueEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameGoodsCatalogueAddPostData, any>({
@@ -109,7 +109,7 @@ export class GameGoodsCatalogue<SecurityDataType = unknown> {
    * @request POST:/api/gameGoodsCatalogue/page
    */
   gameGoodsCataloguePagePost = (
-    data: PageTenantGameGoodsCatalogueEntityRequest,
+    data: PageGameGoodsCatalogueEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameGoodsCataloguePagePostData, any>({
@@ -169,7 +169,7 @@ export class GameGoodsCatalogue<SecurityDataType = unknown> {
    * @request POST:/api/gameGoodsCatalogue/update
    */
   gameGoodsCatalogueUpdatePost = (
-    data: UpdateTenantGameGoodsCatalogueEntityRequest,
+    data: UpdateGameGoodsCatalogueEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameGoodsCatalogueUpdatePostData, any>({

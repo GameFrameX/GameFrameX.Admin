@@ -14,7 +14,7 @@ public static class CryptogramUtility
 
     /// <summary>
     /// 应用平台密码策略快照到静态属性（C173）。由 <c>PlatformPasswordPolicyConfigProvider.RefreshAsync</c>
-    /// 在启动期与 SuperAdmin 保存后调用，使 <c>TenantUserService.ChangePwd</c> 读取的密码策略静态属性
+    /// 在启动期与 SuperAdmin 保存后调用，使 <c>UserService.ChangePwd</c> 读取的密码策略静态属性
     /// 始终反映 SystemConfigEntity 最新快照，实现同 Host 动态生效。
     /// </summary>
     /// <param name="strongPassword">是否开启密码强度验证</param>

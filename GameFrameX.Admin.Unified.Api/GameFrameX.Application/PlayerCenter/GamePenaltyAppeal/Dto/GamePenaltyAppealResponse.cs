@@ -5,7 +5,7 @@ namespace GameFrameX.Application.PlayerCenter.GamePenaltyAppeal.Dto;
 /// <summary>
 /// 申诉输出参数（含审核审计字段，供后台只读展示）。
 /// </summary>
-public class GamePenaltyAppealResponse : IBasePageResponse<Entity.Tenant.Game.TenantGamePenaltyAppealEntity>
+public class GamePenaltyAppealResponse : IBasePageResponse<Entity.Business.Game.GamePenaltyAppealEntity>
 {
     /// <summary>
     /// Id
@@ -13,7 +13,7 @@ public class GamePenaltyAppealResponse : IBasePageResponse<Entity.Tenant.Game.Te
     public long Id { get; set; }
 
     /// <summary>
-    /// 关联处罚 Id（TenantGamePenaltyEntity.Id）。
+    /// 关联处罚 Id（GamePenaltyEntity.Id）。
     /// </summary>
     public long PenaltyId { get; set; }
 

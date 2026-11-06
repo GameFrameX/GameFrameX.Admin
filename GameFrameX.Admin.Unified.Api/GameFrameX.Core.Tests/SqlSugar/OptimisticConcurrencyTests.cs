@@ -4,7 +4,7 @@ using GameFrameX.Core.Exceptions;
 using GameFrameX.Core.Service.Base;
 using GameFrameX.Core.Extension;
 using GameFrameX.Core.SqlSugar;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 using Microsoft.AspNetCore.Http;
 using SqlSugar;
 using ClientRepository = GameFrameX.Core.SqlSugar.Repository<GameFrameX.Core.Tests.SqlSugar.OptimisticTestEntity>;
@@ -27,14 +27,14 @@ public sealed class OptimisticConcurrencyTests : IDisposable
         };
         SqlSugarUnifiedConfig.ConfigureBaseSettings(config);
         _db = new SqlSugarScope(config);
-        _db.CodeFirst.InitTables(typeof(TenantGameGoodsEntity), typeof(OptimisticTestEntity));
+        _db.CodeFirst.InitTables(typeof(GameGoodsEntity), typeof(OptimisticTestEntity));
     }
 
     [Fact]
     public void VersionColumn_UsesSqlSugarOptimisticLockMetadata()
     {
-        var versionColumn = _db.EntityMaintenance.GetEntityInfo<TenantGameGoodsEntity>().Columns
-                               .Single(column => column.PropertyName == nameof(TenantGameGoodsEntity.RowVersion));
+        var versionColumn = _db.EntityMaintenance.GetEntityInfo<GameGoodsEntity>().Columns
+                               .Single(column => column.PropertyName == nameof(GameGoodsEntity.RowVersion));
 
         Assert.True(versionColumn.IsEnableUpdateVersionValidation);
     }
@@ -78,7 +78,7 @@ public sealed class OptimisticConcurrencyTests : IDisposable
     [Fact]
     public async Task OptimisticUpdate_WhenSnapshotsHaveSameVersion_RejectsSecondWrite()
     {
-        var entity = new TenantGameGoodsEntity
+        var entity = new GameGoodsEntity
         {
             Id = 1,
             Name = "initial",
@@ -88,8 +88,8 @@ public sealed class OptimisticConcurrencyTests : IDisposable
         };
         await _db.Insertable(entity).ExecuteCommandAsync();
 
-        var firstSnapshot = await _db.Queryable<TenantGameGoodsEntity>().InSingleAsync(entity.Id);
-        var secondSnapshot = await _db.Queryable<TenantGameGoodsEntity>().InSingleAsync(entity.Id);
+        var firstSnapshot = await _db.Queryable<GameGoodsEntity>().InSingleAsync(entity.Id);
+        var secondSnapshot = await _db.Queryable<GameGoodsEntity>().InSingleAsync(entity.Id);
         firstSnapshot.Name = "first";
         secondSnapshot.Name = "second";
 
@@ -97,7 +97,7 @@ public sealed class OptimisticConcurrencyTests : IDisposable
         await Assert.ThrowsAsync<VersionExceptions>(() =>
                                                         _db.Updateable(secondSnapshot).ExecuteCommandWithOptLockAsync(true));
 
-        var persisted = await _db.Queryable<TenantGameGoodsEntity>().InSingleAsync(entity.Id);
+        var persisted = await _db.Queryable<GameGoodsEntity>().InSingleAsync(entity.Id);
         Assert.Equal(1, firstRows);
         Assert.Equal("first", persisted.Name);
         Assert.NotEqual(0, persisted.RowVersion);

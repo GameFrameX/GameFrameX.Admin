@@ -6,7 +6,7 @@ namespace GameFrameX.Application.CommerceCenter.GameOrderFulfillment.Dto;
 /// 权益发货账本输出参数（C120）。投影暴露实体全字段：
 /// Type/Status/FailureReason/IdempotencyKey/OperatorId/ItemsJson/订单快照（OrderId/PayChannel/ProviderTransactionId/Sku/RoleId/AreaId/AccountId/Amount）/审计列。
 /// </summary>
-public class GameOrderFulfillmentResponse : IBasePageResponse<Entity.Tenant.Game.TenantGameOrderFulfillmentEntity>
+public class GameOrderFulfillmentResponse : IBasePageResponse<Entity.Business.Game.GameOrderFulfillmentEntity>
 {
     /// <summary>
     /// Id
@@ -14,7 +14,7 @@ public class GameOrderFulfillmentResponse : IBasePageResponse<Entity.Tenant.Game
     public long Id { get; set; }
 
     /// <summary>
-    /// 来源订单 Id（TenantGameOrderEntity.Id）。
+    /// 来源订单 Id（GameOrderEntity.Id）。
     /// </summary>
     public long OrderId { get; set; }
 

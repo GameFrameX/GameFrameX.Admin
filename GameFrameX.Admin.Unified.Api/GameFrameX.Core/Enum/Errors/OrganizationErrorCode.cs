@@ -51,7 +51,7 @@ public enum OrganizationErrorCode
     /// 租户默认组织禁止删除
     /// </summary>
     [ErrorText("租户默认组织禁止删除", "The tenant default organization cannot be deleted")]
-    TenantDefaultOrganizationDeleteForbidden = 30700008,
+    DefaultOrganizationDeleteForbidden = 30700008,
 
     /// <summary>
     /// 禁止增加根节点组织

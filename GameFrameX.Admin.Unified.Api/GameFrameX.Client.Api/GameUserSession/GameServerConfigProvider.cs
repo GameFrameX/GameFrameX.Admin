@@ -1,4 +1,4 @@
-using GameFrameX.Entity.Tenant.Game.ServerConfig;
+using GameFrameX.Entity.Business.Game.ServerConfig;
 
 namespace GameFrameX.Client.Api.GameUserSession;
 
@@ -10,7 +10,7 @@ public static class GameServerConfigProvider
     /// <summary>
     /// 加载生效配置行（键 → 内容版本号与配置 JSON 原文）。
     /// </summary>
-    public static async Task<Dictionary<string, (string Md5, string Config)>> LoadEffectiveAsync(Repository<TenantGameAppServerConfigEntity> repository)
+    public static async Task<Dictionary<string, (string Md5, string Config)>> LoadEffectiveAsync(Repository<GameAppServerConfigEntity> repository)
     {
         var rows = await repository.GetListAsync(u => u.Enabled);
         var effective = new Dictionary<string, (string, string)>(StringComparer.Ordinal);

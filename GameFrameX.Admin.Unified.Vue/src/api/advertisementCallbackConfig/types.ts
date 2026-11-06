@@ -2,7 +2,7 @@
 /* tslint:disable */
 
 /** 租户广告回调配置新增输入参数 */
-export interface AddTenantAdvertisementCallbackConfigRequest {
+export interface AddAdvertisementCallbackConfigRequest {
   /**
    * 广告平台 Provider。当前首批配置支持 `TopOn`、`GoogleAdMob`、`Pangle`、`UnityAds`。
    * @minLength 1
@@ -107,7 +107,7 @@ export interface AdvertisementCallbackProviderItem {
 }
 
 /** 租户广告回调验签配置分页查询输入参数 */
-export interface PageTenantAdvertisementCallbackConfigRequest {
+export interface PageAdvertisementCallbackConfigRequest {
   searchKey?: string | null;
   /**
    * @format int32
@@ -133,7 +133,7 @@ export interface PageTenantAdvertisementCallbackConfigRequest {
  *
  * 敏感字段提交 `******` 时表示保留原值。
  */
-export interface UpdateTenantAdvertisementCallbackConfigRequest {
+export interface UpdateAdvertisementCallbackConfigRequest {
   /**
    * @min 1
    * @max 9223372036854776000

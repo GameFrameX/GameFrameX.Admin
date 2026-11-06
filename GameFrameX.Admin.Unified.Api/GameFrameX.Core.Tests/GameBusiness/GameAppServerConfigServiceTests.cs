@@ -6,7 +6,7 @@ using GameFrameX.Application.ClientDelivery.GameAppServerConfig.Dto;
 using GameFrameX.Core.Exceptions;
 using GameFrameX.Core.Extension;
 using GameFrameX.Core.SqlSugar;
-using GameFrameX.Entity.Tenant.Game.ServerConfig;
+using GameFrameX.Entity.Business.Game.ServerConfig;
 using SqlSugar;
 
 namespace GameFrameX.Core.Tests.GameBusiness;
@@ -31,7 +31,7 @@ public sealed class GameAppServerConfigServiceTests : IDisposable
         SqlSugarUnifiedConfig.ConfigureBaseSettings(config);
         _db = new SqlSugarScope(config);
         SqlSugarUnifiedConfig.ConfigureBaseFilters(_db);
-        _db.CodeFirst.InitTables(typeof(TenantGameAppServerConfigEntity));
+        _db.CodeFirst.InitTables(typeof(GameAppServerConfigEntity));
     }
 
     /// <summary>
@@ -50,7 +50,7 @@ public sealed class GameAppServerConfigServiceTests : IDisposable
         });
 
         Assert.Equal(Md5Of("{\"list\":[1,2]}"), row.Md5);
-        var stored = await _db.Queryable<TenantGameAppServerConfigEntity>().FirstAsync(u => u.Id == row.Id);
+        var stored = await _db.Queryable<GameAppServerConfigEntity>().FirstAsync(u => u.Id == row.Id);
         Assert.Equal("{\"list\":[1,2]}", stored.Config); // 归一化原文落库
         Assert.Equal(Md5Of(stored.Config), stored.Md5);
     }
@@ -119,7 +119,7 @@ public sealed class GameAppServerConfigServiceTests : IDisposable
             Enabled = true,
         });
 
-        var stored = await _db.Queryable<TenantGameAppServerConfigEntity>().FirstAsync(u => u.Id == row.Id);
+        var stored = await _db.Queryable<GameAppServerConfigEntity>().FirstAsync(u => u.Id == row.Id);
         Assert.NotEqual(row.Md5, stored.Md5);
         Assert.Equal(Md5Of(stored.Config), stored.Md5);
     }
@@ -146,7 +146,7 @@ public sealed class GameAppServerConfigServiceTests : IDisposable
             Enabled = true,
         });
 
-        var stored = await _db.Queryable<TenantGameAppServerConfigEntity>().FirstAsync(u => u.Id == row.Id);
+        var stored = await _db.Queryable<GameAppServerConfigEntity>().FirstAsync(u => u.Id == row.Id);
         Assert.Equal(row.Md5, stored.Md5);
     }
 
@@ -173,7 +173,7 @@ public sealed class GameAppServerConfigServiceTests : IDisposable
             Enabled = false,
         });
 
-        var stored = await _db.Queryable<TenantGameAppServerConfigEntity>().FirstAsync(u => u.Id == row.Id);
+        var stored = await _db.Queryable<GameAppServerConfigEntity>().FirstAsync(u => u.Id == row.Id);
         Assert.False(stored.Enabled);
     }
 
@@ -191,14 +191,14 @@ public sealed class GameAppServerConfigServiceTests : IDisposable
 
     private GameAppServerConfigService CreateService()
     {
-        return new GameAppServerConfigService(new SqlSugarRepository<TenantGameAppServerConfigEntity> { Context = _db, });
+        return new GameAppServerConfigService(new SqlSugarRepository<GameAppServerConfigEntity> { Context = _db, });
     }
 
     private long _nextSeedId = 900000;
 
     private async Task InsertAsync(string key, string config)
     {
-        await _db.Insertable(new TenantGameAppServerConfigEntity
+        await _db.Insertable(new GameAppServerConfigEntity
         {
             Id = _nextSeedId++,
             Key = key,

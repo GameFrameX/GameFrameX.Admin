@@ -10,15 +10,15 @@
  */
 
 import {
-  AddTenantGameMailEntityRequest,
+  AddGameMailEntityRequest,
   GameMailAddPostData,
   GameMailDeletePostData,
   GameMailDetailGetData,
   GameMailPagePostData,
   GameMailSendPostData,
   GameMailUpdatePostData,
-  PageTenantGameMailEntityRequest,
-  UpdateTenantGameMailEntityRequest,
+  PageGameMailEntityRequest,
+  UpdateGameMailEntityRequest,
 } from "./types";
 import {
   BaseDeleteRequest,
@@ -43,7 +43,7 @@ export class GameMail<SecurityDataType = unknown> {
    * @request POST:/api/gameMail/add
    */
   gameMailAddPost = (
-    data: AddTenantGameMailEntityRequest,
+    data: AddGameMailEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameMailAddPostData, any>({
@@ -105,7 +105,7 @@ export class GameMail<SecurityDataType = unknown> {
    * @request POST:/api/gameMail/page
    */
   gameMailPagePost = (
-    data: PageTenantGameMailEntityRequest,
+    data: PageGameMailEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameMailPagePostData, any>({
@@ -141,7 +141,7 @@ export class GameMail<SecurityDataType = unknown> {
    * @request POST:/api/gameMail/update
    */
   gameMailUpdatePost = (
-    data: UpdateTenantGameMailEntityRequest,
+    data: UpdateGameMailEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameMailUpdatePostData, any>({

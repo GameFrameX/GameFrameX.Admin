@@ -6,7 +6,7 @@ namespace GameFrameX.Application.GmCenter.Console.Dto;
 public enum OnlineAuditSourceKind
 {
     /// <summary>
-    /// Admin 操作日志（TenantLogOperationEntity，MonitorLogging 全 action 自动落库）。
+    /// Admin 操作日志（LogOperationEntity，MonitorLogging 全 action 自动落库）。
     /// </summary>
     AdminOperation = 1,
 

@@ -2,7 +2,7 @@ using System.Security.Cryptography;
 using GameFrameX.Application.ClientDelivery.Security.SessionKey.Dto;
 using GameFrameX.Core.Service.Base;
 using GameFrameX.Core.Service;
-using GameFrameX.Core.Service.Tenant;
+using GameFrameX.Core.Service.Business;
 
 #pragma warning disable CS8629 // SqlSugar WhereIF(condition, lambda)：lambda 仅在 condition=true 时执行；NRT 无法跨方法传播条件守卫，lambda 内 .Value 实际安全
 namespace GameFrameX.Application.ClientDelivery.Security.SessionKey;
@@ -11,12 +11,12 @@ namespace GameFrameX.Application.ClientDelivery.Security.SessionKey;
 /// App 会话密钥环管理服务（change C5 server-envelope-middleware；C7 登录自动签发见 Client.Api 的 ClientApiSessionKeyIssuer）。
 /// <para>密钥明文仅服务端随机生成（不接受外部提交，避免弱密钥入环），仅 AddAsync/RotateAsync 响应一次性回显；
 /// 列表/详情一律脱敏 ******；实体禁删（历史 key 是在途加密信封的解密依据），退场走 DisableAsync 或租约到期。</para>
-/// <para>作用域：主库。路由前缀 /api/tenantSessionKeyEntity。</para>
+/// <para>作用域：主库。路由前缀 /api/sessionKeyEntity。</para>
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 114)]
-public class SessionKeyService : BaseService<TenantSessionKeyEntity>
+public class SessionKeyService : BaseService<SessionKeyEntity>
 {
-    public SessionKeyService(SqlSugarRepository<TenantSessionKeyEntity> repository)
+    public SessionKeyService(SqlSugarRepository<SessionKeyEntity> repository)
         : base(repository)
     {
     }
@@ -26,7 +26,7 @@ public class SessionKeyService : BaseService<TenantSessionKeyEntity>
     /// </summary>
     [HttpPost(CrudActionRoutes.Page)]
     [ApiDescriptionSettings(Name = "Page")]
-    public async Task<SqlSugarPagedList<SessionKeyResponse>> PageAsync(PageTenantSessionKeyRequest input)
+    public async Task<SqlSugarPagedList<SessionKeyResponse>> PageAsync(PageSessionKeyRequest input)
     {
         var page = await Repository.AsQueryable()
                                    .Where(u => u.IsDeleted == false)
@@ -56,10 +56,10 @@ public class SessionKeyService : BaseService<TenantSessionKeyEntity>
         ValidateLease(notBefore, input.ExpireTime, now);
 
         var plainSecret = GenerateSecret();
-        var entity = new TenantSessionKeyEntity
+        var entity = new SessionKeyEntity
         {
             Kid = GenerateKid(now),
-            Secret = TenantSecretCrypto.Encrypt(plainSecret) ?? string.Empty,
+            Secret = SecretCrypto.Encrypt(plainSecret) ?? string.Empty,
             NotBeforeTime = notBefore,
             ExpireTime = input.ExpireTime,
             IsEnabled = true,
@@ -108,10 +108,10 @@ public class SessionKeyService : BaseService<TenantSessionKeyEntity>
         }
 
         var plainSecret = GenerateSecret();
-        var entity = new TenantSessionKeyEntity
+        var entity = new SessionKeyEntity
         {
             Kid = GenerateKid(now),
-            Secret = TenantSecretCrypto.Encrypt(plainSecret) ?? string.Empty,
+            Secret = SecretCrypto.Encrypt(plainSecret) ?? string.Empty,
             NotBeforeTime = now,
             ExpireTime = null,
             IsEnabled = true,
@@ -254,7 +254,7 @@ public class SessionKeyService : BaseService<TenantSessionKeyEntity>
     /// <summary>
     /// 一次性回显输出：库内密文（C371），响应携带生成时明文。
     /// </summary>
-    private static SessionKeyRevealResponse ToRevealOutput(TenantSessionKeyEntity entity, string plainSecret)
+    private static SessionKeyRevealResponse ToRevealOutput(SessionKeyEntity entity, string plainSecret)
     {
         return new SessionKeyRevealResponse
         {

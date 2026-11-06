@@ -13,7 +13,7 @@ import {
   GameOnlineConfigRolloutPagePostData,
   GameOnlineConfigRolloutPublishPostData,
   GameOnlineConfigRolloutRollbackPostData,
-  PageTenantGameOnlineConfigRolloutRequest,
+  PageGameOnlineConfigRolloutRequest,
   PublishConfigRolloutRequest,
   RollbackConfigRolloutRequest,
 } from "./types";
@@ -36,7 +36,7 @@ export class GameOnlineConfigRollout<SecurityDataType = unknown> {
    * @request POST:/api/gameOnlineConfigRollout/page
    */
   gameOnlineConfigRolloutPagePost = (
-    data: PageTenantGameOnlineConfigRolloutRequest,
+    data: PageGameOnlineConfigRolloutRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameOnlineConfigRolloutPagePostData, any>({

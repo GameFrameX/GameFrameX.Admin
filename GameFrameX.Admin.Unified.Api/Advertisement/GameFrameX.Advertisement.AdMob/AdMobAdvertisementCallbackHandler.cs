@@ -3,7 +3,7 @@ using GameFrameX.Advertisement.Abstract;
 using GameFrameX.Foundation.Json;
 using GameFrameX.Foundation.Logger;
 using GameFrameX.Core.SqlSugar;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 using Microsoft.AspNetCore.Http;
 using GameFrameX.Core.SignatureAuth;
 
@@ -19,11 +19,11 @@ public sealed class AdMobAdvertisementCallbackHandler : AdvertisementCallbackHan
         get { return "GoogleAdMob"; }
     }
 
-    public AdMobAdvertisementCallbackHandler(Repository<TenantGameRoleEntity> roleRepository) : base(roleRepository)
+    public AdMobAdvertisementCallbackHandler(Repository<GameRoleEntity> roleRepository) : base(roleRepository)
     {
     }
 
-    public OptionVerification Verify(TenantAdvertisementCallbackOptions advertisementOptions, IQueryCollection query)
+    public OptionVerification Verify(AdvertisementCallbackOptions advertisementOptions, IQueryCollection query)
     {
         var option = DeserializeOption<GoogleAdMobAdvertisementCallbackOption>(advertisementOptions);
         if (option == null || string.IsNullOrWhiteSpace(option.verificationKeys))

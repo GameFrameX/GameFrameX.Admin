@@ -21,27 +21,27 @@ namespace GameFrameX.Entity.Game.Online;
 public enum LiveOpsSourceKind
 {
     /// <summary>
-    /// 远程配置（<c>TenantGameAppRemoteConfigEntity</c>；Online 命令 <c>publishRemoteConfig</c>，配置内容快照幂等）。
+    /// 远程配置（<c>GameAppRemoteConfigEntity</c>；Online 命令 <c>publishRemoteConfig</c>，配置内容快照幂等）。
     /// </summary>
     [Description("远程配置")] RemoteConfig = 1,
 
     /// <summary>
-    /// 设备分组（<c>TenantDeviceGroupEntity</c>；Online 命令 <c>syncDeviceGroup</c>，全量快照同步幂等）。
+    /// 设备分组（<c>DeviceGroupEntity</c>；Online 命令 <c>syncDeviceGroup</c>，全量快照同步幂等）。
     /// </summary>
     [Description("设备分组")] DeviceGroup = 2,
 
     /// <summary>
-    /// 定时任务（<c>TenantGameTimeJobEntity</c>；Online 命令 <c>syncScheduledTask</c>，任务定义快照同步幂等）。
+    /// 定时任务（<c>GameTimeJobEntity</c>；Online 命令 <c>syncScheduledTask</c>，任务定义快照同步幂等）。
     /// </summary>
     [Description("定时任务")] ScheduledTask = 3,
 
     /// <summary>
-    /// 玩家公告（<c>TenantGameAnnouncementEntity</c>；Online 命令 <c>pushAnnouncement</c>，公告 Id + 内容快照幂等）。
+    /// 玩家公告（<c>GameAnnouncementEntity</c>；Online 命令 <c>pushAnnouncement</c>，公告 Id + 内容快照幂等）。
     /// </summary>
     [Description("玩家公告")] Announcement = 4,
 
     /// <summary>
-    /// 运营邮件 Campaign（<c>TenantGameMailCampaignEntity</c>；复用既有 <c>publish_mail_campaign</c> 链路，
+    /// 运营邮件 Campaign（<c>GameMailCampaignEntity</c>；复用既有 <c>publish_mail_campaign</c> 链路，
     /// 同目标已发布时合并返回首次回执，不重复下发）。
     /// </summary>
     [Description("邮件 Campaign")] MailCampaign = 5,

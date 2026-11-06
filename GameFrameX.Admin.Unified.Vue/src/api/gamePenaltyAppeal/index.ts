@@ -10,16 +10,16 @@
  */
 
 import {
-  AddTenantGamePenaltyAppealEntityRequest,
+  AddGamePenaltyAppealEntityRequest,
   GamePenaltyAppealAddPostData,
   GamePenaltyAppealDeletePostData,
   GamePenaltyAppealDetailGetData,
   GamePenaltyAppealPagePostData,
   GamePenaltyAppealReviewPostData,
   GamePenaltyAppealUpdatePostData,
-  PageTenantGamePenaltyAppealEntityRequest,
-  ReviewTenantGamePenaltyAppealEntityRequest,
-  UpdateTenantGamePenaltyAppealEntityRequest,
+  PageGamePenaltyAppealEntityRequest,
+  ReviewGamePenaltyAppealEntityRequest,
+  UpdateGamePenaltyAppealEntityRequest,
 } from "./types";
 import {
   BaseDeleteRequest,
@@ -43,7 +43,7 @@ export class GamePenaltyAppeal<SecurityDataType = unknown> {
    * @request POST:/api/gamePenaltyAppeal/add
    */
   gamePenaltyAppealAddPost = (
-    data: AddTenantGamePenaltyAppealEntityRequest,
+    data: AddGamePenaltyAppealEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GamePenaltyAppealAddPostData, any>({
@@ -108,7 +108,7 @@ export class GamePenaltyAppeal<SecurityDataType = unknown> {
    * @request POST:/api/gamePenaltyAppeal/page
    */
   gamePenaltyAppealPagePost = (
-    data: PageTenantGamePenaltyAppealEntityRequest,
+    data: PageGamePenaltyAppealEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GamePenaltyAppealPagePostData, any>({
@@ -128,7 +128,7 @@ export class GamePenaltyAppeal<SecurityDataType = unknown> {
    * @request POST:/api/gamePenaltyAppeal/review
    */
   gamePenaltyAppealReviewPost = (
-    data: ReviewTenantGamePenaltyAppealEntityRequest,
+    data: ReviewGamePenaltyAppealEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GamePenaltyAppealReviewPostData, any>({
@@ -147,7 +147,7 @@ export class GamePenaltyAppeal<SecurityDataType = unknown> {
    * @request POST:/api/gamePenaltyAppeal/update
    */
   gamePenaltyAppealUpdatePost = (
-    data: UpdateTenantGamePenaltyAppealEntityRequest,
+    data: UpdateGamePenaltyAppealEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GamePenaltyAppealUpdatePostData, any>({

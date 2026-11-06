@@ -10,7 +10,7 @@
  */
 
 import {
-  AddTenantGameRoleEntityRequest,
+  AddGameRoleEntityRequest,
   GameRoleAddPostData,
   GameRoleDeletePostData,
   GameRoleDetailGetData,
@@ -21,8 +21,8 @@ import {
   GameRoleUpdatePostData,
   GameRoleUpdateToSandBoxPostData,
   GameRoleUpdateToUnSandBoxPostData,
-  PageTenantGameRoleEntityRequest,
-  UpdateTenantGameRoleEntityRequest,
+  PageGameRoleEntityRequest,
+  UpdateGameRoleEntityRequest,
 } from "./types";
 import {
   BaseDeleteRequest,
@@ -47,7 +47,7 @@ export class GameRole<SecurityDataType = unknown> {
    * @request POST:/api/gameRole/add
    */
   gameRoleAddPost = (
-    data: AddTenantGameRoleEntityRequest,
+    data: AddGameRoleEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameRoleAddPostData, any>({
@@ -109,7 +109,7 @@ export class GameRole<SecurityDataType = unknown> {
    * @request POST:/api/gameRole/page
    */
   gameRolePagePost = (
-    data: PageTenantGameRoleEntityRequest,
+    data: PageGameRoleEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameRolePagePostData, any>({
@@ -169,7 +169,7 @@ export class GameRole<SecurityDataType = unknown> {
    * @request POST:/api/gameRole/sync
    */
   gameRoleSyncPost = (
-    data: UpdateTenantGameRoleEntityRequest,
+    data: UpdateGameRoleEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameRoleSyncPostData, any>({
@@ -188,7 +188,7 @@ export class GameRole<SecurityDataType = unknown> {
    * @request POST:/api/gameRole/update
    */
   gameRoleUpdatePost = (
-    data: UpdateTenantGameRoleEntityRequest,
+    data: UpdateGameRoleEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameRoleUpdatePostData, any>({
@@ -207,7 +207,7 @@ export class GameRole<SecurityDataType = unknown> {
    * @request POST:/api/gameRole/updateToSandBox
    */
   gameRoleUpdateToSandBoxPost = (
-    data: UpdateTenantGameRoleEntityRequest,
+    data: UpdateGameRoleEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameRoleUpdateToSandBoxPostData, any>({
@@ -226,7 +226,7 @@ export class GameRole<SecurityDataType = unknown> {
    * @request POST:/api/gameRole/updateToUnSandBox
    */
   gameRoleUpdateToUnSandBoxPost = (
-    data: UpdateTenantGameRoleEntityRequest,
+    data: UpdateGameRoleEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameRoleUpdateToUnSandBoxPostData, any>({

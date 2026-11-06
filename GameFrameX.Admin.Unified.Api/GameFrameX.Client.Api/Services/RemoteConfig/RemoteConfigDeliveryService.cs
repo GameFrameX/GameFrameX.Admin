@@ -1,6 +1,6 @@
 using GameFrameX.Client.Api.Services.PackageVersion;
 using GameFrameX.Core.Const;
-using GameFrameX.Entity.Tenant.Game.RemoteConfig;
+using GameFrameX.Entity.Business.Game.RemoteConfig;
 
 namespace GameFrameX.Client.Api.Services.RemoteConfig;
 
@@ -9,7 +9,7 @@ namespace GameFrameX.Client.Api.Services.RemoteConfig;
 /// </summary>
 public sealed class RemoteConfigDeliveryService
 {
-    private readonly Repository<TenantGameAppRemoteConfigEntity> _repository;
+    private readonly Repository<GameAppRemoteConfigEntity> _repository;
     private readonly GameAppPackageResolver _resolver;
 
     /// <summary>
@@ -18,7 +18,7 @@ public sealed class RemoteConfigDeliveryService
     /// <param name="repository">远程配置仓储。</param>
     /// <param name="resolver">母包解析器。</param>
     public RemoteConfigDeliveryService(
-        Repository<TenantGameAppRemoteConfigEntity> repository,
+        Repository<GameAppRemoteConfigEntity> repository,
         GameAppPackageResolver resolver)
     {
         _repository = repository;
@@ -30,7 +30,7 @@ public sealed class RemoteConfigDeliveryService
     /// </summary>
     /// <param name="request">远程配置投放请求。</param>
     /// <returns>命中的远程配置记录；未命中时返回 null。</returns>
-    public async Task<TenantGameAppRemoteConfigEntity?> MatchAsync(RemoteConfigDeliveryRequest request)
+    public async Task<GameAppRemoteConfigEntity?> MatchAsync(RemoteConfigDeliveryRequest request)
     {
         var packageNames = BuildPackageCandidates(request.PackageName);
         var candidates = await _repository.AsQueryable()
@@ -57,7 +57,7 @@ public sealed class RemoteConfigDeliveryService
         return values.Distinct(StringComparer.Ordinal).ToArray();
     }
 
-    private static int CalculateScore(TenantGameAppRemoteConfigEntity item, RemoteConfigDeliveryRequest request, string[] packageNames)
+    private static int CalculateScore(GameAppRemoteConfigEntity item, RemoteConfigDeliveryRequest request, string[] packageNames)
     {
         var score = 0;
         if (item.Platform == request.Platform)

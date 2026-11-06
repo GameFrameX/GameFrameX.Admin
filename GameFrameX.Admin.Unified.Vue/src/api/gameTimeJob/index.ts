@@ -10,7 +10,7 @@
  */
 
 import {
-  AddTenantGameTimeJobEntityRequest,
+  AddGameTimeJobEntityRequest,
   GameTimeJobAddPostData,
   GameTimeJobDeletePostData,
   GameTimeJobDetailGetData,
@@ -18,8 +18,8 @@ import {
   GameTimeJobSelectPostData,
   GameTimeJobSelectStringPostData,
   GameTimeJobUpdatePostData,
-  PageTenantGameTimeJobEntityRequest,
-  UpdateTenantGameTimeJobEntityRequest,
+  PageGameTimeJobEntityRequest,
+  UpdateGameTimeJobEntityRequest,
 } from "./types";
 import {
   BaseDeleteRequest,
@@ -44,7 +44,7 @@ export class GameTimeJob<SecurityDataType = unknown> {
    * @request POST:/api/gameTimeJob/add
    */
   gameTimeJobAddPost = (
-    data: AddTenantGameTimeJobEntityRequest,
+    data: AddGameTimeJobEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameTimeJobAddPostData, any>({
@@ -109,7 +109,7 @@ export class GameTimeJob<SecurityDataType = unknown> {
    * @request POST:/api/gameTimeJob/page
    */
   gameTimeJobPagePost = (
-    data: PageTenantGameTimeJobEntityRequest,
+    data: PageGameTimeJobEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameTimeJobPagePostData, any>({
@@ -169,7 +169,7 @@ export class GameTimeJob<SecurityDataType = unknown> {
    * @request POST:/api/gameTimeJob/update
    */
   gameTimeJobUpdatePost = (
-    data: UpdateTenantGameTimeJobEntityRequest,
+    data: UpdateGameTimeJobEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameTimeJobUpdatePostData, any>({

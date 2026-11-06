@@ -161,7 +161,7 @@ public abstract class ChannelDefinitionManagementServiceBase<TEntity>
         var searchKey = input?.SearchKey?.Trim();
         var pageSize = Math.Min(input.PageSize > 0 ? input.PageSize : BaseSelectPageRequest.DefaultPageSize, BaseSelectPageRequest.MaxPageSize);
         var channels = new List<GameFrameX.Entity.System.ChannelDefinition>();
-        if (ManagedScope == ChannelScopeEnum.Tenant && _globalChannelRepository != null)
+        if (ManagedScope == ChannelScopeEnum.Business && _globalChannelRepository != null)
         {
             channels.AddRange(await _globalChannelRepository.AsQueryable()
                                                             .Filter(null, true)
@@ -270,15 +270,15 @@ public abstract class ChannelDefinitionManagementServiceBase<TEntity>
             throw BusinessError.Oh("租户渠道编码不能与系统渠道重复");
         }
 
-        var existsTenantCode = excludeId.HasValue
+        var existsCode = excludeId.HasValue
                                    ? await Repository.AsQueryable().Filter(null, true)
-                                                     .AnyAsync(u => u.Scope == ChannelScopeEnum.Tenant &&
+                                                     .AnyAsync(u => u.Scope == ChannelScopeEnum.Business &&
                                                                     u.Code == code &&
                                                                     u.Id != excludeId.Value)
                                    : await Repository.AsQueryable().Filter(null, true)
-                                                     .AnyAsync(u => u.Scope == ChannelScopeEnum.Tenant &&
+                                                     .AnyAsync(u => u.Scope == ChannelScopeEnum.Business &&
                                                                     u.Code == code);
-        if (existsTenantCode)
+        if (existsCode)
         {
             throw BusinessError.Oh("租户渠道编码已存在");
         }

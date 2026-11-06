@@ -12,7 +12,7 @@ public sealed class GameAreaMergeClient
     public int ExecutionTimeoutSeconds { get; }
 
     public GameAreaMergeClient(HttpClient httpClient, IOnlineServerEndpointResolver endpointResolver,
-        SqlSugarRepository<TenantGameAreaEntity> repository, OnlineScopeContextFactory scopeFactory)
+        SqlSugarRepository<GameAreaEntity> repository, OnlineScopeContextFactory scopeFactory)
     {
         ExecutionTimeoutSeconds = httpClient.Timeout == Timeout.InfiniteTimeSpan
             ? DefaultExecutionTimeoutSeconds

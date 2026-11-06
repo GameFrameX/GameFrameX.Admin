@@ -4,7 +4,7 @@
 import type { BaseSelectPageResponse, BaseSelectPageStringResponse, GameMailStatus, GameMailType } from "../_shared/data-contracts";
 
 /** 游戏商城实体新增输入参数 */
-export interface AddTenantGameWebShopEntityRequest {
+export interface AddGameWebShopEntityRequest {
   /**
    * 商品名称
    * @minLength 1
@@ -108,7 +108,7 @@ export interface GameWebShopResponseSqlSugarPagedList {
 }
 
 /** 游戏邮件分页查询输入参数 */
-export interface PageTenantGameWebShopEntityRequest {
+export interface PageGameWebShopEntityRequest {
   searchKey?: string | null;
   /**
    * @format int32
@@ -134,7 +134,7 @@ export interface PageTenantGameWebShopEntityRequest {
 }
 
 /** 游戏商城实体更新输入参数 */
-export interface UpdateTenantGameWebShopEntityRequest {
+export interface UpdateGameWebShopEntityRequest {
   /**
    * @min 1
    * @max 9223372036854776000

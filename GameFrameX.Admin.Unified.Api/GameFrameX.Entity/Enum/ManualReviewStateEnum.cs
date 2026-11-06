@@ -1,7 +1,7 @@
 namespace GameFrameX.Entity.Enum;
 
 /// <summary>
-/// 人工复核状态（反作弊事件账本 TenantGameAntiCheatEventEntity.ManualReviewState）。
+/// 人工复核状态（反作弊事件账本 GameAntiCheatEventEntity.ManualReviewState）。
 /// <para>严格锁定 4 值：状态机单向迁移 Pending → Approved/Rejected/Escalated；非 Pending 拒绝重审。
 /// 这是"风险 Provider 上报不能绕过人工审核策略"的闸门——Submit 一律写 Pending，SuggestedAction 永不跳过此状态。</para>
 /// </summary>

@@ -1,5 +1,5 @@
 using GameFrameX.Core.SqlSugar;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 using GameFrameX.Foundation.Json;
 using GameFrameX.Foundation.Logger;
 using Microsoft.AspNetCore.Http;
@@ -11,9 +11,9 @@ namespace GameFrameX.Advertisement.Abstract;
 /// </summary>
 public abstract class AdvertisementCallbackHandlerBase
 {
-    protected readonly Repository<TenantGameRoleEntity> RoleRepository;
+    protected readonly Repository<GameRoleEntity> RoleRepository;
 
-    protected AdvertisementCallbackHandlerBase(Repository<TenantGameRoleEntity> roleRepository)
+    protected AdvertisementCallbackHandlerBase(Repository<GameRoleEntity> roleRepository)
     {
         RoleRepository = roleRepository;
     }
@@ -21,7 +21,7 @@ public abstract class AdvertisementCallbackHandlerBase
     /// <summary>
     /// 反序列化 ConfigJson 为强类型 Option；校验 Provider 绑定与类型匹配。
     /// </summary>
-    protected static TOption? DeserializeOption<TOption>(TenantAdvertisementCallbackOptions advertisementOptions) where TOption : class, IAdvertisementCallbackOptionSetting
+    protected static TOption? DeserializeOption<TOption>(AdvertisementCallbackOptions advertisementOptions) where TOption : class, IAdvertisementCallbackOptionSetting
     {
         if (string.IsNullOrWhiteSpace(advertisementOptions?.ConfigJson))
         {

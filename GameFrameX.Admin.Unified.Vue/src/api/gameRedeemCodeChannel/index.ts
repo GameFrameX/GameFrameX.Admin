@@ -10,7 +10,7 @@
  */
 
 import {
-  AddTenantGameRedeemCodeChannelEntityRequest,
+  AddGameRedeemCodeChannelEntityRequest,
   GameRedeemCodeChannelAddPostData,
   GameRedeemCodeChannelDeletePostData,
   GameRedeemCodeChannelDetailGetData,
@@ -18,8 +18,8 @@ import {
   GameRedeemCodeChannelSelectPostData,
   GameRedeemCodeChannelSelectStringPostData,
   GameRedeemCodeChannelUpdatePostData,
-  PageTenantGameRedeemCodeChannelEntityRequest,
-  UpdateTenantGameRedeemCodeChannelEntityRequest,
+  PageGameRedeemCodeChannelEntityRequest,
+  UpdateGameRedeemCodeChannelEntityRequest,
 } from "./types";
 import {
   BaseDeleteRequest,
@@ -44,7 +44,7 @@ export class GameRedeemCodeChannel<SecurityDataType = unknown> {
    * @request POST:/api/gameRedeemCodeChannel/add
    */
   gameRedeemCodeChannelAddPost = (
-    data: AddTenantGameRedeemCodeChannelEntityRequest,
+    data: AddGameRedeemCodeChannelEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameRedeemCodeChannelAddPostData, any>({
@@ -109,7 +109,7 @@ export class GameRedeemCodeChannel<SecurityDataType = unknown> {
    * @request POST:/api/gameRedeemCodeChannel/page
    */
   gameRedeemCodeChannelPagePost = (
-    data: PageTenantGameRedeemCodeChannelEntityRequest,
+    data: PageGameRedeemCodeChannelEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameRedeemCodeChannelPagePostData, any>({
@@ -169,7 +169,7 @@ export class GameRedeemCodeChannel<SecurityDataType = unknown> {
    * @request POST:/api/gameRedeemCodeChannel/update
    */
   gameRedeemCodeChannelUpdatePost = (
-    data: UpdateTenantGameRedeemCodeChannelEntityRequest,
+    data: UpdateGameRedeemCodeChannelEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameRedeemCodeChannelUpdatePostData, any>({

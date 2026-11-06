@@ -1,7 +1,7 @@
 namespace GameFrameX.Entity.Enum;
 
 /// <summary>
-/// 举报类型。举报事实源（TenantGameReportEntity）的分类。
+/// 举报类型。举报事实源（GameReportEntity）的分类。
 /// <para>严格锁定 5 值。</para>
 /// </summary>
 [Description("举报类型")]

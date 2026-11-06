@@ -10,16 +10,16 @@
  */
 
 import {
-  AddTenantGameReportEntityRequest,
+  AddGameReportEntityRequest,
   GameReportAddPostData,
   GameReportDeletePostData,
   GameReportDetailGetData,
   GameReportLinkPenaltyPostData,
   GameReportPagePostData,
   GameReportUpdatePostData,
-  LinkPenaltyTenantGameReportEntityRequest,
-  PageTenantGameReportEntityRequest,
-  UpdateTenantGameReportEntityRequest,
+  LinkPenaltyGameReportEntityRequest,
+  PageGameReportEntityRequest,
+  UpdateGameReportEntityRequest,
 } from "./types";
 import {
   BaseDeleteRequest,
@@ -43,7 +43,7 @@ export class GameReport<SecurityDataType = unknown> {
    * @request POST:/api/gameReport/add
    */
   gameReportAddPost = (
-    data: AddTenantGameReportEntityRequest,
+    data: AddGameReportEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameReportAddPostData, any>({
@@ -108,7 +108,7 @@ export class GameReport<SecurityDataType = unknown> {
    * @request POST:/api/gameReport/linkPenalty
    */
   gameReportLinkPenaltyPost = (
-    data: LinkPenaltyTenantGameReportEntityRequest,
+    data: LinkPenaltyGameReportEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameReportLinkPenaltyPostData, any>({
@@ -127,7 +127,7 @@ export class GameReport<SecurityDataType = unknown> {
    * @request POST:/api/gameReport/page
    */
   gameReportPagePost = (
-    data: PageTenantGameReportEntityRequest,
+    data: PageGameReportEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameReportPagePostData, any>({
@@ -147,7 +147,7 @@ export class GameReport<SecurityDataType = unknown> {
    * @request POST:/api/gameReport/update
    */
   gameReportUpdatePost = (
-    data: UpdateTenantGameReportEntityRequest,
+    data: UpdateGameReportEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameReportUpdatePostData, any>({

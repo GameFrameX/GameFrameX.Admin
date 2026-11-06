@@ -8,16 +8,16 @@ namespace GameFrameX.Application.CommerceCenter.GameGoods;
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
 public class GameGoodsService
-    : GenericCrudSelectService<Entity.Tenant.Game.TenantGameGoodsEntity,
-        AddTenantGameGoodsEntityRequest, UpdateTenantGameGoodsEntityRequest,
-        GameGoodsResponse, PageTenantGameGoodsEntityRequest>
+    : GenericCrudSelectService<Entity.Business.Game.GameGoodsEntity,
+        AddGameGoodsEntityRequest, UpdateGameGoodsEntityRequest,
+        GameGoodsResponse, PageGameGoodsEntityRequest>
 {
-    public GameGoodsService(SqlSugarRepository<Entity.Tenant.Game.TenantGameGoodsEntity> repository)
+    public GameGoodsService(SqlSugarRepository<Entity.Business.Game.GameGoodsEntity> repository)
         : base(repository)
     {
     }
 
-    protected override async Task OnAddingAsync(AddTenantGameGoodsEntityRequest input)
+    protected override async Task OnAddingAsync(AddGameGoodsEntityRequest input)
     {
         var exists = await Repository.IsAnyAsync(u => u.ConfigId == input.ConfigId);
         if (exists)
@@ -29,7 +29,7 @@ public class GameGoodsService
     /// <summary>
     /// 更新前校验记录存在。
     /// </summary>
-    protected override async Task OnUpdatingAsync(UpdateTenantGameGoodsEntityRequest input)
+    protected override async Task OnUpdatingAsync(UpdateGameGoodsEntityRequest input)
     {
         var existing = await Repository.GetFirstAsync(u => u.Id == input.Id);
         if (existing == null)
@@ -38,7 +38,7 @@ public class GameGoodsService
         }
     }
 
-    protected override ISugarQueryable<GameGoodsResponse> BuildPageQuery(PageTenantGameGoodsEntityRequest input)
+    protected override ISugarQueryable<GameGoodsResponse> BuildPageQuery(PageGameGoodsEntityRequest input)
     {
         return Repository.AsQueryable()
                          .WhereIF(!string.IsNullOrWhiteSpace(input.SearchKey), u =>
@@ -58,7 +58,7 @@ public class GameGoodsService
         var query = await Repository.AsQueryable()
                                     .WhereIF(!string.IsNullOrWhiteSpace(input.SearchKey), u =>
                                                  u.Name.Contains(input.SearchKey.Trim()))
-                                    .LeftJoin<Entity.Tenant.Game.TenantGameGoodsCatalogueEntity>((g, c) => g.ClassifyId == c.Id)
+                                    .LeftJoin<Entity.Business.Game.GameGoodsCatalogueEntity>((g, c) => g.ClassifyId == c.Id)
                                     .Select((g, c) => new GameGoodsSelectPageStringResponse
                                     {
                                         Id = g.Id.ToString(),

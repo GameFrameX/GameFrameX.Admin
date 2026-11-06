@@ -51,7 +51,6 @@ export interface LogDiffFields {
   rowVersion?: string | null;
   /** 是否启用,true:启用，false:禁用，null:未设置(启用) */
   isEnabled?: boolean | null;
-  tenantId?: string | null;
   beforeData?: string | null;
   afterData?: string | null;
   snapshot?: string | null;

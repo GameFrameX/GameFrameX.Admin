@@ -2,7 +2,7 @@ using GameFrameX.Client.Api.GameUserArchive.Models;
 using GameFrameX.Client.Api.GameUserArchive;
 using System.Text.Json;
 using GameFrameX.Core.Tests.ClientApi;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 using GameFrameX.Client.Api.GameUserArchive.Dto;
 using GameFrameX.Client.Api.Services;
 using GameFrameX.Core.SqlSugar;
@@ -176,9 +176,9 @@ public sealed class GameUserArchiveRoundTripTests
 
     private static GameUserArchiveController CreateController(ClientApiTestDb db)
     {
-        db.InitTenantTables(typeof(TenantGameUserArchiveEntity));
-        var tenantDbProvider = db.MainDb;
-        var repository = new Repository<TenantGameUserArchiveEntity>(db.MainDb);
+        db.InitBusinessTables(typeof(GameUserArchiveEntity));
+        var dbProvider = db.MainDb;
+        var repository = new Repository<GameUserArchiveEntity>(db.MainDb);
         return new GameUserArchiveController(repository);
     }
 

@@ -1,5 +1,5 @@
 using GameFrameX.Application.ClientDelivery.GameAppVersionDefinition.Dto;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 
 namespace GameFrameX.Application.ClientDelivery.GameAppVersionDefinition;
 
@@ -8,12 +8,12 @@ namespace GameFrameX.Application.ClientDelivery.GameAppVersionDefinition;
 /// </summary>
 [ApiDescriptionSettings(ClientConst.GroupName, Order = 100)]
 public class GameAppVersionDefinitionService
-    : GenericCrudSelectService<Entity.Tenant.Game.Release.TenantGameAppVersionDefinitionEntity,
+    : GenericCrudSelectService<Entity.Business.Game.Release.GameAppVersionDefinitionEntity,
         AddGameAppVersionDefinitionRequest, UpdateGameAppVersionDefinitionRequest,
         GameAppVersionDefinitionPageResponse, PageGameAppVersionDefinitionRequest>
 {
     public GameAppVersionDefinitionService(
-        SqlSugarRepository<Entity.Tenant.Game.Release.TenantGameAppVersionDefinitionEntity> repository)
+        SqlSugarRepository<Entity.Business.Game.Release.GameAppVersionDefinitionEntity> repository)
         : base(repository)
     {
     }

@@ -16,16 +16,16 @@ public sealed partial class RuntimeCredentialReadPathGuardTests
         // Client.Api 六链路
         ("GameFrameX.Core/Middleware/SignatureKeyResolver.cs", "RuntimeKeyMaterialCache.Decrypt", 2),
         ("GameFrameX.Core/Middleware/SessionKeyResolver.cs", "RuntimeKeyMaterialCache.Decrypt", 1),
-        ("GameFrameX.Core/Middleware/RuntimeKeyMaterialCache.cs", "TenantSecretCrypto.Decrypt(storedSecret)", 1),
-        ("GameFrameX.Client.Api/Services/GameLoginTicket/GameLoginTicketKeyResolver.cs", "TenantSecretCrypto.DecryptCached", 1),
-        ("GameFrameX.Client.Api/Services/ClientApiTenantOptions/ClientApiTenantOptionsProvider.cs", "TenantSecretCrypto.DecryptCached", 3),
-        ("GameFrameX.Client.Api/Services/ClientApiTenantOptions/ClientApiTenantOptionsProvider.cs", "AdvertisementCallbackConfigCrypto.DecryptConfigJson", 1),
-        ("GameFrameX.Client.Api/Services/Email/TenantEmailSender.cs", "TenantSecretCrypto.DecryptCached", 2),
+        ("GameFrameX.Core/Middleware/RuntimeKeyMaterialCache.cs", "SecretCrypto.Decrypt(storedSecret)", 1),
+        ("GameFrameX.Client.Api/Services/GameLoginTicket/GameLoginTicketKeyResolver.cs", "SecretCrypto.DecryptCached", 1),
+        ("GameFrameX.Client.Api/Services/ClientApiOptions/ClientApiOptionsProvider.cs", "SecretCrypto.DecryptCached", 3),
+        ("GameFrameX.Client.Api/Services/ClientApiOptions/ClientApiOptionsProvider.cs", "AdvertisementCallbackConfigCrypto.DecryptConfigJson", 1),
+        ("GameFrameX.Client.Api/Services/Email/EmailSender.cs", "SecretCrypto.DecryptCached", 2),
         ("GameFrameX.Client.Api/Integrations/Payment/PaymentOptionSettingProvider.cs", "PaymentConfigCrypto.DecryptConfigJson", 1),
         // Hub.Api 链路
-        ("GameFrameX.Hub.Api/Middleware/TenantGameAppOpenAccessAuthMiddleware.cs", "TenantSecretCrypto.DecryptCached", 1),
+        ("GameFrameX.Hub.Api/Middleware/GameAppOpenAccessAuthMiddleware.cs", "SecretCrypto.DecryptCached", 1),
         // C370 已收口的主库域读取（防回退）
-        ("GameFrameX.Application/Platform/OpenAccess/SystemOpenAccessService.cs", "TenantSecretCrypto.Decrypt", 1),
+        ("GameFrameX.Application/Platform/OpenAccess/SystemOpenAccessService.cs", "SecretCrypto.Decrypt", 1),
     };
 
     /// <summary>

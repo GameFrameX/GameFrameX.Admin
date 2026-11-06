@@ -1,7 +1,7 @@
 namespace GameFrameX.Entity.Enum;
 
 /// <summary>
-/// 风险等级（反作弊事件账本 TenantGameAntiCheatEventEntity.RiskLevel）。
+/// 风险等级（反作弊事件账本 GameAntiCheatEventEntity.RiskLevel）。
 /// <para>严格锁定 4 值：由 Provider 上报，建议处置强度递增，仅作为人工复核参考，不自动决定处罚。</para>
 /// </summary>
 [Description("风险等级")]
