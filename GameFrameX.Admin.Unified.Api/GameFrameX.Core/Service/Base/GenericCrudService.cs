@@ -90,12 +90,12 @@ public abstract class GenericCrudService<TEntity, TAddRequest, TUpdateRequest, T
     }
 
     /// <summary>
-    /// 通用导出核心实现：复用既有 <see cref="BuildPageQuery"/>（已含租户/权限过滤）
+    /// 通用导出核心实现：复用既有 <see cref="BuildPageQuery"/>（已含权限过滤）
     /// 与 <see cref="ApplyOrdering"/>，按列白名单投影生成 Excel。
     /// </summary>
     /// <remarks>
     /// 各业务 Service 通过显式 <c>Export</c> 端点 opt-in 调用本方法；禁止裸 SQL，
-    /// 禁止绕过 <see cref="BuildPageQuery"/> 的租户/权限过滤。租户边界由各 Service
+    /// 禁止绕过 <see cref="BuildPageQuery"/> 的权限过滤。数据边界由各 Service
     /// 的 <see cref="BuildPageQuery"/> override 强制叠加（参考 ChannelDefinitionManagementServiceBase）。
     /// </remarks>
     /// <param name="query">实体既有查询输入，复用各 Service 的筛选条件；分页参数仅在 <paramref name="range"/>=CurrentPage 时生效。</param>

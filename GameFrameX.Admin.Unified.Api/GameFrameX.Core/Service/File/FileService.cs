@@ -9,10 +9,10 @@ namespace GameFrameX.Core.Service.File;
 
 /// <summary>
 /// 系统文件服务。
-/// <para>上传/下载/删除全部经由 <see cref="IObjectStorageAdapterFactory"/> 解析当前租户的对象存储配置。</para>
+/// <para>上传/下载/删除全部经由 <see cref="IObjectStorageAdapterFactory"/> 解析当前的对象存储配置。</para>
 /// <para>业务规则：</para>
 /// <list type="bullet">
-/// <item>上传必须命中当前租户唯一启用的配置；未启用任何配置时直接报错，不做隐式 fallback。</item>
+/// <item>上传必须命中唯一启用的配置；未启用任何配置时直接报错，不做隐式 fallback。</item>
 /// <item>下载/删除按文件记录的 <see cref="FileEntity.StorageConfigId"/> 精确解析（即使该配置已被禁用）。</item>
 /// <item><see cref="FileEntity.StorageConfigId"/> 为 null 的历史记录按本地 legacy 行为兜底（wwwroot 下原 FilePath）。</item>
 /// <item>大小限额直接按字节比较 <see cref="ObjectStorageConfigEntity.MaxFileSizeBytes"/>。</item>
@@ -247,7 +247,7 @@ public class FileService : IAdminApiController
     }
 
     /// <summary>
-    /// 上传文件核心逻辑：解析租户活动配置 → 校验 → 写对象存储 → 写文件记录。
+    /// 上传文件核心逻辑：解析活动配置 → 校验 → 写对象存储 → 写文件记录。
     /// </summary>
     /// <param name="file">文件</param>
     /// <param name="savePath">路径覆盖值；为空时使用配置的 PathTemplate</param>
@@ -259,7 +259,7 @@ public class FileService : IAdminApiController
             throw BusinessError.Oh(FileErrorCode.FileNotFound);
         }
 
-        // 当前租户必须存在唯一启用的对象存储配置。命中 0 条 → 未配置；命中 ≥2 条 → 配置异常（不变量违反）。
+        // 必须存在唯一启用的对象存储配置。命中 0 条 → 未配置；命中 ≥2 条 → 配置异常（不变量违反）。
         // 两者都明确报错，不 fallback、不静默取首条（spec-review P1：Resolver 遇多条视为配置错误）。
         var activeConfigs = await _storageConfigRepository.AsQueryable().Where(c => c.IsEnabled == true).ToListAsync();
         var config = EnsureSingleActiveConfig(activeConfigs);
@@ -459,22 +459,22 @@ public class FileService : IAdminApiController
     }
 
     /// <summary>
-    /// 校验当前租户存在且仅存在一条启用的对象存储配置。
+    /// 校验存在且仅存在一条启用的对象存储配置。
     /// <para>命中 0 条：上传明确报错“未配置”，不 fallback 到平台/本地。</para>
     /// <para>命中 ≥2 条：视为唯一活动配置不变量被违反（并发竞态/回填 bug/手工改库），明确报错，不静默取首条。</para>
     /// </summary>
-    /// <param name="activeConfigs">当前租户启用的配置列表。</param>
+    /// <param name="activeConfigs">启用的配置列表。</param>
     /// <returns>唯一启用配置。</returns>
     internal static ObjectStorageConfigEntity EnsureSingleActiveConfig(List<ObjectStorageConfigEntity> activeConfigs)
     {
         if (activeConfigs == null || activeConfigs.Count == 0)
         {
-            throw BusinessError.Oh("当前租户未启用对象存储配置，请联系管理员在「对象存储配置」中启用一项");
+            throw BusinessError.Oh("未启用对象存储配置，请联系管理员在「对象存储配置」中启用一项");
         }
 
         if (activeConfigs.Count > 1)
         {
-            throw BusinessError.Oh("对象存储配置异常：当前租户存在多个启用配置，请联系管理员仅保留一项");
+            throw BusinessError.Oh("对象存储配置异常：存在多个启用配置，请联系管理员仅保留一项");
         }
 
         return activeConfigs[0];

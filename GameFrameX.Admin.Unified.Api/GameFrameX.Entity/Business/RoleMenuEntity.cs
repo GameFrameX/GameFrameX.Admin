@@ -6,7 +6,7 @@ namespace GameFrameX.Entity.Business;
 /// <summary>
 /// 系统角色菜单表
 /// </summary>
-[SugarTable(null, "租户库角色菜单表")]
+[SugarTable(null, "角色菜单表")]
 [BusinessTable]
 [IncrementTable]
 public class RoleMenuEntity : EntityBase

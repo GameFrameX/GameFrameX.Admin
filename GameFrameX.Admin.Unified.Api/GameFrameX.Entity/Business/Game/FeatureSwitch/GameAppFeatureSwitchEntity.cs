@@ -3,7 +3,7 @@ using GameFrameX.Entity.Base;
 namespace GameFrameX.Entity.Business.Game.FeatureSwitch;
 
 /// <summary>
-/// 活动/功能开关注册表（租户库）。
+/// 活动/功能开关注册表。
 /// <para>每行一个可运行时投放的开关/活动事实源：客户端经 Client.Api、游戏服务器经 Hub.Api
 /// 按 <see cref="Audience"/> 过滤后拉取，玩法 gate 判定权在使用方业务端点，本表只承载配置分发。</para>
 /// </summary>

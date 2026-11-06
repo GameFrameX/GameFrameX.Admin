@@ -13,7 +13,7 @@ namespace GameFrameX.Entity.Business.Game;
 public class GameUserArchiveEntity : EntityBasicSelect
 {
     /// <summary>
-    /// 玩家 id（租户内唯一，一玩家一行）
+    /// 玩家 id（全局唯一，一玩家一行）
     /// </summary>
     [SugarColumn(ColumnDescription = "玩家 id", DefaultValue = "0")]
     public long UserId { get; set; }

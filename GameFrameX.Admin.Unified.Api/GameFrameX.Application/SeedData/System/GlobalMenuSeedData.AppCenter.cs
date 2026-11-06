@@ -2896,7 +2896,7 @@ public partial class GlobalMenuSeedData
             },
             new()
             {
-                // A4: 支付配置 Schema 查询按钮权限。原先缺失该 Button 种子，/api/gamePaymentConfig/schema 无显式绑定 → 租户 403。
+                // A4: 支付配置 Schema 查询按钮权限。原先缺失该 Button 种子，/api/gamePaymentConfig/schema 无显式绑定 → 管理员 403。
                 // 页面加载需要读取配置 schema。
                 Id = StableSeedId.Menu("gamePaymentConfigEntity:schema"),
                 Key = "gamePaymentConfigEntity:schema",

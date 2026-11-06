@@ -5,7 +5,7 @@ using GameFrameX.Foundation.Encryption;
 namespace GameFrameX.Core.Service.Business;
 
 /// <summary>
-/// 租户业务凭证静态加密唯一收口（C370 / GFX-829）：除连接串外的可逆凭证（邮件 Provider 凭据、开放接口 AccessSecret、
+/// 业务凭证静态加密唯一收口（C370 / GFX-829）：除连接串外的可逆凭证（邮件 Provider 凭据、开放接口 AccessSecret、
 /// 对象存储 ConfigJson 敏感字段等）落库前加密、使用前解密都必须经过本类，禁止调用方自行判断密文形态。
 /// <para>密文格式为 <c>enc:sec:v1:&lt;Base64&gt;</c>，底层复用 Foundation.Encryption 的 <see cref="AesHelper"/>（AES-GCM + PBKDF2 600,000 迭代派生）；
 /// 密钥取环境变量 <see cref="KeyEnvironmentVariable"/>（GAMEFRAMEX_SECRET_ENCRYPTION_KEY），用于主库保留运行凭据的静态加密。</para>

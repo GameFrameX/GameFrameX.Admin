@@ -486,7 +486,7 @@ internal sealed class MonitorLoggingFilter : IAsyncActionFilter, IOrderedFilter
     }
 
     /// <summary>
-    /// 方法名去掉 Async 后缀作为 actionTypeName（DatabaseLoggingWriter 的登录租户归因判定 actionTypeName == "Login"
+    /// 方法名去掉 Async 后缀作为 actionTypeName（DatabaseLoggingWriter 的登录归因判定 actionTypeName == "Login"
     /// 的配套口径：#189 路由锁定重命名把方法统一加了 Async 后缀，去后缀后与历史框架时代判定值一致）。
     /// </summary>
     private static string TrimAsyncSuffix(string methodName)

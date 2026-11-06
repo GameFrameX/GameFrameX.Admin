@@ -4,14 +4,14 @@ using GameFrameX.ObjectStorage.Abstract;
 namespace GameFrameX.Core.Service.Business.ObjectStorage;
 
 /// <summary>
-/// 租户对象存储 ConfigJson 敏感字段级加解密收口（C370 / GFX-829）：写入侧在 <see cref="ObjectStorageConfigNormalizer.Normalize"/> 规范化之后、
+/// 对象存储 ConfigJson 敏感字段级加解密收口（C370 / GFX-829）：写入侧在 <see cref="ObjectStorageConfigNormalizer.Normalize"/> 规范化之后、
 /// 落库之前调用 <see cref="EncryptConfigJson"/>；读取侧在 <see cref="IObjectStorageAdapterFactory.BuildContext"/> 之前调用 <see cref="DecryptConfigJson"/>。
 /// <para>敏感字段集合由 Provider Schema 的 <c>Sensitive</c> 标记驱动（与表单脱敏同源），非敏感字段（Bucket / Endpoint 等）保持明文可读；
 /// 字段值为 <see cref="SecretCrypto"/> 密文形态（<c>enc:sec:v1:</c> 前缀）时幂等跳过。</para>
 /// <para>性能约束：底层 PBKDF2 派生单次数百毫秒级，而文件上传 / 下载 / 连通性测试按请求读取配置——
 /// <see cref="DecryptConfigJson"/> 按「密文原文 → 明文 JSON」做进程级缓存，同一密文只解密一次；
 /// 任何配置写入都会产生新密文（每次加密随机 Salt + Nonce），缓存 key 随之失效，无需显式失效协议。</para>
-/// <para>ponytail: 缓存字典无淘汰上限（key 为整段密文 JSON，每条数 KB）；对象存储配置行数极少（每租户至多几条），
+/// <para>ponytail: 缓存字典无淘汰上限（key 为整段密文 JSON，每条数 KB）；对象存储配置行数极少（至多几条），
 /// 增长天花板可忽略。升级路径：按 StorageConfigId 失效或换 LRU。</para>
 /// </summary>
 public static class ObjectStorageConfigCrypto

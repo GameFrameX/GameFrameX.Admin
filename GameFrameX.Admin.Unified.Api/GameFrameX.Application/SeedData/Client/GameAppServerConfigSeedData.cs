@@ -7,7 +7,7 @@ namespace GameFrameX.Application.SeedData.Client;
 /// <summary>
 /// 游戏运营配置表 表种子数据（AppId=null 出厂基线行；登录下发时被应用行按 Key 覆盖）。
 /// 数据构建逻辑在 GameServerConfigBaselineSeed（Core 嵌入资源单一事实源）；
-/// 自动推导的租户库连接 EnableInitSeed=false 时本渠道不生效，由 DefaultDatabaseSeeder 走同一工厂补种
+/// 自动推导连接的库 EnableInitSeed=false 时本渠道不生效，由 DefaultDatabaseSeeder 走同一工厂补种
 /// </summary>
 public class GameAppServerConfigSeedData : ISqlSugarEntitySeedData<GameAppServerConfigEntity>
 {

@@ -43,7 +43,7 @@ public sealed class ProtoVersionMiddleware
         var options = optionsAccessor.Value;
         if (!options.AllowedVersions.Contains(headerValue, StringComparer.Ordinal))
         {
-            // AuditOnly：只告警不拦截（major 变更时才收紧）；记录 appId/租户便于定位未升级客户端
+            // AuditOnly：只告警不拦截（major 变更时才收紧）；记录协议版本便于定位未升级客户端
             logger.LogWarning("未知协议版本放行（AuditOnly）：protoVer={ProtoVer} allowed=[{Allowed}] path={Path}",
                               headerValue, string.Join(",", options.AllowedVersions), context.Request.Path);
         }

@@ -109,7 +109,7 @@ public class GlobalMenuResponse
 
 
     /// <summary>
-    /// 超管专属菜单下允许租户只读访问
+    /// 超管专属菜单下允许管理员只读访问
     /// </summary>
     public bool AllowAdminWhenSuperAdminOnly { get; set; }
 

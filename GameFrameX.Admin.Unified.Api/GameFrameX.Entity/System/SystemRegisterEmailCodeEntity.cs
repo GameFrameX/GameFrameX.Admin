@@ -5,7 +5,7 @@ namespace GameFrameX.Entity.System;
 
 /// <summary>
 /// 平台邮箱自助注册验证码。
-/// <para>存储边界：主库 / 匿名注册流程；与租户玩家邮件验证码（<c>GameUserEmailEntity</c>）完全独立，互不复用。</para>
+/// <para>存储边界：主库 / 匿名注册流程；与玩家邮件验证码（<c>GameUserEmailEntity</c>）完全独立，互不复用。</para>
 /// </summary>
 [SugarTable(null, "平台邮箱自助注册验证码")]
 [SugarIndex("idx_system_register_email_code_email", nameof(Email), OrderByType.Asc)]

@@ -5,7 +5,7 @@ namespace GameFrameX.Entity.Business;
 /// <summary>
 /// 系统用户角色表
 /// </summary>
-[SugarTable(null, "租户库用户角色表")]
+[SugarTable(null, "用户角色表")]
 [BusinessTable]
 [IncrementTable]
 public class UserRoleEntity : EntityBase

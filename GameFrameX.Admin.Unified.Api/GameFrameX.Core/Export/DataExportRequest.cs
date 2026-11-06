@@ -9,7 +9,7 @@ namespace GameFrameX.Core.Export;
 public class DataExportRequest<TQuery> where TQuery : class, new()
 {
     /// <summary>
-    /// 查询条件，复用各实体既有 Query 输入；租户与权限过滤由 Service 的 BuildPageQuery 强制叠加。
+    /// 查询条件，复用各实体既有 Query 输入；权限过滤由 Service 的 BuildPageQuery 强制叠加。
     /// </summary>
     public TQuery Query { get; set; } = new();
 

@@ -4,7 +4,7 @@ namespace GameFrameX.Entity.Business.Game;
 
 /// <summary>
 /// 奖励模板分组。
-/// <para>分组用于邮件、兑换码、活动等运营场景归类奖励模板；分组本身强制绑定具体应用，不存在租户默认分组。</para>
+/// <para>分组用于邮件、兑换码、活动等运营场景归类奖励模板；分组本身强制绑定具体应用，不存在全局默认分组。</para>
 /// </summary>
 [SugarTable(null, "奖励模板分组")]
 [BusinessTable]

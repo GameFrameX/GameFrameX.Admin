@@ -19,7 +19,7 @@ public class GameAppOpenAccessEntity : EntityBasic
     }
 
     /// <summary>
-    /// 绑定的租户系统用户 Id。Hub.Api 写入版本数据和审计列时使用该用户身份。
+    /// 绑定的系统用户 Id。Hub.Api 写入版本数据和审计列时使用该用户身份。
     /// </summary>
     [SugarColumn(ColumnDescription = "绑定用户Id", DefaultValue = "0")]
     public long BindUserId { get; set; }
@@ -50,13 +50,13 @@ public class GameAppOpenAccessEntity : EntityBasic
     public string ScopesJson { get; set; } = null!;
 
     /// <summary>
-    /// 访问 Key。租户内唯一，鉴权时按声明租户路由租户库查询。
+    /// 访问 Key。全局唯一，鉴权时直接查询主库。
     /// </summary>
     [SugarColumn(ColumnDescription = "访问Key", Length = EntityStringLength.Length256)]
     public string AccessKey { get; set; } = null!;
 
     /// <summary>
-    /// 访问密钥。C371（GFX-838）起经 <c>SecretCrypto</c> 密文落租户库（HMAC-SHA256 签名验证需服务端持有可逆共享密钥）。
+    /// 访问密钥。C371（GFX-838）起经 <c>SecretCrypto</c> 密文落库（HMAC-SHA256 签名验证需服务端持有可逆共享密钥）。
     /// <para>签发 / 轮换时仅返回一次明文，列表 / 详情不得输出。</para>
     /// </summary>
     [SugarColumn(ColumnDescription = "访问Secret", Length = EntityStringLength.Length512)]

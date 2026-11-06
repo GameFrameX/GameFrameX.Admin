@@ -18,7 +18,7 @@ public enum PaymentErrorCode
     RefundNotSupported = 70400002,
 
     /// <summary>
-    /// 渠道退款所需的支付配置缺失（租户支付配置表中无该渠道该应用的启用配置）（C310 / GFX-718）
+    /// 渠道退款所需的支付配置缺失（支付配置表中无该渠道该应用的启用配置）（C310 / GFX-718）
     /// </summary>
     [ErrorText("退款失败：渠道支付配置缺失", "Refund failed: payment channel configuration is missing")]
     RefundConfigMissing = 70400003,

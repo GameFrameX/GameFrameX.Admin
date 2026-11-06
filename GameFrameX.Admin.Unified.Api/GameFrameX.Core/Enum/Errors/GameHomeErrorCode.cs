@@ -6,8 +6,8 @@ namespace GameFrameX.Core.Enum.Errors;
 public enum GameHomeErrorCode
 {
     /// <summary>
-    /// 目标租户库连接不可用
+    /// 数据库连接不可用
     /// </summary>
-    [ErrorText("目标租户库连接不可用，无法读取首页读数", "Target tenant database connection is unavailable for home metrics")]
+    [ErrorText("数据库连接不可用，无法读取首页读数", "The database connection is unavailable for home metrics")]
     DbUnavailable = 60500002,
 }

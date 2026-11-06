@@ -275,7 +275,7 @@ public partial class GlobalMenuSeedData
             },
             new()
             {
-                // C1: 邮箱新增用户按钮权限。原先缺失该 Button 种子，/api/gameUser/addByMail 无显式绑定 → 租户 403。
+                // C1: 邮箱新增用户按钮权限。原先缺失该 Button 种子，/api/gameUser/addByMail 无显式绑定 → 管理员 403。
                 // 父菜单 route:gameUserEntity 已含 Admin，按钮经 ShouldSyncToRole 自动授予管理员角色（与 :add 一致）。
                 Id = StableSeedId.Menu("gameUserEntity:addByMail"),
                 Key = "gameUserEntity:addByMail",

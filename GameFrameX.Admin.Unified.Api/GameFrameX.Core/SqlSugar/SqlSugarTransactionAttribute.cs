@@ -4,7 +4,7 @@
 /// SqlSugar 请求事务过滤器。
 /// </summary>
 /// <remarks>
-/// 标记在动态 API action 或普通 MVC action 上时，使用当前 <see cref="ISqlSugarClient"/> 的多租户事务入口包裹整次 action 执行。
+/// 标记在动态 API action 或普通 MVC action 上时，使用当前 <see cref="ISqlSugarClient"/> 的事务入口包裹整次 action 执行。
 /// 这是 C38 迁移后的显式事务边界，替代 历史框架 隐式工作单元注册。
 /// </remarks>
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]

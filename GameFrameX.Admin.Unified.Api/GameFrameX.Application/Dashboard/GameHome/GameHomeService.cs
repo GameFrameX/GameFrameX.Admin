@@ -152,7 +152,7 @@ public class GameHomeService : IAdminApiController
     }
 
     /// <summary>
-    /// 解析当前请求的租户库连接。区服/订单/玩家/采样均为租户库表，平台面（SuperAdmin 无目标租户）主库无对应物理表，
+    /// 解析主库连接。区服/订单/玩家/采样均为主库业务表，
     /// 返回明确业务错误而非让查询落到主库触发 42P01 裸 500（lesson：2026-07-11-superadminonly-coupling-d1016）。
     /// </summary>
     private ISqlSugarClient ResolveDb(string operationName)
