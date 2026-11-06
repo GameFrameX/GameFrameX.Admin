@@ -68,9 +68,9 @@ export async function grantAdminMenus(browser: Browser, adminPage: Page, adminTo
         expect(typeof readField(node, 'superAdminOnly')).toBe('boolean');
         const protectedBranch = protectedAncestor || readField(node, 'superAdminOnly') === true;
         // 既有只读选择器例外允许业务页取平台/语言；仍不授予任何超管目录或管理叶子。
-        const sharedSelector = readField(node, 'allowWhenSuperAdminOnly') === true;
+        const sharedSelector = readField(node, 'allowAdminWhenSuperAdminOnly') === true;
         if (sharedSelector) {
-          expect(readField(node, 'type'), '租户可读例外只能是辅助按钮').toBe(3);
+          expect(readField(node, 'type'), '管理员可读例外只能是辅助按钮').toBe(3);
           sharedSelectorKeys.push(String(readField(node, 'key')));
         }
         if (!protectedBranch || sharedSelector) {
