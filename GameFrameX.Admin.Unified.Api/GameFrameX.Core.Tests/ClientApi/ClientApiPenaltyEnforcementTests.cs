@@ -83,7 +83,7 @@ public sealed class ClientApiPenaltyEnforcementTests
     {
         using var db = new ClientApiTestDb();
         db.InitBusinessTables(typeof(GamePenaltyEntity));
-        SeedPenalty(db, 6, PenaltyActionTypeEnum.Ban, PenaltyStatusEnum.Active, null, 0);
+        SeedPenalty(db, 6, PenaltyActionTypeEnum.Ban, PenaltyStatusEnum.Active, null);
 
         var service = new GamePenaltyEnforcementService(db.Repository<GamePenaltyEntity>());
         var hit = await service.GetLoginBlockingPenaltyAsync(PenaltyTargetTypeEnum.Account, "user-1001");
