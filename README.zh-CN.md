@@ -48,6 +48,7 @@ Admin/
 ├── doc/                             # README 配图
 ├── .github/workflows/               # CI：三 API 镜像与前端镜像构建、前端测试、外部镜像同步
 ├── docker-compose.yml               # 一键全栈编排（PostgreSQL + 三 API + 前端）
+├── docker-compose.admin.yml          # Admin 独立栈：自带 PostgreSQL + 三 API 宿主，无前端容器
 ├── .env.example                     # compose 环境变量模板（复制为 .env 后按需覆盖）
 ├── AGENTS.md / CLAUDE.md            # AI Agent 协作入口（根指令 + readme_i18n 配置）
 └── LICENSE.md                       # 开源协议
@@ -93,6 +94,16 @@ docker compose up -d --build
 Compose 内置 PostgreSQL + 三个 host（20802/20806/20808）+ Admin 前端（20800，与 `pnpm run dev` 互斥，起容器前先停 dev server），起完等 healthcheck 变绿即可访问。
 
 环境变量统一入口：复制根目录 [`.env.example`](.env.example) 为 `.env` 后按需覆盖（未填写的变量走 compose 默认值；`.env` 不进 git）。
+
+### Admin 独立栈（docker-compose.admin.yml）
+
+生产或隔离环境可改用 Admin 独立 compose：自带 PostgreSQL + 仅三个 API 宿主，不含前端容器——管理台静态站点用统一 compose 的 `web-vue` 或自有静态托管发布，并把 `WEB_VUE_API_URL` 指向浏览器可达的 Web API 地址。
+
+```bash
+docker compose -f docker-compose.admin.yml up -d --build
+```
+
+启动顺序由 healthcheck 固定：`pg` → `admin-web`（初始化主库）→ `admin-client` / `admin-hub`。游戏服也在 Docker 里时，先起本栈、等四个 healthcheck 全绿后再起游戏服 compose；两份 compose 互相不 `depends_on`，也不共享 Admin 的 PostgreSQL 数据卷。隔离覆盖（`ADMIN_WEB_PORT` / `ADMIN_CLIENT_PORT` / `ADMIN_HUB_PORT` / `ADMIN_POSTGRES_DATA_DIRECTORY`）同样写根目录 `.env`。
 
 更细的命令与踩坑见 [`GameFrameX.Admin.Unified.Api/README.zh-CN.md`](GameFrameX.Admin.Unified.Api/README.zh-CN.md)（后端手册）与 [`GameFrameX.Admin.Unified.Vue/README.zh-CN.md`](GameFrameX.Admin.Unified.Vue/README.zh-CN.md)（前端手册）。
 
@@ -257,6 +268,8 @@ Compose 内置 PostgreSQL + 三个 host（20802/20806/20808）+ Admin 前端（2
 docker compose up -d --build
 # 内置 PostgreSQL + Admin(20802) + Client(20808) + Hub(20806) + 前端(20800)，起完等 healthcheck 变绿（前端容器与 dev server 同抢 20800，互斥）
 ```
+
+生产也可改用 Admin 独立栈（[`docker-compose.admin.yml`](docker-compose.admin.yml)）：自带 PostgreSQL + 三 API 宿主、healthcheck 固定启动顺序，详见 [Admin 独立栈](#admin-独立栈docker-composeadminyml)。
 
 单容器 `docker run`、环境变量成对覆盖（半套覆盖启动期直接报错）等细节见 [后端 README · 部署](GameFrameX.Admin.Unified.Api/README.zh-CN.md#部署)。
 

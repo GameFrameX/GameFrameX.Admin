@@ -48,6 +48,7 @@ Admin/
 ├── doc/                             # README 用画像
 ├── .github/workflows/               # CI：3 API イメージとフロントエンドイメージのビルド、フロントエンドテスト、外部イメージ同期
 ├── docker-compose.yml               # コマンド 1 つのフルスタック編成（PostgreSQL + 3 API + フロントエンド）
+├── docker-compose.admin.yml          # Admin 独立スタック：専用 PostgreSQL + 3 API ホスト、フロントエンドコンテナなし
 ├── .env.example                     # compose 環境変数テンプレート（.env にコピーして必要に応じて上書き）
 ├── AGENTS.md / CLAUDE.md            # AI エージェント連携入口（ルート指示 + readme_i18n 設定）
 └── LICENSE.md                       # ライセンス
@@ -93,6 +94,16 @@ docker compose up -d --build
 Compose には PostgreSQL + 3 つのホスト（20802/20806/20808）+ Admin フロントエンド（20800、`pnpm run dev` と排他。コンテナを起動する前に先に dev server を停止してください）が組み込まれており、起動後 healthcheck が緑になればアクセスできます。
 
 環境変数の統一エントリ：ルートの [`.env.example`](.env.example) を `.env` にコピーして必要に応じて上書きしてください（未設定の変数は compose のデフォルト値を使用。`.env` は git 管理対象外です）。
+
+### Admin 独立スタック（docker-compose.admin.yml）
+
+本番や隔離環境では Admin 独立 compose を利用できます。専用 PostgreSQL + 3 つの API ホストのみで、フロントエンドコンテナは含みません。管理画面の静的サイトは統一 compose の `web-vue` または独自の静的ホスティングで公開し、`WEB_VUE_API_URL` をブラウザから到達可能な Web API アドレスに設定してください。
+
+```bash
+docker compose -f docker-compose.admin.yml up -d --build
+```
+
+起動順序は healthcheck で固定されます：`pg` → `admin-web`（メイン DB を初期化）→ `admin-client` / `admin-hub`。ゲームサーバーも Docker で動かす場合は、先に本スタックを起動し 4 つの healthcheck がすべて緑になってからゲームサーバー側 compose を起動してください。2 つの compose は相互に `depends_on` せず、Admin の PostgreSQL データボリュームも共有しません。隔離用オーバーライド（`ADMIN_WEB_PORT` / `ADMIN_CLIENT_PORT` / `ADMIN_HUB_PORT` / `ADMIN_POSTGRES_DATA_DIRECTORY`）も同じルートの `.env` に記述します。
 
 より細かいコマンドと落とし穴については [`GameFrameX.Admin.Unified.Api/README.ja.md`](GameFrameX.Admin.Unified.Api/README.ja.md)（バックエンドマニュアル）と [`GameFrameX.Admin.Unified.Vue/README.ja.md`](GameFrameX.Admin.Unified.Vue/README.ja.md)（フロントエンドマニュアル）を参照してください。
 
@@ -257,6 +268,8 @@ Compose には PostgreSQL + 3 つのホスト（20802/20806/20808）+ Admin フ�
 docker compose up -d --build
 # PostgreSQL + Admin(20802) + Client(20808) + Hub(20806) + フロントエンド(20800) を内蔵。起動後 healthcheck が緑になるまで待つ（フロントコンテナと dev server が 20800 を取り合うため排他）
 ```
+
+本番では Admin 独立スタック（[`docker-compose.admin.yml`](docker-compose.admin.yml)）も利用できます。専用 PostgreSQL + 3 API ホスト、healthcheck による起動順序固定。詳しくは [Admin 独立スタック](#admin-独立スタックdocker-composeadminyml) を参照してください。
 
 単一コンテナの `docker run`、環境変数のペアオーバーライド（片側だけのオーバーライドは起動時に即エラー）などの詳細は [バックエンド README · デプロイ](GameFrameX.Admin.Unified.Api/README.ja.md#デプロイ) を参照してください。
 
