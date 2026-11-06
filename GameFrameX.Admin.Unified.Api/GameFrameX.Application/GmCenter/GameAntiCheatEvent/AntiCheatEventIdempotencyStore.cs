@@ -40,7 +40,7 @@ public sealed class AntiCheatEventIdempotencyStore : IIdempotencyStore
     /// <summary>
     /// 初始化存储。
     /// </summary>
-    /// <param name="repository">事件仓储（租户路由）。</param>
+    /// <param name="repository">事件仓储。</param>
     /// <param name="eventTemplate">占位模板（业务字段已就绪，IdempotencyKey 以占位记录为准覆盖）。</param>
     public AntiCheatEventIdempotencyStore(SqlSugarRepository<GameAntiCheatEventEntity> repository, GameAntiCheatEventEntity eventTemplate)
     {

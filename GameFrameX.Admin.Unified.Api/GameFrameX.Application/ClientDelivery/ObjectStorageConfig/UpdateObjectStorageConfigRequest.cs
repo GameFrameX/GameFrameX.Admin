@@ -1,7 +1,7 @@
 namespace GameFrameX.Application.ClientDelivery.ObjectStorageConfig;
 
 /// <summary>
-/// 更新租户对象存储配置入参。Provider 必须与既有记录一致。
+/// 更新对象存储配置入参。Provider 必须与既有记录一致。
 /// </summary>
 public class UpdateObjectStorageConfigRequest : BaseUpdateRequest
 {

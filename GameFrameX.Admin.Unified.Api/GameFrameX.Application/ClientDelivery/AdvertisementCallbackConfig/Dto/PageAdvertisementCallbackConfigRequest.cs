@@ -1,7 +1,7 @@
 namespace GameFrameX.Application.ClientDelivery.AdvertisementCallbackConfig.Dto;
 
 /// <summary>
-/// 租户广告回调验签配置分页查询输入参数
+/// 广告回调验签配置分页查询输入参数
 /// </summary>
 public class PageAdvertisementCallbackConfigRequest : BaseAppActivePageRequest
 {

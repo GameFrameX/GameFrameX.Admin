@@ -54,7 +54,7 @@ public sealed class FulfillmentLedgerIdempotencyStore : IIdempotencyStore
     /// <summary>
     /// 初始化存储。
     /// </summary>
-    /// <param name="db">租户路由的数据库客户端（与发货服务同源）。</param>
+    /// <param name="db">业务数据库客户端（与发货服务同源）。</param>
     /// <param name="ledgerTemplate">占位模板（订单快照字段已就绪，IdempotencyKey 以占位记录为准覆盖）。</param>
     public FulfillmentLedgerIdempotencyStore(ISqlSugarClient db, GameOrderFulfillmentEntity ledgerTemplate)
     {

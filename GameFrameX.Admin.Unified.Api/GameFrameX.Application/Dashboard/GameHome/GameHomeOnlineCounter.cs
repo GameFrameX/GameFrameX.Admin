@@ -12,9 +12,9 @@ namespace GameFrameX.Application.Dashboard.GameHome;
 public static class GameHomeOnlineCounter
 {
     /// <summary>
-    /// 按指定租户库连接聚合全服在线人数。无可用区服时返回 0。
+    /// 按指定主库连接聚合全服在线人数。无可用区服时返回 0。
     /// </summary>
-    /// <param name="mainDb">租户业务库连接（必须已路由到目标租户库）。</param>
+    /// <param name="mainDb">主库业务连接。</param>
     /// <param name="httpClientFactory">HTTP 客户端工厂。</param>
     /// <returns>启用区服在线人数之和。</returns>
     public static async Task<int> GetTotalOnlineAsync(ISqlSugarClient mainDb, IHttpClientFactory httpClientFactory)

@@ -8,7 +8,7 @@ using GameFrameX.Entity.Global;
 namespace GameFrameX.Application.ClientDelivery.ChannelDefinition;
 
 /// <summary>
-/// 租户渠道定义服务，仅管理当前租户渠道
+/// 业务渠道定义服务，仅管理业务渠道
 /// </summary>
 [ApiDescriptionSettings(Order = 101)]
 public class ChannelDefinitionService
@@ -17,7 +17,7 @@ public class ChannelDefinitionService
     private readonly SqlSugarRepository<GameAppPackageEntity> _packageRepository;
 
     /// <summary>
-    /// 租户渠道定义服务
+    /// 业务渠道定义服务
     /// </summary>
     public ChannelDefinitionService(
         SqlSugarRepository<ChannelDefinitionEntity> repository,
@@ -61,9 +61,9 @@ public class ChannelDefinitionService
     [HttpPost(CrudActionRoutes.Export)]
     [ApiDescriptionSettings(Name = "Export")]
     [NonUnify]
-    [DisplayName("导出租户渠道定义")]
+    [DisplayName("导出业务渠道定义")]
     public Task<IActionResult> ExportAsync(DataExportRequest<PageChannelDefinitionRequest> input)
     {
-        return ExportCoreAsync(input.Query, input.Columns, input.Range, "租户渠道定义");
+        return ExportCoreAsync(input.Query, input.Columns, input.Range, "业务渠道定义");
     }
 }

@@ -10,7 +10,7 @@ using GameFrameX.Core.Service.Business;
 namespace GameFrameX.Application.ClientDelivery.ClientApiPolicy;
 
 /// <summary>
-/// 租户 Client API 运行策略管理服务（C378 四表合一：Token / 登录票据 / 区服输出 / 订单策略单页管理）。
+/// Client API 运行策略管理服务（C378 四表合一：Token / 登录票据 / 区服输出 / 订单策略单页管理）。
 /// <para>主库保存唯一运行策略，所有请求读取同一行。</para>
 /// <para>敏感字段（SigningKey）承载 C368 空值防护语义：新增空白自动生成 64-hex、更新空白与 <c>******</c> 同义保留原值；
 /// 输出恒为脱敏占位；该密钥纯服务端内部使用，任何响应均不回显明文。</para>

@@ -1,7 +1,7 @@
 namespace GameFrameX.Application.ClientDelivery.ObjectStorageConfig;
 
 /// <summary>
-/// 租户对象存储配置分页查询入参。
+/// 对象存储配置分页查询入参。
 /// </summary>
 public class PageObjectStorageConfigRequest : BasePageRequest
 {

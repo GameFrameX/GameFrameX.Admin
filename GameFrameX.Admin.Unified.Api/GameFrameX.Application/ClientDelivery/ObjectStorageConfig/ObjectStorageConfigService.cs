@@ -11,8 +11,8 @@ using GameFrameX.ObjectStorage.Abstract;
 namespace GameFrameX.Application.ClientDelivery.ObjectStorageConfig;
 
 /// <summary>
-/// 租户对象存储配置管理服务：CRUD + 提供商/Schema 查询 + 连通性测试。
-/// 业务规则：Provider 创建后不可变更；同租户至多一条启用；ConfigJson 白名单规范化与脱敏。
+/// 对象存储配置管理服务：CRUD + 提供商/Schema 查询 + 连通性测试。
+/// 业务规则：Provider 创建后不可变更；至多一条启用；ConfigJson 白名单规范化与脱敏。
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 111)]
 public class ObjectStorageConfigService
@@ -21,7 +21,7 @@ public class ObjectStorageConfigService
         ObjectStorageConfigResponse, PageObjectStorageConfigRequest>
 {
     /// <summary>
-    /// 启用切换进程级串行锁。同租户“停用其它 + 写当前启用”必须串行，避免并发 AddAsync/UpdateAsync 产生多条启用配置。
+    /// 启用切换进程级串行锁。“停用其它 + 写当前启用”必须串行，避免并发 AddAsync/UpdateAsync 产生多条启用配置。
     /// <para>注：当前为单实例部署的进程级锁；未来水平扩展为多实例时，需升级为分布式锁或 DB 级唯一约束。</para>
     /// </summary>
     private static readonly SemaphoreSlim ActiveConfigTransitionLock = new(1, 1);
@@ -53,7 +53,7 @@ public class ObjectStorageConfigService
     }
 
     /// <summary>
-    /// 新增配置。校验 Provider 已注册、规范化 ConfigJson；若启用则在事务内停用同租户其它配置。
+    /// 新增配置。校验 Provider 已注册、规范化 ConfigJson；若启用则在事务内停用其它配置。
     /// </summary>
     public override async Task<ObjectStorageConfigResponse> AddAsync(AddObjectStorageConfigRequest input)
     {

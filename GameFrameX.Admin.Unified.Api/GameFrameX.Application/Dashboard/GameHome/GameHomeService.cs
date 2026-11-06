@@ -34,7 +34,7 @@ public class GameHomeService : IAdminApiController
     {
         // C175：从全局 GameServerOptions.HttpRootUrl 改为区服级聚合。仅统计启用且配置了管理地址的区服，
         // 每个区服按 Control 能力前缀调用 GetOnlinePlayer，求和返回全服在线人数。
-        // C321：区服表是租户库表，经租户库连接路由查询；平台面（无租户上下文）返回明确业务错误而非裸 500。
+        // C321：区服表是主库业务表，经主库连接查询；无区服数据时返回明确业务错误而非裸 500。
         var mainDb = ResolveDb("首页在线人数");
         var total = await GameHomeOnlineCounter.GetTotalOnlineAsync(mainDb, _httpClientFactory);
         return HttpJsonResultData<GameHomeOnlineResponse>.Success(new GameHomeOnlineResponse { OnlineCount = total, });

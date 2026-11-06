@@ -14,7 +14,7 @@ public class LogOperationService : BaseLogService<SystemLogOperationEntity, LogO
     /// 构造函数
     /// </summary>
     /// <param name="systemLogOperationRepository">平台操作日志仓储（主库）</param>
-    /// <param name="logOperationRepository">租户操作日志仓储（当前租户库）</param>
+    /// <param name="logOperationRepository">管理员操作日志仓储（主库）</param>
     /// <param name="currentUserContext">当前登录用户</param>
     public LogOperationService(SqlSugarRepository<SystemLogOperationEntity> systemLogOperationRepository, SqlSugarRepository<LogOperationEntity> logOperationRepository, CurrentUserContext currentUserContext)
         : base(systemLogOperationRepository, logOperationRepository, currentUserContext)
