@@ -53,6 +53,6 @@ export function createMergeStub() {
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const port = Number(process.env.MERGE_STUB_PORT ?? 22390);
   const server = createMergeStub();
-  server.listen(port, '127.0.0.1', () => process.stdout.write(`Server merge stub: http://127.0.0.1:${port}/online/admin\n`));
+  server.listen(port, process.env.E2E_STUB_HOST ?? '127.0.0.1', () => process.stdout.write(`Server merge stub: http://127.0.0.1:${port}/online/admin\n`));
   for (const signal of ['SIGTERM', 'SIGINT']) process.on(signal, () => server.close());
 }

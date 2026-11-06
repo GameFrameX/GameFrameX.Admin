@@ -51,7 +51,7 @@ const server = createServer(async (request, response) => {
     response.writeHead(400, { 'Content-Type': 'application/json' }).end(JSON.stringify({ code: 400, message: error.message }));
   }
 });
-server.listen(port, '127.0.0.1', () => process.stdout.write(`provision-ready:${port}\n`));
+server.listen(port, process.env.E2E_STUB_HOST ?? '127.0.0.1', () => process.stdout.write(`provision-ready:${port}\n`));
 for (const signal of ['SIGINT', 'SIGTERM']) {
   process.on(signal, () => { server.closeAllConnections(); server.close(() => process.exit(0)); });
 }

@@ -36,15 +36,16 @@ test('a 登录表单无租户字段且双身份表单登录', async ({ browser }
 
 // —— (c) 改名后的 8 个页面经真实菜单打开、请求改名后的接口、表格渲染 ——
 const RENAMED_PAGES = [
-  { leaf: '广告回调配置', root: 'C 端交付', urlPart: /#\/clientDelivery\/advertisementCallbackConfigEntity/, api: '/api/advertisementCallbackConfig/page' },
+  { leaf: '广告回调验签', root: 'C 端交付', urlPart: /#\/clientDelivery\/advertisementCallbackConfigEntity/, api: '/api/advertisementCallbackConfig/page' },
   { leaf: '传输签名密钥', root: 'C 端交付', urlPart: /#\/clientDelivery\/appSignatureKeyEntity/, api: '/api/appSignatureKey/page' },
   { leaf: '渠道定义', root: 'C 端交付', urlPart: /#\/clientDelivery\/channelDefinition/, api: '/api/channelDefinition/page' },
   { leaf: 'Client API 策略', root: 'C 端交付', urlPart: /#\/clientDelivery\/clientApiPolicyEntity/, api: '/api/clientApiPolicy/page' },
-  { leaf: '广告奖励账本', root: 'C 端交付', urlPart: /#\/clientDelivery\/gameAdvertisementRewardEntity/, api: '/api/gameAdvertisementReward/page' },
   { leaf: '登录票据密钥', root: 'C 端交付', urlPart: /#\/clientDelivery\/gameLoginTicketKeyEntity/, api: '/api/gameLoginTicketKey/page' },
   { leaf: '会话密钥', root: 'C 端交付', urlPart: /#\/clientDelivery\/sessionKeyEntity/, api: '/api/sessionKey/page' },
   { leaf: '对象存储配置', root: '系统', urlPart: /#\/system\/objectStorageConfigEntity/, api: '/api/objectStorageConfig/page' },
 ] as const;
+// 广告奖励账本为设计内隐藏页（种子 IsHide=true，与权益发货账本同款先例，侧边栏不露出）——URL 直达验证
+const HIDDEN_RENAMED_PAGE = { urlPart: /#\/clientDelivery\/gameAdvertisementRewardEntity/, api: '/api/gameAdvertisementReward/page' };
 
 test('c 改名页面经真实菜单请求改名接口并渲染表格', async ({ page }) => {
   await page.goto('/');
@@ -68,6 +69,18 @@ test('c 改名页面经真实菜单请求改名接口并渲染表格', async ({ 
     await shot(page, `c406-c-${item.leaf}`);
     await page.waitForTimeout(300);
   }
+
+  // 隐藏页（广告奖励账本，设计内 IsHide）经 URL 直达：同样请求改名接口并渲染表格
+  let hiddenApiRequested = false;
+  await page.route(new RegExp(HIDDEN_RENAMED_PAGE.api.replace(/\//g, '\\/')), async route => {
+    if (route.request().method() === 'POST') hiddenApiRequested = true;
+    await route.continue();
+  });
+  await page.goto('/#/clientDelivery/gameAdvertisementRewardEntity');
+  await expect(page).toHaveURL(HIDDEN_RENAMED_PAGE.urlPart);
+  await expect(page.locator('.p-datatable')).toBeVisible();
+  expect(hiddenApiRequested, '广告奖励账本应请求改名后的接口').toBe(true);
+  await shot(page, 'c406-c-广告奖励账本-隐藏页直达');
 });
 
 // —— (d) 策展页面巡查：记录的页面请求 body/query 不含旧作用域字段；区服请求带 serverId ——
@@ -76,11 +89,11 @@ const WALK_LEAVES: Array<{ leaf: string; root?: string }> = [
   { leaf: '游戏区服', root: '区服' },
   { leaf: '开服向导', root: '区服' },
   { leaf: '游戏公告', root: '内容运营' },
-  { leaf: '功能开关', root: '内容运营' },
+  { leaf: '活动/功能开关', root: 'C 端交付' },
   { leaf: '远程配置', root: '内容运维' },
   { leaf: '在线总览', root: '在线运维' },
-  { leaf: '玩家查询', root: '玩家' },
-  { leaf: '订单查询', root: '商业化' },
+  { leaf: '游戏用户', root: '玩家' },
+  { leaf: '订单', root: '商业化' },
   { leaf: '支付配置', root: '商业化' },
   ...RENAMED_PAGES.map(item => ({ leaf: item.leaf, root: item.root })),
   { leaf: '操作日志', root: '审计' },
@@ -150,7 +163,7 @@ test('f 支付配置回调地址为单 packageId 形态', async ({ page, context
   await context.grantPermissions(['clipboard-read', 'clipboard-write'], { origin: new URL(process.env.E2E_APP_URL ?? 'http://127.0.0.1:21140').origin });
   await page.goto('/');
   await expectOverview(page);
-  await navigateByMenu(page, '支付配置', '商业化');
+  await navigateByMenu(page, '支付配置', 'C 端交付');
   await expect(page).toHaveURL(/#\/clientDelivery\/gamePaymentConfigEntity/);
   await expect(page.locator('.p-datatable')).toBeVisible();
 
@@ -186,7 +199,7 @@ function hmacSignature(secret: string, method: string, path: string, query: stri
 
 async function hubSync(page: Page, headers: Record<string, string>): Promise<{ status: number; code: number | null }> {
   return page.evaluate(async ({ endpoint, requestHeaders }) => {
-    const body = JSON.stringify({ Version: 0 });
+    const body = JSON.stringify({});
     const response = await fetch(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...requestHeaders },
@@ -239,7 +252,7 @@ test('g Hub 机器通道 HMAC 鉴权与旧租户头被忽略', async ({ page }) 
   // 1. HMAC 正确 → 200 + 业务码 0
   const ts = Math.floor(Date.now() / 1000);
   const nonce = `c406-${ts}-${Math.random().toString(36).slice(2, 8)}`;
-  const goodSig = hmacSignature(accessSecret, 'POST', '/api/FeatureSwitchSync/Sync', '', accessKey, ts, nonce, JSON.stringify({ Version: 0 }));
+  const goodSig = hmacSignature(accessSecret, 'POST', '/api/FeatureSwitchSync/Sync', '', accessKey, ts, nonce, JSON.stringify({}));
   const accepted = await hubSync(page, { Signature: `v2;${accessKey};${ts};${nonce};${goodSig}` });
   expect(accepted.status, '正确 HMAC 签名必须 200').toBe(200);
   expect(accepted.code, '业务信封码应为 0').toBe(0);
@@ -255,7 +268,7 @@ test('g Hub 机器通道 HMAC 鉴权与旧租户头被忽略', async ({ page }) 
   // 4. 正确签名 + 旧三个租户/应用头 → 结果与不带完全一致（旧头被忽略）
   const ts2 = ts + 1;
   const nonce2 = `c406-${ts2}-x`;
-  const sig2 = hmacSignature(accessSecret, 'POST', '/api/FeatureSwitchSync/Sync', '', accessKey, ts2, nonce2, JSON.stringify({ Version: 0 }));
+  const sig2 = hmacSignature(accessSecret, 'POST', '/api/FeatureSwitchSync/Sync', '', accessKey, ts2, nonce2, JSON.stringify({}));
   const withLegacy = await hubSync(page, {
     Signature: `v2;${accessKey};${ts2};${nonce2};${sig2}`,
     'GameFrameX-Tenant-Id': '1300000000001',
