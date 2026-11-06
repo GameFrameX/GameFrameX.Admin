@@ -4,7 +4,7 @@ import { test, expect } from '@playwright/test';
 import { ADMIN_STATE, navigateByMenu, shot, signIn } from './helpers';
 import { installApiRecorder, readApiRecords } from './module-coverage';
 import { globalServerSelector, selectServerOption } from './server-selection';
-import { readField } from './admin-menu-fixture';
+import { readField } from './admin-stack';
 
 // 环境准备见 notes-provision.md：隔离库模板“E2E 开服模板”的分类 HttpManagerUrl 指向本桩。
 // 用例只通过真实表单与菜单操作，不主动调用管理 API 或 SQL。
