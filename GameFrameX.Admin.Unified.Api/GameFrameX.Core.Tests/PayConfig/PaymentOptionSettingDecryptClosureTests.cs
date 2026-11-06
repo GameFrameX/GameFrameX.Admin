@@ -36,7 +36,7 @@ public sealed class PaymentOptionSettingDecryptClosureTests
             using var fixture = new PostgresPaymentFixture(tenantId, appId);
             var configJson = PaymentConfigCrypto.EncryptConfigJson("alipay",
                 "{\"AliPayAppId\":\"2021001\",\"AliPayMerchantPrivateKey\":\"plain-merchant-key\",\"AliPayGatewayUrl\":\"https://openapi.alipay.com/gateway.do\"}");
-            fixture.TenantDb.Insertable(new GamePaymentConfigEntity
+            fixture.MainDb.Insertable(new GamePaymentConfigEntity
             {
                 Id = 1900000004201, IsEnabled = true, PayChannel = "alipay", ConfigJson = configJson,
             }).ExecuteCommand();
@@ -75,14 +75,12 @@ public sealed class PaymentOptionSettingDecryptClosureTests
 
 
             DbProvider = MainDb;
-            TenantDb = DbProvider;
-            TenantDb.CodeFirst.InitTables(typeof(GamePaymentConfigEntity));
+            DbProvider.CodeFirst.InitTables(typeof(GamePaymentConfigEntity));
             _ = appId;
         }
 
         public SqlSugarScope MainDb { get; }
 
-        public ISqlSugarClient TenantDb { get; }
 
         public ISqlSugarClient DbProvider { get; }
 

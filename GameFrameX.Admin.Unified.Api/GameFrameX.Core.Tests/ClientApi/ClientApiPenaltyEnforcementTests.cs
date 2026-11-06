@@ -130,6 +130,6 @@ public sealed class ClientApiPenaltyEnforcementTests
             ExpireTime = expiresAt?.ToUnixTimeSeconds(),
             OperatorId = 1,
         };
-        db.TenantDb.Insertable(entity).ExecuteCommand();
+        db.MainDb.Insertable(entity).ExecuteCommand();
     }
 }

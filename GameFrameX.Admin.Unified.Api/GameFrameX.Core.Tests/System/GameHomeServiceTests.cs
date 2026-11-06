@@ -12,11 +12,10 @@ using SqlSugar;
 namespace GameFrameX.Core.Tests.System;
 
 // C175：GetOnlineAsync 从全局 GameServerOptions.HttpRootUrl 改为按启用区服的 Control 能力前缀聚合。
-// C321：getOnline/overview/onlineTrend 经租户库连接路由查询；平台面（无租户上下文）抛 BusinessException 明确语义。
+// C321：getOnline/overview/onlineTrend 直接经主库连接查询；平台面（无区服上下文）抛 BusinessException 明确语义。
 // 用 Sqlite 双库 SqlSugarScope 种子数据，伪造 HttpMessageHandler 验证聚合、降级、计数与趋势桶行为。
 public class GameHomeServiceTests : IDisposable
 {
-    private const long TenantId = 1001L;
     private const string ConfigId = "1001";
 
     private readonly string _dbPath = Path.Combine(Path.GetTempPath(), $"game_home_{Guid.NewGuid():N}.db");
@@ -28,7 +27,7 @@ public class GameHomeServiceTests : IDisposable
         SqlSugarCache.Configure(new FakeCache());
         // AuthTestHost 判例：连接配置必须经 SqlSugarSetup.SetDbConfig 装配 ConfigureExternalServices
         // （实体列名/类型服务，[BusinessTable] 实体前缀 mutate 也在此链路），否则 ORM 写读列映射不一致
-        // （实测种子 ControlApiPrefix 落 NULL、读回空导致 Build 抛降级）。建表与种子统一走租户库 scope。
+        // （实测种子 ControlApiPrefix 落 NULL、读回空导致 Build 抛降级）。建表与种子统一走主库 scope。
         var config = new DbConnectionConfig
         {
             ConfigId = ConfigId,
@@ -41,11 +40,11 @@ public class GameHomeServiceTests : IDisposable
         };
         SqlSugarSetup.SetDbConfig(config);
         _db = new SqlSugarScope(new List<ConnectionConfig> { config, });
-        var tenantScope = _db.GetConnectionScope(ConfigId);
-        tenantScope.CodeFirst.InitTables<GameAreaEntity>();
-        tenantScope.CodeFirst.InitTables<GameOrderEntity>();
-        tenantScope.CodeFirst.InitTables<GameUserEntity>();
-        tenantScope.CodeFirst.InitTables<GameHomeOnlineSampleEntity>();
+        var mainScope = _db.GetConnectionScope(ConfigId);
+        mainScope.CodeFirst.InitTables<GameAreaEntity>();
+        mainScope.CodeFirst.InitTables<GameOrderEntity>();
+        mainScope.CodeFirst.InitTables<GameUserEntity>();
+        mainScope.CodeFirst.InitTables<GameHomeOnlineSampleEntity>();
         _dbProvider = new FakeDbConnectionProvider(_db, ConfigId);
     }
 
@@ -124,7 +123,7 @@ public class GameHomeServiceTests : IDisposable
     [Fact]
     public async Task GetOnline_UsesMainDatabaseWithoutTenantContext()
     {
-        // C321：平台面（SuperAdmin 无目标租户）不落到主库查租户表触发 42P01 裸 500，而是抛明确业务错误
+        // C321：平台面（无区服上下文）不裸查业务表触发 42P01 裸 500，而是抛明确业务错误
         var service = CreateService();
 
         var result = await service.GetOnlineAsync();

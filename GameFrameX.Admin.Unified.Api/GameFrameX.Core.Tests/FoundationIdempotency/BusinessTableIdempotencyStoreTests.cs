@@ -34,7 +34,7 @@ public sealed class BusinessTableIdempotencyStoreTests : IDisposable
         }
 
         Assert.Single(results, succeeded => succeeded);
-        var rows = await _db.TenantDb.Queryable<GameAntiCheatEventEntity>().Where(u => u.IdempotencyKey == "anticheat-key-concurrent").ToListAsync();
+        var rows = await _db.MainDb.Queryable<GameAntiCheatEventEntity>().Where(u => u.IdempotencyKey == "anticheat-key-concurrent").ToListAsync();
         Assert.Single(rows);
     }
 
@@ -94,7 +94,7 @@ public sealed class BusinessTableIdempotencyStoreTests : IDisposable
         // 法定覆盖：存量 Failed 重试复用同一行（翻回 Pending）
         Assert.True(await store.TryBeginProcessingAsync(BuildRecord(AdvertisementRewardLedgerIdempotencyStore.IdempotencyScope, "adreward-key-retry")));
 
-        var rows = await _db.TenantDb.Queryable<GameAdvertisementRewardEntity>().Where(u => u.IdempotencyKey == "adreward-key-retry").ToListAsync();
+        var rows = await _db.MainDb.Queryable<GameAdvertisementRewardEntity>().Where(u => u.IdempotencyKey == "adreward-key-retry").ToListAsync();
         Assert.Single(rows);
         Assert.Equal(AdvertisementRewardStatusEnum.Pending, rows[0].Status);
     }
@@ -131,7 +131,7 @@ public sealed class BusinessTableIdempotencyStoreTests : IDisposable
     {
         _db.InitBusinessTables(typeof(GameOrderFulfillmentEntity));
 
-        var store = new FulfillmentLedgerIdempotencyStore(_db.TenantDb, BuildFulfillmentTemplate("fulfillment-key-claim"));
+        var store = new FulfillmentLedgerIdempotencyStore(_db.MainDb, BuildFulfillmentTemplate("fulfillment-key-claim"));
         Assert.True(await store.TryBeginProcessingAsync(BuildRecord(FulfillmentLedgerIdempotencyStore.OrderShipIdempotencyScope, "fulfillment-key-claim")));
 
         // Pending 占用中：占位失败（协调器等待后回忙碌）
@@ -141,7 +141,7 @@ public sealed class BusinessTableIdempotencyStoreTests : IDisposable
         var identifier = new IdempotencyRecordIdentifier(FulfillmentLedgerIdempotencyStore.OrderShipIdempotencyScope, "fulfillment-key-claim");
         await store.FailAsync(new IdempotencyFailureRequest(identifier, 0));
         Assert.True(await store.TryBeginProcessingAsync(BuildRecord(identifier.IdempotencyScope, identifier.IdempotencyKey)));
-        var rows = await _db.TenantDb.Queryable<GameOrderFulfillmentEntity>().Where(u => u.IdempotencyKey == "fulfillment-key-claim").ToListAsync();
+        var rows = await _db.MainDb.Queryable<GameOrderFulfillmentEntity>().Where(u => u.IdempotencyKey == "fulfillment-key-claim").ToListAsync();
         Assert.Single(rows);
         Assert.Equal(FulfillmentStatusEnum.Pending, rows[0].Status);
 
@@ -157,11 +157,11 @@ public sealed class BusinessTableIdempotencyStoreTests : IDisposable
     {
         _db.InitBusinessTables(typeof(GameOrderFulfillmentEntity));
 
-        var store = new FulfillmentLedgerIdempotencyStore(_db.TenantDb, BuildFulfillmentTemplate("fulfillment-key-voided"));
+        var store = new FulfillmentLedgerIdempotencyStore(_db.MainDb, BuildFulfillmentTemplate("fulfillment-key-voided"));
         Assert.True(await store.TryBeginProcessingAsync(BuildRecord(FulfillmentLedgerIdempotencyStore.OrderRefundIdempotencyScope, "fulfillment-key-voided")));
 
         // 作废为业务终态：服务侧落 Voided 后 Complete 做存在性校验（不抛错）
-        await _db.TenantDb.Updateable<GameOrderFulfillmentEntity>()
+        await _db.MainDb.Updateable<GameOrderFulfillmentEntity>()
                  .SetColumns(u => u.Status == FulfillmentStatusEnum.Voided)
                  .Where(u => u.IdempotencyKey == "fulfillment-key-voided")
                  .ExecuteCommandAsync();

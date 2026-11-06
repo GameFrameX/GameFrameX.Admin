@@ -25,7 +25,7 @@ public sealed class PublicCallbackSingleMainTests
             var configJson = channel == "alipay"
                 ? JsonSerializer.Serialize(new AliPayOptionSetting { AliPayNotifyUrl = "https://example.test", })
                 : JsonSerializer.Serialize(new WechatPayOptionSetting { WechatPayNotifyUrl = "https://example.test", });
-            database.TenantDb.Insertable(new GamePaymentConfigEntity
+            database.MainDb.Insertable(new GamePaymentConfigEntity
             {
                 Id = 1900000005101,
                 PackageIdNormalized = 0,

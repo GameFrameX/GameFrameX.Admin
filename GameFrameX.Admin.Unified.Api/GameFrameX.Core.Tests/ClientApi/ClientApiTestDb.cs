@@ -37,7 +37,6 @@ internal sealed class ClientApiTestDb : IDisposable
 
 
         DbProvider = MainDb;
-        TenantDb = DbProvider;
     }
 
     public long TenantId { get; }
@@ -45,8 +44,6 @@ internal sealed class ClientApiTestDb : IDisposable
     public long AppId { get; }
 
     public SqlSugarScope MainDb { get; }
-
-    public ISqlSugarClient TenantDb { get; }
 
     public string DbPath { get; }
 
@@ -60,7 +57,7 @@ internal sealed class ClientApiTestDb : IDisposable
 
     public ClientApiTestDb InitBusinessTables(params Type[] tableTypes)
     {
-        TenantDb.CodeFirst.InitTables(tableTypes);
+        DbProvider.CodeFirst.InitTables(tableTypes);
         return this;
     }
 
@@ -105,7 +102,7 @@ internal sealed class ClientApiTestDb : IDisposable
             IsEnabled = true,
             IsDeleted = false,
         });
-        TenantDb.Insertable(entity).ExecuteCommand();
+        DbProvider.Insertable(entity).ExecuteCommand();
         return entity;
     }
 
@@ -127,7 +124,7 @@ internal sealed class ClientApiTestDb : IDisposable
             IsEnabled = true,
             IsDeleted = false,
         });
-        TenantDb.Insertable(entity).ExecuteCommand();
+        DbProvider.Insertable(entity).ExecuteCommand();
         return entity;
     }
 
@@ -161,7 +158,7 @@ internal sealed class ClientApiTestDb : IDisposable
             AppVersion = "1.0.0",
         });
         entity.IsEnabled = isEnabled;
-        TenantDb.Insertable(entity).ExecuteCommand();
+        DbProvider.Insertable(entity).ExecuteCommand();
         return entity;
     }
 
@@ -169,7 +166,7 @@ internal sealed class ClientApiTestDb : IDisposable
     {
         InitBusinessTables(typeof(GameAppFeatureSwitchEntity));
         WithBasic(entity);
-        TenantDb.Insertable(entity).ExecuteCommand();
+        DbProvider.Insertable(entity).ExecuteCommand();
         return entity;
     }
 
@@ -192,7 +189,7 @@ internal sealed class ClientApiTestDb : IDisposable
             RolloutPercent = 100,
             Description = "C108 global info",
         });
-        TenantDb.Insertable(entity).ExecuteCommand();
+        DbProvider.Insertable(entity).ExecuteCommand();
         return entity;
     }
 
@@ -214,7 +211,7 @@ internal sealed class ClientApiTestDb : IDisposable
             Announcement = "Upgrade now",
             Description = "C108 app version",
         });
-        TenantDb.Insertable(entity).ExecuteCommand();
+        DbProvider.Insertable(entity).ExecuteCommand();
         return entity;
     }
 
@@ -234,7 +231,7 @@ internal sealed class ClientApiTestDb : IDisposable
             ResourceVersion = "2026.07.18",
             Description = "C108 asset package",
         });
-        TenantDb.Insertable(entity).ExecuteCommand();
+        DbProvider.Insertable(entity).ExecuteCommand();
         return entity;
     }
 
@@ -255,7 +252,7 @@ internal sealed class ClientApiTestDb : IDisposable
             IsEnabled = true,
             IsDeleted = false,
         });
-        TenantDb.Insertable(entity).ExecuteCommand();
+        DbProvider.Insertable(entity).ExecuteCommand();
         return entity;
     }
 
@@ -290,7 +287,7 @@ internal sealed class ClientApiTestDb : IDisposable
             IsEnabled = true,
             IsDeleted = false,
         });
-        TenantDb.Insertable(entity).ExecuteCommand();
+        DbProvider.Insertable(entity).ExecuteCommand();
         return entity;
     }
 
@@ -316,7 +313,7 @@ internal sealed class ClientApiTestDb : IDisposable
             AllRecharge = 0,
             OnlineTime = 0,
         });
-        TenantDb.Insertable(entity).ExecuteCommand();
+        DbProvider.Insertable(entity).ExecuteCommand();
         return entity;
     }
 
@@ -334,7 +331,7 @@ internal sealed class ClientApiTestDb : IDisposable
             IsEnabled = isEnabled,
             IsDeleted = false,
         });
-        TenantDb.Insertable(entity).ExecuteCommand();
+        DbProvider.Insertable(entity).ExecuteCommand();
         return entity;
     }
 
@@ -355,7 +352,7 @@ internal sealed class ClientApiTestDb : IDisposable
             Sales = 0,
             Weight = weight,
         });
-        TenantDb.Insertable(entity).ExecuteCommand();
+        DbProvider.Insertable(entity).ExecuteCommand();
         return entity;
     }
 
@@ -395,7 +392,7 @@ internal sealed class ClientApiTestDb : IDisposable
             AppleVerifiedTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
             ProviderTransactionId = providerTransactionId ?? string.Empty,
         });
-        TenantDb.Insertable(entity).ExecuteCommand();
+        DbProvider.Insertable(entity).ExecuteCommand();
         return entity;
     }
 
@@ -416,7 +413,7 @@ internal sealed class ClientApiTestDb : IDisposable
             EndTime = endTime != null ? new DateTimeOffset(endTime.Value).ToUnixTimeSeconds() : DateTimeOffset.Now.AddHours(1).ToUnixTimeSeconds(),
             Contents = contents,
         });
-        TenantDb.Insertable(entity).ExecuteCommand();
+        DbProvider.Insertable(entity).ExecuteCommand();
         return entity;
     }
 
@@ -429,7 +426,7 @@ internal sealed class ClientApiTestDb : IDisposable
             Name = name,
             RoleUsageLimit = roleUsageLimit,
         });
-        TenantDb.Insertable(entity).ExecuteCommand();
+        DbProvider.Insertable(entity).ExecuteCommand();
         return entity;
     }
 
@@ -446,7 +443,7 @@ internal sealed class ClientApiTestDb : IDisposable
             OrderStatus = orderStatus,
             OrderId = $"webshop-{orderId}",
         });
-        TenantDb.Insertable(entity).ExecuteCommand();
+        DbProvider.Insertable(entity).ExecuteCommand();
         return entity;
     }
 
@@ -464,7 +461,7 @@ internal sealed class ClientApiTestDb : IDisposable
             OrderNo = 100,
             Remark = "C108 test config",
         });
-        MainDb.Insertable(entity).ExecuteCommand();
+        DbProvider.Insertable(entity).ExecuteCommand();
         return entity;
     }
 
@@ -483,7 +480,7 @@ internal sealed class ClientApiTestDb : IDisposable
             IsEnabled = true,
             IsDeleted = false,
         });
-        TenantDb.Insertable(entity).ExecuteCommand();
+        DbProvider.Insertable(entity).ExecuteCommand();
         return entity;
     }
 

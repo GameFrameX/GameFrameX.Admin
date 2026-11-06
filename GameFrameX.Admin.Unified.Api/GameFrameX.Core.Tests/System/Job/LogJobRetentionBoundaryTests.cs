@@ -9,7 +9,7 @@ namespace GameFrameX.Core.Tests.System.Job;
 
 /// <summary>
 /// C404 裁定 §9.4：LogJob 不再删除 SystemLogVisit / SystemLogOperation（移交审计留存归档），
-/// 仍清理 SystemLogDiff 与租户历史日志表。行为级断言，防止有人回退修剪。
+/// 仍清理 SystemLogDiff 与管理员历史日志表。行为级断言，防止有人回退修剪。
 /// </summary>
 public sealed class LogJobRetentionBoundaryTests : IDisposable
 {
@@ -27,7 +27,7 @@ public sealed class LogJobRetentionBoundaryTests : IDisposable
     }
 
     [Fact]
-    public async Task LogJob_KeepsSystemVisitAndOperation_DeletesDiffAndTenantHistory()
+    public async Task LogJob_KeepsSystemVisitAndOperation_DeletesDiffAndBusinessHistory()
     {
         var cutoff = DateTimeOffset.UtcNow.ToUnixTimeSeconds() - 40 * 24 * 60 * 60;
         foreach (var entity in new object[]
@@ -61,7 +61,7 @@ public sealed class LogJobRetentionBoundaryTests : IDisposable
         // §9.4：两张 System 表保留（审计留存负责归档）。
         Assert.Equal(1, _database.MainDb.Queryable<SystemLogVisitEntity>().Count());
         Assert.Equal(1, _database.MainDb.Queryable<SystemLogOperationEntity>().Count());
-        // 差异日志与租户历史日志仍按保留期清理。
+        // 差异日志与管理员历史日志仍按保留期清理。
         Assert.Equal(0, _database.MainDb.Queryable<SystemLogDiffEntity>().Count());
         Assert.Equal(0, _database.MainDb.Queryable<LogVisitEntity>().Count());
         Assert.Equal(0, _database.MainDb.Queryable<LogOperationEntity>().Count());

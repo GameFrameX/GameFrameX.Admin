@@ -15,9 +15,4 @@ internal sealed class FakeDbConnectionProvider
     }
 
     public ISqlSugarClient Database => _client.GetConnectionScope(_configId);
-
-    public SqlSugarScopeProvider GetDbConnectionScope(long tenantId)
-    {
-        return _client.GetConnectionScope(_configId);
-    }
 }

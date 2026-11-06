@@ -7,15 +7,15 @@ namespace GameFrameX.Core.Tests.System;
 
 /// <summary>
 /// C156 日志边界隔离测试。日志不再集中到独立日志库，平台日志（SystemLog*）归属主库 system_log_*，
-/// 租户日志（TenantLog*）归属当前租户库 log_*。隔离由实体归属 + 物理库边界共同保证：
-/// 平台与租户日志为不同 CLR 类型，分别路由到不同数据库（路由/catalog 验收见 SqlSugarDatabaseInitializationTests）。
+/// 管理员日志（Log*）归属主库 log_*。隔离由实体归属 + 物理表前缀边界共同保证：
+/// 平台与管理员日志为不同 CLR 类型，分别落到不同物理表（路由/catalog 验收见 SqlSugarDatabaseInitializationTests）。
 /// </summary>
 public class LogQueryIsolationTests
 {
     [Fact]
     public void SystemLogEntities_ArePlatformMainDatabase()
     {
-        // 平台日志归属主库 system_log_*，SuperAdmin 平台查询只读主库，不触碰任何租户库。
+        // 平台日志归属主库 system_log_*，SuperAdmin 平台查询只读平台日志表。
         Assert.True(SqlSugarEntityBoundary.IsPlatformTable(typeof(SystemLogVisitEntity)));
         Assert.True(SqlSugarEntityBoundary.IsPlatformTable(typeof(SystemLogOperationEntity)));
         Assert.True(SqlSugarEntityBoundary.IsPlatformTable(typeof(SystemLogExceptionEntity)));
@@ -27,7 +27,7 @@ public class LogQueryIsolationTests
     }
 
     [Fact]
-    public void TenantLogEntities_UseMainDatabase()
+    public void BusinessLogEntities_BelongToMainDatabase()
     {
         // 历史日志表保留名称，读写统一归主库。
         Assert.True(SqlSugarEntityBoundary.IsBusinessTable(typeof(LogVisitEntity)));
@@ -40,9 +40,9 @@ public class LogQueryIsolationTests
     }
 
     [Fact]
-    public void PlatformAndTenantLogs_UseDistinctClrTypes()
+    public void PlatformAndBusinessLogs_UseDistinctClrTypes()
     {
-        // C156 禁止同一 CLR 实体按运行上下文切物理表：平台与租户日志必须是不同实体类型。
+        // C156 禁止同一 CLR 实体按运行上下文切物理表：平台与管理员日志必须是不同实体类型。
         Assert.NotEqual(typeof(SystemLogVisitEntity), typeof(LogVisitEntity));
         Assert.NotEqual(typeof(SystemLogOperationEntity), typeof(LogOperationEntity));
         Assert.NotEqual(typeof(SystemLogExceptionEntity), typeof(LogExceptionEntity));
@@ -85,8 +85,8 @@ public class LogQueryIsolationTests
                 value = new
                 {
                     account = "admin",
-                    tenantId = 1300000000001,
-                    tenantHost = (string?)null,
+                    serverId = 1300000000001,
+                    channel = (string?)null,
                 },
             },
         });

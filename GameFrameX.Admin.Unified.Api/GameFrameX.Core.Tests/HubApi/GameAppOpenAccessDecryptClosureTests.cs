@@ -153,8 +153,8 @@ public sealed class GameAppOpenAccessDecryptClosureTests : IDisposable
             Id = 7801, Account = "ci-user", RealName = "CI", Password = "not-a-real-password",
         };
         UserService.NormalizeNewUser(bindUser); // 补齐 NOT NULL 字符串列默认值
-        _db.TenantDb.Insertable(bindUser).ExecuteCommand();
-        _db.TenantDb.Insertable(new GameAppOpenAccessEntity
+        _db.MainDb.Insertable(bindUser).ExecuteCommand();
+        _db.MainDb.Insertable(new GameAppOpenAccessEntity
         {
             Id = 7802, BindUserId = 7801,
             Scenario = "ci", Purpose = "unit-test", SubjectName = "unit-test",

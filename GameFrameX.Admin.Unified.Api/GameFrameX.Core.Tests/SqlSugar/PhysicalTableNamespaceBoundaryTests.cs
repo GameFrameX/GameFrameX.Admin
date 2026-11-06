@@ -176,7 +176,7 @@ public class PhysicalTableNamespaceBoundaryTests
     private static bool HasAllowedPrefix(string tableName)
     {
         // D3：业务表不带前缀；system_/global_ 为保留前缀；tenant_ 前缀已随 C406 退场，禁止再现。
-        return !tableName.StartsWith("tenant_", StringComparison.Ordinal)
+        return !tableName.StartsWith("tenant_", StringComparison.Ordinal) // c406-keep（负向断言：旧前缀禁止再现）
                && !tableName.StartsWith("system_sys_", StringComparison.Ordinal);
     }
 }
