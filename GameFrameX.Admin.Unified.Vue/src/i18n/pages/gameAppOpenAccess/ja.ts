@@ -33,7 +33,8 @@ export default {
       subjectNameRequired: 'サブジェクト名は必須です',
       scopesRequired: '少なくとも1つのスコープを選択してください',
 
-      scopePackageReport: 'パッケージレポート (package-report)',
+      scopePackageBuildReport: 'パッケージビルド報告 (PackageBuildReport)',
+      scopeFeatureSwitchSync: '機能スイッチ同期 (FeatureSwitchSync)',
       revoke: '失効',
       enable: '有効化',
       disable: '無効化',

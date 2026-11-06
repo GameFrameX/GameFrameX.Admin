@@ -33,7 +33,8 @@ export default {
       subjectNameRequired: 'Subject name is required',
       scopesRequired: 'Please select at least one scope',
 
-      scopePackageReport: 'Package Report (package-report)',
+      scopePackageBuildReport: 'Package Build Report (PackageBuildReport)',
+      scopeFeatureSwitchSync: 'Feature Switch Sync (FeatureSwitchSync)',
       revoke: 'Revoke',
       enable: 'Enable',
       disable: 'Disable',

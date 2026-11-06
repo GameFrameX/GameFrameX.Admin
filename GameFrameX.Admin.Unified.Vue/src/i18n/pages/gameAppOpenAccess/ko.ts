@@ -33,7 +33,8 @@ export default {
       subjectNameRequired: '주체 이름은 필수입니다',
       scopesRequired: '최소한 하나의 스코프를 선택하세요',
 
-      scopePackageReport: '패키지 리포트 (package-report)',
+      scopePackageBuildReport: '패키지 빌드 리포트 (PackageBuildReport)',
+      scopeFeatureSwitchSync: '기능 스위치 동기화 (FeatureSwitchSync)',
       revoke: '취소',
       enable: '활성화',
       disable: '비활성화',

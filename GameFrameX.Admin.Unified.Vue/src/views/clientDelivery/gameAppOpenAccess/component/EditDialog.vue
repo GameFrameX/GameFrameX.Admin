@@ -67,7 +67,9 @@ const dialogRef = ref()
 const userOptions = ref<any[]>([])
 
 const scopeOptions = computed(() => [
-  { label: t('message.gameBusiness.openAccess.scopePackageReport'), value: 'package-report' },
+  // scope 值必须等于 Hub.Api 机器端点的路由前缀（GameAppOpenAccessAuthMiddleware.IsRouteInScopes 按前缀匹配）
+  { label: t('message.gameBusiness.openAccess.scopePackageBuildReport'), value: 'PackageBuildReport' },
+  { label: t('message.gameBusiness.openAccess.scopeFeatureSwitchSync'), value: 'FeatureSwitchSync' },
 ])
 
 const rules = {
