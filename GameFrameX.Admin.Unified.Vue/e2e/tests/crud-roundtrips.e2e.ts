@@ -322,6 +322,8 @@ test.describe('CRUD 功能闭环（首批）', () => {
             // editable/只读 Select 点输入框不开面板：兜底点专用下拉钮
             await page.locator(`.p-dialog >> .p-select-dropdown >> nth=${selectIndex}`).click();
           }
+          // 选项异步懒加载（如分组列表）：先等首项可见再点，避免空面板竞态
+          await firstOption.first().waitFor({ state: 'visible', timeout: 8_000 });
           await firstOption.first().click();
           selectIndex += 1;
         } else if (field === 'unique-number') {
