@@ -2,7 +2,7 @@ namespace GameFrameX.Core.Tests.Architecture;
 
 // C344 / GFX-760（vault:C9 S8.1/S8.2）Online 控制台四条红线守护：
 // ① X6 口径：Online/Console 全域源码 + OnlineOverviewQueryService 依赖闭包零引用管理员连接链路
-//    （OnlineUserHub / TenantOnlineUserService / TenantOnlineUserEntity / GameHomeOnlineCounter）——
+//    （OnlineUserHub / OnlineUserService / OnlineUserEntity / GameHomeOnlineCounter）——
 //    玩家在线数据唯一来源是 Online 玩家侧查询 API，总览不得并入管理员浏览器连接，也不得复用
 //    首页驾驶舱 24h 在线时序（GameHomeOnlineCounter，C321 产物，口径不同源）；
 // ② 受控命令枚举严格四值（CancelTicket / EndAbnormalMatch / SuspendResumePlayer / MatchIsolation）——
@@ -23,7 +23,7 @@ public sealed class OnlineOverviewIsolationTests
     /// <summary>X6 红线：管理员连接链路标识（总览玩家口径不得混入的四个类型名）。</summary>
     private static readonly string[] AdministratorConnectionTokens =
     {
-        "OnlineUserHub", "TenantOnlineUserService", "TenantOnlineUserEntity", "GameHomeOnlineCounter",
+        "OnlineUserHub", "OnlineUserService", "OnlineUserEntity", "GameHomeOnlineCounter",
     };
 
     /// <summary>既有受控命令 token（复用矩阵：Console 域出现任意一个即构成平行实现）。</summary>
@@ -55,7 +55,7 @@ public sealed class OnlineOverviewIsolationTests
             AdministratorConnectionTokens);
         Assert.True(offenders.Count == 0,
             "Online/Console 源码出现管理员连接链路引用（X6：玩家在线数据唯一来源是 Online 玩家侧查询 API，" +
-            "总览不得计入 OnlineUserHub/TenantOnlineUserService 管理员连接，也不得复用 GameHomeOnlineCounter 驾驶舱口径）。违规点:" +
+            "总览不得计入 OnlineUserHub/OnlineUserService 管理员连接，也不得复用 GameHomeOnlineCounter 驾驶舱口径）。违规点:" +
             Environment.NewLine + string.Join(Environment.NewLine, offenders));
     }
 

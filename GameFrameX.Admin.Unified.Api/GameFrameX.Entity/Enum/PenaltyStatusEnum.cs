@@ -1,7 +1,7 @@
 namespace GameFrameX.Entity.Enum;
 
 /// <summary>
-/// 处罚状态。处罚事实源（TenantGamePenaltyEntity）的生命周期状态。
+/// 处罚状态。处罚事实源（GamePenaltyEntity）的生命周期状态。
 /// </summary>
 [Description("处罚状态")]
 [AdminEnum]

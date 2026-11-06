@@ -10,7 +10,7 @@
  */
 
 import {
-  AddTenantGameAppOpenAccessRequest,
+  AddGameAppOpenAccessRequest,
   GameAppOpenAccessActionRequest,
   GameAppOpenAccessAddPostData,
   GameAppOpenAccessDeletePostData,
@@ -20,8 +20,8 @@ import {
   GameAppOpenAccessRefreshPostData,
   GameAppOpenAccessRevokePostData,
   GameAppOpenAccessUpdatePostData,
-  PageTenantGameAppOpenAccessRequest,
-  UpdateTenantGameAppOpenAccessRequest,
+  PageGameAppOpenAccessRequest,
+  UpdateGameAppOpenAccessRequest,
 } from "./types";
 import { ContentType, HttpClient, RequestParams } from "../_shared/http-client";
 import {getAPI} from "../../utils/axiosUtils";
@@ -42,7 +42,7 @@ export class GameAppOpenAccess<SecurityDataType = unknown> {
    * @request POST:/api/gameAppOpenAccess/add
    */
   gameAppOpenAccessAddPost = (
-    data: AddTenantGameAppOpenAccessRequest,
+    data: AddGameAppOpenAccessRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameAppOpenAccessAddPostData, any>({
@@ -119,7 +119,7 @@ export class GameAppOpenAccess<SecurityDataType = unknown> {
    * @request POST:/api/gameAppOpenAccess/page
    */
   gameAppOpenAccessPagePost = (
-    data: PageTenantGameAppOpenAccessRequest,
+    data: PageGameAppOpenAccessRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameAppOpenAccessPagePostData, any>({
@@ -178,7 +178,7 @@ export class GameAppOpenAccess<SecurityDataType = unknown> {
    * @request POST:/api/gameAppOpenAccess/update
    */
   gameAppOpenAccessUpdatePost = (
-    data: UpdateTenantGameAppOpenAccessRequest,
+    data: UpdateGameAppOpenAccessRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameAppOpenAccessUpdatePostData, any>({

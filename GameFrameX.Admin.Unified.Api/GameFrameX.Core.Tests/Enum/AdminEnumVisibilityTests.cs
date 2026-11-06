@@ -68,7 +68,7 @@ public class AdminEnumVisibilityTests
         "GameFrameX.Core.Enum.Errors.RoleMenuErrorCode",
         "GameFrameX.Core.Enum.Errors.DictionaryErrorCode",
         "GameFrameX.Core.Enum.Errors.PlatformConfigErrorCode",
-        "GameFrameX.Core.Enum.Errors.TenantErrorCode",
+        "GameFrameX.Core.Enum.Errors.ErrorCode",
         "GameFrameX.Core.Enum.Errors.OrganizationErrorCode",
         "GameFrameX.Core.Enum.Errors.PositionErrorCode",
         "GameFrameX.Core.Enum.Errors.FileErrorCode",

@@ -1,7 +1,7 @@
 using GameFrameX.Application.SeedData.System;
 using GameFrameX.Core.Cache;
 using GameFrameX.Core.Option;
-using GameFrameX.Core.Service.Tenant;
+using GameFrameX.Core.Service.Business;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Core.Tests.System;
 using GameFrameX.Entity.Global;
@@ -119,23 +119,23 @@ public class SeedInsertOnlyTests : IDisposable
         using (var scope = CreateScope("tenant_2001"))
         {
             var tenantConfig = CreateConfig("tenant_2001");
-            SqlSugarSetup.InitDatabase(scope, tenantConfig, new[] { typeof(TenantRoleEntity), });
+            SqlSugarSetup.InitDatabase(scope, tenantConfig, new[] { typeof(RoleEntity), });
 
             var tenantDb = scope.GetConnectionScope("tenant_2001");
-            var role = new TenantRoleEntity { Id = 99001, Name = "初始角色", Code = "init_role", };
-            DefaultTenantDatabaseSeeder.Upsert(tenantDb, new[] { role, });
+            var role = new RoleEntity { Id = 99001, Name = "初始角色", Code = "init_role", };
+            DefaultDatabaseSeeder.Upsert(tenantDb, new[] { role, });
 
             // 模拟用户在管理端改名
-            tenantDb.Updateable<TenantRoleEntity>()
+            tenantDb.Updateable<RoleEntity>()
                     .SetColumns(u => u.Name == "用户改过")
                     .Where(u => u.Id == 99001)
                     .ExecuteCommand();
 
             // 二次 seed（如默认租户库重复初始化）：同名主键行不再覆盖
-            var seedAgain = new TenantRoleEntity { Id = 99001, Name = "seed 新值", Code = "init_role", };
-            DefaultTenantDatabaseSeeder.Upsert(tenantDb, new[] { seedAgain, });
+            var seedAgain = new RoleEntity { Id = 99001, Name = "seed 新值", Code = "init_role", };
+            DefaultDatabaseSeeder.Upsert(tenantDb, new[] { seedAgain, });
 
-            var name = tenantDb.Queryable<TenantRoleEntity>().First(u => u.Id == 99001).Name;
+            var name = tenantDb.Queryable<RoleEntity>().First(u => u.Id == 99001).Name;
             Assert.Equal("用户改过", name);
         }
     }

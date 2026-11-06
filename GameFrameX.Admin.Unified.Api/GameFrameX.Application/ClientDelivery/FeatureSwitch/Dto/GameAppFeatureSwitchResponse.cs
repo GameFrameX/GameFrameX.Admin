@@ -1,11 +1,11 @@
-using GameFrameX.Entity.Tenant.Game.FeatureSwitch;
+using GameFrameX.Entity.Business.Game.FeatureSwitch;
 
 namespace GameFrameX.Application.ClientDelivery.FeatureSwitch.Dto;
 
 /// <summary>
 /// 活动/功能开关管理输出参数（字段名与实体逐字一致，名映射投影）
 /// </summary>
-public class GameAppFeatureSwitchResponse : IBasePageResponse<TenantGameAppFeatureSwitchEntity>
+public class GameAppFeatureSwitchResponse : IBasePageResponse<GameAppFeatureSwitchEntity>
 {
     /// <summary>
     /// Id

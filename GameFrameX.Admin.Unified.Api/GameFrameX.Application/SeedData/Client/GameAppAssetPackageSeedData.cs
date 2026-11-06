@@ -1,4 +1,4 @@
-using GameFrameX.Entity.Tenant.Game.Resource;
+using GameFrameX.Entity.Business.Game.Resource;
 using GameFrameX.Core.SqlSugar;
 
 namespace GameFrameX.Application.SeedData.Client;
@@ -6,15 +6,15 @@ namespace GameFrameX.Application.SeedData.Client;
 /// <summary>
 /// 客户端资源包 表种子数据
 /// </summary>
-public class GameAppAssetPackageSeedData : ISqlSugarEntitySeedData<TenantGameAppAssetPackageEntity>
+public class GameAppAssetPackageSeedData : ISqlSugarEntitySeedData<GameAppAssetPackageEntity>
 {
     /// <summary>
     /// 种子数据
     /// </summary>
     /// <returns></returns>
-    public IEnumerable<TenantGameAppAssetPackageEntity> HasData()
+    public IEnumerable<GameAppAssetPackageEntity> HasData()
     {
-        var records = new List<TenantGameAppAssetPackageEntity>
+        var records = new List<GameAppAssetPackageEntity>
         {
             new()
             {

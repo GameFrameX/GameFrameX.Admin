@@ -1,12 +1,12 @@
 using GameFrameX.Entity.Enum;
-using GameFrameX.Entity.Tenant.Game.App;
+using GameFrameX.Entity.Business.Game.App;
 
 namespace GameFrameX.Application.ClientDelivery.GameAppPackage.Dto;
 
 /// <summary>
 /// 游戏应用分包输出参数
 /// </summary>
-public class GameAppPackageResponse : IBasePageResponse<TenantGameAppPackageEntity>
+public class GameAppPackageResponse : IBasePageResponse<GameAppPackageEntity>
 {
     /// <summary>
     /// Id

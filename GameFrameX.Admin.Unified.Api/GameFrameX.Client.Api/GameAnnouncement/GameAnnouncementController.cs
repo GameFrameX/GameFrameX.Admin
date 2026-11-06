@@ -1,6 +1,6 @@
 using GameFrameX.Client.Api.GameAnnouncement.Dto;
 using GameFrameX.Core.Const;
-using GameFrameX.Entity.Tenant.Game.Announcement;
+using GameFrameX.Entity.Business.Game.Announcement;
 
 namespace GameFrameX.Client.Api.GameAnnouncement;
 
@@ -8,7 +8,7 @@ namespace GameFrameX.Client.Api.GameAnnouncement;
 /// 公告控制器
 /// </summary>
 /// <remarks>
-/// 类名自 TenantGameAnnouncementEntityServiceController 清理而来（GFX-708）；调用方（游戏客户端）依赖既有路径，
+/// 类名自 GameAnnouncementEntityServiceController 清理而来（GFX-708）；调用方（游戏客户端）依赖既有路径，
 /// 显式 [Route] 锁定旧 token 路由解析结果 api/GameAnnouncementService/[action]，确保路由零变化。
 /// 不继承 BaseController&lt;T&gt;：其类级 token 路由 [controller] 会随类名解析为 api/GameAnnouncement 叠加出别名端点；
 /// 本类直接继承 Controller 并自持仓储，路由仅显式声明一条。
@@ -17,13 +17,13 @@ namespace GameFrameX.Client.Api.GameAnnouncement;
 [ApiController]
 public class GameAnnouncementController : Controller
 {
-    private readonly SqlSugarRepository<TenantGameAnnouncementEntity> _repository;
+    private readonly SqlSugarRepository<GameAnnouncementEntity> _repository;
 
     /// <summary>
     ///
     /// </summary>
     /// <param name="repository"></param>
-    public GameAnnouncementController(SqlSugarRepository<TenantGameAnnouncementEntity> repository)
+    public GameAnnouncementController(SqlSugarRepository<GameAnnouncementEntity> repository)
     {
         _repository = repository;
     }

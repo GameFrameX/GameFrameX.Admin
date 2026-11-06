@@ -10,13 +10,13 @@ namespace GameFrameX.Client.Api.GameUserReward;
 /// </summary>
 public class GameUserRewardController : BaseController
 {
-    private readonly Repository<TenantGameUserRewardEntity> _rewardRepository;
+    private readonly Repository<GameUserRewardEntity> _rewardRepository;
 
     /// <summary>
     ///
     /// </summary>
     /// <param name="rewardRepository">奖励记录仓储</param>
-    public GameUserRewardController(Repository<TenantGameUserRewardEntity> rewardRepository)
+    public GameUserRewardController(Repository<GameUserRewardEntity> rewardRepository)
     {
         _rewardRepository = rewardRepository;
     }
@@ -58,7 +58,7 @@ public class GameUserRewardController : BaseController
         {
             // 无记录（check_exist=0 问卷/mail 允许创建；check_exist=1 的 op_cp 记录自建模型下也无预建路径，
             // 统一创建 + rcode 0——客户端发奖用本地任务配置，不受服务端 content 影响）
-            entity = new TenantGameUserRewardEntity
+            entity = new GameUserRewardEntity
             {
                 UserId = request.UserId,
                 RewardKey = request.Key,

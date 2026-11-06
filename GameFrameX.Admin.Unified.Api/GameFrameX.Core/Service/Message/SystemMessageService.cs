@@ -47,7 +47,7 @@ public class SystemMessageService : IAdminApiController
     [ApiDescriptionSettings(Name = "SendOtherUser")]
     public async Task SendOtherUserAsync(MessageRequest input)
     {
-        var user = _systemCacheService.Get<TenantOnlineUserEntity>(CacheConst.KeyUserOnline + input.UserId);
+        var user = _systemCacheService.Get<OnlineUserEntity>(CacheConst.KeyUserOnline + input.UserId);
         if (user != null && !string.IsNullOrEmpty(user.ConnectionId))
         {
             await _chatHubContext.Clients.AllExcept(user.ConnectionId).ReceiveMessageAsync(input);
@@ -63,7 +63,7 @@ public class SystemMessageService : IAdminApiController
     [ApiDescriptionSettings(Name = "SendUser")]
     public async Task SendUserAsync(MessageRequest input)
     {
-        var user = _systemCacheService.Get<TenantOnlineUserEntity>(CacheConst.KeyUserOnline + input.UserId);
+        var user = _systemCacheService.Get<OnlineUserEntity>(CacheConst.KeyUserOnline + input.UserId);
         if (user == null || string.IsNullOrEmpty(user.ConnectionId))
         {
             return;
@@ -89,7 +89,7 @@ public class SystemMessageService : IAdminApiController
         var userlist = new List<string>();
         foreach (var userid in input.UserIds)
         {
-            var user = _systemCacheService.Get<TenantOnlineUserEntity>(CacheConst.KeyUserOnline + userid);
+            var user = _systemCacheService.Get<OnlineUserEntity>(CacheConst.KeyUserOnline + userid);
             if (user != null && !string.IsNullOrEmpty(user.ConnectionId))
             {
                 userlist.Add(user.ConnectionId);

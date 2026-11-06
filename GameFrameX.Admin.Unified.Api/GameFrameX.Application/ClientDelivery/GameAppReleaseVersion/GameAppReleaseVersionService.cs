@@ -1,6 +1,6 @@
 using GameFrameX.Application.ClientDelivery.AppScope;
 using GameFrameX.Application.ClientDelivery.GameAppReleaseVersion.Dto;
-using GameFrameX.Entity.Tenant.Game.App;
+using GameFrameX.Entity.Business.Game.App;
 
 namespace GameFrameX.Application.ClientDelivery.GameAppReleaseVersion;
 
@@ -8,11 +8,11 @@ namespace GameFrameX.Application.ClientDelivery.GameAppReleaseVersion;
 /// 游戏版本管理服务
 /// </summary>
 [ApiDescriptionSettings(ClientConst.GroupName, Order = 100)]
-public class GameAppReleaseVersionService : GenericCrudService<Entity.Tenant.Game.Release.TenantGameAppReleaseVersionEntity, AddGameAppReleaseVersionRequest, UpdateGameAppReleaseVersionRequest, GameAppReleaseVersionResponse, PageGameAppReleaseVersionRequest>
+public class GameAppReleaseVersionService : GenericCrudService<Entity.Business.Game.Release.GameAppReleaseVersionEntity, AddGameAppReleaseVersionRequest, UpdateGameAppReleaseVersionRequest, GameAppReleaseVersionResponse, PageGameAppReleaseVersionRequest>
 {
-    private readonly SqlSugarRepository<TenantGameAppPackageEntity> _packageRepository;
+    private readonly SqlSugarRepository<GameAppPackageEntity> _packageRepository;
 
-    public GameAppReleaseVersionService(SqlSugarRepository<Entity.Tenant.Game.Release.TenantGameAppReleaseVersionEntity> repository, SqlSugarRepository<TenantGameAppPackageEntity> packageRepository) : base(repository)
+    public GameAppReleaseVersionService(SqlSugarRepository<Entity.Business.Game.Release.GameAppReleaseVersionEntity> repository, SqlSugarRepository<GameAppPackageEntity> packageRepository) : base(repository)
     {
         _packageRepository = packageRepository;
     }

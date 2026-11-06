@@ -4,7 +4,7 @@
 import type { GameMailStatus, GameMailType } from "../_shared/data-contracts";
 
 /** 游戏邮件增加输入参数 */
-export interface AddTenantGameMailEntityRequest {
+export interface AddGameMailEntityRequest {
   /**
    * @min 1
    * @max 9223372036854776000
@@ -120,7 +120,7 @@ export interface GameMailResponseSqlSugarPagedList {
 }
 
 /** 游戏邮件分页查询输入参数 */
-export interface PageTenantGameMailEntityRequest {
+export interface PageGameMailEntityRequest {
   searchKey?: string | null;
   /**
    * @format int32
@@ -146,7 +146,7 @@ export interface PageTenantGameMailEntityRequest {
 }
 
 /** 游戏邮件更新输入参数 */
-export interface UpdateTenantGameMailEntityRequest {
+export interface UpdateGameMailEntityRequest {
   /**
    * @min 1
    * @max 9223372036854776000

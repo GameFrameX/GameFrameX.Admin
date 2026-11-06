@@ -10,20 +10,20 @@ namespace GameFrameX.Application.PlayerCenter.GameUser;
 /// 游戏账号服务
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 111)]
-public class GameUserService : GenericCrudSelectService<Entity.Tenant.Game.TenantGameUserEntity, AddTenantGameUserEntityByMailRequest, UpdateTenantGameUserEntityRequest, GameUserResponse, PageTenantGameUserEntityRequest>
+public class GameUserService : GenericCrudSelectService<Entity.Business.Game.GameUserEntity, AddGameUserEntityByMailRequest, UpdateGameUserEntityRequest, GameUserResponse, PageGameUserEntityRequest>
 {
-    private readonly GameUserPasswordService _tenantGameUserPasswordService;
+    private readonly GameUserPasswordService _gameUserPasswordService;
 
-    public GameUserService(SqlSugarRepository<Entity.Tenant.Game.TenantGameUserEntity> repository,
-        GameUserPasswordService tenantGameUserPasswordService) : base(repository)
+    public GameUserService(SqlSugarRepository<Entity.Business.Game.GameUserEntity> repository,
+        GameUserPasswordService gameUserPasswordService) : base(repository)
     {
-        _tenantGameUserPasswordService = tenantGameUserPasswordService;
+        _gameUserPasswordService = gameUserPasswordService;
     }
 
     /// <summary>
     /// 构建分页查询条件
     /// </summary>
-    protected override ISugarQueryable<GameUserResponse> BuildPageQuery(PageTenantGameUserEntityRequest input)
+    protected override ISugarQueryable<GameUserResponse> BuildPageQuery(PageGameUserEntityRequest input)
     {
         return Repository.AsQueryable()
                          .WhereIF(input.Id > 0, u => u.Id == input.Id)
@@ -40,7 +40,7 @@ public class GameUserService : GenericCrudSelectService<Entity.Tenant.Game.Tenan
     /// <returns></returns>
     [HttpPost]
     [ApiDescriptionSettings(Name = "addByMail")]
-    public async Task<GameUserResponse> AddByMailAsync(AddTenantGameUserEntityByMailRequest input)
+    public async Task<GameUserResponse> AddByMailAsync(AddGameUserEntityByMailRequest input)
     {
         //判断邮箱是否已经存在
         var entity = await Repository.GetFirstAsync(x => x.Email == input.Email);
@@ -49,10 +49,10 @@ public class GameUserService : GenericCrudSelectService<Entity.Tenant.Game.Tenan
             throw new Exception("该邮箱已经被使用");
         }
 
-        entity = input.Adapt<Entity.Tenant.Game.TenantGameUserEntity>();
-        entity.EmailPassword = _tenantGameUserPasswordService.Hash(input.EmailPassword);
+        entity = input.Adapt<Entity.Business.Game.GameUserEntity>();
+        entity.EmailPassword = _gameUserPasswordService.Hash(input.EmailPassword);
         entity.UserName = input.Email;
-        entity.Password = _tenantGameUserPasswordService.Hash(input.Password);
+        entity.Password = _gameUserPasswordService.Hash(input.Password);
         await Repository.InsertAsync(entity);
 
         return entity.Adapt<GameUserResponse>();
@@ -65,7 +65,7 @@ public class GameUserService : GenericCrudSelectService<Entity.Tenant.Game.Tenan
     /// <returns></returns>
     [HttpPost]
     [ApiDescriptionSettings(Name = "Ban")]
-    public async Task BanAsync(DeleteTenantGameUserEntityRequest input)
+    public async Task BanAsync(DeleteGameUserEntityRequest input)
     {
         var entity = await Repository.GetFirstAsync(u => u.Id == input.Id) ?? throw BusinessError.Oh(CommonErrorCode.RecordNotFound);
         entity.Status = GameUserStatus.Banned;
@@ -79,7 +79,7 @@ public class GameUserService : GenericCrudSelectService<Entity.Tenant.Game.Tenan
     /// <returns></returns>
     [HttpPost]
     [ApiDescriptionSettings(Name = "Unseal")]
-    public async Task UnsealAsync(DeleteTenantGameUserEntityRequest input)
+    public async Task UnsealAsync(DeleteGameUserEntityRequest input)
     {
         var entity = await Repository.GetFirstAsync(u => u.Id == input.Id) ?? throw BusinessError.Oh(CommonErrorCode.RecordNotFound);
         entity.Status = GameUserStatus.Active;

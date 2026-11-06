@@ -7,15 +7,15 @@ namespace GameFrameX.Application.CommerceCenter.GameRedeemCodeUseRecord;
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
 public class GameRedeemCodeUseRecordService
-    : GenericCrudService<Entity.Tenant.Game.TenantGameRedeemCodeUseRecordEntity,
-        AddTenantGameRedeemCodeUseRecordEntityRequest, UpdateTenantGameRedeemCodeUseRecordEntityRequest,
-        GameRedeemCodeUseRecordResponse, PageTenantGameRedeemCodeUseRecordEntityRequest>
+    : GenericCrudService<Entity.Business.Game.GameRedeemCodeUseRecordEntity,
+        AddGameRedeemCodeUseRecordEntityRequest, UpdateGameRedeemCodeUseRecordEntityRequest,
+        GameRedeemCodeUseRecordResponse, PageGameRedeemCodeUseRecordEntityRequest>
 {
-    private readonly SqlSugarRepository<Entity.Tenant.Game.TenantGameAreaEntity> _areaRepository;
+    private readonly SqlSugarRepository<Entity.Business.Game.GameAreaEntity> _areaRepository;
 
     public GameRedeemCodeUseRecordService(
-        SqlSugarRepository<Entity.Tenant.Game.TenantGameRedeemCodeUseRecordEntity> repository,
-        SqlSugarRepository<Entity.Tenant.Game.TenantGameAreaEntity> areaRepository)
+        SqlSugarRepository<Entity.Business.Game.GameRedeemCodeUseRecordEntity> repository,
+        SqlSugarRepository<Entity.Business.Game.GameAreaEntity> areaRepository)
         : base(repository)
     {
         _areaRepository = areaRepository;
@@ -25,22 +25,22 @@ public class GameRedeemCodeUseRecordService
     /// 新增前解析并校验附件道具。
     /// 新增前解析并校验附件道具。
     /// </summary>
-    protected override Task OnAddingAsync(AddTenantGameRedeemCodeUseRecordEntityRequest input)
+    protected override Task OnAddingAsync(AddGameRedeemCodeUseRecordEntityRequest input)
     {
         throw new Exception("兑换码使用记录由客户端兑换链路产生，不支持通过管理后台直接创建");
     }
 
-    protected override ISugarQueryable<GameRedeemCodeUseRecordResponse> BuildPageQuery(PageTenantGameRedeemCodeUseRecordEntityRequest input)
+    protected override ISugarQueryable<GameRedeemCodeUseRecordResponse> BuildPageQuery(PageGameRedeemCodeUseRecordEntityRequest input)
     {
         return Repository.AsQueryable()
                          .WhereIF(input.AreaId > 0, u => u.AreaId == input.AreaId)
                          .WhereIF(!string.IsNullOrWhiteSpace(input.Code), u => u.Code == input.Code)
                          .WhereIF(input.PlayerId > 0, u => u.PlayerId == input.PlayerId)
                          //处理外键和TreeSelector相关字段的连接
-                         .LeftJoin<Entity.Tenant.Game.TenantGameAreaEntity>((u, areaid) => u.AreaId == areaid.Id)
+                         .LeftJoin<Entity.Business.Game.GameAreaEntity>((u, areaid) => u.AreaId == areaid.Id)
                          //关联兑换码（Code+AreaId 复合，回避跨区同名兑换码歧义）取渠道ID，再关联渠道取名称
-                         .LeftJoin<Entity.Tenant.Game.TenantGameRedeemCodeEntity>((u, areaid, code) => u.Code == code.Code && u.AreaId == code.AreaId)
-                         .LeftJoin<Entity.Tenant.Game.TenantGameRedeemCodeChannelEntity>((u, areaid, code, channel) => code.ChannelId == channel.Id)
+                         .LeftJoin<Entity.Business.Game.GameRedeemCodeEntity>((u, areaid, code) => u.Code == code.Code && u.AreaId == code.AreaId)
+                         .LeftJoin<Entity.Business.Game.GameRedeemCodeChannelEntity>((u, areaid, code, channel) => code.ChannelId == channel.Id)
                          .WhereIF(input.ChannelId > 0, (u, areaid, code, channel) => code.ChannelId == input.ChannelId)
                          .Select((u, areaid, code, channel) => new GameRedeemCodeUseRecordResponse
                          {
@@ -60,7 +60,7 @@ public class GameRedeemCodeUseRecordService
                          });
     }
 
-    protected override ISugarQueryable<GameRedeemCodeUseRecordResponse> ApplyOrdering(ISugarQueryable<GameRedeemCodeUseRecordResponse> query, PageTenantGameRedeemCodeUseRecordEntityRequest input)
+    protected override ISugarQueryable<GameRedeemCodeUseRecordResponse> ApplyOrdering(ISugarQueryable<GameRedeemCodeUseRecordResponse> query, PageGameRedeemCodeUseRecordEntityRequest input)
     {
         if (!string.IsNullOrEmpty(input.OrderBy))
         {
@@ -78,8 +78,8 @@ public class GameRedeemCodeUseRecordService
     /// 获取区服下拉列表（AreaId 外键关联）
     /// </summary>
     [HttpGet]
-    [ApiDescriptionSettings(Name = "TenantGameAreaEntityAreaIdDropdown")]
-    public async Task<List<BaseSelectPageResponse>> TenantGameAreaEntityAreaIdDropdownAsync()
+    [ApiDescriptionSettings(Name = "GameAreaEntityAreaIdDropdown")]
+    public async Task<List<BaseSelectPageResponse>> GameAreaEntityAreaIdDropdownAsync()
     {
         var list = await _areaRepository.AsQueryable()
                                         .Select(a => new BaseSelectPageResponse { Id = a.Id, Value = a.Name, Label = a.Description, })

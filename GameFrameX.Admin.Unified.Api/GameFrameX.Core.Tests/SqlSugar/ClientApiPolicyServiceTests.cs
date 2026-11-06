@@ -4,7 +4,7 @@ using GameFrameX.Core.Exceptions;
 using GameFrameX.Core.Service;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Core.Tests.ClientApi;
-using GameFrameX.Entity.Tenant.ClientApiConfig;
+using GameFrameX.Entity.Business.ClientApiConfig;
 
 namespace GameFrameX.Core.Tests.SqlSugar;
 
@@ -18,7 +18,7 @@ public sealed class ClientApiPolicyServiceTests : IDisposable
 
     public ClientApiPolicyServiceTests()
     {
-        _db.InitTenantTables(typeof(TenantClientApiPolicyEntity));
+        _db.InitBusinessTables(typeof(ClientApiPolicyEntity));
     }
 
     public void Dispose()
@@ -29,7 +29,7 @@ public sealed class ClientApiPolicyServiceTests : IDisposable
     private ClientApiPolicyService CreateService()
     {
         return new ClientApiPolicyService(
-            new Repository<TenantClientApiPolicyEntity>(_db.MainDb),
+            new Repository<ClientApiPolicyEntity>(_db.MainDb),
             new GameFrameX.Core.Service.User.CurrentUserContext(new Microsoft.AspNetCore.Http.HttpContextAccessor()));
     }
 
@@ -38,14 +38,14 @@ public sealed class ClientApiPolicyServiceTests : IDisposable
     {
         var service = CreateService();
 
-        await service.AddAsync(new AddTenantClientApiPolicyRequest
+        await service.AddAsync(new AddClientApiPolicyRequest
         {
             SigningKey = string.Empty,
             LifetimeMinutes = 60,
             TicketExpireTime = 0,
         });
 
-        var row = _db.TenantDb.Queryable<TenantClientApiPolicyEntity>().Single();
+        var row = _db.TenantDb.Queryable<ClientApiPolicyEntity>().Single();
         Assert.Matches("^[0-9a-f]{64}$", row.SigningKey);
     }
 
@@ -54,9 +54,9 @@ public sealed class ClientApiPolicyServiceTests : IDisposable
     {
         var service = CreateService();
 
-        await service.AddAsync(new AddTenantClientApiPolicyRequest { SigningKey = "k1", });
+        await service.AddAsync(new AddClientApiPolicyRequest { SigningKey = "k1", });
 
-        await Assert.ThrowsAsync<BusinessException>(() => service.AddAsync(new AddTenantClientApiPolicyRequest { SigningKey = "k3", }));
+        await Assert.ThrowsAsync<BusinessException>(() => service.AddAsync(new AddClientApiPolicyRequest { SigningKey = "k3", }));
     }
 
     [Fact]
@@ -64,7 +64,7 @@ public sealed class ClientApiPolicyServiceTests : IDisposable
     {
         var service = CreateService();
 
-        await Assert.ThrowsAsync<BusinessException>(() => service.AddAsync(new AddTenantClientApiPolicyRequest
+        await Assert.ThrowsAsync<BusinessException>(() => service.AddAsync(new AddClientApiPolicyRequest
         {
             SigningKey = "k1",
             TicketExpireTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds() + 31L * 24 * 60 * 60,
@@ -75,9 +75,9 @@ public sealed class ClientApiPolicyServiceTests : IDisposable
     public async Task UpdateAsync_MaskedSigningKey_PreservesStoredValue()
     {
         var service = CreateService();
-        var created = await service.AddAsync(new AddTenantClientApiPolicyRequest { SigningKey = "original-key", });
+        var created = await service.AddAsync(new AddClientApiPolicyRequest { SigningKey = "original-key", });
 
-        await service.UpdateAsync(new UpdateTenantClientApiPolicyRequest
+        await service.UpdateAsync(new UpdateClientApiPolicyRequest
         {
             Id = created.Id,
             SigningKey = SensitiveFieldMask.MaskValue,
@@ -86,7 +86,7 @@ public sealed class ClientApiPolicyServiceTests : IDisposable
             RowVersion = 0,
         });
 
-        var row = _db.TenantDb.Queryable<TenantClientApiPolicyEntity>().Single();
+        var row = _db.TenantDb.Queryable<ClientApiPolicyEntity>().Single();
         Assert.Equal("original-key", row.SigningKey);
         Assert.Equal(90, row.LifetimeMinutes);
     }
@@ -95,10 +95,10 @@ public sealed class ClientApiPolicyServiceTests : IDisposable
     public async Task UpdateAsync_BlankSigningKey_PreservesStoredValue()
     {
         var service = CreateService();
-        var created = await service.AddAsync(new AddTenantClientApiPolicyRequest { SigningKey = "original-key", });
+        var created = await service.AddAsync(new AddClientApiPolicyRequest { SigningKey = "original-key", });
 
         // 空白与掩码同义（C368）
-        await service.UpdateAsync(new UpdateTenantClientApiPolicyRequest
+        await service.UpdateAsync(new UpdateClientApiPolicyRequest
         {
             Id = created.Id,
             SigningKey = string.Empty,
@@ -107,7 +107,7 @@ public sealed class ClientApiPolicyServiceTests : IDisposable
             RowVersion = 0,
         });
 
-        var row = _db.TenantDb.Queryable<TenantClientApiPolicyEntity>().Single();
+        var row = _db.TenantDb.Queryable<ClientApiPolicyEntity>().Single();
         Assert.Equal("original-key", row.SigningKey);
         Assert.Equal(120, row.LifetimeMinutes);
     }

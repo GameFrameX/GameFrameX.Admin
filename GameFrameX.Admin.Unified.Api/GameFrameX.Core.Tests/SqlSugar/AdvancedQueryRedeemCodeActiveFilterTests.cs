@@ -1,5 +1,5 @@
 using GameFrameX.Core.SqlSugar;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 using SqlSugar;
 
 namespace GameFrameX.Core.Tests.SqlSugar;
@@ -18,7 +18,7 @@ public sealed class AdvancedQueryRedeemCodeActiveFilterTests : IDisposable
         SqlSugarUnifiedConfig.ConfigureBaseSettings(config);
         _db = new SqlSugarScope(config);
         SqlSugarUnifiedConfig.ConfigureBaseFilters(_db);
-        _db.CodeFirst.InitTables(typeof(TenantGameRedeemCodeEntity));
+        _db.CodeFirst.InitTables(typeof(GameRedeemCodeEntity));
     }
 
     [Fact]
@@ -38,9 +38,9 @@ public sealed class AdvancedQueryRedeemCodeActiveFilterTests : IDisposable
         Assert.Equal(3, all.Count);
     }
 
-    private ISugarQueryable<TenantGameRedeemCodeEntity> BuildQuery(bool? isActive)
+    private ISugarQueryable<GameRedeemCodeEntity> BuildQuery(bool? isActive)
     {
-        return _db.Queryable<TenantGameRedeemCodeEntity>()
+        return _db.Queryable<GameRedeemCodeEntity>()
                   .WhereIF(isActive.HasValue, u => u.IsActive == isActive!.Value);
     }
 
@@ -48,9 +48,9 @@ public sealed class AdvancedQueryRedeemCodeActiveFilterTests : IDisposable
     {
         var nowDt = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
         var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-        await _db.Insertable(new TenantGameRedeemCodeEntity { Id = 1, Code = "C1", IsActive = true, UsageLimit = 10, UsedCount = 0, StartTime = nowDt, EndTime = nowDt, Description = "d", Contents = "[]", IsDeleted = false, CreatedTime = now, }).ExecuteCommandAsync();
-        await _db.Insertable(new TenantGameRedeemCodeEntity { Id = 2, Code = "C2", IsActive = false, UsageLimit = 10, UsedCount = 0, StartTime = nowDt, EndTime = nowDt, Description = "d", Contents = "[]", IsDeleted = false, CreatedTime = now, }).ExecuteCommandAsync();
-        await _db.Insertable(new TenantGameRedeemCodeEntity { Id = 3, Code = "C3", IsActive = true, UsageLimit = 10, UsedCount = 0, StartTime = nowDt, EndTime = nowDt, Description = "d", Contents = "[]", IsDeleted = false, CreatedTime = now, }).ExecuteCommandAsync();
+        await _db.Insertable(new GameRedeemCodeEntity { Id = 1, Code = "C1", IsActive = true, UsageLimit = 10, UsedCount = 0, StartTime = nowDt, EndTime = nowDt, Description = "d", Contents = "[]", IsDeleted = false, CreatedTime = now, }).ExecuteCommandAsync();
+        await _db.Insertable(new GameRedeemCodeEntity { Id = 2, Code = "C2", IsActive = false, UsageLimit = 10, UsedCount = 0, StartTime = nowDt, EndTime = nowDt, Description = "d", Contents = "[]", IsDeleted = false, CreatedTime = now, }).ExecuteCommandAsync();
+        await _db.Insertable(new GameRedeemCodeEntity { Id = 3, Code = "C3", IsActive = true, UsageLimit = 10, UsedCount = 0, StartTime = nowDt, EndTime = nowDt, Description = "d", Contents = "[]", IsDeleted = false, CreatedTime = now, }).ExecuteCommandAsync();
     }
 
     public void Dispose()

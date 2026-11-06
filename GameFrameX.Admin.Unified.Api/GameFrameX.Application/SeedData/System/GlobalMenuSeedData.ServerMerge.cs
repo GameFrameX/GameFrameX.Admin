@@ -20,7 +20,6 @@ public partial class GlobalMenuSeedData
                 Type = MenuTypeEnum.Menu,
                 Name = "gameAreaMerge",
                 Path = "/serverCenter/gameAreaMerge",
-                AppScope = MenuAppScopeEnum.Console,
                 Component = "/serverCenter/gameAreaMerge/index",
                 Title = "合服",
                 TitleCode = "message.menu.gameAreaMerge",

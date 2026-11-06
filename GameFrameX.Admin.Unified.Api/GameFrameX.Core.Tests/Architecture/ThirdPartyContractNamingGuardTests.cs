@@ -46,7 +46,7 @@ public sealed class ThirdPartyContractNamingGuardTests
     {
         "Payment/GameFrameX.Payment.Xsolla/Order/OrderManager.cs",
         "Payment/GameFrameX.Payment.Xsolla/Reports/Transactions/Search.cs",
-        "GameFrameX.Client.Api/GameWebShop/Dto/TenantGameWebShopEntityBuyNotifyRequest.cs",
+        "GameFrameX.Client.Api/GameWebShop/Dto/GameWebShopEntityBuyNotifyRequest.cs",
         "GameFrameX.Client.Api/Integrations/Payment/Dto/XsollaWebHookOrderPaidRequest.cs",
         "GameFrameX.Client.Api/Integrations/Payment/Dto/XsollaWebHookRequest.cs",
         "GameFrameX.Client.Api/Integrations/Payment/Dto/XsollaWebHookUserValidationRequest.cs",

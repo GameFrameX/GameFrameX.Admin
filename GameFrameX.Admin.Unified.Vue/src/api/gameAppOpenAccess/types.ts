@@ -2,7 +2,7 @@
 /* tslint:disable */
 
 /** 新增应用开放访问凭证输入。AccessSecret 由服务端生成，仅签发响应中返回一次。 */
-export interface AddTenantGameAppOpenAccessRequest {
+export interface AddGameAppOpenAccessRequest {
   /**
    * 绑定的系统用户 Id。
    * @min 1
@@ -63,7 +63,7 @@ export interface GameAppOpenAccessActionRequest {
 /**
  * 应用开放访问凭证输出。
  *
- * 注意：GameFrameX.Entity.Tenant.Game.App.TenantGameAppOpenAccessEntity.AccessSecret 永不输出（明文仅签发 / 轮换时一次性返回）。
+ * 注意：GameFrameX.Entity.Business.Game.App.GameAppOpenAccessEntity.AccessSecret 永不输出（明文仅签发 / 轮换时一次性返回）。
  * Output 不含 AccessSecret 字段，Service 投影时也不得引入。
  */
 export interface GameAppOpenAccessResponse {
@@ -148,7 +148,7 @@ export interface GameAppOpenAccessSecretResponse {
 }
 
 /** 应用开放访问凭证分页查询输入。 */
-export interface PageTenantGameAppOpenAccessRequest {
+export interface PageGameAppOpenAccessRequest {
   searchKey?: string | null;
   /**
    * @format int32
@@ -175,7 +175,7 @@ export interface PageTenantGameAppOpenAccessRequest {
 }
 
 /** 更新应用开放访问凭证输入。绑定用户和接口范围由服务端校验。 */
-export interface UpdateTenantGameAppOpenAccessRequest {
+export interface UpdateGameAppOpenAccessRequest {
   /**
    * @min 1
    * @max 9223372036854776000

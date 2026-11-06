@@ -6,10 +6,10 @@ using GameFrameX.Advertisement.AdMob;
 using GameFrameX.Advertisement.TopOn;
 using GameFrameX.Advertisement.UnityAds;
 using GameFrameX.Client.Api.Integrations.Advertisement;
-using GameFrameX.Client.Api.Services.ClientApiTenantOptions;
+using GameFrameX.Client.Api.Services.ClientApiOptions;
 using GameFrameX.Core.Enum;
 using GameFrameX.Entity.Enum;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 using GameFrameX.Foundation.Http.Normalization;
 using GameFrameX.Foundation.Json;
 using Microsoft.AspNetCore.Http;
@@ -45,7 +45,7 @@ public sealed class GameAdvertisementRewardServiceTests
         Assert.Equal(AdvertisementRewardStatusEnum.Success, result.Status);
         Assert.Equal("adreward:topon:TX-1001", result.IdempotencyKey);
         Assert.Equal(1, handler.Count(DispatchPath));
-        var rows = await db.TenantDb.Queryable<TenantGameAdvertisementRewardEntity>().ToListAsync();
+        var rows = await db.TenantDb.Queryable<GameAdvertisementRewardEntity>().ToListAsync();
         Assert.Single(rows);
         Assert.Equal(AdvertisementRewardStatusEnum.Success, rows[0].Status);
     }
@@ -67,7 +67,7 @@ public sealed class GameAdvertisementRewardServiceTests
         Assert.False(result.IsValid);
         Assert.Equal(601, result.Code);
         Assert.Equal(0, handler.Count(DispatchPath));
-        var rows = await db.TenantDb.Queryable<TenantGameAdvertisementRewardEntity>().ToListAsync();
+        var rows = await db.TenantDb.Queryable<GameAdvertisementRewardEntity>().ToListAsync();
         Assert.Empty(rows);
     }
 
@@ -88,7 +88,7 @@ public sealed class GameAdvertisementRewardServiceTests
         Assert.True(second.IsValid);
         Assert.Equal(AdvertisementRewardStatusEnum.Success, second.Status);
         Assert.Equal(1, handler.Count(DispatchPath));
-        var rows = await db.TenantDb.Queryable<TenantGameAdvertisementRewardEntity>().ToListAsync();
+        var rows = await db.TenantDb.Queryable<GameAdvertisementRewardEntity>().ToListAsync();
         Assert.Single(rows);
     }
 
@@ -142,7 +142,7 @@ public sealed class GameAdvertisementRewardServiceTests
         Assert.Equal(AdvertisementRewardStatusEnum.Success, result.Status);
         Assert.Equal("adreward:admob:AD-5005", result.IdempotencyKey);
         Assert.Equal(1, handler.Count(DispatchPath));
-        var rows = await db.TenantDb.Queryable<TenantGameAdvertisementRewardEntity>().ToListAsync();
+        var rows = await db.TenantDb.Queryable<GameAdvertisementRewardEntity>().ToListAsync();
         Assert.Single(rows);
         Assert.Equal(AdvertisementRewardStatusEnum.Success, rows[0].Status);
     }
@@ -168,7 +168,7 @@ public sealed class GameAdvertisementRewardServiceTests
         Assert.False(result.IsValid);
         Assert.Equal(601, result.Code);
         Assert.Equal(0, handler.Count(DispatchPath));
-        var rows = await db.TenantDb.Queryable<TenantGameAdvertisementRewardEntity>().ToListAsync();
+        var rows = await db.TenantDb.Queryable<GameAdvertisementRewardEntity>().ToListAsync();
         Assert.Empty(rows);
     }
 
@@ -193,7 +193,7 @@ public sealed class GameAdvertisementRewardServiceTests
         Assert.Equal(AdvertisementRewardStatusEnum.Success, result.Status);
         Assert.Equal("adreward:unityads:OID-7007", result.IdempotencyKey);
         Assert.Equal(1, handler.Count(DispatchPath));
-        var rows = await db.TenantDb.Queryable<TenantGameAdvertisementRewardEntity>().ToListAsync();
+        var rows = await db.TenantDb.Queryable<GameAdvertisementRewardEntity>().ToListAsync();
         Assert.Single(rows);
         Assert.Equal(AdvertisementRewardStatusEnum.Success, rows[0].Status);
     }
@@ -218,7 +218,7 @@ public sealed class GameAdvertisementRewardServiceTests
         Assert.False(result.IsValid);
         Assert.Equal(601, result.Code);
         Assert.Equal(0, handler.Count(DispatchPath));
-        var rows = await db.TenantDb.Queryable<TenantGameAdvertisementRewardEntity>().ToListAsync();
+        var rows = await db.TenantDb.Queryable<GameAdvertisementRewardEntity>().ToListAsync();
         Assert.Empty(rows);
     }
 
@@ -236,7 +236,7 @@ public sealed class GameAdvertisementRewardServiceTests
         Assert.False(first.IsValid);
         Assert.Equal(AdvertisementRewardStatusEnum.Failed, first.Status);
         Assert.NotNull(first.Message);
-        var rowsAfterFirst = await db.TenantDb.Queryable<TenantGameAdvertisementRewardEntity>().ToListAsync();
+        var rowsAfterFirst = await db.TenantDb.Queryable<GameAdvertisementRewardEntity>().ToListAsync();
         Assert.Single(rowsAfterFirst);
         Assert.Equal(AdvertisementRewardStatusEnum.Failed, rowsAfterFirst[0].Status);
         var firstLedgerId = rowsAfterFirst[0].Id;
@@ -246,7 +246,7 @@ public sealed class GameAdvertisementRewardServiceTests
         var second = await CreateService(db, option, handler, query).ReceiveTopOnAsync();
         Assert.True(second.IsValid);
         Assert.Equal(AdvertisementRewardStatusEnum.Success, second.Status);
-        var rowsAfterSecond = await db.TenantDb.Queryable<TenantGameAdvertisementRewardEntity>().ToListAsync();
+        var rowsAfterSecond = await db.TenantDb.Queryable<GameAdvertisementRewardEntity>().ToListAsync();
         Assert.Single(rowsAfterSecond);
         Assert.Equal(firstLedgerId, rowsAfterSecond[0].Id);
         Assert.Equal(AdvertisementRewardStatusEnum.Success, rowsAfterSecond[0].Status);
@@ -256,7 +256,7 @@ public sealed class GameAdvertisementRewardServiceTests
     private static ClientApiTestDb CreateDb()
     {
         var db = new ClientApiTestDb();
-        db.InitTenantTables(typeof(TenantGameAdvertisementRewardEntity), typeof(TenantGameRoleEntity), typeof(TenantGameAreaEntity));
+        db.InitBusinessTables(typeof(GameAdvertisementRewardEntity), typeof(GameRoleEntity), typeof(GameAreaEntity));
         db.SeedAreaClassify(ClassifyId);
         db.SeedArea(AreaId, ClassifyId);
         db.SeedRole(RoleId, UserId, AreaId, db.AppId);
@@ -268,7 +268,7 @@ public sealed class GameAdvertisementRewardServiceTests
         return CreateService(db, BuildAdvertisementOptions("TopOn", option), handler, query);
     }
 
-    private static GameAdvertisementRewardService CreateService(ClientApiTestDb db, TenantAdvertisementCallbackOptions advertisementOptions, ClientApiRecordingHttpHandler handler, Dictionary<string, string> query)
+    private static GameAdvertisementRewardService CreateService(ClientApiTestDb db, AdvertisementCallbackOptions advertisementOptions, ClientApiRecordingHttpHandler handler, Dictionary<string, string> query)
     {
         var httpContext = db.CreateHttpContext();
 #pragma warning disable CS8620 // 测试输入 Dictionary<string,string> 与 QueryString.Create 期望的 string? 仅可空性差异，运行时等价
@@ -276,7 +276,7 @@ public sealed class GameAdvertisementRewardServiceTests
 #pragma warning restore CS8620
         var accessor = new HttpContextAccessor { HttpContext = httpContext, };
         var optionsProvider = new FakeAdvertisementOptionsProvider(advertisementOptions);
-        var roleRepository = db.Repository<TenantGameRoleEntity>();
+        var roleRepository = db.Repository<GameRoleEntity>();
         var factory = new AdvertisementCallbackFactory(new IAdvertisementCallbackHandler[]
         {
             new TopOnAdvertisementCallbackHandler(roleRepository),
@@ -285,16 +285,16 @@ public sealed class GameAdvertisementRewardServiceTests
         });
         return new GameAdvertisementRewardService(
             optionsProvider,
-            db.Repository<TenantGameAdvertisementRewardEntity>(),
-            db.Repository<TenantGameAreaEntity>(),
+            db.Repository<GameAdvertisementRewardEntity>(),
+            db.Repository<GameAreaEntity>(),
             new HttpClient(handler, false),
             accessor,
             factory);
     }
 
-    private static TenantAdvertisementCallbackOptions BuildAdvertisementOptions(string provider, IAdvertisementCallbackOptionSetting option, IReadOnlyDictionary<string, string>? adMobKeys = null)
+    private static AdvertisementCallbackOptions BuildAdvertisementOptions(string provider, IAdvertisementCallbackOptionSetting option, IReadOnlyDictionary<string, string>? adMobKeys = null)
     {
-        return new TenantAdvertisementCallbackOptions
+        return new AdvertisementCallbackOptions
         {
             Provider = provider,
             ConfigJson = JsonHelper.Serialize(option),
@@ -383,49 +383,49 @@ public sealed class GameAdvertisementRewardServiceTests
     }
 
     /// <summary>
-    /// 仅广告回调配置可注入的 <see cref="IClientApiTenantOptionsProvider"/> 桩。
+    /// 仅广告回调配置可注入的 <see cref="IClientApiOptionsProvider"/> 桩。
     /// </summary>
-    private sealed class FakeAdvertisementOptionsProvider : IClientApiTenantOptionsProvider
+    private sealed class FakeAdvertisementOptionsProvider : IClientApiOptionsProvider
     {
-        private readonly TenantAdvertisementCallbackOptions _adOptions;
+        private readonly AdvertisementCallbackOptions _adOptions;
 
-        public FakeAdvertisementOptionsProvider(TenantAdvertisementCallbackOptions advertisementOptions)
+        public FakeAdvertisementOptionsProvider(AdvertisementCallbackOptions advertisementOptions)
         {
             _adOptions = advertisementOptions;
         }
 
-        public Task<TenantEmailOptions> GetEmailOptionsAsync()
+        public Task<EmailOptions> GetEmailOptionsAsync()
         {
 #pragma warning disable CS8625 // 测试桩：本场景只测广告回调，邮件策略返回 null 表示未配置
-            return Task.FromResult<TenantEmailOptions>(null);
+            return Task.FromResult<EmailOptions>(null);
 #pragma warning restore CS8625
         }
 
-        public Task<TenantAdvertisementCallbackOptions> GetAdvertisementCallbackOptionsAsync()
+        public Task<AdvertisementCallbackOptions> GetAdvertisementCallbackOptionsAsync()
         {
             return Task.FromResult(_adOptions);
         }
 
-        public Task<TenantClientApiTokenPolicyOptions> GetTokenPolicyAsync()
+        public Task<ClientApiTokenPolicyOptions> GetTokenPolicyAsync()
         {
 #pragma warning disable CS8625 // 测试桩：本场景只测广告回调，Token 策略返回 null 表示未配置
-            return Task.FromResult<TenantClientApiTokenPolicyOptions>(null);
+            return Task.FromResult<ClientApiTokenPolicyOptions>(null);
 #pragma warning restore CS8625
         }
 
-        public Task<TenantGameLoginTicketPolicyOptions> GetGameLoginTicketPolicyAsync()
+        public Task<GameLoginTicketPolicyOptions> GetGameLoginTicketPolicyAsync()
         {
-            return Task.FromResult(new TenantGameLoginTicketPolicyOptions());
+            return Task.FromResult(new GameLoginTicketPolicyOptions());
         }
 
-        public Task<TenantOrderPolicyOptions> GetOrderPolicyAsync()
+        public Task<OrderPolicyOptions> GetOrderPolicyAsync()
         {
-            return Task.FromResult(new TenantOrderPolicyOptions());
+            return Task.FromResult(new OrderPolicyOptions());
         }
 
-        public Task<TenantAreaPolicyOptions> GetAreaPolicyAsync()
+        public Task<AreaPolicyOptions> GetAreaPolicyAsync()
         {
-            return Task.FromResult(new TenantAreaPolicyOptions());
+            return Task.FromResult(new AreaPolicyOptions());
         }
     }
 }

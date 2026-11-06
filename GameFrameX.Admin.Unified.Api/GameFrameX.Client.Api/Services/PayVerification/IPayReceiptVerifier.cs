@@ -15,5 +15,5 @@ public interface IPayReceiptVerifier
     /// <param name="order">待验真订单（未到账状态）</param>
     /// <param name="request">验真请求（含渠道凭证）</param>
     /// <returns>验真结果三态（成功 / pending 可疑 / 拒绝）</returns>
-    Task<GamePayVerifyResponse> VerifyAsync(TenantGameOrderEntity order, GameUserPayVerifyRequest request);
+    Task<GamePayVerifyResponse> VerifyAsync(GameOrderEntity order, GameUserPayVerifyRequest request);
 }

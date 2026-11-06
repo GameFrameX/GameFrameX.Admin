@@ -55,11 +55,11 @@ public class PhysicalTableNamespaceBoundaryTests
     {
         Assert.True(SqlSugarEntityBoundary.IsPhysicalTableNameAllowedForDatabase(DatabaseOwnership.System, "system_user"));
         Assert.True(SqlSugarEntityBoundary.IsPhysicalTableNameAllowedForDatabase(DatabaseOwnership.System, "global_menu"));
-        Assert.False(SqlSugarEntityBoundary.IsPhysicalTableNameAllowedForDatabase(DatabaseOwnership.System, "tenant_user"));
+        Assert.False(SqlSugarEntityBoundary.IsPhysicalTableNameAllowedForDatabase(DatabaseOwnership.System, "user"));
 
-        Assert.True(SqlSugarEntityBoundary.IsPhysicalTableNameAllowedForDatabase(DatabaseOwnership.Tenant, "tenant_user"));
-        Assert.False(SqlSugarEntityBoundary.IsPhysicalTableNameAllowedForDatabase(DatabaseOwnership.Tenant, "system_user"));
-        Assert.False(SqlSugarEntityBoundary.IsPhysicalTableNameAllowedForDatabase(DatabaseOwnership.Tenant, "global_menu"));
+        Assert.True(SqlSugarEntityBoundary.IsPhysicalTableNameAllowedForDatabase(DatabaseOwnership.Business, "user"));
+        Assert.False(SqlSugarEntityBoundary.IsPhysicalTableNameAllowedForDatabase(DatabaseOwnership.Business, "system_user"));
+        Assert.False(SqlSugarEntityBoundary.IsPhysicalTableNameAllowedForDatabase(DatabaseOwnership.Business, "global_menu"));
     }
 
     [Fact]
@@ -95,7 +95,7 @@ public class PhysicalTableNamespaceBoundaryTests
         var ns = type.Namespace ?? string.Empty;
         return ns.StartsWith("GameFrameX.Client.Api.Integrations.", StringComparison.Ordinal)
                || ns.StartsWith("GameFrameX.Hub.Api.Dto.WebHook", StringComparison.Ordinal)
-               || type.FullName == "GameFrameX.Client.Api.GameWebShop.Dto.TenantGameWebShopEntityBuyNotifyRequest";
+               || type.FullName == "GameFrameX.Client.Api.GameWebShop.Dto.GameWebShopEntityBuyNotifyRequest";
     }
 
     private static IEnumerable<Type> EntityTypes()
@@ -175,8 +175,8 @@ public class PhysicalTableNamespaceBoundaryTests
 
     private static bool HasAllowedPrefix(string tableName)
     {
-        return tableName.StartsWith("system_", StringComparison.Ordinal)
-               || tableName.StartsWith("tenant_", StringComparison.Ordinal)
-               || tableName.StartsWith("global_", StringComparison.Ordinal);
+        // D3：业务表不带前缀；system_/global_ 为保留前缀；tenant_ 前缀已随 C406 退场，禁止再现。
+        return !tableName.StartsWith("tenant_", StringComparison.Ordinal)
+               && !tableName.StartsWith("system_sys_", StringComparison.Ordinal);
     }
 }

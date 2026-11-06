@@ -1,6 +1,6 @@
 ﻿namespace GameFrameX.Core.Service.Role.Dto;
 
-public class AddRoleRequest : TenantRoleEntity
+public class AddRoleRequest : RoleEntity
 {
     /// <summary>
     /// 名称

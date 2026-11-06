@@ -44,7 +44,7 @@ public sealed class AdminEndpointReturnContractTests
         "GameFrameX.Application.Platform.Email.Dto.SystemEmailProviderResponse.Password",
         "GameFrameX.Application.Platform.Email.Dto.SystemEmailProviderResponse.SecretId",
         "GameFrameX.Application.Platform.Email.Dto.SystemEmailProviderResponse.SecretKey",
-        // TenantClientApiConfigMaskHelper / 动态脱敏输出 ******（各 Config Service）
+        // ClientApiConfigMaskHelper / 动态脱敏输出 ******（各 Config Service）
         "GameFrameX.Application.ClientDelivery.AdvertisementCallbackConfig.Dto.AdvertisementCallbackConfigResponse.SigningSecret",
         "GameFrameX.Application.ClientDelivery.AdvertisementCallbackConfig.Dto.AdvertisementCallbackConfigResponse.VerificationKeys",
         "GameFrameX.Application.ClientDelivery.ClientApiPolicy.Dto.ClientApiPolicyResponse.SigningKey",
@@ -62,10 +62,10 @@ public sealed class AdminEndpointReturnContractTests
         "GameFrameX.Core.Service.User.Dto.ResetPwdResponse.NewPassword",
         "GameFrameX.Application.Platform.OpenAccess.Dto.SecretCreateResponse.Secret",
         // Client host（C227 批次 2 之前暂豁免）：游戏用户令牌 / Google OAuth 交换令牌为端点业务载荷本身
-        "GameFrameX.Client.Api.GameUser.Dto.GetTenantGameUserEntityResponse.AccessToken",
+        "GameFrameX.Client.Api.GameUser.Dto.GetGameUserEntityResponse.AccessToken",
         "GameFrameX.Client.Api.GameUser.Dto.GoogleAuthExchangeResponse.AccessToken",
         // C237 后缀统一后 Client host Response 进入本扫描集：登录类响应一次性回显的会话密钥（AES-256-GCM 信封对称密钥，仅登录非空，其余响应恒 null）
-        "GameFrameX.Client.Api.GameUser.Dto.GetTenantGameUserEntityResponse.SessionKeySecret",
+        "GameFrameX.Client.Api.GameUser.Dto.GetGameUserEntityResponse.SessionKeySecret",
         // C290 后缀统一（Result→Response）进入本扫描集：登录期 per-session 会话密钥签发响应，Secret 仅签发一次性回显（ClientApiSessionKeyIssuer）
         "GameFrameX.Client.Api.Services.Auth.ClientApiSessionKeyIssueResponse.Secret",
         // 密码策略配置：正则/文案/开关名命中 password，值为策略配置而非密码（PlatformPasswordPolicyService）

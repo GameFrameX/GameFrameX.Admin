@@ -10,14 +10,14 @@
  */
 
 import {
-  AddTenantGameBannerAnnouncementEntityRequest,
+  AddGameBannerAnnouncementEntityRequest,
   GameBannerAnnouncementAddPostData,
   GameBannerAnnouncementDeletePostData,
   GameBannerAnnouncementDetailGetData,
   GameBannerAnnouncementPagePostData,
   GameBannerAnnouncementUpdatePostData,
-  PageTenantGameBannerAnnouncementEntityRequest,
-  UpdateTenantGameBannerAnnouncementEntityRequest,
+  PageGameBannerAnnouncementEntityRequest,
+  UpdateGameBannerAnnouncementEntityRequest,
 } from "./types";
 import {
   BaseDeleteRequest,
@@ -41,7 +41,7 @@ export class GameBannerAnnouncement<SecurityDataType = unknown> {
    * @request POST:/api/gameBannerAnnouncement/add
    */
   gameBannerAnnouncementAddPost = (
-    data: AddTenantGameBannerAnnouncementEntityRequest,
+    data: AddGameBannerAnnouncementEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameBannerAnnouncementAddPostData, any>({
@@ -106,7 +106,7 @@ export class GameBannerAnnouncement<SecurityDataType = unknown> {
    * @request POST:/api/gameBannerAnnouncement/page
    */
   gameBannerAnnouncementPagePost = (
-    data: PageTenantGameBannerAnnouncementEntityRequest,
+    data: PageGameBannerAnnouncementEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameBannerAnnouncementPagePostData, any>({
@@ -126,7 +126,7 @@ export class GameBannerAnnouncement<SecurityDataType = unknown> {
    * @request POST:/api/gameBannerAnnouncement/update
    */
   gameBannerAnnouncementUpdatePost = (
-    data: UpdateTenantGameBannerAnnouncementEntityRequest,
+    data: UpdateGameBannerAnnouncementEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameBannerAnnouncementUpdatePostData, any>({

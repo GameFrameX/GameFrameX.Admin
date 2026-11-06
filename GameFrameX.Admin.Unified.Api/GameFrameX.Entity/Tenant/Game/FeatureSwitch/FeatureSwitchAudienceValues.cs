@@ -1,7 +1,7 @@
-namespace GameFrameX.Entity.Tenant.Game.FeatureSwitch;
+namespace GameFrameX.Entity.Business.Game.FeatureSwitch;
 
 /// <summary>
-/// 开关注册表消费方标记（<see cref="TenantGameAppFeatureSwitchEntity.Audience"/> 列）的取值域。
+/// 开关注册表消费方标记（<see cref="GameAppFeatureSwitchEntity.Audience"/> 列）的取值域。
 /// <para>定义在实体层：列默认值、Admin 写入校验与投放解析的行过滤必须共用同一取值域，避免字面量漂移。</para>
 /// </summary>
 public static class FeatureSwitchAudienceValues

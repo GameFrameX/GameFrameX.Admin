@@ -18,7 +18,7 @@ public sealed class PublicCallbackSingleMainTests
     public void OutboundPayment_BuildsNotifyUrlFromSiteRootThroughProvider(string channel)
     {
         // 出站下单通知地址经 PaymentOptionSettingProvider 真实构造：站点根地址自动补全新回调路由段
-        //（旧 tenantId/appId 查询作用域不参与），生成的 notify_url 能命中公开回调端点。 // c406-keep
+        //（旧 tenantId/appId 查询作用域不参与），生成的 notify_url 能命中公开回调端点。 // c406-keep // c406-keep
         using (var database = new ClientApiTestDb())
         {
             database.InitBusinessTables(typeof(GamePaymentConfigEntity));

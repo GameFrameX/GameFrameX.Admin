@@ -11,13 +11,13 @@ namespace GameFrameX.Core.Tests.SqlSugar;
 // 这三个测试在阶段 A 预期为 RED（失败），其失败列表即实体命名矩阵与重命名/补 Attribute 的待办清单；
 // 阶段 B 完成实体重命名、Attribute 补齐、SqlSugarEntityBoundary 中心化映射删除后转 GREEN。
 //
-// 互斥边界 Attribute 集合为：PlatformTable / TenantTable / GlobalTable。
+// 互斥边界 Attribute 集合为：PlatformTable / BusinessTable / GlobalTable。
 // [SystemTable] 来自外部包，属兼容元数据，不参与 Admin 数据边界路由，不计入互斥校验。
 
 public class EntityTableNameAlignmentTests
 {
     /// <summary>
-    /// 受管持久化实体必须且只能拥有一个边界 Attribute（PlatformTable/TenantTable/GlobalTable）。
+    /// 受管持久化实体必须且只能拥有一个边界 Attribute（PlatformTable/BusinessTable/GlobalTable）。
     /// 阶段 A 预期 RED：当前大量实体未补齐边界 Attribute，依赖 SqlSugarEntityBoundary 的实体名 HashSet 判定归属。
     /// </summary>
     [Fact]
@@ -59,7 +59,7 @@ public class EntityTableNameAlignmentTests
 
     /// <summary>
     /// 实体类名前缀必须与其边界归属的物理前缀一致：
-    /// System* -> system_、Global* -> global_、Tenant* -> tenant_、Log* -> log_。
+    /// System* -> system_、Global* -> global_、Business* -> tenant_、Log* -> log_。
     /// 阶段 A 预期 RED：阶段 B 完成实体重命名 + Attribute 补齐后转 GREEN。
     /// </summary>
     [Fact]
@@ -79,7 +79,7 @@ public class EntityTableNameAlignmentTests
                            item.ClassName,
                            ExpectedPrefix = ClassExpectedPrefix(item.Ownership),
                        })
-                       .Where(item => !item.ClassName.StartsWith(item.ExpectedPrefix, StringComparison.Ordinal))
+                       .Where(item => item.ExpectedPrefix.Length > 0 && !item.ClassName.StartsWith(item.ExpectedPrefix, StringComparison.Ordinal))
                        .Select(item => $"{item.ClassName}|ownership={item.Ownership}|expectedPrefix={item.ExpectedPrefix}")
                        .ToList();
 
@@ -101,7 +101,7 @@ public class EntityTableNameAlignmentTests
             count++;
         }
 
-        if (type.IsDefined(typeof(TenantTableAttribute), false))
+        if (type.IsDefined(typeof(BusinessTableAttribute), false))
         {
             count++;
         }
@@ -120,7 +120,8 @@ public class EntityTableNameAlignmentTests
         {
             DatabaseOwnership.System => "System",
             DatabaseOwnership.Global => "Global",
-            DatabaseOwnership.Tenant => "Tenant",
+            // D3/C406：业务表无物理前缀，类名不再要求 Business 前缀（如 UserEntity、LogOperationEntity）。
+            DatabaseOwnership.Business => string.Empty,
             _                        => string.Empty,
         };
     }

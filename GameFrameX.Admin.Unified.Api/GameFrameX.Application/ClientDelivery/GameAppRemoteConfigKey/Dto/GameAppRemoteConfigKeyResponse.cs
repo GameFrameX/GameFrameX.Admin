@@ -1,11 +1,11 @@
-using GameFrameX.Entity.Tenant.Game.RemoteConfig;
+using GameFrameX.Entity.Business.Game.RemoteConfig;
 
 namespace GameFrameX.Application.ClientDelivery.GameAppRemoteConfigKey.Dto;
 
 /// <summary>
 /// 远程配置内容键定义输出参数
 /// </summary>
-public class GameAppRemoteConfigKeyResponse : IBasePageResponse<TenantGameAppRemoteConfigKeyEntity>
+public class GameAppRemoteConfigKeyResponse : IBasePageResponse<GameAppRemoteConfigKeyEntity>
 {
     /// <summary>
     /// Id

@@ -1,6 +1,6 @@
 using GameFrameX.Core.Enum;
 using GameFrameX.Entity.Enum;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 using SqlSugar;
 
 namespace GameFrameX.Core.Tests.SqlSugar;
@@ -24,7 +24,7 @@ public sealed class AdvancedQueryAreaFilterTests : IDisposable
             InitKeyType = InitKeyType.Attribute,
             IsAutoCloseConnection = true,
         });
-        _db.CodeFirst.InitTables(typeof(TenantGameAreaEntity));
+        _db.CodeFirst.InitTables(typeof(GameAreaEntity));
     }
 
     [Fact]
@@ -54,9 +54,9 @@ public sealed class AdvancedQueryAreaFilterTests : IDisposable
         Assert.Equal(3, all.Count);
     }
 
-    private ISugarQueryable<TenantGameAreaEntity> BuildQuery(bool? isDefault = null, bool? isRecommend = null, bool? isEnabled = null, GameLanguage? language = null)
+    private ISugarQueryable<GameAreaEntity> BuildQuery(bool? isDefault = null, bool? isRecommend = null, bool? isEnabled = null, GameLanguage? language = null)
     {
-        return _db.Queryable<TenantGameAreaEntity>()
+        return _db.Queryable<GameAreaEntity>()
                   .WhereIF(isDefault.HasValue, u => u.IsDefault == isDefault!.Value)
                   .WhereIF(isRecommend.HasValue, u => u.IsRecommend == isRecommend!.Value)
                   .WhereIF(isEnabled.HasValue, u => u.IsEnabled == isEnabled!.Value)
@@ -71,11 +71,11 @@ public sealed class AdvancedQueryAreaFilterTests : IDisposable
         await _db.Insertable(BuildArea(3, "a3", true, GameLanguage.Unspecified, now)).ExecuteCommandAsync();
     }
 
-    private static TenantGameAreaEntity BuildArea(long id, string name, bool isEnable, GameLanguage language, long now)
+    private static GameAreaEntity BuildArea(long id, string name, bool isEnable, GameLanguage language, long now)
     {
         // 与 GameOrderShipServiceTests 一致的种子字段集（裸配置下所有列均 NOT NULL，需全量赋值）。
         // 本测试只断言 IsEnabled（C301 归一基类列）/Language 过滤形状，其余列给占位值。
-        return new TenantGameAreaEntity
+        return new GameAreaEntity
         {
             Id = id, Name = name, Language = language,
             CreatedId = 1, CreatedTime = now, CreatedName = "test",

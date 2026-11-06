@@ -15,20 +15,20 @@ namespace GameFrameX.Application.CommerceCenter.GameOrderFulfillment;
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
 public class GameOrderFulfillmentService
-    : GenericCrudService<Entity.Tenant.Game.TenantGameOrderFulfillmentEntity,
+    : GenericCrudService<Entity.Business.Game.GameOrderFulfillmentEntity,
         FulfillmentActionRequest,
-        UpdateTenantGameOrderFulfillmentEntityRequest,
+        UpdateGameOrderFulfillmentEntityRequest,
         GameOrderFulfillmentResponse,
-        PageTenantGameOrderFulfillmentEntityRequest>
+        PageGameOrderFulfillmentEntityRequest>
 {
     private readonly GameOrderShipService _shipService;
     private readonly GameOrderChannelRefundService _channelRefundService;
-    private readonly SqlSugarRepository<Entity.Tenant.Game.TenantGameOrderEntity> _orderRepository;
+    private readonly SqlSugarRepository<Entity.Business.Game.GameOrderEntity> _orderRepository;
     private readonly CurrentUserContext _currentUserContext;
 
     public GameOrderFulfillmentService(
-        SqlSugarRepository<Entity.Tenant.Game.TenantGameOrderFulfillmentEntity> repository,
-        SqlSugarRepository<Entity.Tenant.Game.TenantGameOrderEntity> orderRepository,
+        SqlSugarRepository<Entity.Business.Game.GameOrderFulfillmentEntity> repository,
+        SqlSugarRepository<Entity.Business.Game.GameOrderEntity> orderRepository,
         GameOrderShipService shipService,
         GameOrderChannelRefundService channelRefundService,
         CurrentUserContext currentUserContext)
@@ -51,7 +51,7 @@ public class GameOrderFulfillmentService
     /// <summary>
     /// 账本为事实数据，禁止管理后台修改。
     /// </summary>
-    protected override Task OnUpdatingAsync(UpdateTenantGameOrderFulfillmentEntityRequest input)
+    protected override Task OnUpdatingAsync(UpdateGameOrderFulfillmentEntityRequest input)
     {
         throw new Exception("权益发货账本为事实数据，不支持修改");
     }
@@ -59,7 +59,7 @@ public class GameOrderFulfillmentService
     /// <summary>
     /// 账本分页查询过滤（字段穷举见 change C120 §3）。
     /// </summary>
-    protected override ISugarQueryable<GameOrderFulfillmentResponse> BuildPageQuery(PageTenantGameOrderFulfillmentEntityRequest input)
+    protected override ISugarQueryable<GameOrderFulfillmentResponse> BuildPageQuery(PageGameOrderFulfillmentEntityRequest input)
     {
         return Repository.AsQueryable()
                          .WhereIF(input.OrderId.HasValue, u => u.OrderId == input.OrderId.Value)
@@ -83,7 +83,7 @@ public class GameOrderFulfillmentService
     /// </summary>
     [HttpPost]
     [ApiDescriptionSettings(Name = "Export")]
-    public async Task<List<GameOrderFulfillmentResponse>> ExportAsync(PageTenantGameOrderFulfillmentEntityRequest input)
+    public async Task<List<GameOrderFulfillmentResponse>> ExportAsync(PageGameOrderFulfillmentEntityRequest input)
     {
         return await BuildPageQuery(input).Take(1000).ToListAsync();
     }
@@ -143,7 +143,7 @@ public class GameOrderFulfillmentService
     /// 解析退款动作对应的订单（C310）：input.Id 兼容订单 Id（GameOrderShipService 既有口径）与账本行 Id（账本页动作语义）两种传参，
     /// 后者按账本行 OrderId 映射回订单实体。
     /// </summary>
-    private async Task<Entity.Tenant.Game.TenantGameOrderEntity> GetOrderForChannelRefundAsync(long inputId)
+    private async Task<Entity.Business.Game.GameOrderEntity> GetOrderForChannelRefundAsync(long inputId)
     {
         var order = await _orderRepository.GetFirstAsync(u => u.Id == inputId);
         if (order != null)

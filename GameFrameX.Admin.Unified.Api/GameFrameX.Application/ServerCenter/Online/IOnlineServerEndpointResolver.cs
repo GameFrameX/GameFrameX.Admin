@@ -17,5 +17,5 @@ public interface IOnlineServerEndpointResolver
     /// <param name="action">Online 管理 action 名。</param>
     /// <returns>绝对 URL。</returns>
     /// <exception cref="InvalidOperationException">根地址缺失/非法，或 Online 管理前缀为空（同 Gm/Control 守卫：空表示该区服未开放 Online 管理）。</exception>
-    string Resolve(TenantGameAreaEntity area, string action);
+    string Resolve(GameAreaEntity area, string action);
 }

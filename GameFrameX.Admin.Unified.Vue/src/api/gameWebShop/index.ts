@@ -10,7 +10,7 @@
  */
 
 import {
-  AddTenantGameWebShopEntityRequest,
+  AddGameWebShopEntityRequest,
   GameWebShopAddPostData,
   GameWebShopDeletePostData,
   GameWebShopDetailGetData,
@@ -18,8 +18,8 @@ import {
   GameWebShopSelectPostData,
   GameWebShopSelectStringPostData,
   GameWebShopUpdatePostData,
-  PageTenantGameWebShopEntityRequest,
-  UpdateTenantGameWebShopEntityRequest,
+  PageGameWebShopEntityRequest,
+  UpdateGameWebShopEntityRequest,
 } from "./types";
 import {
   BaseDeleteRequest,
@@ -44,7 +44,7 @@ export class GameWebShop<SecurityDataType = unknown> {
    * @request POST:/api/gameWebShop/add
    */
   gameWebShopAddPost = (
-    data: AddTenantGameWebShopEntityRequest,
+    data: AddGameWebShopEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameWebShopAddPostData, any>({
@@ -109,7 +109,7 @@ export class GameWebShop<SecurityDataType = unknown> {
    * @request POST:/api/gameWebShop/page
    */
   gameWebShopPagePost = (
-    data: PageTenantGameWebShopEntityRequest,
+    data: PageGameWebShopEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameWebShopPagePostData, any>({
@@ -169,7 +169,7 @@ export class GameWebShop<SecurityDataType = unknown> {
    * @request POST:/api/gameWebShop/update
    */
   gameWebShopUpdatePost = (
-    data: UpdateTenantGameWebShopEntityRequest,
+    data: UpdateGameWebShopEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameWebShopUpdatePostData, any>({

@@ -61,7 +61,7 @@ public sealed class ThreeHostApiRoutingContractTests
     [Fact]
     public void Client_GameAnnouncementController_RenamesClassButLocksLegacyRoute()
     {
-        // C300（GFX-708）：类名自 TenantGameAnnouncementEntityServiceController 清理而来；调用方（游戏客户端）
+        // C300（GFX-708）：类名自 GameAnnouncementEntityServiceController 清理而来；调用方（游戏客户端）
         // 依赖既有路径，显式 [Route] 锁定旧 token 解析结果。MVC 路由模板收集与 GetCustomAttributes(inherit: true)
         // 同源，此处断言 controller 级路由唯一且等于旧值，防止基类 token 路由叠加出 api/GameAnnouncement 别名端点。
         var routes = typeof(GameAnnouncementController)
@@ -76,7 +76,7 @@ public sealed class ThreeHostApiRoutingContractTests
     [Fact]
     public void Hub_MachineChannels_UseOpenAccessAuthentication()
     {
-        // C405：Hub 仅保留机器通道，两个控制器均由 TenantGameAppOpenAccessAuthMiddleware 使用 HMAC 鉴权；JWT 不应进入信任域。
+        // C405：Hub 仅保留机器通道，两个控制器均由 GameAppOpenAccessAuthMiddleware 使用 HMAC 鉴权；JWT 不应进入信任域。
         Assert.False(typeof(Service.BaseController).IsDefined(typeof(AuthorizeAttribute), true));
         Assert.True(typeof(FeatureSwitchSyncController).IsDefined(typeof(AllowAnonymousAttribute), false));
         Assert.True(typeof(PackageBuildReportController).IsDefined(typeof(AllowAnonymousAttribute), false));

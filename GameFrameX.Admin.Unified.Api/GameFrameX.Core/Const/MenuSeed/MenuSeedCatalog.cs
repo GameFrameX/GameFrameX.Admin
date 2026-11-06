@@ -60,12 +60,12 @@ public static class MenuSeedCatalog
     /// <summary>
     /// 获取 SuperAdmin-only 树下允许租户调用的只读辅助按钮 ID。
     /// </summary>
-    public static IReadOnlySet<long> TenantReadableSuperAdminOnlyMenuIds
+    public static IReadOnlySet<long> AdminReadableSuperAdminOnlyMenuIds
     {
         get
         {
             return Definitions
-                   .Where(u => u.SuperAdminOnly && u.AllowTenantWhenSuperAdminOnly)
+                   .Where(u => u.SuperAdminOnly && u.AllowAdminWhenSuperAdminOnly)
                    .Select(u => StableSeedId.Menu(u.Key))
                    .ToHashSet();
         }
@@ -178,8 +178,7 @@ public static class MenuSeedCatalog
                 dbMenu.CreatedTime,
                 dbMenu.UpdateTime ?? dbMenu.CreatedTime,
                 dbMenu.SuperAdminOnly,
-                dbMenu.AllowTenantWhenSuperAdminOnly,
-                dbMenu.AppScope);
+                dbMenu.AllowAdminWhenSuperAdminOnly);
         }).ToArray();
 
         _dbMenus = dbMenus;
@@ -232,11 +231,6 @@ public static class MenuSeedCatalog
 
 
 
-        var invalidAppScope = dbMenus.FirstOrDefault(u => !global::System.Enum.IsDefined(typeof(MenuAppScopeEnum), u.AppScope));
-        if (invalidAppScope != null)
-        {
-            throw new InvalidOperationException($"global_menu.AppScope 非法值: Key={invalidAppScope.Key}, AppScope={invalidAppScope.AppScope}。");
-        }
 
         EnsureNoCycles(dbMenus);
     }

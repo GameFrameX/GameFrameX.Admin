@@ -4,7 +4,7 @@
 import type { BaseSelectPageResponse, BaseSelectPageStringResponse } from "../_shared/data-contracts";
 
 /** 游戏Docker标签增加输入参数 */
-export interface AddTenantGameDockerTagEntityRequest {
+export interface AddGameDockerTagEntityRequest {
   /**
    * 名称
    * @minLength 1
@@ -66,7 +66,7 @@ export interface GameDockerTagResponseSqlSugarPagedList {
 }
 
 /** 游戏大区分类分页查询输入参数 */
-export interface PageTenantGameDockerTagEntityRequest {
+export interface PageGameDockerTagEntityRequest {
   searchKey?: string | null;
   /**
    * @format int32
@@ -87,7 +87,7 @@ export interface PageTenantGameDockerTagEntityRequest {
 }
 
 /** 游戏Docker标签更新输入参数 */
-export interface UpdateTenantGameDockerTagEntityRequest {
+export interface UpdateGameDockerTagEntityRequest {
   /**
    * @min 1
    * @max 9223372036854776000

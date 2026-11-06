@@ -1,6 +1,6 @@
 using GameFrameX.Application.ClientDelivery.AppScope;
 using GameFrameX.Core.SqlSugar;
-using GameFrameX.Entity.Tenant.Game.App;
+using GameFrameX.Entity.Business.Game.App;
 using SqlSugar;
 
 namespace GameFrameX.Core.Tests.AppScope;
@@ -33,7 +33,7 @@ public sealed class PackageScopeValidatorTests : IDisposable
         SqlSugarUnifiedConfig.ConfigureBaseSettings(config);
         _db = new SqlSugarScope(config);
         SqlSugarUnifiedConfig.ConfigureBaseFilters(_db);
-        _db.CodeFirst.InitTables(typeof(TenantGameAppPackageEntity));
+        _db.CodeFirst.InitTables(typeof(GameAppPackageEntity));
     }
 
     /// <summary>
@@ -104,9 +104,9 @@ public sealed class PackageScopeValidatorTests : IDisposable
 
 
 
-    private ISugarQueryable<TenantGameAppPackageEntity> Query()
+    private ISugarQueryable<GameAppPackageEntity> Query()
     {
-        return _db.Queryable<TenantGameAppPackageEntity>();
+        return _db.Queryable<GameAppPackageEntity>();
     }
 
     private async Task SeedAsync()
@@ -118,9 +118,9 @@ public sealed class PackageScopeValidatorTests : IDisposable
         await _db.Insertable(BuildPackage(3, 200, "com.app.c", true, now)).ExecuteCommandAsync();
     }
 
-    private static TenantGameAppPackageEntity BuildPackage(long id, long gameAppId, string packageName, bool isEnabled, long now)
+    private static GameAppPackageEntity BuildPackage(long id, long gameAppId, string packageName, bool isEnabled, long now)
     {
-        return new TenantGameAppPackageEntity
+        return new GameAppPackageEntity
         {
             Id = id,
             PackageName = packageName,

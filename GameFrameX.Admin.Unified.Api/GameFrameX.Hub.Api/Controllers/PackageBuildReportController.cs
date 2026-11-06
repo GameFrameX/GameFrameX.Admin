@@ -1,7 +1,7 @@
 using GameFrameX.Core.Const;
 using GameFrameX.Core.Service;
 using GameFrameX.Core.BaseInputOutput;
-using GameFrameX.Entity.Tenant.Game.App;
+using GameFrameX.Entity.Business.Game.App;
 using GameFrameX.Hub.Api.Dto.PackageBuildReport;
 using GameFrameX.Hub.Api.Middleware;
 using Microsoft.AspNetCore.Authorization;
@@ -11,17 +11,17 @@ namespace GameFrameX.Hub.Api.Controllers;
 
 /// <summary>
 /// 打包上报控制器。
-/// <para>机器对机器调用（打包机 / CI / 流水线），由 <see cref="TenantGameAppOpenAccessAuthMiddleware"/> 鉴权（非 JWT），故标记 <c>[AllowAnonymous]</c>（C236 起 JWT 默认鉴权由各控制器显式 <c>[Authorize]</c> 承担，本控制器不参与）。</para>
+/// <para>机器对机器调用（打包机 / CI / 流水线），由 <see cref="GameAppOpenAccessAuthMiddleware"/> 鉴权（非 JWT），故标记 <c>[AllowAnonymous]</c>（C236 起 JWT 默认鉴权由各控制器显式 <c>[Authorize]</c> 承担，本控制器不参与）。</para>
 /// <para>分包 Id 驱动：查分包解析 <c>PackageName / PlatformCode / ChannelCode</c>，校验分包存在且启用，
-/// 资源包 → <see cref="TenantGameAppAssetPackageVersionEntity"/>，整包 → <see cref="TenantGameAppReleaseVersionEntity"/>，幂等 upsert（存在则更新，否则新增）。</para>
+/// 资源包 → <see cref="GameAppAssetPackageVersionEntity"/>，整包 → <see cref="GameAppReleaseVersionEntity"/>，幂等 upsert（存在则更新，否则新增）。</para>
 /// <para>遵循 Hub.Api Controller 惯例（Repository 直接操作 Entity，不调 Application Service），故未提层 ScopeValidator / 未复用 Application.RemoteConfig 的 CheckXxxUnique —— Controller 自写归属与查重。</para>
 /// </summary>
 [AllowAnonymous]
 public class PackageBuildReportController : BaseController
 {
-    private readonly Repository<TenantGameAppPackageEntity> _packageRepo;
-    private readonly Repository<TenantGameAppAssetPackageVersionEntity> _assetVersionRepo;
-    private readonly Repository<TenantGameAppReleaseVersionEntity> _releaseVersionRepo;
+    private readonly Repository<GameAppPackageEntity> _packageRepo;
+    private readonly Repository<GameAppAssetPackageVersionEntity> _assetVersionRepo;
+    private readonly Repository<GameAppReleaseVersionEntity> _releaseVersionRepo;
 
     /// <summary>
     /// 打包上报控制器构造函数。
@@ -30,9 +30,9 @@ public class PackageBuildReportController : BaseController
     /// <param name="assetVersionRepo">资源包版本仓储。</param>
     /// <param name="releaseVersionRepo">整包版本仓储。</param>
     public PackageBuildReportController(
-        Repository<TenantGameAppPackageEntity> packageRepo,
-        Repository<TenantGameAppAssetPackageVersionEntity> assetVersionRepo,
-        Repository<TenantGameAppReleaseVersionEntity> releaseVersionRepo)
+        Repository<GameAppPackageEntity> packageRepo,
+        Repository<GameAppAssetPackageVersionEntity> assetVersionRepo,
+        Repository<GameAppReleaseVersionEntity> releaseVersionRepo)
     {
         _packageRepo = packageRepo;
         _assetVersionRepo = assetVersionRepo;
@@ -87,7 +87,7 @@ public class PackageBuildReportController : BaseController
     /// <summary>
     /// 资源包版本幂等 upsert（Package + AppVersion + AssetPackageName + Language 命中则更新，否则新增）。
     /// </summary>
-    private async Task UpsertAssetVersionAsync(TenantGameAppPackageEntity package, PackageBuildReportRequest input, string language)
+    private async Task UpsertAssetVersionAsync(GameAppPackageEntity package, PackageBuildReportRequest input, string language)
     {
         var existing = await _assetVersionRepo.GetFirstAsync(v =>
                                                                  v.Package == package.PackageName
@@ -105,7 +105,7 @@ public class PackageBuildReportController : BaseController
             return;
         }
 
-        var entity = new TenantGameAppAssetPackageVersionEntity
+        var entity = new GameAppAssetPackageVersionEntity
         {
             Package = package.PackageName,
             Platform = package.PlatformCode,
@@ -122,7 +122,7 @@ public class PackageBuildReportController : BaseController
     /// <summary>
     /// 整包版本幂等 upsert（Package + AppVersion + Language 命中则更新，否则新增）。
     /// </summary>
-    private async Task UpsertReleaseVersionAsync(TenantGameAppPackageEntity package, PackageBuildReportRequest input, string language)
+    private async Task UpsertReleaseVersionAsync(GameAppPackageEntity package, PackageBuildReportRequest input, string language)
     {
         var existing = await _releaseVersionRepo.GetFirstAsync(v =>
                                                                    v.Package == package.PackageName
@@ -138,7 +138,7 @@ public class PackageBuildReportController : BaseController
             return;
         }
 
-        var entity = new TenantGameAppReleaseVersionEntity
+        var entity = new GameAppReleaseVersionEntity
         {
             Package = package.PackageName,
             Platform = package.PlatformCode,

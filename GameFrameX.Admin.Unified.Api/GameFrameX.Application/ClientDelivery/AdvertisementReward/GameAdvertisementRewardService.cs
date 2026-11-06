@@ -9,16 +9,16 @@ namespace GameFrameX.Application.ClientDelivery.AdvertisementReward;
 /// <para>只读：PageAsync（继承基类）/ GetAsync 详情（继承基类）/ ExportAsync 导出当前过滤列表（上限 1000 行，文件化由前端处理）。</para>
 /// <para>事实数据铁律：OnAddingAsync / OnUpdatingAsync 抛错关闭默认 AddAsync/UpdateAsync 端点，无 DeleteAsync 端点。</para>
 /// <para>高风险动作 RetryAsync / MarkProcessedAsync 涉及 C114 幂等状态机（同 IdempotencyKey 复用账本行从 Failed 翻回），
-/// 留待单独 change 落地；前端对应按钮已由 tenantGameAdRewardEntity:retry / :markProcessed 权限码门控，未种码即隐藏。</para>
+/// 留待单独 change 落地；前端对应按钮已由 gameAdRewardEntity:retry / :markProcessed 权限码门控，未种码即隐藏。</para>
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
 public class GameAdvertisementRewardService
-    : GenericCrudService<Entity.Tenant.Game.TenantGameAdvertisementRewardEntity,
-        AddTenantGameAdvertisementRewardEntityRequest, UpdateTenantGameAdvertisementRewardEntityRequest,
-        GameAdvertisementRewardResponse, PageTenantGameAdvertisementRewardEntityRequest>
+    : GenericCrudService<Entity.Business.Game.GameAdvertisementRewardEntity,
+        AddGameAdvertisementRewardEntityRequest, UpdateGameAdvertisementRewardEntityRequest,
+        GameAdvertisementRewardResponse, PageGameAdvertisementRewardEntityRequest>
 {
     public GameAdvertisementRewardService(
-        SqlSugarRepository<Entity.Tenant.Game.TenantGameAdvertisementRewardEntity> repository)
+        SqlSugarRepository<Entity.Business.Game.GameAdvertisementRewardEntity> repository)
         : base(repository)
     {
     }
@@ -26,7 +26,7 @@ public class GameAdvertisementRewardService
     /// <summary>
     /// 账本由广告服务端回调链路产生（Client.Api GameAdvertisementRewardService），禁止管理后台直接创建。
     /// </summary>
-    protected override Task OnAddingAsync(AddTenantGameAdvertisementRewardEntityRequest input)
+    protected override Task OnAddingAsync(AddGameAdvertisementRewardEntityRequest input)
     {
         throw new Exception("广告奖励账本由广告回调链路产生，不支持通过管理后台直接创建");
     }
@@ -34,7 +34,7 @@ public class GameAdvertisementRewardService
     /// <summary>
     /// 账本为事实数据，禁止管理后台修改。
     /// </summary>
-    protected override Task OnUpdatingAsync(UpdateTenantGameAdvertisementRewardEntityRequest input)
+    protected override Task OnUpdatingAsync(UpdateGameAdvertisementRewardEntityRequest input)
     {
         throw new Exception("广告奖励账本为事实数据，不支持修改");
     }
@@ -42,7 +42,7 @@ public class GameAdvertisementRewardService
     /// <summary>
     /// 账本分页查询过滤。
     /// </summary>
-    protected override ISugarQueryable<GameAdvertisementRewardResponse> BuildPageQuery(PageTenantGameAdvertisementRewardEntityRequest input)
+    protected override ISugarQueryable<GameAdvertisementRewardResponse> BuildPageQuery(PageGameAdvertisementRewardEntityRequest input)
     {
         return Repository.AsQueryable()
                          .WhereIF(!string.IsNullOrWhiteSpace(input.Provider), u => u.Provider == input.Provider)
@@ -66,7 +66,7 @@ public class GameAdvertisementRewardService
     [HttpPost(CrudActionRoutes.Export)]
     [ApiDescriptionSettings(Name = "Export")]
     [DisplayName("导出广告奖励账本")]
-    public async Task<List<GameAdvertisementRewardResponse>> ExportAsync(PageTenantGameAdvertisementRewardEntityRequest input)
+    public async Task<List<GameAdvertisementRewardResponse>> ExportAsync(PageGameAdvertisementRewardEntityRequest input)
     {
         return await BuildPageQuery(input).Take(1000).ToListAsync();
     }

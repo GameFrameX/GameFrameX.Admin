@@ -10,7 +10,7 @@ using GameFrameX.Core.Extension;
 using GameFrameX.Core.Service.User;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Entity.Game.Online;
-using GameFrameX.Entity.Tenant.Game.Online;
+using GameFrameX.Entity.Business.Game.Online;
 using GameFrameX.Foundation.Orm.Entity;
 using Microsoft.AspNetCore.Http;
 using SqlSugar;
@@ -49,8 +49,8 @@ public sealed class GameOnlineConfigRolloutServiceTests : IDisposable
         _db.Aop.DataExecuting = (oldValue, entityInfo) => SqlSugarAopHelper.HandleBaseAudit(oldValue, entityInfo);
         SqlSugarUnifiedConfig.ConfigureBaseFilters(_db);
         _db.CodeFirst.InitTables(
-            typeof(TenantGameOnlineConfigRolloutEntity),
-            typeof(TenantGameOnlinePlayerSegmentEntity));
+            typeof(GameOnlineConfigRolloutEntity),
+            typeof(GameOnlinePlayerSegmentEntity));
     }
 
     /// <summary>
@@ -65,7 +65,7 @@ public sealed class GameOnlineConfigRolloutServiceTests : IDisposable
         await Assert.ThrowsAsync<BusinessException>(() => service.PublishAsync(NewPublish(0)));
         await Assert.ThrowsAsync<BusinessException>(() => service.PublishAsync(NewPublish(101)));
 
-        Assert.Equal(0, await _db.Queryable<TenantGameOnlineConfigRolloutEntity>().CountAsync());
+        Assert.Equal(0, await _db.Queryable<GameOnlineConfigRolloutEntity>().CountAsync());
     }
 
     /// <summary>
@@ -86,7 +86,7 @@ public sealed class GameOnlineConfigRolloutServiceTests : IDisposable
         Assert.Equal("cv-publish", second.OnlineConfirmVersion); // fake 回执回写
 
         // 旧生效行被替代：v1 → RolledBack，v2 为唯一生效行
-        var rows = await _db.Queryable<TenantGameOnlineConfigRolloutEntity>().OrderBy(u => u.ConfigVersion).ToListAsync();
+        var rows = await _db.Queryable<GameOnlineConfigRolloutEntity>().OrderBy(u => u.ConfigVersion).ToListAsync();
         Assert.Equal(2, rows.Count);
         Assert.Equal(OnlineConfigRolloutStatus.RolledBack, rows[0].Status);
         Assert.Equal(OnlineConfigRolloutStatus.Published, rows[1].Status);
@@ -147,7 +147,7 @@ public sealed class GameOnlineConfigRolloutServiceTests : IDisposable
         Assert.Equal(OnlineConfigRolloutStatus.Published, rollback.Status);
         Assert.Equal("cv-rollback", rollback.OnlineConfirmVersion);
 
-        var rows = await _db.Queryable<TenantGameOnlineConfigRolloutEntity>().OrderBy(u => u.ConfigVersion).ToListAsync();
+        var rows = await _db.Queryable<GameOnlineConfigRolloutEntity>().OrderBy(u => u.ConfigVersion).ToListAsync();
         Assert.Equal(3, rows.Count);
         Assert.All(rows.Take(2), row => Assert.Equal(OnlineConfigRolloutStatus.RolledBack, row.Status)); // v1、v2 均被替代
         Assert.Equal(OnlineConfigRolloutStatus.Published, rows[2].Status); // v3 唯一生效
@@ -182,7 +182,7 @@ public sealed class GameOnlineConfigRolloutServiceTests : IDisposable
 
         await Assert.ThrowsAsync<BusinessException>(() => service.PublishAsync(NewPublish(50)));
 
-        Assert.Equal(0, await _db.Queryable<TenantGameOnlineConfigRolloutEntity>().CountAsync());
+        Assert.Equal(0, await _db.Queryable<GameOnlineConfigRolloutEntity>().CountAsync());
         // 失败重试：版本号未被污染，仍从 1 起
         _dispatch.FailNextPublish = false;
         var retry = await service.PublishAsync(NewPublish(50));
@@ -217,8 +217,8 @@ public sealed class GameOnlineConfigRolloutServiceTests : IDisposable
     private GameOnlineConfigRolloutService CreateService()
     {
         return new GameOnlineConfigRolloutService(
-            Repository<TenantGameOnlineConfigRolloutEntity>(),
-            Repository<TenantGameOnlinePlayerSegmentEntity>(),
+            Repository<GameOnlineConfigRolloutEntity>(),
+            Repository<GameOnlinePlayerSegmentEntity>(),
             _dispatch,
             CreateUserContext(TenantA));
     }
@@ -244,7 +244,7 @@ public sealed class GameOnlineConfigRolloutServiceTests : IDisposable
     private async Task SeedAsync()
     {
         var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-        await _db.Insertable(new TenantGameOnlinePlayerSegmentEntity
+        await _db.Insertable(new GameOnlinePlayerSegmentEntity
         {
             Id = SegmentSynced,
             Name = "synced-segment",
@@ -252,7 +252,7 @@ public sealed class GameOnlineConfigRolloutServiceTests : IDisposable
             CreatedTime = now,
             IsDeleted = false,
         }).ExecuteCommandAsync();
-        await _db.Insertable(new TenantGameOnlinePlayerSegmentEntity
+        await _db.Insertable(new GameOnlinePlayerSegmentEntity
         {
             Id = 7002,
             Name = "unsynced-segment",
@@ -280,12 +280,12 @@ public sealed class GameOnlineConfigRolloutServiceTests : IDisposable
             return Task.CompletedTask; // 来源校验行为由 OnlineLiveOpsDispatchServiceTests 覆盖
         }
 
-        public Task<OnlinePlayerSegmentSyncResponse> SyncSegmentToOnlineAsync(TenantGameOnlinePlayerSegmentEntity segment, long serverId, string reason)
+        public Task<OnlinePlayerSegmentSyncResponse> SyncSegmentToOnlineAsync(GameOnlinePlayerSegmentEntity segment, long serverId, string reason)
         {
             throw new NotSupportedException("分群同步行为由 GameOnlinePlayerSegmentServiceTests 覆盖");
         }
 
-        public Task<OnlineConfigRolloutDispatchResponse> PublishRolloutToOnlineAsync(TenantGameOnlineConfigRolloutEntity rollout)
+        public Task<OnlineConfigRolloutDispatchResponse> PublishRolloutToOnlineAsync(GameOnlineConfigRolloutEntity rollout)
         {
             PublishCalls += 1;
             if (FailNextPublish)
@@ -301,7 +301,7 @@ public sealed class GameOnlineConfigRolloutServiceTests : IDisposable
             });
         }
 
-        public Task<OnlineConfigRolloutDispatchResponse> RollbackRolloutToOnlineAsync(TenantGameOnlineConfigRolloutEntity rollout)
+        public Task<OnlineConfigRolloutDispatchResponse> RollbackRolloutToOnlineAsync(GameOnlineConfigRolloutEntity rollout)
         {
             RollbackCalls += 1;
             return Task.FromResult(new OnlineConfigRolloutDispatchResponse

@@ -6,21 +6,21 @@ using GameFrameX.Entity.Enum;
 namespace GameFrameX.Application.PlayerCenter.GamePenaltyAppeal;
 
 /// <summary>
-/// 申诉事实源管理服务。路由前缀 /api/tenantGamePenaltyAppealEntity。
+/// 申诉事实源管理服务。路由前缀 /api/gamePenaltyAppealEntity。
 /// <para>AddAsync：校验关联处罚生效中 + 同一处罚不存在待审申诉；服务端强制 Status=Pending。</para>
 /// <para>ReviewAsync：通过→同步撤销关联处罚（写 RevokeAsync* + SourceAppealId 审计链）；驳回→写 Rejected。同一申诉不可重复 ReviewAsync。</para>
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
 public class GamePenaltyAppealService
-    : GenericCrudService<Entity.Tenant.Game.TenantGamePenaltyAppealEntity,
-        AddTenantGamePenaltyAppealEntityRequest, UpdateTenantGamePenaltyAppealEntityRequest,
-        GamePenaltyAppealResponse, PageTenantGamePenaltyAppealEntityRequest>
+    : GenericCrudService<Entity.Business.Game.GamePenaltyAppealEntity,
+        AddGamePenaltyAppealEntityRequest, UpdateGamePenaltyAppealEntityRequest,
+        GamePenaltyAppealResponse, PageGamePenaltyAppealEntityRequest>
 {
     private readonly CurrentUserContext _currentUserContext;
-    private readonly SqlSugarRepository<Entity.Tenant.Game.TenantGamePenaltyEntity> _penaltyRepository;
+    private readonly SqlSugarRepository<Entity.Business.Game.GamePenaltyEntity> _penaltyRepository;
 
-    public GamePenaltyAppealService(SqlSugarRepository<Entity.Tenant.Game.TenantGamePenaltyAppealEntity> repository,
-        SqlSugarRepository<Entity.Tenant.Game.TenantGamePenaltyEntity> penaltyRepository,
+    public GamePenaltyAppealService(SqlSugarRepository<Entity.Business.Game.GamePenaltyAppealEntity> repository,
+        SqlSugarRepository<Entity.Business.Game.GamePenaltyEntity> penaltyRepository,
         CurrentUserContext currentUserContext)
         : base(repository)
     {
@@ -31,7 +31,7 @@ public class GamePenaltyAppealService
     /// <summary>
     /// 提交申诉：校验处罚生效中、同一处罚无待审申诉；Status 服务端强制为 Pending。
     /// </summary>
-    public override async Task<GamePenaltyAppealResponse> AddAsync(AddTenantGamePenaltyAppealEntityRequest input)
+    public override async Task<GamePenaltyAppealResponse> AddAsync(AddGamePenaltyAppealEntityRequest input)
     {
         var penalty = await _penaltyRepository.GetFirstAsync(p => p.Id == input.PenaltyId);
         if (penalty == null)
@@ -57,7 +57,7 @@ public class GamePenaltyAppealService
             throw BusinessError.Oh("申诉理由不能为空");
         }
 
-        var entity = input.Adapt<Entity.Tenant.Game.TenantGamePenaltyAppealEntity>();
+        var entity = input.Adapt<Entity.Business.Game.GamePenaltyAppealEntity>();
         entity.Status = AppealStatusEnum.Pending;
         await Repository.InsertWithDiffLogAsync(entity);
         return entity.Adapt<GamePenaltyAppealResponse>();
@@ -66,7 +66,7 @@ public class GamePenaltyAppealService
     /// <summary>
     /// 分页查询：按 PenaltyId / Status 过滤。
     /// </summary>
-    protected override ISugarQueryable<GamePenaltyAppealResponse> BuildPageQuery(PageTenantGamePenaltyAppealEntityRequest input)
+    protected override ISugarQueryable<GamePenaltyAppealResponse> BuildPageQuery(PageGamePenaltyAppealEntityRequest input)
     {
         return Repository.AsQueryable()
 
@@ -81,7 +81,7 @@ public class GamePenaltyAppealService
     /// <param name="input"></param>
     [HttpPost("review")]
     [ApiDescriptionSettings(Name = "Review")]
-    public async Task ReviewAsync(ReviewTenantGamePenaltyAppealEntityRequest input)
+    public async Task ReviewAsync(ReviewGamePenaltyAppealEntityRequest input)
     {
         var appeal = await Repository.GetFirstAsync(a => a.Id == input.Id);
         if (appeal == null)

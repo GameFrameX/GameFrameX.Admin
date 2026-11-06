@@ -2,7 +2,7 @@
 /* tslint:disable */
 
 /** 新增租户对象存储配置入参。 */
-export interface AddTenantObjectStorageConfigRequest {
+export interface AddObjectStorageConfigRequest {
   /** 存储提供商名称（local / aliyun / tencent-cos / qiniu）。 */
   provider?: string | null;
   /** 对象键路径模板。 */
@@ -92,7 +92,7 @@ export interface ObjectStorageProviderItem {
 }
 
 /** 租户对象存储配置分页查询入参。 */
-export interface PageTenantObjectStorageConfigRequest {
+export interface PageObjectStorageConfigRequest {
   searchKey?: string | null;
   /**
    * @format int32
@@ -115,7 +115,7 @@ export interface PageTenantObjectStorageConfigRequest {
 }
 
 /** 更新租户对象存储配置入参。Provider 必须与既有记录一致。 */
-export interface UpdateTenantObjectStorageConfigRequest {
+export interface UpdateObjectStorageConfigRequest {
   /**
    * @min 1
    * @max 9223372036854776000

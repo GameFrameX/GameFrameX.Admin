@@ -1,13 +1,13 @@
 using GameFrameX.Advertisement.Abstract;
 using GameFrameX.Core.SqlSugar;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 using GameFrameX.Foundation.Hash;
 using Microsoft.AspNetCore.Http;
 
 namespace GameFrameX.Advertisement.Pangle;
 
 /// <summary>
-/// Pangle 广告回调处理器（SHA256(SecurityKey:TransId) 验签，密钥取租户配置 <see cref="TenantAdvertisementCallbackOptions.PangleSecurityKey"/>）。
+/// Pangle 广告回调处理器（SHA256(SecurityKey:TransId) 验签，密钥取租户配置 <see cref="AdvertisementCallbackOptions.PangleSecurityKey"/>）。
 /// <para>与 TopOn / AdMob / UnityAds 不同：不进发奖链路，仅由宿主 Controller 调用 <see cref="Verify"/> 验签，保持既有 HTTP 响应行为。</para>
 /// </summary>
 public sealed class PangleAdvertisementCallbackHandler : AdvertisementCallbackHandlerBase, IAdvertisementCallbackHandler
@@ -17,11 +17,11 @@ public sealed class PangleAdvertisementCallbackHandler : AdvertisementCallbackHa
         get { return "Pangle"; }
     }
 
-    public PangleAdvertisementCallbackHandler(Repository<TenantGameRoleEntity> roleRepository) : base(roleRepository)
+    public PangleAdvertisementCallbackHandler(Repository<GameRoleEntity> roleRepository) : base(roleRepository)
     {
     }
 
-    public OptionVerification Verify(TenantAdvertisementCallbackOptions advertisementOptions, IQueryCollection query)
+    public OptionVerification Verify(AdvertisementCallbackOptions advertisementOptions, IQueryCollection query)
     {
         if (advertisementOptions == null || string.IsNullOrWhiteSpace(advertisementOptions.PangleSecurityKey))
         {

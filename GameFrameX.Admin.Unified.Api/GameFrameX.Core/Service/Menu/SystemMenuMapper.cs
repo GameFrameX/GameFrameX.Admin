@@ -19,7 +19,6 @@ public class SystemMenuMapper : IRegister
               .Map(t => t.Meta.IsHide, o => o.IsHide)
               .Map(t => t.Meta.IsKeepAlive, o => o.IsKeepAlive)
               .Map(t => t.Meta.IsAffix, o => o.IsAffix)
-              .Map(t => t.Meta.AppScope, o => "console")
               .Map(t => t.Meta.MenuContext, o => "console");
     }
 

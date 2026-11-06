@@ -1,5 +1,5 @@
 using GameFrameX.Core.SqlSugar;
-using GameFrameX.Entity.Tenant.Game.Release;
+using GameFrameX.Entity.Business.Game.Release;
 using SqlSugar;
 
 namespace GameFrameX.Core.Tests.SqlSugar;
@@ -22,7 +22,7 @@ public sealed class GameAppAssetPackageVersionPackageFilterTests : IDisposable
         SqlSugarUnifiedConfig.ConfigureBaseSettings(config);
         _db = new SqlSugarScope(config);
         SqlSugarUnifiedConfig.ConfigureBaseFilters(_db);
-        _db.CodeFirst.InitTables(typeof(TenantGameAppAssetPackageVersionEntity));
+        _db.CodeFirst.InitTables(typeof(GameAppAssetPackageVersionEntity));
     }
 
 
@@ -68,16 +68,16 @@ public sealed class GameAppAssetPackageVersionPackageFilterTests : IDisposable
         Assert.False(exists);
     }
 
-    private ISugarQueryable<TenantGameAppAssetPackageVersionEntity> BuildQuery(string? package)
+    private ISugarQueryable<GameAppAssetPackageVersionEntity> BuildQuery(string? package)
     {
         var normalizedPackage = string.IsNullOrWhiteSpace(package) ? string.Empty : package.Trim();
-        return _db.Queryable<TenantGameAppAssetPackageVersionEntity>()
+        return _db.Queryable<GameAppAssetPackageVersionEntity>()
                   .WhereIF(!string.IsNullOrEmpty(normalizedPackage), u => u.Package == normalizedPackage);
     }
 
     private async Task<bool> CheckAssetPackageVersionDuplicate(string channel, string platform, string appVersion, string package, string language, string assetPackageName)
     {
-        return await _db.Queryable<TenantGameAppAssetPackageVersionEntity>()
+        return await _db.Queryable<GameAppAssetPackageVersionEntity>()
                         .AnyAsync(u => u.Channel == channel
                                        && u.Platform == platform
                                        && u.AppVersion == appVersion
@@ -95,9 +95,9 @@ public sealed class GameAppAssetPackageVersionPackageFilterTests : IDisposable
         await _db.Insertable(BuildAssetVersion(4, "default", now)).ExecuteCommandAsync();
     }
 
-    private static TenantGameAppAssetPackageVersionEntity BuildAssetVersion(long id, string package, long now)
+    private static GameAppAssetPackageVersionEntity BuildAssetVersion(long id, string package, long now)
     {
-        return new TenantGameAppAssetPackageVersionEntity
+        return new GameAppAssetPackageVersionEntity
         {
             Id = id,
             Channel = "default",

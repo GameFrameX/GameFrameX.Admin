@@ -1,6 +1,6 @@
 using GameFrameX.Application.GmCenter.LiveOps.Dispatch.Dto;
 using GameFrameX.Entity.Game.Online;
-using GameFrameX.Entity.Tenant.Game.Online;
+using GameFrameX.Entity.Business.Game.Online;
 
 namespace GameFrameX.Application.GmCenter.LiveOps.Dispatch;
 
@@ -45,7 +45,7 @@ public interface IOnlineLiveOpsDispatchService
     /// <param name="reason">同步理由（审计）。</param>
     /// <returns>同步结果（Online 分群标识 + 确认版本）。</returns>
     /// <exception cref="BusinessException">作用域越界 / Online 协议码非 0（镜像段透出）。</exception>
-    Task<OnlinePlayerSegmentSyncResponse> SyncSegmentToOnlineAsync(TenantGameOnlinePlayerSegmentEntity segment, long serverId, string reason);
+    Task<OnlinePlayerSegmentSyncResponse> SyncSegmentToOnlineAsync(GameOnlinePlayerSegmentEntity segment, long serverId, string reason);
 
     /// <summary>
     /// 灰度发布下发 Online（publishConfigRollout；调用前版本行已由灰度 Service 分配 ConfigVersion）。
@@ -53,7 +53,7 @@ public interface IOnlineLiveOpsDispatchService
     /// <param name="rollout">已落库的发布版本行（含 ServerId/ConfigKind/ConfigKey/ConfigVersion/SegmentId/Percent）。</param>
     /// <returns>下发结果（Online 确认版本回执，原样回写版本行）。</returns>
     /// <exception cref="BusinessException">作用域越界 / Online 协议码非 0（镜像段透出）。</exception>
-    Task<OnlineConfigRolloutDispatchResponse> PublishRolloutToOnlineAsync(TenantGameOnlineConfigRolloutEntity rollout);
+    Task<OnlineConfigRolloutDispatchResponse> PublishRolloutToOnlineAsync(GameOnlineConfigRolloutEntity rollout);
 
     /// <summary>
     /// 灰度回滚下发 Online（rollbackConfigRollout；回滚 = 版本化新下发，TargetVersion 指向目标历史版本）。
@@ -61,5 +61,5 @@ public interface IOnlineLiveOpsDispatchService
     /// <param name="rollout">已落库的回滚版本行（Status=Published、TargetVersion&gt;0 的版本化新行）。</param>
     /// <returns>下发结果（Online 确认版本回执，原样回写版本行）。</returns>
     /// <exception cref="BusinessException">作用域越界 / Online 协议码非 0（镜像段透出）。</exception>
-    Task<OnlineConfigRolloutDispatchResponse> RollbackRolloutToOnlineAsync(TenantGameOnlineConfigRolloutEntity rollout);
+    Task<OnlineConfigRolloutDispatchResponse> RollbackRolloutToOnlineAsync(GameOnlineConfigRolloutEntity rollout);
 }

@@ -12,15 +12,15 @@ namespace GameFrameX.Application.PlayerCenter.GamePenalty;
 /// </summary>
 public class GamePenaltyEnforcementService : IGamePenaltyEnforcementService
 {
-    private readonly SqlSugarRepository<Entity.Tenant.Game.TenantGamePenaltyEntity> _penaltyRepository;
+    private readonly SqlSugarRepository<Entity.Business.Game.GamePenaltyEntity> _penaltyRepository;
 
-    public GamePenaltyEnforcementService(SqlSugarRepository<Entity.Tenant.Game.TenantGamePenaltyEntity> penaltyRepository)
+    public GamePenaltyEnforcementService(SqlSugarRepository<Entity.Business.Game.GamePenaltyEntity> penaltyRepository)
     {
         _penaltyRepository = penaltyRepository;
     }
 
     /// <inheritdoc />
-    public async Task<Entity.Tenant.Game.TenantGamePenaltyEntity> GetLoginBlockingPenaltyAsync(
+    public async Task<Entity.Business.Game.GamePenaltyEntity> GetLoginBlockingPenaltyAsync(
         PenaltyTargetTypeEnum targetType, string targetId, long? areaId = null)
     {
         if (string.IsNullOrEmpty(targetId))

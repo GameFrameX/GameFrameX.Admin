@@ -1,6 +1,6 @@
 using GameFrameX.Client.Api.Services.RemoteConfig;
 using GameFrameX.Client.Api.Services;
-using GameFrameX.Entity.Tenant.Game.RemoteConfig;
+using GameFrameX.Entity.Business.Game.RemoteConfig;
 
 namespace GameFrameX.Core.Tests.ClientApi;
 
@@ -68,12 +68,12 @@ public class RemoteConfigRolloutMatcherTests
         Assert.Same(latest, winner);
     }
 
-    private static TenantGameAppRemoteConfigEntity CreateRecord(
+    private static GameAppRemoteConfigEntity CreateRecord(
         long id = 1,
         int priority = 0,
         int rolloutPercent = 100)
     {
-        return new TenantGameAppRemoteConfigEntity
+        return new GameAppRemoteConfigEntity
         {
             Id = id,
             Priority = priority,

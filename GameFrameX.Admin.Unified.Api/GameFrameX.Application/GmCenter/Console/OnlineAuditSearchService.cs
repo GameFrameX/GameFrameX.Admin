@@ -3,8 +3,8 @@ using GameFrameX.Application.GmCenter.Console.Dto;
 using GameFrameX.Application.ServerCenter.Online;
 using GameFrameX.Core.Enum;
 using GameFrameX.Entity.Log;
-using GameFrameX.Entity.Tenant.Game;
-using GameFrameX.Entity.Tenant.Game.Online;
+using GameFrameX.Entity.Business.Game;
+using GameFrameX.Entity.Business.Game.Online;
 
 // S3/C401 断链修复点
 namespace GameFrameX.Application.GmCenter.Console;
@@ -12,9 +12,9 @@ namespace GameFrameX.Application.GmCenter.Console;
 /// <summary>
 /// Online 控制台统一审计检索服务。路由前缀 /api/onlineAuditSearch（change C344 / vault:C9 S8.2）。
 /// <para>
-/// 三来源实时归并（Admin 侧零事件镜像、零落地表）：Admin 操作日志（<see cref="TenantLogOperationEntity"/>，
+/// 三来源实时归并（Admin 侧零事件镜像、零落地表）：Admin 操作日志（<see cref="LogOperationEntity"/>，
 /// MonitorLogging 全 action 自动落库）+ Online 审计事件（IOnlineServerClient 实时透传）+ 各域命令事实源表
-/// （处罚落账 <see cref="TenantGamePenaltyEntity"/> / 配置灰度 <see cref="TenantGameOnlineConfigRolloutEntity"/>）。
+/// （处罚落账 <see cref="GamePenaltyEntity"/> / 配置灰度 <see cref="GameOnlineConfigRolloutEntity"/>）。
 /// 三来源 → 五维统一字段的映射唯一来源是 <see cref="OnlineAuditSourceMap"/>，本 Service 不散落第二套映射。
 /// </para>
 /// <para>
@@ -32,8 +32,8 @@ public class OnlineAuditSearchService : IAdminApiController
     private const string QueryOnlineAuditEventsAction = "query_online_audit_events";
 
     private readonly SqlSugarRepository<SystemLogOperationEntity> _operationLogRepository;
-    private readonly SqlSugarRepository<TenantGamePenaltyEntity> _penaltyRepository;
-    private readonly SqlSugarRepository<TenantGameOnlineConfigRolloutEntity> _rolloutRepository;
+    private readonly SqlSugarRepository<GamePenaltyEntity> _penaltyRepository;
+    private readonly SqlSugarRepository<GameOnlineConfigRolloutEntity> _rolloutRepository;
     private readonly IOnlineServerClient _onlineServerClient;
     private readonly OnlineScopeContextFactory _scopeContextFactory;
 
@@ -42,8 +42,8 @@ public class OnlineAuditSearchService : IAdminApiController
     /// </summary>
     public OnlineAuditSearchService(
         SqlSugarRepository<SystemLogOperationEntity> operationLogRepository,
-        SqlSugarRepository<TenantGamePenaltyEntity> penaltyRepository,
-        SqlSugarRepository<TenantGameOnlineConfigRolloutEntity> rolloutRepository,
+        SqlSugarRepository<GamePenaltyEntity> penaltyRepository,
+        SqlSugarRepository<GameOnlineConfigRolloutEntity> rolloutRepository,
         IOnlineServerClient onlineServerClient,
         OnlineScopeContextFactory scopeContextFactory)
     {
@@ -122,7 +122,7 @@ public class OnlineAuditSearchService : IAdminApiController
     private async Task<List<OnlineAuditSearchEntryResponse>> QueryAdminOperationSourceAsync(PageOnlineAuditSearchRequest input, long? cursorSeconds)
     {
         var current = await QueryOperationLogsAsync(_operationLogRepository.AsQueryable(), input, cursorSeconds);
-        var historical = await QueryOperationLogsAsync(_operationLogRepository.Context.Queryable<TenantLogOperationEntity>(), input, cursorSeconds);
+        var historical = await QueryOperationLogsAsync(_operationLogRepository.Context.Queryable<LogOperationEntity>(), input, cursorSeconds);
         current.AddRange(historical);
         return current;
     }

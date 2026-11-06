@@ -6,7 +6,7 @@ using GameFrameX.Core.Tests.ClientApi;
 using GameFrameX.Entity.Enum;
 using GameFrameX.Entity.Global;
 using GameFrameX.Entity.System;
-using GameFrameX.Entity.Tenant.Game.App;
+using GameFrameX.Entity.Business.Game.App;
 
 namespace GameFrameX.Core.Tests.AppManagement;
 
@@ -20,8 +20,8 @@ public sealed class MainDatabasePackageServiceTests
             var service = CreateService(database);
             var first = await service.AddAsync(Input("first", isDefault: true));
             var second = await service.AddAsync(Input("second", isDefault: true));
-            Assert.False((await database.MainDb.Queryable<TenantGameAppPackageEntity>().InSingleAsync(first.Id)).IsDefault);
-            Assert.True((await database.MainDb.Queryable<TenantGameAppPackageEntity>().InSingleAsync(second.Id)).IsDefault);
+            Assert.False((await database.MainDb.Queryable<GameAppPackageEntity>().InSingleAsync(first.Id)).IsDefault);
+            Assert.True((await database.MainDb.Queryable<GameAppPackageEntity>().InSingleAsync(second.Id)).IsDefault);
             var childInput = Input("child");
             childInput.ParentPackageId = first.Id;
             var child = await service.AddAsync(childInput);
@@ -61,8 +61,8 @@ public sealed class MainDatabasePackageServiceTests
 
     private static GameAppPackageService CreateService(ClientApiTestDb database)
     {
-        database.InitTenantTables(typeof(TenantGameAppPackageEntity), typeof(GlobalPlatformEntity),
-            typeof(GlobalChannelDefinitionEntity), typeof(TenantChannelDefinitionEntity));
+        database.InitBusinessTables(typeof(GameAppPackageEntity), typeof(GlobalPlatformEntity),
+            typeof(GlobalChannelDefinitionEntity), typeof(ChannelDefinitionEntity));
         database.MainDb.Insertable(new GlobalPlatformEntity
         {
             Id = 1, Name = "android", Description = "Android", IsEnabled = true, IsDeleted = false,
@@ -73,9 +73,9 @@ public sealed class MainDatabasePackageServiceTests
             IsEnabled = true, IsDeleted = false,
         }).ExecuteCommand();
         return new GameAppPackageService(
-            new SqlSugarRepository<TenantGameAppPackageEntity> { Context = database.MainDb },
+            new SqlSugarRepository<GameAppPackageEntity> { Context = database.MainDb },
             new SqlSugarRepository<GlobalPlatformEntity> { Context = database.MainDb },
             new SqlSugarRepository<GlobalChannelDefinitionEntity> { Context = database.MainDb },
-            new SqlSugarRepository<TenantChannelDefinitionEntity> { Context = database.MainDb });
+            new SqlSugarRepository<ChannelDefinitionEntity> { Context = database.MainDb });
     }
 }

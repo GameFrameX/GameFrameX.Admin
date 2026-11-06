@@ -24,7 +24,6 @@ public partial class GlobalMenuSeedData
                 Type = MenuTypeEnum.Dir,
                 Name = "dashboard",
                 Path = "/dashboard",
-                AppScope = MenuAppScopeEnum.Console,
                 Component = "Layout",
                 Redirect = null,
                 Permission = null,
@@ -42,7 +41,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1706499485,
                 UpdateTime = 1706793684,
                 SuperAdminOnly = false,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -53,7 +52,6 @@ public partial class GlobalMenuSeedData
                 Type = MenuTypeEnum.Menu,
                 Name = "home",
                 Path = "/dashboard/home",
-                AppScope = MenuAppScopeEnum.Console,
                 Component = "/dashboard/home/index",
                 Redirect = null,
                 Permission = null,
@@ -71,7 +69,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1706499485,
                 UpdateTime = 1706793684,
                 SuperAdminOnly = false,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
             new()
@@ -99,7 +97,7 @@ public partial class GlobalMenuSeedData
                 CreatedTime = 1783612800,
                 UpdateTime = 1783612800,
                 SuperAdminOnly = false,
-                AllowTenantWhenSuperAdminOnly = false,
+                AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
         };

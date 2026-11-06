@@ -1,4 +1,4 @@
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 using GameFrameX.Foundation.Idempotency;
 using GameFrameX.Foundation.Utility;
 using SqlSugar;
@@ -30,19 +30,19 @@ public sealed class AntiCheatEventIdempotencyStore : IIdempotencyStore
     /// </summary>
     public const string RequestDigest = "anti-cheat-key-replay";
 
-    private readonly SqlSugarRepository<TenantGameAntiCheatEventEntity> _repository;
+    private readonly SqlSugarRepository<GameAntiCheatEventEntity> _repository;
 
     /// <summary>
     /// 占位模板：携带全部业务字段（含 IdempotencyKey），占位成功即事件入账。
     /// </summary>
-    private readonly TenantGameAntiCheatEventEntity _eventTemplate;
+    private readonly GameAntiCheatEventEntity _eventTemplate;
 
     /// <summary>
     /// 初始化存储。
     /// </summary>
     /// <param name="repository">事件仓储（租户路由）。</param>
     /// <param name="eventTemplate">占位模板（业务字段已就绪，IdempotencyKey 以占位记录为准覆盖）。</param>
-    public AntiCheatEventIdempotencyStore(SqlSugarRepository<TenantGameAntiCheatEventEntity> repository, TenantGameAntiCheatEventEntity eventTemplate)
+    public AntiCheatEventIdempotencyStore(SqlSugarRepository<GameAntiCheatEventEntity> repository, GameAntiCheatEventEntity eventTemplate)
     {
         _repository = repository;
         _eventTemplate = eventTemplate;

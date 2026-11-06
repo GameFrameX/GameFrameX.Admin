@@ -135,7 +135,7 @@ public sealed class SystemWechatPayEntity : EntityBasic
     /// 关联微信用户
     /// </summary>
     [Navigate(NavigateType.OneToOne, nameof(OpenId))]
-    public TenantWechatUserEntity TenantWechatUserEntity { get; set; } = null!;
+    public WechatUserEntity WechatUserEntity { get; set; } = null!;
 
     /// <summary>
     /// 子商户号

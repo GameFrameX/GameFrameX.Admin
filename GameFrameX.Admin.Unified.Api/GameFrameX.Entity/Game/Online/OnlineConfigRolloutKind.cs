@@ -19,22 +19,22 @@ namespace GameFrameX.Entity.Game.Online;
 public enum OnlineConfigRolloutKind
 {
     /// <summary>
-    /// 远程配置（ConfigKey = <c>TenantGameAppRemoteConfigEntity.Id</c>）。
+    /// 远程配置（ConfigKey = <c>GameAppRemoteConfigEntity.Id</c>）。
     /// </summary>
     [Description("远程配置")] RemoteConfig = 1,
 
     /// <summary>
-    /// 玩家公告（ConfigKey = <c>TenantGameAnnouncementEntity.Id</c>）。
+    /// 玩家公告（ConfigKey = <c>GameAnnouncementEntity.Id</c>）。
     /// </summary>
     [Description("玩家公告")] Announcement = 2,
 
     /// <summary>
-    /// 设备分组（ConfigKey = <c>TenantDeviceGroupEntity.Id</c>）。
+    /// 设备分组（ConfigKey = <c>DeviceGroupEntity.Id</c>）。
     /// </summary>
     [Description("设备分组")] DeviceGroup = 3,
 
     /// <summary>
-    /// 定时任务（ConfigKey = <c>TenantGameTimeJobEntity.Id</c>）。
+    /// 定时任务（ConfigKey = <c>GameTimeJobEntity.Id</c>）。
     /// </summary>
     [Description("定时任务")] ScheduledTask = 4,
 }

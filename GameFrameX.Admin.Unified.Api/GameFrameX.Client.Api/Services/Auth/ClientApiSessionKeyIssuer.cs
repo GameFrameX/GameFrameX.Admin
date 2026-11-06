@@ -1,23 +1,23 @@
 using GameFrameX.Application.ClientDelivery.Security.SessionKey;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 
 namespace GameFrameX.Client.Api.Services.Auth;
 
 /// <summary>
 /// 登录期会话密钥签发服务。
-/// <para>每次登录生成一把 Kid 会话密钥写入会话密钥环（<see cref="TenantSessionKeyEntity"/>，AES-256-GCM 信封对称密钥），
+/// <para>每次登录生成一把 Kid 会话密钥写入会话密钥环（<see cref="SessionKeyEntity"/>，AES-256-GCM 信封对称密钥），
 /// NotBefore=now、Expire 与 AccessToken 到期时间对齐，随登录响应一次性回显 Kid/Secret。</para>
 /// <para>Kid 使用随机标识；Secret 复用管理面 <see cref="SessionKeyService"/> 的安全随机源。</para>
 /// </summary>
 public sealed class ClientApiSessionKeyIssuer
 {
-    private readonly SqlSugarRepository<TenantSessionKeyEntity> _repository;
+    private readonly SqlSugarRepository<SessionKeyEntity> _repository;
 
     /// <summary>
     ///
     /// </summary>
     /// <param name="repository">会话密钥仓储（主库）。</param>
-    public ClientApiSessionKeyIssuer(SqlSugarRepository<TenantSessionKeyEntity> repository)
+    public ClientApiSessionKeyIssuer(SqlSugarRepository<SessionKeyEntity> repository)
     {
         _repository = repository;
     }
@@ -37,10 +37,10 @@ public sealed class ClientApiSessionKeyIssuer
                          .ExecuteCommandAsync();
 
         var plainSecret = SessionKeyService.GenerateSecret();
-        var entity = new TenantSessionKeyEntity
+        var entity = new SessionKeyEntity
         {
             Kid = Guid.NewGuid().ToString("N"),
-            Secret = GameFrameX.Core.Service.Tenant.TenantSecretCrypto.Encrypt(plainSecret) ?? string.Empty,
+            Secret = GameFrameX.Core.Service.Business.SecretCrypto.Encrypt(plainSecret) ?? string.Empty,
             NotBeforeTime = now,
             ExpireTime = expireAtUnixSeconds,
             IsEnabled = true,

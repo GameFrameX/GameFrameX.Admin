@@ -30,11 +30,11 @@ public sealed class AdminEndpointParameterShapeContractTests
         // 裸 List<long> 入参（批量删除参数配置；整改须收敛 BatchDeleteConfigRequest 并同步前端）
         "SystemConfigService.BatchDeleteConfigAsync",
         // 文件 + query 元数据混合绑定（文件上传特例；整改需配套前端 multipart 适配）
-        "TenantFileService.UploadFileAsync",
+        "FileService.UploadFileAsync",
         // 3 散参（message/title/isHtml，平台系统邮件发送）
         "SystemMessageService.SendEmailAsync",
-        // Entity 直传入参（TenantUserEntity，与 GFX-770 已整改的 TenantWechatUser 同性质越权攻击面）
-        "TenantUserService.UpdateBaseInfoAsync",
+        // Entity 直传入参（UserEntity，与 GFX-770 已整改的 WechatUser 同性质越权攻击面）
+        "UserService.UpdateBaseInfoAsync",
     };
 
     [Fact]

@@ -3,9 +3,9 @@ using GameFrameX.Application.ClientDelivery.GameAppAssetPackageVersion.Dto;
 using GameFrameX.Core.BaseInputOutput;
 using GameFrameX.Core.Exceptions;
 using GameFrameX.Core.SqlSugar;
-using GameFrameX.Entity.Tenant.Game.App;
-using GameFrameX.Entity.Tenant.Game.Release;
-using GameFrameX.Entity.Tenant.Game.Resource;
+using GameFrameX.Entity.Business.Game.App;
+using GameFrameX.Entity.Business.Game.Release;
+using GameFrameX.Entity.Business.Game.Resource;
 using GameFrameX.Foundation.Orm.Entity;
 using SqlSugar;
 
@@ -29,7 +29,7 @@ public sealed class GameAppAssetPackageVersionSelectTests : IDisposable
         SqlSugarUnifiedConfig.ConfigureBaseSettings(config);
         _db = new SqlSugarScope(config);
         SqlSugarUnifiedConfig.ConfigureBaseFilters(_db);
-        _db.CodeFirst.InitTables(typeof(TenantGameAppPackageEntity), typeof(TenantGameAppAssetPackageVersionEntity));
+        _db.CodeFirst.InitTables(typeof(GameAppPackageEntity), typeof(GameAppAssetPackageVersionEntity));
     }
 
     [Fact]
@@ -64,10 +64,10 @@ public sealed class GameAppAssetPackageVersionSelectTests : IDisposable
     private async Task<List<BaseSelectPageResponse>> BuildSelectAsync(long? appPackageId, string? searchKey = null)
     {
         var service = new GameAppAssetPackageVersionService(
-            Repository<TenantGameAppAssetPackageVersionEntity>(),
-            Repository<TenantGameAppAssetPackageVersionHistoryEntity>(),
-            Repository<TenantGameAppPackageEntity>(),
-            Repository<TenantGameAppAssetPackageEntity>());
+            Repository<GameAppAssetPackageVersionEntity>(),
+            Repository<GameAppAssetPackageVersionHistoryEntity>(),
+            Repository<GameAppPackageEntity>(),
+            Repository<GameAppAssetPackageEntity>());
 
         return await service.SelectAsync(new PageGameAppAssetPackageVersionSelectRequest
         {
@@ -85,7 +85,7 @@ public sealed class GameAppAssetPackageVersionSelectTests : IDisposable
     {
         var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
-        await _db.Insertable(new TenantGameAppPackageEntity
+        await _db.Insertable(new GameAppPackageEntity
         {
             Id = 1,
             Name = "pkg-a",
@@ -99,7 +99,7 @@ public sealed class GameAppAssetPackageVersionSelectTests : IDisposable
             IsDeleted = false,
         }).ExecuteCommandAsync();
 
-        await _db.Insertable(new TenantGameAppPackageEntity
+        await _db.Insertable(new GameAppPackageEntity
         {
             Id = 2,
             Name = "pkg-b",
@@ -113,7 +113,7 @@ public sealed class GameAppAssetPackageVersionSelectTests : IDisposable
             IsDeleted = false,
         }).ExecuteCommandAsync();
 
-        await _db.Insertable(new TenantGameAppPackageEntity
+        await _db.Insertable(new GameAppPackageEntity
         {
             Id = 3,
             Name = "pkg-c",
@@ -127,7 +127,7 @@ public sealed class GameAppAssetPackageVersionSelectTests : IDisposable
             IsDeleted = false,
         }).ExecuteCommandAsync();
 
-        await _db.Insertable(new TenantGameAppAssetPackageVersionEntity
+        await _db.Insertable(new GameAppAssetPackageVersionEntity
         {
             Id = 11,
             Channel = "default",
@@ -143,7 +143,7 @@ public sealed class GameAppAssetPackageVersionSelectTests : IDisposable
             IsDeleted = false,
         }).ExecuteCommandAsync();
 
-        await _db.Insertable(new TenantGameAppAssetPackageVersionEntity
+        await _db.Insertable(new GameAppAssetPackageVersionEntity
         {
             Id = 12,
             Channel = "default",
@@ -159,7 +159,7 @@ public sealed class GameAppAssetPackageVersionSelectTests : IDisposable
             IsDeleted = false,
         }).ExecuteCommandAsync();
 
-        await _db.Insertable(new TenantGameAppAssetPackageVersionEntity
+        await _db.Insertable(new GameAppAssetPackageVersionEntity
         {
             Id = 13,
             Channel = "default",
@@ -175,7 +175,7 @@ public sealed class GameAppAssetPackageVersionSelectTests : IDisposable
             IsDeleted = false,
         }).ExecuteCommandAsync();
 
-        await _db.Insertable(new TenantGameAppAssetPackageVersionEntity
+        await _db.Insertable(new GameAppAssetPackageVersionEntity
         {
             Id = 21,
             Channel = "default",

@@ -15,6 +15,6 @@ public interface IGamePenaltyEnforcementService
     /// <param name="targetId">对象标识（AccountId / RoleId / 设备标识 / IP）。</param>
     /// <param name="areaId">当前区服 Id；null 时仅命中 AreaId 为空的处罚。</param>
     /// <returns>命中返回处罚实体（含原因），未命中返回 null。</returns>
-    Task<Entity.Tenant.Game.TenantGamePenaltyEntity> GetLoginBlockingPenaltyAsync(
+    Task<Entity.Business.Game.GamePenaltyEntity> GetLoginBlockingPenaltyAsync(
         PenaltyTargetTypeEnum targetType, string targetId, long? areaId = null);
 }

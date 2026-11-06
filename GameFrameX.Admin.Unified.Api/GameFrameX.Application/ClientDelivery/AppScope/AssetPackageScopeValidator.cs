@@ -1,4 +1,4 @@
-using GameFrameX.Entity.Tenant.Game.Resource;
+using GameFrameX.Entity.Business.Game.Resource;
 
 namespace GameFrameX.Application.ClientDelivery.AppScope;
 
@@ -8,7 +8,7 @@ public static class AssetPackageScopeValidator
     /// <summary>
     /// 校验版本引用的资源包定义存在。
     /// </summary>
-    public static async Task ValidateAsync(string? assetPackageName, ISugarQueryable<TenantGameAppAssetPackageEntity> assetPackageQuery)
+    public static async Task ValidateAsync(string? assetPackageName, ISugarQueryable<GameAppAssetPackageEntity> assetPackageQuery)
     {
         var normalizedName = assetPackageName?.Trim() ?? string.Empty;
         if (normalizedName.Length == 0)

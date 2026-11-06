@@ -10,16 +10,16 @@
  */
 
 import {
-  AddTenantGameOnlinePlayerSegmentRequest,
+  AddGameOnlinePlayerSegmentRequest,
   GameOnlinePlayerSegmentAddPostData,
   GameOnlinePlayerSegmentDeletePostData,
   GameOnlinePlayerSegmentDetailGetData,
   GameOnlinePlayerSegmentPagePostData,
   GameOnlinePlayerSegmentSyncOnlinePostData,
   GameOnlinePlayerSegmentUpdatePostData,
-  PageTenantGameOnlinePlayerSegmentRequest,
+  PageGameOnlinePlayerSegmentRequest,
   SyncPlayerSegmentOnlineRequest,
-  UpdateTenantGameOnlinePlayerSegmentRequest,
+  UpdateGameOnlinePlayerSegmentRequest,
 } from "./types";
 import {
   BaseDeleteRequest,
@@ -43,7 +43,7 @@ export class GameOnlinePlayerSegment<SecurityDataType = unknown> {
    * @request POST:/api/gameOnlinePlayerSegment/add
    */
   gameOnlinePlayerSegmentAddPost = (
-    data: AddTenantGameOnlinePlayerSegmentRequest,
+    data: AddGameOnlinePlayerSegmentRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameOnlinePlayerSegmentAddPostData, any>({
@@ -108,7 +108,7 @@ export class GameOnlinePlayerSegment<SecurityDataType = unknown> {
    * @request POST:/api/gameOnlinePlayerSegment/page
    */
   gameOnlinePlayerSegmentPagePost = (
-    data: PageTenantGameOnlinePlayerSegmentRequest,
+    data: PageGameOnlinePlayerSegmentRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameOnlinePlayerSegmentPagePostData, any>({
@@ -148,7 +148,7 @@ export class GameOnlinePlayerSegment<SecurityDataType = unknown> {
    * @request POST:/api/gameOnlinePlayerSegment/update
    */
   gameOnlinePlayerSegmentUpdatePost = (
-    data: UpdateTenantGameOnlinePlayerSegmentRequest,
+    data: UpdateGameOnlinePlayerSegmentRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameOnlinePlayerSegmentUpdatePostData, any>({

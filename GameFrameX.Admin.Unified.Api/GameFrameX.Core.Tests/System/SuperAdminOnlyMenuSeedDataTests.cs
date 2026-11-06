@@ -22,7 +22,7 @@ public class SuperAdminOnlyMenuSeedDataTests
         Assert.All(protectedChildren, menu =>
         {
             Assert.Contains(menu.Id, protectedMenuIds);
-            Assert.False(menu.AllowTenantWhenSuperAdminOnly);
+            Assert.False(menu.AllowAdminWhenSuperAdminOnly);
         });
         Assert.Contains(protectedChildren, menu => menu.Key == "route:develop");
         Assert.Contains(protectedChildren, menu => menu.Key == "route:doc");
@@ -44,7 +44,7 @@ public class SuperAdminOnlyMenuSeedDataTests
 
         var definition = MenuSeedCatalog.AllDefinitions.Single(u => u.Key == "route:platformCaptchaConfig");
         Assert.True(definition.SuperAdminOnly);
-        Assert.False(definition.AllowTenantWhenSuperAdminOnly);
+        Assert.False(definition.AllowAdminWhenSuperAdminOnly);
     }
 
     [Fact]
@@ -62,6 +62,6 @@ public class SuperAdminOnlyMenuSeedDataTests
 
         var definition = MenuSeedCatalog.AllDefinitions.Single(u => u.Key == "route:platformRateLimitConfig");
         Assert.True(definition.SuperAdminOnly);
-        Assert.False(definition.AllowTenantWhenSuperAdminOnly);
+        Assert.False(definition.AllowAdminWhenSuperAdminOnly);
     }
 }

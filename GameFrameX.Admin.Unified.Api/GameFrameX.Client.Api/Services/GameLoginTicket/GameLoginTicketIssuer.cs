@@ -1,5 +1,5 @@
 using System.Security.Claims;
-using GameFrameX.Client.Api.Services.ClientApiTenantOptions;
+using GameFrameX.Client.Api.Services.ClientApiOptions;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 
@@ -12,12 +12,12 @@ namespace GameFrameX.Client.Api.Services.GameLoginTicket;
 public sealed class GameLoginTicketIssuer
 {
     private readonly IGameLoginTicketKeyResolver _keyResolver;
-    private readonly IClientApiTenantOptionsProvider _optionsProvider;
+    private readonly IClientApiOptionsProvider _optionsProvider;
     private readonly JsonWebTokenHandler _handler = new() { SetDefaultTimesOnTokenCreation = false, };
 
     /// <summary>
     /// </summary>
-    public GameLoginTicketIssuer(IGameLoginTicketKeyResolver keyResolver, IClientApiTenantOptionsProvider optionsProvider)
+    public GameLoginTicketIssuer(IGameLoginTicketKeyResolver keyResolver, IClientApiOptionsProvider optionsProvider)
     {
         _keyResolver = keyResolver;
         _optionsProvider = optionsProvider;

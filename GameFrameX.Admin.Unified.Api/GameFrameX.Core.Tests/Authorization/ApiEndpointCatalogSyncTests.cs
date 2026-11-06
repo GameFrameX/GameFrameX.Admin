@@ -33,8 +33,8 @@ public sealed class ApiEndpointCatalogSyncTests
         var sourceFile = FindSourceFile(nameof(ApiEndpointCatalogSync));
         var source = File.ReadAllText(sourceFile.FullName);
 
-        Assert.DoesNotContain("TenantRoleMenuEntity", source, StringComparison.Ordinal);
-        Assert.DoesNotContain("SyncTenantDefaultRoleMenusAsync", source, StringComparison.Ordinal);
+        Assert.DoesNotContain("RoleMenuEntity", source, StringComparison.Ordinal);
+        Assert.DoesNotContain("SyncDefaultRoleMenusAsync", source, StringComparison.Ordinal);
         Assert.DoesNotContain("BuildRoleMenus", source, StringComparison.Ordinal);
     }
 

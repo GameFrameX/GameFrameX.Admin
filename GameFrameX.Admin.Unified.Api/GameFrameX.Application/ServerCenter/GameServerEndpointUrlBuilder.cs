@@ -7,7 +7,7 @@ namespace GameFrameX.Application.ServerCenter;
 /// <para>所有 Admin / Client API 调游戏服 HTTP 的代码必须经此构造器，显式声明 <see cref="GameServerEndpointKindEnum"/> 能力类型，不得散落硬编码 <c>/game/api</c>。</para>
 /// <para>规则：</para>
 /// <list type="number">
-/// <item><description><see cref="TenantGameAreaEntity.HttpManageUrl"/> 作为根地址，必须非空且为合法 http/https 绝对 URI，否则抛 <see cref="InvalidOperationException"/>。</description></item>
+/// <item><description><see cref="GameAreaEntity.HttpManageUrl"/> 作为根地址，必须非空且为合法 http/https 绝对 URI，否则抛 <see cref="InvalidOperationException"/>。</description></item>
 /// <item><description>按 <c>kind</c> 选择区服对应前缀；对应前缀为空时直接抛 <see cref="InvalidOperationException"/>，拒绝拼出根地址调用（空表示该区服未开放对应能力；C150 §3.2：空表示 Admin 不构造 GM/控制 URL）。</description></item>
 /// <item><description>OnlineAdmin 前缀（默认 <c>online/admin</c>）空时同上抛异常拒绝构造（C339 / vault:C2 S1.7：空表示该区服未开放 Online 管理）。</description></item>
 /// <item><description>前缀去除首尾 <c>/</c>，action 去除开头 <c>/</c>，拼接为 <c>{root}/{prefix}/{action}</c>。</description></item>
@@ -24,13 +24,13 @@ public static class GameServerEndpointUrlBuilder
     /// <summary>
     /// 按 <c>kind</c> 构造区服游戏服 HTTP 调用 URL。
     /// </summary>
-    /// <param name="area">目标区服，提供 <see cref="TenantGameAreaEntity.HttpManageUrl"/> 根地址与各能力前缀。</param>
+    /// <param name="area">目标区服，提供 <see cref="GameAreaEntity.HttpManageUrl"/> 根地址与各能力前缀。</param>
     /// <param name="kind">接口能力类型；决定使用哪个前缀字段。</param>
     /// <param name="action">Server HTTP action 名（snake_case，如 <c>req_player_send_item</c>）。</param>
     /// <returns>形如 <c>{root}/{prefix}/{action}</c> 的绝对 URL。</returns>
     /// <exception cref="ArgumentNullException"><paramref name="area"/> 为 null。</exception>
     /// <exception cref="InvalidOperationException">根地址缺失/非法，或对应能力前缀为空。</exception>
-    public static string Build(TenantGameAreaEntity area, GameServerEndpointKindEnum kind, string action)
+    public static string Build(GameAreaEntity area, GameServerEndpointKindEnum kind, string action)
     {
         if (area == null)
         {
@@ -63,7 +63,7 @@ public static class GameServerEndpointUrlBuilder
     /// <summary>
     /// 解析 <c>kind</c> 对应前缀；任一能力前缀为空即抛 <see cref="InvalidOperationException"/>，拒绝构造调用 URL。
     /// </summary>
-    private static string ResolvePrefix(TenantGameAreaEntity area, GameServerEndpointKindEnum kind)
+    private static string ResolvePrefix(GameAreaEntity area, GameServerEndpointKindEnum kind)
     {
         switch (kind)
         {

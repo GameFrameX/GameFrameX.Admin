@@ -1,7 +1,7 @@
 using GameFrameX.Core.Option;
 using GameFrameX.Application.SeedData.Client;
-using GameFrameX.Entity.Tenant.Device;
-using GameFrameX.Entity.Tenant.Game.Release;
+using GameFrameX.Entity.Business.Device;
+using GameFrameX.Entity.Business.Game.Release;
 using GameFrameX.Application.SeedData.System;
 using GameFrameX.Core.Cache;
 using GameFrameX.Core.Tests.System;
@@ -10,11 +10,11 @@ using GameFrameX.Core.Enum;
 using GameFrameX.Core.Const.MenuSeed;
 using GameFrameX.Application.Platform.TimeJob.GameTimeJob.Dto;
 using GameFrameX.Entity.Enum;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 using GameFrameX.Entity.Global;
 using GameFrameX.Entity.System;
 using GameFrameX.Entity.Log;
-using GameFrameX.Entity.Tenant.ObjectStorage;
+using GameFrameX.Entity.Business.ObjectStorage;
 using SqlSugar;
 
 namespace GameFrameX.Core.Tests.SqlSugar;
@@ -25,23 +25,23 @@ public class SqlSugarDatabaseInitializationTests : IDisposable
     private static readonly Type[] InitializationTypes =
     {
         typeof(SystemUserEntity),
-        typeof(TenantUserEntity),
+        typeof(UserEntity),
         typeof(GlobalMenuEntity),
         typeof(SystemConfigEntity),
         typeof(GlobalConfigEntity),
         typeof(GlobalDictionaryTypeEntity),
         typeof(GlobalDictionaryDataEntity),
         typeof(GlobalChannelDefinitionEntity),
-        typeof(TenantChannelDefinitionEntity),
-        typeof(TenantGameGoodsEntity),
+        typeof(ChannelDefinitionEntity),
+        typeof(GameGoodsEntity),
         typeof(SystemLogVisitEntity),
         typeof(SystemLogOperationEntity),
         typeof(SystemLogVisitArchiveEntity),
         typeof(SystemLogOperationArchiveEntity),
         typeof(SystemLogDiffEntity),
-        typeof(TenantLogVisitEntity),
-        typeof(TenantLogOperationEntity),
-        typeof(TenantLogDiffEntity),
+        typeof(LogVisitEntity),
+        typeof(LogOperationEntity),
+        typeof(LogDiffEntity),
     };
 
     private readonly List<string> _dbPaths = new();
@@ -54,21 +54,21 @@ public class SqlSugarDatabaseInitializationTests : IDisposable
         {
             var config = CreateConfig("main");
             config.SeedSettings.EnableInitSeed = true;
-            var types = new[] { typeof(GlobalMenuEntity), typeof(GlobalMenuSeedData), typeof(TenantChannelDefinitionEntity),
-                typeof(BusinessChannelSeedData), typeof(TenantGameAppDeviceGroupEntity), typeof(GameAppDeviceGroupSeedData),
-                typeof(TenantGameAppVersionDefinitionEntity), typeof(GameAppVersionDefinitionSeedData) };
+            var types = new[] { typeof(GlobalMenuEntity), typeof(GlobalMenuSeedData), typeof(ChannelDefinitionEntity),
+                typeof(BusinessChannelSeedData), typeof(GameAppDeviceGroupEntity), typeof(GameAppDeviceGroupSeedData),
+                typeof(GameAppVersionDefinitionEntity), typeof(GameAppVersionDefinitionSeedData) };
             SqlSugarSetup.InitDatabase(scope, config, types);
             var database = scope.GetConnectionScope("main");
-            var channel = Assert.Single(database.Queryable<TenantChannelDefinitionEntity>().ToList());
+            var channel = Assert.Single(database.Queryable<ChannelDefinitionEntity>().ToList());
             Assert.Equal("business-default", channel.Code);
             Assert.True(channel.IsDefault);
             Assert.True(channel.IsEnabled);
-            Assert.Single(database.Queryable<TenantGameAppDeviceGroupEntity>().ToList());
-            Assert.Equal(new[] { "1.0.0", "default" }, database.Queryable<TenantGameAppVersionDefinitionEntity>().OrderBy(row => row.Name).Select(row => row.Name).ToArray());
-            database.Updateable<TenantChannelDefinitionEntity>().SetColumns(row => new TenantChannelDefinitionEntity
+            Assert.Single(database.Queryable<GameAppDeviceGroupEntity>().ToList());
+            Assert.Equal(new[] { "1.0.0", "default" }, database.Queryable<GameAppVersionDefinitionEntity>().OrderBy(row => row.Name).Select(row => row.Name).ToArray());
+            database.Updateable<ChannelDefinitionEntity>().SetColumns(row => new ChannelDefinitionEntity
                 { Name = "运维修改", IsEnabled = false, IsDeleted = true }).Where(row => row.Id == channel.Id).ExecuteCommand();
             SqlSugarSetup.InitDatabase(scope, config, types);
-            var actual = Assert.Single(database.Queryable<TenantChannelDefinitionEntity>().Filter(null, true).ToList());
+            var actual = Assert.Single(database.Queryable<ChannelDefinitionEntity>().Filter(null, true).ToList());
             Assert.Equal("运维修改", actual.Name);
             Assert.False(actual.IsEnabled);
             Assert.True(actual.IsDeleted);
@@ -86,14 +86,14 @@ public class SqlSugarDatabaseInitializationTests : IDisposable
             var userSeeds = typeof(SystemUserSeedData).Assembly.GetTypes().Where(type => !type.IsAbstract
                 && type.GetInterfaces().Any(contract => contract.IsGenericType
                     && contract.GetGenericTypeDefinition() == typeof(ISqlSugarEntitySeedData<>)
-                    && new[] { typeof(TenantUserEntity), typeof(SystemUserEntity) }.Contains(contract.GetGenericArguments()[0]))).ToArray();
-            var types = userSeeds.Concat(new[] { typeof(SystemUserEntity), typeof(TenantUserEntity), typeof(GlobalMenuEntity), typeof(GlobalMenuSeedData) }).ToArray();
+                    && new[] { typeof(UserEntity), typeof(SystemUserEntity) }.Contains(contract.GetGenericArguments()[0]))).ToArray();
+            var types = userSeeds.Concat(new[] { typeof(SystemUserEntity), typeof(UserEntity), typeof(GlobalMenuEntity), typeof(GlobalMenuSeedData) }).ToArray();
             SqlSugarSetup.InitDatabase(scope, config, types);
             var database = scope.GetConnectionScope("main");
             Assert.Equal("superadmin", Assert.Single(database.Queryable<SystemUserEntity>().ToList()).Account);
-            Assert.Empty(database.Queryable<TenantUserEntity>().ToList());
-            var existing = new TenantUserEntity { Id = 5001, Account = "existing-operator", Password = "existing-hash" };
-            foreach (var property in typeof(TenantUserEntity).GetProperties().Where(property => property.PropertyType == typeof(string) && property.CanWrite))
+            Assert.Empty(database.Queryable<UserEntity>().ToList());
+            var existing = new UserEntity { Id = 5001, Account = "existing-operator", Password = "existing-hash" };
+            foreach (var property in typeof(UserEntity).GetProperties().Where(property => property.PropertyType == typeof(string) && property.CanWrite))
             {
                 if (property.GetValue(existing) == null)
                 {
@@ -103,7 +103,7 @@ public class SqlSugarDatabaseInitializationTests : IDisposable
 
             database.Insertable(existing).ExecuteCommand();
             SqlSugarSetup.InitDatabase(scope, config, types);
-            Assert.Equal("existing-hash", Assert.Single(database.Queryable<TenantUserEntity>().ToList()).Password);
+            Assert.Equal("existing-hash", Assert.Single(database.Queryable<UserEntity>().ToList()).Password);
         }
     }
 
@@ -117,18 +117,18 @@ public class SqlSugarDatabaseInitializationTests : IDisposable
         {
             var config = CreateConfig("main");
             config.SeedSettings.EnableInitSeed = true;
-            var types = new[] { typeof(GlobalMenuEntity), typeof(GlobalMenuSeedData), typeof(TenantObjectStorageConfigEntity) };
+            var types = new[] { typeof(GlobalMenuEntity), typeof(GlobalMenuSeedData), typeof(ObjectStorageConfigEntity) };
             SqlSugarSetup.InitDatabase(scope, config, types);
             var database = scope.GetConnectionScope("main");
-            var initial = database.Queryable<TenantObjectStorageConfigEntity>().Single();
+            var initial = database.Queryable<ObjectStorageConfigEntity>().Single();
             Assert.Equal("local", initial.Provider);
             Assert.True(initial.IsEnabled);
-            database.Updateable<TenantObjectStorageConfigEntity>()
-                .SetColumns(row => new TenantObjectStorageConfigEntity { IsEnabled = enabled, IsDeleted = deleted, Remark = "保留运维配置" })
+            database.Updateable<ObjectStorageConfigEntity>()
+                .SetColumns(row => new ObjectStorageConfigEntity { IsEnabled = enabled, IsDeleted = deleted, Remark = "保留运维配置" })
                 .Where(row => row.Id == initial.Id).ExecuteCommand();
 
             SqlSugarSetup.InitDatabase(scope, config, types);
-            var existing = database.Queryable<TenantObjectStorageConfigEntity>().Filter(null, true).ToList();
+            var existing = database.Queryable<ObjectStorageConfigEntity>().Filter(null, true).ToList();
             var actual = Assert.Single(existing);
             Assert.Equal(initial.Id, actual.Id);
             Assert.Equal(enabled, actual.IsEnabled);
@@ -173,17 +173,17 @@ public class SqlSugarDatabaseInitializationTests : IDisposable
         Assert.True(TableExists(mainDb, typeof(GlobalDictionaryTypeEntity)));
         Assert.True(TableExists(mainDb, typeof(GlobalDictionaryDataEntity)));
         Assert.True(TableExists(mainDb, typeof(GlobalChannelDefinitionEntity)));
-        Assert.True(TableExists(mainDb, typeof(TenantUserEntity)));
-        Assert.True(TableExists(mainDb, typeof(TenantChannelDefinitionEntity)));
-        Assert.True(TableExists(mainDb, typeof(TenantGameGoodsEntity)));
+        Assert.True(TableExists(mainDb, typeof(UserEntity)));
+        Assert.True(TableExists(mainDb, typeof(ChannelDefinitionEntity)));
+        Assert.True(TableExists(mainDb, typeof(GameGoodsEntity)));
         Assert.True(TableExists(mainDb, typeof(SystemLogVisitEntity)));
         Assert.True(TableExists(mainDb, typeof(SystemLogOperationEntity)));
         Assert.True(TableExists(mainDb, typeof(SystemLogVisitArchiveEntity)));
         Assert.True(TableExists(mainDb, typeof(SystemLogOperationArchiveEntity)));
         Assert.True(TableExists(mainDb, typeof(SystemLogDiffEntity)));
-        Assert.True(TableExists(mainDb, typeof(TenantLogVisitEntity)));
-        Assert.True(TableExists(mainDb, typeof(TenantLogOperationEntity)));
-        Assert.True(TableExists(mainDb, typeof(TenantLogDiffEntity)));
+        Assert.True(TableExists(mainDb, typeof(LogVisitEntity)));
+        Assert.True(TableExists(mainDb, typeof(LogOperationEntity)));
+        Assert.True(TableExists(mainDb, typeof(LogDiffEntity)));
         Assert.Equal("system_log_operation_entity", TableName(mainDb, typeof(SystemLogOperationEntity)));
         Assert.Equal("system_user_entity", TableName(mainDb, typeof(SystemUserEntity)));
         Assert.Equal("global_menu_entity", TableName(mainDb, typeof(GlobalMenuEntity)));
@@ -217,18 +217,17 @@ public class SqlSugarDatabaseInitializationTests : IDisposable
         var isAffixColumn = ColumnName(mainDb, typeof(GlobalMenuEntity), nameof(GlobalMenuEntity.IsAffix));
         var orderNoColumn = ColumnName(mainDb, typeof(GlobalMenuEntity), nameof(GlobalMenuEntity.OrderNo));
         var superAdminOnlyColumn = ColumnName(mainDb, typeof(GlobalMenuEntity), nameof(GlobalMenuEntity.SuperAdminOnly));
-        var allowTenantColumn = ColumnName(mainDb, typeof(GlobalMenuEntity), nameof(GlobalMenuEntity.AllowTenantWhenSuperAdminOnly));
+        var allowColumn = ColumnName(mainDb, typeof(GlobalMenuEntity), nameof(GlobalMenuEntity.AllowAdminWhenSuperAdminOnly));
         var isEnabledColumn = ColumnName(mainDb, typeof(GlobalMenuEntity), nameof(GlobalMenuEntity.IsEnabled));
         var isDeletedColumn = ColumnName(mainDb, typeof(GlobalMenuEntity), nameof(GlobalMenuEntity.IsDeleted));
         var createdIdColumn = ColumnName(mainDb, typeof(GlobalMenuEntity), nameof(GlobalMenuEntity.CreatedId));
         var createdTimeColumn = ColumnName(mainDb, typeof(GlobalMenuEntity), nameof(GlobalMenuEntity.CreatedTime));
         var createdNameColumn = ColumnName(mainDb, typeof(GlobalMenuEntity), nameof(GlobalMenuEntity.CreatedName));
         var updateCountColumn = ColumnName(mainDb, typeof(GlobalMenuEntity), nameof(GlobalMenuEntity.UpdateCount));
-        var appScopeColumn = ColumnName(mainDb, typeof(GlobalMenuEntity), nameof(GlobalMenuEntity.AppScope));
         mainDb.Ado.ExecuteCommand(
-            $"INSERT INTO {tableName} ({idColumn}, {pidColumn}, {keyColumn}, {titleColumn}, {typeColumn}, {isHideColumn}, {isIframeColumn}, {isKeepAliveColumn}, {isAffixColumn}, {orderNoColumn}, {superAdminOnlyColumn}, {allowTenantColumn}, {isEnabledColumn}, {isDeletedColumn}, {createdIdColumn}, {createdTimeColumn}, {createdNameColumn}, {updateCountColumn}, {appScopeColumn}) " +
-            "VALUES (@legacyId, @pid, @legacyKey, @legacyTitle, @type, @falseValue, @falseValue, @trueValue, @falseValue, @orderNo, @falseValue, @falseValue, @trueValue, @falseValue, @createdId, @createdTime, @createdName, @updateCount, @appScope), " +
-            "(@autoId, @pid, @autoKey, @autoTitle, @type, @trueValue, @falseValue, @trueValue, @falseValue, @orderNo, @falseValue, @falseValue, @trueValue, @falseValue, @createdId, @createdTime, @createdName, @updateCount, @appScope)",
+            $"INSERT INTO {tableName} ({idColumn}, {pidColumn}, {keyColumn}, {titleColumn}, {typeColumn}, {isHideColumn}, {isIframeColumn}, {isKeepAliveColumn}, {isAffixColumn}, {orderNoColumn}, {superAdminOnlyColumn}, {allowColumn}, {isEnabledColumn}, {isDeletedColumn}, {createdIdColumn}, {createdTimeColumn}, {createdNameColumn}, {updateCountColumn}) " +
+            "VALUES (@legacyId, @pid, @legacyKey, @legacyTitle, @type, @falseValue, @falseValue, @trueValue, @falseValue, @orderNo, @falseValue, @falseValue, @trueValue, @falseValue, @createdId, @createdTime, @createdName, @updateCount), " +
+            "(@autoId, @pid, @autoKey, @autoTitle, @type, @trueValue, @falseValue, @trueValue, @falseValue, @orderNo, @falseValue, @falseValue, @trueValue, @falseValue, @createdId, @createdTime, @createdName, @updateCount)",
             new SugarParameter("@legacyId", legacyId),
             new SugarParameter("@pid", 0),
             new SugarParameter("@legacyKey", "legacy:menu"),
@@ -243,8 +242,7 @@ public class SqlSugarDatabaseInitializationTests : IDisposable
             new SugarParameter("@createdName", "test"),
             new SugarParameter("@updateCount", 0),
             new SugarParameter("@trueValue", true),
-            new SugarParameter("@falseValue", false),
-            new SugarParameter("@appScope", (int)MenuAppScopeEnum.Console));
+            new SugarParameter("@falseValue", false));
 
         ResetMenuSeedCatalogDbCache();
         MenuSeedCatalog.LoadFromDb(mainDb);
@@ -274,11 +272,11 @@ public class SqlSugarDatabaseInitializationTests : IDisposable
         using var scope = CreateScope("tenant_1003");
         var tenantDb = scope.GetConnectionScope("tenant_1003");
 
-        var sql = tenantDb.Queryable<TenantGameTimeJobEntity>()
+        var sql = tenantDb.Queryable<GameTimeJobEntity>()
                           .Select<GameTimeJobResponse>()
                           .ToSql();
 
-        Assert.Contains("tenant_game_time_job_entity", sql.Key, StringComparison.Ordinal);
+        Assert.Contains("game_time_job_entity", sql.Key, StringComparison.Ordinal);
     }
 
     public void Dispose()

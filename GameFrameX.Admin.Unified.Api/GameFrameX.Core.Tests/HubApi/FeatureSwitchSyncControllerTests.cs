@@ -7,7 +7,7 @@ using GameFrameX.Core.SqlSugar;
 using GameFrameX.Core.Extension;
 using GameFrameX.Core.Tests.ClientApi;
 using GameFrameX.Entity.System;
-using GameFrameX.Entity.Tenant.Game.FeatureSwitch;
+using GameFrameX.Entity.Business.Game.FeatureSwitch;
 using GameFrameX.Hub.Api.Const;
 using GameFrameX.Hub.Api.Controllers;
 using GameFrameX.Hub.Api.Dto.FeatureSwitchSync;
@@ -32,7 +32,7 @@ public sealed class FeatureSwitchSyncControllerTests : IDisposable
     private const long CredentialAppId = 2091001;
 
     private readonly string _mainDbPath = Path.Combine(Path.GetTempPath(), $"gfx_hub_switch_main_{Guid.NewGuid():N}.db");
-    private readonly string _tenantDbPath = Path.Combine(Path.GetTempPath(), $"gfx_hub_switch_tenant_{Guid.NewGuid():N}.db");
+    private readonly string _dbPath = Path.Combine(Path.GetTempPath(), $"gfx_hub_switch_{Guid.NewGuid():N}.db");
     private readonly SqlSugarScope _mainDb;
 
     public FeatureSwitchSyncControllerTests()
@@ -46,13 +46,13 @@ public sealed class FeatureSwitchSyncControllerTests : IDisposable
         SqlSugarUnifiedConfig.ConfigureBaseSettings(config);
         _mainDb = new SqlSugarScope(config);
         var provider = _mainDb;
-        provider.CodeFirst.InitTables(typeof(TenantGameAppFeatureSwitchEntity));
+        provider.CodeFirst.InitTables(typeof(GameAppFeatureSwitchEntity));
     }
 
     private FeatureSwitchSyncController CreateController(out ISqlSugarClient tenantDb, bool includeContext = true)
     {
         var provider = _mainDb;
-        var repository = new Repository<TenantGameAppFeatureSwitchEntity>(_mainDb);
+        var repository = new Repository<GameAppFeatureSwitchEntity>(_mainDb);
         tenantDb = provider;
         var controller = new FeatureSwitchSyncController(new FeatureSwitchDeliveryResolver(repository));
         var context = new DefaultHttpContext();
@@ -60,7 +60,7 @@ public sealed class FeatureSwitchSyncControllerTests : IDisposable
         return controller;
     }
 
-    private static TenantGameAppFeatureSwitchEntity Row(
+    private static GameAppFeatureSwitchEntity Row(
         long id,
         string switchKey,
         string valueJson = "{}",
@@ -69,7 +69,7 @@ public sealed class FeatureSwitchSyncControllerTests : IDisposable
         string platform = GameDimensionConst.PlatformDefault,
         int rolloutPercent = 100)
     {
-        return new TenantGameAppFeatureSwitchEntity
+        return new GameAppFeatureSwitchEntity
         {
             Id = id,
             SwitchKey = switchKey,
@@ -208,8 +208,8 @@ public sealed class FeatureSwitchSyncControllerTests : IDisposable
     {
         var path = new PathString("/api/FeatureSwitchSync/Sync");
 
-        Assert.True(TenantGameAppOpenAccessAuthMiddleware.IsRouteInScopes(path, "[\"" + OpenAccessScopeConst.FeatureSwitchSync + "\"]"));
-        Assert.False(TenantGameAppOpenAccessAuthMiddleware.IsRouteInScopes(path, "[\"PackageBuildReport\"]"));
+        Assert.True(GameAppOpenAccessAuthMiddleware.IsRouteInScopes(path, "[\"" + OpenAccessScopeConst.FeatureSwitchSync + "\"]"));
+        Assert.False(GameAppOpenAccessAuthMiddleware.IsRouteInScopes(path, "[\"PackageBuildReport\"]"));
     }
 
     /// <summary>
@@ -219,7 +219,7 @@ public sealed class FeatureSwitchSyncControllerTests : IDisposable
     [Fact]
     public void OpenAccessSignature_V2CanonicalMessage_VerifiesForFeatureSwitchSync()
     {
-        var credential = new GameFrameX.Entity.Tenant.Game.App.TenantGameAppOpenAccessEntity
+        var credential = new GameFrameX.Entity.Business.Game.App.GameAppOpenAccessEntity
         {
             AccessKey = "ak-feature-switch-001",
             AccessSecret = "GFX-C347-FEATURE-SWITCH-SECRET",
@@ -230,15 +230,15 @@ public sealed class FeatureSwitchSyncControllerTests : IDisposable
             Encoding.UTF8.GetBytes(credential.AccessSecret),
             GameFrameX.Core.SignatureAuth.CanonicalRequestBuilder.BuildV2Message("POST", "/api/FeatureSwitchSync/Sync", string.Empty, credential.AccessKey, 1755244800, "n-c347", body));
 
-        Assert.True(TenantGameAppOpenAccessAuthMiddleware.VerifySignature(credential, "POST", "/api/FeatureSwitchSync/Sync", string.Empty, 1755244800, "n-c347", body, provided));
-        Assert.False(TenantGameAppOpenAccessAuthMiddleware.VerifySignature(credential, "POST", "/api/FeatureSwitchSync/Sync", string.Empty, 1755244800, "n-c347",
+        Assert.True(GameAppOpenAccessAuthMiddleware.VerifySignature(credential, "POST", "/api/FeatureSwitchSync/Sync", string.Empty, 1755244800, "n-c347", body, provided));
+        Assert.False(GameAppOpenAccessAuthMiddleware.VerifySignature(credential, "POST", "/api/FeatureSwitchSync/Sync", string.Empty, 1755244800, "n-c347",
             Encoding.UTF8.GetBytes("{\"version\":\"tampered\"}"), provided));
     }
 
     public void Dispose()
     {
         _mainDb.Dispose();
-        foreach (var path in new[] { _mainDbPath, _tenantDbPath, })
+        foreach (var path in new[] { _mainDbPath, _dbPath, })
         {
             if (File.Exists(path))
             {

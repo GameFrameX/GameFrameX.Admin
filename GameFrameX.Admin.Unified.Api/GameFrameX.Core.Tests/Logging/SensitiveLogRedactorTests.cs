@@ -70,7 +70,7 @@ public sealed class SensitiveLogRedactorTests
     [Fact]
     public void EndpointMetadataAndOrdinaryParameters_RemainReadable()
     {
-        const string value = "{\"ControllerName\":\"TenantSessionKeyEntity\",\"ActionName\":\"SetupSuperAdminPassword\",\"Keyword\":\"ordinary\"}";
+        const string value = "{\"ControllerName\":\"SessionKeyEntity\",\"ActionName\":\"SetupSuperAdminPassword\",\"Keyword\":\"ordinary\"}";
         Assert.Equal(value, SensitiveLogRedactor.Redact(value));
     }
 

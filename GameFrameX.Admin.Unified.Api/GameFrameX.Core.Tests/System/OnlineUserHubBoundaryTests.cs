@@ -13,7 +13,7 @@ public class OnlineUserHubBoundaryTests
                                         .SelectMany(u => u.GetParameters())
                                         .Select(u => u.ParameterType);
 
-        Assert.DoesNotContain(typeof(SqlSugarRepository<TenantOnlineUserEntity>), constructorParameterTypes);
+        Assert.DoesNotContain(typeof(SqlSugarRepository<OnlineUserEntity>), constructorParameterTypes);
     }
 
     [Fact]

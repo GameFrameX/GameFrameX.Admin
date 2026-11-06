@@ -9,7 +9,7 @@ public sealed class PlatformPasswordPolicySettings
 {
     /// <summary>
     /// 是否开启密码强度验证。默认关闭，等价历史 StrongPassword 默认值（关闭）。
-    /// 保存后同 Host 即时生效（TenantUserService.ChangePwdAsync 读 CryptogramUtility 镜像）。
+    /// 保存后同 Host 即时生效（UserService.ChangePwdAsync 读 CryptogramUtility 镜像）。
     /// </summary>
     public bool StrongPassword { get; set; } = false;
 

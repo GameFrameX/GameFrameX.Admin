@@ -10,8 +10,8 @@
  */
 
 import {
-  AddTenantGameUserEntityByMailRequest,
-  DeleteTenantGameUserEntityRequest,
+  AddGameUserEntityByMailRequest,
+  DeleteGameUserEntityRequest,
   GameUserAddByMailPostData,
   GameUserAddPostData,
   GameUserBanPostData,
@@ -22,8 +22,8 @@ import {
   GameUserSelectStringPostData,
   GameUserUnsealPostData,
   GameUserUpdatePostData,
-  PageTenantGameUserEntityRequest,
-  UpdateTenantGameUserEntityRequest,
+  PageGameUserEntityRequest,
+  UpdateGameUserEntityRequest,
 } from "./types";
 import {
   BaseDeleteRequest,
@@ -48,7 +48,7 @@ export class GameUser<SecurityDataType = unknown> {
    * @request POST:/api/gameUser/add
    */
   gameUserAddPost = (
-    data: AddTenantGameUserEntityByMailRequest,
+    data: AddGameUserEntityByMailRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameUserAddPostData, any>({
@@ -68,7 +68,7 @@ export class GameUser<SecurityDataType = unknown> {
    * @request POST:/api/gameUser/addByMail
    */
   gameUserAddByMailPost = (
-    data: AddTenantGameUserEntityByMailRequest,
+    data: AddGameUserEntityByMailRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameUserAddByMailPostData, any>({
@@ -88,7 +88,7 @@ export class GameUser<SecurityDataType = unknown> {
    * @request POST:/api/gameUser/ban
    */
   gameUserBanPost = (
-    data: DeleteTenantGameUserEntityRequest,
+    data: DeleteGameUserEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameUserBanPostData, any>({
@@ -149,7 +149,7 @@ export class GameUser<SecurityDataType = unknown> {
    * @request POST:/api/gameUser/page
    */
   gameUserPagePost = (
-    data: PageTenantGameUserEntityRequest,
+    data: PageGameUserEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameUserPagePostData, any>({
@@ -209,7 +209,7 @@ export class GameUser<SecurityDataType = unknown> {
    * @request POST:/api/gameUser/unseal
    */
   gameUserUnsealPost = (
-    data: DeleteTenantGameUserEntityRequest,
+    data: DeleteGameUserEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameUserUnsealPostData, any>({
@@ -228,7 +228,7 @@ export class GameUser<SecurityDataType = unknown> {
    * @request POST:/api/gameUser/update
    */
   gameUserUpdatePost = (
-    data: UpdateTenantGameUserEntityRequest,
+    data: UpdateGameUserEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameUserUpdatePostData, any>({

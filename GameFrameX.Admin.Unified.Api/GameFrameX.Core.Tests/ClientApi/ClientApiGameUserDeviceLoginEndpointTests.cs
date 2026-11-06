@@ -5,7 +5,7 @@ using GameFrameX.Client.Api.Services;
 using GameFrameX.Application.PlayerCenter.GameUser;
 using GameFrameX.Core.Enum;
 using GameFrameX.Entity.Enum;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 
 namespace GameFrameX.Core.Tests.ClientApi;
 
@@ -31,7 +31,7 @@ public sealed class ClientApiGameUserDeviceLoginEndpointTests
 
             var root = ClientApiResultReader.Read(result);
             var data = ClientApiResultReader.Data(root);
-            var saved = await db.TenantDb.Queryable<TenantGameUserEntity>().FirstAsync(u => u.DeviceId == "device-c320-a1");
+            var saved = await db.TenantDb.Queryable<GameUserEntity>().FirstAsync(u => u.DeviceId == "device-c320-a1");
             Assert.Equal(0, ClientApiResultReader.Code(root));
             Assert.True(data.GetProperty("IsNewRegister").GetBoolean());
             Assert.Equal("Device", data.GetProperty("Provider").GetString());
@@ -62,7 +62,7 @@ public sealed class ClientApiGameUserDeviceLoginEndpointTests
             var secondRoot = ClientApiResultReader.Read(second);
             var firstData = ClientApiResultReader.Data(firstRoot);
             var secondData = ClientApiResultReader.Data(secondRoot);
-            var count = await db.TenantDb.Queryable<TenantGameUserEntity>().CountAsync(u => u.DeviceId == "device-c320-a2");
+            var count = await db.TenantDb.Queryable<GameUserEntity>().CountAsync(u => u.DeviceId == "device-c320-a2");
             Assert.Equal(0, ClientApiResultReader.Code(secondRoot));
             // 二次登录找号复用既有账号：IsNewRegister=false 且不重复建号
             Assert.True(firstData.GetProperty("IsNewRegister").GetBoolean());
@@ -128,12 +128,12 @@ public sealed class ClientApiGameUserDeviceLoginEndpointTests
 
     private static GameUserController CreateController(ClientApiTestDb db)
     {
-        db.InitTenantTables(typeof(TenantGameUserEntity), typeof(TenantGameUserEmailEntity), typeof(TenantSessionKeyEntity));
+        db.InitBusinessTables(typeof(GameUserEntity), typeof(GameUserEmailEntity), typeof(SessionKeyEntity));
         return new GameUserController(
-            db.Repository<TenantGameUserEntity>(),
+            db.Repository<GameUserEntity>(),
             CreateTokenIssuer(),
-            new ClientApiSessionKeyIssuer(db.Repository<TenantSessionKeyEntity>()),
-            db.Repository<TenantGameUserEmailEntity>(),
+            new ClientApiSessionKeyIssuer(db.Repository<SessionKeyEntity>()),
+            db.Repository<GameUserEmailEntity>(),
             new FakeGamePenaltyEnforcementService(),
             new GameUserPasswordService());
     }

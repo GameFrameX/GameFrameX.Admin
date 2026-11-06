@@ -2,7 +2,7 @@ using GameFrameX.Application.ServerCenter.Online;
 using GameFrameX.Core.Const;
 using GameFrameX.Core.Service.User;
 using GameFrameX.Core.SqlSugar;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 using GameFrameX.Foundation.Orm.Entity;
 using Microsoft.AspNetCore.Http;
 using SqlSugar;
@@ -10,7 +10,7 @@ using SqlSugar;
 namespace GameFrameX.Core.Tests.Online.Asset;
 
 // C340 / GFX-752（vault:C4）资产域 Service 单测共享基座：SQLite 专属 ConfigId 隔离 + IOnlineServerClient fake +
-// TenantGameApp/Area 作用域种子 + 当前用户上下文构造。各 Service 测试只关心断言本身，不重复构造基座。
+// GameApp/Area 作用域种子 + 当前用户上下文构造。各 Service 测试只关心断言本身，不重复构造基座。
 //
 // C283 命名对齐守护：本文件以「共享基座」单一类型 `OnlineAssetTestSupport` 立名；
 // IOnlineServerClient fake 与 OnlineCall 记录类都内嵌为私有嵌套类型，避免平级多类型破规。
@@ -72,9 +72,9 @@ internal static class OnlineAssetTestSupport
         return new CurrentUserContext(accessor);
     }
 
-    public static TenantGameAreaEntity NewArea(long id, long appId, long now)
+    public static GameAreaEntity NewArea(long id, long appId, long now)
     {
-        return new TenantGameAreaEntity
+        return new GameAreaEntity
         {
             Id = id,
             Name = $"area-{id}",

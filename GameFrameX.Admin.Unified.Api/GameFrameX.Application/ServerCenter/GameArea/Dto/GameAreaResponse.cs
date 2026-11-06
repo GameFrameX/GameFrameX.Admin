@@ -5,7 +5,7 @@ namespace GameFrameX.Application.ServerCenter.GameArea.Dto;
 /// <summary>
 /// 游戏区服输出参数
 /// </summary>
-public class GameAreaResponse : IBasePageResponse<Entity.Tenant.Game.TenantGameAreaEntity>
+public class GameAreaResponse : IBasePageResponse<Entity.Business.Game.GameAreaEntity>
 {
     /// <summary>
     /// Id

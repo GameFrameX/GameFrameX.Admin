@@ -5,7 +5,7 @@ namespace GameFrameX.Application.PlayerCenter.GamePenalty.Dto;
 /// <summary>
 /// 处罚输出参数（包含全部审计字段，供后台只读展示）。
 /// </summary>
-public class GamePenaltyResponse : IBasePageResponse<Entity.Tenant.Game.TenantGamePenaltyEntity>
+public class GamePenaltyResponse : IBasePageResponse<Entity.Business.Game.GamePenaltyEntity>
 {
     /// <summary>
     /// Id

@@ -10,15 +10,15 @@
  */
 
 import {
-  AddTenantGameAdvertisementRewardEntityRequest,
+  AddGameAdvertisementRewardEntityRequest,
   GameAdvertisementRewardAddPostData,
   GameAdvertisementRewardDeletePostData,
   GameAdvertisementRewardDetailGetData,
   GameAdvertisementRewardExportPostData,
   GameAdvertisementRewardPagePostData,
   GameAdvertisementRewardUpdatePostData,
-  PageTenantGameAdvertisementRewardEntityRequest,
-  UpdateTenantGameAdvertisementRewardEntityRequest,
+  PageGameAdvertisementRewardEntityRequest,
+  UpdateGameAdvertisementRewardEntityRequest,
 } from "./types";
 import {
   BaseDeleteRequest,
@@ -42,7 +42,7 @@ export class GameAdvertisementReward<SecurityDataType = unknown> {
    * @request POST:/api/gameAdvertisementReward/add
    */
   gameAdvertisementRewardAddPost = (
-    data: AddTenantGameAdvertisementRewardEntityRequest,
+    data: AddGameAdvertisementRewardEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameAdvertisementRewardAddPostData, any>({
@@ -107,7 +107,7 @@ export class GameAdvertisementReward<SecurityDataType = unknown> {
    * @request POST:/api/gameAdvertisementReward/export
    */
   gameAdvertisementRewardExportPost = (
-    data: PageTenantGameAdvertisementRewardEntityRequest,
+    data: PageGameAdvertisementRewardEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameAdvertisementRewardExportPostData, any>({
@@ -127,7 +127,7 @@ export class GameAdvertisementReward<SecurityDataType = unknown> {
    * @request POST:/api/gameAdvertisementReward/page
    */
   gameAdvertisementRewardPagePost = (
-    data: PageTenantGameAdvertisementRewardEntityRequest,
+    data: PageGameAdvertisementRewardEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameAdvertisementRewardPagePostData, any>({
@@ -147,7 +147,7 @@ export class GameAdvertisementReward<SecurityDataType = unknown> {
    * @request POST:/api/gameAdvertisementReward/update
    */
   gameAdvertisementRewardUpdatePost = (
-    data: UpdateTenantGameAdvertisementRewardEntityRequest,
+    data: UpdateGameAdvertisementRewardEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameAdvertisementRewardUpdatePostData, any>({

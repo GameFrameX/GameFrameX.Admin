@@ -1,8 +1,8 @@
 using GameFrameX.Application.ClientDelivery.AppScope;
 using GameFrameX.Application.ClientDelivery.GameAppAssetPackageVersion.Dto;
 using GameFrameX.Application.ClientDelivery.GameAppAssetPackageVersionHistory.Dto;
-using GameFrameX.Entity.Tenant.Game.App;
-using GameFrameX.Entity.Tenant.Game.Resource;
+using GameFrameX.Entity.Business.Game.App;
+using GameFrameX.Entity.Business.Game.Resource;
 
 
 namespace GameFrameX.Application.ClientDelivery.GameAppAssetPackageVersion;
@@ -11,17 +11,17 @@ namespace GameFrameX.Application.ClientDelivery.GameAppAssetPackageVersion;
 /// 资源包版本服务
 /// </summary>
 [ApiDescriptionSettings(ClientConst.GroupName, Order = 100)]
-public class GameAppAssetPackageVersionService : GenericCrudService<Entity.Tenant.Game.Release.TenantGameAppAssetPackageVersionEntity, AddGameAppAssetPackageVersionRequest, UpdateGameAppAssetPackageVersionRequest, GameAppAssetPackageVersionResponse, PageGameAppAssetPackageVersionRequest>
+public class GameAppAssetPackageVersionService : GenericCrudService<Entity.Business.Game.Release.GameAppAssetPackageVersionEntity, AddGameAppAssetPackageVersionRequest, UpdateGameAppAssetPackageVersionRequest, GameAppAssetPackageVersionResponse, PageGameAppAssetPackageVersionRequest>
 {
-    protected readonly SqlSugarRepository<Entity.Tenant.Game.Release.TenantGameAppAssetPackageVersionHistoryEntity> RepositoryAssetPackageVersionHistory;
-    private readonly SqlSugarRepository<TenantGameAppPackageEntity> _packageRepository;
-    private readonly SqlSugarRepository<TenantGameAppAssetPackageEntity> _assetPackageRepository;
+    protected readonly SqlSugarRepository<Entity.Business.Game.Release.GameAppAssetPackageVersionHistoryEntity> RepositoryAssetPackageVersionHistory;
+    private readonly SqlSugarRepository<GameAppPackageEntity> _packageRepository;
+    private readonly SqlSugarRepository<GameAppAssetPackageEntity> _assetPackageRepository;
 
     public GameAppAssetPackageVersionService(
-        SqlSugarRepository<Entity.Tenant.Game.Release.TenantGameAppAssetPackageVersionEntity> service,
-        SqlSugarRepository<Entity.Tenant.Game.Release.TenantGameAppAssetPackageVersionHistoryEntity> rep2,
-        SqlSugarRepository<TenantGameAppPackageEntity> packageRepository,
-        SqlSugarRepository<TenantGameAppAssetPackageEntity> assetPackageRepository) : base(service)
+        SqlSugarRepository<Entity.Business.Game.Release.GameAppAssetPackageVersionEntity> service,
+        SqlSugarRepository<Entity.Business.Game.Release.GameAppAssetPackageVersionHistoryEntity> rep2,
+        SqlSugarRepository<GameAppPackageEntity> packageRepository,
+        SqlSugarRepository<GameAppAssetPackageEntity> assetPackageRepository) : base(service)
     {
         RepositoryAssetPackageVersionHistory = rep2;
         _packageRepository = packageRepository;
@@ -143,10 +143,10 @@ public class GameAppAssetPackageVersionService : GenericCrudService<Entity.Tenan
     /// <summary>
     /// 新增后自动插入版本历史记录
     /// </summary>
-    protected override async Task OnAddedAsync(AddGameAppAssetPackageVersionRequest input, Entity.Tenant.Game.Release.TenantGameAppAssetPackageVersionEntity entity)
+    protected override async Task OnAddedAsync(AddGameAppAssetPackageVersionRequest input, Entity.Business.Game.Release.GameAppAssetPackageVersionEntity entity)
     {
         var historyInput = new AddGameAppAssetPackageVersionHistoryRequest();
-        var historyEntity = historyInput.Adapt<Entity.Tenant.Game.Release.TenantGameAppAssetPackageVersionHistoryEntity>();
+        var historyEntity = historyInput.Adapt<Entity.Business.Game.Release.GameAppAssetPackageVersionHistoryEntity>();
         historyEntity.CreatedTime = entity.CreatedTime;
         historyEntity.CreatedId = entity.CreatedId;
         historyEntity.CreatedName = entity.CreatedName;
@@ -159,7 +159,7 @@ public class GameAppAssetPackageVersionService : GenericCrudService<Entity.Tenan
     /// <summary>
     /// 更新后自动插入版本历史记录（仅当版本号变化时）
     /// </summary>
-    protected override async Task OnUpdatedAsync(UpdateGameAppAssetPackageVersionRequest input, Entity.Tenant.Game.Release.TenantGameAppAssetPackageVersionEntity before, Entity.Tenant.Game.Release.TenantGameAppAssetPackageVersionEntity after)
+    protected override async Task OnUpdatedAsync(UpdateGameAppAssetPackageVersionRequest input, Entity.Business.Game.Release.GameAppAssetPackageVersionEntity before, Entity.Business.Game.Release.GameAppAssetPackageVersionEntity after)
     {
         if (input.ResourceVersion == before.ResourceVersion)
         {
@@ -167,7 +167,7 @@ public class GameAppAssetPackageVersionService : GenericCrudService<Entity.Tenan
         }
 
         var historyInput = new AddGameAppAssetPackageVersionHistoryRequest();
-        var entity = historyInput.Adapt<Entity.Tenant.Game.Release.TenantGameAppAssetPackageVersionHistoryEntity>();
+        var entity = historyInput.Adapt<Entity.Business.Game.Release.GameAppAssetPackageVersionHistoryEntity>();
         entity.CreatedTime = after.CreatedTime;
         entity.CreatedId = after.CreatedId;
         entity.CreatedName = after.CreatedName;
@@ -212,7 +212,7 @@ public class GameAppAssetPackageVersionService : GenericCrudService<Entity.Tenan
         }
 
         var historyInput = new AddGameAppAssetPackageVersionHistoryRequest();
-        var entity = historyInput.Adapt<Entity.Tenant.Game.Release.TenantGameAppAssetPackageVersionHistoryEntity>();
+        var entity = historyInput.Adapt<Entity.Business.Game.Release.GameAppAssetPackageVersionHistoryEntity>();
         entity.VersionId = input.Id;
         entity.CreatedId = repositoryAssetPackageVersionHistory.CreatedId;
         entity.CreatedName = repositoryAssetPackageVersionHistory.CreatedName;

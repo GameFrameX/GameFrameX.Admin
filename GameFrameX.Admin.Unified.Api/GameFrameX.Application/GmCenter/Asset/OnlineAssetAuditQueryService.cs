@@ -8,7 +8,7 @@ namespace GameFrameX.Application.GmCenter.Asset;
 /// <summary>
 /// Online 资产审计查询服务。路由前缀 /api/onlineAssetAuditQuery（change C340 / vault:C4 S3.7）。
 /// <para>命令审计行（操作者/命令类型/目标玩家/时间窗）实时透传 Online；Admin 侧审计另有
-/// MonitorLogging 全 action 自动落库（TenantLogOperationEntity），本服务覆盖「按 Online 命令语义反查」的展示半边。</para>
+/// MonitorLogging 全 action 自动落库（LogOperationEntity），本服务覆盖「按 Online 命令语义反查」的展示半边。</para>
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 134)]
 public class OnlineAssetAuditQueryService : IAdminApiController

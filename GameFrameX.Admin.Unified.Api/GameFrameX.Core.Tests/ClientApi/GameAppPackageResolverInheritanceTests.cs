@@ -4,7 +4,7 @@ using GameFrameX.Core.Enum;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Entity.Enum;
 using GameFrameX.Entity.System;
-using GameFrameX.Entity.Tenant.Game.App;
+using GameFrameX.Entity.Business.Game.App;
 using SqlSugar;
 
 namespace GameFrameX.Core.Tests.ClientApi;
@@ -137,7 +137,7 @@ public sealed class GameAppPackageResolverInheritanceTests : IDisposable
 
         var provider = scope;
         var tenantDb = provider;
-        tenantDb.CodeFirst.InitTables(typeof(TenantGameAppPackageEntity));
+        tenantDb.CodeFirst.InitTables(typeof(GameAppPackageEntity));
 
         return new ResolverFixture(scope, provider, tenantDb, tenantId);
     }
@@ -199,7 +199,7 @@ public sealed class GameAppPackageResolverInheritanceTests : IDisposable
 
         public void UpdatePackage(long id, string? packageName = null, long? parentPackageId = null, InheritanceModeEnum? mode = null, long updateTime = 0)
         {
-            var existing = _tenantDb.Queryable<TenantGameAppPackageEntity>().First(p => p.Id == id);
+            var existing = _tenantDb.Queryable<GameAppPackageEntity>().First(p => p.Id == id);
             if (existing == null)
             {
                 return;
@@ -224,9 +224,9 @@ public sealed class GameAppPackageResolverInheritanceTests : IDisposable
             _tenantDb.Updateable(existing).ExecuteCommand();
         }
 
-        private TenantGameAppPackageEntity BuildEntity(long id, string packageName, long? parentPackageId, PackageKindEnum kind, InheritanceModeEnum mode, bool isEnabled, long updateTime)
+        private GameAppPackageEntity BuildEntity(long id, string packageName, long? parentPackageId, PackageKindEnum kind, InheritanceModeEnum mode, bool isEnabled, long updateTime)
         {
-            return new TenantGameAppPackageEntity
+            return new GameAppPackageEntity
             {
                 Id = id,
                 Name = $"pkg-{id}",

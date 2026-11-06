@@ -3,7 +3,7 @@ using GameFrameX.Entity.Enum;
 namespace GameFrameX.Application.GmCenter.Social.Dto;
 
 /// <summary>
-/// 处罚联动命令输入参数（高危端点，权限码 onlinePenaltyLinkCommand:execute 仅同步 TenantAdmin）。
+/// 处罚联动命令输入参数（高危端点，权限码 onlinePenaltyLinkCommand:execute 仅同步 Admin）。
 /// <para>作用域从处罚事实源行推导（AreaId 有值 = 单区服联动，null = 主库全部区服逐一联动）。</para>
 /// </summary>
 public class OnlinePenaltyLinkRequest

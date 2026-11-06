@@ -6,9 +6,9 @@ namespace GameFrameX.Application.ClientDelivery.GameAppRemoteConfigMode;
 /// 远程配置模式定义管理服务
 /// </summary>
 [ApiDescriptionSettings(ClientConst.GroupName, Order = 100)]
-public class GameAppRemoteConfigModeService : GenericCrudService<Entity.Tenant.Game.RemoteConfig.TenantGameAppRemoteConfigModeEntity, AddGameAppRemoteConfigModeRequest, UpdateGameAppRemoteConfigModeRequest, GameAppRemoteConfigModeResponse, PageGameAppRemoteConfigModeRequest>
+public class GameAppRemoteConfigModeService : GenericCrudService<Entity.Business.Game.RemoteConfig.GameAppRemoteConfigModeEntity, AddGameAppRemoteConfigModeRequest, UpdateGameAppRemoteConfigModeRequest, GameAppRemoteConfigModeResponse, PageGameAppRemoteConfigModeRequest>
 {
-    public GameAppRemoteConfigModeService(SqlSugarRepository<Entity.Tenant.Game.RemoteConfig.TenantGameAppRemoteConfigModeEntity> repository) : base(repository)
+    public GameAppRemoteConfigModeService(SqlSugarRepository<Entity.Business.Game.RemoteConfig.GameAppRemoteConfigModeEntity> repository) : base(repository)
     {
     }
 

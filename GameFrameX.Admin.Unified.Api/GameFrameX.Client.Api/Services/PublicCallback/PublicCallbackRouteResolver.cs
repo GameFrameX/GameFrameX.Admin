@@ -1,4 +1,4 @@
-using GameFrameX.Entity.Tenant.Game.App;
+using GameFrameX.Entity.Business.Game.App;
 using SqlSugar;
 
 namespace GameFrameX.Client.Api.Services.PublicCallback;
@@ -58,7 +58,7 @@ public sealed class PublicCallbackRouteResolver
 
     private bool PackageMatches(long packageId)
     {
-        return _db.Queryable<TenantGameAppPackageEntity>()
+        return _db.Queryable<GameAppPackageEntity>()
                   .Any(package => package.Id == packageId && package.IsEnabled == true);
     }
 

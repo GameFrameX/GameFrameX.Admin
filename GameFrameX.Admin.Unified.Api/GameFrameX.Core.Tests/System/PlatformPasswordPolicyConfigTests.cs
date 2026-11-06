@@ -67,7 +67,7 @@ public class PlatformPasswordPolicyConfigTests
 
     /// <summary>
     /// 动态生效证据：Provider.RefreshAsync 内部把快照镜像同步到 CryptogramUtility 静态属性
-    /// （这里直接验证 ApplyPasswordPolicy 镜像语义，TenantUserService.ChangePwdAsync 读 CryptogramUtility 静态属性）。
+    /// （这里直接验证 ApplyPasswordPolicy 镜像语义，UserService.ChangePwdAsync 读 CryptogramUtility 静态属性）。
     /// </summary>
     [Fact]
     public void ApplyPasswordPolicy_MirrorsSnapshotToCryptogramUtility()
@@ -91,7 +91,7 @@ public class PlatformPasswordPolicyConfigTests
 
     /// <summary>
     /// 改密强度校验动态生效：SuperAdmin 保存 StrongPassword=true + 新正则后，Provider 镜像同步，
-    /// TenantUserService.ChangePwdAsync 读 CryptogramUtility.StrongPassword=true 并用镜像正则校验新密码。
+    /// UserService.ChangePwdAsync 读 CryptogramUtility.StrongPassword=true 并用镜像正则校验新密码。
     /// </summary>
     [Fact]
     public void ChangePwd_StrengthCheck_HonorsMirroredSnapshot()
@@ -103,7 +103,7 @@ public class PlatformPasswordPolicyConfigTests
         {
             CryptogramUtility.ApplyPasswordPolicy(true, "^[A-Z]+$", "必须大写");
 
-            // 模拟 TenantUserService.ChangePwdAsync 门控（CryptogramUtility.StrongPassword + Regex.IsMatch）
+            // 模拟 UserService.ChangePwdAsync 门控（CryptogramUtility.StrongPassword + Regex.IsMatch）
             var gateEnabled = CryptogramUtility.StrongPassword;
             var weakPasswordPasses = Regex.IsMatch("abc", CryptogramUtility.PasswordStrengthValidation);
             var strongPasswordPasses = Regex.IsMatch("ABC", CryptogramUtility.PasswordStrengthValidation);

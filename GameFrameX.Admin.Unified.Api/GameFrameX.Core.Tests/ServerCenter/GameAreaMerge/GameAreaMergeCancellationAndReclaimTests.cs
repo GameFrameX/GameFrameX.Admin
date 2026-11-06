@@ -2,7 +2,7 @@ using GameFrameX.Application.ServerCenter.GameAreaMerge.Dto;
 using GameFrameX.Core.Enum.Errors;
 using GameFrameX.Core.Exceptions;
 using GameFrameX.Entity.Enum;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 
 namespace GameFrameX.Core.Tests.ServerCenter.GameAreaMerge;
 
@@ -45,8 +45,8 @@ public sealed class GameAreaMergeCancellationAndReclaimTests
             }
             else if (state == GameAreaMergePlanStatus.Failed)
             {
-                await context.Database.Updateable<TenantGameAreaMergePlanEntity>()
-                    .SetColumns(item => new TenantGameAreaMergePlanEntity
+                await context.Database.Updateable<GameAreaMergePlanEntity>()
+                    .SetColumns(item => new GameAreaMergePlanEntity
                     {
                         Status = GameAreaMergePlanStatus.Failed,
                         FailedTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
@@ -74,8 +74,8 @@ public sealed class GameAreaMergeCancellationAndReclaimTests
         using (var context = new GameAreaMergeTestContext())
         {
             var plan = await context.CreateAsync();
-            await context.Database.Updateable<TenantGameAreaMergePlanEntity>()
-                .SetColumns(item => new TenantGameAreaMergePlanEntity
+            await context.Database.Updateable<GameAreaMergePlanEntity>()
+                .SetColumns(item => new GameAreaMergePlanEntity
                 {
                     Status = state,
                     ExecutionStartedTime = enteredExecution ? 1 : null,
@@ -97,7 +97,7 @@ public sealed class GameAreaMergeCancellationAndReclaimTests
             var plan = await context.CreateAsync();
             await context.Service.CancelAsync(new() { Id = plan.Id, Reason = "重新选择区服" });
             // 测试进程的 SqlSugar fallback generator 在同一 SQLite 连接上会复用 ID；删除已核验的取消行只为释放该测试 ID。
-            await context.Database.Deleteable<TenantGameAreaMergePlanEntity>()
+            await context.Database.Deleteable<GameAreaMergePlanEntity>()
                 .Where(item => item.Id == plan.Id)
                 .ExecuteCommandAsync();
 
@@ -205,8 +205,8 @@ public sealed class GameAreaMergeCancellationAndReclaimTests
         using (var context = new GameAreaMergeTestContext())
         {
             var plan = await context.CreateAsync();
-            await context.Database.Updateable<TenantGameAreaMergePlanEntity>()
-                .SetColumns(item => new TenantGameAreaMergePlanEntity
+            await context.Database.Updateable<GameAreaMergePlanEntity>()
+                .SetColumns(item => new GameAreaMergePlanEntity
                 {
                     Status = state,
                     ExecutionStartedTime = state == GameAreaMergePlanStatus.Executing ? DateTimeOffset.UtcNow.ToUnixTimeSeconds() : null,
@@ -238,8 +238,8 @@ public sealed class GameAreaMergeCancellationAndReclaimTests
 
     private static async Task SetExecutionStateAsync(GameAreaMergeTestContext context, long identifier, long executionStartedTime)
     {
-        await context.Database.Updateable<TenantGameAreaMergePlanEntity>()
-            .SetColumns(item => new TenantGameAreaMergePlanEntity
+        await context.Database.Updateable<GameAreaMergePlanEntity>()
+            .SetColumns(item => new GameAreaMergePlanEntity
             {
                 Status = GameAreaMergePlanStatus.Executing,
                 ExecutionStartedTime = executionStartedTime,

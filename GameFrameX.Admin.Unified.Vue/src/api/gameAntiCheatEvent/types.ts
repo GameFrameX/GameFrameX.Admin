@@ -62,7 +62,7 @@ export enum AntiCheatProviderEnum {
 }
 
 /** 反作弊事件上报输入（SubmitAsync 接入）。不含复核相关字段——上报一律落 Pending，复核由 ReviewAsync 动作单独驱动。 */
-export interface AddTenantGameAntiCheatEventRequest {
+export interface AddGameAntiCheatEventRequest {
   provider?: AntiCheatProviderEnum;
   /** Provider 名称。Provider=Custom 时必填；其它可空。 */
   providerName?: string | null;
@@ -138,7 +138,7 @@ export interface GameAntiCheatEventResponseSqlSugarPagedList {
 }
 
 /** 反作弊事件分页查询输入。 */
-export interface PageTenantGameAntiCheatEventRequest {
+export interface PageGameAntiCheatEventRequest {
   searchKey?: string | null;
   /**
    * @format int32
@@ -163,7 +163,7 @@ export interface PageTenantGameAntiCheatEventRequest {
 }
 
 /** 反作弊事件人工复核输入（ReviewAsync 动作）。仅允许在 Pending 状态下迁移到 Approved/Rejected/Escalated。 */
-export interface UpdateTenantGameAntiCheatEventReviewRequest {
+export interface UpdateGameAntiCheatEventReviewRequest {
   /**
    * @min 1
    * @max 9223372036854776000

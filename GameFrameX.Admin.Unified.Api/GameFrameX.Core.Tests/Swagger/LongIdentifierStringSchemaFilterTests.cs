@@ -22,14 +22,10 @@ public class LongIdentifierStringSchemaFilterTests
         var schema = ApplyFilter(new Dictionary<string, IOpenApiSchema>
         {
             ["id"] = new OpenApiSchema { Type = JsonSchemaType.Integer, Format = "int64", },
-            ["tenantId"] = new OpenApiSchema { Type = JsonSchemaType.Integer | JsonSchemaType.Null, Format = "int64", },
         });
 
         Assert.Equal(JsonSchemaType.String, schema.Properties["id"].Type);
         Assert.Null(schema.Properties["id"].Format);
-        // 可空标志保留（String | Null），仅数值位替换
-        Assert.Equal(JsonSchemaType.String | JsonSchemaType.Null, schema.Properties["tenantId"].Type);
-        Assert.Null(schema.Properties["tenantId"].Format);
     }
 
     [Fact]

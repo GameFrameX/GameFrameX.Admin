@@ -1,7 +1,7 @@
 namespace GameFrameX.Entity.Enum;
 
 /// <summary>
-/// 申诉状态。申诉事实源（TenantGamePenaltyAppealEntity）的生命周期状态。
+/// 申诉状态。申诉事实源（GamePenaltyAppealEntity）的生命周期状态。
 /// </summary>
 [Description("申诉状态")]
 [AdminEnum]

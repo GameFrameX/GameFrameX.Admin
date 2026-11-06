@@ -10,7 +10,7 @@
  */
 
 import {
-  PageTenantSessionKeyRequest,
+  PageSessionKeyRequest,
   SessionKeyAddPostData,
   SessionKeyAddRequest,
   SessionKeyDeletePostData,
@@ -143,7 +143,7 @@ export class SessionKey<SecurityDataType = unknown> {
    * @request POST:/api/sessionKey/page
    */
   sessionKeyPagePost = (
-    data: PageTenantSessionKeyRequest,
+    data: PageSessionKeyRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<SessionKeyPagePostData, any>({

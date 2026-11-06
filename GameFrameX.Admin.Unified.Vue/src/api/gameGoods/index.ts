@@ -10,7 +10,7 @@
  */
 
 import {
-  AddTenantGameGoodsEntityRequest,
+  AddGameGoodsEntityRequest,
   GameGoodsAddPostData,
   GameGoodsDeletePostData,
   GameGoodsDetailGetData,
@@ -18,8 +18,8 @@ import {
   GameGoodsSelectPostData,
   GameGoodsSelectStringPostData,
   GameGoodsUpdatePostData,
-  PageTenantGameGoodsEntityRequest,
-  UpdateTenantGameGoodsEntityRequest,
+  PageGameGoodsEntityRequest,
+  UpdateGameGoodsEntityRequest,
 } from "./types";
 import {
   BaseDeleteRequest,
@@ -44,7 +44,7 @@ export class GameGoods<SecurityDataType = unknown> {
    * @request POST:/api/gameGoods/add
    */
   gameGoodsAddPost = (
-    data: AddTenantGameGoodsEntityRequest,
+    data: AddGameGoodsEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameGoodsAddPostData, any>({
@@ -106,7 +106,7 @@ export class GameGoods<SecurityDataType = unknown> {
    * @request POST:/api/gameGoods/page
    */
   gameGoodsPagePost = (
-    data: PageTenantGameGoodsEntityRequest,
+    data: PageGameGoodsEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameGoodsPagePostData, any>({
@@ -166,7 +166,7 @@ export class GameGoods<SecurityDataType = unknown> {
    * @request POST:/api/gameGoods/update
    */
   gameGoodsUpdatePost = (
-    data: UpdateTenantGameGoodsEntityRequest,
+    data: UpdateGameGoodsEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameGoodsUpdatePostData, any>({

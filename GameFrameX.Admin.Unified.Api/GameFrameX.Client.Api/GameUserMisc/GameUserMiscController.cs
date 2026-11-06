@@ -10,16 +10,16 @@ namespace GameFrameX.Client.Api.GameUserMisc;
 /// </summary>
 public class GameUserMiscController : BaseController
 {
-    private readonly Repository<TenantGameUserLogoutRecordEntity> _logoutRepository;
-    private readonly Repository<TenantGameUserArchiveEntity> _archiveRepository;
+    private readonly Repository<GameUserLogoutRecordEntity> _logoutRepository;
+    private readonly Repository<GameUserArchiveEntity> _archiveRepository;
 
     /// <summary>
     ///
     /// </summary>
     /// <param name="logoutRepository">登出记录仓储</param>
     /// <param name="archiveRepository">存档仓储（机器人从真实玩家档抽样）</param>
-    public GameUserMiscController(Repository<TenantGameUserLogoutRecordEntity> logoutRepository,
-        Repository<TenantGameUserArchiveEntity> archiveRepository)
+    public GameUserMiscController(Repository<GameUserLogoutRecordEntity> logoutRepository,
+        Repository<GameUserArchiveEntity> archiveRepository)
     {
         _logoutRepository = logoutRepository;
         _archiveRepository = archiveRepository;
@@ -34,12 +34,12 @@ public class GameUserMiscController : BaseController
     public async Task<HttpJsonResultData<MarkLogoutResponse>> MarkLogout([FromBody] MarkLogoutRequest request)
     {
         // 仅删号成功后上报（在线统计用）；响应 rcode 客户端不消费，落库即成功
-        await _logoutRepository.InsertAsync(new TenantGameUserLogoutRecordEntity
+        await _logoutRepository.InsertAsync(new GameUserLogoutRecordEntity
         {
             UserId = request.UserId,
             ClientVersion = request.Version,
             LogoutTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
-            Name = nameof(TenantGameUserLogoutRecordEntity),
+            Name = nameof(GameUserLogoutRecordEntity),
         });
         return HttpJsonResultData<MarkLogoutResponse>.Success(new MarkLogoutResponse { Rcode = 0, });
     }
@@ -88,7 +88,7 @@ public class GameUserMiscController : BaseController
     /// <summary>
     /// Fisher-Yates 洗牌（机器人候选随机化）
     /// </summary>
-    private static void Shuffle(List<TenantGameUserArchiveEntity> list)
+    private static void Shuffle(List<GameUserArchiveEntity> list)
     {
         for (var i = list.Count - 1; i > 0; i--)
         {

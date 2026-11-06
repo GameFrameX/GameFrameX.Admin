@@ -1,5 +1,5 @@
 using GameFrameX.Entity.Enum;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 using GameFrameX.Foundation.Idempotency;
 using GameFrameX.Foundation.Utility;
 using SqlSugar;
@@ -49,14 +49,14 @@ public sealed class FulfillmentLedgerIdempotencyStore : IIdempotencyStore
     /// <summary>
     /// 占位模板：携带订单快照全字段（Type / ItemsJson / OperatorId / 审计列），占位成功即账本行落库。
     /// </summary>
-    private readonly TenantGameOrderFulfillmentEntity _ledgerTemplate;
+    private readonly GameOrderFulfillmentEntity _ledgerTemplate;
 
     /// <summary>
     /// 初始化存储。
     /// </summary>
     /// <param name="db">租户路由的数据库客户端（与发货服务同源）。</param>
     /// <param name="ledgerTemplate">占位模板（订单快照字段已就绪，IdempotencyKey 以占位记录为准覆盖）。</param>
-    public FulfillmentLedgerIdempotencyStore(ISqlSugarClient db, TenantGameOrderFulfillmentEntity ledgerTemplate)
+    public FulfillmentLedgerIdempotencyStore(ISqlSugarClient db, GameOrderFulfillmentEntity ledgerTemplate)
     {
         _db = db;
         _ledgerTemplate = ledgerTemplate;
@@ -92,7 +92,7 @@ public sealed class FulfillmentLedgerIdempotencyStore : IIdempotencyStore
         catch (Exception)
         {
             // 并发同键由账本唯一索引仲裁：输家重读既有行按状态判定；重读无行 = 非冲突异常，原样上抛
-            var existing = await _db.Queryable<TenantGameOrderFulfillmentEntity>()
+            var existing = await _db.Queryable<GameOrderFulfillmentEntity>()
                                      .FirstAsync(u => u.IdempotencyKey == newRecord.IdempotencyKey);
             if (existing == null)
             {
@@ -106,7 +106,7 @@ public sealed class FulfillmentLedgerIdempotencyStore : IIdempotencyStore
             }
 
             // 法定覆盖：存量 Failed 允许重试复用同一行——条件更新（仅 Failed 可翻回 Pending）保证并发重试恰一
-            var rows = await _db.Updateable<TenantGameOrderFulfillmentEntity>()
+            var rows = await _db.Updateable<GameOrderFulfillmentEntity>()
                                 .SetColumns(u => u.Status == FulfillmentStatusEnum.Pending)
                                 .SetColumns(u => u.FailureReason == null)
                                 .SetColumns(u => u.ItemsJson == _ledgerTemplate.ItemsJson)
@@ -129,7 +129,7 @@ public sealed class FulfillmentLedgerIdempotencyStore : IIdempotencyStore
         }
 
         // 落定成功：仅 Pending 可翻 Success（退款作废等业务终态由服务先行落定，此处做存在性校验）
-        var rows = await _db.Updateable<TenantGameOrderFulfillmentEntity>()
+        var rows = await _db.Updateable<GameOrderFulfillmentEntity>()
                             .SetColumns(u => u.Status == FulfillmentStatusEnum.Success)
                             .SetColumns(u => u.FailureReason == null)
                             .Where(u => u.IdempotencyKey == request.Identifier.IdempotencyKey && u.Status == FulfillmentStatusEnum.Pending)
@@ -149,7 +149,7 @@ public sealed class FulfillmentLedgerIdempotencyStore : IIdempotencyStore
         }
 
         // 落定失败：仅 Pending 可翻 Failed；失败原因（业务事实）由服务先行写入
-        var rows = await _db.Updateable<TenantGameOrderFulfillmentEntity>()
+        var rows = await _db.Updateable<GameOrderFulfillmentEntity>()
                             .SetColumns(u => u.Status == FulfillmentStatusEnum.Failed)
                             .Where(u => u.IdempotencyKey == request.Identifier.IdempotencyKey && u.Status == FulfillmentStatusEnum.Pending)
                             .ExecuteCommandAsync();
@@ -167,7 +167,7 @@ public sealed class FulfillmentLedgerIdempotencyStore : IIdempotencyStore
             throw new ArgumentNullException(nameof(identifier));
         }
 
-        var entity = await _db.Queryable<TenantGameOrderFulfillmentEntity>()
+        var entity = await _db.Queryable<GameOrderFulfillmentEntity>()
                               .FirstAsync(u => u.IdempotencyKey == identifier.IdempotencyKey);
         if (entity == null)
         {
@@ -194,7 +194,7 @@ public sealed class FulfillmentLedgerIdempotencyStore : IIdempotencyStore
 
     private async Task EnsureRecordExistsAsync(IdempotencyRecordIdentifier identifier)
     {
-        var exists = await _db.Queryable<TenantGameOrderFulfillmentEntity>()
+        var exists = await _db.Queryable<GameOrderFulfillmentEntity>()
                               .AnyAsync(u => u.IdempotencyKey == identifier.IdempotencyKey);
         if (!exists)
         {
