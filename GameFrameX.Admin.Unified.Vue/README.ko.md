@@ -28,7 +28,7 @@
 
 GameFrameX 게임 관리 플랫폼의 프런트엔드 프로젝트로, Vue 3 + TypeScript + Vite + PrimeVue 기반으로 구축되었습니다.
 
-> 본 프로젝트는 [vue-next-admin](https://gitee.com/lyt-top/vue-next-admin)에서 fork 하여 GameFrameX의 멀티 테넌트 / 앱 스코프 모델에 맞게 개조한 것입니다. 현재 버전 ![version](https://img.shields.io/github/package-json/v/GameFrameX/Admin?filename=GameFrameX.Admin.Unified.Vue/package.json)(package.json 기반, 자동 동기화).
+> 본 프로젝트는 [vue-next-admin](https://gitee.com/lyt-top/vue-next-admin)에서 fork 하여 GameFrameX 단일 게임 관리 백오피스 모델에 맞게 개조한 것입니다. 현재 버전 ![version](https://img.shields.io/github/package-json/v/GameFrameX/Admin?filename=GameFrameX.Admin.Unified.Vue/package.json)(package.json 기반, 자동 동기화).
 
 ## 목차
 
@@ -144,11 +144,8 @@ src/
 │   ├── useCrudTable.ts             테이블 페이지네이션 / 정렬 / loading 래핑
 │   ├── useEditDialog.ts            추가 / 수정 다이얼로그 (감사 필드 제거, isEnabled 기본값)
 │   ├── useTableColumnPersistence.ts  컬럼 너비 / 순서 / 표시 여부 로컬 영속화
-│   ├── useCurrentApp.ts            현재 앱 (AppId) 상태 + 로드 / 전환
-│   ├── useConfigAppScope.ts        앱 스코프 변경
 │   ├── useRequiredFields.ts        필수 필드 집합
 │   ├── usePrimeTablePage.ts        테이블 페이지네이션 hook
-│   ├── useRouteAppIdQuerySync.ts   AppId query와 테이블 동기화
 │   ├── formResolver.ts             폼 검증 규칙 어댑터
 │   └── types/                      컴포지션 함수의 TS 타입
 │
@@ -160,7 +157,6 @@ src/
 │   ├── time-column/                테이블 컬럼: long 초 자동 포맷
 │   ├── form-label / form-help-text 폼 필드 라벨 / 도움말 텍스트
 │   ├── app-confirm-dialog          전역 확인 다이얼로그
-│   ├── config-app-scope-picker     앱 스코프 선택기
 │   ├── narrow-screen-hint          좁은 화면 힌트
 │   ├── notice-bar                  공지 바
 │   ├── cropper / drag-verify / editor / icon-selector / reward-items-editor / svg-icon / table
@@ -190,7 +186,6 @@ src/
 │   ├── index.ts                    라우트 인스턴스 + 가드
 │   ├── frontEnd.ts                 프런트엔드 제어 라우팅 (폴백, 현재는 미사용)
 │   ├── backEnd.ts                  백엔드 동적 라우팅 핵심
-│   ├── appWorkspaceRoutes.ts       앱 워크스페이스 라우팅
 │   ├── globalConfigRoutes.ts       전역 설정 라우팅
 │   └── route.ts                    정적 / 폴백 라우팅 (/login / 404 / 401)
 │
@@ -220,7 +215,6 @@ src/
 │   ├── watermark.ts                워터마크
 │   ├── isEnabled.ts                IsEnabled 정규화 및 신규 추가 기본값
 │   ├── rowVersion.ts               행 버전 읽기 (rowVersion / RowVersion 호환)
-│   ├── targetTenant.ts             테넌트 간 헤더 (X-Target-Tenant-Id)
 │   ├── primevue-locale.ts          PrimeVue 컴포넌트 언어 전환
 │   ├── formatTime.ts               날짜 / 시간 포맷
 │   ├── download.ts / exportExcel.ts  내보내기
@@ -228,15 +222,13 @@ src/
 │   ├── fontawesome.ts              FA 자동 온디맨드
 │   ├── icons.ts                    FA 이름 매핑
 │   ├── build.ts                    CDN 설정
-│   ├── appWorkspace.ts             ※ 앱 스코프 유틸리티 (resolveRouteScope 등)
 │   ├── arrayOperation.ts / commonFunction.ts / base64Conver.ts / crudConfig.ts / getStyleSheets.ts / loading.ts / mitt.ts / other.ts / template-utils.ts
 │   └── http/                       인터셉터 분리
 │
 ├── views/                        # 비즈니스 페이지
-│   ├── system/                     시스템 관리 (사용자 / 역할 / 메뉴 / 조직 / 테넌트 / 사전 / 로그 / 설정 / 알림 / 플러그인 / 인쇄 / 지역 / 온라인 사용자 ……)
+│   ├── system/                     시스템 관리 (사용자 / 역할 / 메뉴 / 사전 / 로그 / 설정 / 알림 ……)
 │   ├── game/                       게임 관리 (서버 / 상품 / 주문 / 메일 / 교환 코드 / 상점 / 공지 / 아이템 / 재화 ……)
 │   ├── client/                     클라이언트 관리 (플랫폼 / 버전 / 채널 / 기기 / 언어 / 리소스 패키지 / 오픈 API ……)
-│   ├── appCenter/                  앱 센터 (appEntry / appSelector / appWorkspace / gameAppEntity 등)
 │   ├── contentCenter / chart / chartCenter / chartCenter / opsCenter / trustCenter / automationCenter / goodsCenter / redeemCenter / webShopCenter / playerCenter
 │   ├── home/                       홈 대시보드
 │   ├── login/                      로그인
@@ -367,9 +359,9 @@ Vite 시작 시 이 값들을 `public/config/config.js`의 `window.__env__`에 �
 **요청 인터셉트** (4단계):
 
 1. `Authorization: Bearer <access-token>` 자동 추가; JWT 만료가 임박하면 동시에 `X-Authorization: Bearer <x-refresh-token>`을 추가해 백엔드가 조용히 재발급
-2. `X-Target-Tenant-Id` 자동 추가 (테넌트 간 전환 시 `utils/targetTenant.ts`가 제어)
-3. `request.ts`는 GET 요청의 `data`를 query string으로 직렬화 (`tansParams`)
-4. `axios-utils.ts`는 `Accept-Language: <globalI18n>` 추가
+2. `request.ts`는 GET 요청의 `data`를 query string으로 직렬화 (`tansParams`)
+3. `axios-utils.ts`는 `Accept-Language: <globalI18n>` 추가
+4. 페이지 요청은 전역 서버 구역 셀렉터에서 `ServerId`를 읽어 업무 파라미터로 첨부
 
 **응답 인터셉트** (4단계):
 
@@ -381,17 +373,6 @@ Vite 시작 시 이 값들을 `public/config/config.js`의 `window.__env__`에 �
    - 기타 → 백엔드 `message` 표시
 4. 카멜케이스화 (첫 글자 대문자 → 소문자) + 오류 알림은 PrimeVue Toast 사용
 
-### 앱 스코프 (멀티 테넌트)
-
-백엔드 메뉴 각 항목에는 `app_scope`（`platform` / `tenant` / `app`）와 `menu_context`가 붙습니다. 프런트엔드는 `meta.appScope` + `meta.menuContext`로 표시합니다:
-
-| Scope | 의미 | 라우팅 예시 |
-|---|---|---|
-| `platform` | 플랫폼 수준 (최고 관리자만 보임, 테넌트 간) | `/platform/*` |
-| `tenant` | 테넌트 수준 (모든 앱 공통, appId query 없음) | `/dashboard/*`, `/system/*` |
-| `app` | 앱 워크스페이스 내 (`appId` query 필수) | `/gameCenter/*` |
-
-이동 로직은 `src/utils/appWorkspace.ts`의 `decideTenantAppEntry()` / `resolveRouteScope()`에 있으며, `router/index.ts`의 `resolveTenantAppRedirect()`가 가드에서 트리거합니다.
 
 ### Pinia 영속화
 
@@ -695,7 +676,7 @@ git push
 - **page / list / query / search / filter류 인터페이스는 GET으로 params / data 전송 금지**——`pnpm run check:frontend api-query-get`이 검사
 - 백엔드 생성 API는 반드시 `xxxPagePost` / `xxxListPost` / `xxxQueryPost` 사용
 - 수작성 API는 `request({ method: 'post', data: params })` 사용
-- 비즈니스 코드에서 `Authorization` / `Accept-Language` / `X-Tenant-Id`를 수동으로 추가하지 **마세요**——인터셉터가 자동 처리
+- 비즈니스 코드에서 `Authorization` / `Accept-Language`를 수동으로 추가하지 **마세요**——인터셉터가 자동 처리
 - 응답에서 수동으로 `showError`하지 **마세요**——인터셉터가 비즈니스 코드를 자동 처리
 
 ### 제출 흐름
@@ -977,7 +958,6 @@ echo "wrote ${FRONTEND_REPO}/openapi.json"
 - `src/utils/http/shared.ts` — HTTP 인터셉터
 - `src/stores/userInfo.ts` — 사용자 정보 / 버튼 권한
 - `src/composables/useEditDialog.ts` — 다이얼로그 핵심
-- `src/utils/appWorkspace.ts` — 멀티 테넌트 앱 스코프
 - `scripts/check-frontend-standards.mjs` — 크로스 플랫폼 규칙 게이트
 
 ## 문서 및 자료

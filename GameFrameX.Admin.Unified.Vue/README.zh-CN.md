@@ -28,7 +28,7 @@
 
 GameFrameX 游戏管理平台的前端工程，基于 Vue 3 + TypeScript + Vite + PrimeVue 构建。
 
-> 本项目 fork 自 [vue-next-admin](https://gitee.com/lyt-top/vue-next-admin)，按 GameFrameX 的多租户 / 应用作用域模型做了改造。当前版本 ![version](https://img.shields.io/github/package-json/v/GameFrameX/Admin?filename=GameFrameX.Admin.Unified.Vue/package.json)（取自 package.json，自动同步）。
+> 本项目 fork 自 [vue-next-admin](https://gitee.com/lyt-top/vue-next-admin)，按 GameFrameX 单游戏管理后台模型做了改造。当前版本 ![version](https://img.shields.io/github/package-json/v/GameFrameX/Admin?filename=GameFrameX.Admin.Unified.Vue/package.json)（取自 package.json，自动同步）。
 
 ## 目录
 
@@ -144,11 +144,8 @@ src/
 │   ├── useCrudTable.ts             表格分页 / 排序 / loading 封装
 │   ├── useEditDialog.ts            新增 / 编辑弹窗（剥离审计字段、isEnabled 默认）
 │   ├── useTableColumnPersistence.ts  列宽 / 列顺序 / 列显隐本地持久化
-│   ├── useCurrentApp.ts            当前应用（AppId）状态 + 加载 / 切换
-│   ├── useConfigAppScope.ts        应用作用域变更
 │   ├── useRequiredFields.ts        必填字段集合
 │   ├── usePrimeTablePage.ts        表格分页 hook
-│   ├── useRouteAppIdQuerySync.ts   AppId query 与表格同步
 │   ├── formResolver.ts             表单校验规则适配
 │   └── types/                      组合式函数的 TS 类型
 │
@@ -160,7 +157,6 @@ src/
 │   ├── time-column/                表格列：long 秒自动格式化
 │   ├── form-label / form-help-text 表单字段标签 / 帮助文字
 │   ├── app-confirm-dialog          全局确认弹窗
-│   ├── config-app-scope-picker     应用作用域选择器
 │   ├── narrow-screen-hint          窄屏提示
 │   ├── notice-bar                  通知条
 │   ├── cropper / drag-verify / editor / icon-selector / reward-items-editor / svg-icon / table
@@ -190,7 +186,6 @@ src/
 │   ├── index.ts                    路由实例 + 守卫
 │   ├── frontEnd.ts                 前端控制路由（兜底，目前用不到）
 │   ├── backEnd.ts                  后端动态路由核心
-│   ├── appWorkspaceRoutes.ts       应用工作台路由
 │   ├── globalConfigRoutes.ts       全局配置路由
 │   └── route.ts                    静态 / 兜底路由（/login / 404 / 401）
 │
@@ -220,7 +215,6 @@ src/
 │   ├── watermark.ts                水印
 │   ├── isEnabled.ts                IsEnabled 归一化与新增默认值
 │   ├── rowVersion.ts               行版本读取（兼容 rowVersion / RowVersion）
-│   ├── targetTenant.ts             跨租户 header（X-Target-Tenant-Id）
 │   ├── primevue-locale.ts          PrimeVue 组件按语言切换
 │   ├── formatTime.ts               日期 / 时间格式化
 │   ├── download.ts / exportExcel.ts  导出
@@ -228,15 +222,13 @@ src/
 │   ├── fontawesome.ts              FA 自动按需
 │   ├── icons.ts                    FA 名称映射
 │   ├── build.ts                    CDN 配置
-│   ├── appWorkspace.ts             ※ 应用作用域工具（resolveRouteScope 等）
 │   ├── arrayOperation.ts / commonFunction.ts / base64Conver.ts / crudConfig.ts / getStyleSheets.ts / loading.ts / mitt.ts / other.ts / template-utils.ts
 │   └── http/                       拦截器拆分
 │
 ├── views/                        # 业务页面
-│   ├── system/                     系统管理（用户 / 角色 / 菜单 / 组织 / 租户 / 字典 / 日志 / 配置 / 通知 / 在线用户 ……）
+│   ├── system/                     系统管理（用户 / 角色 / 菜单 / 字典 / 日志 / 配置 / 通知 ……）
 │   ├── game/                       游戏管理（区服 / 商品 / 订单 / 邮件 / 兑换码 / 商城 / 公告 / 物品 / 道具 ……）
 │   ├── client/                     客户端管理（平台 / 版本 / 渠道 / 设备 / 语言 / 资源包 / 开放接口 ……）
-│   ├── appCenter/                  应用中心（appEntry / appSelector / appWorkspace / gameAppEntity 等）
 │   ├── contentCenter / chart / chartCenter / chartCenter / opsCenter / trustCenter / automationCenter / goodsCenter / redeemCenter / webShopCenter / playerCenter
 │   ├── home/                       首页仪表盘
 │   ├── login/                      登录
@@ -367,9 +359,9 @@ Vite 启动时会把这些值写入 `public/config/config.js` 的 `window.__env_
 **请求拦截**（4 步）：
 
 1. 自动加 `Authorization: Bearer <access-token>`；如 JWT 即将过期，同时加 `X-Authorization: Bearer <x-refresh-token>`，让后端静默换发
-2. 自动加 `X-Target-Tenant-Id`（跨租户切换时由 `utils/targetTenant.ts` 控制）
-3. `request.ts` 额外把 GET 请求的 `data` 序列化为 query string（`tansParams`）
-4. `axios-utils.ts` 额外加 `Accept-Language: <globalI18n>`
+2. `request.ts` 额外把 GET 请求的 `data` 序列化为 query string（`tansParams`）
+3. `axios-utils.ts` 额外加 `Accept-Language: <globalI18n>`
+4. 页面请求从全局区服选择器读取 `ServerId` 并附带业务参数
 
 **响应拦截**（4 步）：
 
@@ -381,17 +373,6 @@ Vite 启动时会把这些值写入 `public/config/config.js` 的 `window.__env_
    - 其它 → 显示后端 `message`
 4. 驼峰化（首字母大写 → 小写）+ 错误提示走 PrimeVue Toast
 
-### 应用作用域（多租户）
-
-后端菜单每项带 `app_scope`（`platform` / `tenant` / `app`）与 `menu_context`。前端用 `meta.appScope` + `meta.menuContext` 标记：
-
-| Scope | 含义 | 路由示例 |
-|---|---|---|
-| `platform` | 平台级（超管可见，跨租户） | `/platform/*` |
-| `tenant` | 租户级（所有应用共有，无 appId query） | `/dashboard/*`、`/system/*` |
-| `app` | 应用工作台内（必须带 `appId` query） | `/gameCenter/*` |
-
-跳转逻辑在 `src/utils/appWorkspace.ts` 的 `decideTenantAppEntry()` / `resolveRouteScope()`，由 `router/index.ts` 的 `resolveTenantAppRedirect()` 在守卫里触发。
 
 ### Pinia 持久化
 
@@ -695,7 +676,7 @@ git push
 - **page / list / query / search / filter 类接口禁止用 GET 传 params / data**——`pnpm run check:frontend api-query-get` 会卡
 - 后端生成 API 必须用 `xxxPagePost` / `xxxListPost` / `xxxQueryPost`
 - 手写 API 用 `request({ method: 'post', data: params })`
-- **不要**在业务代码里手动加 `Authorization` / `Accept-Language` / `X-Tenant-Id`——拦截器自动处理
+- **不要**在业务代码里手动加 `Authorization` / `Accept-Language`——拦截器自动处理
 - **不要**在响应里手动 `showError`——拦截器自动处理业务码
 
 ### 提交流程
@@ -977,7 +958,6 @@ echo "wrote ${FRONTEND_REPO}/openapi.json"
 - `src/utils/http/shared.ts` — HTTP 拦截器
 - `src/stores/userInfo.ts` — 用户信息 / 按钮权限
 - `src/composables/useEditDialog.ts` — 弹窗核心
-- `src/utils/appWorkspace.ts` — 多租户应用作用域
 - `scripts/check-frontend-standards.mjs` — 跨端规范门禁
 
 ## 文档与资源

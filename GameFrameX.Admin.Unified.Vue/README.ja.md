@@ -28,7 +28,7 @@
 
 GameFrameX ゲーム管理プラットフォームのフロントエンドプロジェクト。Vue 3 + TypeScript + Vite + PrimeVue で構築されています。
 
-> 本プロジェクトは [vue-next-admin](https://gitee.com/lyt-top/vue-next-admin) を fork し、GameFrameX のマルチテナント / アプリケーションスコープモデルに合わせて改造したものです。現在のバージョンは ![version](https://img.shields.io/github/package-json/v/GameFrameX/Admin?filename=GameFrameX.Admin.Unified.Vue/package.json)（package.json 由来、自動同期）です。
+> 本プロジェクトは [vue-next-admin](https://gitee.com/lyt-top/vue-next-admin) を fork し、GameFrameX の単一ゲーム管理バックエンドモデルに合わせて改造したものです。現在のバージョンは ![version](https://img.shields.io/github/package-json/v/GameFrameX/Admin?filename=GameFrameX.Admin.Unified.Vue/package.json)（package.json 由来、自動同期）です。
 
 ## 目次
 
@@ -144,11 +144,8 @@ src/
 │   ├── useCrudTable.ts             テーブルページング / ソート / loading ラップ
 │   ├── useEditDialog.ts            追加 / 編集ダイアログ（監査フィールドの除去、isEnabled デフォルト）
 │   ├── useTableColumnPersistence.ts  列幅 / 列順 / 列表示のローカル永続化
-│   ├── useCurrentApp.ts            現在のアプリケーション（AppId）状態 + 読み込み / 切り替え
-│   ├── useConfigAppScope.ts        アプリケーションスコープ変更
 │   ├── useRequiredFields.ts        必須フィールドの集合
 │   ├── usePrimeTablePage.ts        テーブルページング hook
-│   ├── useRouteAppIdQuerySync.ts   AppId query とテーブルの同期
 │   ├── formResolver.ts             フォームバリデーションルールの適合
 │   └── types/                      composables の TS 型
 │
@@ -160,7 +157,6 @@ src/
 │   ├── time-column/                テーブル列：long 秒を自動フォーマット
 │   ├── form-label / form-help-text フォームフィールドのラベル / ヘルプテキスト
 │   ├── app-confirm-dialog          グローバル確認ダイアログ
-│   ├── config-app-scope-picker     アプリケーションスコープセレクター
 │   ├── narrow-screen-hint          狭画面ヒント
 │   ├── notice-bar                  通知バー
 │   ├── cropper / drag-verify / editor / icon-selector / reward-items-editor / svg-icon / table
@@ -190,7 +186,6 @@ src/
 │   ├── index.ts                    ルーターインスタンス + ガード
 │   ├── frontEnd.ts                 フロントエンド制御ルート（フォールバック、現在未使用）
 │   ├── backEnd.ts                  バックエンド動的ルーティングの核
-│   ├── appWorkspaceRoutes.ts       アプリケーションワークスペースルート
 │   ├── globalConfigRoutes.ts       グローバル設定ルート
 │   └── route.ts                    静的 / フォールバックルート（/login / 404 / 401）
 │
@@ -220,7 +215,6 @@ src/
 │   ├── watermark.ts                透かし
 │   ├── isEnabled.ts                IsEnabled の正規化と追加時デフォルト値
 │   ├── rowVersion.ts               行バージョン読み取り（rowVersion / RowVersion 互換）
-│   ├── targetTenant.ts             テナント横断 header（X-Target-Tenant-Id）
 │   ├── primevue-locale.ts          PrimeVue コンポーネントの言語切替
 │   ├── formatTime.ts               日付 / 時刻フォーマット
 │   ├── download.ts / exportExcel.ts  エクスポート
@@ -228,15 +222,13 @@ src/
 │   ├── fontawesome.ts              FA 自動オンデマンド
 │   ├── icons.ts                    FA 名前マッピング
 │   ├── build.ts                    CDN 設定
-│   ├── appWorkspace.ts             ※ アプリケーションスコープユーティリティ（resolveRouteScope など）
 │   ├── arrayOperation.ts / commonFunction.ts / base64Conver.ts / crudConfig.ts / getStyleSheets.ts / loading.ts / mitt.ts / other.ts / template-utils.ts
 │   └── http/                       インターセプター分割
 │
 ├── views/                        # 業務ページ
-│   ├── system/                     システム管理（ユーザー / ロール / メニュー / 組織 / テナント / 辞書 / ログ / 設定 / 通知 / プラグイン / 印刷 / 地域 / オンラインユーザー ……）
+│   ├── system/                     システム管理（ユーザー / ロール / メニュー / 辞書 / ログ / 設定 / 通知 ……）
 │   ├── game/                       ゲーム管理（区服 / 商品 / 注文 / メール / 引換コード / ショップ / お知らせ / アイテム ……）
 │   ├── client/                     クライアント管理（プラットフォーム / バージョン / チャネル / デバイス / 言語 / リソースパッケージ / オープン API ……）
-│   ├── appCenter/                  アプリケーションセンター（appEntry / appSelector / appWorkspace / gameAppEntity など）
 │   ├── contentCenter / chart / chartCenter / chartCenter / opsCenter / trustCenter / automationCenter / goodsCenter / redeemCenter / webShopCenter / playerCenter
 │   ├── home/                       ホームダッシュボード
 │   ├── login/                      ログイン
@@ -367,9 +359,9 @@ Vite 起動時にこれらの値が `public/config/config.js` の `window.__env_
 **リクエストインターセプター**（4 ステップ）：
 
 1. `Authorization: Bearer <access-token>` を自動付与；JWT が期限切れ間近なら `X-Authorization: Bearer <x-refresh-token>` も同時に付与し、バックエンドに黙って再発行させる
-2. `X-Target-Tenant-Id` を自動付与（テナント横断切替時は `utils/targetTenant.ts` が制御）
-3. `request.ts` は追加で GET リクエストの `data` を query string にシリアライズ（`tansParams`）
-4. `axios-utils.ts` は追加で `Accept-Language: <globalI18n>` を付与
+2. `request.ts` は追加で GET リクエストの `data` を query string にシリアライズ（`tansParams`）
+3. `axios-utils.ts` は追加で `Accept-Language: <globalI18n>` を付与
+4. ページリクエストはグローバルのサーバー区セレクターから `ServerId` を読み込み、業務パラメータとして付与する
 
 **レスポンスインターセプター**（4 ステップ）：
 
@@ -381,17 +373,6 @@ Vite 起動時にこれらの値が `public/config/config.js` の `window.__env_
    - その他 → バックエンドの `message` を表示
 4. キャメルケース化（先頭大文字 → 小文字）+ エラー通知は PrimeVue Toast 経由
 
-### アプリケーションスコープ（マルチテナント）
-
-バックエンドメニューの各項目は `app_scope`（`platform` / `tenant` / `app`）と `menu_context` を持ちます。フロントエンドは `meta.appScope` + `meta.menuContext` でマークします：
-
-| Scope | 意味 | ルート例 |
-|---|---|---|
-| `platform` | プラットフォームレベル（超管理者のみ、テナント横断） | `/platform/*` |
-| `tenant` | テナントレベル（全アプリ共通、appId query なし） | `/dashboard/*`、`/system/*` |
-| `app` | アプリケーションワークスペース内（`appId` query 必須） | `/gameCenter/*` |
-
-遷移ロジックは `src/utils/appWorkspace.ts` の `decideTenantAppEntry()` / `resolveRouteScope()` にあり、`router/index.ts` の `resolveTenantAppRedirect()` がガード内で発火します。
 
 ### Pinia 永続化
 
@@ -695,7 +676,7 @@ git push
 - **page / list / query / search / filter 系インターフェースで GET による params / data 送信は禁止**——`pnpm run check:frontend api-query-get` がブロックします
 - バックエンド生成 API は `xxxPagePost` / `xxxListPost` / `xxxQueryPost` を使用
 - 手書き API は `request({ method: 'post', data: params })` を使用
-- 業務コードで `Authorization` / `Accept-Language` / `X-Tenant-Id` を手動で付与**しない**——インターセプターが自動処理
+- 業務コードで `Authorization` / `Accept-Language` を手動で付与**しない**——インターセプターが自動処理
 - レスポンス内で手動 `showError` **しない**——インターセプターが業務コードを自動処理
 
 ### コミットフロー
@@ -977,7 +958,6 @@ echo "wrote ${FRONTEND_REPO}/openapi.json"
 - `src/utils/http/shared.ts` — HTTP インターセプター
 - `src/stores/userInfo.ts` — ユーザー情報 / ボタン権限
 - `src/composables/useEditDialog.ts` — ダイアログの核
-- `src/utils/appWorkspace.ts` — マルチテナントアプリケーションスコープ
 - `scripts/check-frontend-standards.mjs` — クロスプラットフォーム規約ゲート
 
 ## ドキュメントとリソース
