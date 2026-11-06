@@ -67,7 +67,7 @@ Client API와 Hub API는 더 "가볍습니다": Client API는 Entity + Payment�
 
 1. **Service를 작성하면 API가 자동 생성됩니다**(Admin API). `IDynamicApiController`를 구현하면 클래스의 public 메서드가 자동으로 REST 엔드포인트가 되어, Controller를 직접 작성하거나 `[Route]`를 붙일 필요가 없습니다. Admin API의 핵심입니다.
 2. **엔티티를 작성하면 테이블이 자동 생성됩니다**. SqlSugar Code-First: 시작 시 엔티티 클래스를 스캔 → 테이블 생성 → 시드 데이터 입력. 한 줄의 DDL도 작성할 필요가 없으며, 필드를 수정하고 재시작하면 테이블 구조가 따라옵니다.
-3. **세 호스트가 단일 메인 DB를 공유합니다**. 리포지토리는 `ConfigId=main`을 사용하며 로그인과 업무 데이터에서 테넌트와 앱 차원을 제거했습니다. 소프트 삭제와 생성자 데이터 권한은 유지됩니다.
+3. **세 호스트가 단일 메인 DB를 공유합니다**. 리포지토리는 `ConfigId=main`을 사용하며 로그인과 업무 데이터에 다중 DB 차원이 없습니다. 소프트 삭제와 생성자 데이터 권한은 유지됩니다.
 
 ---
 
@@ -107,7 +107,7 @@ Admin API（20802）              Client API（20808）            Hub API（208
 의존 관계는 다음과 같습니다(왼쪽에서 오른쪽이 참조 방향):
 
 ```
-Web.Api → Web.Core → Application.{System, Game, Client, Tenant} → Core → Entity → Core.Enum
+Web.Api → Web.Core → Application.{System, Game, Client, Business} → Core → Entity → Core.Enum
 Client.Api（독립, Entity + Payment만 참조）
 Hub.Api（독립, Application.Game + Core + Entity 참조, 단 Controller는 Application Service를 호출하지 않음）
 ```
@@ -134,7 +134,7 @@ GameFrameX.Admin.Unified.Api/
 ├── GameFrameX.Application.System/ # 시스템 관리 서비스(사용자/역할/메뉴/로그...)
 ├── GameFrameX.Application.Game/   # 게임 관리 서비스(구역 서버/주문/메일/교환 코드...)
 ├── GameFrameX.Application.Client/ # 클라이언트 관리 서비스(버전/채널/리소스 패키지...)
-├── GameFrameX.Application.Tenant/ # 업무 서비스(기기 / 기기 그룹, 프로젝트 이름은 후속 단계에서 변경)
+├── GameFrameX.Application.Business/ # 업무 서비스(기기 / 기기 그룹)
 ├── GameFrameX.Entity/             # 엔티티 계층(Base / System / Game / Client)
 ├── GameFrameX.Core/               # 핵심 계층(리포지토리, 서비스 기본 클래스, 인증, SignalR)
 ├── GameFrameX.Core.Enum/          # 열거형 정의
@@ -176,13 +176,12 @@ GameFrameX.Admin.Unified.Api/
 **프로덕션 / 컨테이너(PostgreSQL, 환경 변수 쌍으로 오버라이드)**: 데이터베이스를 오버라이드할 때는 타입과 연결 문자열을 반드시 **쌍으로** 설정해야 하며, 절반만 설정하면 시작 시 바로 오류가 발생합니다. 세 개의 host(Web / Client / Hub)는 **동일한 변수 쌍**을 사용합니다:
 
 - `GFX_MAIN_DB_TYPE=PostgreSQL` + `GFX_MAIN_DB_CONNECTION_STRING=Host=...`
-- 세 호스트는 `ConfigId=main`만 사용하며 테넌트 DB를 자동 생성하거나 유도하지 않습니다.
+- 세 호스트는 `ConfigId=main`만 사용하며, 단일 메인 DB가 전부입니다. 다른 DB를 자동 생성하거나 유도하지 않습니다.
 - 기존 배포의 `DbType` / `ConnectionString` 시작 파라미터도 여전히 사용 가능(호환 계층), 시작 시 마이그레이션 경고가 출력되므로 빠르게 전환하세요
 - 다른 데이터베이스(MySQL / Oracle / DM…… 전체 34종 DbType)로 전환하는 연결 문자열 작성법과 예시: [`GameFrameX.Application/Configuration/Database-ConnectionStrings.md`](GameFrameX.Application/Configuration/Database-ConnectionStrings.md)
 
 데이터베이스에 대해 알아야 할 몇 가지 규칙:
 
-- **기본 자체 호스팅 인스턴스 업그레이드**: 쓰기를 중지하고 두 DB를 백업한 뒤 `db/single-main/migrate-default-instance.sh --dry-run`, 이후 `--execute`를 실행하세요. `GFX_MIGRATION_DATABASE_TYPE`, `GFX_MIGRATION_SOURCE`, `GFX_MIGRATION_TARGET`을 설정합니다. 여러 테넌트, 여러 앱, 데이터 충돌은 거부하며 dry-run은 롤백되고 반복 실행은 멱등입니다.
 - **Compose에 PostgreSQL 내장**. 리포지토리 루트에서 `docker compose up` 실행 시 `postgres:16-alpine`이 자동으로 시작됨(첫 시작 시 자동 DB 생성, `docker/postgres/init.sql` 참조, 데이터는 리포지토리 루트 `postgres-data/` bind mount에 저장). 호스트의 기존 postgres 컨테이너를 재사용하려면 리포지토리 루트 `.env`에 `POSTGRES_HOST=host.docker.internal` 등 변수를 설정하고 api 서비스의 `postgres`에 대한 `depends_on`을 제거하면 됩니다.
 - **세 개의 host가 동일한 기본 구성을 공유**. Client / Hub 시작 시 `Database.json`을 자동으로 로드(Admin과 동일한 소스, 한 곳 수정 시 세 곳에 적용); 환경 변수 오버라이드 방식은 compose와 일치.
 
@@ -288,7 +287,7 @@ public class MyService : ITransient, IDynamicApiController
 
 ### 리포지토리와 단일 메인 DB
 
-`SqlSugarRepository<T>`는 항상 메인 연결(`ConfigId=main`)을 사용합니다. 엔티티 특성으로 테넌트 DB를 선택하지 않습니다.
+`SqlSugarRepository<T>`는 항상 메인 연결(`ConfigId=main`)을 사용하며 세 호스트가 단일 메인 DB를 공유합니다.
 
 ### 인증 체계: JWT 공유 + 서명
 
@@ -320,7 +319,7 @@ SqlSugar AOP가 `SqlSugarSetup.SetDbAop()`에서 이 작업을 처리합니다:
 | Insert | `CreatedTime`, `CreatedId`, `CreatedName` |
 | Update | `UpdateTime`, `UpdatedId`, `UpdatedName` |
 
-동시에 데이터 변경 사항을 감사 로그(`SystemLogDiff` / `TenantLogDiff`)에 기록합니다. 따라서 엔티티를 만들 때 감사 필드를 직접 할당할 필요 없이 프레임워크가 채워줍니다.
+동시에 데이터 변경 사항을 감사 로그(`SystemLogDiff` / `LogDiff`)에 기록합니다. 따라서 엔티티를 만들 때 감사 필드를 직접 할당할 필요 없이 프레임워크가 채워줍니다.
 
 ### 스노우플레이크 ID
 
@@ -359,7 +358,7 @@ Admin API의 `AdminResultProvider`가 모든 응답을 통일된 형식으로 �
 ### SignalR 실시간 통신
 
 - Hub: `OnlineUserHub`, 경로 `/hubs/onlineUser`
-- 연결은 인증된 사용자 식별자를 사용하며 테넌트별 메시지 그룹은 생성하지 않습니다.
+- 연결은 인증된 사용자 식별자를 사용합니다.
 - 가능한 기능: 온라인 사용자 목록, 강제 로그아웃, 메시지 발송(유니캐스트 / 브로드캐스트 / 자신 제외 / 특정 사용자 지정)
 - 다중 인스턴스 배포 시 선택적 Redis Backplane + Data Protection Key 영속화로 메시지를 인스턴스 간에 푸시
 
@@ -390,12 +389,12 @@ Hub API(`GameFrameX.Hub.Api`, 포트 `20806`)는 **외부 시스템**을 위한 
 |------|----------|-----------|------|
 | 로그인 사용자 | JWT(각 컨트롤러에 `[Authorize]` 명시) | 인증된 사용자 | 컨테이너 관리 / 리소스 버전 기록 |
 | 익명 WebHook | - | - | 이 호스트에 컴파일된 WebHook 없음 |
-| 머신 간 | `[AllowAnonymous]` + `TenantGameAppOpenAccessAuthMiddleware` | 연결된 사용자 | `PackageBuildReportController` / `FeatureSwitchSyncController` |
+| 머신 간 | `[AllowAnonymous]` + 오픈 액세스 HMAC 인증 미들웨어(머신 채널) | 연결된 사용자 | `PackageBuildReportController` / `FeatureSwitchSyncController` |
 
 머신 자격 증명 방식은 AccessKey + 서명 + scope를 검증하며 **JWT가 아닙니다**. 따라서 Controller에 `[AllowAnonymous]`를 표시해 JWT를 건너뛰고, 전용 미들웨어가 처리합니다.
 
 **4. 메인 DB와 자격 증명에 연결된 사용자.**
-JWT 요청은 인증된 사용자를 사용합니다. 머신 요청은 AccessKey, HMAC 서명, scope, 폐기 상태, 연결된 사용자를 검증하며 테넌트나 앱을 선택하지 않습니다.
+JWT 요청은 인증된 사용자를 사용합니다. 머신 요청은 AccessKey, HMAC 서명, scope, 폐기 상태, 연결된 사용자를 검증하며 자격 증명은 사용자에게 직접 연결됩니다.
 
 **5. 자체 낙관적 잠금 미들웨어와 헬스 체크 내장.**
 `OptimisticConcurrencyMiddleware`가 파이프라인 맨 앞에 있어 동시성 제어가 필요한 쓰기 작업의 안전망이 됩니다. 헬스 체크 엔드포인트는 3개: `/health`, `/health/live`, `/health/ready`(compose가 생존 프로브로 사용).
@@ -407,7 +406,7 @@ OptimisticConcurrencyMiddleware
   → Swagger(스위치 제어)
   → CORS
   → Authentication → Authorization
-  → TenantGameAppOpenAccessAuthMiddleware(/api/PackageBuildReport / /api/FeatureSwitchSync)
+  → 오픈 액세스 HMAC 인증 미들웨어(/api/PackageBuildReport / /api/FeatureSwitchSync)
   → HealthChecks / MapControllers
 ```
 
@@ -438,14 +437,14 @@ Admin API의 독립 JSON 구성은 모두 `GameFrameX.Application/Configuration/
 | 기능 | 서비스 클래스 | 설명 |
 |------|--------|--------|
 | 인증 로그인 | `SystemAuthService` | 계정 비밀번호 로그인, JWT 발급 + 자동 갱신, 캡차 |
-| 사용자 관리 | `SystemUserService` | 사용자 CRUD, 비밀번호 초기화, 사용자-역할 바인딩(주의: 이 서비스가 실제로 관리하는 것은 `TenantUser`이며, 명명이 다소 오해의 소지가 있음) |
-| 역할 관리 | `TenantRoleService` | 역할 CRUD, 데이터 범위 제어, 역할-메뉴 권한 바인딩 |
+| 사용자 관리 | `SystemUserService` | 사용자 CRUD, 비밀번호 초기화, 사용자-역할 바인딩 |
+| 역할 관리 | `RoleService` | 역할 CRUD, 데이터 범위 제어, 역할-메뉴 권한 바인딩 |
 | 메뉴 권한 | `GlobalMenuService` | 트리 메뉴, 버튼 수준 권한 파싱, 라우팅과 API 매핑 |
 | 사전 관리 | `GlobalDictTypeService` / `GlobalDictDataService` | 사전 타입과 사전 값 CRUD, 상태 전환 |
-| 파일 관리 | `TenantFileService` | 파일 업로드/다운로드, OSS 객체 스토리지 |
+| 파일 관리 | `FileService` | 파일 업로드/다운로드, OSS 객체 스토리지 |
 | 정기 작업 | `SystemJobService` | 작업과 트리거 CRUD, 일시 정지 / 시작 / 즉시 실행, 클러스터 조율 |
 | 데이터베이스 관리 | `SystemDatabaseService` | 테이블 / 컬럼 CRUD, DB 테이블 구조 온라인 관리 |
-| 온라인 사용자 | `TenantOnlineUserService` | 실시간 온라인 목록, 강제 로그아웃, 싱글 사인온 |
+| 온라인 사용자 | `OnlineUserService` | 실시간 온라인 목록, 강제 로그아웃, 싱글 사인온 |
 | 로그 시스템 | `LogOperationService` / `LogExceptionService` / `LogVisitService` / `LogDiffService` | 작업 로그, 예외 로그, 접속 로그, 데이터 변경 감사, Excel 내보내기 지원 |
 | 캐시 관리 | `SystemCacheService` | 통일 캐시 추상화(Memory / Redis), 캐시 키 관리 |
 | 시스템 구성 | `SystemConfigService` | 키-값 쌍 구성 CRUD |
@@ -489,9 +488,9 @@ Admin API의 독립 JSON 구성은 모두 `GameFrameX.Application/Configuration/
 | 리소스 패키지 | `GameAppAssetPackageService` | AssetBundle / 리소스 패키지 관리 |
 | 리소스 버전 | `GameAppAssetPackageVersionService` | 리소스 패키지 버전 추적 |
 | 리소스 이력 | `GameAppAssetPackageVersionHistoryService` | 리소스 버전 변경 기록 |
-| 채널 정의 | `GlobalChannelDefinitionService` / `TenantChannelDefinitionService` | 배포 채널(App Store, Google Play 등) |
-| 기기 관리 | `TenantDeviceService` | 기기 등록과 식별(`Application.Tenant`에 위치) |
-| 기기 그룹 | `TenantDeviceGroupService` | 기기 그룹(그레이스케일 / A/B 테스트, `Application.Tenant`에 위치) |
+| 채널 정의 | `GlobalChannelDefinitionService` / `ChannelDefinitionService` | 배포 채널(App Store, Google Play 등) |
+| 기기 관리 | `DeviceService` | 기기 등록과 식별(`Application.Business`에 위치) |
+| 기기 그룹 | `DeviceGroupService` | 기기 그룹(그레이스케일 / A/B 테스트, `Application.Business`에 위치) |
 | 다국어 | `GlobalLanguageService` | 지원 언어 구성 |
 | 분할 패키지 관리 | `GameAppPackageService` | 앱 분할 패키지, 채널 바인딩과 마스터 패키지 상속 관리 |
 | 플랫폼 관리 | `GlobalPlatformService` | 실행 플랫폼(iOS, Android 등) |
@@ -552,7 +551,7 @@ public class GameItemEntity : EntityBasic
 
 | 기본 클래스 | 특징 | 적용 시나리오 |
 |------|------|----------|
-| `EntityBaseId` | `Id`만 있음 | 연결 테이블, 테넌트 없는 엔티티 |
+| `EntityBaseId` | `Id`만 있음 | 연결 테이블, 생성자/감사 열 없는 엔티티 |
 | `EntityBase` | Id + 감사 필드 + 소프트 삭제 | 메인 DB 엔티티 |
 | `EntityBasic` | `EntityBase` 상속 | 범용 비즈니스 엔티티(가장 많이 사용) |
 | `EntityBasicData` | 생성자 데이터 권한 | `CreatedId`로 필터링 |
@@ -579,7 +578,7 @@ public class GameItemSeedData : ISqlSugarEntitySeedData<GameItemEntity>
 
 ### 3. Service 작성
 
-`GameFrameX.Application.Game/Service/`(또는 System / Client / Tenant) 아래에 서비스를 생성합니다:
+`GameFrameX.Application.Game/Service/`(또는 System / Client / Business) 아래에 서비스를 생성합니다:
 
 ```csharp
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
@@ -729,7 +728,7 @@ SuperAdmin의 권한 우회는 유지됩니다. 모든 호스트는 메인 DB를
 Hub는 Admin의 JWT 키를 재사용하지만, 자체 `appsettings.json`의 `JWTSettings` 노드를 읽습니다. 양쪽 키(`IssuerSigningKey` / `ValidIssuer` / `ValidAudience`)가 반드시 일치해야 합니다. 불일치하면 발급된 token을 서로 인정하지 않습니다.
 
 **빌드 보고(PackageBuildReport)에서 401?**
-머신 채널은 `TenantGameAppOpenAccessAuthMiddleware`에서 AccessKey, HMAC 서명, scope, 연결된 사용자를 검증합니다。
+머신 채널은 오픈 액세스 HMAC 인증 미들웨어에서 AccessKey, HMAC 서명, scope, 연결된 사용자를 검증합니다。
 
 ### 함정
 
@@ -774,11 +773,11 @@ cd .. && docker compose up --build   # 통합 오케스트레이션은 리포지
 
 ### 출시 전 체크리스트: 데이터베이스 재적재와 컴팩트 숏 ID
 
-이 절은 2026-09-15의 기존 긴 ID에서 짧은 ID로의 전환만 설명하며 데이터 변환 스크립트는 없습니다. 이미 짧은 ID를 사용하는 기본 인스턴스는 위의 단일 메인 DB 마이그레이션을 사용할 수 있습니다. 이 도구는 기존 긴 ID를 변환하지 않습니다.
+이 절은 2026-09-15의 기존 긴 ID에서 짧은 ID로의 전환만 설명하며 데이터 변환 스크립트는 없습니다. C406부터는 마이그레이션 도구 자체를 제공하지 않습니다. 2.0은 단일 메인 DB의 신규 초기화만 지원하며, 기존 DB는 릴리스 전 전체 백업으로만 롤백할 수 있습니다.
 
-컴팩트 숏 ID 레이아웃의 출시 방침은 **리셋 가능, 마이그레이션 스크립트 없음**입니다(2026-09-15 결정): 신규/기존 ID 레이아웃은 호환되지 않으므로, 프로덕션 PG 메인 DB / 테넌트 DB는 "비우고 재적재" 방식으로 출시하며, 신규/기존 ID 혼재 쓰기를 허용하지 않습니다. 출시 전에 확인하세요:
+컴팩트 숏 ID 레이아웃의 출시 방침은 **리셋 가능, 마이그레이션 스크립트 없음**입니다(2026-09-15 결정): 신규/기존 ID 레이아웃은 호환되지 않으므로, 프로덕션 PG 메인 DB는 "비우고 재적재" 방식으로 출시하며, 신규/기존 ID 혼재 쓰기를 허용하지 않습니다. 출시 전에 확인하세요:
 
-1. **비우고 재적재**: 프로덕션 PG 메인 DB + 전체 테넌트 DB를 비우고, 각 host 시작 시 재구축(CodeFirst 테이블 생성 + 시드 데이터 재적재). 기존 DB의 18-19자리 긴 Id 데이터를 새 레이아웃으로 마이그레이션하지 마세요——신규/기존 Id 공간 중복은 데이터 무결성 사고입니다.
+1. **비우고 재적재**: 프로덕션 PG 메인 DB를 비우고, 각 host 시작 시 재구축(CodeFirst 테이블 생성 + 시드 데이터 재적재). 기존 DB의 18-19자리 긴 Id 데이터를 새 레이아웃으로 마이그레이션하지 마세요——신규/기존 Id 공간 중복은 데이터 무결성 사고입니다.
 2. **WorkerId 상호 배제 확인**: 동일한 DB에 쓰는 모든 인스턴스(Web.Api 복제본 / Hub / Client)의 `SnowFlake__WorkerId`가 서로 다르고 0-7 범위 내인지 확인. 기본값 1/2/3은 단일 머신 배포에서만 충돌이 없음을 보장; 복제본 확장 전에 반드시 명시적으로 할당하세요.
 3. **규모 샘플 검사**: 재적재 후 비즈니스 테이블의 기본 키를 샘플링하면 13-14자리 숫자여야 합니다(< 2^53). 18-19자리가 보이면 Foundation 발급 경로를 벗어난 것이므로 중단하고 조사하세요.
 

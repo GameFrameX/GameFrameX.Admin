@@ -23,7 +23,7 @@ Build / run / 前端脚本见 `gfx-doc/agent-handbook/INDEX.md` 的 Build & Run;
 - Root `gfx-doc/` is the only code-side document system.
 - Keep `AGENTS.md`, `CLAUDE.md`, and `gfx-doc` as root-level entry points only.
 - Use SqlSugar patterns in backend work; do not introduce Entity Framework.
-- Preserve tenant boundaries: `全局配置` is SuperAdmin-only; tenant features belong under tenant-visible business menus.
+- `全局配置` is SuperAdmin-only; admin-facing business features belong under admin-visible business menus. `ServerId` is the only operational scope.
 - Prefer existing local patterns and generated API clients before adding new abstractions.
 - Any change affecting user-visible behavior MUST be verified by real browser end-to-end (see **Verification Standard** below). Compile-only or API-only (curl/fetch) verification is NOT acceptable as the sole evidence for such changes.
 
@@ -37,7 +37,7 @@ Any change a user can see or click must be verified in a real browser before rep
 
 **What counts as real-browser verification:**
 - Drive the actual Vue app (default dev server `http://127.0.0.1:20800`, hash router) with the e2e suite under `GameFrameX.Admin.Unified.Vue/e2e/` (Playwright, `channel: 'msedge'` launches system Edge — no manual CDP/browser step; run `pnpm run test:e2e` from the Vue root).
-- Perform real interactions (form login with the right tenant, navigate by real menu), prove the page's real API fired (route recorder), then assert the DOM renders the expected data (account, tenant, the row/field under test).
+- Perform real interactions (form login, navigate by real menu), prove the page's real API fired (route recorder), then assert the DOM renders the expected data (account, server selection, the row/field under test).
 - Evidence lands automatically under `GameFrameX.Admin.Unified.Vue/e2e/.e2e/`: per-test artifacts in `results/<test>/` (explicit `shot(page, 'label')` screenshots + trace.zip on failure), plus `report.json` and the HTML report in `report/` (`pnpm run test:e2e:report`). Use the `shot()` helper from `e2e/tests/helpers.ts` for explicit proof shots.
 
 **What is NOT sufficient on its own:**

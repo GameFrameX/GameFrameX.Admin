@@ -67,7 +67,7 @@ Client API と Hub API はどちらもより「スリム」です：Client API �
 
 1. **Service を書けば自動的に API が生える**（Admin API）。`IDynamicApiController` を実装すると、クラス内の public メソッドが自動的に REST エンドポイントになります。Controller を手書きしたり `[Route]` を手で貼ったりする必要はありません。これが Admin API の魂です。
 2. **エンティティを書けば自動的にテーブルができる**。SqlSugar Code-First：起動時にエンティティクラスをスキャン → テーブル生成 → シードデータ投入。CREATE TABLE の SQL を 1 行も書かなくてよく、フィールドを変えたら再起動するだけでテーブル構造が追従します。
-3. **3 ホストは単一のメイン DB を共有**。リポジトリは `ConfigId=main` を使用し、ログインと業務データからテナント・アプリの軸を廃止。ソフトデリートと作成者ベースの権限は維持します。
+3. **3 ホストは単一のメイン DB を共有**。リポジトリは `ConfigId=main` を使用し、ログインと業務データにマルチ DB の軸はありません。ソフトデリートと作成者ベースの権限は維持します。
 
 ---
 
@@ -107,7 +107,7 @@ Admin API（20802）              Client API（20808）            Hub API（208
 依存関係はこんな形です（左から右が参照方向）：
 
 ```
-Web.Api → Web.Core → Application.{System, Game, Client, Tenant} → Core → Entity → Core.Enum
+Web.Api → Web.Core → Application.{System, Game, Client, Business} → Core → Entity → Core.Enum
 Client.Api（独立、Entity + Payment のみ参照）
 Hub.Api（独立、Application.Game + Core + Entity を参照するが、Controller は Application Service を呼ばない）
 ```
@@ -134,7 +134,7 @@ GameFrameX.Admin.Unified.Api/
 ├── GameFrameX.Application.System/ # システム管理サービス（ユーザー/ロール/メニュー/ログ…）
 ├── GameFrameX.Application.Game/   # ゲーム管理サービス（サーバー/注文/メール/引換コード…）
 ├── GameFrameX.Application.Client/ # クライアント管理サービス（バージョン/チャネル/リソースパッケージ…）
-├── GameFrameX.Application.Tenant/ # 業務サービス（デバイス / デバイスグループ、プロジェクト名は後続で変更予定）
+├── GameFrameX.Application.Business/ # 業務サービス（デバイス / デバイスグループ）
 ├── GameFrameX.Entity/             # エンティティ層（Base / System / Game / Client）
 ├── GameFrameX.Core/               # コア層（リポジトリ、サービス基底クラス、認証、SignalR）
 ├── GameFrameX.Core.Enum/          # 列挙型定義
@@ -176,13 +176,12 @@ GameFrameX.Admin.Unified.Api/
 **本番 / コンテナ（PostgreSQL、環境変数でペア上書き）**：データベースを上書きする場合、タイプと接続文字列は必ず**ペアで**設定します。片方だけの上書きは起動時に即エラーになります。3 つの host（Web / Client / Hub）は**同じペアの変数**を使います：
 
 - `GFX_MAIN_DB_TYPE=PostgreSQL` + `GFX_MAIN_DB_CONNECTION_STRING=Host=...`
-- 3 ホストは `ConfigId=main` のみを使用します。テナント DB の自動作成・導出は行いません。
+- 3 ホストは `ConfigId=main` のみを使用します。単一メイン DB がすべての DB であり、他の DB の自動作成・導出は行いません。
 - 既存デプロイの素の `DbType` / `ConnectionString` 起動パラメータも引き続き使用可能（互換層）ですが、起動時に移行警告が出るので、早めに切り替えてください
 - 他のデータベース（MySQL / Oracle / 達夢……全 34 種の DbType）への切り替えの接続文字列の書き方と例：[`GameFrameX.Application/Configuration/Database-ConnectionStrings.md`](GameFrameX.Application/Configuration/Database-ConnectionStrings.md)
 
 データベースについて、他にも知っておくべき決まりがいくつかあります：
 
-- **デフォルトのセルフホスト環境の移行**：書き込みを停止し両 DB をバックアップ後、`db/single-main/migrate-default-instance.sh --dry-run`、続いて `--execute` を実行します。`GFX_MIGRATION_DATABASE_TYPE`、`GFX_MIGRATION_SOURCE`、`GFX_MIGRATION_TARGET` を設定してください。複数テナント・複数アプリ・データ競合は拒否します。dry-run はロールバックされ、再実行は冪等です。
 - **Compose 内蔵 PostgreSQL**。リポジトリルートで `docker compose up` を実行すると `postgres:16-alpine` が一緒に起動します（初回起動時に自動構築、`docker/postgres/init.sql` 参照、データはリポジトリルートの `postgres-data/` bind mount に保存）。ホスト側の既存 postgres コンテナを再利用する場合は、リポジトリルートの `.env` に `POSTGRES_HOST=host.docker.internal` などの変数を設定し、api サービスの `postgres` への `depends_on` を外すだけです。
 - **3 つの host は同じデフォルト設定を共有**。Client / Hub は起動時に `Database.json` を自動ロードします（Admin と同一ソース、1 ヵ所変えれば 3 ヵ所に反映）。環境変数での上書き方法は compose と同一です。
 
@@ -288,7 +287,7 @@ public class MyService : ITransient, IDynamicApiController
 
 ### リポジトリと単一メイン DB
 
-`SqlSugarRepository<T>` は常にメイン接続（`ConfigId=main`）を使用します。エンティティ属性によるテナント DB 選択は廃止しました。
+`SqlSugarRepository<T>` は常にメイン接続（`ConfigId=main`）を使用し、3 ホストが単一メイン DB を共有します。
 
 ### 認証体系：JWT 共通＋署名
 
@@ -320,7 +319,7 @@ SqlSugar AOP が `SqlSugarSetup.SetDbAop()` の中でこの仕事を代行しま
 | Insert | `CreatedTime`、`CreatedId`、`CreatedName` |
 | Update | `UpdateTime`、`UpdatedId`、`UpdatedName` |
 
-同時に、データ変更を監査ログ（`SystemLogDiff` / `TenantLogDiff`）に書き込みます。エンティティを作るとき、監査フィールドの値は自分で入れなくてよく、フレームワークが埋めてくれます。
+同時に、データ変更を監査ログ（`SystemLogDiff` / `LogDiff`）に書き込みます。エンティティを作るとき、監査フィールドの値は自分で入れなくてよく、フレームワークが埋めてくれます。
 
 ### スノーフレーク ID
 
@@ -359,7 +358,7 @@ Admin API の `AdminResultProvider` がすべてのレスポンスに統一の�
 ### SignalR リアルタイム通信
 
 - Hub：`OnlineUserHub`、パス `/hubs/onlineUser`
-- 接続は認証済みユーザーを使用し、テナント別メッセージグループは作成しません。
+- 接続は認証済みユーザーを使用します。
 - できること：オンラインユーザー一覧、強制ログアウト、メッセージ送信（ユニキャスト / ブロードキャスト / 自分以外 / 特定ユーザー）
 - マルチインスタンスデプロイでは任意で Redis Backplane + Data Protection Key の永続化が可能で、メッセージをインスタンス横断でプッシュできる
 
@@ -390,12 +389,12 @@ Hub API（`GameFrameX.Hub.Api`、ポート `20806`）は**外部システム**�
 |------|----------|-----------|------|
 | ログインユーザー | JWT（各コントローラーが `[Authorize]` を明示） | 認証済みユーザー | コンテナ制御 / リソースバージョンの書き戻し |
 | 匿名 WebHook | - | - | このホストにコンパイル済み WebHook はありません |
-| マシン間 | `[AllowAnonymous]` + `TenantGameAppOpenAccessAuthMiddleware` | 紐付くユーザー | `PackageBuildReportController` / `FeatureSwitchSyncController` |
+| マシン間 | `[AllowAnonymous]` + オープンアクセス HMAC 認証ミドルウェア（マシン経路） | 紐付くユーザー | `PackageBuildReportController` / `FeatureSwitchSyncController` |
 
 マシン証憑の仕組みが検証するのは AccessKey + 署名 + scope で、**JWT ではありません**。だから Controller は `[AllowAnonymous]` で JWT をスキップし、専用ミドルウェアが引き受けます。
 
 **4. メイン DB と認証情報に紐付くユーザー。**
-JWT は認証済みユーザーを使用します。マシン経路は AccessKey、HMAC 署名、scope、失効状態、紐付くユーザーを検証し、テナントやアプリは選択しません。
+JWT は認証済みユーザーを使用します。マシン経路は AccessKey、HMAC 署名、scope、失効状態、紐付くユーザーを検証し、資格情報はユーザーに直接紐付きます。
 
 **5. 楽観ロックミドルウェアとヘルスチェックを内蔵。**
 `OptimisticConcurrencyMiddleware` はパイプラインの先頭にいて、並行制御が必要な書き込み操作を下支えします。ヘルスチェックのエンドポイントは 3 つ：`/health`、`/health/live`、`/health/ready`（compose の liveness probe に使用）。
@@ -407,7 +406,7 @@ OptimisticConcurrencyMiddleware
   → Swagger（スイッチ制御）
   → CORS
   → Authentication → Authorization
-  → TenantGameAppOpenAccessAuthMiddleware（/api/PackageBuildReport / /api/FeatureSwitchSync）
+  → オープンアクセス HMAC 認証ミドルウェア（/api/PackageBuildReport / /api/FeatureSwitchSync）
   → HealthChecks / MapControllers
 ```
 
@@ -438,14 +437,14 @@ Admin API の独立した JSON 設定はすべて `GameFrameX.Application/Config
 | 機能 | サービスクラス | 説明 |
 |------|--------|--------|
 | 認証ログイン | `SystemAuthService` | アカウントとパスワードでのログイン、JWT 発行 + 自動更新、CAPTCHA |
-| ユーザー管理 | `SystemUserService` | ユーザーの CRUD、パスワードリセット、ユーザー-ロール紐付け（注意：このサービスが実際に管理するのは `TenantUser`。命名は少しミスリード） |
-| ロール管理 | `TenantRoleService` | ロール CRUD、データ範囲制御、ロール-メニュー権限紐付け |
+| ユーザー管理 | `SystemUserService` | ユーザーの CRUD、パスワードリセット、ユーザー-ロール紐付け |
+| ロール管理 | `RoleService` | ロール CRUD、データ範囲制御、ロール-メニュー権限紐付け |
 | メニュー権限 | `GlobalMenuService` | ツリー形式メニュー、ボタン単位の権限解決、ルートと API のマッピング |
 | 辞書管理 | `GlobalDictTypeService` / `GlobalDictDataService` | 辞書タイプと辞書値の CRUD、状態切替 |
-| ファイル管理 | `TenantFileService` | ファイルのアップロード・ダウンロード、OSS オブジェクトストレージ |
+| ファイル管理 | `FileService` | ファイルのアップロード・ダウンロード、OSS オブジェクトストレージ |
 | 定期ジョブ | `SystemJobService` | ジョブとトリガーの CRUD、一時停止 / 開始 / 即時実行、クラスタ協調 |
 | データベース管理 | `SystemDatabaseService` | テーブル / 列 CRUD、DB・テーブル構造のオンライン管理 |
-| オンラインユーザー | `TenantOnlineUserService` | リアルタイムオンライン一覧、強制ログアウト、シングルサインオン |
+| オンラインユーザー | `OnlineUserService` | リアルタイムオンライン一覧、強制ログアウト、シングルサインオン |
 | ログシステム | `LogOperationService` / `LogExceptionService` / `LogVisitService` / `LogDiffService` | 操作ログ、例外ログ、アクセスログ、データ変更監査、Excel エクスポート対応 |
 | キャッシュ管理 | `SystemCacheService` | 統一キャッシュ抽象（Memory / Redis）、キャッシュキー管理 |
 | システム設定 | `SystemConfigService` | キー・バリュー設定の CRUD |
@@ -489,9 +488,9 @@ Admin API の独立した JSON 設定はすべて `GameFrameX.Application/Config
 | リソースパッケージ | `GameAppAssetPackageService` | AssetBundle / リソースパッケージ管理 |
 | リソースバージョン | `GameAppAssetPackageVersionService` | リソースパッケージのバージョン追跡 |
 | リソース履歴 | `GameAppAssetPackageVersionHistoryService` | リソースバージョンの変更履歴 |
-| チャネル定義 | `GlobalChannelDefinitionService` / `TenantChannelDefinitionService` | 配信チャネル（App Store、Google Play など） |
-| デバイス管理 | `TenantDeviceService` | デバイスの登録と識別（`Application.Tenant` にある） |
-| デバイスグループ | `TenantDeviceGroupService` | デバイスのグルーピング（カナリア / A/B テスト、`Application.Tenant` にある） |
+| チャネル定義 | `GlobalChannelDefinitionService` / `ChannelDefinitionService` | 配信チャネル（App Store、Google Play など） |
+| デバイス管理 | `DeviceService` | デバイスの登録と識別（`Application.Business` にある） |
+| デバイスグループ | `DeviceGroupService` | デバイスのグルーピング（カナリア / A/B テスト、`Application.Business` にある） |
 | 多言語 | `GlobalLanguageService` | 対応言語の設定 |
 | 分割パッケージ管理 | `GameAppPackageService` | アプリの分割パッケージ、チャネル紐付けとベースパッケージ継承の管理 |
 | プラットフォーム管理 | `GlobalPlatformService` | 実行プラットフォーム（iOS、Android など） |
@@ -552,7 +551,7 @@ public class GameItemEntity : EntityBasic
 
 | 基底クラス | 特徴 | 適用シーン |
 |------|------|----------|
-| `EntityBaseId` | `Id` のみ | 紐付けテーブル、テナントなしエンティティ |
+| `EntityBaseId` | `Id` のみ | 紐付けテーブル、作成者 / 監査カラムなしのエンティティ |
 | `EntityBase` | Id + 監査フィールド + ソフトデリート | メイン DB のエンティティ |
 | `EntityBasic` | `EntityBase` を継承 | 汎用ビジネスエンティティ（最頻出） |
 | `EntityBasicData` | 作成者ベースのデータ権限 | `CreatedId` でフィルタ |
@@ -579,7 +578,7 @@ public class GameItemSeedData : ISqlSugarEntitySeedData<GameItemEntity>
 
 ### 3. Service を書く
 
-`GameFrameX.Application.Game/Service/`（または System / Client / Tenant）配下にサービスを作成します：
+`GameFrameX.Application.Game/Service/`（または System / Client / Business）配下にサービスを作成します：
 
 ```csharp
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
@@ -729,7 +728,7 @@ SuperAdmin の権限バイパスは維持します。全ホストがメイン DB
 Hub は Admin の JWT 鍵を再利用しますが、読むのは自分の `appsettings.json` の `JWTSettings` ノードです。両側の鍵（`IssuerSigningKey` / `ValidIssuer` / `ValidAudience`）は一致が必須。不一致だと発行された token を互いに受理しません。
 
 **ビルド報告（PackageBuildReport）が 401？**
-マシン経路は `TenantGameAppOpenAccessAuthMiddleware` で AccessKey、HMAC 署名、scope、紐付くユーザーを検証します。
+マシン経路はオープンアクセス HMAC 認証ミドルウェアで AccessKey、HMAC 署名、scope、紐付くユーザーを検証します。
 
 ### ハマりポイント
 
@@ -774,11 +773,11 @@ cd .. && docker compose up --build   # 統一オーケストレーションは�
 
 ### リリース前チェックリスト：DB 再投入とコンパクト短 ID
 
-この節は 2026-09-15 の旧ロング ID から短い ID への移行のみを説明し、データ変換スクリプトはありません。短い ID を使用中のデフォルト環境は、前述の単一メイン DB 移行を利用できます。このツールは旧ロング ID を変換しません。
+この節は 2026-09-15 の旧ロング ID から短い ID への移行のみを説明し、データ変換スクリプトはありません。C406 以降は移行ツール自体を提供しません。2.0 は単一メイン DB の新規初期化のみサポートし、旧 DB はリリース前の完全バックアップによる全体ロールバックでのみ復元できます。
 
-コンパクト短 ID レイアウトのリリース方針は**リセット可能、移行スクリプトなし**（2026-09-15 決定）：新旧の ID レイアウトは非互換で、本番 PG のメイン DB / テナント DB は「全消し再投入」でリリースし、新旧 ID の混在は許されません。リリース前に以下を確認：
+コンパクト短 ID レイアウトのリリース方針は**リセット可能、移行スクリプトなし**（2026-09-15 決定）：新旧の ID レイアウトは非互換で、本番 PG のメイン DB は「全消し再投入」でリリースし、新旧 ID の混在は許されません。リリース前に以下を確認：
 
-1. **全消し再投入**：本番 PG メイン DB + 全テナント DB を空にし、各 host の起動で再構築（CodeFirst によるテーブル作成 + シード再投入）。旧 DB の 18〜19 桁のロング Id データを新レイアウトへ移行しないこと——新旧 Id 空間の重複はデータ整合性事故です。
+1. **全消し再投入**：本番 PG メイン DB を空にし、各 host の起動で再構築（CodeFirst によるテーブル作成 + シード再投入）。旧 DB の 18〜19 桁のロング Id データを新レイアウトへ移行しないこと——新旧 Id 空間の重複はデータ整合性事故です。
 2. **WorkerId 相互排他の確認**：同じ DB に書き込むすべてのインスタンス（Web.Api レプリカ / Hub / Client）の `SnowFlake__WorkerId` が互いに異なり 0-7 の範囲内であること。デフォルト値 1/2/3 は単一マシン構成での非衝突しか保証しません。レプリカを増やす前に必ず明示的に割り当ててください。
 3. **桁数の抜き取りチェック**：再投入後、業務テーブルの主キーを抜き取り、13〜14 桁の数値（< 2^53）であることを確認。18〜19 桁が見えたら Foundation の採番を通っていない経路があるので、停止して調査してください。
 
