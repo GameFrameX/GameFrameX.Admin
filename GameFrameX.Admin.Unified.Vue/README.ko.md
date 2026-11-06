@@ -291,6 +291,7 @@ pnpm run dev    # 기본 http://localhost:20800
 
 - `GFX_SUPERADMIN_INITIAL_PASSWORD`: superadmin `superadmin`의 초기 비밀번호. 설정하지 않으면 로그인 페이지 첫 접속 시 초기 설치 마법사에서 설정합니다.
 - `GAMEFRAMEX_ADMIN_INITIAL_ACCOUNT` + `GAMEFRAMEX_ADMIN_INITIAL_PASSWORD`: 쌍으로 설정하면 백엔드 기동 시 **첫 번째 업무 관리자** 계정을 자동 생성합니다(`sys_admin` 역할에 바인딩, 모든 non-superadmin 메뉴 부여). 이 계정으로 로그인하면 업무 관리 화면에 진입할 수 있습니다. 메인 DB에 업무 관리자가 아직 없는 동안에만 한 번 적용됩니다.
+또한 플랫폼 비밀번호 정책은 기본적으로 꺼져 있습니다. 활성화하면 6–16자에 대소문자·숫자·특수문자가 필요하므로 초기 비밀번호를 그 규칙으로 설정하고 공개 전에 정책을 켜세요.
 
 ### 막혔다면?
 

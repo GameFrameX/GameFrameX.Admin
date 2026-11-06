@@ -290,6 +290,7 @@ pnpm run dev    # 預設 http://localhost:20800
 
 - `GFX_SUPERADMIN_INITIAL_PASSWORD`：超級管理員 `superadmin` 的初始密碼；不設則首次開啟登入頁走首裝嚮導設定。
 - `GAMEFRAMEX_ADMIN_INITIAL_ACCOUNT` + `GAMEFRAMEX_ADMIN_INITIAL_PASSWORD`：成對設定時，後端啟動會自動建立**首個業務管理員**帳號（綁定 `sys_admin` 角色、授權全部非超管選單），前端用它登入即可進業務後台；只在主庫還沒有任何業務管理員時生效一次。
+另注意「平台密碼策略」預設關閉：開啟後口令需 6–16 位並含大小寫字母、數字與特殊字元，建議初始口令按此設定並在上線前開啟策略。
 
 ### 卡住了？
 

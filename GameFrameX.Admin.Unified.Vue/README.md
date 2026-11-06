@@ -292,6 +292,8 @@ Where the first-deployment accounts come from (two backend-side environment vari
 - `GFX_SUPERADMIN_INITIAL_PASSWORD`: initial password of the superadmin `superadmin`; if unset, the first visit to the login page goes through the first-install wizard to set one.
 - `GAMEFRAMEX_ADMIN_INITIAL_ACCOUNT` + `GAMEFRAMEX_ADMIN_INITIAL_PASSWORD`: when set together, backend startup automatically creates the **first business administrator** account (bound to the `sys_admin` role with all non-superadmin menus granted); sign in with it to enter the business back office. Takes effect only once, while the main database has no business administrator yet.
 
+The platform password policy is off by default; once enabled, passwords need 6–16 characters with upper/lower case, digits and a special character — set the initial password that way and enable the policy before go-live.
+
 ### Stuck?
 
 | Symptom | Most likely cause |

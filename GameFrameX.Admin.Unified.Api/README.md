@@ -782,6 +782,8 @@ On the very first startup against an empty database, web-api runs the "first bus
 
 Idempotency: once the account exists it is neither recreated nor is its password overwritten; on every startup the `sys_admin` menu grants only add newly introduced seed menus and never remove existing grants (manual narrowing done by operators in role management survives restarts). When neither variable is set and no business administrator exists, startup logs a "business administrator not initialized" warning. No log line ever prints a password.
 
+> Password strength: the platform password policy is **off by default** on a fresh install (`strongPassword=false`), so neither initial password is strength-checked. Once enabled it requires 6–16 characters including upper case, lower case, digits and a special character. Set the initial passwords to that shape (12+ characters) and enable the policy before exposing the service.
+
 ### Pre-Release Checklist: Database Re-Seeding and Compact Short IDs
 
 This section describes only the historical long-ID to compact-ID upgrade (2026-09-15), which has no data conversion script. Since C406 there is no migration tooling at all: 2.0 only supports fresh single-main-database initialization; legacy databases must be rolled back wholesale from a pre-release backup.
