@@ -203,7 +203,7 @@ export async function logoutByMenu(page: Page): Promise<void> {
   await expect(page).toHaveURL(/#\/login/);
 }
 
-// C400 单实例账号不再拼接 @tenantId；身份与菜单必须由真实表单登录建立。
+// C400 单实例账号直接登录；身份与菜单必须由真实表单登录建立。
 export async function signIn(page: Page, account: string, password: string): Promise<string> {
   await page.goto('/#/login');
   await page.locator('#login-account').fill(account);

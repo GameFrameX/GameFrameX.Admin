@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { shot, expectOverview, userMenuButton, logoutByMenu, signIn, ADMIN_STATE } from './helpers';
 
-// 单 shell 登录后直达总览首页，旧应用选择卡片/应用工作台入口退场。
+// 单 shell 登录后直达总览首页，旧选择卡片/工作台入口退场。
 test('登录落地页渲染总览首页', async ({ page }) => {
   await page.goto('/');
   await expectOverview(page);
