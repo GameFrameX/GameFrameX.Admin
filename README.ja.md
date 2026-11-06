@@ -97,7 +97,9 @@ Compose には PostgreSQL + 3 つのホスト（20802/20806/20808）+ Admin フ�
 
 ### Admin 独立スタック（docker-compose.admin.yml）
 
-本番や隔離環境では Admin 独立 compose を利用できます。専用 PostgreSQL + 3 つの API ホストのみで、フロントエンドコンテナは含みません。管理画面の静的サイトは統一 compose の `web-vue` または独自の静的ホスティングで公開し、`WEB_VUE_API_URL` をブラウザから到達可能な Web API アドレスに設定してください。
+本番や隔離環境では Admin 独立 compose を利用できます。専用 PostgreSQL + 3 つの API ホストのみで、フロントエンドコンテナは含みません。管理画面の静的サイトは統一 compose の `web-vue` または独自の静的ホスティングで公開してください。`WEB_VUE_API_URL` は統一 compose の `web-vue` コンテナのみを設定するもので、自己ホストの静的サイトには作用しません。自己ホスト時はビルド・公開した `config/config.js` の `window.__env__.VITE_API_URL` をブラウザから到達可能な Web API アドレスに設定してください。
+
+起動前にルートの `.env`（または実行環境）で空でない `POSTGRES_PASSWORD` を設定してください。未設定の場合、Compose は起動前にエラーで中断します。
 
 ```bash
 docker compose -f docker-compose.admin.yml up -d --build

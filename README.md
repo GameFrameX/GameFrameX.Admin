@@ -97,7 +97,9 @@ Environment variable entry point: copy the root [`.env.example`](.env.example) t
 
 ### Admin-Independent Stack (docker-compose.admin.yml)
 
-Production or isolated environments can instead use the Admin-independent compose: its own PostgreSQL plus the three API hosts only, with no frontend container — serve the console static site from the unified stack's `web-vue` or your own static hosting, and point `WEB_VUE_API_URL` at a browser-reachable Web API address.
+Production or isolated environments can instead use the Admin-independent compose: its own PostgreSQL plus the three API hosts only, with no frontend container — serve the console static site from the unified stack's `web-vue` or your own static hosting. Note that `WEB_VUE_API_URL` only configures the `web-vue` container in the unified compose; it does not touch self-hosted static sites. For self-hosting, set `window.__env__.VITE_API_URL` to a browser-reachable Web API address in the built/published `config/config.js`.
+
+A non-empty `POSTGRES_PASSWORD` is required: set it in the root `.env` (or the runtime environment) before starting, otherwise Compose aborts before the stack comes up.
 
 ```bash
 docker compose -f docker-compose.admin.yml up -d --build

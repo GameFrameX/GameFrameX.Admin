@@ -97,7 +97,9 @@ Compose에는 PostgreSQL + 세 개의 host(20802/20806/20808) + Admin 프론트�
 
 ### Admin 독립 스택(docker-compose.admin.yml)
 
-프로덕션 또는 격리 환경에서는 Admin 독립 compose를 사용할 수 있습니다. 자체 PostgreSQL + 세 개의 API 호스트만 포함되며 프론트엔드 컨테이너는 없습니다. 콘솔 정적 사이트는 통합 compose의 `web-vue` 또는 자체 정적 호스팅으로 게시하고, `WEB_VUE_API_URL`을 브라우저에서 접근 가능한 Web API 주소로 설정하세요.
+프로덕션 또는 격리 환경에서는 Admin 독립 compose를 사용할 수 있습니다. 자체 PostgreSQL + 세 개의 API 호스트만 포함되며 프론트엔드 컨테이너는 없습니다. 콘솔 정적 사이트는 통합 compose의 `web-vue` 또는 자체 정적 호스팅으로 게시하세요. `WEB_VUE_API_URL`은 통합 compose의 `web-vue` 컨테이너에만 적용되며 자체 호스팅 정적 사이트에는 적용되지 않습니다. 자체 호스팅 시 빌드/배포된 `config/config.js`의 `window.__env__.VITE_API_URL`을 브라우저에서 접근 가능한 Web API 주소로 설정하세요.
+
+기동 전에 루트의 `.env`(또는 실행 환경)에 비어 있지 않은 `POSTGRES_PASSWORD`를 설정해야 합니다. 설정하지 않으면 Compose가 기동 전에 오류로 중단됩니다.
 
 ```bash
 docker compose -f docker-compose.admin.yml up -d --build

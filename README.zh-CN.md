@@ -97,7 +97,9 @@ Compose 内置 PostgreSQL + 三个 host（20802/20806/20808）+ Admin 前端（2
 
 ### Admin 独立栈（docker-compose.admin.yml）
 
-生产或隔离环境可改用 Admin 独立 compose：自带 PostgreSQL + 仅三个 API 宿主，不含前端容器——管理台静态站点用统一 compose 的 `web-vue` 或自有静态托管发布，并把 `WEB_VUE_API_URL` 指向浏览器可达的 Web API 地址。
+生产或隔离环境可改用 Admin 独立 compose：自带 PostgreSQL + 仅三个 API 宿主，不含前端容器——管理台静态站点用统一 compose 的 `web-vue` 或自有静态托管发布。注意 `WEB_VUE_API_URL` 只配置统一 compose 里的 `web-vue` 容器，不会作用于自托管静态站点；自托管时需在构建/发布的 `config/config.js` 中把 `window.__env__.VITE_API_URL` 设为浏览器可达的 Web API 地址。
+
+启动前必须在根目录 `.env`（或运行环境）设置非空 `POSTGRES_PASSWORD`，否则 Compose 会在启动前报错中止。
 
 ```bash
 docker compose -f docker-compose.admin.yml up -d --build
