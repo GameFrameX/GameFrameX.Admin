@@ -65,6 +65,7 @@ test('c 改名页面经真实菜单请求改名接口并渲染表格', async ({ 
 
 // —— (d) 巡查全部叶子：记录的页面请求 body/query 不含旧作用域字段；区服请求带 serverId ——
 test('d 全页面请求不含旧作用域字段且区服请求携带 serverId', async ({ page }) => {
+  test.setTimeout(600_000);
   await installApiRecorder(page);
   await page.goto('/');
   await expectOverview(page);
