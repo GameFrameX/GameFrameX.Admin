@@ -1,0 +1,72 @@
+# path_glob	token	reason
+# C406 D13 残留白名单（R2-a token 精确匹配；只允许 D2.5 第三方原生、D7 断代说明、R3-a 协议镜像、D12 负向测试）
+# D2.5：SqlSugar 原生多库 API（R2-a：仅放行实际调用 AsTenant() 的文件）
+GameFrameX.Admin.Unified.Api/GameFrameX.Core/SqlSugar/SqlSugarRepository.cs	AsTenant	SqlSugar 原生多库客户端 API（GetConnectionScope(MainConfigId)），D2.5 不改名
+GameFrameX.Admin.Unified.Api/GameFrameX.Core/SqlSugar/SqlSugarTransactionRunner.cs	AsTenant	SqlSugar 原生多库事务 API（BeginTran/CommitTran/RollbackTran），D2.5 不改名
+GameFrameX.Admin.Unified.Api/GameFrameX.Core/Job/LogJob.cs	AsTenant	SqlSugar 原生多库客户端 API，D2.5 不改名
+GameFrameX.Admin.Unified.Api/GameFrameX.Core/Service/Menu/GlobalMenuService.cs	AsTenant	SqlSugar 原生多库客户端 API，D2.5 不改名
+GameFrameX.Admin.Unified.Api/GameFrameX.Core/Logging/DatabaseLoggingWriter.cs	AsTenant	SqlSugar 原生多库客户端 API，D2.5 不改名
+GameFrameX.Admin.Unified.Api/GameFrameX.Application/Platform/DataBase/SystemDatabaseService.cs	AsTenant	SqlSugar 原生多库客户端 API（按 ConfigId 取连接），D2.5 不改名
+GameFrameX.Admin.Unified.Api/GameFrameX.Application/Audit/Retention/AuditRetentionService.cs	AsTenant	SqlSugar 原生多库客户端 API（GetConnectionScope(MainConfigId)），D2.5 不改名
+# D2.5：SqlSugar 原生 [Tenant] 特性反射（仅这两处 GetCustomAttribute<TenantAttribute>）
+GameFrameX.Admin.Unified.Api/GameFrameX.Core/SqlSugar/SqlSugarFilter.cs	Tenant	SqlSugar 原生 TenantAttribute 反射判断，D2.5 不改名
+GameFrameX.Admin.Unified.Api/GameFrameX.Core.Extension/RepositoryExtension.cs	Tenant	SqlSugar 原生 TenantAttribute 反射判断，D2.5 不改名
+# D2.5：第三方支付生态原生 AppId（微信/支付宝/Apple/Google 协议字段）
+GameFrameX.Admin.Unified.Api/Payment/**	AppId	支付平台协议字段或配置（微信/支付宝/Apple/Google），D2.5 保留
+GameFrameX.Admin.Unified.Api/Payment/**	appId	支付平台 wire 字段，D2.5 保留
+GameFrameX.Admin.Unified.Api/GameFrameX.Entity/System/SystemWechatPayEntity.cs	AppId	微信支付原生 AppId 配置列，D2.5 保留
+GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/PayConfig/PaymentOptionSettingDecryptClosureTests.cs	AppId	支付宝原生 AliPayAppId 加解密闭环样本，D2.5 保留
+GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/ClientApi/RuntimeCredentialDecryptClosureTests.cs	AppId	支付宝原生 AliPayAppId 加解密闭环样本，D2.5 保留
+GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/ClientApi/ClientApiWeChatPayCallbackTests.cs	AppId	微信支付回调协议测试，D2.5 保留
+# D7 断代说明：旧库拒绝启动守卫有意引用旧 schema 标志（行已标 c406-keep）
+GameFrameX.Admin.Unified.Api/GameFrameX.Core/Bootstrap/LegacySchemaStartupGuard.cs	tenant_	D7 旧库检测标志（tenant_ 前缀表 / system_tenant_entity），断代说明
+GameFrameX.Admin.Unified.Api/GameFrameX.Core/Bootstrap/LegacySchemaStartupGuard.cs	Tenant	D7 旧租户登记表断代说明（1.x SystemTenantEntity）
+GameFrameX.Admin.Unified.Api/GameFrameX.Core/Bootstrap/LegacySchemaStartupGuard.cs	tenant	D7 断代说明（多租户架构退场描述）
+GameFrameX.Admin.Unified.Api/GameFrameX.Core/SqlSugar/SqlSugarSetup.cs	tenant_	D7 守卫接线注释（旧 schema 标志 fail-closed）
+# R3-a：游戏服 Online 协议错误码镜像（vault error-code-table.md 唯一权威；后续项由游戏服仓/协议负责人收口）
+GameFrameX.Admin.Unified.Api/GameFrameX.Core/Enum/Errors/OnlineErrorCode.cs	tenant	R3-a 游戏服协议镜像（32200002 CrossTenantDenied 文案）
+GameFrameX.Admin.Unified.Api/error-codes.json	tenant	R3-a 协议镜像导出产物（ErrorCodeContractTests 生成，同 OnlineErrorCode）
+GameFrameX.Admin.Unified.Vue/src/i18n/pages/errors/en.ts	tenant	R3-a 协议镜像五语同步（32200002 en-US 文案）
+# D12：旧字段/旧路径负向测试（R2-b：明确断言旧三段 404、旧字段不解析不透传、旧属性不回归；行已标 c406-keep）
+GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/ClientApi/ClientApiRoleEndpointTests.cs	tenant	D12 负向断言：旧字段不出站（body/query/URI）
+GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/ClientApi/ClientApiRoleEndpointTests.cs	appId	D12 负向断言：旧字段不出站（body/query/URI）
+GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/ClientApi/ClientApiRoleEndpointTests.cs	gameAppId	D12 负向断言：旧字段不出站（body/query/URI）
+GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/ClientApi/ClientApiTokenIssuerTests.cs	tenant	D12 负向断言：签发 JWT 不含旧 claim、旧字段入 ExtraFields
+GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/ClientApi/ClientApiTokenIssuerTests.cs	appId	D12 负向断言：签发 JWT 不含旧 claim、旧字段入 ExtraFields
+GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/ClientApi/PublicCallbackLegacyRouteRejectionTests.cs	tenant	D12 负向断言：旧三段路由 404、旧路由值不建上下文
+GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/ClientApi/PublicCallbackLegacyRouteRejectionTests.cs	appId	D12 负向断言：旧三段路由 404、旧路由值不建上下文
+GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/ClientApi/PublicCallbackLegacyRouteRejectionTests.cs	gameAppId	D12 负向断言：旧三段路由 404、旧路由值不建上下文
+GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/ClientApi/PublicCallbackSingleMainTests.cs	tenant	D12 负向断言：旧查询串/路由值不参与解析
+GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/ClientApi/PublicCallbackSingleMainTests.cs	appId	D12 负向断言：旧查询串/路由值不参与解析
+GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/ClientApi/ClientApiEndpointCoverageTests.cs	tenant	D12 负向断言：端点路由模板不含旧三段
+GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/ClientApi/ClientApiEndpointCoverageTests.cs	appId	D12 负向断言：端点路由模板不含旧三段
+GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/ClientApi/ClientApiConfigEndpointTests.cs	tenant	D12 负向断言：配置响应不含旧作用域字段
+GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/ClientApi/ClientApiConfigEndpointTests.cs	appId	D12 负向断言：配置响应不含旧作用域字段
+GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/ClientApi/CryptoEnvelopeMiddlewareTests.cs	tenant	D12 负向断言：旧上下文字段不参与加密信封
+GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/ServerManager/Online/OnlineServerClientTests.cs	tenant	D12 负向断言：出站载荷不含旧三字段
+GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/ServerManager/Online/OnlineServerClientTests.cs	appId	D12 负向断言：出站载荷不含旧三字段
+GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/ServerManager/Online/OnlineServerClientTests.cs	gameAppId	D12 负向断言：出站载荷不含旧三字段
+GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/ServerManager/Online/OnlineScopeContextFactoryTests.cs	appId	D12 负向断言：越界错误样本可检索（c406-keep）
+GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/System/PlatformJwtIssuedClaimSetTests.cs	tenant	D12 负向断言：签发 claim 全集不含旧作用域 claim
+GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/System/PlatformJwtIssuedClaimSetTests.cs	appId	D12 负向断言：签发 claim 全集不含旧作用域 claim
+GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/HubApi/GameAppOpenAccessDecryptClosureTests.cs	tenant	D12 负向断言：机器通道身份不含旧作用域 claim
+GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/Bootstrap/LegacySchemaStartupGuardTests.cs	tenant_	D12 负向测试：预建 tenant_ 旧表触发启动拒绝
+GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/Bootstrap/LegacySchemaStartupGuardTests.cs	Tenant	D12 负向测试：旧租户登记表字面量触发拒绝
+GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/Bootstrap/LegacySchemaStartupGuardTests.cs	tenant	D12 负向测试：旧表名字面量（c406-keep）
+GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/SqlSugar/PhysicalTableNamespaceBoundaryTests.cs	tenant_	D12 负向断言：业务表禁止再现 tenant_ 前缀（c406-keep）
+GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/SqlSugar/SqlSugarDiffLogPrefixTests.cs	tenant_	D12 负向回归注释：lesson 原型引用旧前缀（c406-keep）
+GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/GameBusiness/GameAppFeatureSwitchServiceTests.cs	tenant_	D12 断代注释：业务表不再带 tenant_ 前缀（c406-keep）
+GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/SqlSugar/GameRoleAdvertisementEntityTests.cs	appId	D12 负向断言：实体列集合不含旧作用域列（c406-keep）
+GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/GameBusiness/RewardTemplateContractTests.cs	appId	D12 负向断言：DTO/源码不含旧作用域字段（c406-keep）
+GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/GameBusiness/GameCommodityEntityContractTests.cs	appId	D12 负向断言：旧字段按未知字段忽略、DTO 无旧属性（c406-keep）
+GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/AppManagement/GameAppPackageTests.cs	appId	D12 负向断言：请求 DTO 无旧作用域属性（c406-keep）
+GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/AppManagement/GameAppOpenAccessEntityTests.cs	appId	D12 负向断言：请求 DTO 无旧作用域属性（c406-keep）
+GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/GameAppDevice/GameAppDeviceContractTests.cs	appId	D12 负向断言：请求 DTO 无旧作用域属性（c406-keep）
+GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/MailCampaign/MailCampaignEntityServiceContractTests.cs	appId	D12 负向断言：DTO 属性集不含旧作用域字段（c406-keep）
+GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/GameOrder/GameOrderFulfillmentServiceContractTests.cs	appId	D12 负向断言：DTO 属性集不含旧作用域字段（c406-keep）
+GameFrameX.Admin.Unified.Vue/src/views/gmCenter/controlledOperation/commandForm.test.ts	appId	D12 负向断言：运营命令出站请求不含旧字段（c406-keep）
+GameFrameX.Admin.Unified.Vue/src/views/clientDelivery/gamePaymentConfigEntity/notifyUrl.test.ts	tenant	D12 负向断言：公开回调 URL 不含旧查询字段（c406-keep）
+GameFrameX.Admin.Unified.Vue/src/views/clientDelivery/gamePaymentConfigEntity/notifyUrl.test.ts	appId	D12 负向断言：公开回调 URL 不含旧查询字段（c406-keep）
+GameFrameX.Admin.Unified.Vue/scripts/check-frontend-standards.mjs	tenant	D12 负向自检：退役目录段必须被 views 白名单拒绝（c406-keep）
+# D13 执行机制自引用：守护测试自身的扫描正则与说明文字必然包含全部 token
+GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/Architecture/LegacyScopeResidualGuardTests.cs	AsTenant|ITenant|TenantTable|GameAppId|gameAppId|AppId|appId|app_id|tenant_|Tenant|tenant	D13 阻断测试自身（扫描正则与机制说明，文件名已按 R4 去 tenant）
