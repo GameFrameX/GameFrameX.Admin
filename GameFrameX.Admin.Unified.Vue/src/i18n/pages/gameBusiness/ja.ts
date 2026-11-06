@@ -42,7 +42,7 @@ export default {
 
         // Current application context (game business pages)
 
-        // Config scope (tenant default / app override)
+        // 設定スコープ（デフォルト / 上書き）
         configScope: {
             gameDefault: '既定の設定',
             scope: 'スコープ',
@@ -364,7 +364,7 @@ export default {
             addSenderName: '差出人名追加',
             addAttachment: '添付追加',
             name: 'キャンペーン名',
-            namePlaceholder: 'キャンペーン名を入力（appId+areaId 単位で一意）',
+            namePlaceholder: 'キャンペーン名を入力（エリア単位で一意）',
             nameRequired: 'キャンペーン名を入力してください',
             areaId: 'エリア ID',
             areaIdRequired: 'エリアを選択してください',

@@ -42,7 +42,7 @@ export default {
 
         // Current application context (game business pages)
 
-        // Config scope (tenant default / app override)
+        // 설정 범위（기본 / 재정의）
         configScope: {
             gameDefault: '기본 설정',
             scope: '스코프',
@@ -364,7 +364,7 @@ export default {
             addSenderName: '발신자 이름 추가',
             addAttachment: '첨부 추가',
             name: '캠페인 이름',
-            namePlaceholder: '캠페인 이름 입력 (appId+areaId 단위 고유)',
+            namePlaceholder: '캠페인 이름 입력 (영역 서버별 고유)',
             nameRequired: '캠페인 이름을 입력하세요',
             areaId: '영역 ID',
             areaIdRequired: '영역을 선택하세요',

@@ -42,7 +42,7 @@ export default {
 
         // Current application context (game business pages)
 
-        // Config scope (tenant default / app override)
+        // Configuration scope (default / override)
         configScope: {
             gameDefault: 'Default configuration',
             scope: 'Scope',
@@ -364,7 +364,7 @@ export default {
             addSenderName: 'Add Sender Name',
             addAttachment: 'Add Attachment',
             name: 'Campaign Name',
-            namePlaceholder: 'Enter campaign name (unique per appId+areaId)',
+            namePlaceholder: 'Enter campaign name (unique per area)',
             nameRequired: 'Please enter campaign name',
             areaId: 'Area ID',
             areaIdRequired: 'Please select area',

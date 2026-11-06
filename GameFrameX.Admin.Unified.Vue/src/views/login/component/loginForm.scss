@@ -59,7 +59,7 @@
       caret-color: var(--p-primary-color);
 
       // Chromium 截断 placeholder 跟随 input 自身的 text-overflow（伪元素上设置无效）：
-      // 长占位文案（账号@租户ID 格式提示）窄屏省略号截断，避免拦腰断字。
+      // 长账号提示在窄屏使用省略号截断，避免拦腰断字。
       // InputText 根即 input；Password 的 input 是后代——两种形态都覆盖
       overflow: hidden;
       text-overflow: ellipsis;

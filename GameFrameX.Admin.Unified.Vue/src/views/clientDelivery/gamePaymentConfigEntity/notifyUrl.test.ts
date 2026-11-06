@@ -75,7 +75,7 @@ test('buildNotifyUrl omits packageId segment when missing, zero, or empty', () =
   expect(buildNotifyUrl({ ...base, packageId: undefined })).toBe('/api/gameOrder/notifyApple')
 })
 
-test('buildNotifyUrl omits tenant and app path segments', () => {
+test('buildNotifyUrl uses the canonical callback path without retired scope segments', () => {
   const url = buildNotifyUrl({ payChannel: 'alipay' })
   expect(url).toBe('/api/gameOrder/notifyAliPay')
 })

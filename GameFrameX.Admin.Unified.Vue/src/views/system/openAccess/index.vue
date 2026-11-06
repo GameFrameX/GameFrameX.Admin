@@ -34,7 +34,6 @@
           <Column field="accessKey" :header="t('system.openAccess.accessName')"/>
           <Column field="accessSecret" :header="t('message.system.openAccess.accessSecret')"/>
           <Column field="bindUserAccount" :header="t('message.system.openAccess.bindUserAccount')"/>
-          <Column field="bindTenantName" :header="t('message.system.openAccess.bindTenantName')"/>
           <TimeColumn field="createdTime" :header="t('common.label.createTime')" align="center" />
         </CrudDataTable>
       </template>

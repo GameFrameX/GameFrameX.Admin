@@ -1,4 +1,4 @@
-// Defined content (APP cockpit = tenant home after selecting an app)
+// Defined content (single-game operations home)
 export default {
     appHome: {
         kpiOnline: 'Online · THIS APP',

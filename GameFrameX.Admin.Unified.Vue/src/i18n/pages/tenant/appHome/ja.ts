@@ -1,4 +1,4 @@
-// 定義内容（APP-コックピット=テナントがアプリ選択後の運用ホーム）
+// 定義内容（単一ゲーム運用ホーム）
 export default {
     appHome: {
         kpiOnline: 'アプリオンライン · ONLINE',

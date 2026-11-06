@@ -7,7 +7,7 @@ export default {
         forgotHint: '忘記憑證？請聯絡系統管理員',
         account: {
             accountLabel: '帳號',
-            accountPlaceholder: "admin{'@'}租戶ID",
+            accountPlaceholder: "請輸入管理員帳號",
             passwordLabel: '密碼',
             passwordPlaceholder: '123456',
             codeLabel: '驗證碼',

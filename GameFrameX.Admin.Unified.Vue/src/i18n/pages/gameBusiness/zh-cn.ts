@@ -42,7 +42,7 @@ export default {
 
         // Current application context (game business pages)
 
-        // Config scope (tenant default / app override)
+        // 配置作用域（默认 / 覆盖）
         configScope: {
             gameDefault: '默认配置',
             scope: '作用域',
@@ -364,7 +364,7 @@ export default {
             addSenderName: '添加发件人名称',
             addAttachment: '添加附件',
             name: '活动名称',
-            namePlaceholder: '请输入活动名称（同一 appId+areaId 下唯一）',
+            namePlaceholder: '请输入活动名称（同一区服下唯一）',
             nameRequired: '请输入活动名称',
             areaId: '区服 ID',
             areaIdRequired: '请选择区服',

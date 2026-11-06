@@ -216,8 +216,6 @@ const onQuerySelectorAssetPackageName = async () => {
   querySelectorParams.value.assetPackageName = res.data.data
 }
 
-// 切换应用：清空包名筛选并按新应用重载包名候选，避免残留其它应用的包。
-
 onQuerySelectorChannel()
 onQuerySelectorPlatform()
 onQuerySelectorAppVersion()

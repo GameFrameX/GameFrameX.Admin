@@ -16,7 +16,7 @@ function isNewGameMode(id: unknown): boolean {
 
 function isNewSystemMode(id: unknown): boolean {
     // 雪花 long 的 JSON 形态是字符串（超出 JS 安全整数），正整数字符串同样是已有项；
-    // 否则菜单/租户等 long 主键行编辑会被误判为新增，提交打到 add 接口报"路由名称重复"
+    // 否则菜单等 long 主键行编辑会被误判为新增，提交打到 add 接口报"路由名称重复"
     if (typeof id === 'string') return !/^[1-9]\d*$/.test(id)
     return !(id != null && typeof id === 'number' && id > 0)
 }
@@ -30,7 +30,7 @@ function extractId(row: unknown): unknown {
 // 避免 createdTime 等 ISO 字符串污染载荷（后端 long/Int64 解析失败）或审计列被前端覆写。
 // UpdateTime 与 UpdatedTime 并存：后端基类 UpdateTime 归一化为 updateTime，
 // 部分老接口（JobTrigger 等）仍保留 UpdatedTime → updatedTime。
-const AUDIT_FIELDS = ['createdTime', 'createdId', 'createdBy', 'updatedTime', 'updatedId', 'updatedBy', 'updateTime', 'tenantId']
+const AUDIT_FIELDS = ['createdTime', 'createdId', 'createdBy', 'updatedTime', 'updatedId', 'updatedBy', 'updateTime']
 const LEGACY_ROW_VERSION_FIELDS = ['version', 'Version']
 
 function stripAuditFields<T extends object>(values: T): T {

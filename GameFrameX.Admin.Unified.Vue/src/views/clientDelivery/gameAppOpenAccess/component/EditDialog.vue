@@ -146,7 +146,7 @@ const wrappedUpdateApi = async (payload: any) => {
   await gameAppOpenAccessUpdatePost(payload)
 }
 
-// ---- 加载租户用户列表 ----
+// ---- 加载绑定用户列表 ----
 const loadUsers = async () => {
   try {
     const res: any = await tenantUserPagePost({ page: 1, pageSize: MAX_PAGE_SIZE })

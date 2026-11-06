@@ -87,7 +87,6 @@ import { systemEmailProviderDeletePost, systemEmailProviderDetailGet, systemEmai
 
 const systemPurposeOptions = [
   {label: '默认', value: 0},
-  {label: '租户生命周期', value: 1},
   {label: '平台安全', value: 2},
   {label: '平台运维', value: 3},
 ]

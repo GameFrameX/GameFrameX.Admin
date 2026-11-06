@@ -191,10 +191,8 @@ export default {
             columnInfo: '数据列信息',
             addPrimaryColumn: '新增主键字段',
             addNormalColumn: '新增普通字段',
-            addTenantColumn: '新增租户字段',
             addBaseColumn: '新增基础字段',
             primaryKeyId: '主键Id',
-            tenantId: '租户Id',
             createTimeDesc: '创建时间',
             updateTimeDesc: '更新时间',
             creatorIdDesc: '创建人Id',
@@ -395,7 +393,6 @@ export default {
             helpView: '帮助说明',
             accessSecret: '密钥',
             bindUserAccount: '绑定用户账号',
-            bindTenantName: '绑定租户名称',
             bindUser: '绑定用户',
         },
         // ===== Server module =====

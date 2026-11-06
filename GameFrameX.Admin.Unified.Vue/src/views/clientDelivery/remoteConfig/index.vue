@@ -160,7 +160,7 @@ const onVersionQuery = async () => {
 }
 
 // 包名候选按当前应用加载：gameAppPackageListGet 已按应用过滤、默认包置顶。
-// 当前应用未确认时不展示候选，避免展示其它应用包名。
+// 当前产品未确认时不展示候选，避免展示无关包名。
 const buildPackageOptions = (packages: any[]) => {
   const options: any[] = [{label: t('message.client.appDefaultPackage'), value: 'default'}]
   for (const p of packages || []) {
