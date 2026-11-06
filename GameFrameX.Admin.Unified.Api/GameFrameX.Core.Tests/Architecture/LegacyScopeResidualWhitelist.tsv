@@ -34,6 +34,11 @@ GameFrameX.Admin.Unified.Api/GameFrameX.Core/SqlSugar/SqlSugarSetup.cs	tenant_	D
 GameFrameX.Admin.Unified.Api/GameFrameX.Core/Enum/Errors/OnlineErrorCode.cs	tenant	R3-a 游戏服协议镜像（32200002 CrossTenantDenied 文案）
 GameFrameX.Admin.Unified.Api/error-codes.json	tenant	R3-a 协议镜像导出产物（ErrorCodeContractTests 生成，同 OnlineErrorCode）
 GameFrameX.Admin.Unified.Vue/src/i18n/pages/errors/en.ts	tenant	R3-a 协议镜像五语同步（32200002 en-US 文案）
+GameFrameX.Admin.Unified.Vue/src/i18n/pages/errors/zh-cn.ts	32200002	R3-a 协议镜像（32200002 zh-CN「跨租户」译文；中文不在 ASCII token 扫描范围，登记备查）
+GameFrameX.Admin.Unified.Vue/src/i18n/pages/errors/zh-tw.ts	32200002	R3-a 协议镜像（32200002 zh-TW「跨租戶」译文；同上登记备查）
+GameFrameX.Admin.Unified.Vue/src/i18n/pages/errors/ja.ts	32200002	R3-a 协议镜像（32200002 ja テナント译文；同上登记备查）
+GameFrameX.Admin.Unified.Vue/src/i18n/pages/errors/ko.ts	32200002	R3-a 协议镜像（32200002 ko 테넌트译文；同上登记备查）
+GameFrameX.Admin.Unified.Api/GameFrameX.Entity/Enum/WechatReturnCodeEnum.cs	appId	微信返回码原生字段（不合法的APPID 等 5 处，D2.5 生态原生；大小写变体不在 TOKEN_RE 扫描范围，登记备查）
 # D12：旧字段/旧路径负向测试（R2-b：明确断言旧三段 404、旧字段不解析不透传、旧属性不回归；行已标 c406-keep）
 GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/ClientApi/ClientApiRoleEndpointTests.cs	tenant	D12 负向断言：旧字段不出站（body/query/URI）
 GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/ClientApi/ClientApiRoleEndpointTests.cs	appId	D12 负向断言：旧字段不出站（body/query/URI）
