@@ -85,10 +85,14 @@ public sealed class ThreeHostApiRoutingContractTests
     [Fact]
     public void Hub_ExposesOnlyMachineChannelControllers()
     {
+        // 与 MVC ControllerFeatureProvider.IsController 同规则：公开、非抽象、非泛型，
+        // 且类名以 Controller 结尾或标注 [Controller]；不再按命名空间/ControllerBase 过滤，
+        // 避免 Hub 意外暴露的控制器被跳过（CodeRabbit PR #25）。
         var controllerNames = typeof(PackageBuildReportController).Assembly
             .GetTypes()
-            .Where(type => type.Namespace == typeof(PackageBuildReportController).Namespace)
-            .Where(type => typeof(ControllerBase).IsAssignableFrom(type) && type.IsPublic && !type.IsAbstract)
+            .Where(type => type.IsPublic && !type.IsAbstract && !type.IsGenericType)
+            .Where(type => type.IsDefined(typeof(ControllerAttribute), false)
+                           || type.Name.EndsWith("Controller", StringComparison.Ordinal))
             .Select(type => type.Name)
             .Order(StringComparer.Ordinal)
             .ToArray();

@@ -84,9 +84,14 @@ test('Client.Api 新协议鉴权头经真实 Admin 菜单关联到启动配置�
     'X-Proto-Ver': CLIENT_PROTO_VERSION,
   };
   const accepted = await requestStartupEndpoint(page, client.url, headers);
-  // 远程配置可能没有命中种子数据（404），但带完整新协议头不能被版本中间件以 400 拒绝。
-  expect(accepted.status).not.toBe(400);
-  expect(accepted.body).toBeTruthy();
+  // 业务信封固定 HTTP 200（HttpJsonResultData），业务码承载结果：0 = 成功，404 = 配置未命中。
+  // 只接受这两种已确认结果，防止 401/403/500 的 JSON 错误体误判为通过（CodeRabbit PR #25）。
+  expect(accepted.status).toBe(200);
+  const acceptedBody = accepted.body as { code?: number };
+  expect(
+    [0, 404],
+    '带完整新协议头的请求必须命中成功(0)或配置未命中(404)，不得是鉴权/服务器错误',
+  ).toContain(acceptedBody?.code);
 
   const missingProto = await requestStartupEndpoint(page, client.url, {
     'GameFrameX-Tenant-Id': client.tenantId,

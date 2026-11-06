@@ -20,7 +20,7 @@ EXPECTED_PORTS = {
     "pg": "5432:5432",
 }
 SENSITIVE_LITERAL = re.compile(
-    r"(?:password|secret|api[_-]?key|private[_-]?key)\s*[:=]\s*['\"]?(?!\$\{)[^\s,'\"]+",
+    r"(?:password|secret|api[_-]?key|private[_-]?key|signing[_-]?key)[\w.-]*\s*[:=]\s*['\"]?(?!\$\{)[^\s,'\"]+",
     re.IGNORECASE,
 )
 
