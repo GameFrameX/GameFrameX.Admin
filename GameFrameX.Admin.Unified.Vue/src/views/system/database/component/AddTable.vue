@@ -96,10 +96,6 @@
           <i class="fa-solid fa-plus mr-1"></i>
           {{ t('system.database.addNormalColumn') }}
         </Button>
-        <Button severity="secondary" @click="addTenantColumn">
-          <i class="fa-solid fa-plus mr-1"></i>
-          {{ t('system.database.addTenantColumn') }}
-        </Button>
         <Button severity="secondary" @click="addBaseColumn">
           <i class="fa-solid fa-plus mr-1"></i>
           {{ t('system.database.addBaseColumn') }}
@@ -207,24 +203,6 @@ function addColumn() {
     isNullable: 1,
     isPrimarykey: 0,
     length: 32,
-    key: colIndex,
-    editable: true,
-    isNew: true,
-  });
-  colIndex++;
-}
-
-// 增加租户列
-function addTenantColumn() {
-  state.tableData.push({
-    columnDescription: t('system.database.tenantId'),
-    dataType: 'bigint',
-    dbColumnName: 'TenantId',
-    decimalDigits: 0,
-    isIdentity: 0,
-    isNullable: 1,
-    isPrimarykey: 0,
-    length: 0,
     key: colIndex,
     editable: true,
     isNew: true,

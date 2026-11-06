@@ -214,8 +214,6 @@ const actions = {
   delete: onDelete,
 }
 
-// ---- 路由应用切换 ----
-
 onMounted(() => {
   onQuery()
 })

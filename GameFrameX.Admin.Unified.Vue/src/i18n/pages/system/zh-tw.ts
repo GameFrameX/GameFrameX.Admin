@@ -191,10 +191,8 @@ export default {
             columnInfo: '數據列資訊',
             addPrimaryColumn: '新增主鍵欄位',
             addNormalColumn: '新增普通欄位',
-            addTenantColumn: '新增租戶欄位',
             addBaseColumn: '新增基礎欄位',
             primaryKeyId: '主鍵Id',
-            tenantId: '租戶Id',
             createTimeDesc: '創建時間',
             updateTimeDesc: '更新時間',
             creatorIdDesc: '創建人Id',
@@ -395,7 +393,6 @@ export default {
             helpView: '幫助說明',
             accessSecret: '密鑰',
             bindUserAccount: '綁定用戶帳號',
-            bindTenantName: '綁定租戶名稱',
             bindUser: '綁定用戶',
         },
         // ===== Server module =====

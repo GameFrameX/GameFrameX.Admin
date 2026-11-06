@@ -7,7 +7,7 @@ import { installApiRecorder, readApiRecords } from './module-coverage';
 //    （job_gameTimeJobDispatch）——内置作业此前从未落库，页面看不到；手动执行留存作业后，
 //    触发器运行态（触发次数）从数据库刷新可见（§9.8 运行态写回）。
 // 2) 预置的超期访问 / 操作日志（环境准备 SQL，CreatedTime 早于热数据窗口）在留存作业执行前
-//    于「审计 › 访问日志 / 操作日志」（admin 视角，system_* 与 tenant_* 联合查询）可见，
+//    于「审计 › 访问日志 / 操作日志」（admin 视角，system_* 与业务日志联合查询）可见，
 //    手动执行后消失（归档表行数由编排脚本查库留证）。
 // 3) 普通 admin 在「系统 › 定时任务」完成增删改（crud-roundtrips 闭环之外的专门截图证据）。
 const RETENTION_JOB_ID = 'job_auditRetention';

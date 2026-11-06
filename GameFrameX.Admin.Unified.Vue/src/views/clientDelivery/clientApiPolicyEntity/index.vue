@@ -1,5 +1,5 @@
 <template>
-  <div class="tenantClientApiPolicyEntity-container">
+  <div class="clientApiPolicyEntity-container">
     <Card>
       <template #content>
         <SearchForm
@@ -51,7 +51,7 @@
   </div>
 </template>
 
-<script lang="ts" setup name="tenantClientApiPolicyEntity">
+<script lang="ts" setup name="clientApiPolicyEntity">
 import {computed, onMounted, ref} from 'vue'
 import Tag from 'primevue/tag'
 import SearchForm from '/@/components/search-form/index.vue'

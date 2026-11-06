@@ -37,7 +37,7 @@ export function isolatedAdminOrigin(): string {
 
 export async function grantAdminMenus(browser: Browser, adminPage: Page, adminToken: string): Promise<void> {
   const origin = isolatedAdminOrigin();
-  const rolesResponse = await adminPage.request.get(`${origin}/api/tenantRole/list`, {
+  const rolesResponse = await adminPage.request.get(`${origin}/api/role/list`, {
     headers: { Authorization: `Bearer ${adminToken}` },
   });
   expect(rolesResponse.ok()).toBe(true);
@@ -68,7 +68,7 @@ export async function grantAdminMenus(browser: Browser, adminPage: Page, adminTo
         expect(typeof readField(node, 'superAdminOnly')).toBe('boolean');
         const protectedBranch = protectedAncestor || readField(node, 'superAdminOnly') === true;
         // 既有只读选择器例外允许业务页取平台/语言；仍不授予任何超管目录或管理叶子。
-        const sharedSelector = readField(node, 'allowTenantWhenSuperAdminOnly') === true;
+        const sharedSelector = readField(node, 'allowWhenSuperAdminOnly') === true;
         if (sharedSelector) {
           expect(readField(node, 'type'), '租户可读例外只能是辅助按钮').toBe(3);
           sharedSelectorKeys.push(String(readField(node, 'key')));
@@ -88,7 +88,7 @@ export async function grantAdminMenus(browser: Browser, adminPage: Page, adminTo
       'route:commerceCenter', 'route:clientDelivery', 'route:audit', 'route:system',
     ].sort());
     // 调服务清除权限缓存；不直接写 SQL，也不依赖菜单种子的自动授权。
-    const grant = await bootstrapPage.request.post(`${origin}/api/tenantRole/grantMenu`, {
+    const grant = await bootstrapPage.request.post(`${origin}/api/role/grantMenu`, {
       headers, data: { id: roleId, menuIdList: [...new Set(menuIdentifiers)] },
     });
     expect(grant.ok()).toBe(true);

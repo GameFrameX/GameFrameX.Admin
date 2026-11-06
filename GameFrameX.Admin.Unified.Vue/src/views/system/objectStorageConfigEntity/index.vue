@@ -1,5 +1,5 @@
 <template>
-  <div class="tenant-object-storage-config-container">
+  <div class="object-storage-config-container">
     <Card>
       <template #content>
         <SearchForm
@@ -57,7 +57,7 @@
   </div>
 </template>
 
-<script lang="ts" setup name="tenantObjectStorageConfigEntity">
+<script lang="ts" setup name="objectStorageConfigEntity">
 import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import type {CrudAction, CrudColumnConfig} from '../../../components/crud-data-table/types.js'
 import SearchForm from '/@/components/search-form/index.vue'
@@ -66,7 +66,7 @@ import {usePrimeTablePage} from '../../../composables'
 import {showConfirm, showError, showSuccess} from '../../../utils/message.js'
 import {formatUnix} from '../../../utils/formatTime.js'
 import {objectStorageConfigPagePost, objectStorageConfigDeletePost, objectStorageConfigDetailGet, objectStorageConfigTestConnectionGet, objectStorageConfigUpdatePost, objectStorageConfigProvidersGet} from '../../../api/objectStorageConfig'
-import type {UpdateTenantObjectStorageConfigInput} from '../../../api/_shared/data-contracts'
+import type {UpdateObjectStorageConfigInput} from '../../../api/_shared/data-contracts'
 import {computed, onMounted, ref} from 'vue'
 import editDialog from './component/EditDialog.vue'
 import {readRowVersion} from '../../../utils/rowVersion.js'
@@ -228,7 +228,7 @@ const toggleEnabled = async (row: any) => {
 
   const res = await objectStorageConfigDetailGet(toApiId(row.id))
   const detail = normalizeRow(readResult(res))
-  const input: UpdateTenantObjectStorageConfigInput = {
+  const input: UpdateObjectStorageConfigInput = {
     id: toApiId(detail.id),
     rowVersion: detail.rowVersion,
     provider: detail.provider,

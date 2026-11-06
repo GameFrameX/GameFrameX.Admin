@@ -191,10 +191,8 @@ export default {
             columnInfo: '컬럼 정보',
             addPrimaryColumn: '기본키 컬럼 추가',
             addNormalColumn: '일반 컬럼 추가',
-            addTenantColumn: '테넌트 컬럼 추가',
             addBaseColumn: '기본 컬럼 추가',
             primaryKeyId: '기본키 ID',
-            tenantId: '테넌트 ID',
             createTimeDesc: '생성 시간',
             updateTimeDesc: '수정 시간',
             creatorIdDesc: '생성자 ID',
@@ -392,7 +390,6 @@ export default {
             helpView: '도움말',
             accessSecret: '시크릿 키',
             bindUserAccount: '바인딩된 사용자 계정',
-            bindTenantName: '바인딩된 테넌트 이름',
             bindUser: '사용자 바인딩',
         },
         // ===== 서버 모듈 =====

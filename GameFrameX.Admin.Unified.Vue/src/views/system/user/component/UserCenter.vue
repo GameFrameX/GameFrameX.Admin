@@ -207,9 +207,9 @@ import CropperDialog from '/@/components/image-cropper/index.vue';
 import VueGridLayout from 'vue-grid-layout';
 
 import {clearAccessTokens} from '../../../../utils/axiosUtils.ts';
-import {tenantFileUploadAvatarPost, tenantFileUploadSignaturePost} from '../../../../api/tenantFile';
-import {tenantUserBaseInfoGet, tenantUserBaseInfoPost, tenantUserChangePwdPost} from '../../../../api/tenantUser';
-import {ChangePwdInput, TenantUserEntity} from '../../../../api/_shared/data-contracts.ts';
+import {fileUploadAvatarPost, fileUploadSignaturePost} from '../../../../api/file';
+import {userBaseInfoGet, userBaseInfoPost, userChangePwdPost} from '../../../../api/user';
+import {ChangePwdInput, UserEntity} from '../../../../api/_shared/data-contracts.ts';
 
 import Card from 'primevue/card';
 import Button from 'primevue/button';
@@ -243,7 +243,7 @@ const state = reactive({
   avatarLoading: false,
   signDialogVisible: false,
   selectedTabName: '0',
-  ruleFormBase: {} as TenantUserEntity,
+  ruleFormBase: {} as UserEntity,
   ruleFormPassword: {} as ChangePwdInput,
   signOptions: {
     penColor: '#000000',
@@ -278,7 +278,7 @@ const passwordResolver = buildFormResolver(passwordRules, (values: any) => {
 
 onMounted(async () => {
   state.loading = true;
-  var res = await tenantUserBaseInfoGet();
+  var res = await userBaseInfoGet();
   const base: any = res.data.data ?? {account: ''};
   // 回显：long(秒) → Date 供 DatePicker 显示
   if (base.birthdayTime && typeof base.birthdayTime === 'number') {
@@ -294,7 +294,7 @@ watch(state.signOptions, () => {
 });
 
 const uploadCropperImage = async (e: any) => {
-  var res = await tenantFileUploadAvatarPost({file: e.img});
+  var res = await fileUploadAvatarPost({file: e.img});
   userInfos.value.avatar = resolveBackendFileUrl(res.data.data?.url || `${res.data.data?.filePath}/${res.data.data?.name}`);
 };
 
@@ -306,7 +306,7 @@ const saveUploadSign = async () => {
   const {isEmpty, data} = signaturePadRef.value.saveSignature();
   if (isEmpty) return;
 
-  var res = await tenantFileUploadSignaturePost({file: base64ToFile(data, userInfos.value.account + '.png')});
+  var res = await fileUploadSignaturePost({file: base64ToFile(data, userInfos.value.account + '.png')});
   userInfos.value.signature = resolveBackendFileUrl(res.data.data?.url || `${res.data.data?.filePath}/${res.data.data?.name}`);
 
   clearSign();
@@ -324,7 +324,7 @@ const clearSign = () => {
 const onSignFileSelect = async (event: any) => {
   const file = event.files?.[0]
   if (!file) return
-  var res = await tenantFileUploadSignaturePost({file: file});
+  var res = await fileUploadSignaturePost({file: file});
   userInfos.value.signature = resolveBackendFileUrl(res.data.data?.url);
 };
 
@@ -340,7 +340,7 @@ const onBaseFormSubmit = async ({valid}: { valid: boolean }) => {
     if (payload.birthdayTime) {
       payload.birthdayTime = Math.floor(new Date(payload.birthdayTime).getTime() / 1000);
     }
-    await tenantUserBaseInfoPost(payload);
+    await userBaseInfoPost(payload);
   }
 };
 
@@ -350,7 +350,7 @@ const submitUserBase = () => {
 
 const onPasswordFormSubmit = async ({valid}: { valid: boolean }) => {
   if (!valid) return;
-  await tenantUserChangePwdPost(state.ruleFormPassword);
+  await userChangePwdPost(state.ruleFormPassword);
   if (await showConfirm(t('system.userCenter.changePwdSuccess'), t('common.message.tip'))) {
     clearAccessTokens();
   }

@@ -52,7 +52,7 @@ import DatePicker from 'primevue/datepicker'
 import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import {TextField, TextareaField} from '../../../../components/crud-form-fields'
 import { gameAppOpenAccessAddPost, gameAppOpenAccessUpdatePost } from '../../../../api/gameAppOpenAccess'
-import { tenantUserPagePost } from '../../../../api/tenantUser'
+import { userPagePost } from '../../../../api/user'
 
 import { MAX_PAGE_SIZE } from '../../../../constants/pagination.ts'
 
@@ -146,10 +146,10 @@ const wrappedUpdateApi = async (payload: any) => {
   await gameAppOpenAccessUpdatePost(payload)
 }
 
-// ---- 加载租户用户列表 ----
+// ---- 加载绑定用户列表 ----
 const loadUsers = async () => {
   try {
-    const res: any = await tenantUserPagePost({ page: 1, pageSize: MAX_PAGE_SIZE })
+    const res: any = await userPagePost({ page: 1, pageSize: MAX_PAGE_SIZE })
     const items = res.data?.data?.items ?? []
     userOptions.value = items.map((item: any) => ({
       id: item.id,

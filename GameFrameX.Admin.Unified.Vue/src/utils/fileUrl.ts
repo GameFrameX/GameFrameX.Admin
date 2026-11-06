@@ -2,7 +2,7 @@
  * 后端文件 URL 解析（纯函数）。
  *
  * 背景：对象存储 local provider 把文件落盘到后端 wwwroot（如 Upload/Avatar/123.png），
- * 而 TenantUserEntity.Avatar 等 DB 字段只保存相对对象键（无 origin、无协议）。
+ * 而 UserEntity.Avatar 等 DB 字段只保存相对对象键（无 origin、无协议）。
  * 前端直接 `'/'+path` 渲染时请求打到前端自身（dev 20800 / 静态站），命中 SPA fallback
  * 返回 index.html（HTTP 200 的 HTML），<img> 渲染为裂图——登录后头像不显示即此因。
  * 统一经 window.__env__.VITE_API_URL 补全为指向后端 origin 的可加载绝对地址

@@ -7,7 +7,7 @@ export default {
         forgotHint: '忘记凭据？请联系系统管理员',
         account: {
             accountLabel: '账号',
-            accountPlaceholder: "admin{'@'}租户ID",
+            accountPlaceholder: "请输入管理员账号",
             passwordLabel: '密码',
             passwordPlaceholder: '123456',
             codeLabel: '验证码',

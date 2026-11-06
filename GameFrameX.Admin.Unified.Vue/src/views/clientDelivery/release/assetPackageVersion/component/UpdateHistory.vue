@@ -1,5 +1,5 @@
 <template>
-  <div class="tenantGameAppAssetPackageVersionHistory-container">
+  <div class="gameAppAssetPackageVersionHistory-container">
     <Dialog v-model:visible="dialogVisible" modal :style="{ width: '75%' }" draggable
             :header="`${queryParams.assetPackageName} ${t('message.client.updateHistory')}`">
       <Card style="margin-top: 8px">
@@ -14,7 +14,7 @@
             <Column :header="t('message.common.table.action')" style="width: 140px" align="center"
                     v-if="auth('gameAppAssetPackageVersion:restore')">
               <template #body="{ data }">
-                <Button link @click="restoreTenantGameAppAssetPackageVersionHistory(data)"
+                <Button link @click="restoreGameAppAssetPackageVersionHistory(data)"
                         v-auth="'gameAppAssetPackageVersion:restore'">
                   <i :class="faPenToSquare.className" class="mr-1"></i>{{ t('message.client.restore') }}
                 </Button>
@@ -30,7 +30,7 @@
   </div>
 </template>
 
-<script lang="ts" setup="" name="tenantGameAppAssetPackageVersionHistory">
+<script lang="ts" setup="" name="gameAppAssetPackageVersionHistory">
 import { faPenToSquare } from '../../../../../utils/icons.ts';
 import {ref} from "vue";
 import {showConfirm, showSuccess} from '../../../../../utils/message.ts';
@@ -79,7 +79,7 @@ const onQuery = async () => {
 const onPage = usePrimeTablePage(tableParams, onQuery)
 
 // 还原
-const restoreTenantGameAppAssetPackageVersionHistory = async (row: any) => {
+const restoreGameAppAssetPackageVersionHistory = async (row: any) => {
   const confirmed = await showConfirm(t('message.client.confirmRestore'), t('message.common.message.tip'))
   if (!confirmed) return
   let values = returnVersionPackage.value;

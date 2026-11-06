@@ -21,7 +21,7 @@ import {IDomEditor} from '@wangeditor/editor';
 import {Toolbar, Editor} from '@wangeditor/editor-for-vue';
 import NarrowScreenHint from '../narrow-screen-hint/index.vue';
 import {showError} from '../../utils/message';
-import {tenantFileUploadFilePost} from '../../api/tenantFile';
+import {fileUploadFilePost} from '../../api/file';
 
 
 const props = defineProps({
@@ -65,7 +65,7 @@ const state = reactive({
         customUpload(file, insertFn) {
           const uploadFun = async () => {
             try {
-              const rps = await tenantFileUploadFilePost({file: file});
+              const rps = await fileUploadFilePost({file: file});
               if (rps.data.code === 0 && rps.data.data != null) {
                 insertFn(rps.data.data.url, rps.data.data.name, rps.data.data.url);
               } else {

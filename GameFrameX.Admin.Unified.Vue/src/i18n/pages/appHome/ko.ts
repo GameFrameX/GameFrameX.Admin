@@ -1,4 +1,4 @@
-// 정의 내용 (APP-콕핏=테넌트가 앱 선택 후의 운영 홈)
+// 정의 내용 (단일 게임 운영 홈)
 export default {
     appHome: {
         kpiOnline: '앱 온라인 · ONLINE',

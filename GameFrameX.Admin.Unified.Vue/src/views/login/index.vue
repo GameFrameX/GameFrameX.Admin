@@ -141,7 +141,7 @@ onMounted(async () => {
       captchaEnabled: res?.data?.data?.captchaEnabled === true,
     };
     superAdminNeedsSetup.value = res?.data?.data?.superAdminPasswordConfigured === false;
-    // 首装零门槛：超管密码未初始化时直接落到初始化面（租户用户可点「返回登录」正常登录）
+    // 首装零门槛：管理员密码未初始化时直接落到初始化面（其他管理员可点「返回登录」正常登录）
     if (superAdminNeedsSetup.value) {
       switchMode('setup');
     }

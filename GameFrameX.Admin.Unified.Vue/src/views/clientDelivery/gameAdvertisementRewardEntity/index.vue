@@ -1,5 +1,5 @@
 <template>
-  <div class="tenantGameAdvertisementRewardEntity-container">
+  <div class="gameAdvertisementRewardEntity-container">
     <Card>
       <template #content>
         <SearchForm
@@ -54,7 +54,7 @@
   </div>
 </template>
 
-<script lang="ts" setup name="tenantGameAdvertisementRewardEntity">
+<script lang="ts" setup name="gameAdvertisementRewardEntity">
 import type {CrudColumnConfig} from '../../../components/crud-data-table/types'
 import {ref, computed, onMounted} from 'vue'
 import Button from 'primevue/button'

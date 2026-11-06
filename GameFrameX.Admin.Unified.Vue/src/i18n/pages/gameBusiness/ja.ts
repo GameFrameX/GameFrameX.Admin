@@ -42,7 +42,7 @@ export default {
 
         // Current application context (game business pages)
 
-        // Config scope (tenant default / app override)
+        // 設定スコープ（デフォルト / 上書き）
         configScope: {
             gameDefault: '既定の設定',
             scope: 'スコープ',
@@ -55,7 +55,7 @@ export default {
         pleaseSelectEndTime: '終了時間を選択してください',
         pleaseSelectOrderStatus: '注文ステータスを選択してください',
         pleaseEnterGameVersion: 'ゲームバージョンを入力してください',
-        pleaseSelectTenantGameAppVersionDefinition: 'クライアントバージョンを選択してください',
+        pleaseSelectGameAppVersionDefinition: 'クライアントバージョンを選択してください',
         pleaseEnterAttachmentList: '添付リストを入力してください',
         pleaseSelectMailExpiry: 'メール有効期限を選択してください',
         pleaseEnterTitleTemplate: 'タイトルテンプレートを入力してください',
@@ -123,7 +123,7 @@ export default {
             pleaseSelectPlatform: 'プラットフォームを選択してください',
             package: 'パッケージ（任意）',
             pleaseSelectPackage: 'パッケージを選択してください（任意）',
-            tenantGameAppVersionDefinition: 'クライアントバージョン',
+            gameAppVersionDefinition: 'クライアントバージョン',
             allowedPlayerProfile: '許可プレイヤープロフィール',
             pleaseEnterAllowedPlayerProfile: '許可プレイヤープロフィールを入力してください',
             serverEvents: 'サーバーイベント',
@@ -364,7 +364,7 @@ export default {
             addSenderName: '差出人名追加',
             addAttachment: '添付追加',
             name: 'キャンペーン名',
-            namePlaceholder: 'キャンペーン名を入力（appId+areaId 単位で一意）',
+            namePlaceholder: 'キャンペーン名を入力（エリア単位で一意）',
             nameRequired: 'キャンペーン名を入力してください',
             areaId: 'エリア ID',
             areaIdRequired: 'エリアを選択してください',

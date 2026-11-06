@@ -191,10 +191,8 @@ export default {
             columnInfo: 'カラム情報',
             addPrimaryColumn: '主キーカラム追加',
             addNormalColumn: '通常カラム追加',
-            addTenantColumn: 'テナントカラム追加',
             addBaseColumn: '基本カラム追加',
             primaryKeyId: '主キーID',
-            tenantId: 'テナントID',
             createTimeDesc: '作成時間',
             updateTimeDesc: '更新時間',
             creatorIdDesc: '作成者ID',
@@ -392,7 +390,6 @@ export default {
             helpView: 'ヘルプ',
             accessSecret: 'シークレットキー',
             bindUserAccount: 'バインドされたユーザーアカウント',
-            bindTenantName: 'バインドされたテナント名',
             bindUser: 'ユーザーバインド',
         },
         // ===== サーバーモジュール =====

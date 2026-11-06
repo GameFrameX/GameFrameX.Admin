@@ -1,4 +1,4 @@
-// 定义内容（APP-驾驶舱=租户选定应用后的运营首页）
+// 定义内容（单游戏运营首页）
 export default {
     appHome: {
         kpiOnline: '应用在线 · ONLINE',

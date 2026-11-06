@@ -1,5 +1,5 @@
 <template>
-  <div class="tenantAdvertisementCallbackConfigEntity-container">
+  <div class="advertisementCallbackConfigEntity-container">
     <Card>
       <template #content>
         <SearchForm
@@ -47,7 +47,7 @@
   </div>
 </template>
 
-<script lang="ts" setup name="tenantAdvertisementCallbackConfigEntity">
+<script lang="ts" setup name="advertisementCallbackConfigEntity">
 import {ref, computed, onMounted} from 'vue'
 import SearchForm from '/@/components/search-form/index.vue'
 import CrudDataTable from '/@/components/crud-data-table/index.vue'

@@ -191,10 +191,8 @@ export default {
             columnInfo: 'Column Info',
             addPrimaryColumn: 'Add Primary Key Column',
             addNormalColumn: 'Add Normal Column',
-            addTenantColumn: 'Add Tenant Column',
             addBaseColumn: 'Add Base Columns',
             primaryKeyId: 'Primary Key Id',
-            tenantId: 'Tenant Id',
             createTimeDesc: 'Created Time',
             updateTimeDesc: 'Updated Time',
             creatorIdDesc: 'Creator Id',
@@ -395,7 +393,6 @@ export default {
             helpView: 'Help',
             accessSecret: 'Secret Key',
             bindUserAccount: 'Bound User Account',
-            bindTenantName: 'Bound Tenant Name',
             bindUser: 'Bind User',
         },
         // ===== Server module =====

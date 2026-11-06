@@ -7,7 +7,7 @@ export default {
         forgotHint: '로그인 정보를 잊으셨나요? 시스템 관리자에게 문의하세요',
         account: {
             accountLabel: '계정',
-            accountPlaceholder: "admin{'@'}tenantId",
+            accountPlaceholder: "관리자 계정을 입력하세요",
             passwordLabel: '비밀번호',
             passwordPlaceholder: '123456',
             codeLabel: '인증 코드',

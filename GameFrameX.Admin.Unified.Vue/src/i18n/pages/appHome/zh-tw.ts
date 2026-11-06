@@ -1,4 +1,4 @@
-// 定義內容（APP-駕駛艙=租戶選定應用後的運營首頁）
+// 定義內容（單一遊戲運營首頁）
 export default {
     appHome: {
         kpiOnline: '應用在線 · ONLINE',

@@ -27,7 +27,7 @@ export const adRewardStatusSeverity = (v: number): string | undefined => {
 
 /**
  * Provider 兜底选项（标准化值来自后端 AdCallbackConfigSchemaProvider.NormalizeProvider：
- * TopOn / GoogleAdMob / UnityAds）。运行期 index.vue 优先复用 tenantAdvertisementCallbackConfigEntity
+ * TopOn / GoogleAdMob / UnityAds）。运行期 index.vue 优先复用 advertisementCallbackConfigEntity
  * 的 /providers 端点拉取真实 Provider 列表；此常量仅在端点不可用时兜底。
  */
 export const ADVERTISEMENT_REWARD_PROVIDER_FALLBACK_OPTIONS = [
