@@ -1,5 +1,5 @@
 <template>
-  <div class="tenantAppSignatureKeyEntity-container">
+  <div class="appSignatureKeyEntity-container">
     <Card>
       <template #content>
         <SearchForm
@@ -62,7 +62,7 @@
   </div>
 </template>
 
-<script lang="ts" setup name="tenantAppSignatureKeyEntity">
+<script lang="ts" setup name="appSignatureKeyEntity">
 import {showConfirm, showSuccess} from '../../../utils/message'
 import { computed, ref } from 'vue'
 import SearchForm from '/@/components/search-form/index.vue'

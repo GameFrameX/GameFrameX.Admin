@@ -1,5 +1,5 @@
 <template>
-  <div class="tenantGameLoginTicketKeyEntity-container">
+  <div class="gameLoginTicketKeyEntity-container">
     <Card>
       <template #content>
         <SearchForm
@@ -51,7 +51,7 @@
   </div>
 </template>
 
-<script lang="ts" setup name="tenantGameLoginTicketKeyEntity">
+<script lang="ts" setup name="gameLoginTicketKeyEntity">
 import {showConfirm, showSuccess} from '../../../utils/message'
 import {computed, ref} from 'vue'
 import SearchForm from '/@/components/search-form/index.vue'

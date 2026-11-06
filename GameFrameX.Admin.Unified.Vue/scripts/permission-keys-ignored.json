@@ -5,7 +5,7 @@
   "utils/authFunction.ts": [
     "x:update"
   ],
-  "views/clientDelivery/tenantGameAdvertisementRewardEntity/index.vue": [
+  "views/clientDelivery/gameAdvertisementRewardEntity/index.vue": [
     "gameAdvertisementReward:export"
   ],
   "views/system/platformLoggingConfig/index.vue": [

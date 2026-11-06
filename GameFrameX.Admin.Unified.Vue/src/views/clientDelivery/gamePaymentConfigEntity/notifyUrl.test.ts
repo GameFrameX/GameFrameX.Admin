@@ -94,8 +94,8 @@ test('buildNotifyUrl never emits legacy query or /client/gameOrder/ format acros
     // 形态守卫：拦截大写 N 前缀 action 段与大写 G base path 段（PascalCase 回退），字面量不落入验收 grep 模式
     expect(url).not.toMatch(/\/Notify[A-Z]/)
     expect(url).not.toContain('/GameOrder/')
-    expect(url).not.toContain('tenantId=')
-    expect(url).not.toContain('appId=')
+    expect(url).not.toContain('tenantId=') // c406-keep
+    expect(url).not.toContain('appId=') // c406-keep
     expect(url).not.toContain('packageId=')
   }
 })

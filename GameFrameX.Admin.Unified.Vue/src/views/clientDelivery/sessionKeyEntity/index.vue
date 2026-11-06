@@ -1,5 +1,5 @@
 <template>
-  <div class="tenantSessionKeyEntity-container">
+  <div class="sessionKeyEntity-container">
     <Card>
       <template #content>
         <SearchForm
@@ -63,7 +63,7 @@
   </div>
 </template>
 
-<script lang="ts" setup name="tenantSessionKeyEntity">
+<script lang="ts" setup name="sessionKeyEntity">
 import {showConfirm, showSuccess} from '../../../utils/message'
 import { computed, ref } from 'vue'
 import SearchForm from '/@/components/search-form/index.vue'

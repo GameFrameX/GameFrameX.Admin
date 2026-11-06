@@ -24,7 +24,7 @@
                        :exportQuery="queryParams"
                        @page="onPage">
           <template #body-scope="{ data }">
-            <Tag :value="data.scope === 1 ? t('message.client.channelScopeSystem') : t('message.client.channelScopeTenant')" :severity="data.scope === 1 ? 'success' : 'info'"/>
+            <Tag :value="data.scope === 1 ? t('message.client.channelScopeSystem') : t('message.client.channelScope')" :severity="data.scope === 1 ? 'success' : 'info'"/>
           </template>
           <template #body-channelType="{ data }">
             {{ channelTypeText(data.channelType) }}

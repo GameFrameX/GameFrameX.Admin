@@ -2,8 +2,8 @@
   <BaseEditDialog
     ref="dialogRef"
     :title="props.title"
-    :addApi="(params: any) => tenantUserAddPost(params)"
-    :updateApi="(params: any) => tenantUserUpdatePost(params)"
+    :addApi="(params: any) => userAddPost(params)"
+    :updateApi="(params: any) => userUpdatePost(params)"
     :rules="rules"
     :beforeOpen="beforeOpen"
     :beforeSubmit="beforeSubmit"
@@ -122,8 +122,8 @@ import FormField from '@primevue/forms/formfield'
 import Message from 'primevue/message'
 import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import BaseEditFieldGroup from '/@/components/base-edit-dialog/FieldGroup.vue'
-import {tenantRoleListGet} from '../../../../api/tenantRole';
-import {tenantUserAddPost, tenantUserUpdatePost, tenantUserOwnRoleListGet} from '../../../../api/tenantUser';
+import {roleListGet} from '../../../../api/role';
+import {userAddPost, userUpdatePost, userOwnRoleListGet} from '../../../../api/user';
 import {RoleOutput} from '../../../../api/_shared/data-contracts.ts'
 
 import InputText from 'primevue/inputtext';
@@ -180,7 +180,7 @@ const cultureLevelOptions = computed(() => [
 
 onMounted(async () => {
   loading.value = true
-  var res1 = await tenantRoleListGet()
+  var res1 = await roleListGet()
   roleData.value = res1.data.data ?? []
   loading.value = false
 })
@@ -203,7 +203,7 @@ const beforeOpen = async (form: any, isEditor: boolean) => {
     form.joinTime = new Date(form.joinTime * 1000)
   }
   if (isEditor && form.id != undefined) {
-    var resRole = await tenantUserOwnRoleListGet(form.id)
+    var resRole = await userOwnRoleListGet(form.id)
     form.roleIdList = resRole.data.data
   } else {
     form.accountType = 777

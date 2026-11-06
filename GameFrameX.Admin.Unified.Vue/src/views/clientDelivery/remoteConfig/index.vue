@@ -1,5 +1,5 @@
 <template>
-  <div class="tenantGameAppRemoteConfig-container">
+  <div class="gameAppRemoteConfig-container">
     <Card>
       <template #content>
         <SearchForm
@@ -9,7 +9,7 @@
             authPrefix="gameAppRemoteConfig"
             @query="runScopedQuery"
 
-            @add="openAddTenantGameAppRemoteConfig"
+            @add="openAddGameAppRemoteConfig"
         />
       </template>
     </Card>
@@ -38,7 +38,7 @@
         </CrudDataTable>
         <editDialog
             ref="editDialogRef"
-            :title="editTenantGameAppRemoteConfigTitle"
+            :title="editGameAppRemoteConfigTitle"
             @reloadTable="runScopedQuery"
         />
         <contentEditDialog
@@ -51,7 +51,7 @@
   </div>
 </template>
 
-<script lang="ts" setup="" name="tenantGameAppRemoteConfig">
+<script lang="ts" setup="" name="gameAppRemoteConfig">
 import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import {computed, onMounted, ref} from 'vue'
 import {useCrudTable} from '../../../composables/useCrudTable.ts'
@@ -74,7 +74,7 @@ import { mapAvailableChannelDefinitions } from '../../../utils/channelDefinition
 
 const editDialogRef = ref()
 const contentEditDialogRef = ref()
-const editTenantGameAppRemoteConfigTitle = ref('')
+const editGameAppRemoteConfigTitle = ref('')
 const contentEditTitle = ref('')
 const modeMap = ref<Record<string, any>>({})
 
@@ -185,18 +185,18 @@ const onPackageQuery = async () => {
 }
 
 // 打开新增页面
-const openAddTenantGameAppRemoteConfig = () => {
+const openAddGameAppRemoteConfig = () => {
 
 
-  editTenantGameAppRemoteConfigTitle.value = t('message.client.addRemoteConfig')
+  editGameAppRemoteConfigTitle.value = t('message.client.addRemoteConfig')
   editDialogRef.value.isEditor = false
   editDialogRef.value.openDialog({})
 }
 
 // 打开编辑页面
-const openEditTenantGameAppRemoteConfig = (row: any) => {
+const openEditGameAppRemoteConfig = (row: any) => {
 
-  editTenantGameAppRemoteConfigTitle.value = t('message.client.editRemoteConfig')
+  editGameAppRemoteConfigTitle.value = t('message.client.editRemoteConfig')
   editDialogRef.value.isEditor = true
   editDialogRef.value.openDialog(row)
 }
@@ -226,7 +226,7 @@ const columns = computed<CrudColumnConfig[]>(() => [
 ])
 
 const actions = {
-  edit: openEditTenantGameAppRemoteConfig,
+  edit: openEditGameAppRemoteConfig,
   delete: onScopedDelete,
 }
 

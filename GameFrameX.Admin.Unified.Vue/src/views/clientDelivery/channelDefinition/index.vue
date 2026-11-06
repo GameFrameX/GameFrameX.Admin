@@ -9,7 +9,7 @@
             authPrefix="channelDefinition"
             @query="onQuery"
             
-            @add="openAddTenantChannelDefinition"
+            @add="openAddChannelDefinition"
         />
       </template>
     </Card>
@@ -25,7 +25,7 @@
                        :exportQuery="queryParams"
                        @page="onPage">
           <template #body-scope="{ data }">
-            <Tag :value="data.scope === 1 ? t('message.client.channelScopeSystem') : t('message.client.channelScopeTenant')" :severity="data.scope === 1 ? 'success' : 'info'"/>
+            <Tag :value="data.scope === 1 ? t('message.client.channelScopeSystem') : t('message.client.channelScope')" :severity="data.scope === 1 ? 'success' : 'info'"/>
           </template>
           <template #body-channelType="{ data }">
             {{ channelTypeText(data.channelType) }}
@@ -39,25 +39,25 @@
             <Tag v-else :value="t('message.common.label.no')" severity="info"/>
           </template>
         </CrudDataTable>
-        <editDialog ref="editDialogRef" :title="editTenantChannelDefinitionTitle" @reloadTable="onQuery"/>
+        <editDialog ref="editDialogRef" :title="editChannelDefinitionTitle" @reloadTable="onQuery"/>
       </template>
     </Card>
   </div>
 </template>
 
-<script lang="ts" setup="" name="tenantChannelDefinition">
+<script lang="ts" setup="" name="channelDefinition">
 import {ref, computed} from 'vue'
 import SearchForm from '/@/components/search-form/index.vue'
 import CrudDataTable from '/@/components/crud-data-table/index.vue'
 import {useCrudTable} from '../../../composables/useCrudTable.ts'
 import {usePrimeTablePage} from '../../../composables'
 import {createdNameColumn, descriptionColumn, nameColumn, updatedNameColumn} from '../../../utils/crudConfig.ts'
-import editDialog from '/@/views/clientDelivery/tenantChannelDefinition/component/EditDialog.vue'
+import editDialog from '/@/views/clientDelivery/channelDefinition/component/EditDialog.vue'
 import { channelDefinitionPagePost, channelDefinitionDeletePost } from '../../../api/channelDefinition'
 import type {CrudColumnConfig} from '../../../components/crud-data-table/types.ts'
 
 const editDialogRef = ref()
-const editTenantChannelDefinitionTitle = ref('')
+const editChannelDefinitionTitle = ref('')
 
 const searchFields = computed(() => [])
 
@@ -78,13 +78,13 @@ const {
 
 const onPage = usePrimeTablePage(tableParams, onQuery)
 
-const openAddTenantChannelDefinition = () => {
-  editTenantChannelDefinitionTitle.value = t('message.client.addChannel')
+const openAddChannelDefinition = () => {
+  editChannelDefinitionTitle.value = t('message.client.addChannel')
   editDialogRef.value.openDialog({})
 }
 
-const openEditTenantChannelDefinition = (row: any) => {
-  editTenantChannelDefinitionTitle.value = t('message.client.editChannel')
+const openEditChannelDefinition = (row: any) => {
+  editChannelDefinitionTitle.value = t('message.client.editChannel')
   editDialogRef.value.openDialog(row)
 }
 
@@ -112,7 +112,7 @@ const columns = computed<CrudColumnConfig[]>(() => [
 ])
 
 const actions = {
-  edit: openEditTenantChannelDefinition,
+  edit: openEditChannelDefinition,
   delete: onDelete,
 }
 </script>

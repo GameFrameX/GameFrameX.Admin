@@ -1,6 +1,6 @@
 <!--
-  聚合架构页（非独立资源）：本页属信任中心「处罚执行」视图，复用 tenantGamePenalty 的 API 与权限码
-  （authPrefix=tenantGamePenaltyEntity），不复用 penalty 目录是刻意的域聚合——C302/GFX-715。
+  聚合架构页（非独立资源）：本页属信任中心「处罚执行」视图，复用 gamePenalty 的 API 与权限码
+  （authPrefix=gamePenaltyEntity），不复用 penalty 目录是刻意的域聚合——C302/GFX-715。
 -->
 <template>
   <div class="penaltyEnforcement-container">

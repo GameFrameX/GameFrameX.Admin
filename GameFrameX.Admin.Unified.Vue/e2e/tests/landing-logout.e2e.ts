@@ -35,7 +35,7 @@ test('个人中心签名上传后真实加载', async ({ page }) => {
   await page.waitForURL(/#\/system\/userCenter/);
 
   const uploadResponse = page.waitForResponse(
-    (r) => /\/api\/tenantFile\/uploadSignature/.test(r.url()) && r.request().method() === 'POST',
+    (r) => /\/api\/file\/uploadSignature/.test(r.url()) && r.request().method() === 'POST',
     { timeout: 30_000 },
   );
   await page.locator('.sys-userCenter-container input[type="file"][accept=".png"]').setInputFiles('e2e/tests/fixtures/signature-source.png');

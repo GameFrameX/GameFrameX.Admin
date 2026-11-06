@@ -40,7 +40,7 @@ for (const f of files) {
 
     // 2. upload PostForm → Post + {file: ...}
     const beforeUpload = c;
-    c = c.replace(/tenantFileUpload(\w+)PostForm\((.+)\)/g, (_m, name, args) => `tenantFileUpload${name}Post({file: ${args}})`);
+    c = c.replace(/fileUpload(\w+)PostForm\((.+)\)/g, (_m, name, args) => `fileUpload${name}Post({file: ${args}})`);
     if (c !== beforeUpload) uploadFixed++;
 
     if (c !== orig) writeFileSync(f, c);

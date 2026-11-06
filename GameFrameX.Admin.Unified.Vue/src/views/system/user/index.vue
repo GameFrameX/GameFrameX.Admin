@@ -109,8 +109,8 @@ import {auth} from '../../../utils/authFunction.ts';
 import {resolveBackendFileUrl} from '../../../utils/fileUrl.ts';
 import EditUser from '/@/views/system/user/component/EditUser.vue';
 
-import {tenantUserDeletePost, tenantUserPagePost, tenantUserResetPwdPost, tenantUserSetStatusPost} from '../../../api/tenantUser';
-import {TenantUserEntity} from '../../../api/_shared/data-contracts.ts';
+import {userDeletePost, userPagePost, userResetPwdPost, userSetStatusPost} from '../../../api/user';
+import {UserEntity} from '../../../api/_shared/data-contracts.ts';
 import {normalizeIsEnabled} from '../../../utils/isEnabled.ts';
 
 import Card from 'primevue/card';
@@ -126,7 +126,7 @@ import Menu from 'primevue/menu';
 const editUserRef = ref<InstanceType<typeof EditUser>>();
 const menuRef = ref();
 const contextMenuRow = ref<any>(null);
-type UserRow = TenantUserEntity & Record<string, any>;
+type UserRow = UserEntity & Record<string, any>;
 
 const contextMenuItems = computed(() => [
   {
@@ -175,7 +175,7 @@ onMounted(async () => {
 const onQuery = async () => {
   state.loading = true;
   let params = Object.assign(state.queryParams, state.tableParams);
-  var res = await tenantUserPagePost(params);
+  var res = await userPagePost(params);
   state.userData = (res.data.data?.items ?? []).map((row) => normalizeIsEnabled(row) as UserRow);
   state.tableParams.total = res.data.data?.total;
   state.loading = false;
@@ -208,7 +208,7 @@ const openEditUser = (row: any) => {
 const delUser = async (row: any) => {
   const confirmed = await showConfirm(`${t('system.user.deleteAccountConfirm')}：【${row.account}】?`, t('common.message.tip'), {type: 'danger'})
   if (!confirmed) return
-  await tenantUserDeletePost({id: row.id});
+  await userDeletePost({id: row.id});
   onQuery();
   showSuccess(t('common.message.deleteSuccess'));
 };
@@ -223,7 +223,7 @@ const onPageChange = (event: any) => {
 const avatarImageUrl = (row: UserRow) => resolveBackendFileUrl(row.avatar);
 
 const changeStatus = (row: any) => {
-  tenantUserSetStatusPost({id: row.id, isEnabled: row.isEnabled})
+  userSetStatusPost({id: row.id, isEnabled: row.isEnabled})
       .then(() => {
         showSuccess(t('system.user.accountStatusSuccess'));
       })
@@ -235,7 +235,7 @@ const changeStatus = (row: any) => {
 const resetUserPwd = async (row: any) => {
   const confirmed = await showConfirm(`${t('system.user.resetPwdConfirm')}：【${row.account}】?`, t('common.message.tip'))
   if (!confirmed) return
-  const res = await tenantUserResetPwdPost({id: row.id})
+  const res = await userResetPwdPost({id: row.id})
   showSuccess(`${t('system.user.resetPwdSuccess')}：${res.data.data?.newPassword}`);
 };
 

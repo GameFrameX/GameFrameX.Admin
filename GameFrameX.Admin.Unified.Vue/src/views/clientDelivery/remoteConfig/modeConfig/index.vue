@@ -36,7 +36,7 @@
   </div>
 </template>
 
-<script lang="ts" setup name="tenantGameAppRemoteConfigMode">
+<script lang="ts" setup name="gameAppRemoteConfigMode">
 import {ref, computed} from 'vue'
 import SearchForm from '/@/components/search-form/index.vue'
 import CrudDataTable from '/@/components/crud-data-table/index.vue'

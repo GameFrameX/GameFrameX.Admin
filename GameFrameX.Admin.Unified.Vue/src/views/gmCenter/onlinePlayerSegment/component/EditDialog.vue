@@ -49,7 +49,7 @@ import InputText from 'primevue/inputtext'
 import Select from 'primevue/select'
 import { showSuccess } from '../../../../utils/message.ts'
 import { gameOnlinePlayerSegmentAddPost, gameOnlinePlayerSegmentUpdatePost } from '../../../../api/gameOnlinePlayerSegment'
-import type { UpdateTenantGameOnlinePlayerSegmentRequest } from '../../../../api/gameOnlinePlayerSegment/types'
+import type { UpdateGameOnlinePlayerSegmentRequest } from '../../../../api/gameOnlinePlayerSegment/types'
 import { ONLINE_SEGMENT_FIELD_OPTIONS, ONLINE_SEGMENT_OP_OPTIONS } from '../constants'
 
 withDefaults(defineProps<{
@@ -119,7 +119,7 @@ const confirm = async () => {
   loading.value = true
   try {
     if (isEditor.value) {
-      const input: UpdateTenantGameOnlinePlayerSegmentRequest = {
+      const input: UpdateGameOnlinePlayerSegmentRequest = {
         id: editId.value as number | string,
         rowVersion: editRowVersion.value,
 

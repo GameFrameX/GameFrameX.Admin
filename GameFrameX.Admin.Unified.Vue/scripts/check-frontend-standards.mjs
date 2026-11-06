@@ -846,7 +846,7 @@ function selfTest() {
     assert(splitArgs('"a,b", null, Flag.A | Flag.B').length === 3, 'splitArgs should ignore commas inside strings')
     assert(changedSourceFiles().every((file) => file.startsWith(ROOT)), 'changed source files should be absolute paths')
     assert(isQueryOperationName('pageGameEntity'), 'page operation should be treated as a query')
-    assert(isGeneratedFilterGetCall('apiTenantOrgListGet', 'state.queryParams.name'), 'generated list GET with queryParams should be blocked')
+    assert(isGeneratedFilterGetCall('apiOrgListGet', 'state.queryParams.name'), 'generated list GET with queryParams should be blocked')
     assert(!isGeneratedFilterGetCall('apiSysEnumEnumDataListGet', '"GameLanguage"'), 'plain dictionary GET should not be blocked')
     const requestSample = "export const pageX = (params) => request({\n  url: Api.Page,\n  method: 'get',\n  params,\n})"
     const requestIndex = requestSample.indexOf('request(')
@@ -874,8 +874,8 @@ function selfTest() {
     assert(staticRouteScopeViolation('dashboard/home/index.vue', null) === null, 'flat dashboard needs no audience scope')
     assert(staticRouteScopeViolation('gmCenter/onlineDashboard/index.vue', 'app') !== null, 'flat directory rejects retired scope metadata')
     assert(staticRouteScopeViolation('app/appCenter/appWorkspace/index.vue', 'app') !== null, 'appScope=app with app/ first segment should pass')
-    assert(staticRouteScopeViolation('tenant/appCenter/appEntry/index.vue', 'app') !== null, 'appScope=app with tenant/ first segment should violate')
-    assert(staticRouteScopeViolation('tenant/appHome/AppHomeBoard.vue', 'tenant') !== null, 'appScope=tenant with tenant/ first segment should pass')
+    assert(staticRouteScopeViolation('appCenter/appEntry/index.vue', 'app') !== null, 'appScope=app with tenant/ first segment should violate')
+    assert(staticRouteScopeViolation('appHome/AppHomeBoard.vue', 'tenant') !== null, 'appScope=tenant with tenant/ first segment should pass')
     assert(staticRouteScopeViolation('platform/global/platformJwtConfig/index.vue', null) !== null, 'scopeless platform page should pass shared whitelist')
     assert(staticRouteScopeViolation('login/index.vue', null) === null, 'scopeless shared page should pass shared whitelist')
     assert(staticRouteScopeViolation('global/platform/index.vue', null) !== null, 'scopeless page outside shared whitelist should violate')
@@ -1073,7 +1073,7 @@ function checkComponentNames() {
     return failures.length === 0
 }
 
-// 反向守护（2026-09-17，tenantAppSignatureKeyEntity 菜单缺失事故防回潮）：
+// 反向守护（2026-09-17，appSignatureKeyEntity 菜单缺失事故防回潮）：
 // checkRoutes 只校验「种子 → 页面文件」方向；本检查补上「页面文件 → 种子/静态路由」方向——
 // src/views 下每个目录式页面入口（index.vue）必须被某条菜单种子 Component 引用，或被
 // src/router/*.ts 静态路由 import，否则该页面在任何租户的动态菜单里都不可达（孤儿页）。

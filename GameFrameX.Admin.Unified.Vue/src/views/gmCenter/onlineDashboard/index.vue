@@ -94,7 +94,7 @@
 /**
  * 在线总览页（C344 / GFX-761，dashboard）。
  * 数据源唯一 = Online 玩家侧查询 API 聚合快照（X6 口径）：
- * OnlineUserHub / TenantOnlineUserService / GameHomeOnlineCounter 数据一律不计入。
+ * OnlineUserHub / OnlineUserService / GameHomeOnlineCounter 数据一律不计入。
  */
 import { ref, computed, watch, onMounted } from 'vue'
 import ServerSelector from '/@/components/server-selector/ServerSelector.vue'

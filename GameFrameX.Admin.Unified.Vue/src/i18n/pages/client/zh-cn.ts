@@ -4,7 +4,7 @@ export default {
         channelCode: '渠道编码',
         channelScope: '渠道范围',
         channelScopeSystem: '系统',
-        channelScopeTenant: '自定义',
+        channelScope: '自定义',
         channelType: '渠道类型',
         channelTypeOfficial: '官方',
         channelTypeStore: '商店',

@@ -39,7 +39,7 @@
   </div>
 </template>
 
-<script lang="ts" setup name="tenantGameAppRemoteConfigKey">
+<script lang="ts" setup name="gameAppRemoteConfigKey">
 import {ref, computed} from 'vue'
 import SearchForm from '/@/components/search-form/index.vue'
 import CrudDataTable from '/@/components/crud-data-table/index.vue'

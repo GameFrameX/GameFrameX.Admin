@@ -6,7 +6,7 @@
 
 INSERT INTO global_menu_entity
   (id, pid, type, key, permission, title, is_iframe, is_hide, is_keep_alive, is_affix,
-   order_no, super_admin_only, sync_roles, allow_tenant_when_super_admin_only, app_scope,
+   order_no, super_admin_only, sync_roles, allow_admin_when_super_admin_only, app_scope,
    tenant_id, created_time, is_deleted, is_enabled, row_version)
 VALUES
   (6237617357109286359, 4272713015995144348, 3, 'systemDatabase:updatetable',  'systemDatabase:updatetable',  '编辑表',   false, false, true, false, 100, true, 0, false, 0, 0, extract(epoch from now())::bigint, false, true, 0),

@@ -37,7 +37,7 @@
   </Dialog>
 </template>
 
-<script lang="ts" setup name="tenantGameAdRewardDetailDialog">
+<script lang="ts" setup name="gameAdRewardDetailDialog">
 import { ref, h, defineComponent } from 'vue'
 import Dialog from 'primevue/dialog'
 import Button from 'primevue/button'

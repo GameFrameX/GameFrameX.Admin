@@ -88,8 +88,8 @@ import {showConfirm, showSuccess} from '../../../utils/message.ts';
 import {auth} from '../../../utils/authFunction.ts';
 import EditRole from '/@/views/system/role/component/EditRole.vue';
 
-import {tenantRolePagePost, tenantRoleDeletePost} from '../../../api/tenantRole';
-import {TenantRoleEntity} from '../../../api/_shared/data-contracts.ts';
+import {rolePagePost, roleDeletePost} from '../../../api/role';
+import {RoleEntity} from '../../../api/_shared/data-contracts.ts';
 import {isEnabled} from '../../../utils/isEnabled.ts';
 
 import Card from 'primevue/card';
@@ -122,7 +122,7 @@ const toggleMenu = (event: Event, row: any) => {
 
 const state = reactive({
   loading: false,
-  roleData: [] as Array<TenantRoleEntity>,
+  roleData: [] as Array<RoleEntity>,
   queryParams: {
     name: undefined,
     code: undefined,
@@ -142,7 +142,7 @@ onMounted(async () => {
 const onQuery = async () => {
   state.loading = true;
   let params = Object.assign(state.queryParams, state.tableParams);
-  var res = await tenantRolePagePost(params);
+  var res = await rolePagePost(params);
   state.roleData = res.data.data?.items ?? [];
   state.tableParams.total = res.data.data?.total;
   state.loading = false;
@@ -167,7 +167,7 @@ const openEditRole = async (row: any) => {
 const delRole = async (row: any) => {
   const confirmed = await showConfirm(`${t('system.role.deleteRoleConfirm')}：【${row.name}】?`, t('common.message.tip'), {type: 'danger'})
   if (!confirmed) return
-  await tenantRoleDeletePost({id: row.id});
+  await roleDeletePost({id: row.id});
   onQuery();
   showSuccess(t('common.message.deleteSuccess'));
 };

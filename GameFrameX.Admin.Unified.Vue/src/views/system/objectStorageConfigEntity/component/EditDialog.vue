@@ -136,7 +136,7 @@ import BaseEditDialog from '/@/components/base-edit-dialog/index.vue'
 import {TextField, TextareaField} from '../../../../components/crud-form-fields'
 import {showError} from '../../../../utils/message'
 import {objectStorageConfigProvidersGet, objectStorageConfigSchemaGet, objectStorageConfigAddPost, objectStorageConfigUpdatePost} from '../../../../api/objectStorageConfig';
-import type {AddTenantObjectStorageConfigInput, UpdateTenantObjectStorageConfigInput} from '../../../../api/_shared/data-contracts'
+import type {AddObjectStorageConfigInput, UpdateObjectStorageConfigInput} from '../../../../api/_shared/data-contracts'
 import {isEnabled} from '../../../../utils/isEnabled'
 import {readRowVersion} from '../../../../utils/rowVersion'
 
@@ -399,7 +399,7 @@ const beforeSubmit = (form: any) => {
   }
 }
 
-const toAddInput = (form: any): AddTenantObjectStorageConfigInput => ({
+const toAddInput = (form: any): AddObjectStorageConfigInput => ({
   provider: form.provider,
   pathTemplate: form.pathTemplate,
   maxFileSizeBytes: form.maxFileSizeBytes,
@@ -410,7 +410,7 @@ const toAddInput = (form: any): AddTenantObjectStorageConfigInput => ({
   remark: form.remark,
 })
 
-const toUpdateInput = (form: any): UpdateTenantObjectStorageConfigInput => ({
+const toUpdateInput = (form: any): UpdateObjectStorageConfigInput => ({
   id: toApiId(form.id),
   rowVersion: form.rowVersion,
   ...toAddInput(form),

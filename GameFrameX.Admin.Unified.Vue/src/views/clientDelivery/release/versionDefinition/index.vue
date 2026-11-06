@@ -9,7 +9,7 @@
             authPrefix="gameAppVersionDefinition"
             @query="onQuery"
 
-            @add="openAddTenantGameAppVersionDefinition"
+            @add="openAddGameAppVersionDefinition"
         />
       </template>
     </Card>
@@ -26,7 +26,7 @@
         </CrudDataTable>
         <editDialog
             ref="editDialogRef"
-            :title="editTenantGameAppVersionDefinitionTitle"
+            :title="editGameAppVersionDefinitionTitle"
             @reloadTable="onQuery"
         />
       </template>
@@ -47,7 +47,7 @@ import {createdNameColumn, descriptionColumn, nameColumn, updatedNameColumn} fro
 
 
 const editDialogRef = ref()
-const editTenantGameAppVersionDefinitionTitle = ref('')
+const editGameAppVersionDefinitionTitle = ref('')
 
 const searchFields = computed(() => [
 ])
@@ -70,19 +70,19 @@ const {
 const onPage = usePrimeTablePage(tableParams, onQuery)
 
 // 打开新增页面
-const openAddTenantGameAppVersionDefinition = () => {
-  editTenantGameAppVersionDefinitionTitle.value = t('message.client.addVersion')
+const openAddGameAppVersionDefinition = () => {
+  editGameAppVersionDefinitionTitle.value = t('message.client.addVersion')
   editDialogRef.value.openDialog({})
 }
 
 // 打开编辑页面
-const openEditTenantGameAppVersionDefinition = (row: any) => {
-  editTenantGameAppVersionDefinitionTitle.value = t('message.client.editVersion')
+const openEditGameAppVersionDefinition = (row: any) => {
+  editGameAppVersionDefinitionTitle.value = t('message.client.editVersion')
   editDialogRef.value.openDialog(row)
 }
 
 const actions = {
-  edit: openEditTenantGameAppVersionDefinition,
+  edit: openEditGameAppVersionDefinition,
   delete: onDelete,
 }
 

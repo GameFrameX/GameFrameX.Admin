@@ -4,7 +4,7 @@ export default {
         channelCode: 'チャネルコード',
         channelScope: 'チャネル範囲',
         channelScopeSystem: 'システム',
-        channelScopeTenant: 'カスタム',
+        channelScope: 'カスタム',
         channelType: 'チャネルタイプ',
         channelTypeOfficial: '公式',
         channelTypeStore: 'ストア',

@@ -65,7 +65,7 @@ const ENTITIES: EntitySpec[] = [
   },
   {
     name: '设备定义',
-    menuTitle: '设备', // tenantDevice 的 zh-cn 渲染标签（树 Title「设备定义」已漂移）
+    menuTitle: '设备', // device 的 zh-cn 渲染标签（树 Title「设备定义」已漂移）
     menuRoot: 'C 端交付',
     fields: ['text', 'text', 'text'],
     createApi: /gameAppDevice\/add/,
