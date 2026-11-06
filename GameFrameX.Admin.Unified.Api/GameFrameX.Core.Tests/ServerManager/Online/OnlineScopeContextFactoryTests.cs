@@ -119,7 +119,7 @@ public sealed class OnlineScopeContextFactoryTests : IDisposable
         }
 
         Assert.Contains("Online 作用域越界", persistedMessage); // ErrorLocalizer 本地化文案完整落库往返
-        Assert.Contains("9999", persistedMessage); // errors JSON 透出的越界 appId 可检索
+        Assert.Contains("9999", persistedMessage); // errors JSON 透出的越界 appId 可检索 // c406-keep
     }
 
     [Fact]

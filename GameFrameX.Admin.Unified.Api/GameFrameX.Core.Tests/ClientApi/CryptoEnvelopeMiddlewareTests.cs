@@ -591,7 +591,7 @@ public sealed class CryptoEnvelopeMiddlewareTests
     [Fact]
     public async Task LegacyTenantContext_DoesNotBypassDecryption()
     {
-        var context = CreateEnvelopeContext("{}", tenantId: 999);
+        var context = CreateEnvelopeContext("{}", tenantId: 999); // c406-keep
         var nextCalled = false;
         await InvokeAsync(context, CreateOptions(true), () =>
         {

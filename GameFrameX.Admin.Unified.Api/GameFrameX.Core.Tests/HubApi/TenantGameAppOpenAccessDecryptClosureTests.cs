@@ -134,7 +134,7 @@ public sealed class TenantGameAppOpenAccessDecryptClosureTests : IDisposable
         {
             nextCount++;
             Assert.Equal("7801", context.User.FindFirst(GameFrameX.Core.Const.ClaimConst.UserId)?.Value);
-            Assert.Null(context.User.FindFirst("TenantId"));
+            Assert.Null(context.User.FindFirst("TenantId")); // c406-keep
             return Task.CompletedTask;
         });
         await middleware.InvokeAsync(first, cache);

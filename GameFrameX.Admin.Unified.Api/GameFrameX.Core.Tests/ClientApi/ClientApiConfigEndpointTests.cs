@@ -222,8 +222,8 @@ public sealed class ClientApiConfigEndpointTests
         var root = ClientApiResultReader.Read(result);
         Assert.Equal(0, ClientApiResultReader.Code(root));
         var key = ClientApiResultReader.Data(root)[0];
-        Assert.False(key.TryGetProperty("TenantId", out _));
-        Assert.False(key.TryGetProperty("AppId", out _));
+        Assert.False(key.TryGetProperty("TenantId", out _)); // c406-keep
+        Assert.False(key.TryGetProperty("AppId", out _)); // c406-keep
     }
 
     [Fact]
