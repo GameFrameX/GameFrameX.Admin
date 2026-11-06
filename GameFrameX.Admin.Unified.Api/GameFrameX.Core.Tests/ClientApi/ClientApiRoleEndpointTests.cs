@@ -216,9 +216,9 @@ public sealed class ClientApiRoleEndpointTests
             Assert.DoesNotContain("gameAppId", body.RootElement.EnumerateObject().Select(property => property.Name), StringComparer.OrdinalIgnoreCase); // c406-keep
         }
 
-        Assert.DoesNotContain(handler.RequestPaths, path => path.Contains("tenantId", StringComparison.OrdinalIgnoreCase)); // c406-keep
-        Assert.DoesNotContain(handler.RequestPaths, path => path.Contains("appId", StringComparison.OrdinalIgnoreCase)); // c406-keep
-        Assert.DoesNotContain(handler.RequestPaths, path => path.Contains("gameAppId", StringComparison.OrdinalIgnoreCase)); // c406-keep
+        Assert.DoesNotContain(handler.RequestUris, uri => uri.Contains("tenantId", StringComparison.OrdinalIgnoreCase)); // c406-keep
+        Assert.DoesNotContain(handler.RequestUris, uri => uri.Contains("appId", StringComparison.OrdinalIgnoreCase)); // c406-keep
+        Assert.DoesNotContain(handler.RequestUris, uri => uri.Contains("gameAppId", StringComparison.OrdinalIgnoreCase)); // c406-keep
     }
 
     [Fact]
