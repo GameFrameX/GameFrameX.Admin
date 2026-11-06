@@ -1,0 +1,132 @@
+# GameFrameX Admin 独立 API 编排（C405 S7-B）。
+# Vue 静态站点仍由根 docker-compose.yml 的 web-vue 或独立静态托管发布。
+# 敏感变量只从 .env / 运行环境注入；此文件不包含可用凭据。
+
+x-main-db: &main-db
+  GFX_MAIN_DB_TYPE: PostgreSQL
+  # POSTGRES_PORT is the host-published port; service-to-service traffic always uses pg:5432.
+  GFX_MAIN_DB_CONNECTION_STRING: "Host=${POSTGRES_HOST:-pg};Port=5432;Database=gameframex_admin;Username=${POSTGRES_USER:-gameframex};Password=${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}"
+  GFX_TENANT_SECRET_ENC_KEY: ${GFX_TENANT_SECRET_ENC_KEY:-}
+
+x-grafana-otel: &grafana-otel
+  OpenTelemetry__Endpoint: "${OTEL_ENDPOINT:-}"
+  OpenTelemetry__UserName: "${OTEL_USER:-}"
+  OpenTelemetry__ApiKey: "${OTEL_API_KEY:-}"
+
+services:
+  pg:
+    image: postgres:16-alpine
+    container_name: gameframex-admin-pg
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-gameframex}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}
+      POSTGRES_DB: postgres
+      TZ: Asia/Shanghai
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - ${ADMIN_POSTGRES_DATA_DIRECTORY:-./postgres-data}:/var/lib/postgresql/data
+      - ./GameFrameX.Admin.Unified.Api/docker/postgres/init.sql:/docker-entrypoint-initdb.d/01-init-databases.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-gameframex} -d postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - gameframex-admin
+
+  admin-web:
+    build:
+      context: ./GameFrameX.Admin.Unified.Api
+      dockerfile: Dockerfile.web-api
+    container_name: gameframex-admin-web
+    restart: unless-stopped
+    ports:
+      - "${ADMIN_WEB_PORT:-20802}:20802"
+    environment:
+      <<: [*main-db, *grafana-otel]
+      ASPNETCORE_ENVIRONMENT: Production
+      TZ: Asia/Shanghai
+      Swagger__Enabled: "true"
+    volumes:
+      - ./GameFrameX.Admin.Unified.Api/GameFrameX.Web.Api/appsettings.json:/app/appsettings.json:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - gameframex-admin
+    depends_on:
+      pg:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "bash -ec 'exec 3<>/dev/tcp/127.0.0.1/20802; printf \"GET /health HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n\" >&3; read -r status <&3; [[ $$status == *\" 200 \"* ]]'"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  admin-client:
+    build:
+      context: ./GameFrameX.Admin.Unified.Api
+      dockerfile: Dockerfile.client-api
+    container_name: gameframex-admin-client
+    restart: unless-stopped
+    ports:
+      - "${ADMIN_CLIENT_PORT:-20808}:20808"
+    environment:
+      <<: [*main-db, *grafana-otel]
+      ASPNETCORE_ENVIRONMENT: Production
+      TZ: Asia/Shanghai
+      Swagger__Enabled: "true"
+      TagName: client-api
+    volumes:
+      - ./GameFrameX.Admin.Unified.Api/GameFrameX.Client.Api/appsettings.json:/app/appsettings.json:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - gameframex-admin
+    depends_on:
+      admin-web:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "bash -ec 'exec 3<>/dev/tcp/127.0.0.1/20808; printf \"GET /health HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n\" >&3; read -r status <&3; [[ $$status == *\" 200 \"* ]]'"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  admin-hub:
+    build:
+      context: ./GameFrameX.Admin.Unified.Api
+      dockerfile: Dockerfile.hub-api
+    container_name: gameframex-admin-hub
+    restart: unless-stopped
+    ports:
+      - "${ADMIN_HUB_PORT:-20806}:20806"
+    environment:
+      <<: [*main-db, *grafana-otel]
+      ASPNETCORE_ENVIRONMENT: Production
+      TZ: Asia/Shanghai
+      Swagger__Enabled: "true"
+      JWTSettings__IssuerSigningKey: ${GFX_HUB_JWT_SIGNING_KEY:-}
+      TagName: hub-api
+    volumes:
+      - ./GameFrameX.Admin.Unified.Api/GameFrameX.Hub.Api/appsettings.json:/app/appsettings.json:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - gameframex-admin
+    depends_on:
+      admin-web:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "bash -ec 'exec 3<>/dev/tcp/127.0.0.1/20806; printf \"GET /health HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n\" >&3; read -r status <&3; [[ $$status == *\" 200 \"* ]]'"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  gameframex-admin:
+    driver: bridge

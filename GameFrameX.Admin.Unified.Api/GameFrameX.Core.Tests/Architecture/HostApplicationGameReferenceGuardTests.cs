@@ -31,8 +31,7 @@ public sealed class HostApplicationGameReferenceGuardTests
 
     private static readonly HashSet<string> HubApiAllowedReferences = new(StringComparer.Ordinal)
     {
-        // 原区服增删停三个 DTO（物理文件在 Hub.Api/Dto/GameArea/）曾命名空间挂在旧 Application.Game 项目根（应用层合并前），
-        // 归位到 GameFrameX.Hub.Api.Dto.GameArea 后，Hub.Api 对 Application 层零可触达；新增引用须登记并说明理由。
+        // C405 Hub 仅保留机器通道；管理区服 DTO 已回收至 Web.Api 业务服务，Hub.Api 对管理业务层零可触达。
         // C347 活动/功能开关服务器同步通道：FeatureSwitchSyncController 消费 C345 冻结的共享投放解析器，
         // Result/EffectiveItem 为解析器返回值与元素类型（控制器内做 Unix 秒 wire 转换）。
         "GameFrameX.Application.ClientDelivery.FeatureSwitch.FeatureSwitchDeliveryResolver",
