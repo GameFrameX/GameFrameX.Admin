@@ -40,7 +40,7 @@ export class ObjectStorageConfig<SecurityDataType = unknown> {
    *
    * @tags objectStorageConfig
    * @name ObjectStorageConfigAddPost
-   * @summary 新增配置。校验 Provider 已注册、规范化 ConfigJson；若启用则在事务内停用同租户其它配置。
+   * @summary 新增配置。校验 Provider 已注册、规范化 ConfigJson；若启用则在事务内停用其它配置。
    * @request POST:/api/objectStorageConfig/add
    */
   objectStorageConfigAddPost = (

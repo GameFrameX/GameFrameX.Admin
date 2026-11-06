@@ -386,7 +386,7 @@ export interface UserRequest {
   isEnabled?: boolean;
 }
 
-/** 租户用户输出参数 */
+/** 用户输出参数 */
 export interface UserResponse {
   /** Id */
   id?: string;
@@ -549,7 +549,7 @@ export interface UserBaseInfoGetData {
   code: number;
   /** 错误或提示信息 */
   message: string;
-  /** 租户用户输出参数 */
+  /** 用户输出参数 */
   data: UserResponse;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;

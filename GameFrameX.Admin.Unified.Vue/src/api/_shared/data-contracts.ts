@@ -109,7 +109,7 @@ export enum ChannelTypeEnum {
 export enum ChannelScopeEnum {
   /** 系统 */
   System = 1,
-  /** 租户 */
+  /** 业务 */
   Business = 2,
 }
 

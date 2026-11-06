@@ -27,7 +27,7 @@ export interface OnlineOverviewQueueSummaryResponse {
 /** 在线总览快照查询输入参数（作用域必填；change C344 / vault:C9 S8.1）。 */
 export interface OnlineOverviewRequest {
   /**
-   * 区服作用域（必填，经 OnlineScopeContextFactory 校验租户与应用归属）。
+   * 区服作用域（必填，经 OnlineScopeContextFactory 校验区服归属）。
    * @min 1
    * @max 9223372036854776000
    */

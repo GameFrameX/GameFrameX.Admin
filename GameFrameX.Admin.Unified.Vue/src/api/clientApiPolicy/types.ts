@@ -1,7 +1,7 @@
 /* eslint-disable */
 /* tslint:disable */
 
-/** 租户 Client API 运行策略新增输入参数 */
+/** Client API 运行策略新增输入参数 */
 export interface AddClientApiPolicyRequest {
   /** 是否要求请求签名。 */
   signatureRequired?: boolean;
@@ -21,7 +21,7 @@ export interface AddClientApiPolicyRequest {
    * @format int64
    */
   ticketExpireTime?: number;
-  /** 是否允许首次签发时自动创建租户应用级 RSA key。 */
+  /** 是否允许首次签发时自动创建应用级 RSA key。 */
   enableKeyAutoCreate?: boolean;
   /** 区服列表是否返回 HttpManagerUrl。 */
   enableReturnHttpManager?: boolean;
@@ -31,7 +31,7 @@ export interface AddClientApiPolicyRequest {
   remark?: string | null;
 }
 
-/** 租户 Client API 运行策略输出参数 */
+/** Client API 运行策略输出参数 */
 export interface ClientApiPolicyResponse {
   /** 是否要求请求签名。 */
   signatureRequired?: boolean;
@@ -53,7 +53,7 @@ export interface ClientApiPolicyResponse {
    * @format int64
    */
   ticketExpireTime?: number;
-  /** 是否允许首次签发时自动创建租户应用级 RSA key。 */
+  /** 是否允许首次签发时自动创建应用级 RSA key。 */
   enableKeyAutoCreate?: boolean;
   /** 区服列表是否返回 HttpManagerUrl。 */
   enableReturnHttpManager?: boolean;
@@ -95,7 +95,7 @@ export interface ClientApiPolicyResponseSqlSugarPagedList {
   hasNextPage?: boolean;
 }
 
-/** 租户 Client API 运行策略分页查询输入参数 */
+/** Client API 运行策略分页查询输入参数 */
 export interface PageClientApiPolicyRequest {
   searchKey?: string | null;
   /**
@@ -115,7 +115,7 @@ export interface PageClientApiPolicyRequest {
   isActive?: boolean | null;
 }
 
-/** 租户 Client API 运行策略更新输入参数 */
+/** Client API 运行策略更新输入参数 */
 export interface UpdateClientApiPolicyRequest {
   /**
    * @min 1
@@ -145,7 +145,7 @@ export interface UpdateClientApiPolicyRequest {
    * @format int64
    */
   ticketExpireTime?: number;
-  /** 是否允许首次签发时自动创建租户应用级 RSA key。 */
+  /** 是否允许首次签发时自动创建应用级 RSA key。 */
   enableKeyAutoCreate?: boolean;
   /** 区服列表是否返回 HttpManagerUrl。 */
   enableReturnHttpManager?: boolean;
@@ -163,7 +163,7 @@ export interface ClientApiPolicyAddPostData {
   code: number;
   /** 错误或提示信息 */
   message: string;
-  /** 租户 Client API 运行策略输出参数 */
+  /** Client API 运行策略输出参数 */
   data: ClientApiPolicyResponse;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
@@ -189,7 +189,7 @@ export interface ClientApiPolicyDetailGetData {
   code: number;
   /** 错误或提示信息 */
   message: string;
-  /** 租户 Client API 运行策略输出参数 */
+  /** Client API 运行策略输出参数 */
   data: ClientApiPolicyResponse;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;

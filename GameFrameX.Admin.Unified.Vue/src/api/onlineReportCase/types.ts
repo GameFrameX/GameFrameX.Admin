@@ -77,7 +77,7 @@ export interface OnlineReportCasePageResponse {
 /** 举报案件处置输入参数（处置流：事实源写入 → 联动命令 → 当事人通知，三步状态落审计）。 */
 export interface OnlineReportHandleRequest {
   /**
-   * 区服作用域（案件所在区服，经 OnlineScopeContextFactory 校验租户与应用归属）。
+   * 区服作用域（案件所在区服，经 OnlineScopeContextFactory 校验区服归属）。
    * @min 1
    * @max 9223372036854776000
    */
@@ -139,7 +139,7 @@ export interface OnlineReportHandleResponse {
 /** 举报案件分页查询输入参数（案件数据实时透传 Online，Admin 不落镜像；作用域必填，与消息审计页一致）。 */
 export interface PageOnlineReportCaseRequest {
   /**
-   * 区服作用域（必填，经 OnlineScopeContextFactory 校验租户与应用归属）。
+   * 区服作用域（必填，经 OnlineScopeContextFactory 校验区服归属）。
    * @min 1
    * @max 9223372036854776000
    */

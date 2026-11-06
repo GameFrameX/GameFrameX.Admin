@@ -117,7 +117,7 @@ export interface OnlineMatchFailureResponse {
 /** 异常 Ticket 分页查询输入参数（change C341 §3；按异常类别检索，Cursor 翻页透传 Online）。 */
 export interface PageOnlineMatchAbnormalTicketRequest {
   /**
-   * 区服作用域（必填，经 OnlineScopeContextFactory 校验租户与应用归属）。
+   * 区服作用域（必填，经 OnlineScopeContextFactory 校验区服归属）。
    * @min 1
    * @max 9223372036854776000
    */
@@ -142,7 +142,7 @@ export interface PageOnlineMatchAbnormalTicketRequest {
 /** 匹配失败原因分页查询输入参数（change C341 §3；Cursor 翻页透传 Online）。 */
 export interface PageOnlineMatchFailureRequest {
   /**
-   * 区服作用域（必填，经 OnlineScopeContextFactory 校验租户与应用归属）。
+   * 区服作用域（必填，经 OnlineScopeContextFactory 校验区服归属）。
    * @min 1
    * @max 9223372036854776000
    */

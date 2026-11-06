@@ -119,7 +119,7 @@ export interface SyncPlayerSegmentOnlineRequest {
    */
   id: string;
   /**
-   * 目标区服Id（Online 作用域 ServerId，经租户归属校验）。
+   * 目标区服Id（Online 作用域 ServerId，经区服归属校验）。
    * @min 1
    * @max 9223372036854776000
    */

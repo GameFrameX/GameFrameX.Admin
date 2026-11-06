@@ -139,7 +139,7 @@ export interface GlobalMenuResponse {
   remark?: string | null;
   /** 是否仅超管可见（种子元数据，DB 驱动授权读取） */
   superAdminOnly?: boolean;
-  /** 超管专属菜单下允许租户只读访问 */
+  /** 超管专属菜单下允许管理员只读访问 */
   allowAdminWhenSuperAdminOnly?: boolean;
   /** 菜单子项 */
   children?: GlobalMenuResponse[] | null;
