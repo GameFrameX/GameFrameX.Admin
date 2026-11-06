@@ -11,8 +11,8 @@ namespace GameFrameX.Core.Service.User;
 [ApiDescriptionSettings(Order = 490)]
 public class UserService : BaseSystemService
 {
-    private readonly SqlSugarRepository<UserEntity> _tenantUserRepository;
-    private readonly UserRoleService _tenantUserRoleService;
+    private readonly SqlSugarRepository<UserEntity> _userRepository;
+    private readonly UserRoleService _userRoleService;
     private readonly SystemConfigService _systemConfigService;
 
     public UserService(
@@ -22,8 +22,8 @@ public class UserService : BaseSystemService
         SystemConfigService systemConfigService)
         : base(currentUserContext)
     {
-        _tenantUserRepository = userRepository;
-        _tenantUserRoleService = userRoleService;
+        _userRepository = userRepository;
+        _userRoleService = userRoleService;
         _systemConfigService = systemConfigService;
     }
 
@@ -47,7 +47,7 @@ public class UserService : BaseSystemService
     [ApiDescriptionSettings(Name = "Page")]
     public async Task<SqlSugarPagedList<UserResponse>> PageAsync(PageUserRequest input)
     {
-        return await _tenantUserRepository.AsQueryable()
+        return await _userRepository.AsQueryable()
                                    .Where(u => u.AccountType != AccountTypeEnum.SuperAdmin)
                                    .WhereIF(!string.IsNullOrWhiteSpace(input.Account), u => u.Account.Contains(input.Account))
                                    .WhereIF(!string.IsNullOrWhiteSpace(input.RealName), u => u.RealName.Contains(input.RealName))
@@ -68,7 +68,7 @@ public class UserService : BaseSystemService
     [DisplayName("增加用户")]
     public async Task<long> AddUserAsync(AddUserRequest input)
     {
-        var isExist = await _tenantUserRepository.AsQueryable().Filter(null, true).AnyAsync(u => u.Account == input.Account);
+        var isExist = await _userRepository.AsQueryable().Filter(null, true).AnyAsync(u => u.Account == input.Account);
         if (isExist)
         {
             throw BusinessError.Oh(SystemUserErrorCode.AccountAlreadyExists);
@@ -79,7 +79,7 @@ public class UserService : BaseSystemService
         var user = input.Adapt<UserEntity>();
         NormalizeNewUser(user);
         user.Password = CryptogramUtility.HashPassword(password);
-        var newUser = await _tenantUserRepository.AsInsertable(user).ExecuteReturnEntityAsync();
+        var newUser = await _userRepository.AsInsertable(user).ExecuteReturnEntityAsync();
         input.Id = newUser.Id;
         await UpdateUserRolesAsync(input);
 
@@ -97,12 +97,12 @@ public class UserService : BaseSystemService
     [DisplayName("更新用户")]
     public async Task UpdateUserAsync(UpdateUserRequest input)
     {
-        if (await _tenantUserRepository.AsQueryable().Filter(null, true).AnyAsync(u => u.Account == input.Account && u.Id != input.Id))
+        if (await _userRepository.AsQueryable().Filter(null, true).AnyAsync(u => u.Account == input.Account && u.Id != input.Id))
         {
             throw BusinessError.Oh(SystemUserErrorCode.AccountAlreadyExists);
         }
 
-        await _tenantUserRepository.AsUpdateable(input.Adapt<UserEntity>()).IgnoreColumns(true)
+        await _userRepository.AsUpdateable(input.Adapt<UserEntity>()).IgnoreColumns(true)
                             .IgnoreColumns(u => new { u.Password, u.IsEnabled, }).ExecuteCommandAsync();
 
         await UpdateUserRolesAsync(input);
@@ -131,7 +131,7 @@ public class UserService : BaseSystemService
     [DisplayName("删除用户")]
     public async Task DeleteUserAsync(DeleteUserRequest input)
     {
-        var user = await _tenantUserRepository.GetFirstAsync(u => u.Id == input.Id) ?? throw BusinessError.Oh(SystemUserErrorCode.AccountNotFound);
+        var user = await _userRepository.GetFirstAsync(u => u.Id == input.Id) ?? throw BusinessError.Oh(SystemUserErrorCode.AccountNotFound);
         if (user.AccountType == AccountTypeEnum.SuperAdmin)
         {
             throw BusinessError.Oh(SystemUserErrorCode.DeleteSuperAdminForbidden);
@@ -142,10 +142,10 @@ public class UserService : BaseSystemService
             throw BusinessError.Oh(SystemUserErrorCode.DeleteSelfForbidden);
         }
 
-        await _tenantUserRepository.DeleteAsync(user);
+        await _userRepository.DeleteAsync(user);
 
         // 删除用户角色
-        await _tenantUserRoleService.DeleteUserRoleByUserIdAsync(input.Id);
+        await _userRoleService.DeleteUserRoleByUserIdAsync(input.Id);
 
     }
 
@@ -157,7 +157,7 @@ public class UserService : BaseSystemService
     [ApiDescriptionSettings(Name = "GetBaseInfo")]
     public async Task<UserResponse> GetBaseInfoAsync()
     {
-        var user = await _tenantUserRepository.GetFirstAsync(u => u.Id == CurrentUserContext.UserId);
+        var user = await _userRepository.GetFirstAsync(u => u.Id == CurrentUserContext.UserId);
 #pragma warning disable CS8603 // 查询未命中时返回 null 是既有 API 契约（前端按 null 判断 not-found）
         return user?.Adapt<UserResponse>();
 #pragma warning restore CS8603
@@ -172,7 +172,7 @@ public class UserService : BaseSystemService
     [DisplayName("更新用户基本信息")]
     public async Task<int> UpdateBaseInfoAsync(UserEntity user)
     {
-        return await _tenantUserRepository.AsUpdateable(user)
+        return await _userRepository.AsUpdateable(user)
                                    .IgnoreColumns(u => new { u.CreatedTime, u.Account, u.Password, u.AccountType, }).ExecuteCommandAsync();
     }
 
@@ -185,14 +185,14 @@ public class UserService : BaseSystemService
     [ApiDescriptionSettings(Name = "SetStatus")]
     public async Task<int> SetStatusAsync(UserRequest input)
     {
-        var user = await _tenantUserRepository.GetFirstAsync(u => u.Id == input.Id) ?? throw BusinessError.Oh(SystemUserErrorCode.AccountNotFound);
+        var user = await _userRepository.GetFirstAsync(u => u.Id == input.Id) ?? throw BusinessError.Oh(SystemUserErrorCode.AccountNotFound);
         if (user.AccountType == AccountTypeEnum.SuperAdmin)
         {
             throw BusinessError.Oh(SystemUserErrorCode.ModifySuperAdminStatusForbidden);
         }
 
         user.IsEnabled = input.IsEnabled;
-        return await _tenantUserRepository.AsUpdateable(user).UpdateColumns(u => new { u.IsEnabled, }).ExecuteCommandAsync();
+        return await _userRepository.AsUpdateable(user).UpdateColumns(u => new { u.IsEnabled, }).ExecuteCommandAsync();
     }
 
     /// <summary>
@@ -204,12 +204,12 @@ public class UserService : BaseSystemService
     [ApiDescriptionSettings(Name = "GrantRole")]
     public async Task GrantRoleAsync(UserRoleRequest input)
     {
-        //var user = await _tenantUserRepository.GetFirstAsync(u => u.Id == input.UserId) ?? throw BusinessError.Oh(SystemUserErrorCode.AccountNotFound);
+        //var user = await _userRepository.GetFirstAsync(u => u.Id == input.UserId) ?? throw BusinessError.Oh(SystemUserErrorCode.AccountNotFound);
         //if (user.AccountType == AccountTypeEnum.SuperAdmin)
         //    throw BusinessError.Oh(SystemUserErrorCode.AssignRoleToSuperAdminForbidden);
 
-        await _tenantUserRoleService.GrantUserRoleAsync(input);
-        SqlSugarFilter.ClearUserDataScopeCache(input.UserId, _tenantUserRepository.Context.CurrentConnectionConfig.ConfigId?.ToString() ?? string.Empty);
+        await _userRoleService.GrantUserRoleAsync(input);
+        SqlSugarFilter.ClearUserDataScopeCache(input.UserId, _userRepository.Context.CurrentConnectionConfig.ConfigId?.ToString() ?? string.Empty);
     }
 
     /// <summary>
@@ -221,7 +221,7 @@ public class UserService : BaseSystemService
     [ApiDescriptionSettings(Name = "ChangePwd")]
     public async Task<int> ChangePwdAsync(ChangePwdRequest input)
     {
-        var user = await _tenantUserRepository.GetFirstAsync(u => u.Id == CurrentUserContext.UserId) ?? throw BusinessError.Oh(SystemUserErrorCode.AccountNotFound);
+        var user = await _userRepository.GetFirstAsync(u => u.Id == CurrentUserContext.UserId) ?? throw BusinessError.Oh(SystemUserErrorCode.AccountNotFound);
         if (!CryptogramUtility.VerifyPassword(input.PasswordOld, user.Password))
         {
             throw BusinessError.Oh(SystemUserErrorCode.OldPasswordMismatch);
@@ -239,7 +239,7 @@ public class UserService : BaseSystemService
             user.Password = CryptogramUtility.HashPassword(input.PasswordNew);
         }
 
-        return await _tenantUserRepository.AsUpdateable(user).UpdateColumns(u => u.Password).ExecuteCommandAsync();
+        return await _userRepository.AsUpdateable(user).UpdateColumns(u => u.Password).ExecuteCommandAsync();
     }
 
     /// <summary>
@@ -251,10 +251,10 @@ public class UserService : BaseSystemService
     [ApiDescriptionSettings(Name = "ResetPwd")]
     public async Task<HttpJsonResultData<ResetPwdResponse>> ResetPwdAsync(ResetPwdUserRequest input)
     {
-        var user = await _tenantUserRepository.GetFirstAsync(u => u.Id == input.Id) ?? throw BusinessError.Oh(SystemUserErrorCode.AccountNotFound);
+        var user = await _userRepository.GetFirstAsync(u => u.Id == input.Id) ?? throw BusinessError.Oh(SystemUserErrorCode.AccountNotFound);
         var password = await _systemConfigService.GetConfigValueAsync<string>(CommonConst.SysPassword);
         user.Password = CryptogramUtility.HashPassword(password);
-        await _tenantUserRepository.AsUpdateable(user).UpdateColumns(u => u.Password).ExecuteCommandAsync();
+        await _userRepository.AsUpdateable(user).UpdateColumns(u => u.Password).ExecuteCommandAsync();
         return HttpJsonResultData<ResetPwdResponse>.Success(new ResetPwdResponse
         {
             NewPassword = password,
@@ -270,7 +270,7 @@ public class UserService : BaseSystemService
     [ApiDescriptionSettings(Name = "GetOwnRoleList")]
     public async Task<List<long>> GetOwnRoleListAsync(long userId)
     {
-        return await _tenantUserRoleService.GetUserRoleIdListAsync(userId);
+        return await _userRoleService.GetUserRoleIdListAsync(userId);
     }
 
 }

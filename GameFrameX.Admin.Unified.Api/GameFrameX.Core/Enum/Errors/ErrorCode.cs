@@ -44,7 +44,7 @@ public enum ErrorCode
     /// <summary>
     /// 普通租户禁止使用ID隔离
     /// </summary>
-    [ErrorText("普通租户禁止使用ID隔离", "ID isolation is forbidden for normal s")]
+    [ErrorText("普通租户禁止使用ID隔离", "ID isolation is forbidden for normal tenants")]
     IdIsolationForbiddenForNormal = 30600007,
 
     /// <summary>

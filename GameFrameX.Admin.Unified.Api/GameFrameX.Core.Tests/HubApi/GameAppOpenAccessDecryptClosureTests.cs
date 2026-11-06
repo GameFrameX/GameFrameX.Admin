@@ -134,7 +134,7 @@ public sealed class GameAppOpenAccessDecryptClosureTests : IDisposable
         {
             nextCount++;
             Assert.Equal("7801", context.User.FindFirst(GameFrameX.Core.Const.ClaimConst.UserId)?.Value);
-            Assert.Null(context.User.FindFirst("Id"));
+            Assert.Null(context.User.FindFirst("TenantId"));
             return Task.CompletedTask;
         });
         await middleware.InvokeAsync(first, cache);
@@ -153,8 +153,8 @@ public sealed class GameAppOpenAccessDecryptClosureTests : IDisposable
             Id = 7801, Account = "ci-user", RealName = "CI", Password = "not-a-real-password",
         };
         UserService.NormalizeNewUser(bindUser); // 补齐 NOT NULL 字符串列默认值
-        _db.Db.Insertable(bindUser).ExecuteCommand();
-        _db.Db.Insertable(new GameAppOpenAccessEntity
+        _db.TenantDb.Insertable(bindUser).ExecuteCommand();
+        _db.TenantDb.Insertable(new GameAppOpenAccessEntity
         {
             Id = 7802, BindUserId = 7801,
             Scenario = "ci", Purpose = "unit-test", SubjectName = "unit-test",

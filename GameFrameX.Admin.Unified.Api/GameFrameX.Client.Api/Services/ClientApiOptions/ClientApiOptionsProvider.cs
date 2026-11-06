@@ -14,7 +14,7 @@ namespace GameFrameX.Client.Api.Services.ClientApiOptions;
 /// </summary>
 public sealed class ClientApiOptionsProvider : IClientApiOptionsProvider
 {
-    private readonly ISqlSugarClient _tenantDbProvider;
+    private readonly ISqlSugarClient _dbProvider;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
     private ClientApiPolicyEntity? _effectivePolicyRow;
@@ -22,7 +22,7 @@ public sealed class ClientApiOptionsProvider : IClientApiOptionsProvider
 
     public ClientApiOptionsProvider(ISqlSugarClient database, IHttpContextAccessor httpContextAccessor)
     {
-        _tenantDbProvider = database;
+        _dbProvider = database;
         _httpContextAccessor = httpContextAccessor;
     }
 
@@ -30,7 +30,7 @@ public sealed class ClientApiOptionsProvider : IClientApiOptionsProvider
 #pragma warning disable CS8603 // 接口 IClientApiOptionsProvider 签名非空（跨项目共享），但语义允许返回 null（未配置）；改返回类型会级联到测试 fake
     public async Task<EmailOptions> GetEmailOptionsAsync()
     {
-        var db = _tenantDbProvider;
+        var db = _dbProvider;
         var entity = await EmailConfigSelector.SelectAsync(db, 0);
         return entity == null
                    ? null
@@ -84,7 +84,7 @@ public sealed class ClientApiOptionsProvider : IClientApiOptionsProvider
 
     private async Task<AdvertisementCallbackConfigEntity?> PickAdvertisementCallbackConfigAsync()
     {
-        var db = _tenantDbProvider;
+        var db = _dbProvider;
         var provider = ResolvePublicCallbackProvider(_httpContextAccessor.HttpContext);
         var query = db.Queryable<AdvertisementCallbackConfigEntity>()
                       .Where(c => c.IsEnabled == true);
@@ -151,7 +151,7 @@ public sealed class ClientApiOptionsProvider : IClientApiOptionsProvider
     {
         if (!_effectivePolicyRowFetched)
         {
-            _effectivePolicyRow = await _tenantDbProvider.Queryable<ClientApiPolicyEntity>()
+            _effectivePolicyRow = await _dbProvider.Queryable<ClientApiPolicyEntity>()
                 .Where(c => c.IsEnabled == true)
                 .OrderByDescending(c => c.Id)
                 .FirstAsync();

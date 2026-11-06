@@ -45,12 +45,12 @@ public sealed class CredentialWritePathCryptoTests : IDisposable
             new Repository<AppSignatureKeyEntity>(_db.MainDb));
 
         var added = await service.AddAsync(new AppSignatureKeyAddRequest { Remark = "unit-add", });
-        var storedAdded = _db.Db.Queryable<AppSignatureKeyEntity>().Filter(null, true).First(u => u.Id == added.Id);
+        var storedAdded = _db.TenantDb.Queryable<AppSignatureKeyEntity>().Filter(null, true).First(u => u.Id == added.Id);
         Assert.StartsWith(SecretCrypto.EncryptedPrefix, storedAdded.Secret, StringComparison.Ordinal);
         Assert.Equal(added.Secret, SecretCrypto.Decrypt(storedAdded.Secret));
 
         var rotated = await service.RotateAsync(new AppSignatureKeyRotateRequest { });
-        var storedRotated = _db.Db.Queryable<AppSignatureKeyEntity>().Filter(null, true).First(u => u.Id == rotated.Id);
+        var storedRotated = _db.TenantDb.Queryable<AppSignatureKeyEntity>().Filter(null, true).First(u => u.Id == rotated.Id);
         Assert.StartsWith(SecretCrypto.EncryptedPrefix, storedRotated.Secret, StringComparison.Ordinal);
         Assert.Equal(rotated.Secret, SecretCrypto.Decrypt(storedRotated.Secret));
         Assert.NotEqual(storedAdded.Secret, storedRotated.Secret);
@@ -74,7 +74,7 @@ public sealed class CredentialWritePathCryptoTests : IDisposable
             ConfigJson = configJson,
         });
 
-        var stored = _db.Db.Queryable<AdvertisementCallbackConfigEntity>().Filter(null, true).First(u => u.Id == added.Id);
+        var stored = _db.TenantDb.Queryable<AdvertisementCallbackConfigEntity>().Filter(null, true).First(u => u.Id == added.Id);
         Assert.StartsWith(SecretCrypto.EncryptedPrefix, stored.SigningSecret, StringComparison.Ordinal);
         Assert.Equal("ad-plain-secret", SecretCrypto.Decrypt(stored.SigningSecret));
 
@@ -98,7 +98,7 @@ public sealed class CredentialWritePathCryptoTests : IDisposable
             ConfigJson = "{\"callbackUrl\":\"https://cb.example.com/hook\",\"signingSecret\":\"******\"}",
             RowVersion = stored.RowVersion,
         });
-        stored = _db.Db.Queryable<AdvertisementCallbackConfigEntity>().Filter(null, true).First(u => u.Id == added.Id);
+        stored = _db.TenantDb.Queryable<AdvertisementCallbackConfigEntity>().Filter(null, true).First(u => u.Id == added.Id);
         Assert.Equal(cipherJsonBefore, stored.ConfigJson);
         Assert.StartsWith(SecretCrypto.EncryptedPrefix, stored.SigningSecret, StringComparison.Ordinal);
         Assert.Equal("ad-plain-secret", SecretCrypto.Decrypt(stored.SigningSecret));

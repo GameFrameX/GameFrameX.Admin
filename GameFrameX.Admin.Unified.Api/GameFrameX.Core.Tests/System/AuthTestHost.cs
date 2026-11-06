@@ -41,8 +41,8 @@ internal sealed class AuthTestHost : IDisposable
     {
         SqlSugarCache.Configure(new FakeCache());
         var mainConfig = CreateConfig(MainConfigId);
-        var config = CreateConfig(ConfigId);
-        _client = new SqlSugarScope(new List<ConnectionConfig> { mainConfig, config, });
+        var tenantConfig = CreateConfig(ConfigId);
+        _client = new SqlSugarScope(new List<ConnectionConfig> { mainConfig, tenantConfig, });
         SqlSugarSetup.InitDatabase(_client, mainConfig, new[]
         {
             typeof(SystemUserEntity),
@@ -50,7 +50,7 @@ internal sealed class AuthTestHost : IDisposable
             typeof(UserEntity),
         });
         _client.GetConnectionScope(MainConfigId).CodeFirst.InitTables<UserEntity>();
-        SqlSugarSetup.InitDatabase(_client, config, new[]
+        SqlSugarSetup.InitDatabase(_client, tenantConfig, new[]
         {
             typeof(UserEntity),
         });
@@ -124,13 +124,13 @@ internal sealed class AuthTestHost : IDisposable
     /// <summary>
     /// 在租户库 seed 一条 <see cref="UserEntity"/>（AccountType=NormalUser，IsEnabled=true，以通过冻结检查进入租户禁用分支）。
     /// </summary>
-    public async Task SeedUserAsync(long id, string account, string password)
+    public async Task SeedUserAsync(long tenantId, string account, string password)
     {
         var user = BuildUser<UserEntity>(UserId, account, password, AccountTypeEnum.NormalUser);
         user.IsEnabled = true;
 
-        var db = _client.GetConnectionScope(MainConfigId);
-        await db.Insertable(user).ExecuteCommandAsync();
+        var tenantDb = _client.GetConnectionScope(MainConfigId);
+        await tenantDb.Insertable(user).ExecuteCommandAsync();
     }
 
     public void Dispose()
@@ -145,7 +145,7 @@ internal sealed class AuthTestHost : IDisposable
     }
 
     /// <summary>
-    /// 填充 <see cref="SystemUserBase"/> 共享字段（system_user / user 通用），调用方再按需覆盖 Id/Id/IsEnabled/AccountType。
+    /// 填充 <see cref="SystemUserBase"/> 共享字段（system_user / user 通用），调用方再按需覆盖 Id/TenantId/IsEnabled/AccountType。
     /// </summary>
     private static T BuildUser<T>(long id, string account, string password, AccountTypeEnum accountType) where T : SystemUserBase, new()
     {

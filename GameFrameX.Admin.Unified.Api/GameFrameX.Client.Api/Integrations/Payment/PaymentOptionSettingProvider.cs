@@ -36,7 +36,7 @@ public class PaymentOptionSettingProvider : IPaymentOptionSettingProvider
         PropertyNameCaseInsensitive = true,
     };
 
-    private readonly ISqlSugarClient _tenantDbProvider;
+    private readonly ISqlSugarClient _dbProvider;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
     /// <summary>
@@ -44,7 +44,7 @@ public class PaymentOptionSettingProvider : IPaymentOptionSettingProvider
     /// </summary>
     public PaymentOptionSettingProvider(ISqlSugarClient dbProvider, IHttpContextAccessor httpContextAccessor)
     {
-        _tenantDbProvider = dbProvider;
+        _dbProvider = dbProvider;
         _httpContextAccessor = httpContextAccessor;
     }
 
@@ -74,7 +74,7 @@ public class PaymentOptionSettingProvider : IPaymentOptionSettingProvider
         }
 
         var context = _httpContextAccessor.HttpContext;
-        var packageId = ResolveCurrentPackageId(context, _tenantDbProvider);
+        var packageId = ResolveCurrentPackageId(context, _dbProvider);
         return GetPaymentConfigs(normalizedChannel, packageId)
                .Where(config => !string.IsNullOrWhiteSpace(config.ConfigJson))
                // C372（GFX-838）：支付配置读取边界字段级解密（C371 起库内敏感字段密文；
@@ -120,7 +120,7 @@ public class PaymentOptionSettingProvider : IPaymentOptionSettingProvider
     private List<GamePaymentConfigEntity> GetPaymentConfigs(string channelName, long? packageId)
     {
         var context = _httpContextAccessor.HttpContext;
-        var db = _tenantDbProvider;
+        var db = _dbProvider;
         var environments = GetRequestedEnvironments(context);
         var hasPackageId = packageId.HasValue;
         var packageIdValue = packageId.GetValueOrDefault();
@@ -163,7 +163,7 @@ public class PaymentOptionSettingProvider : IPaymentOptionSettingProvider
 
     /// <summary>
     /// 按公开回调路由规范化支付渠道的回调通知地址（C401，GFX-1213）：站点根地址自动补全路由段
-    /// （含当前分包段），旧「回调/{id}/{appId}/{packageId}」三段地址自动去段重建；
+    /// （含当前分包段），旧「回调/{tenantId}/{appId}/{packageId}」三段地址自动去段重建；
     /// 无法识别的地址置空并由支付处理器按「通知地址未配置」拒绝下单，避免网关回调打在无法命中的地址上
     /// 导致已付款订单不发货。其余渠道地址原样透传。
     /// </summary>

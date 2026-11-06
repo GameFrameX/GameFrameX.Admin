@@ -45,7 +45,7 @@ public sealed class GameAdvertisementRewardServiceTests
         Assert.Equal(AdvertisementRewardStatusEnum.Success, result.Status);
         Assert.Equal("adreward:topon:TX-1001", result.IdempotencyKey);
         Assert.Equal(1, handler.Count(DispatchPath));
-        var rows = await db.Db.Queryable<GameAdvertisementRewardEntity>().ToListAsync();
+        var rows = await db.TenantDb.Queryable<GameAdvertisementRewardEntity>().ToListAsync();
         Assert.Single(rows);
         Assert.Equal(AdvertisementRewardStatusEnum.Success, rows[0].Status);
     }
@@ -67,7 +67,7 @@ public sealed class GameAdvertisementRewardServiceTests
         Assert.False(result.IsValid);
         Assert.Equal(601, result.Code);
         Assert.Equal(0, handler.Count(DispatchPath));
-        var rows = await db.Db.Queryable<GameAdvertisementRewardEntity>().ToListAsync();
+        var rows = await db.TenantDb.Queryable<GameAdvertisementRewardEntity>().ToListAsync();
         Assert.Empty(rows);
     }
 
@@ -88,7 +88,7 @@ public sealed class GameAdvertisementRewardServiceTests
         Assert.True(second.IsValid);
         Assert.Equal(AdvertisementRewardStatusEnum.Success, second.Status);
         Assert.Equal(1, handler.Count(DispatchPath));
-        var rows = await db.Db.Queryable<GameAdvertisementRewardEntity>().ToListAsync();
+        var rows = await db.TenantDb.Queryable<GameAdvertisementRewardEntity>().ToListAsync();
         Assert.Single(rows);
     }
 
@@ -142,7 +142,7 @@ public sealed class GameAdvertisementRewardServiceTests
         Assert.Equal(AdvertisementRewardStatusEnum.Success, result.Status);
         Assert.Equal("adreward:admob:AD-5005", result.IdempotencyKey);
         Assert.Equal(1, handler.Count(DispatchPath));
-        var rows = await db.Db.Queryable<GameAdvertisementRewardEntity>().ToListAsync();
+        var rows = await db.TenantDb.Queryable<GameAdvertisementRewardEntity>().ToListAsync();
         Assert.Single(rows);
         Assert.Equal(AdvertisementRewardStatusEnum.Success, rows[0].Status);
     }
@@ -168,7 +168,7 @@ public sealed class GameAdvertisementRewardServiceTests
         Assert.False(result.IsValid);
         Assert.Equal(601, result.Code);
         Assert.Equal(0, handler.Count(DispatchPath));
-        var rows = await db.Db.Queryable<GameAdvertisementRewardEntity>().ToListAsync();
+        var rows = await db.TenantDb.Queryable<GameAdvertisementRewardEntity>().ToListAsync();
         Assert.Empty(rows);
     }
 
@@ -193,7 +193,7 @@ public sealed class GameAdvertisementRewardServiceTests
         Assert.Equal(AdvertisementRewardStatusEnum.Success, result.Status);
         Assert.Equal("adreward:unityads:OID-7007", result.IdempotencyKey);
         Assert.Equal(1, handler.Count(DispatchPath));
-        var rows = await db.Db.Queryable<GameAdvertisementRewardEntity>().ToListAsync();
+        var rows = await db.TenantDb.Queryable<GameAdvertisementRewardEntity>().ToListAsync();
         Assert.Single(rows);
         Assert.Equal(AdvertisementRewardStatusEnum.Success, rows[0].Status);
     }
@@ -218,7 +218,7 @@ public sealed class GameAdvertisementRewardServiceTests
         Assert.False(result.IsValid);
         Assert.Equal(601, result.Code);
         Assert.Equal(0, handler.Count(DispatchPath));
-        var rows = await db.Db.Queryable<GameAdvertisementRewardEntity>().ToListAsync();
+        var rows = await db.TenantDb.Queryable<GameAdvertisementRewardEntity>().ToListAsync();
         Assert.Empty(rows);
     }
 
@@ -236,7 +236,7 @@ public sealed class GameAdvertisementRewardServiceTests
         Assert.False(first.IsValid);
         Assert.Equal(AdvertisementRewardStatusEnum.Failed, first.Status);
         Assert.NotNull(first.Message);
-        var rowsAfterFirst = await db.Db.Queryable<GameAdvertisementRewardEntity>().ToListAsync();
+        var rowsAfterFirst = await db.TenantDb.Queryable<GameAdvertisementRewardEntity>().ToListAsync();
         Assert.Single(rowsAfterFirst);
         Assert.Equal(AdvertisementRewardStatusEnum.Failed, rowsAfterFirst[0].Status);
         var firstLedgerId = rowsAfterFirst[0].Id;
@@ -246,7 +246,7 @@ public sealed class GameAdvertisementRewardServiceTests
         var second = await CreateService(db, option, handler, query).ReceiveTopOnAsync();
         Assert.True(second.IsValid);
         Assert.Equal(AdvertisementRewardStatusEnum.Success, second.Status);
-        var rowsAfterSecond = await db.Db.Queryable<GameAdvertisementRewardEntity>().ToListAsync();
+        var rowsAfterSecond = await db.TenantDb.Queryable<GameAdvertisementRewardEntity>().ToListAsync();
         Assert.Single(rowsAfterSecond);
         Assert.Equal(firstLedgerId, rowsAfterSecond[0].Id);
         Assert.Equal(AdvertisementRewardStatusEnum.Success, rowsAfterSecond[0].Status);

@@ -72,7 +72,7 @@ public sealed class CryptoEnvelopeMiddlewareTests
         };
     }
 
-    private static DefaultHttpContext CreateEnvelopeContext(string envelopeJson, string path = E1Path, string? query = "?op=BLLogin&userid=10086", string? cryptoHeader = "1", long? appId = TestAppId, long? id = null)
+    private static DefaultHttpContext CreateEnvelopeContext(string envelopeJson, string path = E1Path, string? query = "?op=BLLogin&userid=10086", string? cryptoHeader = "1", long? appId = TestAppId, long? tenantId = null)
     {
         var context = new DefaultHttpContext();
         context.Response.Body = new MemoryStream();
@@ -94,9 +94,9 @@ public sealed class CryptoEnvelopeMiddlewareTests
             context.Request.Headers["GameFrameX-App-Id"] = appId.Value.ToString();
         }
 
-        if (id.HasValue)
+        if (tenantId.HasValue)
         {
-            context.Items["Id"] = id.Value;
+            context.Items["TenantId"] = tenantId.Value;
         }
 
         return context;
@@ -591,7 +591,7 @@ public sealed class CryptoEnvelopeMiddlewareTests
     [Fact]
     public async Task LegacyTenantContext_DoesNotBypassDecryption()
     {
-        var context = CreateEnvelopeContext("{}", id: 999);
+        var context = CreateEnvelopeContext("{}", tenantId: 999);
         var nextCalled = false;
         await InvokeAsync(context, CreateOptions(true), () =>
         {

@@ -16,12 +16,12 @@ namespace GameFrameX.Core.Tests.System;
 // 用 Sqlite 双库 SqlSugarScope 种子数据，伪造 HttpMessageHandler 验证聚合、降级、计数与趋势桶行为。
 public class GameHomeServiceTests : IDisposable
 {
-    private const long Id = 1001L;
+    private const long TenantId = 1001L;
     private const string ConfigId = "1001";
 
     private readonly string _dbPath = Path.Combine(Path.GetTempPath(), $"game_home_{Guid.NewGuid():N}.db");
     private readonly SqlSugarScope _db;
-    private readonly FakeDbConnectionProvider _tenantDbProvider;
+    private readonly FakeDbConnectionProvider _dbProvider;
 
     public GameHomeServiceTests()
     {
@@ -41,18 +41,18 @@ public class GameHomeServiceTests : IDisposable
         };
         SqlSugarSetup.SetDbConfig(config);
         _db = new SqlSugarScope(new List<ConnectionConfig> { config, });
-        var scope = _db.GetConnectionScope(ConfigId);
-        scope.CodeFirst.InitTables<GameAreaEntity>();
-        scope.CodeFirst.InitTables<GameOrderEntity>();
-        scope.CodeFirst.InitTables<GameUserEntity>();
-        scope.CodeFirst.InitTables<GameHomeOnlineSampleEntity>();
-        _tenantDbProvider = new FakeDbConnectionProvider(_db, ConfigId);
+        var tenantScope = _db.GetConnectionScope(ConfigId);
+        tenantScope.CodeFirst.InitTables<GameAreaEntity>();
+        tenantScope.CodeFirst.InitTables<GameOrderEntity>();
+        tenantScope.CodeFirst.InitTables<GameUserEntity>();
+        tenantScope.CodeFirst.InitTables<GameHomeOnlineSampleEntity>();
+        _dbProvider = new FakeDbConnectionProvider(_db, ConfigId);
     }
 
     private GameHomeService CreateService(HttpClient? httpClient = null)
     {
         var client = httpClient ?? new HttpClient(new StubHandler(_ => throw new InvalidOperationException("should not call")));
-        return new GameHomeService(new StubHttpClientFactory(client), _tenantDbProvider.Database);
+        return new GameHomeService(new StubHttpClientFactory(client), _dbProvider.Database);
     }
 
 

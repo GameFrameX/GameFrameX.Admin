@@ -7,7 +7,7 @@ namespace GameFrameX.Core.Tests.System;
 
 /// <summary>
 /// C156 日志边界隔离测试。日志不再集中到独立日志库，平台日志（SystemLog*）归属主库 system_log_*，
-/// 租户日志（Log*）归属当前租户库 log_*。隔离由实体归属 + 物理库边界共同保证：
+/// 租户日志（TenantLog*）归属当前租户库 log_*。隔离由实体归属 + 物理库边界共同保证：
 /// 平台与租户日志为不同 CLR 类型，分别路由到不同数据库（路由/catalog 验收见 SqlSugarDatabaseInitializationTests）。
 /// </summary>
 public class LogQueryIsolationTests
@@ -85,8 +85,8 @@ public class LogQueryIsolationTests
                 value = new
                 {
                     account = "admin",
-                    id = 1300000000001,
-                    host = (string?)null,
+                    tenantId = 1300000000001,
+                    tenantHost = (string?)null,
                 },
             },
         });

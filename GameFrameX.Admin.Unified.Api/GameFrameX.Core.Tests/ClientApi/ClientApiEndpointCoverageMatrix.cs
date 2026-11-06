@@ -6,10 +6,10 @@ internal static class ClientApiEndpointCoverageMatrix
 {
     private static readonly ClientApiEndpointCoverage[] Endpoints =
     {
-        Endpoint("GameAdWebHook.TopOnNotify", "GET", "api/GameAdWebHook/TopOnNotify/{id:long}/{appId:long}/{packageId:long?}", "ad-callback", true, true, false, true, "valid TopOn callback grants reward once", "invalid-route", "signature-failed", "duplicate-callback", "cross-package"),
-        Endpoint("GameAdWebHook.PangleGlobalNotify", "GET", "api/GameAdWebHook/PangleGlobalNotify/{id:long}/{appId:long}/{packageId:long?}", "ad-callback", true, true, false, true, "valid Pangle callback grants reward once", "invalid-route", "signature-failed", "duplicate-callback", "cross-app"),
-        Endpoint("GameAdWebHook.AdMobNotify", "GET", "api/GameAdWebHook/AdMobNotify/{id:long}/{appId:long}/{packageId:long?}", "ad-callback", true, true, false, true, "valid AdMob callback grants reward once", "invalid-route", "signature-failed", "duplicate-callback", "cross-tenant"),
-        Endpoint("GameAdWebHook.UnityAdsNotify", "GET", "api/GameAdWebHook/UnityAdsNotify/{id:long}/{appId:long}/{packageId:long?}", "ad-callback", true, true, false, true, "valid UnityAds callback grants reward once", "invalid-route", "signature-failed", "duplicate-callback"),
+        Endpoint("GameAdWebHook.TopOnNotify", "GET", "api/GameAdWebHook/TopOnNotify/{tenantId:long}/{appId:long}/{packageId:long?}", "ad-callback", true, true, false, true, "valid TopOn callback grants reward once", "invalid-route", "signature-failed", "duplicate-callback", "cross-package"),
+        Endpoint("GameAdWebHook.PangleGlobalNotify", "GET", "api/GameAdWebHook/PangleGlobalNotify/{tenantId:long}/{appId:long}/{packageId:long?}", "ad-callback", true, true, false, true, "valid Pangle callback grants reward once", "invalid-route", "signature-failed", "duplicate-callback", "cross-app"),
+        Endpoint("GameAdWebHook.AdMobNotify", "GET", "api/GameAdWebHook/AdMobNotify/{tenantId:long}/{appId:long}/{packageId:long?}", "ad-callback", true, true, false, true, "valid AdMob callback grants reward once", "invalid-route", "signature-failed", "duplicate-callback", "cross-tenant"),
+        Endpoint("GameAdWebHook.UnityAdsNotify", "GET", "api/GameAdWebHook/UnityAdsNotify/{tenantId:long}/{appId:long}/{packageId:long?}", "ad-callback", true, true, false, true, "valid UnityAds callback grants reward once", "invalid-route", "signature-failed", "duplicate-callback"),
 
         Endpoint("GameAnnouncement.List", "GET", "api/GameAnnouncementService/List", "announcement", true, true, false, false, "lists enabled announcements by language", "missing-tenant", "disabled-record-hidden"),
         Endpoint("GameAnnouncement.ListByAreaId", "POST", "api/GameAnnouncementService/ListByAreaId", "announcement", true, true, false, false, "lists enabled area announcements", "missing-tenant", "area-not-found"),

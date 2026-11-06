@@ -54,8 +54,8 @@ public sealed class ClientApiWeChatPayCallbackTests
         var contentResult = Assert.IsType<ContentResult>(result);
         Assert.Equal(200, contentResult.StatusCode);
         Assert.Contains("\"code\":\"SUCCESS\"", contentResult.Content);
-        var order = await db.Db.Queryable<GameOrderEntity>().FirstAsync(u => u.Id == 7101);
-        var role = await db.Db.Queryable<GameRoleEntity>().FirstAsync(u => u.Id == 3001);
+        var order = await db.TenantDb.Queryable<GameOrderEntity>().FirstAsync(u => u.Id == 7101);
+        var role = await db.TenantDb.Queryable<GameRoleEntity>().FirstAsync(u => u.Id == 3001);
         Assert.Equal(OrderStatusEnum.Shipped, order.Status);
         Assert.Equal(TestTransactionId, order.ProviderTransactionId);
         Assert.Equal(650, role.AllRecharge);
@@ -80,7 +80,7 @@ public sealed class ClientApiWeChatPayCallbackTests
         var contentResult = Assert.IsType<ContentResult>(result);
         Assert.Equal(500, contentResult.StatusCode);
         Assert.Contains("\"code\":\"FAIL\"", contentResult.Content);
-        var order = await db.Db.Queryable<GameOrderEntity>().FirstAsync(u => u.Id == 7101);
+        var order = await db.TenantDb.Queryable<GameOrderEntity>().FirstAsync(u => u.Id == 7101);
         Assert.Equal(OrderStatusEnum.Unpaid, order.Status);
     }
 
@@ -100,7 +100,7 @@ public sealed class ClientApiWeChatPayCallbackTests
         var contentResult = Assert.IsType<ContentResult>(result);
         Assert.Equal(500, contentResult.StatusCode);
         Assert.Contains("\"code\":\"FAIL\"", contentResult.Content);
-        var order = await db.Db.Queryable<GameOrderEntity>().FirstAsync(u => u.Id == 7101);
+        var order = await db.TenantDb.Queryable<GameOrderEntity>().FirstAsync(u => u.Id == 7101);
         Assert.Equal(OrderStatusEnum.Unpaid, order.Status);
     }
 
@@ -123,7 +123,7 @@ public sealed class ClientApiWeChatPayCallbackTests
         // 微信重试通知：两次均 200 SUCCESS（避免继续重试），但发货与累充恰一次（ShipAsync 幂等 + 状态前置守卫）
         Assert.Contains("\"code\":\"SUCCESS\"", Assert.IsType<ContentResult>(first).Content);
         Assert.Contains("\"code\":\"SUCCESS\"", Assert.IsType<ContentResult>(second).Content);
-        var role = await db.Db.Queryable<GameRoleEntity>().FirstAsync(u => u.Id == 3001);
+        var role = await db.TenantDb.Queryable<GameRoleEntity>().FirstAsync(u => u.Id == 3001);
         Assert.Equal(650, role.AllRecharge);
         Assert.Equal(1, handler.Count("/game/api/req_player_send_item"));
     }
@@ -140,7 +140,7 @@ public sealed class ClientApiWeChatPayCallbackTests
             FakeOptionsProvider.WithAreaPolicy(false),
             db.Repository<GameRoleEntity>(),
             new HttpClient(handler, false),
-            new GameOrderShipService(db.Db, new ClientApiTestHttpClientFactory(handler)),
+            new GameOrderShipService(db.TenantDb, new ClientApiTestHttpClientFactory(handler)),
             new WechatCallbackPaymentFactory(setting),
             new TestGooglePubSubPushAuthenticator(false),
             new TestGooglePlayPurchaseService(null));

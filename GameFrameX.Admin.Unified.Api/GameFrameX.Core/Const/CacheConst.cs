@@ -43,7 +43,7 @@ public sealed class CacheConst
     /// <summary>
     /// 租户缓存
     /// </summary>
-    public const string Key = "cache:tenant";
+    public const string KeyTenant = "cache:tenant";
 
     /// <summary>
     /// 常量下拉框

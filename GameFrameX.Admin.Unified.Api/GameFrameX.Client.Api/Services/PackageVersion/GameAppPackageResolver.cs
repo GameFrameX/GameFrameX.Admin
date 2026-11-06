@@ -21,11 +21,11 @@ namespace GameFrameX.Client.Api.Services.PackageVersion;
 public class GameAppPackageResolver
 {
     private PackageCache? _cache;
-    private readonly ISqlSugarClient _tenantDbProvider;
+    private readonly ISqlSugarClient _dbProvider;
 
     public GameAppPackageResolver(ISqlSugarClient dbProvider)
     {
-        _tenantDbProvider = dbProvider;
+        _dbProvider = dbProvider;
     }
 
     /// <summary>
@@ -62,7 +62,7 @@ public class GameAppPackageResolver
     /// </summary>
     private PackageCache RefreshCacheIfChanged()
     {
-        var db = _tenantDbProvider;
+        var db = _dbProvider;
         var signal = GetSignal(db);
         if (_cache is { } existing && existing.Signal == signal)
         {

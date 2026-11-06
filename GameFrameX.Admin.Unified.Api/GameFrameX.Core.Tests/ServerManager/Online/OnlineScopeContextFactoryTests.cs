@@ -19,7 +19,7 @@ namespace GameFrameX.Core.Tests.ServerManager.Online;
 // S3/C401 断链修复点
 public sealed class OnlineScopeContextFactoryTests : IDisposable
 {
-    private const long A = 1001;
+    private const long TenantA = 1001;
     private const long App100 = 100;
     private const long App200 = 200;
     private const long Area1001 = 2001; // 归属 App100

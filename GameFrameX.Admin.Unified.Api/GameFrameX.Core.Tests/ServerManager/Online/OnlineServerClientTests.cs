@@ -27,7 +27,7 @@ namespace GameFrameX.Core.Tests.ServerManager.Online;
 // 作用域构造后区服被删的时序漂移拒绝。
 public sealed class OnlineServerClientTests : IDisposable
 {
-    private const long A = 1001;
+    private const long TenantA = 1001;
     private const long App100 = 100;
     private const long Area1001 = 2001;
 
@@ -105,10 +105,10 @@ public sealed class OnlineServerClientTests : IDisposable
         var handler = new FakeHandler(SuccessEnvelope(new OnlineDemoData { PlayerId = "p-1", }));
         var client = CreateClient(handler);
 
-        await client.PostAsync<OnlineDemoData>("kick_player", new { Id = 999L, AppId = 888L, ServerId = 777L, RequestId = "request-1", IdempotencyKey = "key-1", Reason = 3, }, await CreateScopeAsync());
+        await client.PostAsync<OnlineDemoData>("kick_player", new { TenantId = 999L, AppId = 888L, ServerId = 777L, RequestId = "request-1", IdempotencyKey = "key-1", Reason = 3, }, await CreateScopeAsync());
 
         var body = handler.LastRequestBodyJson;
-        Assert.False(body.ContainsKey("Id"));
+        Assert.False(body.ContainsKey("TenantId"));
         Assert.False(body.ContainsKey("AppId"));
         Assert.Equal(Area1001, Convert.ToInt64(body["ServerId"]?.ToString()));
         Assert.Equal("request-1", body["RequestId"]?.ToString());

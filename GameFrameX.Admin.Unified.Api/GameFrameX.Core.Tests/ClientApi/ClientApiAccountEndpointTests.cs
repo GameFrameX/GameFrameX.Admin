@@ -26,7 +26,7 @@ public sealed class ClientApiAccountEndpointTests
 
         var root = ClientApiResultReader.Read(result);
         var data = ClientApiResultReader.Data(root);
-        var saved = await db.Db.Queryable<GameUserEntity>().FirstAsync(u => u.UserName == "guest-c108");
+        var saved = await db.TenantDb.Queryable<GameUserEntity>().FirstAsync(u => u.UserName == "guest-c108");
         Assert.Equal(0, ClientApiResultReader.Code(root));
         Assert.False(string.IsNullOrWhiteSpace(data.GetProperty("AccessToken").GetString()));
         Assert.Equal("Guest", data.GetProperty("Provider").GetString());
@@ -110,7 +110,7 @@ public sealed class ClientApiAccountEndpointTests
         });
 
         var root = ClientApiResultReader.Read(result);
-        var saved = await db.Db.Queryable<GameUserEntity>().FirstAsync(u => u.Id == user.Id);
+        var saved = await db.TenantDb.Queryable<GameUserEntity>().FirstAsync(u => u.Id == user.Id);
         Assert.Equal(0, ClientApiResultReader.Code(root));
         Assert.Equal(GameUserStatus.Deleted, saved.Status);
         Assert.NotNull(saved.DeletedTime);

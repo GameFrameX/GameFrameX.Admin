@@ -25,7 +25,7 @@ public class ReadActionClassifierTests
     [InlineData("Count", true)]
     [InlineData("Exist", true)]
     [InlineData("Add", false)]
-    [InlineData("Add", false)]
+    [InlineData("AddTenant", false)]
     [InlineData("Update", false)]
     [InlineData("Update", false)]
     [InlineData("Delete", false)]

@@ -26,7 +26,7 @@ public sealed class GameUserMiscTests
         var data = ClientApiResultReader.Data(ClientApiResultReader.Read(result));
         Assert.Equal(0, data.GetProperty("Rcode").GetInt64());
 
-        var records = db.Db.Queryable<GameUserLogoutRecordEntity>().Where(x => x.UserId == 4001).ToList();
+        var records = db.TenantDb.Queryable<GameUserLogoutRecordEntity>().Where(x => x.UserId == 4001).ToList();
         Assert.Single(records);
         Assert.Equal("1.0.0", records[0].ClientVersion);
         Assert.True(records[0].LogoutTime > 0);

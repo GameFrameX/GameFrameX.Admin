@@ -28,11 +28,11 @@ namespace GameFrameX.Core.Tests.HubApi;
 /// </summary>
 public sealed class FeatureSwitchSyncControllerTests : IDisposable
 {
-    private const long Id = 2090001;
+    private const long TenantId = 2090001;
     private const long CredentialAppId = 2091001;
 
     private readonly string _mainDbPath = Path.Combine(Path.GetTempPath(), $"gfx_hub_switch_main_{Guid.NewGuid():N}.db");
-    private readonly string _tenantDbPath = Path.Combine(Path.GetTempPath(), $"gfx_hub_switch_{Guid.NewGuid():N}.db");
+    private readonly string _dbPath = Path.Combine(Path.GetTempPath(), $"gfx_hub_switch_{Guid.NewGuid():N}.db");
     private readonly SqlSugarScope _mainDb;
 
     public FeatureSwitchSyncControllerTests()
@@ -49,11 +49,11 @@ public sealed class FeatureSwitchSyncControllerTests : IDisposable
         provider.CodeFirst.InitTables(typeof(GameAppFeatureSwitchEntity));
     }
 
-    private FeatureSwitchSyncController CreateController(out ISqlSugarClient db, bool includeContext = true)
+    private FeatureSwitchSyncController CreateController(out ISqlSugarClient tenantDb, bool includeContext = true)
     {
         var provider = _mainDb;
         var repository = new Repository<GameAppFeatureSwitchEntity>(_mainDb);
-        db = provider;
+        tenantDb = provider;
         var controller = new FeatureSwitchSyncController(new FeatureSwitchDeliveryResolver(repository));
         var context = new DefaultHttpContext();
         controller.ControllerContext = new ControllerContext { HttpContext = context, };
@@ -93,8 +93,8 @@ public sealed class FeatureSwitchSyncControllerTests : IDisposable
     [Fact]
     public async Task Sync_FiltersByAudienceFromMainDatabase()
     {
-        var controller = CreateController(out var db);
-        db.Insertable(new[]
+        var controller = CreateController(out var tenantDb);
+        tenantDb.Insertable(new[]
         {
             Row(1, "economy.drop_rate", "{\"rate\":2}", audience: FeatureSwitchAudienceValues.Server),
             Row(2, "login.banner", "{\"v\":1}", audience: FeatureSwitchAudienceValues.Both),
@@ -120,8 +120,8 @@ public sealed class FeatureSwitchSyncControllerTests : IDisposable
     [Fact]
     public async Task Sync_WithoutDimensionContext_OnlyDefaultSentinelRowsDelivered()
     {
-        var controller = CreateController(out var db);
-        db.Insertable(new[]
+        var controller = CreateController(out var tenantDb);
+        tenantDb.Insertable(new[]
         {
             Row(1, "activity.android_only", "{\"v\":1}", platform: "android"),
             Row(2, "activity.everyone", "{\"v\":2}"),
@@ -140,8 +140,8 @@ public sealed class FeatureSwitchSyncControllerTests : IDisposable
     [Fact]
     public async Task Sync_ServerChannel_IgnoresDeviceRollout()
     {
-        var controller = CreateController(out var db);
-        db.Insertable(new[]
+        var controller = CreateController(out var tenantDb);
+        tenantDb.Insertable(new[]
         {
             Row(1, "economy.zero_rollout", "{\"rate\":5}", rolloutPercent: 0),
         }).ExecuteCommand();
@@ -159,9 +159,9 @@ public sealed class FeatureSwitchSyncControllerTests : IDisposable
     [Fact]
     public async Task Sync_VersionProtocol_FirstPullUnchangedShortCircuitAndChange()
     {
-        var controller = CreateController(out var db);
+        var controller = CreateController(out var tenantDb);
         var row = Row(1, "economy.drop_rate", "{\"rate\":1}");
-        db.Insertable(row).ExecuteCommand();
+        tenantDb.Insertable(row).ExecuteCommand();
 
         var firstResult = await controller.Sync(new FeatureSwitchSyncRequest());
         var first = ClientApiResultReader.Data(ClientApiResultReader.Read(firstResult));
@@ -177,7 +177,7 @@ public sealed class FeatureSwitchSyncControllerTests : IDisposable
         Assert.Equal(0, unchanged.GetProperty("Switches").GetArrayLength());
 
         row.ValueJson = "{\"rate\":9}";
-        db.Updateable(row).ExecuteCommand();
+        tenantDb.Updateable(row).ExecuteCommand();
         var changedResult = await controller.Sync(new FeatureSwitchSyncRequest { Version = version, });
         var changed = ClientApiResultReader.Data(ClientApiResultReader.Read(changedResult));
         Assert.False(changed.GetProperty("Unchanged").GetBoolean());
@@ -238,7 +238,7 @@ public sealed class FeatureSwitchSyncControllerTests : IDisposable
     public void Dispose()
     {
         _mainDb.Dispose();
-        foreach (var path in new[] { _mainDbPath, _tenantDbPath, })
+        foreach (var path in new[] { _mainDbPath, _dbPath, })
         {
             if (File.Exists(path))
             {

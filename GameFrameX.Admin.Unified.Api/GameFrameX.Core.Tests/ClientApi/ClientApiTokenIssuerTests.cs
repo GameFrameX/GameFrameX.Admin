@@ -60,7 +60,7 @@ public class ClientApiTokenIssuerTests
         Assert.Equal(ClientApiPlatformDefaults.GameLoginTicketAudience, jwt.Audiences.Single());
         Assert.Equal(keyResolver.Kid, jwt.Kid);
         Assert.Equal(keyResolver.Kid, ticket.Kid);
-        Assert.DoesNotContain(jwt.Claims, claim => claim.Type == "id");
+        Assert.DoesNotContain(jwt.Claims, claim => claim.Type == "tenantId");
         Assert.DoesNotContain(jwt.Claims, claim => claim.Type == "appId");
         Assert.Equal("30", jwt.Claims.Single(c => c.Type == "userId").Value);
         Assert.Equal("40", jwt.Claims.Single(c => c.Type == "playerId").Value);
@@ -150,7 +150,7 @@ public class ClientApiTokenIssuerTests
                                + "\"AreaId\":50,"
                                + "\"AccessToken\":\"token\","
                                + "\"UserId\":30,"
-                               + "\"id\":10,"
+                               + "\"tenantId\":10,"
                                + "\"appId\":20"
                                + "}";
 
@@ -158,7 +158,7 @@ public class ClientApiTokenIssuerTests
 
         Assert.NotNull(input);
         Assert.Contains(input!.ExtraFields.Keys, key => string.Equals(key, "UserId", StringComparison.OrdinalIgnoreCase));
-        Assert.Contains(input.ExtraFields.Keys, key => string.Equals(key, "id", StringComparison.OrdinalIgnoreCase));
+        Assert.Contains(input.ExtraFields.Keys, key => string.Equals(key, "tenantId", StringComparison.OrdinalIgnoreCase));
         Assert.Contains(input.ExtraFields.Keys, key => string.Equals(key, "appId", StringComparison.OrdinalIgnoreCase));
     }
 

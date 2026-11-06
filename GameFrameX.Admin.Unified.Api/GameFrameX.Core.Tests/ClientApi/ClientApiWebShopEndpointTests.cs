@@ -187,8 +187,8 @@ public sealed class ClientApiWebShopEndpointTests
         var result = await controller.NotifyWebShop(BuildSignedNotifyRequest(outTradeNo, 6.50m, "sign-secret"));
 
         var root = ClientApiResultReader.Read(result);
-        var order = await db.Db.Queryable<GameOrderEntity>().FirstAsync(u => u.OrderId == outTradeNo);
-        var role = await db.Db.Queryable<GameRoleEntity>().FirstAsync(u => u.Id == 3001);
+        var order = await db.TenantDb.Queryable<GameOrderEntity>().FirstAsync(u => u.OrderId == outTradeNo);
+        var role = await db.TenantDb.Queryable<GameRoleEntity>().FirstAsync(u => u.Id == 3001);
         Assert.Equal(0, ClientApiResultReader.Code(root));
         Assert.Equal(OrderStatusEnum.Shipped, order.Status);
         Assert.Equal(650, role.AllRecharge);
@@ -215,9 +215,9 @@ public sealed class ClientApiWebShopEndpointTests
         var result = await controller.NotifyWebShop(BuildSignedNotifyRequest(outTradeNo, 6.50m, "sign-secret", "forged-sign"));
 
         var root = ClientApiResultReader.Read(result);
-        var order = await db.Db.Queryable<GameOrderEntity>().FirstAsync(u => u.OrderId == outTradeNo);
-        var role = await db.Db.Queryable<GameRoleEntity>().FirstAsync(u => u.Id == 3001);
-        var failedOrders = await db.Db.Queryable<GameWebShopOrderEntity>().ToListAsync();
+        var order = await db.TenantDb.Queryable<GameOrderEntity>().FirstAsync(u => u.OrderId == outTradeNo);
+        var role = await db.TenantDb.Queryable<GameRoleEntity>().FirstAsync(u => u.Id == 3001);
+        var failedOrders = await db.TenantDb.Queryable<GameWebShopOrderEntity>().ToListAsync();
         // 验签缺省强制：伪造签名一律拒绝且不发货（不再有 log 灰度放行）
         Assert.Equal((int)AuthErrorCode.SignatureVerifyFailed, ClientApiResultReader.Code(root));
         Assert.Equal(OrderStatusEnum.Unpaid, order.Status);
@@ -247,8 +247,8 @@ public sealed class ClientApiWebShopEndpointTests
         var result = await controller.NotifyWebShop(BuildSignedNotifyRequest(outTradeNo, 6.50m, "sign-secret"));
 
         var root = ClientApiResultReader.Read(result);
-        var order = await db.Db.Queryable<GameOrderEntity>().FirstAsync(u => u.OrderId == outTradeNo);
-        var role = await db.Db.Queryable<GameRoleEntity>().FirstAsync(u => u.Id == 3001);
+        var order = await db.TenantDb.Queryable<GameOrderEntity>().FirstAsync(u => u.OrderId == outTradeNo);
+        var role = await db.TenantDb.Queryable<GameRoleEntity>().FirstAsync(u => u.Id == 3001);
         Assert.Equal(0, ClientApiResultReader.Code(root));
         Assert.Equal(OrderStatusEnum.Shipped, order.Status);
         Assert.Equal(650, role.AllRecharge);
@@ -276,9 +276,9 @@ public sealed class ClientApiWebShopEndpointTests
         var outTradeNo = await SeedUnpaidOrderAsync(db);
         var failed = ClientApiResultReader.Read(await controller.NotifyWebShop(BuildSignedNotifyRequest(outTradeNo, 6.50m, "sign-secret")));
 
-        var orderAfterFailure = await db.Db.Queryable<GameOrderEntity>().FirstAsync(u => u.OrderId == outTradeNo);
-        var roleAfterFailure = await db.Db.Queryable<GameRoleEntity>().FirstAsync(u => u.Id == 3001);
-        var failedRows = await db.Db.Queryable<GameWebShopOrderEntity>().ToListAsync();
+        var orderAfterFailure = await db.TenantDb.Queryable<GameOrderEntity>().FirstAsync(u => u.OrderId == outTradeNo);
+        var roleAfterFailure = await db.TenantDb.Queryable<GameRoleEntity>().FirstAsync(u => u.Id == 3001);
+        var failedRows = await db.TenantDb.Queryable<GameWebShopOrderEntity>().ToListAsync();
         // 发货失败：订单不能停在已完成，保留 NotShipped 可重试状态，累充不增加
         Assert.Equal((int)AreaErrorCode.AreaCannotBuy, ClientApiResultReader.Code(failed));
         Assert.Equal(OrderStatusEnum.NotShipped, orderAfterFailure.Status);
@@ -289,8 +289,8 @@ public sealed class ClientApiWebShopEndpointTests
         handler.SetJson("/game/api/post_mail", HttpJsonResultData<string>.Success(JsonHelper.Serialize(new GameWebShpBuySendMailResponse { ErrorCode = 0, })).ToString());
         var retried = ClientApiResultReader.Read(await controller.NotifyWebShop(BuildSignedNotifyRequest(outTradeNo, 6.50m, "sign-secret")));
 
-        var orderAfterRetry = await db.Db.Queryable<GameOrderEntity>().FirstAsync(u => u.OrderId == outTradeNo);
-        var roleAfterRetry = await db.Db.Queryable<GameRoleEntity>().FirstAsync(u => u.Id == 3001);
+        var orderAfterRetry = await db.TenantDb.Queryable<GameOrderEntity>().FirstAsync(u => u.OrderId == outTradeNo);
+        var roleAfterRetry = await db.TenantDb.Queryable<GameRoleEntity>().FirstAsync(u => u.Id == 3001);
         Assert.Equal(0, ClientApiResultReader.Code(retried));
         Assert.Equal(OrderStatusEnum.Shipped, orderAfterRetry.Status);
         Assert.Equal(650, roleAfterRetry.AllRecharge);
@@ -316,8 +316,8 @@ public sealed class ClientApiWebShopEndpointTests
         var first = ClientApiResultReader.Read(await controller.NotifyWebShop(request));
         var second = ClientApiResultReader.Read(await controller.NotifyWebShop(request));
 
-        var order = await db.Db.Queryable<GameOrderEntity>().FirstAsync(u => u.OrderId == outTradeNo);
-        var role = await db.Db.Queryable<GameRoleEntity>().FirstAsync(u => u.Id == 3001);
+        var order = await db.TenantDb.Queryable<GameOrderEntity>().FirstAsync(u => u.OrderId == outTradeNo);
+        var role = await db.TenantDb.Queryable<GameRoleEntity>().FirstAsync(u => u.Id == 3001);
         Assert.Equal(0, ClientApiResultReader.Code(first));
         Assert.Equal(0, ClientApiResultReader.Code(second));
         Assert.Equal(OrderStatusEnum.Shipped, order.Status);
@@ -345,8 +345,8 @@ public sealed class ClientApiWebShopEndpointTests
         var result = await controller.NotifyWebShop(BuildSignedNotifyRequest(outTradeNo, 6.50m, "sign-secret"));
 
         var root = ClientApiResultReader.Read(result);
-        var order = await db.Db.Queryable<GameOrderEntity>().FirstAsync(u => u.OrderId == outTradeNo);
-        var role = await db.Db.Queryable<GameRoleEntity>().FirstAsync(u => u.Id == 3001);
+        var order = await db.TenantDb.Queryable<GameOrderEntity>().FirstAsync(u => u.OrderId == outTradeNo);
+        var role = await db.TenantDb.Queryable<GameRoleEntity>().FirstAsync(u => u.Id == 3001);
         Assert.Equal(0, ClientApiResultReader.Code(root));
         Assert.Equal(status, order.Status);
         Assert.Equal(0, role.AllRecharge);
@@ -371,9 +371,9 @@ public sealed class ClientApiWebShopEndpointTests
         var result = await controller.NotifyWebShop(BuildSignedNotifyRequest(outTradeNo, 1.00m, "sign-secret"));
 
         var root = ClientApiResultReader.Read(result);
-        var order = await db.Db.Queryable<GameOrderEntity>().FirstAsync(u => u.OrderId == outTradeNo);
-        var role = await db.Db.Queryable<GameRoleEntity>().FirstAsync(u => u.Id == 3001);
-        var failedOrders = await db.Db.Queryable<GameWebShopOrderEntity>().ToListAsync();
+        var order = await db.TenantDb.Queryable<GameOrderEntity>().FirstAsync(u => u.OrderId == outTradeNo);
+        var role = await db.TenantDb.Queryable<GameRoleEntity>().FirstAsync(u => u.Id == 3001);
+        var failedOrders = await db.TenantDb.Queryable<GameWebShopOrderEntity>().ToListAsync();
         Assert.Equal((int)OrderErrorCode.NotifyAmountMismatch, ClientApiResultReader.Code(root));
         Assert.Equal(OrderStatusEnum.Unpaid, order.Status);
         Assert.Equal(0, role.AllRecharge);
@@ -399,9 +399,9 @@ public sealed class ClientApiWebShopEndpointTests
         var result = await controller.NotifyWebShop(BuildSignedNotifyRequest("999999999999999999", 6.50m, "sign-secret"));
 
         var root = ClientApiResultReader.Read(result);
-        var orderCount = await db.Db.Queryable<GameOrderEntity>().CountAsync(u => u.OrderId == "999999999999999999");
-        var role = await db.Db.Queryable<GameRoleEntity>().FirstAsync(u => u.Id == 3001);
-        var failedOrders = await db.Db.Queryable<GameWebShopOrderEntity>().ToListAsync();
+        var orderCount = await db.TenantDb.Queryable<GameOrderEntity>().CountAsync(u => u.OrderId == "999999999999999999");
+        var role = await db.TenantDb.Queryable<GameRoleEntity>().FirstAsync(u => u.Id == 3001);
+        var failedOrders = await db.TenantDb.Queryable<GameWebShopOrderEntity>().ToListAsync();
         Assert.Equal((int)OrderErrorCode.NotifyOrderNotFound, ClientApiResultReader.Code(root));
         Assert.Equal(0, orderCount);
         Assert.Equal(0, role.AllRecharge);

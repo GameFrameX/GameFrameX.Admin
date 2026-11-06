@@ -7,7 +7,7 @@ namespace GameFrameX.Core.Middleware;
 /// <para>两种 wire 形态（历史契约并存，不可合并为单一形态）：</para>
 /// <list type="bullet">
 /// <item><see cref="WriteRejectedAsync"/>：PascalCase <c>{Code, Message}</c>，未传 errorCode 时 Code 回退 HTTP 状态码 ——
-/// Client.Api（AppResolution / PublicCallbackResolution / Expiration）与 Hub.Api（Hub / GameAppOpenAccessAuth）
+/// Client.Api（AppResolution / PublicCallbackResolution / Expiration）与 Hub.Api（HubTenant / GameAppOpenAccessAuth）
 /// 的拒绝出口；errorCode 参数直接消费 C262 统一错误码枚举数值（如 <c>ErrorCode.Disabled</c>）。</item>
 /// <item><see cref="WriteEnvelopeRejectedAsync"/>：camelCase <c>{code, message}</c>，601xx 信封码
 /// （签名 60101-60103 / 加密信封 60104-60106）—— 与 MVC 主信封 camelCase 一致、客户端 Lua 读 <c>tbErr.code</c> 的双端冻结契约。</item>

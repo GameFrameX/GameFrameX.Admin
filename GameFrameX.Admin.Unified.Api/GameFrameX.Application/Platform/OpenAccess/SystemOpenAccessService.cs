@@ -14,7 +14,7 @@ public class SystemOpenAccessService : IAdminApiController
 {
     private readonly SqlSugarRepository<SystemOpenAccessEntity> _systemOpenAccessRepository;
     private readonly SystemCacheService _systemCacheService;
-    private readonly ISqlSugarClient _tenantDbConnectionProvider;
+    private readonly ISqlSugarClient _dbConnectionProvider;
 
     /// <summary>
     /// 开放接口身份服务构造函数
@@ -25,7 +25,7 @@ public class SystemOpenAccessService : IAdminApiController
     {
         _systemOpenAccessRepository = systemOpenAccessRepository;
         _systemCacheService = systemCacheService;
-        _tenantDbConnectionProvider = dbConnectionProvider;
+        _dbConnectionProvider = dbConnectionProvider;
     }
 
     /// <summary>
@@ -153,11 +153,11 @@ public class SystemOpenAccessService : IAdminApiController
     [NonAction]
     public BoundUser GetBoundUser(SystemOpenAccessEntity openAccess)
     {
-        var db = _tenantDbConnectionProvider;
-        db.QueryFilter.ClearAndBackup();
+        var tenantDb = _dbConnectionProvider;
+        tenantDb.QueryFilter.ClearAndBackup();
         try
         {
-            var user = db.Queryable<UserEntity>().First(u => u.Id == openAccess.BindUserId);
+            var user = tenantDb.Queryable<UserEntity>().First(u => u.Id == openAccess.BindUserId);
             if (user == null)
             {
                 throw BusinessError.Oh(SystemUserErrorCode.AccountNotFound);
@@ -167,7 +167,7 @@ public class SystemOpenAccessService : IAdminApiController
         }
         finally
         {
-            db.QueryFilter.Restore();
+            tenantDb.QueryFilter.Restore();
         }
     }
 }

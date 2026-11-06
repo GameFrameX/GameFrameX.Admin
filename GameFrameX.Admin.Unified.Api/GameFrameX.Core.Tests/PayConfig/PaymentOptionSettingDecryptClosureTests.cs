@@ -26,17 +26,17 @@ public sealed class PaymentOptionSettingDecryptClosureTests
     [PostgreSqlFact]
     public void GetOptionSetting_SensitiveJsonFieldDecrypts()
     {
-        const long id = 1900000004001;
+        const long tenantId = 1900000004001;
         const long appId = 1900000004101;
         var originalKey = Environment.GetEnvironmentVariable(SecretCrypto.KeyEnvironmentVariable);
         Environment.SetEnvironmentVariable(SecretCrypto.KeyEnvironmentVariable, "unit-test-secret-key");
         _ = Assembly.Load("GameFrameX.Payment.AliPay");
         try
         {
-            using var fixture = new PostgresPaymentFixture(id, appId);
+            using var fixture = new PostgresPaymentFixture(tenantId, appId);
             var configJson = PaymentConfigCrypto.EncryptConfigJson("alipay",
                 "{\"AliPayAppId\":\"2021001\",\"AliPayMerchantPrivateKey\":\"plain-merchant-key\",\"AliPayGatewayUrl\":\"https://openapi.alipay.com/gateway.do\"}");
-            fixture.Db.Insertable(new GamePaymentConfigEntity
+            fixture.TenantDb.Insertable(new GamePaymentConfigEntity
             {
                 Id = 1900000004201, IsEnabled = true, PayChannel = "alipay", ConfigJson = configJson,
             }).ExecuteCommand();
@@ -65,7 +65,7 @@ public sealed class PaymentOptionSettingDecryptClosureTests
     {
         private readonly string _databaseName;
 
-        public PostgresPaymentFixture(long id, long appId)
+        public PostgresPaymentFixture(long tenantId, long appId)
         {
             _databaseName = ("gfx_c372_pay_" + Guid.NewGuid().ToString("N")).ToLowerInvariant();
             ExecuteAdminCommand($"CREATE DATABASE \"{_databaseName}\"");
@@ -75,14 +75,14 @@ public sealed class PaymentOptionSettingDecryptClosureTests
 
 
             DbProvider = MainDb;
-            Db = DbProvider;
-            Db.CodeFirst.InitTables(typeof(GamePaymentConfigEntity));
+            TenantDb = DbProvider;
+            TenantDb.CodeFirst.InitTables(typeof(GamePaymentConfigEntity));
             _ = appId;
         }
 
         public SqlSugarScope MainDb { get; }
 
-        public ISqlSugarClient Db { get; }
+        public ISqlSugarClient TenantDb { get; }
 
         public ISqlSugarClient DbProvider { get; }
 

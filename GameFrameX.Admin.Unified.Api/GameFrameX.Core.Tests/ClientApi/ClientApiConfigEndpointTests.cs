@@ -80,7 +80,7 @@ public sealed class ClientApiConfigEndpointTests
         var root = ClientApiResultReader.Read(result);
         var data = ClientApiResultReader.Data(root);
         // GFX-706：GetInfo 纯只读——设备注册副作用已拆至 RegisterDevice，携带标识调用也不写设备表
-        var deviceCount = await db.Db.Queryable<GameAppDeviceEntity>().CountAsync();
+        var deviceCount = await db.TenantDb.Queryable<GameAppDeviceEntity>().CountAsync();
         Assert.Equal(0, ClientApiResultReader.Code(root));
         Assert.Equal(0, deviceCount);
         Assert.Equal("2026.07.18", data.GetProperty("Version").GetString());
@@ -111,7 +111,7 @@ public sealed class ClientApiConfigEndpointTests
 
         var firstRoot = ClientApiResultReader.Read(first);
         var secondRoot = ClientApiResultReader.Read(second);
-        var deviceCount = await db.Db.Queryable<GameAppDeviceEntity>().CountAsync();
+        var deviceCount = await db.TenantDb.Queryable<GameAppDeviceEntity>().CountAsync();
         Assert.Equal(0, ClientApiResultReader.Code(firstRoot));
         Assert.Equal(0, ClientApiResultReader.Code(secondRoot));
         // 幂等：两次注册仅落一行，DeviceId 一致
@@ -222,7 +222,7 @@ public sealed class ClientApiConfigEndpointTests
         var root = ClientApiResultReader.Read(result);
         Assert.Equal(0, ClientApiResultReader.Code(root));
         var key = ClientApiResultReader.Data(root)[0];
-        Assert.False(key.TryGetProperty("Id", out _));
+        Assert.False(key.TryGetProperty("TenantId", out _));
         Assert.False(key.TryGetProperty("AppId", out _));
     }
 
@@ -236,12 +236,12 @@ public sealed class ClientApiConfigEndpointTests
         var publicKeys = await resolver.GetPublicKeysAsync();
 
         Assert.Empty(publicKeys);
-        Assert.Equal(0, await db.Db.Queryable<GameLoginTicketKeyEntity>().CountAsync());
+        Assert.Equal(0, await db.TenantDb.Queryable<GameLoginTicketKeyEntity>().CountAsync());
 
         var signingKey = await resolver.ResolveSigningKeyAsync();
 
         Assert.False(string.IsNullOrWhiteSpace(signingKey.Kid));
-        Assert.Equal(1, await db.Db.Queryable<GameLoginTicketKeyEntity>().CountAsync());
+        Assert.Equal(1, await db.TenantDb.Queryable<GameLoginTicketKeyEntity>().CountAsync());
         Assert.Single(await resolver.GetPublicKeysAsync());
     }
 

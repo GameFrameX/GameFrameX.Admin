@@ -104,7 +104,7 @@ public sealed class OnlineServerClient : IOnlineServerClient
         {
             foreach (var property in payload.EnumerateObject())
             {
-                if (string.Equals(property.Name, "Id", StringComparison.OrdinalIgnoreCase)
+                if (string.Equals(property.Name, "TenantId", StringComparison.OrdinalIgnoreCase)
                     || string.Equals(property.Name, "AppId", StringComparison.OrdinalIgnoreCase)
                     || string.Equals(property.Name, "ServerId", StringComparison.OrdinalIgnoreCase))
                 {

@@ -16,7 +16,7 @@ namespace GameFrameX.Core.Tests.Online.Asset;
 // IOnlineServerClient fake 与 OnlineCall 记录类都内嵌为私有嵌套类型，避免平级多类型破规。
 internal static class OnlineAssetTestSupport
 {
-    public const long A = 4001;
+    public const long TenantA = 4001;
     public const long App100 = 100;
     public const long Area1001 = 2001;
     public const long Area1002 = 2002;
@@ -63,10 +63,10 @@ internal static class OnlineAssetTestSupport
         return new SqlSugarRepository<T> { Context = db, };
     }
 
-    public static CurrentUserContext CreateUserContext(long id = A)
+    public static CurrentUserContext CreateUserContext(long tenantId = TenantA)
     {
         var identity = new global::System.Security.Claims.ClaimsIdentity("TestAuth");
-        identity.AddClaim(new global::System.Security.Claims.Claim("Id", id.ToString()));
+        identity.AddClaim(new global::System.Security.Claims.Claim("TenantId", tenantId.ToString()));
         var httpContext = new DefaultHttpContext { User = new global::System.Security.Claims.ClaimsPrincipal(identity), };
         var accessor = new HttpContextAccessor { HttpContext = httpContext, };
         return new CurrentUserContext(accessor);

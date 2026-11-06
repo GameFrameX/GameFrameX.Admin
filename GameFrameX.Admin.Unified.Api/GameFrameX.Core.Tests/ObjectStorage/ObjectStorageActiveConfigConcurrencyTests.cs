@@ -25,8 +25,8 @@ public class ObjectStorageActiveConfigConcurrencyTests : IDisposable
     [Fact]
     public async Task ConcurrentEnableTransitions_WithSerialLock_LeaveExactlyOneEnabled()
     {
-        var id = 1300000000001L;
-        var db = OpenDb(id);
+        var tenantId = 1300000000001L;
+        var db = OpenDb(tenantId);
 
         // 预置 1 条启用配置
         var seed = DefaultDatabaseSeeder.BuildDefaultObjectStorageConfig();
@@ -67,8 +67,8 @@ public class ObjectStorageActiveConfigConcurrencyTests : IDisposable
     [Fact]
     public void DeactivateOthers_Mechanism_LeavesOnlyCurrentEnabled()
     {
-        var id = 1300000000002L;
-        var db = OpenDb(id);
+        var tenantId = 1300000000002L;
+        var db = OpenDb(tenantId);
 
         var first = DefaultDatabaseSeeder.BuildDefaultObjectStorageConfig();
         db.Insertable(first).ExecuteCommand();
@@ -89,22 +89,22 @@ public class ObjectStorageActiveConfigConcurrencyTests : IDisposable
         Assert.False(firstEnabled == true);
     }
 
-    private ISqlSugarClient OpenDb(long id)
+    private ISqlSugarClient OpenDb(long tenantId)
     {
-        var dbPath = Path.Combine(Path.GetTempPath(), $"gfx_active_config_{id}_{Guid.NewGuid():N}.db");
+        var dbPath = Path.Combine(Path.GetTempPath(), $"gfx_active_config_{tenantId}_{Guid.NewGuid():N}.db");
         _dbPaths.Add(dbPath);
-        var config = new DbConnectionConfig
+        var tenantConfig = new DbConnectionConfig
         {
-            ConfigId = id.ToString(),
+            ConfigId = tenantId.ToString(),
             DbType = DbType.Sqlite,
             ConnectionString = $"DataSource={dbPath}",
             DbSettings = new DbSettings { EnableInitDb = true, },
             TableSettings = new TableSettings { EnableInitTable = true, EnableIncreTable = false, },
             SeedSettings = new SeedSettings { EnableInitSeed = false, EnableIncreSeed = false, },
         };
-        SqlSugarUnifiedConfig.ConfigureBaseSettings(config);
-        var scope = new SqlSugarScope(config);
-        var db = scope.GetConnectionScope(id.ToString());
+        SqlSugarUnifiedConfig.ConfigureBaseSettings(tenantConfig);
+        var scope = new SqlSugarScope(tenantConfig);
+        var db = scope.GetConnectionScope(tenantId.ToString());
         db.CodeFirst.InitTables(typeof(ObjectStorageConfigEntity));
         return db;
     }

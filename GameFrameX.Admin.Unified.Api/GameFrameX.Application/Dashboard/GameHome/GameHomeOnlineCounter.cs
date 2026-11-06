@@ -14,12 +14,12 @@ public static class GameHomeOnlineCounter
     /// <summary>
     /// 按指定租户库连接聚合全服在线人数。无可用区服时返回 0。
     /// </summary>
-    /// <param name="db">租户业务库连接（必须已路由到目标租户库）。</param>
+    /// <param name="tenantDb">租户业务库连接（必须已路由到目标租户库）。</param>
     /// <param name="httpClientFactory">HTTP 客户端工厂。</param>
     /// <returns>启用区服在线人数之和。</returns>
-    public static async Task<int> GetTotalOnlineAsync(ISqlSugarClient db, IHttpClientFactory httpClientFactory)
+    public static async Task<int> GetTotalOnlineAsync(ISqlSugarClient tenantDb, IHttpClientFactory httpClientFactory)
     {
-        var areas = await db.Queryable<Entity.Business.Game.GameAreaEntity>()
+        var areas = await tenantDb.Queryable<Entity.Business.Game.GameAreaEntity>()
                                   .Where(u => u.IsEnabled == true && u.HttpManageUrl != null && u.HttpManageUrl != "")
                                   .ToListAsync();
 

@@ -29,7 +29,7 @@ public sealed class ClientApiSessionKeyIssuerTests
         Assert.Matches("^[0-9a-f]{64}$", result.Secret);
         Assert.Equal(expireAt, result.ExpireTime);
 
-        var saved = await db.Db.Queryable<SessionKeyEntity>().FirstAsync(e => e.Kid == result.Kid);
+        var saved = await db.TenantDb.Queryable<SessionKeyEntity>().FirstAsync(e => e.Kid == result.Kid);
         Assert.NotNull(saved);
         Assert.Equal(result.Secret, saved.Secret);
         Assert.Equal(expireAt, saved.ExpireTime);
@@ -45,7 +45,7 @@ public sealed class ClientApiSessionKeyIssuerTests
         using var db = new ClientApiTestDb();
         db.InitBusinessTables(typeof(SessionKeyEntity));
         var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-        db.Db.Insertable(new[]
+        db.TenantDb.Insertable(new[]
         {
             Seed(db.AppId, "sess-app-1-expired", now - 10),
             Seed(db.AppId, "sess-app-1-live", now + 3600),
@@ -55,7 +55,7 @@ public sealed class ClientApiSessionKeyIssuerTests
         var issuer = new ClientApiSessionKeyIssuer(db.Repository<SessionKeyEntity>());
         await issuer.IssueAsync(now + 120);
 
-        var kids = await db.Db.Queryable<SessionKeyEntity>().Select(e => e.Kid).ToListAsync();
+        var kids = await db.TenantDb.Queryable<SessionKeyEntity>().Select(e => e.Kid).ToListAsync();
         Assert.DoesNotContain("sess-app-1-expired", kids);
         Assert.Contains("sess-app-1-live", kids);
         Assert.DoesNotContain("sess-app-2-expired", kids);

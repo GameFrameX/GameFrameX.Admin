@@ -22,7 +22,7 @@ public class GameRoleController : BaseController<GameRoleEntity>
     private readonly ClientApiTokenIssuer _clientApiTokenIssuer;
     private readonly GameLoginTicketIssuer _gameLoginTicketIssuer;
     private readonly Repository<GameAreaEntity> _areaService;
-    private readonly IGamePenaltyEnforcementService _tenantGamePenaltyEnforcementService;
+    private readonly IGamePenaltyEnforcementService _gamePenaltyEnforcementService;
 
     /// <summary>
     /// </summary>
@@ -43,7 +43,7 @@ public class GameRoleController : BaseController<GameRoleEntity>
         _clientApiTokenIssuer = clientApiTokenIssuer;
         _gameLoginTicketIssuer = gameLoginTicketIssuer;
         _areaService = areaService;
-        _tenantGamePenaltyEnforcementService = gamePenaltyEnforcementService;
+        _gamePenaltyEnforcementService = gamePenaltyEnforcementService;
     }
 
     /// <summary>
@@ -253,7 +253,7 @@ public class GameRoleController : BaseController<GameRoleEntity>
         }
 
         // 处罚事实源登录阻断漏斗：账号级封禁/限制登录命中即拦截
-        var accountBlocking = await _tenantGamePenaltyEnforcementService.GetLoginBlockingPenaltyAsync(PenaltyTargetTypeEnum.Account, user.Id.ToString());
+        var accountBlocking = await _gamePenaltyEnforcementService.GetLoginBlockingPenaltyAsync(PenaltyTargetTypeEnum.Account, user.Id.ToString());
         if (accountBlocking != null)
         {
             _gameLoginTicketIssuer.AuditRejected(user.Id, input.PlayerId, input.AreaId, "account_banned");
@@ -291,7 +291,7 @@ public class GameRoleController : BaseController<GameRoleEntity>
         }
 
         // 处罚事实源登录阻断漏斗：角色级封禁/限制登录命中即拦截（按区服作用域过滤）
-        var roleBlocking = await _tenantGamePenaltyEnforcementService.GetLoginBlockingPenaltyAsync(PenaltyTargetTypeEnum.Role, entity.Id.ToString(), input.AreaId);
+        var roleBlocking = await _gamePenaltyEnforcementService.GetLoginBlockingPenaltyAsync(PenaltyTargetTypeEnum.Role, entity.Id.ToString(), input.AreaId);
         if (roleBlocking != null)
         {
             _gameLoginTicketIssuer.AuditRejected(user.Id, input.PlayerId, input.AreaId, "role_banned");
@@ -367,7 +367,7 @@ public class GameRoleController : BaseController<GameRoleEntity>
         }
 
         return input.ExtraFields.Keys.Any(k =>
-                                              string.Equals(k, "id", StringComparison.OrdinalIgnoreCase) ||
+                                              string.Equals(k, "tenantId", StringComparison.OrdinalIgnoreCase) ||
                                               string.Equals(k, "appId", StringComparison.OrdinalIgnoreCase) ||
                                               string.Equals(k, "userId", StringComparison.OrdinalIgnoreCase));
     }

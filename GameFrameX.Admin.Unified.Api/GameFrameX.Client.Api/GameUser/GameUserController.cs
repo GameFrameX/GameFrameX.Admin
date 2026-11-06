@@ -24,8 +24,8 @@ public class GameUserController : BaseController<GameUserEntity>
     private readonly ClientApiTokenIssuer _clientApiTokenIssuer;
     private readonly ClientApiSessionKeyIssuer _clientApiSessionKeyIssuer;
     private readonly Repository<GameUserEmailEntity> _gameUserEmailService;
-    private readonly IGamePenaltyEnforcementService _tenantGamePenaltyEnforcementService;
-    private readonly GameUserPasswordService _tenantGameUserPasswordService;
+    private readonly IGamePenaltyEnforcementService _gamePenaltyEnforcementService;
+    private readonly GameUserPasswordService _gameUserPasswordService;
 
     /*private readonly GoogleOAuth2Service _googleOAuth2Service;*/
 
@@ -50,8 +50,8 @@ public class GameUserController : BaseController<GameUserEntity>
         _clientApiTokenIssuer = clientApiTokenIssuer;
         _clientApiSessionKeyIssuer = clientApiSessionKeyIssuer;
         _gameUserEmailService = gameUserEmailService;
-        _tenantGamePenaltyEnforcementService = gamePenaltyEnforcementService;
-        _tenantGameUserPasswordService = gameUserPasswordService;
+        _gamePenaltyEnforcementService = gamePenaltyEnforcementService;
+        _gameUserPasswordService = gameUserPasswordService;
         /*_googleOAuth2Service = googleOAuth2Service;*/
     }
 
@@ -73,7 +73,7 @@ public class GameUserController : BaseController<GameUserEntity>
             entity.Name = input.WeChatName ?? "";
             entity.UserName = input.WeChatName ?? string.Empty;
             entity.Status = GameUserStatus.Active;
-            entity.Password = _tenantGameUserPasswordService.Hash(entity.Id.ToString());
+            entity.Password = _gameUserPasswordService.Hash(entity.Id.ToString());
             entity.WeChatId = input.WeChatId;
             EnsureUserStringDefaults(entity);
             var insertAsync = await PRepository.InsertAsync(entity);
@@ -162,7 +162,7 @@ public class GameUserController : BaseController<GameUserEntity>
         // 如果提供了密码，验证密码是否正确（可选的安全验证）
         if (!string.IsNullOrEmpty(input.Password))
         {
-            if (!_tenantGameUserPasswordService.Verify(input.Password, entity.EmailPassword))
+            if (!_gameUserPasswordService.Verify(input.Password, entity.EmailPassword))
             {
                 return GameApiResult.Error<GetGameUserEntityResponse>(AccountErrorCode.AccountOrPasswordError, "密码错误");
             }
@@ -205,7 +205,7 @@ public class GameUserController : BaseController<GameUserEntity>
             entity.Name = input.QQName ?? "";
             entity.UserName = input.QQName ?? string.Empty;
             entity.Status = GameUserStatus.Active;
-            entity.Password = _tenantGameUserPasswordService.Hash(entity.Id.ToString());
+            entity.Password = _gameUserPasswordService.Hash(entity.Id.ToString());
             entity.QqId = input.QQId;
             EnsureUserStringDefaults(entity);
             var insertAsync = await PRepository.InsertAsync(entity);
@@ -295,7 +295,7 @@ public class GameUserController : BaseController<GameUserEntity>
         // 如果提供了密码，验证密码是否正确（可选的安全验证）
         if (!string.IsNullOrEmpty(input.Password))
         {
-            if (!_tenantGameUserPasswordService.Verify(input.Password, entity.EmailPassword))
+            if (!_gameUserPasswordService.Verify(input.Password, entity.EmailPassword))
             {
                 return GameApiResult.Error<GetGameUserEntityResponse>(AccountErrorCode.AccountOrPasswordError, "密码错误");
             }
@@ -338,7 +338,7 @@ public class GameUserController : BaseController<GameUserEntity>
             entity.Name = input.FacebookName ?? "";
             entity.UserName = input.FacebookName ?? string.Empty;
             entity.Status = GameUserStatus.Active;
-            entity.Password = _tenantGameUserPasswordService.Hash(entity.Id.ToString());
+            entity.Password = _gameUserPasswordService.Hash(entity.Id.ToString());
             entity.FacebookId = input.FacebookId;
             EnsureUserStringDefaults(entity);
             var insertAsync = await PRepository.InsertAsync(entity);
@@ -428,7 +428,7 @@ public class GameUserController : BaseController<GameUserEntity>
         // 如果提供了密码，验证密码是否正确（可选的安全验证）
         if (!string.IsNullOrEmpty(input.Password))
         {
-            if (!_tenantGameUserPasswordService.Verify(input.Password, entity.EmailPassword))
+            if (!_gameUserPasswordService.Verify(input.Password, entity.EmailPassword))
             {
                 return GameApiResult.Error<GetGameUserEntityResponse>(AccountErrorCode.AccountOrPasswordError, "密码错误");
             }
@@ -476,7 +476,7 @@ public class GameUserController : BaseController<GameUserEntity>
             return GameApiResult.Error<BaseOperationAckResponse>(AccountErrorCode.EmailCodeNotFoundOrExpired, "验证码错误或已过期，请重新获取验证码。");
         }
 
-        gameUserEntity.EmailPassword = _tenantGameUserPasswordService.Hash(input.Password);
+        gameUserEntity.EmailPassword = _gameUserPasswordService.Hash(input.Password);
         var updateRows = await PRepository.Context.UpdateWithOptimisticLockAsync(gameUserEntity);
         if (updateRows > 0)
         {
@@ -514,7 +514,7 @@ public class GameUserController : BaseController<GameUserEntity>
         entity.Name = input.UserName ?? string.Empty;
         entity.Email = input.UserName ?? string.Empty;
         entity.Status = GameUserStatus.Active;
-        entity.EmailPassword = _tenantGameUserPasswordService.Hash(input.Password);
+        entity.EmailPassword = _gameUserPasswordService.Hash(input.Password);
         EnsureUserStringDefaults(entity);
         var insertAsync = await PRepository.InsertAsync(entity);
         if (insertAsync)
@@ -539,11 +539,11 @@ public class GameUserController : BaseController<GameUserEntity>
         if (entity == null)
         {
             // 账号不存在：执行一次假 Verify 抵御账号枚举（耗时与密码错误路径一致），统一返回账号或密码错误，不泄露账号是否存在
-            _tenantGameUserPasswordService.Verify(input.Password, GameUserPasswordService.EnumerationDecoyHash);
+            _gameUserPasswordService.Verify(input.Password, GameUserPasswordService.EnumerationDecoyHash);
             return GameApiResult.Error<GetGameUserEntityResponse>(AccountErrorCode.AccountOrPasswordByEmailError, "账号或密码错误");
         }
 
-        if (!_tenantGameUserPasswordService.Verify(input.Password, entity.EmailPassword))
+        if (!_gameUserPasswordService.Verify(input.Password, entity.EmailPassword))
         {
             return GameApiResult.Error<GetGameUserEntityResponse>(AccountErrorCode.AccountOrPasswordByEmailError, "账号或密码错误");
         }
@@ -595,7 +595,7 @@ public class GameUserController : BaseController<GameUserEntity>
 
         // 更新用户的邮箱账号信息
         entity.Email = input.Email;
-        entity.EmailPassword = _tenantGameUserPasswordService.Hash(input.Password);
+        entity.EmailPassword = _gameUserPasswordService.Hash(input.Password);
         var executeCommandAsync = await PRepository.AsUpdateable(entity).UpdateColumns(u => new { u.Email, u.EmailPassword, }).ExecuteCommandWithOptLockAsync(true);
 
         if (executeCommandAsync > 0)
@@ -636,7 +636,7 @@ public class GameUserController : BaseController<GameUserEntity>
         // 如果提供了密码，验证密码是否正确（可选的安全验证）
         if (!string.IsNullOrEmpty(input.Password))
         {
-            if (!_tenantGameUserPasswordService.Verify(input.Password, entity.EmailPassword))
+            if (!_gameUserPasswordService.Verify(input.Password, entity.EmailPassword))
             {
                 return GameApiResult.Error<GetGameUserEntityResponse>(AccountErrorCode.AccountOrPasswordError, "密码错误");
             }
@@ -679,7 +679,7 @@ public class GameUserController : BaseController<GameUserEntity>
         var entity = input.Adapt<GameUserEntity>();
         entity.Name = input.UserName;
         entity.Status = GameUserStatus.Active;
-        entity.Password = _tenantGameUserPasswordService.Hash(input.Password);
+        entity.Password = _gameUserPasswordService.Hash(input.Password);
         EnsureUserStringDefaults(entity);
         var insertAsync = await PRepository.InsertAsync(entity);
         if (insertAsync)
@@ -704,11 +704,11 @@ public class GameUserController : BaseController<GameUserEntity>
         if (entity == null)
         {
             // 账号不存在：执行一次假 Verify 抵御账号枚举（耗时与密码错误路径一致），统一返回账号或密码错误，不泄露账号是否存在
-            _tenantGameUserPasswordService.Verify(input.Password, GameUserPasswordService.EnumerationDecoyHash);
+            _gameUserPasswordService.Verify(input.Password, GameUserPasswordService.EnumerationDecoyHash);
             return GameApiResult.Error<GetGameUserEntityResponse>(AccountErrorCode.AccountOrPasswordError, "账号或密码错误");
         }
 
-        if (!_tenantGameUserPasswordService.Verify(input.Password, entity.Password))
+        if (!_gameUserPasswordService.Verify(input.Password, entity.Password))
         {
             return GameApiResult.Error<GetGameUserEntityResponse>(AccountErrorCode.AccountOrPasswordError, "账号或密码错误");
         }
@@ -748,7 +748,7 @@ public class GameUserController : BaseController<GameUserEntity>
                 Name = "device:" + input.DeviceId,
                 DeviceId = input.DeviceId,
                 Status = GameUserStatus.Active,
-                Password = _tenantGameUserPasswordService.Hash(Guid.NewGuid().ToString("N"))
+                Password = _gameUserPasswordService.Hash(Guid.NewGuid().ToString("N"))
             };
             EnsureUserStringDefaults(entity);
             // ponytail: DeviceId 无唯一索引，并发首登可能建重号；客户端按 Token 归属使用
@@ -874,7 +874,7 @@ public class GameUserController : BaseController<GameUserEntity>
             entity.Name = input.AppleName ?? "";
             entity.UserName = input.AppleName ?? string.Empty;
             entity.Status = GameUserStatus.Active;
-            entity.Password = _tenantGameUserPasswordService.Hash(entity.Id.ToString());
+            entity.Password = _gameUserPasswordService.Hash(entity.Id.ToString());
             entity.AppleId = input.AppleId;
             EnsureUserStringDefaults(entity);
             var insertAsync = await PRepository.InsertAsync(entity);
@@ -923,7 +923,7 @@ public class GameUserController : BaseController<GameUserEntity>
         // 如果提供了密码，验证密码是否正确（可选的安全验证）
         if (!string.IsNullOrEmpty(input.Password))
         {
-            if (!_tenantGameUserPasswordService.Verify(input.Password, entity.Password))
+            if (!_gameUserPasswordService.Verify(input.Password, entity.Password))
             {
                 return GameApiResult.Error<GetGameUserEntityResponse>(AccountErrorCode.AccountOrPasswordError, "密码错误");
             }
@@ -1006,7 +1006,7 @@ public class GameUserController : BaseController<GameUserEntity>
             entity.Name = input.GoogleName ?? "";
             entity.UserName = input.GoogleName ?? string.Empty;
             entity.Status = GameUserStatus.Active;
-            entity.Password = _tenantGameUserPasswordService.Hash(entity.Id.ToString());
+            entity.Password = _gameUserPasswordService.Hash(entity.Id.ToString());
             entity.GoogleId = input.GoogleId;
             EnsureUserStringDefaults(entity);
             var insertAsync = await PRepository.InsertAsync(entity);
@@ -1055,7 +1055,7 @@ public class GameUserController : BaseController<GameUserEntity>
         // 如果提供了密码，验证密码是否正确（可选的安全验证）
         if (!string.IsNullOrEmpty(input.Password))
         {
-            if (!_tenantGameUserPasswordService.Verify(input.Password, entity.Password))
+            if (!_gameUserPasswordService.Verify(input.Password, entity.Password))
             {
                 return GameApiResult.Error<GetGameUserEntityResponse>(AccountErrorCode.AccountOrPasswordError, "密码错误");
             }
@@ -1227,7 +1227,7 @@ public class GameUserController : BaseController<GameUserEntity>
     private async Task<GetGameUserEntityResponse> CreateLoginOutputAsync(GameUserEntity entity, string provider)
     {
         // 处罚事实源登录阻断漏斗：账号级封禁/限制登录命中即拦截 Token 签发
-        var blocking = await _tenantGamePenaltyEnforcementService.GetLoginBlockingPenaltyAsync(PenaltyTargetTypeEnum.Account, entity.Id.ToString());
+        var blocking = await _gamePenaltyEnforcementService.GetLoginBlockingPenaltyAsync(PenaltyTargetTypeEnum.Account, entity.Id.ToString());
         if (blocking != null)
         {
             throw new PenaltyLoginBlockedException((int)AccountErrorCode.AccountBanned, $"账号已被封禁：{blocking.Reason}");

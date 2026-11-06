@@ -137,7 +137,7 @@ public sealed class ClientApiFeatureSwitchEndpointTests
         var oldVersion = first.GetProperty("Version").GetString();
 
         row.ValueJson = "{\"v\":2}";
-        db.Db.Updateable(row).ExecuteCommand();
+        db.TenantDb.Updateable(row).ExecuteCommand();
 
         var second = ClientApiResultReader.Data(ClientApiResultReader.Read(await controller.GetInfo(Request(version: oldVersion))));
 

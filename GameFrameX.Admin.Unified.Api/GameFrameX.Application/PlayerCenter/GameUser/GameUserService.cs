@@ -12,12 +12,12 @@ namespace GameFrameX.Application.PlayerCenter.GameUser;
 [ApiDescriptionSettings(GameConst.GroupName, Order = 111)]
 public class GameUserService : GenericCrudSelectService<Entity.Business.Game.GameUserEntity, AddGameUserEntityByMailRequest, UpdateGameUserEntityRequest, GameUserResponse, PageGameUserEntityRequest>
 {
-    private readonly GameUserPasswordService _tenantGameUserPasswordService;
+    private readonly GameUserPasswordService _gameUserPasswordService;
 
     public GameUserService(SqlSugarRepository<Entity.Business.Game.GameUserEntity> repository,
         GameUserPasswordService gameUserPasswordService) : base(repository)
     {
-        _tenantGameUserPasswordService = gameUserPasswordService;
+        _gameUserPasswordService = gameUserPasswordService;
     }
 
     /// <summary>
@@ -50,9 +50,9 @@ public class GameUserService : GenericCrudSelectService<Entity.Business.Game.Gam
         }
 
         entity = input.Adapt<Entity.Business.Game.GameUserEntity>();
-        entity.EmailPassword = _tenantGameUserPasswordService.Hash(input.EmailPassword);
+        entity.EmailPassword = _gameUserPasswordService.Hash(input.EmailPassword);
         entity.UserName = input.Email;
-        entity.Password = _tenantGameUserPasswordService.Hash(input.Password);
+        entity.Password = _gameUserPasswordService.Hash(input.Password);
         await Repository.InsertAsync(entity);
 
         return entity.Adapt<GameUserResponse>();

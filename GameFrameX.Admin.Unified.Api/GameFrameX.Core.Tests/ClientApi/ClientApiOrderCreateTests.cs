@@ -39,7 +39,7 @@ public sealed class ClientApiOrderCreateTests
 
         var root = ClientApiResultReader.Read(result);
         var data = ClientApiResultReader.Data(root);
-        var saved = await db.Db.Queryable<GameOrderEntity>().FirstAsync(u => u.RoleId == "3001");
+        var saved = await db.TenantDb.Queryable<GameOrderEntity>().FirstAsync(u => u.RoleId == "3001");
         Assert.Equal(0, ClientApiResultReader.Code(root));
         Assert.Equal("provider-order-1", data.GetProperty("OrderId").GetString());
         Assert.Equal(OrderStatusEnum.Unpaid, saved.Status);
@@ -93,7 +93,7 @@ public sealed class ClientApiOrderCreateTests
         });
 
         var root = ClientApiResultReader.Read(result);
-        var orderCount = await db.Db.Queryable<GameOrderEntity>().CountAsync();
+        var orderCount = await db.TenantDb.Queryable<GameOrderEntity>().CountAsync();
         Assert.Equal((int)PaymentErrorCode.PayChannelNotSupported, ClientApiResultReader.Code(root));
         Assert.Equal("不支持的支付渠道", ClientApiResultReader.Message(root));
         Assert.Equal(0, orderCount);
@@ -107,7 +107,7 @@ public sealed class ClientApiOrderCreateTests
             FakeOptionsProvider.WithAreaPolicy(false),
             db.Repository<GameRoleEntity>(),
             new HttpClient(ClientApiRecordingHttpHandler.WithGameServerDefaults(), false),
-            new GameOrderShipService(db.Db, new ClientApiTestHttpClientFactory(ClientApiRecordingHttpHandler.WithGameServerDefaults())),
+            new GameOrderShipService(db.TenantDb, new ClientApiTestHttpClientFactory(ClientApiRecordingHttpHandler.WithGameServerDefaults())),
             factory,
             new TestGooglePubSubPushAuthenticator(),
             new TestGooglePlayPurchaseService());

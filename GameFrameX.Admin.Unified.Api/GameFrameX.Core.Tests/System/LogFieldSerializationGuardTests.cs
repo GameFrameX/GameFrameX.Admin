@@ -31,7 +31,7 @@ public class LogFieldSerializationGuardTests
     ""parameters"": [
         {
             ""name"": ""input"",
-            ""value"": { ""account"": ""admin"", ""password"": ""secret"", ""id"": 1300000000001 }
+            ""value"": { ""account"": ""admin"", ""password"": ""secret"", ""tenantId"": 1300000000001 }
         }
     ],
     ""returnInformation"": {

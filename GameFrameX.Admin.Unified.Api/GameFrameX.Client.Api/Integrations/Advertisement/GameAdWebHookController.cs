@@ -41,7 +41,7 @@ public class GameAdWebHookController : BaseController<GameRoleAdvertisementEntit
     /// <para>验签 + 幂等账本 + 发奖由 <see cref="GameAdvertisementRewardService.ReceiveTopOnAsync"/> 处理；本端点仅保留 C59 公开回调路由与 HTTP 形状。</para>
     /// </summary>
     [PublicCallbackEndpoint("topon", "ad")]
-    [HttpGet("{id:long}/{appId:long}/{packageId:long?}")]
+    [HttpGet("{tenantId:long}/{appId:long}/{packageId:long?}")]
     public async Task<JsonResult> TopOnNotify()
     {
         var result = await _advertisementRewardService.ReceiveTopOnAsync();
@@ -54,7 +54,7 @@ public class GameAdWebHookController : BaseController<GameRoleAdvertisementEntit
     /// <para>租户身份只来自公开回调 URL 路由上下文；验签走 <see cref="PangleAdvertisementCallbackHandler"/>（仅验签，不进发奖链路），签名通过后才允许查询广告发放记录。</para>
     /// </summary>
     [PublicCallbackEndpoint("pangle", "ad")]
-    [HttpGet("{id:long}/{appId:long}/{packageId:long?}")]
+    [HttpGet("{tenantId:long}/{appId:long}/{packageId:long?}")]
     public async Task<JsonResult> PangleGlobalNotify([FromQuery] AdvertisementPangleGlobalGameEntityRequest input)
     {
         var advertisementOptions = await _optionsProvider.GetAdvertisementCallbackOptionsAsync();
@@ -86,7 +86,7 @@ public class GameAdWebHookController : BaseController<GameRoleAdvertisementEntit
     /// <para>发放成功后保留对 <see cref="GameRoleAdvertisementEntity"/> 的写入（C75/C91 应用作用域事实，范围外不动）。</para>
     /// </summary>
     [PublicCallbackEndpoint("admob", "ad")]
-    [HttpGet("{id:long}/{appId:long}/{packageId:long?}")]
+    [HttpGet("{tenantId:long}/{appId:long}/{packageId:long?}")]
     public async Task<JsonResult> AdMobNotify([FromQuery] AdMobCallbackRequest input)
     {
         var result = await _advertisementRewardService.ReceiveAdMobAsync();
@@ -107,7 +107,7 @@ public class GameAdWebHookController : BaseController<GameRoleAdvertisementEntit
     /// <para>验签 + 幂等账本 + 发奖由 <see cref="GameAdvertisementRewardService.ReceiveUnityAdsAsync"/> 处理（C114 新增端点）。</para>
     /// </summary>
     [PublicCallbackEndpoint("unityads", "ad")]
-    [HttpGet("{id:long}/{appId:long}/{packageId:long?}")]
+    [HttpGet("{tenantId:long}/{appId:long}/{packageId:long?}")]
     public async Task<JsonResult> UnityAdsNotify([FromQuery] AdvertisementUnityAdsCallbackRequest input)
     {
         var result = await _advertisementRewardService.ReceiveUnityAdsAsync();

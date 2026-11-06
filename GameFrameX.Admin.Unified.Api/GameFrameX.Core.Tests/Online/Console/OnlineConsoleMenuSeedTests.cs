@@ -65,7 +65,7 @@ public sealed class OnlineConsoleMenuSeedTests
     }
 
     [Fact]
-    public void OnlineConsoleMenus_ExecuteButton_IsAdminOnly()
+    public void OnlineConsoleMenus_ExecuteButton_IsTenantAdminOnly()
     {
         var menus = GlobalMenuSeedData.BuildData();
         var execute = Assert.Single(menus, m => m.Key == "onlinePlayerTimeline:execute");

@@ -28,7 +28,7 @@ namespace GameFrameX.Core.Tests.Online.LiveOps;
 // 分群同步通道回执映射。作用域走真实 OnlineScopeContextFactory（含租户归属校验）。
 public sealed class OnlineLiveOpsDispatchServiceTests : IDisposable
 {
-    private const long A = 1001;
+    private const long TenantA = 1001;
     private const long App100 = 100;
     private const long App200 = 200;
     private const long Area1001 = 2001; // 归属 App100
@@ -237,12 +237,12 @@ public sealed class OnlineLiveOpsDispatchServiceTests : IDisposable
             Repository<GameMailCampaignEntity>());
     }
 
-    private static CurrentUserContext CreateUserContext(long? id)
+    private static CurrentUserContext CreateUserContext(long? tenantId)
     {
         var identity = new ClaimsIdentity("TestAuth");
-        if (id.HasValue)
+        if (tenantId.HasValue)
         {
-            identity.AddClaim(new Claim("Id", id.Value.ToString()));
+            identity.AddClaim(new Claim("TenantId", tenantId.Value.ToString()));
         }
 
         var httpContext = new DefaultHttpContext { User = new ClaimsPrincipal(identity), };

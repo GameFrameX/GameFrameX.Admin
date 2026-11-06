@@ -23,7 +23,7 @@ namespace GameFrameX.Core.Tests.Online.LiveOps;
 // 回滚目标不存在拒绝、下发失败删行重抛（不留半生效审计行）。
 public sealed class GameOnlineConfigRolloutServiceTests : IDisposable
 {
-    private const long A = 1001;
+    private const long TenantA = 1001;
     private const long App100 = 100;
     private const long Area1001 = 2001;
     private const long SegmentSynced = 7001;
@@ -220,15 +220,15 @@ public sealed class GameOnlineConfigRolloutServiceTests : IDisposable
             Repository<GameOnlineConfigRolloutEntity>(),
             Repository<GameOnlinePlayerSegmentEntity>(),
             _dispatch,
-            CreateUserContext(A));
+            CreateUserContext(TenantA));
     }
 
-    private static CurrentUserContext CreateUserContext(long? id)
+    private static CurrentUserContext CreateUserContext(long? tenantId)
     {
         var identity = new ClaimsIdentity("TestAuth");
-        if (id.HasValue)
+        if (tenantId.HasValue)
         {
-            identity.AddClaim(new Claim("Id", id.Value.ToString()));
+            identity.AddClaim(new Claim("TenantId", tenantId.Value.ToString()));
         }
 
         var httpContext = new DefaultHttpContext { User = new ClaimsPrincipal(identity), };

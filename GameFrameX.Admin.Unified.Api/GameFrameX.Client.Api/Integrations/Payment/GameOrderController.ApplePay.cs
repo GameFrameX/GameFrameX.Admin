@@ -100,7 +100,7 @@ public partial class GameOrderController
 
                 if (applePaymentOptionSetting == null || applePayNotificationPayload == null || string.IsNullOrWhiteSpace(transactionPayloadJson))
                 {
-                    LogHelper.Error("Apple支付配置未找到或 JWS 签名验证失败。请检查 id/appId/env 对应的后台支付配置");
+                    LogHelper.Error("Apple支付配置未找到或 JWS 签名验证失败。请检查 tenantId/appId/env 对应的后台支付配置");
                     Response.StatusCode = 400;
                     return HttpJsonResultData<BaseOperationAckResponse>.ValidationError();
                 }

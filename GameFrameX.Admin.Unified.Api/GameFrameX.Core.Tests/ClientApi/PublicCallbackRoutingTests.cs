@@ -28,7 +28,7 @@ public sealed class PublicCallbackRoutingTests
             var middleware = new PublicCallbackResolutionMiddleware(current =>
             {
                 nextCalled = true;
-                Assert.False(current.Items.ContainsKey("Id"));
+                Assert.False(current.Items.ContainsKey("TenantId"));
                 Assert.False(current.Items.ContainsKey("AppId"));
                 Assert.IsType<PublicCallbackRouteContext>(current.Items[PublicCallbackRouteContext.ItemKey]);
                 Assert.Equal(packageId, current.Items[PaymentOptionSettingProvider.PackageIdKey]);
@@ -54,7 +54,7 @@ public sealed class PublicCallbackRoutingTests
             });
             await middleware.InvokeAsync(context, new PublicCallbackRouteResolver(fixture.MainDb));
             Assert.Equal(200, context.Response.StatusCode);
-            Assert.False(context.Items.ContainsKey("Id"));
+            Assert.False(context.Items.ContainsKey("TenantId"));
         }
     }
 
@@ -65,7 +65,7 @@ public sealed class PublicCallbackRoutingTests
         {
             InsertAliPayConfig(fixture.MainDb, false);
             var context = new DefaultHttpContext();
-            context.Request.QueryString = new QueryString("?id=999&appId=888&env=prod");
+            context.Request.QueryString = new QueryString("?tenantId=999&appId=888&env=prod");
             context.Items[PublicCallbackRouteContext.ItemKey] = new PublicCallbackRouteContext("alipay", "payment", null);
             var provider = new PaymentOptionSettingProvider(fixture.MainDb, new HttpContextAccessor { HttpContext = context });
             var setting = Assert.Single(provider.GetOptionSettings<AliPayOptionSetting>("alipay"));
@@ -157,7 +157,7 @@ public sealed class PublicCallbackRoutingTests
                 },
             }).ExecuteCommand();
             var context = new DefaultHttpContext();
-            context.Items["Id"] = 999L;
+            context.Items["TenantId"] = 999L;
             context.Items[PublicCallbackRouteContext.ItemKey] = new PublicCallbackRouteContext("pangle", "ad", null);
             var provider = new ClientApiOptionsProvider(fixture.MainDb, new HttpContextAccessor { HttpContext = context });
             var options = await provider.GetAdvertisementCallbackOptionsAsync();

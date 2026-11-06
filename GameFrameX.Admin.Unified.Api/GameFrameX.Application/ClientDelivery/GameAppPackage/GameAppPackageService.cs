@@ -18,7 +18,7 @@ public class GameAppPackageService
 {
     private readonly SqlSugarRepository<GlobalPlatformEntity> _globalPlatformRepository;
     private readonly SqlSugarRepository<GlobalChannelDefinitionEntity> _globalChannelDefinitionRepository;
-    private readonly SqlSugarRepository<ChannelDefinitionEntity> _tenantChannelDefinitionRepository;
+    private readonly SqlSugarRepository<ChannelDefinitionEntity> _channelDefinitionRepository;
 
     public GameAppPackageService(
         SqlSugarRepository<GameAppPackageEntity> repository,
@@ -29,7 +29,7 @@ public class GameAppPackageService
     {
         _globalPlatformRepository = globalPlatformRepository;
         _globalChannelDefinitionRepository = globalChannelDefinitionRepository;
-        _tenantChannelDefinitionRepository = channelDefinitionRepository;
+        _channelDefinitionRepository = channelDefinitionRepository;
     }
 
     protected override ISugarQueryable<GameAppPackageResponse> BuildPageQuery(PageGameAppPackageRequest input)
@@ -395,7 +395,7 @@ public class GameAppPackageService
             return globalChannel;
         }
 
-        return await _tenantChannelDefinitionRepository.AsQueryable()
+        return await _channelDefinitionRepository.AsQueryable()
                                                        .Filter(null, true)
                                                        .Where(u => u.IsDeleted == false)
                                                        .Where(u => (u.IsEnabled == true || u.IsEnabled == null))

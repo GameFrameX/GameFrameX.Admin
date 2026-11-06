@@ -10,7 +10,7 @@ namespace GameFrameX.Core.Tests.SqlSugar;
 
 // C378（GFX-838）+ C368/C371 组合：合并表写路径语义。
 // change：gfx-doc/dev/game-business/changes/C378-client-api-policy-merge/change.md
-// AddAsync 空白 SigningKey → 服务端生成 64-hex；(Id, AppId) 作用域唯一；
+// AddAsync 空白 SigningKey → 服务端生成 64-hex；(TenantId, AppId) 作用域唯一；
 // 票据固定到期时间 30 天上限（C142）；UpdateAsync <c>******</c> 与空白同义保留原值（C368）。
 public sealed class ClientApiPolicyServiceTests : IDisposable
 {
@@ -45,7 +45,7 @@ public sealed class ClientApiPolicyServiceTests : IDisposable
             TicketExpireTime = 0,
         });
 
-        var row = _db.Db.Queryable<ClientApiPolicyEntity>().Single();
+        var row = _db.TenantDb.Queryable<ClientApiPolicyEntity>().Single();
         Assert.Matches("^[0-9a-f]{64}$", row.SigningKey);
     }
 
@@ -86,7 +86,7 @@ public sealed class ClientApiPolicyServiceTests : IDisposable
             RowVersion = 0,
         });
 
-        var row = _db.Db.Queryable<ClientApiPolicyEntity>().Single();
+        var row = _db.TenantDb.Queryable<ClientApiPolicyEntity>().Single();
         Assert.Equal("original-key", row.SigningKey);
         Assert.Equal(90, row.LifetimeMinutes);
     }
@@ -107,7 +107,7 @@ public sealed class ClientApiPolicyServiceTests : IDisposable
             RowVersion = 0,
         });
 
-        var row = _db.Db.Queryable<ClientApiPolicyEntity>().Single();
+        var row = _db.TenantDb.Queryable<ClientApiPolicyEntity>().Single();
         Assert.Equal("original-key", row.SigningKey);
         Assert.Equal(120, row.LifetimeMinutes);
     }

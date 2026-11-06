@@ -269,10 +269,10 @@ public class SqlSugarDatabaseInitializationTests : IDisposable
     [Fact]
     public void ProjectionDto_InheritingEntity_DoesNotRequirePhysicalOwnership()
     {
-        using var scope = CreateScope("1003");
-        var db = scope.GetConnectionScope("1003");
+        using var scope = CreateScope("tenant_1003");
+        var tenantDb = scope.GetConnectionScope("tenant_1003");
 
-        var sql = db.Queryable<GameTimeJobEntity>()
+        var sql = tenantDb.Queryable<GameTimeJobEntity>()
                           .Select<GameTimeJobResponse>()
                           .ToSql();
 

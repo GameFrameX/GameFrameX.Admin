@@ -6,18 +6,18 @@ namespace GameFrameX.Core.Tests.System;
 internal sealed class FakeDbConnectionProvider
 {
     private readonly SqlSugarScope _client;
-    private readonly string _tenantConfigId;
+    private readonly string _configId;
 
     public FakeDbConnectionProvider(SqlSugarScope client, string configId)
     {
         _client = client;
-        _tenantConfigId = configId;
+        _configId = configId;
     }
 
-    public ISqlSugarClient Database => _client.GetConnectionScope(_tenantConfigId);
+    public ISqlSugarClient Database => _client.GetConnectionScope(_configId);
 
-    public SqlSugarScopeProvider GetDbConnectionScope(long id)
+    public SqlSugarScopeProvider GetDbConnectionScope(long tenantId)
     {
-        return _client.GetConnectionScope(_tenantConfigId);
+        return _client.GetConnectionScope(_configId);
     }
 }
