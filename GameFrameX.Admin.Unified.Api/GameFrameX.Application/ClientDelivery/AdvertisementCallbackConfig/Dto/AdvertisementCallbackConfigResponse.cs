@@ -8,6 +8,11 @@ namespace GameFrameX.Application.ClientDelivery.AdvertisementCallbackConfig.Dto;
 public class AdvertisementCallbackConfigResponse : IBasePageResponse<AdvertisementCallbackConfigEntity>
 {
     /// <summary>
+    /// 关联的游戏应用分包 Id。
+    /// </summary>
+    public long PackageId { get; set; }
+
+    /// <summary>
     /// Id
     /// </summary>
     public long Id { get; set; }

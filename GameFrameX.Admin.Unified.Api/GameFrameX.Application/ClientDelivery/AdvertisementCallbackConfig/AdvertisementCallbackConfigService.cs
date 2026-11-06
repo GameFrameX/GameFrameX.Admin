@@ -3,6 +3,8 @@ using GameFrameX.Advertisement.Abstract;
 using GameFrameX.Core.Service;
 using GameFrameX.Core.Service.Business;
 using GameFrameX.Application.ClientDelivery.AdvertisementCallbackConfig.Dto;
+using GameFrameX.Entity.Business.Game.App;
+using GameFrameX.Core.Enum.Errors;
 
 #pragma warning disable CS8604, CS8629 // SqlSugar WhereIF(condition, lambda)：lambda 仅在 condition=true 时执行；NRT 无法跨方法传播条件守卫，lambda 内 .Trim()/.Value 实际安全
 namespace GameFrameX.Application.ClientDelivery.AdvertisementCallbackConfig;
@@ -19,14 +21,17 @@ public class AdvertisementCallbackConfigService
         AdvertisementCallbackConfigResponse, PageAdvertisementCallbackConfigRequest>
 {
     private readonly IAdvertisementCallbackConfigSchemaProvider _schemaProvider;
+    private readonly SqlSugarRepository<GameAppPackageEntity> _packageRepository;
     private const string SupportedProviderMessage = "广告平台只支持 TopOn、GoogleAdMob、Pangle、UnityAds";
 
     public AdvertisementCallbackConfigService(
         SqlSugarRepository<Entity.Business.ClientApiConfig.AdvertisementCallbackConfigEntity> repository,
-        IAdvertisementCallbackConfigSchemaProvider schemaProvider)
+        IAdvertisementCallbackConfigSchemaProvider schemaProvider,
+        SqlSugarRepository<GameAppPackageEntity> packageRepository)
         : base(repository)
     {
         _schemaProvider = schemaProvider;
+        _packageRepository = packageRepository;
     }
 
     protected override ISugarQueryable<AdvertisementCallbackConfigResponse> BuildPageQuery(PageAdvertisementCallbackConfigRequest input)
@@ -36,21 +41,24 @@ public class AdvertisementCallbackConfigService
         return Repository.AsQueryable()
                          .WhereIF(!string.IsNullOrWhiteSpace(searchKey), u => u.Remark.Contains(searchKey) || u.CallbackUrl.Contains(searchKey))
                          .WhereIF(!string.IsNullOrWhiteSpace(provider), u => u.Provider == provider)
+                         .WhereIF(input.PackageId.HasValue, u => u.PackageId == input.PackageId.Value)
                          .WhereIF(input.IsActive.HasValue, u => u.IsEnabled == input.IsActive.Value)
                          .Select<AdvertisementCallbackConfigResponse>();
     }
 
     /// <summary>
-    /// 新增广告回调配置（主库内 Provider 唯一）。
+    /// 新增广告回调配置（同一分组的 (PackageId, Provider) 唯一）。
     /// </summary>
     public override async Task<AdvertisementCallbackConfigResponse> AddAsync(AddAdvertisementCallbackConfigRequest input)
     {
         var provider = NormalizeProvider(input.Provider, true);
+        var packageId = await ValidatePackageAsync(input.PackageId);
         var configJson = NormalizeConfigJson(provider, input.ConfigJson, null);
-        await CheckUniqueScopeAsync(provider, null);
+        await CheckUniqueScopeAsync(packageId, provider, null);
 
         var entity = input.Adapt<Entity.Business.ClientApiConfig.AdvertisementCallbackConfigEntity>();
         entity.Provider = provider;
+        entity.PackageId = packageId;
         entity.ConfigJson = configJson;
         ApplyConfigSummary(entity, configJson);
         // C371：确定最终明文之后、落库之前加密——汇总列整列密文 + ConfigJson 敏感字段级密文（Encrypt 幂等兼容存量明文/密文）
@@ -75,9 +83,11 @@ public class AdvertisementCallbackConfigService
         }
 
         var provider = NormalizeProvider(input.Provider, true);
+        var packageId = await ValidatePackageAsync(input.PackageId);
         var configJson = NormalizeConfigJson(provider, input.ConfigJson, entity.ConfigJson);
-        await CheckUniqueScopeAsync(provider, input.Id);
+        await CheckUniqueScopeAsync(packageId, provider, input.Id);
         entity.Provider = provider;
+        entity.PackageId = packageId;
         entity.ConfigJson = configJson;
         ApplyConfigSummary(entity, configJson);
         // C371：确定最终明文之后、落库之前加密——保留语义下 NormalizeConfigJson 回填的可能是存量密文，Encrypt 幂等跳过不换密文
@@ -93,6 +103,7 @@ public class AdvertisementCallbackConfigService
                         .UpdateColumns(e => new
                         {
                             e.Provider,
+                            e.PackageId,
                             e.CallbackUrl,
                             e.SigningSecret,
                             e.VerificationKeys,
@@ -159,14 +170,33 @@ public class AdvertisementCallbackConfigService
         return _schemaProvider.GetProviders();
     }
 
-    private async Task CheckUniqueScopeAsync(string provider, long? excludeId)
+    /// <summary>
+    /// 校验并返回配置绑定的分包 Id：必填正数，且分包必须存在并启用（与回调解析的启用校验一致）。
+    /// </summary>
+    private async Task<long> ValidatePackageAsync(long? packageId)
+    {
+        if (packageId == null || packageId <= 0)
+        {
+            throw BusinessError.Oh("分包 Id 必须为正数");
+        }
+
+        var package = await _packageRepository.GetFirstAsync(x => x.Id == packageId.Value && x.IsEnabled == true);
+        if (package == null)
+        {
+            throw BusinessError.Oh("分包不存在或未启用");
+        }
+
+        return packageId.Value;
+    }
+
+    private async Task CheckUniqueScopeAsync(long packageId, string provider, long? excludeId)
     {
         var exists = excludeId.HasValue
-                         ? await Repository.IsAnyAsync(x => x.Provider == provider && x.Id != excludeId.Value)
-                         : await Repository.IsAnyAsync(x => x.Provider == provider);
+                         ? await Repository.IsAnyAsync(x => x.PackageId == packageId && x.Provider == provider && x.Id != excludeId.Value)
+                         : await Repository.IsAnyAsync(x => x.PackageId == packageId && x.Provider == provider);
         if (exists)
         {
-            throw BusinessError.Oh("同一广告平台的广告回调配置已存在");
+            throw BusinessError.Oh(AdvertisementCallbackConfigErrorCode.PackageProviderAlreadyExists);
         }
     }
 

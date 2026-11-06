@@ -10,6 +10,7 @@ using GameFrameX.Core.SqlSugar;
 using GameFrameX.Core.Tests.ClientApi;
 using GameFrameX.Entity.Business.ClientApiConfig;
 using GameFrameX.Entity.Business.Game;
+using GameFrameX.Entity.Business.Game.App;
 using Microsoft.Extensions.Logging.Abstractions;
 
 namespace GameFrameX.Core.Tests.Business;
@@ -29,7 +30,8 @@ public sealed class CredentialWritePathCryptoTests : IDisposable
     {
         _originalKey = Environment.GetEnvironmentVariable(SecretCrypto.KeyEnvironmentVariable);
         Environment.SetEnvironmentVariable(SecretCrypto.KeyEnvironmentVariable, "unit-test-secret-key");
-        _db.InitBusinessTables(typeof(AppSignatureKeyEntity), typeof(AdvertisementCallbackConfigEntity));
+        _db.InitBusinessTables(typeof(AppSignatureKeyEntity), typeof(AdvertisementCallbackConfigEntity), typeof(GameAppPackageEntity));
+        _db.SeedPackage(8801, "com.example.ad");
     }
 
     public void Dispose()
@@ -62,12 +64,13 @@ public sealed class CredentialWritePathCryptoTests : IDisposable
     {
         var service = new AdvertisementCallbackConfigService(
             new Repository<AdvertisementCallbackConfigEntity>(_db.MainDb),
-            new AdvertisementCallbackConfigSchemaProvider());
+            new AdvertisementCallbackConfigSchemaProvider(),
+            new Repository<GameAppPackageEntity>(_db.MainDb));
         var configJson = "{\"callbackUrl\":\"https://cb.example.com/hook\",\"signingSecret\":\"ad-plain-secret\"}";
 
         var added = await service.AddAsync(new AddAdvertisementCallbackConfigRequest
         {
-           
+            PackageId = 8801,
             Provider = "Pangle",
             CallbackUrl = "https://cb.example.com/hook",
             SigningSecret = "ad-plain-secret",
@@ -90,7 +93,7 @@ public sealed class CredentialWritePathCryptoTests : IDisposable
         await service.UpdateAsync(new UpdateAdvertisementCallbackConfigRequest
         {
             Id = added.Id,
-           
+            PackageId = 8801,
             Provider = "Pangle",
             CallbackUrl = "https://cb.example.com/hook",
             SigningSecret = SensitiveFieldMask.MaskValue,
