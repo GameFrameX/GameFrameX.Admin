@@ -121,7 +121,7 @@ public class GameHomeServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task GetOnline_UsesMainDatabaseWithoutTenantContext()
+    public async Task GetOnline_QueriesMainDatabaseDirectly()
     {
         // C321：平台面（无区服上下文）不裸查业务表触发 42P01 裸 500，而是抛明确业务错误
         var service = CreateService();
@@ -168,7 +168,7 @@ public class GameHomeServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task Overview_UsesMainDatabaseWithoutTenantContext()
+    public async Task Overview_QueriesMainDatabaseDirectly()
     {
         var service = CreateService();
 
@@ -206,7 +206,7 @@ public class GameHomeServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task OnlineTrend_UsesMainDatabaseWithoutTenantContext()
+    public async Task OnlineTrend_QueriesMainDatabaseDirectly()
     {
         var service = CreateService();
 

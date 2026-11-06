@@ -44,7 +44,7 @@ public sealed class GameAppDeviceContractTests
         var isValid = Validate(input, out var results);
 
         Assert.True(isValid);
-        Assert.Null(typeof(AddGameAppDeviceRequest).GetProperty("AppId"));
+        Assert.Null(typeof(AddGameAppDeviceRequest).GetProperty("AppId")); // c406-keep（负向断言：旧应用作用域字段不得回归）
     }
 
     [Fact]
@@ -58,7 +58,7 @@ public sealed class GameAppDeviceContractTests
         var isValid = Validate(input, out var results);
 
         Assert.True(isValid);
-        Assert.Null(typeof(AddDeviceGroupRequest).GetProperty("AppId"));
+        Assert.Null(typeof(AddDeviceGroupRequest).GetProperty("AppId")); // c406-keep（负向断言：旧应用作用域字段不得回归）
     }
 
     [Fact]
@@ -81,11 +81,11 @@ public sealed class GameAppDeviceContractTests
     [Fact]
     public void UpdateInput_HasNoApplicationField()
     {
-        Assert.Null(typeof(UpdateGameAppDeviceRequest).GetProperty("AppId"));
+        Assert.Null(typeof(UpdateGameAppDeviceRequest).GetProperty("AppId")); // c406-keep（负向断言：旧应用作用域字段不得回归）
     }
 
     [Fact]
-    public void TenantGameAppDeviceService_UpdateUsesGenericCrudPath()
+    public void GameAppDeviceService_UpdateUsesGenericCrudPath()
     {
         var updateMethod = typeof(GameAppDeviceService).GetMethod(
             "UpdateAsync",
@@ -97,7 +97,7 @@ public sealed class GameAppDeviceContractTests
     }
 
     [Fact]
-    public void TenantDeviceGroupService_UpdateUsesGenericCrudPath()
+    public void DeviceGroupService_UpdateUsesGenericCrudPath()
     {
         var updateMethod = typeof(DeviceGroupService).GetMethod(
             "UpdateAsync",

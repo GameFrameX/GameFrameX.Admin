@@ -105,7 +105,7 @@ public sealed class ChannelDefinitionSoftDeleteVisibilityTests : IDisposable
     private ChannelDefinitionService CreateService()
     {
         // 复刻 Admin host DI 形态：Repository<T> 按实体边界路由——业务表经 DbProvider 走主库
-        // （生产过滤器 + TenantId 填充 AOP 已装配），全局表落主库连接。
+        // （生产过滤器 + 审计字段填充 AOP 已装配），全局表落主库连接。
         var currentUserContext = new CurrentUserContext(new HttpContextAccessor());
 
         return new ChannelDefinitionService(

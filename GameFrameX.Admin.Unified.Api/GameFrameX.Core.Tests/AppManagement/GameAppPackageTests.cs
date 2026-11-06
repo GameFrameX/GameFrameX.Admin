@@ -65,7 +65,7 @@ public class GameAppPackageTests
         var isValid = Validator.TryValidateObject(input, new ValidationContext(input), results, true);
 
         Assert.False(isValid);
-        Assert.Null(typeof(AddGameAppPackageRequest).GetProperty("AppId"));
+        Assert.Null(typeof(AddGameAppPackageRequest).GetProperty("AppId")); // c406-keep（负向断言：旧应用作用域字段不得回归）
         Assert.Contains(results, result => result.MemberNames.Contains(nameof(AddGameAppPackageRequest.Name)));
         Assert.Contains(results, result => result.MemberNames.Contains(nameof(AddGameAppPackageRequest.PackageName)));
         Assert.Contains(results, result => result.MemberNames.Contains(nameof(AddGameAppPackageRequest.PlatformCode)));

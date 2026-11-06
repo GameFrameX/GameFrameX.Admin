@@ -28,7 +28,7 @@ public sealed class ApiEndpointCatalogSyncTests
     }
 
     [Fact]
-    public void StartupSync_DoesNotRewriteTenantRoleMenuGrants()
+    public void StartupSync_DoesNotRewriteRoleMenuGrants()
     {
         var sourceFile = FindSourceFile(nameof(ApiEndpointCatalogSync));
         var source = File.ReadAllText(sourceFile.FullName);

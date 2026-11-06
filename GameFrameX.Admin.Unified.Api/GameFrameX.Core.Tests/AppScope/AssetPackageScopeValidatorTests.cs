@@ -75,11 +75,11 @@ public sealed class AssetPackageScopeValidatorTests : IDisposable
     {
         var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
-        await _db.Insertable(BuildAssetPackage(1, 100, "base", now)).ExecuteCommandAsync();
-        await _db.Insertable(BuildAssetPackage(2, 200, "patch", now)).ExecuteCommandAsync();
+        await _db.Insertable(BuildAssetPackage(1, "base", now)).ExecuteCommandAsync();
+        await _db.Insertable(BuildAssetPackage(2, "patch", now)).ExecuteCommandAsync();
     }
 
-    private static GameAppAssetPackageEntity BuildAssetPackage(long id, long gameAppId, string name, long now)
+    private static GameAppAssetPackageEntity BuildAssetPackage(long id, string name, long now)
     {
         return new GameAppAssetPackageEntity
         {

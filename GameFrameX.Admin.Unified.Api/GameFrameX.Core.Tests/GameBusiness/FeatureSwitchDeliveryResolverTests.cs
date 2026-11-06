@@ -15,8 +15,6 @@ namespace GameFrameX.Core.Tests.GameBusiness;
 /// </summary>
 public sealed class FeatureSwitchDeliveryResolverTests : IDisposable
 {
-    private const long App100 = 100;
-    private const long App200 = 200;
 
     private static readonly DateTime NowUtc = new DateTime(2026, 9, 14, 12, 0, 0, DateTimeKind.Utc);
 
@@ -42,8 +40,8 @@ public sealed class FeatureSwitchDeliveryResolverTests : IDisposable
     [Fact]
     public void Resolve_NewerRowWinsRegardlessOfLegacyApplication()
     {
-        var defaultRow = Row("login.banner", id: 1, appId: null, valueJson: "{\"v\":\"base\"}");
-        var appRow = Row("login.banner", id: 2, appId: App100, valueJson: "{\"v\":\"app\"}");
+        var defaultRow = Row("login.banner", id: 1, valueJson: "{\"v\":\"base\"}");
+        var appRow = Row("login.banner", id: 2, valueJson: "{\"v\":\"app\"}");
 
         var result = FeatureSwitchDeliveryResolver.Resolve(new[] { defaultRow, appRow, }, Query());
 
@@ -367,9 +365,9 @@ public sealed class FeatureSwitchDeliveryResolverTests : IDisposable
     [Fact]
     public async Task ResolveAsync_ReadsMainDatabaseCandidates()
     {
-        await InsertAsync(Row("switch.app", id: 900001, appId: App100));
-        await InsertAsync(Row("switch.default", id: 900002, appId: null));
-        await InsertAsync(Row("switch.other", id: 900003, appId: App200));
+        await InsertAsync(Row("switch.app", id: 900001));
+        await InsertAsync(Row("switch.default", id: 900002));
+        await InsertAsync(Row("switch.other", id: 900003));
 
         var result = await CreateResolver().ResolveAsync(Query());
 
@@ -412,7 +410,6 @@ public sealed class FeatureSwitchDeliveryResolverTests : IDisposable
 
     private static FeatureSwitchDeliveryQuery Query(
         FeatureSwitchAudience audience = FeatureSwitchAudience.Client,
-        long? appId = App100,
         string? platform = null,
         IReadOnlyList<string>? packageCandidates = null,
         string? language = null,
@@ -435,7 +432,6 @@ public sealed class FeatureSwitchDeliveryResolverTests : IDisposable
     private static GameAppFeatureSwitchEntity Row(
         string switchKey,
         long id,
-        long? appId = App100,
         string audience = FeatureSwitchAudienceValues.Both,
         string valueJson = "{}",
         long? startTime = null,

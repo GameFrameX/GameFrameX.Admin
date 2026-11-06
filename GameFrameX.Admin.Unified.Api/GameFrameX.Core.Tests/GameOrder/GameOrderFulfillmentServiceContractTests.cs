@@ -38,7 +38,7 @@ public class GameOrderFulfillmentServiceContractTests
                     .Select(p => p.Name)
                     .ToHashSet();
 
-        Assert.DoesNotContain("AppId", props);
+        Assert.DoesNotContain("AppId", props); // c406-keep（负向断言：旧应用作用域字段不得回归）
         Assert.Contains("OrderId", props);
         Assert.Contains("RoleId", props);
         Assert.Contains("AreaId", props);

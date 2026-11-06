@@ -5,7 +5,7 @@ namespace GameFrameX.Core.Tests.Email;
 public class SendEmailTemplateDataMapperTests
 {
     [Fact]
-    public void FromDictionary_MapsSupportedTenantEmailTemplateKeys()
+    public void FromDictionary_MapsSupportedEmailTemplateKeys()
     {
         var data = SendEmailTemplateDataMapper.FromDictionary(new Dictionary<string, string>
         {

@@ -20,7 +20,7 @@ public class SqlSugarEntityBoundaryTests
     }
 
     [Fact]
-    public void TenantGameEntity_IsTenantDatabase()
+    public void GameEntity_IsBusinessTable()
     {
         Assert.True(SqlSugarEntityBoundary.IsBusinessTable(typeof(GameGoodsEntity)));
         Assert.False(SqlSugarEntityBoundary.IsPlatformTable(typeof(GameGoodsEntity)));
@@ -28,14 +28,14 @@ public class SqlSugarEntityBoundaryTests
     }
 
     [Fact]
-    public void TenantGameAppDeviceEntity_IsTenantDatabase()
+    public void GameAppDeviceEntity_IsBusinessTable()
     {
         Assert.True(SqlSugarEntityBoundary.IsBusinessTable(typeof(GameAppDeviceEntity)));
         Assert.False(SqlSugarEntityBoundary.IsPlatformTable(typeof(GameAppDeviceEntity)));
     }
 
     [Fact]
-    public void TenantUser_IsTenantDatabase()
+    public void User_IsBusinessTable()
     {
         Assert.True(SqlSugarEntityBoundary.IsMainDatabaseTable(typeof(UserEntity)));
         Assert.True(SqlSugarEntityBoundary.IsBusinessTable(typeof(UserEntity)));
@@ -43,13 +43,13 @@ public class SqlSugarEntityBoundaryTests
     }
 
     [Fact]
-    public void TenantGameEntity_IsInitializedInMainDatabase()
+    public void GameEntity_IsInitializedInMainDatabase()
     {
         Assert.True(SqlSugarEntityBoundary.IsMainDatabaseTable(typeof(GameGoodsEntity)));
     }
 
     [Fact]
-    public void TenantGameGoodsEntityFamily_UsesTenantGameAppPrefixAndEntitySuffix()
+    public void GameGoodsEntityFamily_UsesGameAppPrefixAndEntitySuffix()
     {
         var entityTypes = new[]
         {
@@ -98,7 +98,7 @@ public class SqlSugarEntityBoundaryTests
     }
 
     [Fact]
-    public void TenantLogEntity_IsTenantDatabase()
+    public void LogEntity_IsBusinessTable()
     {
         Assert.False(SqlSugarEntityBoundary.IsPlatformTable(typeof(LogOperationEntity)));
         Assert.True(SqlSugarEntityBoundary.IsBusinessTable(typeof(LogOperationEntity)));
@@ -150,7 +150,7 @@ public class SqlSugarEntityBoundaryTests
     }
 
     [Fact]
-    public void EmailConfigEntities_AreSplitBetweenSystemAndTenantDatabases()
+    public void EmailConfigEntities_AreSplitBetweenSystemAndBusinessDatabases()
     {
         Assert.True(SqlSugarEntityBoundary.IsPlatformTable(typeof(SystemEmailProviderEntity)));
         Assert.True(SqlSugarEntityBoundary.IsMainDatabaseTable(typeof(SystemEmailProviderEntity)));

@@ -9,10 +9,10 @@ using Xunit.Abstractions;
 namespace GameFrameX.Core.Tests.SqlSugar;
 
 /// <summary>
-/// 2026-07-13 lesson 回归验证：InsertWithDiffLogAsync（DiffLog 路径）是否丢失租户表名前缀 tenant_。
+/// 2026-07-13 lesson 回归验证：InsertWithDiffLogAsync（DiffLog 路径）是否写错物理表名（lesson 原型为丢失 tenant_ 前缀，C406 后业务表物理名无前缀，检查目标改为 EntityNameService 推导的最终物理名）。 // c406-keep（lesson 历史引用）
 /// 复刻生产接线：SqlSugarUnifiedConfig.ConfigureBaseSettings（EntityNameService → SqlSugarEntityBoundary.GetPhysicalTableName）
 /// + RepositoryExtension.InsertWithDiffLogAsync（.AS() + EnableDiffLogEvent，与 BaseService.InnerAddAsync 同链路）。
-/// 同时手工建一张无前缀镜像表，模拟生产"旧表残留、写错表不报错"的场景：若 INSERT 落错表可精确定位。
+/// 同时手工建一张旧名镜像表，模拟生产"旧表残留、写错表不报错"的场景：若 INSERT 落错表可精确定位。
 /// </summary>
 public class SqlSugarDiffLogPrefixTests : IDisposable
 {
@@ -33,7 +33,7 @@ public class SqlSugarDiffLogPrefixTests : IDisposable
     }
 
     [Fact]
-    public async Task Insert_PlainAndDiffLog_BothWriteTenantPrefixTable_Sqlite()
+    public async Task Insert_PlainAndDiffLog_BothWritePhysicalTable_Sqlite()
     {
         var config = CreateSqliteConfig();
         using (var scope = new SqlSugarScope(new List<ConnectionConfig> { config, }))
@@ -44,7 +44,7 @@ public class SqlSugarDiffLogPrefixTests : IDisposable
             var createdTables = db.Ado.SqlQuery<string>("SELECT name FROM sqlite_master WHERE type='table'");
             _output.WriteLine($"[DBG] EntityInfo.DbTableName={entityTableName}");
             _output.WriteLine($"[DBG] sqlite_master={string.Join(",", createdTables)}");
-            // 无前缀镜像表（列结构与 tenant_ 表一致）：写错表时不报错，靠计数精确定位落表位置
+            // 旧名镜像表（列结构与物理表一致）：写错表时不报错，靠计数精确定位落表位置
             db.Ado.ExecuteCommand($"CREATE TABLE {LegacyUnprefixedTable} AS SELECT * FROM {PhysicalTable} WHERE false");
 
             var observers = AttachObservers(db);
@@ -67,19 +67,19 @@ public class SqlSugarDiffLogPrefixTests : IDisposable
             Assert.Equal(2, insertTableNames.Count);
             Assert.All(insertTableNames, name => Assert.Equal(PhysicalTable, name));
 
-            // DiffLog after-data 查回 SQL（GetDiffTableBySql 的 Context.Queryable<T>()）也必须走 tenant_ 前缀表：
-            // 捕获窗口内不允许出现任何指向非 tenant_ 表的 SQL
+            // DiffLog after-data 查回 SQL（GetDiffTableBySql 的 Context.Queryable<T>()）也必须走物理表：
+            // 捕获窗口内不允许出现任何指向其它表名的 SQL
             Assert.All(observers.CapturedSqls, sql =>
             {
                 var tables = SelectTableNameRegex.Matches(sql).Select(m => m.Groups[1].Value).ToList();
                 Assert.All(tables, name => Assert.Equal(PhysicalTable, name));
             });
 
-            // DiffLog 事件中的 SQL 同样带前缀
+            // DiffLog 事件中的 SQL 同样指向物理表
             Assert.NotEmpty(observers.DiffLogSqls);
             Assert.All(observers.DiffLogSqls, sql => _output.WriteLine("[DiffLogEvent] " + sql));
 
-            // 落表位置：tenant_ 表 2 行，无前缀镜像表 0 行
+            // 落表位置：物理表 2 行，旧名镜像表 0 行
             var rows = db.Ado.SqlQuery<long>($"SELECT COUNT(*) FROM {PhysicalTable} WHERE id IN (990001, 990002)");
             var legacyRows = db.Ado.SqlQuery<long>($"SELECT COUNT(*) FROM {LegacyUnprefixedTable}");
             Assert.Equal(2, rows.Single());
@@ -90,7 +90,7 @@ public class SqlSugarDiffLogPrefixTests : IDisposable
     }
 
     [Fact]
-    public async Task Update_EnableDiffLogEvent_UsesTenantPrefixTable_Sqlite()
+    public async Task Update_EnableDiffLogEvent_UsesPhysicalTable_Sqlite()
     {
         // BaseService.InnerUpdateAsync 的 DiffLog 链路没有 .AS() 显式表名（RepositoryExtension.UpdateWithDiffLogAsync 亦然），
         // 表名纯依赖 EntityNameService——这条链路是 lesson 机制的残余暴露面，单独验证。
@@ -129,7 +129,7 @@ public class SqlSugarDiffLogPrefixTests : IDisposable
             Assert.NotEmpty(diffLogSelectTables);
             Assert.All(diffLogSelectTables, name => Assert.Equal(PhysicalTable, name));
 
-            // 更新结果落在 tenant_ 表
+            // 更新结果落在物理表
             var updated = db.Queryable<GameAppRemoteConfigEntity>().Single(u => u.Id == 990003);
             Assert.Equal("difflog-repro-updated", updated.Description);
             var legacyRows = db.Ado.SqlQuery<long>($"SELECT COUNT(*) FROM {LegacyUnprefixedTable}");
@@ -140,7 +140,7 @@ public class SqlSugarDiffLogPrefixTests : IDisposable
     }
 
     [SkippableFact]
-    public async Task Insert_InsertWithDiffLogAsync_WritesTenantPrefixTable_Postgres()
+    public async Task Insert_InsertWithDiffLogAsync_WritesPhysicalTable_Postgres()
     {
         Skip.IfNot(PostgresTestDatabase.TryCreate(out var postgres, out var unavailableReason), unavailableReason);
         using (postgres)

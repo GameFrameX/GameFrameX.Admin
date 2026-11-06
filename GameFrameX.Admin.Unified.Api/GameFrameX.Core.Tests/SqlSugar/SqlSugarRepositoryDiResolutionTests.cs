@@ -37,7 +37,7 @@ public sealed class SqlSugarRepositoryDiResolutionTests : IDisposable
     /// 对应 AddAsync 中 adminAccount 查重的修复路径。
     /// </summary>
     [Fact]
-    public void DiResolution_PlatformTableRepository_RoutesMainDatabase_WithoutTenantContext()
+    public void DiResolution_PlatformTableRepository_RoutesMainDatabaseWithoutLegacyContext()
     {
         var services = BuildServices();
 

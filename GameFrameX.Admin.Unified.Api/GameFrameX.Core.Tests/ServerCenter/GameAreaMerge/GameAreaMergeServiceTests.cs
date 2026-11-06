@@ -171,7 +171,7 @@ public sealed class GameAreaMergeServiceTests
     }
 
     [Fact]
-    public void PlanEntity_UsesMainDatabaseAndExplicitTenantPhysicalOwnership()
+    public void PlanEntity_UsesMainDatabaseAndExplicitBusinessOwnership()
     {
         var entityType = typeof(GameAreaMergePlanEntity);
         Assert.True(GameFrameX.Core.SqlSugar.SqlSugarEntityBoundary.IsMainDatabaseTable(entityType));

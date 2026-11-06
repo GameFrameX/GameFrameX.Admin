@@ -9,9 +9,8 @@ namespace GameFrameX.Core.Tests.AppScope;
 /// GFX-84 / C80 回归测试：PackageScopeValidator 分包级配置包名作用域校验。
 /// <para>规则集：</para>
 /// <list type="number">
-///   <item>package 为空 / "default" → 兜底放行（AppId 可为 0 / null）。</item>
-///   <item>具体包名 + AppId&gt;0 → 必须命中当前应用下启用分包，否则抛错。</item>
-///   <item>具体包名 + AppId&lt;=0（租户默认层）→ 抛错。</item>
+///   <item>package 为空 / "default" → 兜底放行，不查库。</item>
+///   <item>具体包名 → 必须命中启用中的分包，否则抛错。</item>
 /// </list>
 /// <para>用 Sqlite 内存文件库 + ConfigureBaseFilters（软删除过滤）端到端验证；
 /// 校验器内部用 历史框架 <c>BusinessError.Oh</c> 抛友好异常，无 历史框架 host 的纯单测下友好异常构造可能触发
@@ -37,31 +36,30 @@ public sealed class PackageScopeValidatorTests : IDisposable
     }
 
     /// <summary>
-    /// package="default" / 空 / null：兜底放行，AppId 可为 0 / null，不查库。
+    /// package="default" / 空 / null：兜底放行，不查库。
     /// </summary>
     [Theory]
     [InlineData(PackageScopeValidator.DefaultPackage)]
     [InlineData("")]
     [InlineData("   ")]
     [InlineData(null)]
-    public async Task DefaultOrEmptyPackage_PassesWithoutAppScope(string? package)
+    public async Task DefaultOrEmptyPackage_PassesWithoutLookup(string? package)
     {
         await SeedAsync();
 
-        // AppId=null / 0 均应放行（兜底语义不要求应用作用域）
-        await PackageScopeValidator.ValidateAsync(package, Query());
+        // 兜底语义不查库、不要求任何作用域
         await PackageScopeValidator.ValidateAsync(package, Query());
     }
 
     /// <summary>
-    /// 具体包名 + AppId>0 + 命中当前应用下启用分包 → 放行。
+    /// 具体包名 + 命中启用分包 → 放行。
     /// </summary>
     [Fact]
-    public async Task SpecificPackage_BelongingToEnabledAppPackage_Passes()
+    public async Task SpecificPackage_BelongingToEnabledPackage_Passes()
     {
         await SeedAsync();
 
-        // com.app.a 属于 GameAppId=100 且启用
+        // com.app.a 为启用分包
         await PackageScopeValidator.ValidateAsync("com.app.a", Query());
     }
 
@@ -73,7 +71,7 @@ public sealed class PackageScopeValidatorTests : IDisposable
     {
         await SeedAsync();
 
-        // com.app.b 属于 GameAppId=100 但 IsEnabled=false
+        // com.app.b 已停用
         Assert.ThrowsAny<Exception>(() =>
                                         PackageScopeValidator.ValidateAsync("com.app.b", Query()).GetAwaiter().GetResult());
     }
@@ -86,7 +84,7 @@ public sealed class PackageScopeValidatorTests : IDisposable
     {
         await SeedAsync();
 
-        // com.app.c 属于 GameAppId=200，当前作用域 100 下不应命中
+        // com.app.c 为另一启用分包（存在性校验与归属无关）
         await PackageScopeValidator.ValidateAsync("com.app.c", Query());
     }
 
@@ -113,12 +111,12 @@ public sealed class PackageScopeValidatorTests : IDisposable
     {
         var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
-        await _db.Insertable(BuildPackage(1, 100, "com.app.a", true, now)).ExecuteCommandAsync();
-        await _db.Insertable(BuildPackage(2, 100, "com.app.b", false, now)).ExecuteCommandAsync();
-        await _db.Insertable(BuildPackage(3, 200, "com.app.c", true, now)).ExecuteCommandAsync();
+        await _db.Insertable(BuildPackage(1, "com.app.a", true, now)).ExecuteCommandAsync();
+        await _db.Insertable(BuildPackage(2, "com.app.b", false, now)).ExecuteCommandAsync();
+        await _db.Insertable(BuildPackage(3, "com.app.c", true, now)).ExecuteCommandAsync();
     }
 
-    private static GameAppPackageEntity BuildPackage(long id, long gameAppId, string packageName, bool isEnabled, long now)
+    private static GameAppPackageEntity BuildPackage(long id, string packageName, bool isEnabled, long now)
     {
         return new GameAppPackageEntity
         {

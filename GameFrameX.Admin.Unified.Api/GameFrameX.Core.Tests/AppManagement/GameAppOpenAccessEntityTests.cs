@@ -15,14 +15,14 @@ namespace GameFrameX.Core.Tests.AppManagement;
 public class GameAppOpenAccessEntityTests
 {
     [Fact]
-    public void TenantGameAppOpenAccessEntity_Default_IsEnabledTrue()
+    public void GameAppOpenAccessEntity_Default_IsEnabledTrue()
     {
         var entity = new GameAppOpenAccessEntity();
         Assert.True(entity.IsEnabled);
     }
 
     [Fact]
-    public void TenantGameAppOpenAccessEntity_DerivesPhysicalTableNameFromClassName()
+    public void GameAppOpenAccessEntity_DerivesPhysicalTableNameFromClassName()
     {
         var physical = SqlSugarEntityBoundary.GetPhysicalTableName(typeof(GameAppOpenAccessEntity), nameof(GameAppOpenAccessEntity));
 
@@ -30,7 +30,7 @@ public class GameAppOpenAccessEntityTests
     }
 
     [Fact]
-    public void AddTenantGameAppOpenAccessInput_Requires_AllMandatoryFields()
+    public void AddGameAppOpenAccessInput_Requires_AllMandatoryFields()
     {
         var input = new AddGameAppOpenAccessRequest();
         var results = new List<ValidationResult>();
@@ -45,7 +45,7 @@ public class GameAppOpenAccessEntityTests
     }
 
     [Fact]
-    public void AddTenantGameAppOpenAccessInput_AcceptsValidInput()
+    public void AddGameAppOpenAccessInput_AcceptsValidInput()
     {
         var input = new AddGameAppOpenAccessRequest
         {
@@ -62,7 +62,7 @@ public class GameAppOpenAccessEntityTests
     }
 
     [Fact]
-    public void AddTenantGameAppOpenAccessInput_AcceptsWithoutApplication()
+    public void AddGameAppOpenAccessInput_AcceptsWithoutApplication()
     {
         var input = new AddGameAppOpenAccessRequest
         {
@@ -79,7 +79,7 @@ public class GameAppOpenAccessEntityTests
     }
 
     [Fact]
-    public void UpdateTenantGameAppOpenAccessInput_RequiresUserAndScopes()
+    public void UpdateGameAppOpenAccessInput_RequiresUserAndScopes()
     {
         var input = new UpdateGameAppOpenAccessRequest();
         var results = new List<ValidationResult>();
@@ -91,14 +91,14 @@ public class GameAppOpenAccessEntityTests
     }
 
     [Fact]
-    public void TenantGameAppOpenAccessActionInput_HasNoApplicationDimension()
+    public void GameAppOpenAccessActionInput_HasNoApplicationDimension()
     {
         var input = new GameAppOpenAccessActionRequest();
         var results = new List<ValidationResult>();
         var isValid = Validator.TryValidateObject(input, new ValidationContext(input), results, true);
 
         Assert.False(isValid);
-        Assert.Null(typeof(GameAppOpenAccessActionRequest).GetProperty("AppId"));
+        Assert.Null(typeof(GameAppOpenAccessActionRequest).GetProperty("AppId")); // c406-keep（负向断言：旧应用作用域字段不得回归）
     }
 
     [Fact]
@@ -167,7 +167,7 @@ public class GameAppOpenAccessEntityTests
     }
 
     [Fact]
-    public void TenantGameAppOpenAccessSecretResult_SerializesSecretForOneTimeDisplay()
+    public void GameAppOpenAccessSecretResult_SerializesSecretForOneTimeDisplay()
     {
         // SecretResult 仅签发/轮换响应返回，前端一次性展示；序列化含明文 AccessSecret。
         var result = new GameAppOpenAccessSecretResponse

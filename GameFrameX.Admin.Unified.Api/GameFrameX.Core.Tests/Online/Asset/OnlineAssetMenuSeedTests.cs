@@ -47,7 +47,7 @@ public sealed class OnlineAssetMenuSeedTests
     }
 
     [Fact]
-    public void OnlineAssetMenus_HighRiskButtons_AreTenantAdminOnly()
+    public void OnlineAssetMenus_HighRiskButtons_AreAdminRoleOnly()
     {
         var menus = GlobalMenuSeedData.BuildData();
         var grant = Assert.Single(menus, m => m.Key == "onlineWalletLedger:grant");

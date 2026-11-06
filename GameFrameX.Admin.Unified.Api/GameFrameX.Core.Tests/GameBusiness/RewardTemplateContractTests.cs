@@ -20,12 +20,12 @@ public class RewardTemplateContractTests
         var groupProps = PropNames<GameRewardTemplateGroupEntity>();
         var templateProps = PropNames<GameRewardTemplateEntity>();
 
-        Assert.DoesNotContain("AppId", groupProps);
+        Assert.DoesNotContain("AppId", groupProps); // c406-keep（负向断言：旧应用作用域字段不得回归）
         Assert.DoesNotContain("Code", groupProps);
         Assert.DoesNotContain("Icon", groupProps);
         Assert.Contains("Sort", groupProps);
 
-        Assert.DoesNotContain("AppId", templateProps);
+        Assert.DoesNotContain("AppId", templateProps); // c406-keep（负向断言：旧应用作用域字段不得回归）
         Assert.Contains("GroupId", templateProps);
         Assert.Contains("RewardItemsJson", templateProps);
         Assert.Contains("SnapshotSchemaVersion", templateProps);
@@ -35,13 +35,13 @@ public class RewardTemplateContractTests
     [Fact]
     public void RewardTemplateInputs_ExposeRewardFieldsWithoutApplication()
     {
-        Assert.Null(typeof(AddGameRewardTemplateGroupEntityRequest).GetProperty("AppId"));
+        Assert.Null(typeof(AddGameRewardTemplateGroupEntityRequest).GetProperty("AppId")); // c406-keep（负向断言：旧应用作用域字段不得回归）
         Assert.Null(typeof(AddGameRewardTemplateGroupEntityRequest).GetProperty("Code"));
         Assert.Null(typeof(AddGameRewardTemplateGroupEntityRequest).GetProperty("Icon"));
-        Assert.Null(typeof(AddGameRewardTemplateEntityRequest).GetProperty("AppId"));
+        Assert.Null(typeof(AddGameRewardTemplateEntityRequest).GetProperty("AppId")); // c406-keep（负向断言：旧应用作用域字段不得回归）
         AssertRequired<AddGameRewardTemplateEntityRequest>(nameof(AddGameRewardTemplateEntityRequest.GroupId));
         AssertRequired<AddGameRewardTemplateEntityRequest>(nameof(AddGameRewardTemplateEntityRequest.RewardItemsJson));
-        Assert.Null(typeof(GameRewardTemplateSnapshotRequest).GetProperty("AppId"));
+        Assert.Null(typeof(GameRewardTemplateSnapshotRequest).GetProperty("AppId")); // c406-keep（负向断言：旧应用作用域字段不得回归）
     }
 
     [Fact]
@@ -80,14 +80,14 @@ public class RewardTemplateContractTests
         var groupSource = File.ReadAllText(Path.Combine(FindRepoRoot(), "GameFrameX.Application/NoticeCenter/GameRewardTemplateGroup/GameRewardTemplateGroupService.cs"));
         var templateSource = File.ReadAllText(Path.Combine(FindRepoRoot(), "GameFrameX.Application/NoticeCenter/GameRewardTemplate/GameRewardTemplateService.cs"));
 
-        Assert.DoesNotContain("EnsureFactAppId", groupSource);
-        Assert.DoesNotContain("EnsureFactAppId", templateSource);
+        Assert.DoesNotContain("EnsureFactAppId", groupSource); // c406-keep（负向断言：旧应用作用域字段不得回归）
+        Assert.DoesNotContain("EnsureFactAppId", templateSource); // c406-keep（负向断言：旧应用作用域字段不得回归）
         Assert.Contains("ValidateGroupAsync(input.GroupId)", templateSource);
         Assert.Contains("ValidateRewardItemsJson(input.RewardItemsJson)", templateSource);
         Assert.Contains("RowVersion = t.RowVersion", templateSource);
         Assert.DoesNotContain("GroupCode", templateSource);
         Assert.DoesNotContain("EnsureCodeUniqueAsync", groupSource);
-        Assert.DoesNotContain("entity.AppId", templateSource);
+        Assert.DoesNotContain("entity.AppId", templateSource); // c406-keep（负向断言：旧应用作用域字段不得回归）
         Assert.Contains("entity.IsEnabled == false", templateSource);
     }
 

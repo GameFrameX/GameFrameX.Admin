@@ -20,12 +20,12 @@ public class GameCommodityEntityContractTests
     [Fact]
     public void AddRequest_FrontendShapedStringPayload_Deserializes()
     {
-        const string payload = "{\"appId\":\"1300000000001\",\"status\":\"OnSale\",\"categoryId\":\"7451234567890123\",\"cost\":false,\"number\":\"5\"}";
+        const string payload = "{\"appId\":\"1300000000001\",\"status\":\"OnSale\",\"categoryId\":\"7451234567890123\",\"cost\":false,\"number\":\"5\"}"; // c406-keep（负向断言：旧应用作用域字段不得回归）
 
         var request = JsonSerializer.Deserialize<AddGameCommodityEntityRequest>(payload, CreateOptions());
 
         Assert.NotNull(request);
-        Assert.Null(typeof(AddGameCommodityEntityRequest).GetProperty("AppId"));
+        Assert.Null(typeof(AddGameCommodityEntityRequest).GetProperty("AppId")); // c406-keep（负向断言：旧应用作用域字段不得回归）
         Assert.Equal("OnSale", request.Status);
         Assert.Equal(7451234567890123, request.CategoryId);
         Assert.Equal(5, request.Number);
@@ -34,7 +34,7 @@ public class GameCommodityEntityContractTests
     [Fact]
     public void AddRequest_NumericCategoryIdPayload_Deserializes()
     {
-        const string payload = "{\"appId\":1300000000001,\"status\":\"OnSale\",\"categoryId\":7451234567890123,\"cost\":true,\"number\":5}";
+        const string payload = "{\"appId\":1300000000001,\"status\":\"OnSale\",\"categoryId\":7451234567890123,\"cost\":true,\"number\":5}"; // c406-keep（负向断言：旧应用作用域字段不得回归）
 
         var request = JsonSerializer.Deserialize<AddGameCommodityEntityRequest>(payload, CreateOptions());
 
@@ -53,7 +53,7 @@ public class GameCommodityEntityContractTests
     [Fact]
     public void PageRequest_TextSearchNumberFilter_Deserializes()
     {
-        const string payload = "{\"page\":1,\"pageSize\":20,\"appId\":\"1300000000001\",\"number\":\"5\",\"categoryId\":\"7451234567890123\"}";
+        const string payload = "{\"page\":1,\"pageSize\":20,\"appId\":\"1300000000001\",\"number\":\"5\",\"categoryId\":\"7451234567890123\"}"; // c406-keep（负向断言：旧应用作用域字段不得回归）
 
         var request = JsonSerializer.Deserialize<PageGameCommodityEntityRequest>(payload, CreateOptions());
 

@@ -22,12 +22,12 @@ public sealed class GameRoleAdvertisementEntityTests : IDisposable
     }
 
     [Fact]
-    public void InitTables_AcceptsBusinessIndexesWithoutTenantScope()
+    public void InitTables_AcceptsBusinessIndexesWithoutLegacyScopeColumns()
     {
         _db.CodeFirst.InitTables(typeof(GameRoleAdvertisementEntity));
 
         var columns = _db.EntityMaintenance.GetEntityInfo<GameRoleAdvertisementEntity>().Columns;
-        Assert.DoesNotContain(columns, c => c.PropertyName is "AppId");
+        Assert.DoesNotContain(columns, c => c.PropertyName is "AppId"); // c406-keep（负向断言：旧应用作用域字段不得回归）
     }
 
     public void Dispose()

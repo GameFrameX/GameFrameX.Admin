@@ -17,8 +17,6 @@ namespace GameFrameX.Core.Tests.GameBusiness;
 /// </summary>
 public sealed class GameAppFeatureSwitchServiceTests : IDisposable
 {
-    private const long App100 = 100;
-    private const long App200 = 200;
 
     private readonly string _dbPath = Path.Combine(Path.GetTempPath(), $"feature_switch_service_{Guid.NewGuid():N}.db");
     private readonly SqlSugarScope _db;
@@ -108,7 +106,7 @@ public sealed class GameAppFeatureSwitchServiceTests : IDisposable
     public async Task Add_AllowsSameKeyWithDifferentScopeDimension()
     {
         var service = CreateService();
-        await InsertAsync("switch.scoped", App100);
+        await InsertAsync("switch.scoped");
 
         var android = NewRequest("switch.scoped");
         android.Platform = "android";
@@ -118,13 +116,13 @@ public sealed class GameAppFeatureSwitchServiceTests : IDisposable
     }
 
     /// <summary>
-    /// 租户默认层与应用层是两个独立作用域空间，同键同行互不冲突。
+    /// 相同开关键在库内唯一，重复新增被拒绝。
     /// </summary>
     [Fact]
     public async Task Add_RejectsDuplicateInMainDatabase()
     {
         var service = CreateService();
-        await InsertAsync("switch.layered", App100);
+        await InsertAsync("switch.layered");
 
         var defaultRow = NewRequest("switch.layered");
 
@@ -132,7 +130,7 @@ public sealed class GameAppFeatureSwitchServiceTests : IDisposable
     }
 
     /// <summary>
-    /// 租户默认层（AppId &lt;= 0）不得携带具体包名（C80 规则，由 PackageScopeValidator 收口）。
+    /// 未登记的具体包名不得作为投放维度（C80 规则，由 PackageScopeValidator 收口）。
     /// </summary>
     [Fact]
     public async Task Add_RejectsUnregisteredPackage()
@@ -157,7 +155,7 @@ public sealed class GameAppFeatureSwitchServiceTests : IDisposable
         unknown.Package = "com.gameframe.unknown";
         await Assert.ThrowsAsync<BusinessException>(() => service.AddAsync(unknown));
 
-        await InsertPackageAsync(App100, "com.gameframe.known");
+        await InsertPackageAsync("com.gameframe.known");
         var known = NewRequest("switch.package.known");
         known.Package = "com.gameframe.known";
         var row = await service.AddAsync(known);
@@ -252,7 +250,7 @@ public sealed class GameAppFeatureSwitchServiceTests : IDisposable
     }
 
     /// <summary>
-    /// 更新锁定应用作用域：调用方传 AppId 也不允许把应用行改挂到租户默认层。
+    /// 更新沿用自身作用域组合，不允许改挂到其它作用域层。
     /// </summary>
     [Fact]
     public async Task Update_PersistsChangedValue()
@@ -316,14 +314,14 @@ public sealed class GameAppFeatureSwitchServiceTests : IDisposable
     }
 
     /// <summary>
-    /// 分页按应用作用域收口：正值只看该应用行，留空只看租户默认层行，两层不混列。
+    /// 分页从主库读取并施加业务过滤。
     /// </summary>
     [Fact]
     public async Task Page_QueriesMainDatabaseAndAppliesBusinessFilter()
     {
-        await InsertAsync("switch.app100", App100);
-        await InsertAsync("switch.app200", App200);
-        await InsertAsync("switch.default", null);
+        await InsertAsync("switch.app100");
+        await InsertAsync("switch.app200");
+        await InsertAsync("switch.default");
 
         var service = CreateService();
 
@@ -356,7 +354,7 @@ public sealed class GameAppFeatureSwitchServiceTests : IDisposable
     // （紧凑布局、同毫秒有序列），旧「同毫秒两次插入同主键」退化不再成立（C361 / GFX-804）。
     private long _nextSeedId = 900000;
 
-    private async Task InsertAsync(string switchKey, long? appId)
+    private async Task InsertAsync(string switchKey)
     {
         await _db.Insertable(new GameAppFeatureSwitchEntity
         {
@@ -376,7 +374,7 @@ public sealed class GameAppFeatureSwitchServiceTests : IDisposable
         }).ExecuteCommandAsync();
     }
 
-    private async Task InsertPackageAsync(long gameAppId, string packageName)
+    private async Task InsertPackageAsync(string packageName)
     {
         await _db.Insertable(new GameAppPackageEntity
         {
