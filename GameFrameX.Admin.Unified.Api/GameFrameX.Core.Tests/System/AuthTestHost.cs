@@ -30,7 +30,7 @@ internal sealed class AuthTestHost : IDisposable
     private const long UserId = 2001L;
 
     /// <summary>
-    /// 租户库 seed 用的租户 ID（与 <see cref="ConfigId"/> 对应）。
+    /// 业务测试连接 seed 用的配置 ID（与 <see cref="ConfigId"/> 对应）。
     /// </summary>
     public const long SeedId = 1001L;
 
@@ -41,8 +41,8 @@ internal sealed class AuthTestHost : IDisposable
     {
         SqlSugarCache.Configure(new FakeCache());
         var mainConfig = CreateConfig(MainConfigId);
-        var tenantConfig = CreateConfig(ConfigId);
-        _client = new SqlSugarScope(new List<ConnectionConfig> { mainConfig, tenantConfig, });
+        var userConfig = CreateConfig(ConfigId);
+        _client = new SqlSugarScope(new List<ConnectionConfig> { mainConfig, userConfig, });
         SqlSugarSetup.InitDatabase(_client, mainConfig, new[]
         {
             typeof(SystemUserEntity),
@@ -50,7 +50,7 @@ internal sealed class AuthTestHost : IDisposable
             typeof(UserEntity),
         });
         _client.GetConnectionScope(MainConfigId).CodeFirst.InitTables<UserEntity>();
-        SqlSugarSetup.InitDatabase(_client, tenantConfig, new[]
+        SqlSugarSetup.InitDatabase(_client, userConfig, new[]
         {
             typeof(UserEntity),
         });
@@ -122,15 +122,15 @@ internal sealed class AuthTestHost : IDisposable
 
 
     /// <summary>
-    /// 在租户库 seed 一条 <see cref="UserEntity"/>（AccountType=NormalUser，IsEnabled=true，以通过冻结检查进入租户禁用分支）。
+    /// 在业务测试连接 seed 一条 <see cref="UserEntity"/>（AccountType=NormalUser，IsEnabled=true，以通过冻结检查进入业务用户禁用分支）。
     /// </summary>
-    public async Task SeedUserAsync(long tenantId, string account, string password)
+    public async Task SeedUserAsync(string account, string password)
     {
         var user = BuildUser<UserEntity>(UserId, account, password, AccountTypeEnum.NormalUser);
         user.IsEnabled = true;
 
-        var tenantDb = _client.GetConnectionScope(MainConfigId);
-        await tenantDb.Insertable(user).ExecuteCommandAsync();
+        var mainDb = _client.GetConnectionScope(MainConfigId);
+        await mainDb.Insertable(user).ExecuteCommandAsync();
     }
 
     public void Dispose()
@@ -145,7 +145,7 @@ internal sealed class AuthTestHost : IDisposable
     }
 
     /// <summary>
-    /// 填充 <see cref="SystemUserBase"/> 共享字段（system_user / user 通用），调用方再按需覆盖 Id/TenantId/IsEnabled/AccountType。
+    /// 填充 <see cref="SystemUserBase"/> 共享字段（system_user / user 通用），调用方再按需覆盖 Id/IsEnabled/AccountType。
     /// </summary>
     private static T BuildUser<T>(long id, string account, string password, AccountTypeEnum accountType) where T : SystemUserBase, new()
     {
