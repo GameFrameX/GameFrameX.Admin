@@ -48,15 +48,28 @@ const RENAMED_PAGES = [
 const HIDDEN_RENAMED_PAGE = { urlPart: /#\/clientDelivery\/gameAdvertisementRewardEntity/, api: '/api/gameAdvertisementReward/page' };
 
 test('c 改名页面经真实菜单请求改名接口并渲染表格', async ({ page }) => {
+  // 所有路由拦截在导航前注册：SPA hash 导航与页面挂载时序不定，后注册可能漏掉首个请求
+  const apiHits = new Map<string, boolean>();
+  const register = (api: string) => {
+    if (apiHits.has(api)) {
+      return;
+    }
+    apiHits.set(api, false);
+    void page.route(new RegExp(api.replace(/\//g, '\\/')), async route => {
+      if (route.request().method() === 'POST') {
+        apiHits.set(api, true);
+      }
+      await route.continue();
+    });
+  };
+  for (const item of RENAMED_PAGES) {
+    register(item.api);
+  }
+  register(HIDDEN_RENAMED_PAGE.api);
+
   await page.goto('/');
   await expectOverview(page);
   for (const item of RENAMED_PAGES) {
-    let apiRequested = false;
-    await page.route(new RegExp(item.api.replace(/\//g, '\\/')), async route => {
-      if (route.request().method() === 'POST') apiRequested = true;
-      await route.continue();
-    });
-    // 深层子分组展开偶发动画抖动：失败先等待重试一次再判死
     try {
       await navigateByMenu(page, item.leaf, item.root);
     } catch {
@@ -65,23 +78,18 @@ test('c 改名页面经真实菜单请求改名接口并渲染表格', async ({ 
     }
     await expect(page).toHaveURL(item.urlPart);
     await expect(page.locator('.p-datatable')).toBeVisible();
-    expect(apiRequested, `${item.leaf} 应请求改名后的 ${item.api}`).toBe(true);
+    await expect.poll(() => apiHits.get(item.api) === true, { timeout: 15_000 })
+      .toBe(true);
     await shot(page, `c406-c-${item.leaf}`);
     await page.waitForTimeout(300);
   }
 
   // 隐藏页（广告奖励账本，设计内 IsHide）经 URL 直达：同样请求改名接口并渲染表格
-  let hiddenApiRequested = false;
-  await page.route(new RegExp(HIDDEN_RENAMED_PAGE.api.replace(/\//g, '\\/')), async route => {
-    if (route.request().method() === 'POST') hiddenApiRequested = true;
-    await route.continue();
-  });
   await page.goto('/#/clientDelivery/gameAdvertisementRewardEntity');
   await expect(page).toHaveURL(HIDDEN_RENAMED_PAGE.urlPart);
   await expect(page.locator('.p-datatable')).toBeVisible();
-  // 该页 useCrudTable immediate:false —— 点真实「查询」按钮触发分页请求
-  await page.getByRole('button', { name: /查询|搜索/ }).first().click();
-  expect(hiddenApiRequested, '广告奖励账本应请求改名后的接口').toBe(true);
+  await expect.poll(() => apiHits.get(HIDDEN_RENAMED_PAGE.api) === true, { timeout: 15_000 })
+    .toBe(true);
   await shot(page, 'c406-c-广告奖励账本-隐藏页直达');
 });
 
@@ -94,9 +102,11 @@ const WALK_LEAVES: Array<{ leaf: string; root?: string }> = [
   { leaf: '活动/功能开关', root: 'C 端交付' },
   { leaf: '远程配置', root: 'C 端交付' },
   { leaf: '在线总览', root: '在线运维' },
+  { leaf: '统一审计', root: '在线运维' },
+  { leaf: '资产审计', root: '在线运维' },
   { leaf: '游戏用户', root: '玩家' },
   { leaf: '订单', root: '商业化' },
-  { leaf: '支付配置', root: '商业化' },
+  { leaf: '支付配置', root: 'C 端交付' },
   ...RENAMED_PAGES.map(item => ({ leaf: item.leaf, root: item.root })),
   { leaf: '操作日志', root: '审计' },
 ];
@@ -112,6 +122,17 @@ test('d 全页面请求不含旧作用域字段且区服请求携带 serverId', 
 
   await page.goto('/');
   await expectOverview(page);
+
+  // 顶栏全局区服选择器真实点击（在线运维区服维度查询依赖已选区服）
+  const serverSelector = page.locator('.server-selector').first();
+  if (await serverSelector.count()) {
+    await serverSelector.getByRole('combobox', { name: '选择区服', exact: true }).click();
+    const areaOption = page.locator('.p-select-option', { hasText: 'E2E-区服一' }).first();
+    await areaOption.waitFor({ state: 'visible', timeout: 10_000 });
+    await areaOption.click();
+    await page.waitForTimeout(1_000);
+  }
+
   for (const item of WALK_LEAVES) {
     try {
       await navigateByMenu(page, item.leaf, item.root);
@@ -128,12 +149,12 @@ test('d 全页面请求不含旧作用域字段且区服请求携带 serverId', 
     || (record.body !== undefined && /tenantid|appid|gameappid/i.test(record.body)));
   expect(offenders, `旧作用域字段不得出现在任何请求 URL/body：${JSON.stringify(offenders.slice(0, 5))}`).toHaveLength(0);
 
-  const serverRequests = captured.filter(record => /\/api\/(gameArea|gameAreaProvision|onlineServer)/i.test(record.url));
-  const withServerId = serverRequests.filter(record => /serverid/i.test(record.url) || /serverid/i.test(record.body ?? ''));
-  test.info().annotations.push({ type: 'c406-d', description: `captured=${captured.length} serverRequests=${serverRequests.length} withServerId=${withServerId.length}` });
+  // 区服作用域契约：Online 区服维度查询显式携带 serverId（不再有租户/应用字段）
+  const scopedRequests = captured.filter(record => /"serverId"\s*:/.test(record.body ?? '') || /serverid=/i.test(record.url));
+  test.info().annotations.push({ type: 'c406-d', description: `captured=${captured.length} serverScoped=${scopedRequests.length}` });
   await shot(page, 'c406-d-wire-hygiene');
 
-  expect(withServerId.length, '区服作用域请求（开服向导执行）应携带 serverId').toBeGreaterThan(0);
+  expect(scopedRequests.length, '区服作用域查询应携带 serverId').toBeGreaterThan(0);
 });
 
 // —— (e) 日志与审计页没有 TenantId 列并且有数据行 ——
@@ -177,7 +198,17 @@ test('f 支付配置回调地址为单 packageId 形态', async ({ page, context
   const channelOption = page.locator('.p-select-option:visible').first();
   await channelOption.waitFor({ state: 'visible', timeout: 8_000 });
   await channelOption.click();
-  await page.waitForTimeout(600);
+  await page.waitForTimeout(800);
+  // 渠道 schema 的必填字段（各渠道不同）逐个补齐，否则表单校验拦截提交
+  const requiredInputs = paymentDialog.locator('input[type="text"]:visible');
+  const requiredCount = await requiredInputs.count();
+  for (let index = 0; index < requiredCount; index += 1) {
+    const input = requiredInputs.nth(index);
+    if (!(await input.inputValue())) {
+      await input.fill('E2E_PAYMENT_FIXTURE');
+    }
+  }
+  await page.waitForTimeout(300);
   await page.screenshot({ path: test.info().outputPath('c406-f-payment-dialog.png') });
   await page.locator('.p-dialog-footer button', { hasText: '确定' }).first().click();
   await expect(paymentDialog).toBeHidden({ timeout: 20_000 });
