@@ -59,22 +59,22 @@ public enum OnlineErrorCode
     [ErrorText("Online 会话无效或未授权", "Online session invalid or unauthorized")]
     SessionInvalid = 32100003,
 
-    // ---- 段 322：镜像 vault 3xxx 租户、App、Server 作用域 ----
+    // ---- 段 322：镜像 vault 3xxx 作用域（游戏服单键化后仅剩区服位，CrossDenied/CrossAppDenied 为保留位，不再产生） ----
 
     /// <summary>
-    /// Online 作用域越界拒绝（跨租户 / 跨 App / 跨服，镜像 3xxx；VC-1.6/1.7 Admin 半边拒绝码）
+    /// Online 作用域越界拒绝（不归属更具体作用域错误的兜底拒绝，镜像 3xxx）
     /// </summary>
     [ErrorText("Online 作用域越界，请求被拒绝", "Online scope violation, request denied")]
     ScopeDenied = 32200001,
 
     /// <summary>
-    /// Online 跨租户请求被拒绝（镜像 3xxx）
+    /// Online 跨租户请求被拒绝（保留位：游戏服单键化后作用域无租户位，本码不再产生；数值与文案契约锁定不动，镜像 3xxx）
     /// </summary>
     [ErrorText("Online 跨租户请求被拒绝", "Online cross-tenant request denied")]
     CrossDenied = 32200002,
 
     /// <summary>
-    /// Online 跨 App 请求被拒绝（镜像 3xxx）
+    /// Online 跨 App 请求被拒绝（保留位：游戏服单键化后作用域无 App 位，本码不再产生；数值与文案契约锁定不动，镜像 3xxx）
     /// </summary>
     [ErrorText("Online 跨 App 请求被拒绝", "Online cross-app request denied")]
     CrossAppDenied = 32200003,
@@ -86,7 +86,7 @@ public enum OnlineErrorCode
     ServerScopeDenied = 32200004,
 
     /// <summary>
-    /// Online 作用域缺失（Business/App/Server 未提供，镜像 3xxx）
+    /// Online 作用域缺失（ServerId 未提供且无法从鉴权上下文补齐，镜像 3xxx）
     /// </summary>
     [ErrorText("Online 作用域缺失", "Online scope missing")]
     ScopeMissing = 32200005,
