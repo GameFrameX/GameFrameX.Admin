@@ -82,7 +82,7 @@ pnpm install
 pnpm run dev    # デフォルト http://localhost:20800（hash ルーティング）
 ```
 
-ブラウザを開く → ログインページが表示される → アカウント `admin` / パスワード `123456` / テナント `1300000000001`（初回起動時に SqlSugar Code-First が自動でテーブル作成 + シードデータ投入を行います）。
+ブラウザを開く → ログインページが表示される → アカウント `admin` / パスワード `123456`（初回起動時に SqlSugar Code-First が自動でテーブル作成 + シードデータ投入を行います）。
 
 ### コマンド 1 つでフルスタック（リポジトリルートの統一 compose）
 
@@ -102,7 +102,7 @@ Compose には PostgreSQL + 3 つのホスト（20802/20806/20808）+ Admin フ�
 |---|---|
 | インディ / 小規模チームのゲームで、動く運営管理画面が必要 | すでに完全な管理画面があり、その中の一部のモジュールだけ欲しい |
 | 複数の接続先（管理 / クライアント / 外部システム）で明確な境界が必要 | 単一用途のシンプルな管理画面（Admin.NET / vue-next-admin を直接使う方が軽量） |
-| マルチテナント SaaS 化したゲームサービス | 単一テナントの自社運営で外部公開の予定がない |
+| 単一ゲームの自社運営（サーバー区 / プレイヤー / 課金 / クライアント配信の一体型） | 複数ゲームの一元運営や SaaS 型マルチテナント化 |
 | .NET + SqlSugar の技術スタックが必須 | チームが Java / Go / Node しか経験していない |
 | 多言語（5 言語 i18n）+ AI Agent フレンドリーなリポジトリが必要 | — |
 | マイクロサービスへ進化できるモノリスとして始めたい | — |
@@ -131,25 +131,18 @@ Compose には PostgreSQL + 3 つのホスト（20802/20806/20808）+ Admin フ�
 
 > **URL に `Service` 接尾辞を含めることは厳禁**。新人が 100% 踏む落とし穴です。フロントエンドはこの規約に基づいて呼び出しコードを生成するため、クラス名が変わるとフロントが全面的に壊れます。
 
-## マルチテナント + アプリケーションスコープ
+## アイデンティティとスコープ
 
-3 層モデル、外側から内側へ：
+単一ゲームの管理バックエンドで、2 系統のアイデンティティ（ユーザーテーブルは別々、ログイン検索順序は固定）：
 
-```
-SuperAdmin（プラットフォーム級）── グローバル設定・テナント横断クエリが可能
-    ↓
-Tenant テナント（マルチテナント SaaS 化）── アプリ横断で共有
-    ↓
-App アプリ（テナント配下の個別ゲーム / 製品）── AppId スコープ
-```
+| アイデンティティ | 説明 |
+|---|---|
+| SuperAdmin（プラットフォーム管理者） | システムレベルのアイデンティティ。グローバル設定とシステム管理を担当し、初回インストールウィザードで作成 |
+| 管理者 | 日常運用のアイデンティティ。ロール権限が機能を制御し、サーバー区スコープが業務データ範囲を制御 |
 
-| Scope | 意味 | ルーティング例 |
-|---|---|---|
-| `platform` | プラットフォーム級（SuperAdmin のみ表示、テナント横断） | `/platform/*` |
-| `tenant` | テナント級（すべてのアプリで共通、appId query なし） | `/dashboard/*`、`/system/*` |
-| `app` | アプリワークベンチ内（`appId` query が必須） | `/gameCenter/*` |
-
-マルチテナントとデータベースの境界はエンティティ属性で自動的に有効になります：`[Tenant]` は `TenantId` フィルタ + ソフトデリートを自動付与、`[SystemTable]` はメイン DB へ、`[LogTable]` はログ DB へルーティング、属性なしは JWT の `TenantId` でルーティングします。詳細は [バックエンド README · リポジトリとマルチデータベースルーティング](GameFrameX.Admin.Unified.Api/README.ja.md#リポジトリとマルチデータベースルーティング) を参照してください。
+- `ServerId` が唯一の運用スコープです。バックエンドとゲームサーバーの通信・照会・書き込み・コールバック契約はテナントやアプリのアイデンティティに依存しません。
+- DB は単一メイン DB：プラットフォームテーブルは `system_` プレフィックス、グローバル定義テーブルは `global_`、業務テーブルはプレフィックスなし。テナント DB やテナント / アプリ単位のルーティングは存在しません。
+- 公開コールバック（決済 / 広告 / WebShop）の URL は `{packageId}` 形式のみ。テナント / アプリ区分を含む旧 URL は 404 になり、互換解析も提供しません。
 
 ## 30 の機能モジュール
 
@@ -159,19 +152,16 @@ App アプリ（テナント配下の個別ゲーム / 製品）── AppId ス
 
 | モジュール | 内容 |
 |---|---|
-| ユーザー管理 | テナントユーザー / システム管理者の管理。ユーザーに役職・組織・ロール・データ権限をバインド可能 |
-| 組織管理 | 多階層ツリー型の組織構造 |
-| 職位管理 | ユーザーの役職タグ |
+| ユーザー管理 | 管理者アカウントの管理。ロール・データ権限をバインド可能 |
 | メニュー管理 | ディレクトリ / メニュー / ボタンの 3 段階権限 |
 | ロール管理 | ロールへのメニュー + データ権限範囲のバインド |
-| 辞書管理 | グローバル / テナントの 2 階層辞書 |
+| 辞書管理 | グローバル辞書 |
 | オープン認証 | AccessKey / Secret + HMAC 署名認証（外部 API） |
 
 **プラットフォーム設定（SuperAdmin のみ表示）**
 
 | モジュール | 内容 |
 |---|---|
-| プラットフォームテナント管理 | テナント CRUD、テナント DB の自動開設 / 停止 / 有効期限 |
 | グローバルプラットフォーム / 言語 / チャネル定義 | プラットフォーム級の列挙型と多言語ベースライン |
 | システム設定 | キー・バリュー。高頻度の設定はメイン DB の `SystemConfig` に移管（JWT / パスワードポリシー / 画像 CAPTCHA） |
 | データベース管理 | テーブル / カラム CRUD、DB スキーマのオンライン管理 |
@@ -200,7 +190,7 @@ App アプリ（テナント配下の個別ゲーム / 製品）── AppId ス
 | アイテム / 商品 | アイテムカタログ、消耗品 / 永久品の管理 |
 | お知らせ / バナー | ゲーム内 + ログイン後のお知らせ |
 | アプリバージョン / リソースパック | アプリバージョン + 強制アップデート + リソースパックのバージョンと履歴ロールバック |
-| アプリスコープ設定 | リモートパラメータ、アプリ検証、クライアント KV |
+| アプリ設定 | リモートパラメータ、アプリ検証、クライアント KV |
 | メール運用 | テンプレート + Campaign + 多言語 |
 | 広告コールバック | TopOn / AdMob / UnityAds のマルチプロバイダ |
 | ゲームサーバ連携 | プレイヤー登録 / ログイン / 注文コールバック |
@@ -218,7 +208,6 @@ App アプリ（テナント配下の個別ゲーム / 製品）── AppId ス
 
 - **バックエンド駆動メニュー**：メニュー、権限、文言はすべてバックエンドで制御します。フロント側にメニューは書かず、追加はバックエンドのメニュー管理で行います。フロントはバックエンドが返すメニューツリーの描画だけを担当します。
 - **JWT 自動更新**：ログインで受け取った token の期限切れ前に自動で `X-Authorization` を付与し、バックエンドが黙って再発行します。一度ログインすれば長期間そのまま使えます。
-- **アプリケーションスコープ**：ルートの `meta.appScope` + `meta.menuContext` で platform / tenant / app の 3 スコープを指定し、フロントはスコープに応じてメニューの表示を判定します。
 - **i18n 完全性ゲート**：`pnpm run lint:i18n` が 5 言語のキー完全性をチェックします。1 つでも欠ければ即 fail です。
 
 ## セキュリティベースライン
@@ -229,7 +218,7 @@ App アプリ（テナント配下の個別ゲーム / 製品）── AppId ス
 |---|---|
 | 弱いパスワード | プロジェクト全体で **Argon2id** に統一（C214 システムユーザー / C215 プレイヤー）。旧 PBKDF2 は `AppSecretHasher` のみ保持（高エントロピー乱数キーのユースケースで、Argon2id は不要） |
 | SQL インジェクション | SqlSugar の完全パラメータ化。文字列連結なし |
-| 権限超過アクセス | マルチテナントフィルタ + ソフトデリートフィルタ。SuperAdmin はバイパスするが Hub API は SuperAdmin を拒否 |
+| 権限超過アクセス | ソフトデリートフィルタ + ロール権限 / サーバー区スコープ。SuperAdmin は権限チェックをバイパスするが Hub API は SuperAdmin を拒否 |
 | リプレイ攻撃 | HMAC 署名 + nonce キャッシュ + 5 分の時刻ずれ許容 |
 | 情報漏えい | Response DTO には必ず Id/RowVersion/CreatedTime を含める。機密フィールド（パスワードハッシュ / AccessSecret）のあらゆる Response への出現は**禁止**。契約テストで担保 |
 | API 変更の回帰 | `ThreeHostApiRoutingContractTests` + `AdminEndpointReturnContractTests` + `AdminActionStyleContractTests` + `NamingAbbreviationGuardTests` で回帰を防止 |
@@ -238,8 +227,8 @@ App アプリ（テナント配下の個別ゲーム / 製品）── AppId ス
 
 **デフォルトはゼロ設定**：ローカルでソースを直接実行する場合はデフォルトで SQLite（リポジトリルートの `db/` 配下）。本番では PostgreSQL（MySQL / Oracle など合計 34 種の DbType もサポート）。`GameFrameX.Application/Configuration/Database.json` が接続文字列の唯一の情報源です（3 ホストで共有、1 箇所変更すれば 3 ホストに反映）。
 
-- メイン DB / テナント DB / ログ DB はエンティティ属性で自動ルーティング（前述のマルチテナント節を参照）。
-- テナント DB の自動作成：テナント ID に応じて `gameframex_admin_tenant_<TenantId>` を生成。接続文字列の手入力は不要。デフォルトテナント DB も同様に自動推論されます。
+- 単一メイン DB モデル：3 ホストが 1 つのメイン DB を共有し、エンティティの帰属は境界ルールで決まります（前述の「アイデンティティとスコープ」を参照）。
+- 2.0 は破壊的リリースです。旧 DB のアップグレードやデータ移行は提供せず、旧テナント構造（例：`tenant_` プレフィックスのテーブル）を検出すると起動が即失敗します。新規 DB の初期化、またはリリース前のバックアップ全体ロールバックのみサポートします。
 - DB 切り替え時の接続文字列の書き方は [`Database-ConnectionStrings.md`](GameFrameX.Admin.Unified.Api/GameFrameX.Application/Configuration/Database-ConnectionStrings.md) を参照。環境変数のペアオーバーライド（`GFX_MAIN_DB_TYPE` + `GFX_MAIN_DB_CONNECTION_STRING`）などのデプロイ詳細は [バックエンド README · データベース](GameFrameX.Admin.Unified.Api/README.ja.md#データベースデフォルトはゼロ設定本番は-postgresql) を参照してください。
 
 > SQLite はローカル開発専用です。本番での使用は禁止。並行書き込みが弱く、独立したサービスプロセスがなく、バックアップ・復旧や運用監視の能力が不足しているためです。
@@ -295,12 +284,11 @@ CI ゲート（回帰防止）：
 ![キャッシュ管理](doc/img/8.png)
 ![オープン API](doc/img/11.png)
 ![CAPTCHA 設定](doc/img/12.png)
-![テナント管理](doc/img/13.png)
 ![テーブル管理](doc/img/14.png)
 
 ### アプリワークベンチのコア機能（中国語・英語対照）
 
-テナントのアプリワークベンチに入ってからの 5 つのコア機能ページ。同じページが中国語 / 英語のインターフェース言語でどう表示されるか（右上の言語スイッチャーでリアルタイムに切替、リロード不要）：
+ログイン後に表示される 5 つのコア運用ページ。同じページが中国語 / 英語のインターフェース言語でどう表示されるか（右上の言語スイッチャーでリアルタイムに切替、リロード不要）：
 
 | 機能 | 簡体中文 | English |
 |------|----------|---------|
@@ -367,7 +355,7 @@ flowchart TB
 |------|------|------|------|
 | [Unity](https://github.com/GameFrameX/GameFrameX.Unity) | Unity クライアントプロジェクト：GameFrameX UPM レジストリから 90+ のフレームワークパッケージを必要に応じて導入、HybridCLR によるホットアップデート、ログイン・バッグ・ルームのサンプル付き | Unity 2019.4.40+, HybridCLR, YooAsset, FairyGUI, UniTask | Protobuf / Config / FairyGUIProject の成果物を利用；TCP 29100 + HTTP 28080 で Server、HTTP 20808 で Admin Client API に接続 |
 | [Server](https://github.com/GameFrameX/GameFrameX.Server) | Actor モデルのゲームサーバー：永続化状態の Apps 層とホットアップデート可能な Hotfix ロジック層を厳密に分離、単一／マルチプロセス構成に対応 | .NET 10, MongoDB, Docker | TCP 29100 / WebSocket 29110 / HTTP 28080 で待ち受け；Admin 向けにメール・アイテム付与・プレイヤー管理などの HTTP 管理 API を提供 |
-| [Admin](https://github.com/GameFrameX/GameFrameX.Admin) | マルチテナント運営バックエンド：Admin（20802）/ Client（20808）/ Hub（20806）の 3 ホスト + Vue 管理画面。サーバー区、お知らせ、メール、注文・決済、リモート設定、ライブ運営をカバー | .NET 10, SqlSugar, PostgreSQL, Vue 3.5, PrimeVue | サーバー区ごとの `HttpManageUrl` で Server を呼び出し；Client API がゲームクライアントにグローバル情報・ログイン・決済コールバックを提供 |
+| [Admin](https://github.com/GameFrameX/GameFrameX.Admin) | 単一ゲーム運営バックエンド：Admin（20802）/ Client（20808）/ Hub（20806）の 3 ホスト + Vue 管理画面。サーバー区、お知らせ、メール、注文・決済、リモート設定、ライブ運営をカバー | .NET 10, SqlSugar, PostgreSQL, Vue 3.5, PrimeVue | サーバー区ごとの `HttpManageUrl` で Server を呼び出し；Client API がゲームクライアントにグローバル情報・ログイン・決済コールバックを提供 |
 | [luban](https://github.com/GameFrameX/luban) | Luban 設定ツールの GameFrameX フォーク：公式 v5.1.0 をマージし、`gameframex` テーブルインポーターと `cs-dotnet-json` / `cs-dotnet-bin` などの生成ターゲットを追加 | .NET 10, Scriban | Luban の tar.gz と Docker イメージを公開；毎日 Config の `Tools/` に同期 |
 | [Config](https://github.com/GameFrameX/GameFrameX.Config) | 設定テーブルリポジトリ：Excel データ表 + スキーマ + ローカライズ表。スクリプト一つでクライアント・サーバーのコードとデータを生成 | Excel, Luban | `gen-client-*` → Unity; `gen-server-json` → Server; `gen-server-bin` → Server.Source; `gen-godot-json` / `gen-cocos-json` / `gen-laya-json` → Godot / CocosCreator / LayaBox |
 | [Protobuf](https://github.com/GameFrameX/GameFrameX.Protobuf) | 統一ネットワークプロトコル定義：proto3。ファイル名の数値モジュール ID ごとにメッセージとエラーコードを整理（正数＝クライアント↔サーバー、負数＝サーバー内部） | proto3 | `Proto2CsExport_Server` → Server; `Proto2CsExport_Client` → Unity; `Proto2CsExport_Godot` / `Proto2TsExport_CocosCreator` / `Proto2TsExport_LayaBox` → 他のクライアント；push ごとに CI が 6 言語の Release を公開 |
