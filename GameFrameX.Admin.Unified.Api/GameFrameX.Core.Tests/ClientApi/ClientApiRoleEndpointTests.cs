@@ -179,26 +179,34 @@ public sealed class ClientApiRoleEndpointTests
     }
 
     [Fact]
-    public async Task GameRole_Login_RejectsBodyContextOverrideFields()
+    public async Task GameRole_Login_IgnoresUnknownLegacyContextFields()
     {
         using var db = new ClientApiTestDb();
-        var controller = CreateController(db);
+        db.SeedUser(1001, "legacy-fields-user");
+        db.SeedAreaClassify(10);
+        db.SeedArea(2001, 10);
+        db.SeedRole(3001, 1001, 2001);
+        db.InitTenantTables(typeof(TenantGameUserEntity));
+        var issuer = new ClientApiTokenIssuer(FakeOptionsProvider.WithTokenPolicy("unit-test-signing-key", 60));
+        var accessToken = await issuer.IssueAsync(await db.TenantDb.Queryable<TenantGameUserEntity>().FirstAsync(u => u.Id == 1001), "Guest");
+        var controller = CreateController(db, ClientApiRecordingHttpHandler.WithGameServerDefaults(), issuer);
         db.AttachContext(controller);
 
         var result = await controller.Login(new GamePlayerLoginRequest
         {
             PlayerId = 3001,
             AreaId = 2001,
-            AccessToken = "token",
+            AccessToken = accessToken.Token,
             ExtraFields = new Dictionary<string, JsonElement>
             {
                 ["tenantId"] = JsonDocument.Parse("10").RootElement.Clone(),
+                ["appId"] = JsonDocument.Parse("20").RootElement.Clone(),
+                ["gameAppId"] = JsonDocument.Parse("30").RootElement.Clone(),
             },
         });
 
         var root = ClientApiResultReader.Read(result);
-        Assert.Equal((int)AuthErrorCode.AuthorizeInvalid, ClientApiResultReader.Code(root));
-        Assert.Equal("请求体不能包含租户、应用或账号上下文字段", ClientApiResultReader.Message(root));
+        Assert.Equal(0, ClientApiResultReader.Code(root));
     }
 
     [Fact]

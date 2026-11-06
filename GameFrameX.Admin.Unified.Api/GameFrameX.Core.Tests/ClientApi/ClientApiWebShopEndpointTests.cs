@@ -62,7 +62,7 @@ public sealed class ClientApiWebShopEndpointTests
     }
 
     [Fact]
-    public async Task GameWebShop_Buy_NormalizesLegacyThreeSegmentCallbackUrl()
+    public async Task GameWebShop_Buy_RejectsLegacyThreeSegmentCallbackUrl()
     {
         using var db = new ClientApiTestDb();
         db.SeedAreaClassify(10);
@@ -83,11 +83,9 @@ public sealed class ClientApiWebShopEndpointTests
         });
 
         var root = ClientApiResultReader.Read(result);
-        Assert.Equal(0, ClientApiResultReader.Code(root));
-        // 旧「回调/租户/应用/分包」三段地址被去段重建，只保留新路由 + 当前分包段
-        Assert.Contains(handler.RequestBodies, requestBody => requestBody.Contains("NotifyWebShop%2F7001", StringComparison.Ordinal));
-        Assert.DoesNotContain(handler.RequestBodies, requestBody => requestBody.Contains("NotifyWebShop%2F123", StringComparison.Ordinal));
-        Assert.DoesNotContain(handler.RequestBodies, requestBody => requestBody.Contains("NotifyWebShop%2F456", StringComparison.Ordinal));
+        Assert.Equal((int)AreaErrorCode.AreaCannotBuy, ClientApiResultReader.Code(root));
+        // 旧三段地址不再去段重建：下单前拒绝，不提交网关
+        Assert.DoesNotContain("/submit.php", handler.RequestPaths);
     }
 
     [Fact]

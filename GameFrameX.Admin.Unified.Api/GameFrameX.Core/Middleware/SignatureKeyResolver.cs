@@ -8,11 +8,11 @@ namespace GameFrameX.Core.Middleware;
 /// </summary>
 public sealed class SignatureKeyResolver : ISignatureKeyResolver
 {
-    private readonly ISqlSugarClient _tenantDbProvider;
+    private readonly ISqlSugarClient _database;
 
-    public SignatureKeyResolver(ISqlSugarClient tenantDbProvider)
+    public SignatureKeyResolver(ISqlSugarClient database)
     {
-        _tenantDbProvider = tenantDbProvider;
+        _database = database;
     }
 
     /// <inheritdoc />
@@ -32,7 +32,7 @@ public sealed class SignatureKeyResolver : ISignatureKeyResolver
     public async Task<IReadOnlyList<SignatureKeyMaterial>> GetActiveKeysAsync()
     {
         var now = TimerHelper.UnixTimeSeconds();
-        var keys = await _tenantDbProvider.Queryable<TenantAppSignatureKeyEntity>().ClearFilter()
+        var keys = await _database.Queryable<TenantAppSignatureKeyEntity>().ClearFilter()
             .Where(key => key.IsDeleted == false && key.IsEnabled == true
                 && (key.NotBeforeTime == null || key.NotBeforeTime <= now)
                 && (key.ExpireTime == null || key.ExpireTime > now)).ToListAsync();
@@ -71,7 +71,7 @@ public sealed class SignatureKeyResolver : ISignatureKeyResolver
     private async Task<TenantAppSignatureKeyEntity?> GetKeyAsync(string kid)
     {
         // 元数据不缓存，跨宿主轮换、同秒撤销、删除与租约修改在下一请求立即生效。
-        return await _tenantDbProvider.Queryable<TenantAppSignatureKeyEntity>().ClearFilter()
+        return await _database.Queryable<TenantAppSignatureKeyEntity>().ClearFilter()
             .Where(key => key.Kid == kid && key.IsDeleted == false).FirstAsync();
     }
 

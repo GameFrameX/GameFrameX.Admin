@@ -222,11 +222,6 @@ public class GameRoleController : BaseController<TenantGameRoleEntity>
     [ProducesResponseType(200, Type = typeof(GameLoginTicketResponse))]
     public async Task<HttpJsonResultData<GameLoginTicketResponse>> Login([FromBody] GamePlayerLoginRequest input)
     {
-        if (HasForbiddenContextField(input))
-        {
-            return GameApiResult.Error<GameLoginTicketResponse>(AuthErrorCode.AuthorizeInvalid, "请求体不能包含租户、应用或账号上下文字段");
-        }
-
         var tokenValidation = await _clientApiTokenIssuer.ValidateAsync(input.AccessToken);
         if (!tokenValidation.IsValid)
         {
@@ -357,19 +352,6 @@ public class GameRoleController : BaseController<TenantGameRoleEntity>
         }
 
         return long.TryParse(item.ToString(), out value);
-    }
-
-    private static bool HasForbiddenContextField(GamePlayerLoginRequest input)
-    {
-        if (input.ExtraFields == null)
-        {
-            return false;
-        }
-
-        return input.ExtraFields.Keys.Any(k =>
-                                              string.Equals(k, "tenantId", StringComparison.OrdinalIgnoreCase) ||
-                                              string.Equals(k, "appId", StringComparison.OrdinalIgnoreCase) ||
-                                              string.Equals(k, "userId", StringComparison.OrdinalIgnoreCase));
     }
 
     private static string BuildRouteTarget(TenantGameAreaEntity area)

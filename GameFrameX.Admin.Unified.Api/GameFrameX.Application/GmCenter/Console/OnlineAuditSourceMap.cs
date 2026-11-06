@@ -45,7 +45,7 @@ public static class OnlineAuditSourceMap
     };
 
     /// <summary>
-    /// RequestParam JSON 中探测作用域的已知键（appId/serverId 双形态）。
+    /// RequestParam JSON 中探测区服作用域的已知键（serverId 双形态）。
     /// </summary>
     private static readonly string[] ScopeKeys = { "serverId", "ServerId", };
 
@@ -234,7 +234,7 @@ public static class OnlineAuditSourceMap
     }
 
     /// <summary>
-    /// 作用域数字键探测：先根层，miss 再下钻一层对象值（appId/serverId 常在 {"input":{...}} 包裹内，与目标键同形态）。
+    /// 区服数字键探测：先根层，miss 再下钻一层对象值（serverId 常在 {"input":{...}} 包裹内，与目标键同形态）。
     /// </summary>
     private static long? ProbeInt64Deep(JsonElement container, string camelKey, string pascalKey)
     {

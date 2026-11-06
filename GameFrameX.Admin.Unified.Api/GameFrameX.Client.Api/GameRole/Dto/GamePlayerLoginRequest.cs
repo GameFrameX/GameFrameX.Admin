@@ -45,7 +45,7 @@ public sealed class GamePlayerLoginRequest
     public string Platform { get; set; } = null!;
 
     /// <summary>
-    /// 未声明字段，用于拒绝历史上下文字段覆盖 Header 或 token claims。
+    /// 未声明字段；未知字段仅作为输入兼容数据保留，不参与上下文解析或出站载荷。
     /// </summary>
     [JsonExtensionData]
     public Dictionary<string, JsonElement> ExtraFields { get; set; } = null!;

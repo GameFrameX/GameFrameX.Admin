@@ -18,9 +18,9 @@ using SqlSugar;
 namespace GameFrameX.Core.Tests.System;
 
 /// <summary>
-/// SystemAuthService 端到端测试宿主（C217）：真实 SqlSugar 主库（superadmin seed）+ 租户库（tenant_user seed）+
+/// SystemAuthService 端到端测试宿主（C217）：真实 SqlSugar 主库（superadmin seed）+ 业务用户测试连接（tenant_user seed）+
 /// 手写 fake（3 接口）+ CurrentUserContext 真实 + SystemConfigService 真实（FakeCache）+ ICaptcha/IServiceProvider null!（captcha IsEnabled=false 路径不调用）。
-/// <para>C218 扩展：主库 + 租户库双连接 scope（configId=main/1001），FakeTenantDbConnectionProvider 返回租户 scope；</para>
+/// <para>C218 扩展：主库 + 业务测试连接双 scope（configId=main/1001）。</para>
 /// <para>DefaultHttpContext 供 CreateTokenAsync 写响应头；FakePlatformJwtTokenService 捕获 payload 供 Claim 校验。</para>
 /// </summary>
 internal sealed class AuthTestHost : IDisposable

@@ -14,7 +14,7 @@ namespace GameFrameX.Client.Api.Services.ClientApiTenantOptions;
 /// </summary>
 public sealed class ClientApiTenantOptionsProvider : IClientApiTenantOptionsProvider
 {
-    private readonly ISqlSugarClient _tenantDbProvider;
+    private readonly ISqlSugarClient _database;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
     private TenantClientApiPolicyEntity? _effectivePolicyRow;
@@ -22,7 +22,7 @@ public sealed class ClientApiTenantOptionsProvider : IClientApiTenantOptionsProv
 
     public ClientApiTenantOptionsProvider(ISqlSugarClient database, IHttpContextAccessor httpContextAccessor)
     {
-        _tenantDbProvider = database;
+        _database = database;
         _httpContextAccessor = httpContextAccessor;
     }
 
@@ -30,7 +30,7 @@ public sealed class ClientApiTenantOptionsProvider : IClientApiTenantOptionsProv
 #pragma warning disable CS8603 // 接口 IClientApiTenantOptionsProvider 签名非空（跨项目共享），但语义允许返回 null（未配置）；改返回类型会级联到测试 fake
     public async Task<TenantEmailOptions> GetEmailOptionsAsync()
     {
-        var db = _tenantDbProvider;
+        var db = _database;
         var entity = await TenantEmailConfigSelector.SelectAsync(db, 0);
         return entity == null
                    ? null
@@ -84,7 +84,7 @@ public sealed class ClientApiTenantOptionsProvider : IClientApiTenantOptionsProv
 
     private async Task<TenantAdvertisementCallbackConfigEntity?> PickAdvertisementCallbackConfigAsync()
     {
-        var db = _tenantDbProvider;
+        var db = _database;
         var provider = ResolvePublicCallbackProvider(_httpContextAccessor.HttpContext);
         var query = db.Queryable<TenantAdvertisementCallbackConfigEntity>()
                       .Where(c => c.IsEnabled == true);
@@ -151,7 +151,7 @@ public sealed class ClientApiTenantOptionsProvider : IClientApiTenantOptionsProv
     {
         if (!_effectivePolicyRowFetched)
         {
-            _effectivePolicyRow = await _tenantDbProvider.Queryable<TenantClientApiPolicyEntity>()
+            _effectivePolicyRow = await _database.Queryable<TenantClientApiPolicyEntity>()
                 .Where(c => c.IsEnabled == true)
                 .OrderByDescending(c => c.Id)
                 .FirstAsync();

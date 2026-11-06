@@ -21,7 +21,7 @@ public class GameHomeServiceTests : IDisposable
 
     private readonly string _dbPath = Path.Combine(Path.GetTempPath(), $"game_home_{Guid.NewGuid():N}.db");
     private readonly SqlSugarScope _db;
-    private readonly FakeTenantDbConnectionProvider _tenantDbProvider;
+    private readonly ISqlSugarClient _database;
 
     public GameHomeServiceTests()
     {
@@ -46,13 +46,13 @@ public class GameHomeServiceTests : IDisposable
         tenantScope.CodeFirst.InitTables<TenantGameOrderEntity>();
         tenantScope.CodeFirst.InitTables<TenantGameUserEntity>();
         tenantScope.CodeFirst.InitTables<TenantGameHomeOnlineSampleEntity>();
-        _tenantDbProvider = new FakeTenantDbConnectionProvider(_db, TenantConfigId);
+        _database = _db.GetConnectionScope(TenantConfigId);
     }
 
     private GameHomeService CreateService(HttpClient? httpClient = null)
     {
         var client = httpClient ?? new HttpClient(new StubHandler(_ => throw new InvalidOperationException("should not call")));
-        return new GameHomeService(new StubHttpClientFactory(client), _tenantDbProvider.Database);
+        return new GameHomeService(new StubHttpClientFactory(client), _database);
     }
 
 

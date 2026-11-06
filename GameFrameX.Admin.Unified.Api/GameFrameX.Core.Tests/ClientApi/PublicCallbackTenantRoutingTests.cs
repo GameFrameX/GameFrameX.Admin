@@ -107,7 +107,7 @@ public sealed class PublicCallbackTenantRoutingTests
     }
 
     [Fact]
-    public void PaymentProvider_NormalizesLegacyThreeSegmentCallbackUrl()
+    public void PaymentProvider_RejectsLegacyThreeSegmentCallbackUrl()
     {
         using (var fixture = CreateFixture())
         {
@@ -115,9 +115,9 @@ public sealed class PublicCallbackTenantRoutingTests
             var context = new DefaultHttpContext();
             var provider = new PaymentOptionSettingProvider(fixture.MainDb, new HttpContextAccessor { HttpContext = context });
             var setting = provider.GetOptionSetting<AliPayOptionSetting>("alipay");
-            // 旧「租户/应用/分包」三段地址去段重建为新路由（无分包上下文时不带分包段）
+            // 旧三段地址不再去段重建，避免静默兼容已退场的作用域路由
             Assert.NotNull(setting);
-            Assert.Equal("https://client.example.com/api/GameOrder/NotifyAliPay", setting.AliPayNotifyUrl);
+            Assert.Equal(string.Empty, setting.AliPayNotifyUrl);
         }
     }
 

@@ -1,8 +1,15 @@
 using GameFrameX.Client.Api.GameAnnouncement;
 using GameFrameX.Client.Api.GameUser;
+using GameFrameX.Client.Api.Integrations.Advertisement;
 using System.Reflection;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace GameFrameX.Core.Tests.ClientApi;
 
@@ -70,6 +77,32 @@ public sealed class ClientApiEndpointCoverageTests
 
         Assert.NotEmpty(loginEndpoints);
         Assert.All(loginEndpoints, endpoint => Assert.Contains("pascal-case", endpoint.FailureCases));
+    }
+
+    [Fact]
+    public async Task AdvertisementCallback_LegacyThreeSegmentRoute_ReturnsNotFound()
+    {
+        using var host = await new HostBuilder()
+                         .ConfigureWebHost(webBuilder =>
+                         {
+                             webBuilder.UseTestServer();
+                             webBuilder.ConfigureServices(services =>
+                             {
+                                 services.AddRouting();
+                                 services.AddControllers().AddApplicationPart(typeof(GameAdWebHookController).Assembly);
+                             });
+                             webBuilder.Configure(app =>
+                             {
+                                 app.UseRouting();
+                                 app.UseEndpoints(endpoints => endpoints.MapControllers());
+                             });
+                         })
+                         .StartAsync();
+
+        using var client = host.GetTestClient();
+        var response = await client.GetAsync("/api/GameAdWebHook/TopOnNotify/100/200/300");
+
+        Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
     private static IReadOnlyDictionary<string, DiscoveredEndpoint> DiscoverClientApiActions()
