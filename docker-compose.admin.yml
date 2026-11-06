@@ -6,7 +6,7 @@ x-main-db: &main-db
   GFX_MAIN_DB_TYPE: PostgreSQL
   # POSTGRES_PORT is the host-published port; service-to-service traffic always uses pg:5432.
   GFX_MAIN_DB_CONNECTION_STRING: "Host=${POSTGRES_HOST:-pg};Port=5432;Database=gameframex_admin;Username=${POSTGRES_USER:-gameframex};Password=${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}"
-  GFX_TENANT_SECRET_ENC_KEY: ${GFX_TENANT_SECRET_ENC_KEY:-}
+  GAMEFRAMEX_SECRET_ENCRYPTION_KEY: ${GAMEFRAMEX_SECRET_ENCRYPTION_KEY:-}
 
 x-grafana-otel: &grafana-otel
   OpenTelemetry__Endpoint: "${OTEL_ENDPOINT:-}"
