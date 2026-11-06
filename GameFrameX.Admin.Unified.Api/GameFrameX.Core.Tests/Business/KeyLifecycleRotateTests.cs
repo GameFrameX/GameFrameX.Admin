@@ -180,7 +180,7 @@ public sealed class KeyLifecycleRotateTests : IDisposable
 
     /// <summary>
     /// 审计调用意图守护（T3）：DB 操作日志管线断链期，两个新 Rotate 端点必须保留 [KeyAudit] 结构化审计行
-    /// （含操作人/租户/应用/目标），管线修复后统一接入 DB 审计。删除审计行即失败。
+    /// （含操作人/目标键），管线修复后统一接入 DB 审计。删除审计行即失败。
     /// </summary>
     [Fact]
     public void RotateEndpoints_EmitKeyAuditLogLines()

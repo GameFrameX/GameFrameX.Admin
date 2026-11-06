@@ -6,7 +6,7 @@ using GameFrameX.Entity.Business.Game;
 namespace GameFrameX.Core.Tests.ClientApi;
 
 /// <summary>
-/// C7 登录会话密钥签发：kid/secret 契约、租约落库、同应用过期行懒清理（SQLite 租户库，复用 ClientApiTestDb 模式）。
+/// C7 登录会话密钥签发：kid/secret 契约、租约落库、同应用过期行懒清理（SQLite 测试库，复用 ClientApiTestDb 模式）。
 /// </summary>
 public sealed class ClientApiSessionKeyIssuerTests
 {

@@ -10,7 +10,7 @@ using GameFrameX.Foundation.Utility;
 namespace GameFrameX.Core.Tests.FoundationIdempotency;
 
 /// <summary>
-/// 业务表即 Store 的 Foundation 接口契约测试（真实 SQLite 租户库）：
+/// 业务表即 Store 的 Foundation 接口契约测试（真实 SQLite 测试库）：
 /// 反作弊事件表（插入即占位即执行）与广告奖励账本表（claim Pending → 落定），
 /// 验证各站点独立规则下的 <see cref="IIdempotencyStore"/> 硬性契约——并发恰一（唯一索引仲裁）、
 /// 法定覆盖（仅广告账本 Failed 可重试复用）、状态映射回放、落定缺失抛错。仲裁语义被破坏时测试红。

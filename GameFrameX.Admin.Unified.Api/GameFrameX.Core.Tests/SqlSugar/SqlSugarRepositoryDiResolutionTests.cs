@@ -33,7 +33,7 @@ public sealed class SqlSugarRepositoryDiResolutionTests : IDisposable
     }
 
     /// <summary>
-    /// DI 解析平台表仓储：无租户上下文（superadmin 语义）下不抛异常，Context 路由主库且查询可用。
+    /// DI 解析平台表仓储：无作用域上下文（superadmin 语义）下不抛异常，Context 路由主库且查询可用。
     /// 对应 AddAsync 中 adminAccount 查重的修复路径。
     /// </summary>
     [Fact]

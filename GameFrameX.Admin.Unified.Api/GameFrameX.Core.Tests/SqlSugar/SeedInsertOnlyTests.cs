@@ -131,7 +131,7 @@ public class SeedInsertOnlyTests : IDisposable
                     .Where(u => u.Id == 99001)
                     .ExecuteCommand();
 
-            // 二次 seed（如默认租户库重复初始化）：同名主键行不再覆盖
+            // 二次 seed（如同一库重复初始化）：同名主键行不再覆盖
             var seedAgain = new RoleEntity { Id = 99001, Name = "seed 新值", Code = "init_role", };
             DefaultDatabaseSeeder.Upsert(db, new[] { seedAgain, });
 

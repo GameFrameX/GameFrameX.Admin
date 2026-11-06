@@ -10,8 +10,8 @@ namespace GameFrameX.Core.Tests.GameBusiness;
 /// <summary>
 /// C345 活动/功能开关投放解析器测试。
 /// <para>覆盖：winner 作用域评分与 tie-break、时间窗边界（左闭右开）、消费方过滤、设备灰度与白名单旁路、
-/// 租户默认层与应用覆盖同键合并、版本号决定性（行序无关 / 字段敏感 / 灰度无关），
-/// 以及候选查询的应用作用域收口（跨应用不泄漏）。</para>
+/// 默认层与覆盖层同键合并、版本号决定性（行序无关 / 字段敏感 / 灰度无关），
+/// 以及候选查询的作用域收口（跨作用域不泄漏）。</para>
 /// </summary>
 public sealed class FeatureSwitchDeliveryResolverTests : IDisposable
 {

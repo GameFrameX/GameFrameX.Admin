@@ -189,7 +189,7 @@ public sealed class OnlinePenaltyLinkCommandServiceTests : IDisposable
     }
 
     /// <summary>
-    /// 处罚行不存在：RecordNotFound（不区分跨租户与不存在，作用域语义统一）。
+    /// 处罚行不存在：RecordNotFound（不区分越界与不存在，作用域语义统一）。
     /// </summary>
     [Fact]
     public async Task ExecuteLinkAsync_RejectsMissingPenalty()

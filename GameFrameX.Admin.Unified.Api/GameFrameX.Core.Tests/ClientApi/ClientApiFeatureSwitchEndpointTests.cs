@@ -12,7 +12,7 @@ namespace GameFrameX.Core.Tests.ClientApi;
 /// C347 活动/功能开关客户端通道（GameFeatureSwitchController）端点级测试。
 /// <para>覆盖：版本协议三态（首拉全量 / 同版本 Unchanged 短路 / 变更后全量）、消费方过滤（server 行不下发）、
 /// 时间窗外不下发、设备灰度三分支（未命中 / 白名单旁路 / 缺 DeviceId 仅全量命中）、
-/// 无租户 / 应用上下文时主库读取与 PascalCase wire 契约。</para>
+/// 无作用域上下文时主库读取与 PascalCase wire 契约。</para>
 /// </summary>
 public sealed class ClientApiFeatureSwitchEndpointTests
 {
@@ -234,7 +234,7 @@ public sealed class ClientApiFeatureSwitchEndpointTests
     }
 
     /// <summary>
-    /// 无租户上下文仍从主库读取有效开关。
+    /// 无作用域上下文仍从主库读取有效开关。
     /// </summary>
     [Fact]
     public async Task GetInfo_WithoutRequestContext_ReadsMainDatabase()

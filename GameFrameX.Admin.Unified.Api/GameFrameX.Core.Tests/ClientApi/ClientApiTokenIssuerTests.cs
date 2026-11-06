@@ -36,7 +36,7 @@ public class ClientApiTokenIssuerTests
     [Fact]
     public async Task AccessToken_MissingSigningKey_RejectsValidation()
     {
-        // 租户未配置 SigningKey 时，禁止回落到进程级或全局密钥，任何令牌都校验失败
+        // 平台未配置 SigningKey 时，禁止回落到进程级或全局密钥，任何令牌都校验失败
         var provider = FakeOptionsProvider.WithoutTokenPolicy();
         var issuer = new ClientApiTokenIssuer(provider);
 
@@ -55,7 +55,7 @@ public class ClientApiTokenIssuerTests
         var ticket = await ticketIssuer.IssueAsync(new GameLoginTicketIssueContext(30, 40, 50, "wss://game.example.test:9443"));
         var jwt = new JsonWebToken(ticket.Ticket);
 
-        // issuer / audience 固定为平台默认，不读取租户配置
+        // issuer / audience 固定为平台默认，不读取分库差异化配置
         Assert.Equal(ClientApiPlatformDefaults.GameLoginTicketIssuer, jwt.Issuer);
         Assert.Equal(ClientApiPlatformDefaults.GameLoginTicketAudience, jwt.Audiences.Single());
         Assert.Equal(keyResolver.Kid, jwt.Kid);
@@ -71,7 +71,7 @@ public class ClientApiTokenIssuerTests
     [Fact]
     public async Task GameLoginTicket_ExpireTimeReadsPolicyValue()
     {
-        // 票据 exp 直接取自租户票据策略的固定到期时间（Unix 秒）
+        // 票据 exp 直接取自平台票据策略的固定到期时间（Unix 秒）
         var expireAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds() + 120;
         var provider = FakeOptionsProvider.WithTicketPolicy(expireAt);
         var keyResolver = TestGameLoginTicketKeyResolver.Create();

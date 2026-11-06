@@ -86,7 +86,7 @@ internal sealed class FakeOptionsProvider : IClientApiOptionsProvider
 
     public static FakeOptionsProvider WithoutEmailOptions()
     {
-#pragma warning disable CS8625 // 测试桩：模拟租户未配置邮件选项，接口契约允许返回 null
+#pragma warning disable CS8625 // 测试桩：模拟未配置邮件选项，接口契约允许返回 null
         return new FakeOptionsProvider { _emailOptions = null, };
 #pragma warning restore CS8625
     }

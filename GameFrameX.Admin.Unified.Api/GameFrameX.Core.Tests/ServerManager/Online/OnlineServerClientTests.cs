@@ -39,7 +39,7 @@ public sealed class OnlineServerClientTests : IDisposable
         // 专属 ConfigId（C339）：SqlSugar 实体信息（含表名映射）按连接配置静态缓存且进程级共享；
         // 不设 ConfigId 会与裸配置 fixture（AdvancedQueryAreaFilterTests / GameOrderShipServiceTests，
         // PascalCase 表名）互抢默认缓存键，后到者 InitTables no-op → insert 报 no such table
-        //（AdvancedQueryAreaFilterTests ctor 注释记录的同类坑，ClientApi/Home 系靠租户 ConfigId 天然隔离）。
+        //（AdvancedQueryAreaFilterTests ctor 注释记录的同类坑，ClientApi/Home 系靠独立 ConfigId 天然隔离）。
         // 专属键经 List 构造保留 ConfigId（同 ISqlSugarClient 范式），静态缓存彻底隔离。
         var config = new ConnectionConfig
         {

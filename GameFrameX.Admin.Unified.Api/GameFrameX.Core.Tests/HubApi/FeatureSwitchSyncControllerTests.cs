@@ -183,7 +183,7 @@ public sealed class FeatureSwitchSyncControllerTests : IDisposable
     }
 
     /// <summary>
-    /// 不需要遗留租户或应用上下文，机器身份由管线中的 HMAC 中间件验证。
+    /// 不需要任何作用域上下文，机器身份由管线中的 HMAC 中间件验证。
     /// </summary>
     [Fact]
     public async Task Sync_WithoutLegacyScopeContext_ReadsMainDatabase()

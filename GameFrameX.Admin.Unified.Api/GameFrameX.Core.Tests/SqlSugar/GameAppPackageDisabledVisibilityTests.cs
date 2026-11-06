@@ -6,8 +6,8 @@ namespace GameFrameX.Core.Tests.SqlSugar;
 
 /// <summary>
 /// BLA-28 / C67 回归测试：验证全局 ISafeEnabledFilter 会隐藏 IsEnabled==false 的分包，
-/// 而 .Filter(null, true) 绕过 + 手动补 IsDeleted==false + 租户隔离 WhereIF（BuildPageQuery/SetStatusAsync 采用的模式）
-/// 能让禁用分包重新可见且不破坏软删除排除与租户隔离。
+/// 而 .Filter(null, true) 绕过 + 手动补 IsDeleted==false + 搜索过滤 WhereIF（BuildPageQuery/SetStatusAsync 采用的模式）
+/// 能让禁用分包重新可见且不破坏软删除排除与搜索过滤语义。
 /// 复刻生产过滤器注册（ConfigureBaseFilters + ConfigureClientFilters），用 Sqlite 内存文件库做端到端查询验证。
 /// </summary>
 public sealed class GameAppPackageDisabledVisibilityTests : IDisposable
@@ -70,7 +70,7 @@ public sealed class GameAppPackageDisabledVisibilityTests : IDisposable
         await SeedAsync(3, false, false);
 
         long? id = 1;
-        // 修复后查询：绕过过滤器 + IsDeleted==false + 租户隔离 WhereIF（精确复刻 ConfigureAdminFilters 谓词）。
+        // 修复后查询：绕过过滤器 + IsDeleted==false + 搜索过滤 WhereIF（精确复刻 ConfigureAdminFilters 谓词）。
         var rows = await _db.Queryable<GameAppPackageEntity>()
                             .Filter(null, true)
                             .Where(u => u.IsDeleted == false)

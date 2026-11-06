@@ -140,7 +140,7 @@ public sealed class SignatureValidationMiddlewareTests
             onNext();
             return Task.CompletedTask;
         });
-        // C261 起 RiskEnforcementModeResolver 改为方法内 RequestServices 按需解析（避免参数注入在无租户上下文请求上触发租户仓储构造）
+        // C261 起 RiskEnforcementModeResolver 改为方法内 RequestServices 按需解析（避免参数注入在无作用域上下文请求上触发仓储构造）
         context.RequestServices = new ServiceCollection()
                                   .AddSingleton(riskResolver ?? new FakeRiskEnforcementModeResolver())
                                   .BuildServiceProvider();

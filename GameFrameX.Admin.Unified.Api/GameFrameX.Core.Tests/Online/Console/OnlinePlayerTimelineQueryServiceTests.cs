@@ -11,7 +11,7 @@ using SqlSugar;
 namespace GameFrameX.Core.Tests.Online.Console;
 
 // C344 / GFX-760（vault:C9 S8.1）：玩家时间线查询 Service 契约自检。
-// 覆盖：action 名与过滤/时间窗/游标透传、事件行信封原值往返、空事件空槽语义（空列表非错误）、跨租户越界前置拒绝。
+// 覆盖：action 名与过滤/时间窗/游标透传、事件行信封原值往返、空事件空槽语义（空列表非错误）、跨作用域越界前置拒绝。
 public sealed class OnlinePlayerTimelineQueryServiceTests : IDisposable
 {
     private readonly string _dbPath = Path.Combine(Path.GetTempPath(), $"player_timeline_{Guid.NewGuid():N}.db");

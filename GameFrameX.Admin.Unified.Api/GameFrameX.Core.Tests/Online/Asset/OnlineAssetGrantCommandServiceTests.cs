@@ -12,7 +12,7 @@ namespace GameFrameX.Core.Tests.Online.Asset;
 // C340 / GFX-752（vault:C4 S3.7、VC-3.11/3.13、VC-3.14）：人工发放/撤销命令服务契约自检。
 // 覆盖：幂等键策略（caller-supplied vs. 自动 GFX-GRANT/REVOKE-{ts}-{hex8}）、
 // 业务入参兜底（空理由/空物品/非法数量/撤销缺 transactionId）、
-// Online 6xxx DuplicateRequest → 镜像 32500001 透传、跨租户越界前置拒绝。
+// Online 6xxx DuplicateRequest → 镜像 32500001 透传、跨作用域越界前置拒绝。
 public sealed class OnlineAssetGrantCommandServiceTests : IDisposable
 {
     private readonly string _dbPath = Path.Combine(Path.GetTempPath(), $"asset_grant_{Guid.NewGuid():N}.db");

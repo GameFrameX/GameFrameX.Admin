@@ -57,7 +57,7 @@ public sealed class PaymentOptionSettingDecryptClosureTests
 
     /// <summary>
     /// 独立 PG 测试库 fixture（不跨测试类共享状态）：
-    /// 建库 → 主库注册租户行 → 租户库建租户表，Dispose 整库删除。
+    /// 建库 → 主库注册渠道行 → 目标库建配置表，Dispose 整库删除。
     /// </summary>
     private sealed class PostgresPaymentFixture : IDisposable
     {

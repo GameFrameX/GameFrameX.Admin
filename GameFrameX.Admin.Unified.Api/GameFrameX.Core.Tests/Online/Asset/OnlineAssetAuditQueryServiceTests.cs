@@ -10,7 +10,7 @@ using SqlSugar;
 namespace GameFrameX.Core.Tests.Online.Asset;
 
 // C340 / GFX-752（vault:C4 S3.7）：资产审计查询服务契约自检。
-// 覆盖：操作者/玩家/命令类型/时间窗过滤 + 游标透传、线缆响应映射、跨租户越界拒绝。
+// 覆盖：操作者/玩家/命令类型/时间窗过滤 + 游标透传、线缆响应映射、跨作用域越界拒绝。
 public sealed class OnlineAssetAuditQueryServiceTests : IDisposable
 {
     private readonly string _dbPath = Path.Combine(Path.GetTempPath(), $"asset_audit_{Guid.NewGuid():N}.db");

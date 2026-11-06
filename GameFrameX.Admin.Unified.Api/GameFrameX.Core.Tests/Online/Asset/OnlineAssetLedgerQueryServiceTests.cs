@@ -11,7 +11,7 @@ namespace GameFrameX.Core.Tests.Online.Asset;
 
 // C340 / GFX-752（vault:C4 S3.7）：资产流水查询服务契约自检。
 // 覆盖：过滤+游标透传、线缆响应 → Admin 响应映射（DTO 映射）、
-// 作用域缺失 / 跨租户越界拒绝（越界拒绝在 scope factory 抛，fake zero calls）。
+// 作用域缺失 / 跨作用域越界拒绝（越界拒绝在 scope factory 抛，fake zero calls）。
 public sealed class OnlineAssetLedgerQueryServiceTests : IDisposable
 {
     private readonly string _dbPath = Path.Combine(Path.GetTempPath(), $"asset_ledger_{Guid.NewGuid():N}.db");

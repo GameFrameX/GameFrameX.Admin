@@ -542,7 +542,7 @@ public sealed class CryptoEnvelopeMiddlewareTests
         Assert.Equal(CryptoEnvelopeMiddleware.KeyDisabledOrExpiredRejectedCode, await ReadEnvelopeCodeAsync(context));
     }
 
-    // ==================== 灰度门控：开关 / 无头放行 / 测试租户旁路 ====================
+    // ==================== 灰度门控：开关 / 无头放行 / 遗留上下文不旁路 ====================
 
     [Fact]
     public async Task EnabledFalse_CompletelyBypassed()

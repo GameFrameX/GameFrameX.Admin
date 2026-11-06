@@ -16,7 +16,7 @@ namespace GameFrameX.Core.Tests.GameApi;
 
 /// <summary>
 /// C13 T2：登录控制面契约（正常/首启无档/换端顶号/累计充值/注销 rcode=2/版本纯函数/路由守护）
-/// <para>契约来源：C13 change.md §1 28 字段四态去向 + C280 config 差异下发（C315 数据源切租户库
+/// <para>契约来源：C13 change.md §1 28 字段四态去向 + C280 config 差异下发（C315 数据源切独立库
 /// game_app_server_config 表，含基线/应用行合并与 Enabled 过滤语义）+ P0-2 存档行会话列。</para>
 /// </summary>
 public sealed class GameUserSessionTests
@@ -153,7 +153,7 @@ public sealed class GameUserSessionTests
             // C315：库里没有的键不回显（客户端删除本地该键，与原厂「无内容不下发」一致）
             Assert.False(config.TryGetProperty("ServerConfigKey1", out _));
             Assert.False(config.TryGetProperty("ActivityType2", out _));
-            // 库内键上行 md5 不等 → 下发内容（数据源为租户库行，不再依赖嵌入种子）
+            // 库内键上行 md5 不等 → 下发内容（数据源为库内行，不再依赖嵌入种子）
             Assert.Equal(3, config.GetProperty("frame").GetProperty("config").GetArrayLength());
             Assert.True(config.GetProperty("badge").TryGetProperty("config", out _));
             Assert.Equal(Md5Frame, config.GetProperty("frame").GetProperty("md5").GetString());
