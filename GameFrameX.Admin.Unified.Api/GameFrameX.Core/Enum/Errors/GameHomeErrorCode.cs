@@ -9,5 +9,5 @@ public enum GameHomeErrorCode
     /// 目标租户库连接不可用
     /// </summary>
     [ErrorText("目标租户库连接不可用，无法读取首页读数", "Target tenant database connection is unavailable for home metrics")]
-    TenantDbUnavailable = 60500002,
+    DbUnavailable = 60500002,
 }

@@ -14,13 +14,13 @@ public static class LegacySchemaStartupGuard
 /// 旧租户登记表物理名（1.x SystemTenantEntity，[PlatformTable] 派生；租户登记机制已删除，新代码永不创建）。 // c406-keep
     /// </summary>
     // c406-keep：旧 schema 标志字面量，有意引用旧表名（R1-d / R3-b），改名脚本不得改写
-    private const string LegacyTenantRegistryTable = "system_tenant_entity"; // c406-keep
+    private const string LegacyRegistryTable = "system_tenant_entity"; // c406-keep
 
     /// <summary>
     /// 旧租户业务表物理名前缀。
     /// </summary>
     // c406-keep：旧 schema 标志字面量，有意引用旧表名（R1-d / R3-b），改名脚本不得改写
-    private const string LegacyTenantTablePrefix = "tenant_"; // c406-keep
+    private const string LegacyTablePrefix = "tenant_"; // c406-keep
 
     /// <summary>
     /// 检查目标库不是旧 schema；命中旧标志即抛 <see cref="InvalidOperationException"/>。
@@ -64,7 +64,7 @@ public static class LegacySchemaStartupGuard
             return false;
         }
 
-        return tableName.StartsWith(LegacyTenantTablePrefix, StringComparison.OrdinalIgnoreCase)
-               || string.Equals(tableName, LegacyTenantRegistryTable, StringComparison.OrdinalIgnoreCase);
+        return tableName.StartsWith(LegacyTablePrefix, StringComparison.OrdinalIgnoreCase)
+               || string.Equals(tableName, LegacyRegistryTable, StringComparison.OrdinalIgnoreCase);
     }
 }

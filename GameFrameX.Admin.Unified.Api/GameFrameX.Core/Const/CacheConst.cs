@@ -11,7 +11,7 @@ public sealed class CacheConst
     public const string KeyUser = "cache:user:";
 
     /// <summary>
-    /// 用户已授权菜单Id集合缓存（来自 TenantRoleMenuEntity，含目录/菜单/按钮，Id 化）
+    /// 用户已授权菜单Id集合缓存（来自 RoleMenuEntity，含目录/菜单/按钮，Id 化）
     /// </summary>
     public const string KeyUserMenu = "cache:user_menu:";
 
