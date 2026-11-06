@@ -17,10 +17,10 @@ namespace GameFrameX.Core.Bootstrap;
 /// （超管专属子树不授予、<c>AllowAdminWhenSuperAdminOnly</c> 可读选择器照常授予）授予全部非超管种子菜单；
 /// ②<see cref="InitialAccountEnvironmentVariable"/> 与 <see cref="InitialPasswordEnvironmentVariable"/>
 /// 成对设置且库中尚无任何业务管理员（<see cref="UserEntity"/>）时创建该账号（Argon2id）并绑定管理员角色。</para>
-/// <para>幂等口径：账号已存在不重建、不覆盖密码；角色菜单授权只补新增种子菜单、不删除已有授权——
-/// 运营在管理端手工收窄 <c>sys_admin</c> 菜单后重启，收窄结果保留（启动期不是授权的权威纠正源，
-/// 这与 global_menu 种子的 upsert 语义不同：菜单行是权威种子，角色-菜单授权是运维数据）。
-/// 若运营删掉了某条种子菜单授权，后续该菜单再次作为新种子菜单出现时仍会被补授。</para>
+/// <para>幂等口径：账号已存在不重建、不覆盖密码；角色菜单授权每次启动补齐全部缺失的种子菜单授权——
+/// 运营在管理端删掉 <c>sys_admin</c> 的某条种子菜单授权后，下次重启会被补回（模板角色的手工授权不持久，
+/// 与 C353 口径一致）。需要收窄权限时新建自定义角色，不要直接修改 <c>sys_admin</c>；
+/// 这与 global_menu 种子的 upsert 语义同向：菜单行与模板角色授权都由启动期种子保证。</para>
 /// <para>口令永不落入日志；密码不满足平台密码强度策略时 fail-closed 终止启动（错误信息不含密码）。</para>
 /// </summary>
 public static class InitialAdminBootstrap
@@ -76,7 +76,8 @@ public static class InitialAdminBootstrap
     }
 
     /// <summary>
-    /// 只补不删地授予管理员角色全部非超管种子菜单（与 RoleMenuService.ExcludeSuperAdminOnlyMenusAsync 同口径）。
+    /// 补齐管理员角色缺失的非超管种子菜单授权（与 RoleMenuService.ExcludeSuperAdminOnlyMenusAsync 同口径）；
+    /// 已删除的种子授权会在下次启动补回（模板角色手工授权不持久）。
     /// </summary>
     private static async Task GrantAdminMenusAsync(ISqlSugarClient db, long roleId)
     {
@@ -102,7 +103,7 @@ public static class InitialAdminBootstrap
             IsEnabled = true,
         }).ToList()).ExecuteCommandAsync();
 
-        Console.WriteLine($"[InitialAdmin] 管理员角色 {CommonConst.SysAdminRole} 补授 {missingMenuIds.Length} 个种子菜单（只补不删，已有授权保持不变）。");
+        Console.WriteLine($"[InitialAdmin] 管理员角色 {CommonConst.SysAdminRole} 补授 {missingMenuIds.Length} 个种子菜单（缺失授权补齐，手工删除的授权会在重启后恢复）。");
     }
 
     /// <summary>
