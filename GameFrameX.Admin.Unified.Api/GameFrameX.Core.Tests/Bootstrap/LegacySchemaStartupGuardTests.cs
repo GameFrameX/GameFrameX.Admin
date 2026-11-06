@@ -90,6 +90,57 @@ public sealed class LegacySchemaStartupGuardTests : IDisposable
         Assert.True(initIndex > guardIndex, "守卫调用必须先于 InitDatabase（建表前 fail-closed）");
     }
 
+    [Theory]
+    [InlineData("GameFrameX.Client.Api/Program.cs")]
+    [InlineData("GameFrameX.Hub.Api/Program.cs")]
+    public void ClientAndHubPrograms_WireLegacyGuardImmediatelyAfterDatabaseCreation(string relativePath)
+    {
+        var source = File.ReadAllText(Path.Combine(FindRepositoryRoot(), relativePath));
+        var createIndex = source.IndexOf("SqlSugarClientConfig.AddSqlSugarClientService", StringComparison.Ordinal);
+        var guardIndex = source.IndexOf("LegacySchemaStartupGuard.EnsureNotLegacySchema", StringComparison.Ordinal);
+        Assert.True(createIndex >= 0 && guardIndex > createIndex, $"{relativePath} 必须在建立数据库客户端后调用旧库守卫");
+    }
+
+    [Theory]
+    [InlineData(false)] // Client.Api：AddSqlSugarClientService(config) 后立即守卫
+    [InlineData(true)]  // Hub.Api：带 userAuditHandler 的同一组合
+    public void ClientAndHubStartupComposition_LegacySchema_FailsFast(bool withAuditHandler)
+    {
+        // 按两宿主 Program.cs 的真实组合：AddSqlSugarClientService 建客户端后立即 EnsureNotLegacySchema；
+        // 旧 schema 必须在建表/写数据之前抛错终止启动
+        var dbPath = CreateDbPath();
+        var config = new DbConnectionConfig
+        {
+            ConfigId = "main",
+            DbType = DbType.Sqlite,
+            ConnectionString = $"DataSource={dbPath}",
+            IsAutoCloseConnection = true,
+        };
+        using (var seedScope = new SqlSugarScope(new List<ConnectionConfig> { config, }))
+        {
+            seedScope.GetConnectionScope("main").Ado.ExecuteCommand("CREATE TABLE tenant_game_user_entity (Id INTEGER PRIMARY KEY);"); // c406-keep
+        }
+
+        var sqlSugar = withAuditHandler
+                           ? SqlSugarClientConfig.AddSqlSugarClientService(config, _ => { })
+                           : SqlSugarClientConfig.AddSqlSugarClientService(config);
+
+        Assert.Throws<InvalidOperationException>(() => LegacySchemaStartupGuard.EnsureNotLegacySchema(sqlSugar, config));
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void ClientAndHubStartupComposition_CleanDatabase_StartsGuardPasses(bool withAuditHandler)
+    {
+        var config = CreateConfig("main");
+        var sqlSugar = withAuditHandler
+                           ? SqlSugarClientConfig.AddSqlSugarClientService(config, _ => { })
+                           : SqlSugarClientConfig.AddSqlSugarClientService(config);
+
+        LegacySchemaStartupGuard.EnsureNotLegacySchema(sqlSugar, config);
+    }
+
     private static string FindRepositoryRoot()
     {
         var directory = new DirectoryInfo(AppContext.BaseDirectory);
