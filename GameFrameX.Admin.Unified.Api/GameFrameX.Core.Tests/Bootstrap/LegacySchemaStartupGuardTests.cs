@@ -20,25 +20,25 @@ public sealed class LegacySchemaStartupGuardTests : IDisposable
     [Fact]
     public void EnsureNotLegacySchema_TenantPrefixedTable_Throws()
     {
-        using var scope = CreateScopeWithLegacyTable("tenant_game_user_entity", out _);
+        using var scope = CreateScopeWithLegacyTable("tenant_game_user_entity", out _); // c406-keep
 
         var exception = Assert.Throws<InvalidOperationException>(
             () => LegacySchemaStartupGuard.EnsureNotLegacySchema(scope, CreateConfig("main")));
 
         Assert.Contains("2.0 不支持旧库升级，只能用新库或整体回滚", exception.Message);
-        Assert.Contains("tenant_game_user_entity", exception.Message);
+        Assert.Contains("tenant_game_user_entity", exception.Message); // c406-keep
     }
 
     [Fact]
     public void EnsureNotLegacySchema_LegacyTenantRegistryTable_Throws()
     {
-        using var scope = CreateScopeWithLegacyTable("system_tenant_entity", out _);
+        using var scope = CreateScopeWithLegacyTable("system_tenant_entity", out _); // c406-keep
 
         var exception = Assert.Throws<InvalidOperationException>(
             () => LegacySchemaStartupGuard.EnsureNotLegacySchema(scope, CreateConfig("main")));
 
         Assert.Contains("2.0 不支持旧库升级，只能用新库或整体回滚", exception.Message);
-        Assert.Contains("system_tenant_entity", exception.Message);
+        Assert.Contains("system_tenant_entity", exception.Message); // c406-keep
     }
 
     [Fact]
@@ -58,7 +58,7 @@ public sealed class LegacySchemaStartupGuardTests : IDisposable
     [Fact]
     public void GuardedInitSequence_LegacySchema_ThrowsBeforeCreatingAnyTable()
     {
-        using var scope = CreateScopeWithLegacyTable("tenant_game_user_entity", out _);
+        using var scope = CreateScopeWithLegacyTable("tenant_game_user_entity", out _); // c406-keep
         var config = CreateConfig("main");
         var types = new[] { typeof(SystemUserEntity), typeof(GlobalMenuEntity), };
 
@@ -74,7 +74,7 @@ public sealed class LegacySchemaStartupGuardTests : IDisposable
 
         // 守卫在建表前抛出：除预建的旧表外不得出现任何新表
         var tables = scope.GetConnectionScope("main").DbMaintenance.GetTableInfoList(false).Select(table => table.Name).ToList();
-        Assert.Equal(new[] { "tenant_game_user_entity", }, tables);
+        Assert.Equal(new[] { "tenant_game_user_entity", }, tables); // c406-keep
     }
 
     [Fact]

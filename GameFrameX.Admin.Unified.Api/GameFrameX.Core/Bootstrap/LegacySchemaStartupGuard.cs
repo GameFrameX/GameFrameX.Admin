@@ -5,20 +5,22 @@ namespace GameFrameX.Core.Bootstrap;
 /// <summary>
 /// 旧库拒绝启动守卫（C406 / D7）：Web.Api 初始化数据库（建表、种子）之前的 fail-closed 检查。
 /// <para>2.0 为破坏性断代版本，不迁移旧数据：检测到旧 schema 标志（任一 <c>tenant_</c> 前缀表，或旧租户登记表
-/// <c>system_tenant_entity</c>）即抛 <see cref="InvalidOperationException"/> 终止启动——不建表、不写种子、不写数据，
+/// <c>system_tenant_entity</c>）即抛 <see cref="InvalidOperationException"/> 终止启动——不建表、不写种子、不写数据， // c406-keep
 /// 只能用新库或整体回滚。</para>
 /// </summary>
 public static class LegacySchemaStartupGuard
 {
     /// <summary>
-    /// 旧租户登记表物理名（1.x SystemTenantEntity，[PlatformTable] 派生；租户登记机制已删除，新代码永不创建）。
+/// 旧租户登记表物理名（1.x SystemTenantEntity，[PlatformTable] 派生；租户登记机制已删除，新代码永不创建）。 // c406-keep
     /// </summary>
-    private const string LegacyTenantRegistryTable = "system_tenant_entity";
+    // c406-keep：旧 schema 标志字面量，有意引用旧表名（R1-d / R3-b），改名脚本不得改写
+    private const string LegacyTenantRegistryTable = "system_tenant_entity"; // c406-keep
 
     /// <summary>
     /// 旧租户业务表物理名前缀。
     /// </summary>
-    private const string LegacyTenantTablePrefix = "tenant_";
+    // c406-keep：旧 schema 标志字面量，有意引用旧表名（R1-d / R3-b），改名脚本不得改写
+    private const string LegacyTenantTablePrefix = "tenant_"; // c406-keep
 
     /// <summary>
     /// 检查目标库不是旧 schema；命中旧标志即抛 <see cref="InvalidOperationException"/>。
