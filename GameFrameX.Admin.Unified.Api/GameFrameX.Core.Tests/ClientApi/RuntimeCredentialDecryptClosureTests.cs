@@ -42,16 +42,16 @@ public sealed class RuntimeCredentialDecryptClosureTests : IDisposable
     public async Task SignatureKeyResolver_MixedRows_ResolvesPlaintextForBoth()
     {
         _db.InitBusinessTables(typeof(AppSignatureKeyEntity));
-        _db.TenantDb.Insertable(new AppSignatureKeyEntity
+        _db.MainDb.Insertable(new AppSignatureKeyEntity
         {
             Id = 7101, Kid = "kid-plain", Secret = "sig-plain", IsEnabled = true,
         }).ExecuteCommand();
-        _db.TenantDb.Insertable(new AppSignatureKeyEntity
+        _db.MainDb.Insertable(new AppSignatureKeyEntity
         {
             Id = 7102, Kid = "kid-cipher", Secret = SecretCrypto.Encrypt("sig-cipher")!, IsEnabled = true,
         }).ExecuteCommand();
 
-        var resolver = new SignatureKeyResolver(_db.DbProvider);
+        var resolver = new SignatureKeyResolver(_db.MainDb);
 
         var plainLookup = await resolver.ResolveAsync("kid-plain");
         var cipherLookup = await resolver.ResolveAsync("kid-cipher");
@@ -67,16 +67,16 @@ public sealed class RuntimeCredentialDecryptClosureTests : IDisposable
     public async Task SessionKeyResolver_MixedRows_ResolvesPlaintextForBoth()
     {
         _db.InitBusinessTables(typeof(SessionKeyEntity));
-        _db.TenantDb.Insertable(new SessionKeyEntity
+        _db.MainDb.Insertable(new SessionKeyEntity
         {
             Id = 7201, Kid = "kid-plain", Secret = "session-plain", IsEnabled = true,
         }).ExecuteCommand();
-        _db.TenantDb.Insertable(new SessionKeyEntity
+        _db.MainDb.Insertable(new SessionKeyEntity
         {
             Id = 7202, Kid = "kid-cipher", Secret = SecretCrypto.Encrypt("session-cipher")!, IsEnabled = true,
         }).ExecuteCommand();
 
-        var resolver = new SessionKeyResolver(_db.DbProvider);
+        var resolver = new SessionKeyResolver(_db.MainDb);
 
         var plainLookup = await resolver.ResolveAsync("kid-plain");
         var cipherLookup = await resolver.ResolveAsync("kid-cipher");
@@ -91,7 +91,7 @@ public sealed class RuntimeCredentialDecryptClosureTests : IDisposable
         _db.InitBusinessTables(typeof(GameLoginTicketKeyEntity));
         using (var rsa = RSA.Create(2048))
         {
-            _db.TenantDb.Insertable(new GameLoginTicketKeyEntity
+            _db.MainDb.Insertable(new GameLoginTicketKeyEntity
             {
                 Id = 7301, Kid = "kid-ticket",
                 Algorithm = GameLoginTicketSigningKey.AlgorithmRs256,
@@ -102,7 +102,7 @@ public sealed class RuntimeCredentialDecryptClosureTests : IDisposable
         }
 
         // 存在生效 key 时 optionsProvider（自动建 key 开关）不被触达，传 null 即可
-        var resolver = new GameLoginTicketKeyResolver(_db.DbProvider, null!);
+        var resolver = new GameLoginTicketKeyResolver(_db.MainDb, null!);
 
         var signingKey = await resolver.ResolveSigningKeyAsync();
 
@@ -114,12 +114,12 @@ public sealed class RuntimeCredentialDecryptClosureTests : IDisposable
     public async Task OptionsProvider_TokenPolicy_SigningKeyDecrypts()
     {
         _db.InitBusinessTables(typeof(ClientApiPolicyEntity));
-        _db.TenantDb.Insertable(new ClientApiPolicyEntity
+        _db.MainDb.Insertable(new ClientApiPolicyEntity
         {
             Id = 7401, SigningKey = SecretCrypto.Encrypt("policy-signing-key")!, IsEnabled = true,
         }).ExecuteCommand();
 
-        var provider = new ClientApiOptionsProvider(_db.DbProvider, new HttpContextAccessor { HttpContext = _db.CreateHttpContext(), });
+        var provider = new ClientApiOptionsProvider(_db.MainDb, new HttpContextAccessor { HttpContext = _db.CreateHttpContext(), });
 
         var policy = await provider.GetTokenPolicyAsync();
 
@@ -132,14 +132,14 @@ public sealed class RuntimeCredentialDecryptClosureTests : IDisposable
         _db.InitBusinessTables(typeof(AdvertisementCallbackConfigEntity));
         var configJson = AdvertisementCallbackConfigCrypto.EncryptConfigJson("Pangle",
             "{\"callbackUrl\":\"https://cb.example.com/hook\",\"signingSecret\":\"ad-json-secret\"}");
-        _db.TenantDb.Insertable(new AdvertisementCallbackConfigEntity
+        _db.MainDb.Insertable(new AdvertisementCallbackConfigEntity
         {
             Id = 7501, Provider = "Pangle",
             SigningSecret = SecretCrypto.Encrypt("ad-column-secret")!, VerificationKeys = string.Empty,
             ConfigJson = configJson, IsEnabled = true,
         }).ExecuteCommand();
 
-        var provider = new ClientApiOptionsProvider(_db.DbProvider, new HttpContextAccessor { HttpContext = _db.CreateHttpContext(), });
+        var provider = new ClientApiOptionsProvider(_db.MainDb, new HttpContextAccessor { HttpContext = _db.CreateHttpContext(), });
 
         var options = await provider.GetAdvertisementCallbackOptionsAsync();
 
@@ -155,14 +155,14 @@ public sealed class RuntimeCredentialDecryptClosureTests : IDisposable
     {
         _db.InitBusinessTables(typeof(AdvertisementCallbackConfigEntity));
         // ConfigJson 是验签材料唯一来源：Pangle 缺 signingSecret 直接 fail-closed，不再回落汇总列
-        _db.TenantDb.Insertable(new AdvertisementCallbackConfigEntity
+        _db.MainDb.Insertable(new AdvertisementCallbackConfigEntity
         {
             Id = 7511, Provider = "Pangle",
             SigningSecret = SecretCrypto.Encrypt("ad-column-secret")!, VerificationKeys = string.Empty,
             ConfigJson = "{\"callbackUrl\":\"https://cb.example.com/hook\"}", IsEnabled = true,
         }).ExecuteCommand();
 
-        var provider = new ClientApiOptionsProvider(_db.DbProvider, new HttpContextAccessor { HttpContext = _db.CreateHttpContext(), });
+        var provider = new ClientApiOptionsProvider(_db.MainDb, new HttpContextAccessor { HttpContext = _db.CreateHttpContext(), });
 
         var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => provider.GetAdvertisementCallbackOptionsAsync());
         Assert.Contains("signingSecret", ex.Message, StringComparison.Ordinal);
@@ -173,13 +173,13 @@ public sealed class RuntimeCredentialDecryptClosureTests : IDisposable
     {
         _db.InitBusinessTables(typeof(AdvertisementCallbackConfigEntity));
         // AdMob 行必填 verificationKeys；signingSecret 缺失不影响（AdMob 用 verificationKeys 验签）
-        _db.TenantDb.Insertable(new AdvertisementCallbackConfigEntity
+        _db.MainDb.Insertable(new AdvertisementCallbackConfigEntity
         {
             Id = 7512, Provider = "GoogleAdMob",
             ConfigJson = "{\"callbackUrl\":\"https://cb.example.com/admob\",\"verificationKeys\":\"k1=base64key\"}", IsEnabled = true,
         }).ExecuteCommand();
 
-        var provider = new ClientApiOptionsProvider(_db.DbProvider, new HttpContextAccessor { HttpContext = _db.CreateHttpContext(), });
+        var provider = new ClientApiOptionsProvider(_db.MainDb, new HttpContextAccessor { HttpContext = _db.CreateHttpContext(), });
 
         var options = await provider.GetAdvertisementCallbackOptionsAsync();
 
@@ -192,7 +192,7 @@ public sealed class RuntimeCredentialDecryptClosureTests : IDisposable
     public async Task OptionsProvider_Email_SecretIdKeyDecrypts()
     {
         _db.InitBusinessTables(typeof(EmailConfigEntity));
-        _db.TenantDb.Insertable(new EmailConfigEntity
+        _db.MainDb.Insertable(new EmailConfigEntity
         {
             Id = 7601, FromEmailAddress = "noreply@example.com",
             FromEmailSecretId = SecretCrypto.Encrypt("email-plain-id")!,
@@ -200,7 +200,7 @@ public sealed class RuntimeCredentialDecryptClosureTests : IDisposable
             IsEnabled = true,
         }).ExecuteCommand();
 
-        var provider = new ClientApiOptionsProvider(_db.DbProvider, new HttpContextAccessor { HttpContext = _db.CreateHttpContext(), });
+        var provider = new ClientApiOptionsProvider(_db.MainDb, new HttpContextAccessor { HttpContext = _db.CreateHttpContext(), });
 
         var options = await provider.GetEmailOptionsAsync();
 
@@ -216,14 +216,14 @@ public sealed class RuntimeCredentialDecryptClosureTests : IDisposable
         _db.InitBusinessTables(typeof(GamePaymentConfigEntity));
         var configJson = PaymentConfigCrypto.EncryptConfigJson("alipay",
             "{\"AliPayAppId\":\"2021001\",\"AliPayMerchantPrivateKey\":\"plain-merchant-key\",\"AliPayGatewayUrl\":\"https://openapi.alipay.com/gateway.do\"}");
-        _db.TenantDb.Insertable(new GamePaymentConfigEntity
+        _db.MainDb.Insertable(new GamePaymentConfigEntity
         {
             Id = 7701, PayChannel = "alipay", ConfigJson = configJson, IsEnabled = true,
         }).ExecuteCommand();
 
-        var context = _db.CreateHttpContext(include: false, includeApp: false);
+        var context = _db.CreateHttpContext();
         context.Items[GameFrameX.Core.Middleware.PublicCallbackRouteContext.ItemKey] = true;
-        var provider = new PaymentOptionSettingProvider(_db.DbProvider, new HttpContextAccessor { HttpContext = context, });
+        var provider = new PaymentOptionSettingProvider(_db.MainDb, new HttpContextAccessor { HttpContext = context, });
 
         var setting = provider.GetOptionSetting<AliPayOptionSetting>("alipay");
 
@@ -232,7 +232,7 @@ public sealed class RuntimeCredentialDecryptClosureTests : IDisposable
     }
 
     [Fact]
-    public void TenantSecretCrypto_FailClosed_CiphertextWithoutKey_ThrowsWithEnvVarHint()
+    public void SecretCrypto_FailClosed_CiphertextWithoutKey_ThrowsWithEnvVarHint()
     {
         var cipher = SecretCrypto.Encrypt("fail-closed-secret")!;
         Environment.SetEnvironmentVariable(SecretCrypto.KeyEnvironmentVariable, null);
@@ -247,7 +247,7 @@ public sealed class RuntimeCredentialDecryptClosureTests : IDisposable
     }
 
     [Fact]
-    public void TenantSecretCrypto_DecryptCached_PlaintextPassthrough_AndStableResult()
+    public void SecretCrypto_DecryptCached_PlaintextPassthrough_AndStableResult()
     {
         var cipher = SecretCrypto.Encrypt("cached-secret")!;
 

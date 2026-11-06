@@ -38,7 +38,7 @@ public sealed class GameUserPayTests
             Assert.Equal("sku.gold", data.GetProperty("Sku").GetString());
             Assert.Equal(990, data.GetProperty("Amount").GetInt64());
 
-            var row = db.TenantDb.Queryable<GameOrderEntity>().Single(x => x.OrderId == orderId);
+            var row = db.MainDb.Queryable<GameOrderEntity>().Single(x => x.OrderId == orderId);
             Assert.Equal(OrderStatusEnum.Unpaid, row.Status);
             Assert.Equal("7001", row.AccountId);
             Assert.Equal("sku.gold", row.ProductId);
@@ -55,7 +55,7 @@ public sealed class GameUserPayTests
         using (var db = new ClientApiTestDb())
         {
             var policyRepository = CreatePolicyRepository(db);
-            await policyRepository.InsertAsync(MakePolicy(0, true));
+            await policyRepository.InsertAsync(MakePolicy(true));
             var verifier = new FakePayReceiptVerifier();
             var controller = CreateController(db, verifier);
 
@@ -65,7 +65,7 @@ public sealed class GameUserPayTests
             var orderId = data.GetProperty("OrderId").GetString() ?? string.Empty;
 
             // 沙箱直发闭环：落库即 Shipped，免支付免验真，Query 直接 Paid
-            var row = db.TenantDb.Queryable<GameOrderEntity>().Single(x => x.OrderId == orderId);
+            var row = db.MainDb.Queryable<GameOrderEntity>().Single(x => x.OrderId == orderId);
             Assert.Equal(OrderStatusEnum.Shipped, row.Status);
 
             var query = ClientApiResultReader.Data(ClientApiResultReader.Read(await controller.Query(
@@ -86,7 +86,7 @@ public sealed class GameUserPayTests
         using (var db = new ClientApiTestDb())
         {
             var policyRepository = CreatePolicyRepository(db);
-            await policyRepository.InsertAsync(MakePolicy(db.AppId, false));
+            await policyRepository.InsertAsync(MakePolicy(false));
             var controller = CreateController(db, new FakePayReceiptVerifier(), true);
 
             // 主库策略关闭沙箱直发。
@@ -94,7 +94,7 @@ public sealed class GameUserPayTests
             Assert.True(first.GetProperty("IsNeedPay").GetBoolean());
 
             // 更新策略后重建请求级 provider，验证开启沙箱直发。
-            var appRow = db.TenantDb.Queryable<ClientApiPolicyEntity>().Single();
+            var appRow = db.MainDb.Queryable<ClientApiPolicyEntity>().Single();
             appRow.EnableSandBoxRecharge = true;
             await policyRepository.UpdateAsync(appRow);
             var secondController = CreateController(db, new FakePayReceiptVerifier(), true);
@@ -136,7 +136,7 @@ public sealed class GameUserPayTests
             Assert.Equal("sku.gold", data.GetProperty("ProductId").GetString());
             Assert.Equal(1, verifier.CallCount);
 
-            var row = db.TenantDb.Queryable<GameOrderEntity>().Single(x => x.OrderId == "pay_seed_v1");
+            var row = db.MainDb.Queryable<GameOrderEntity>().Single(x => x.OrderId == "pay_seed_v1");
             Assert.Equal(OrderStatusEnum.Shipped, row.Status);
             Assert.Equal("txn_apple_1", row.ProviderTransactionId);
             Assert.Equal("{\"status\":0}", row.ReceiptJson);
@@ -180,7 +180,7 @@ public sealed class GameUserPayTests
                                                                                  new GameUserPayVerifyRequest { UserId = 7103, OrderId = "pay_seed_v3", PayChannel = 7, PurchaseToken = "tok", })));
             Assert.Equal(7, data.GetProperty("Rcode").GetInt64());
 
-            var row = db.TenantDb.Queryable<GameOrderEntity>().Single(x => x.OrderId == "pay_seed_v3");
+            var row = db.MainDb.Queryable<GameOrderEntity>().Single(x => x.OrderId == "pay_seed_v3");
             Assert.Equal(OrderStatusEnum.Unpaid, row.Status);
             Assert.Null(row.ProviderTransactionId);
         }
@@ -219,7 +219,7 @@ public sealed class GameUserPayTests
             Assert.NotEqual(0, ClientApiResultReader.Code(root));
             Assert.Equal(1, verifier.CallCount);
 
-            var row = db.TenantDb.Queryable<GameOrderEntity>().Single(x => x.OrderId == "pay_seed_v4");
+            var row = db.MainDb.Queryable<GameOrderEntity>().Single(x => x.OrderId == "pay_seed_v4");
             Assert.Equal(OrderStatusEnum.Unpaid, row.Status);
         }
     }
@@ -248,7 +248,7 @@ public sealed class GameUserPayTests
             Assert.Equal((int)PaymentErrorCode.PayChannelNotSupported, ClientApiResultReader.Code(root));
             Assert.Equal(0, verifier.CallCount);
 
-            var row = db.TenantDb.Queryable<GameOrderEntity>().Single(x => x.OrderId == "pay_dup_b");
+            var row = db.MainDb.Queryable<GameOrderEntity>().Single(x => x.OrderId == "pay_dup_b");
             Assert.Equal(OrderStatusEnum.Unpaid, row.Status);
             Assert.Null(row.ProviderTransactionId);
         }
@@ -347,7 +347,7 @@ public sealed class GameUserPayTests
             // 契约：Report 响应 data 为 null
             Assert.Equal(JsonValueKind.Null, ClientApiResultReader.Data(root).ValueKind);
 
-            var row = db.TenantDb.Queryable<GameOrderEntity>().Single(x => x.OrderId == "pay_r1");
+            var row = db.MainDb.Queryable<GameOrderEntity>().Single(x => x.OrderId == "pay_r1");
             Assert.Equal(990, row.RealMoney);
             Assert.Equal("USD", row.Currency);
             Assert.Equal(12, row.Level);
@@ -355,7 +355,7 @@ public sealed class GameUserPayTests
             // 纯记账：订单状态与渠道字段不被推进
             Assert.Equal(OrderStatusEnum.Unpaid, row.Status);
             Assert.Equal("100", row.PayChannel);
-            Assert.Equal(1, db.TenantDb.Queryable<GameOrderEntity>().Count(x => x.OrderId == "pay_r1"));
+            Assert.Equal(1, db.MainDb.Queryable<GameOrderEntity>().Count(x => x.OrderId == "pay_r1"));
         }
     }
 
@@ -370,7 +370,7 @@ public sealed class GameUserPayTests
                                                       MakeReport(7302, "pay_unknown", 199)));
             Assert.Equal(0, ClientApiResultReader.Code(root));
 
-            var row = db.TenantDb.Queryable<GameOrderEntity>().Single(x => x.OrderId == "pay_unknown");
+            var row = db.MainDb.Queryable<GameOrderEntity>().Single(x => x.OrderId == "pay_unknown");
             Assert.Equal("7302", row.AccountId);
             Assert.Equal("sku.gem", row.ProductId);
             Assert.Equal(199, row.RealMoney);
@@ -392,8 +392,8 @@ public sealed class GameUserPayTests
             await controller.Report(MakeReport(7303, "pay_r2", 990));
             await controller.Report(MakeReport(7303, "pay_r2", 880));
 
-            Assert.Equal(1, db.TenantDb.Queryable<GameOrderEntity>().Count(x => x.OrderId == "pay_r2"));
-            var row = db.TenantDb.Queryable<GameOrderEntity>().Single(x => x.OrderId == "pay_r2");
+            Assert.Equal(1, db.MainDb.Queryable<GameOrderEntity>().Count(x => x.OrderId == "pay_r2"));
+            var row = db.MainDb.Queryable<GameOrderEntity>().Single(x => x.OrderId == "pay_r2");
             Assert.Equal(880, row.RealMoney);
         }
     }
@@ -416,7 +416,7 @@ public sealed class GameUserPayTests
         if (withAppContext)
         {
             // 旧请求作用域键不影响主库支付查询
-            controller.ControllerContext = new ControllerContext { HttpContext = db.CreateHttpContext(true, true), };
+            controller.ControllerContext = new ControllerContext { HttpContext = db.CreateHttpContext(), };
         }
 
         return controller;
@@ -428,7 +428,7 @@ public sealed class GameUserPayTests
     private static IClientApiOptionsProvider CreateOptionsProvider(ClientApiTestDb db, bool withAppContext)
     {
         var dbProvider = db.MainDb;
-        var accessor = new HttpContextAccessor { HttpContext = db.CreateHttpContext(true, withAppContext), };
+        var accessor = new HttpContextAccessor { HttpContext = db.CreateHttpContext(), };
         return new ClientApiOptionsProvider(dbProvider, accessor);
     }
 
@@ -501,7 +501,7 @@ public sealed class GameUserPayTests
         };
     }
 
-    private static ClientApiPolicyEntity MakePolicy(long appId, bool enableSandbox)
+    private static ClientApiPolicyEntity MakePolicy(bool enableSandbox)
     {
         return new ClientApiPolicyEntity
         {

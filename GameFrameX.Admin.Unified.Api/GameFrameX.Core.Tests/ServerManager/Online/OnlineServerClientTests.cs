@@ -27,7 +27,6 @@ namespace GameFrameX.Core.Tests.ServerManager.Online;
 // 作用域构造后区服被删的时序漂移拒绝。
 public sealed class OnlineServerClientTests : IDisposable
 {
-    private const long TenantA = 1001;
     private const long App100 = 100;
     private const long Area1001 = 2001;
 

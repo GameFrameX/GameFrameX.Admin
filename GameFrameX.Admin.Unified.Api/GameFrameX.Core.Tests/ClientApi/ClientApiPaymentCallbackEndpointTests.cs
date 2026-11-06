@@ -39,8 +39,8 @@ public sealed class ClientApiPaymentCallbackEndpointTests
         var result = await controller.NotifyAliPay();
 
         var root = ClientApiResultReader.Read(result);
-        var order = await db.TenantDb.Queryable<GameOrderEntity>().FirstAsync(u => u.Id == 7001);
-        var role = await db.TenantDb.Queryable<GameRoleEntity>().FirstAsync(u => u.Id == 3001);
+        var order = await db.MainDb.Queryable<GameOrderEntity>().FirstAsync(u => u.Id == 7001);
+        var role = await db.MainDb.Queryable<GameRoleEntity>().FirstAsync(u => u.Id == 3001);
         Assert.Equal(0, ClientApiResultReader.Code(root));
         Assert.Equal(OrderStatusEnum.Shipped, order.Status);
         Assert.Equal(650, role.AllRecharge);
@@ -62,7 +62,7 @@ public sealed class ClientApiPaymentCallbackEndpointTests
         var result = await controller.NotifyAliPay();
 
         var root = ClientApiResultReader.Read(result);
-        var order = await db.TenantDb.Queryable<GameOrderEntity>().FirstAsync(u => u.Id == 7001);
+        var order = await db.MainDb.Queryable<GameOrderEntity>().FirstAsync(u => u.Id == 7001);
         Assert.Equal((int)AuthErrorCode.SignatureVerifyFailed, ClientApiResultReader.Code(root));
         Assert.Equal("签名验证失败", ClientApiResultReader.Message(root));
         Assert.Equal(OrderStatusEnum.Unpaid, order.Status);
@@ -88,7 +88,7 @@ public sealed class ClientApiPaymentCallbackEndpointTests
         var result = await controller.NotifyXsolla();
 
         var root = ClientApiResultReader.Read(result);
-        var order = await db.TenantDb.Queryable<GameOrderEntity>().FirstAsync(u => u.Id == 7001);
+        var order = await db.MainDb.Queryable<GameOrderEntity>().FirstAsync(u => u.Id == 7001);
         Assert.Equal(0, ClientApiResultReader.Code(root));
         Assert.Equal(OrderStatusEnum.Shipped, order.Status);
         Assert.Equal("9007001", order.ProviderTransactionId);
@@ -141,7 +141,7 @@ public sealed class ClientApiPaymentCallbackEndpointTests
         var result = await controller.NotifyGoogle();
 
         var root = ClientApiResultReader.Read(result);
-        var order = await db.TenantDb.Queryable<GameOrderEntity>().FirstAsync(u => u.Id == 7001);
+        var order = await db.MainDb.Queryable<GameOrderEntity>().FirstAsync(u => u.Id == 7001);
         Assert.Equal(0, ClientApiResultReader.Code(root));
         Assert.Equal(OrderStatusEnum.Shipped, order.Status);
         Assert.Equal("google-provider-order-1", order.ProviderTransactionId);
@@ -201,7 +201,7 @@ public sealed class ClientApiPaymentCallbackEndpointTests
         var result = await controller.NotifyApple();
 
         var root = ClientApiResultReader.Read(result);
-        var order = await db.TenantDb.Queryable<GameOrderEntity>().FirstAsync(u => u.Id == 7001);
+        var order = await db.MainDb.Queryable<GameOrderEntity>().FirstAsync(u => u.Id == 7001);
         Assert.Equal(0, ClientApiResultReader.Code(root));
         Assert.Equal(OrderStatusEnum.Shipped, order.Status);
         Assert.Equal("apple-transaction-1", order.AppleTransactionId);
@@ -235,7 +235,7 @@ public sealed class ClientApiPaymentCallbackEndpointTests
             FakeOptionsProvider.WithAreaPolicy(false),
             db.Repository<GameRoleEntity>(),
             new HttpClient(handler, false),
-            new GameOrderShipService(db.TenantDb, new ClientApiTestHttpClientFactory(handler)),
+            new GameOrderShipService(db.MainDb, new ClientApiTestHttpClientFactory(handler)),
             factory,
             authenticator ?? new TestGooglePubSubPushAuthenticator(false),
             googlePurchaseService ?? new TestGooglePlayPurchaseService(null));

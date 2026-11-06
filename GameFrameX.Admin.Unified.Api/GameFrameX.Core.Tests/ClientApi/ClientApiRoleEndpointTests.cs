@@ -21,7 +21,7 @@ public sealed class ClientApiRoleEndpointTests
         db.SeedArea(2001, 10);
         var handler = ClientApiRecordingHttpHandler.WithGameServerDefaults(3001);
         var controller = CreateController(db, handler);
-        db.AttachContext(controller, includeApp: false);
+        db.AttachContext(controller);
 
         var result = await controller.Add(new AddGameRoleEntityRequest
         {
@@ -33,7 +33,7 @@ public sealed class ClientApiRoleEndpointTests
         });
 
         var root = ClientApiResultReader.Read(result);
-        var saved = await db.TenantDb.Queryable<GameRoleEntity>().FirstAsync(u => u.Id == 3001);
+        var saved = await db.MainDb.Queryable<GameRoleEntity>().FirstAsync(u => u.Id == 3001);
         Assert.Equal(0, ClientApiResultReader.Code(root));
         Assert.Equal(1001, saved.UserId);
         Assert.Equal(1, handler.Count("/game/api/req_player_create"));
@@ -44,7 +44,7 @@ public sealed class ClientApiRoleEndpointTests
     {
         using var db = new ClientApiTestDb();
         var controller = CreateController(db);
-        db.AttachContext(controller, includeApp: false);
+        db.AttachContext(controller);
 
         var result = await controller.Add(new AddGameRoleEntityRequest { UserId = 1001, AreaId = 2001, Name = "Hero", });
 
@@ -67,7 +67,7 @@ public sealed class ClientApiRoleEndpointTests
         var result = await controller.ChangePlayerName(new GamePlayerChangeNameRequest { PlayerId = 3001, AreaId = 2001, Name = "New", });
 
         var root = ClientApiResultReader.Read(result);
-        var saved = await db.TenantDb.Queryable<GameRoleEntity>().FirstAsync(u => u.Id == 3001);
+        var saved = await db.MainDb.Queryable<GameRoleEntity>().FirstAsync(u => u.Id == 3001);
         Assert.Equal(0, ClientApiResultReader.Code(root));
         Assert.Equal("New", saved.Name);
     }
@@ -146,7 +146,7 @@ public sealed class ClientApiRoleEndpointTests
         var result = await controller.Delete(new DeleteGameRoleEntityRequest { Id = 3001, });
 
         var root = ClientApiResultReader.Read(result);
-        var saved = await db.TenantDb.Queryable<GameRoleEntity>().Filter(null, true).FirstAsync(u => u.Id == 3001);
+        var saved = await db.MainDb.Queryable<GameRoleEntity>().Filter(null, true).FirstAsync(u => u.Id == 3001);
         Assert.Equal(0, ClientApiResultReader.Code(root));
         Assert.True(saved.IsDeleted);
     }
@@ -154,13 +154,13 @@ public sealed class ClientApiRoleEndpointTests
     [Fact]
     public async Task GameRole_Login_IssuesGameTicketForOwnedRole()
     {
-        using var db = new ClientApiTestDb(10, 20);
+        using var db = new ClientApiTestDb();
         db.SeedUser(1001, "ticket-user");
         db.SeedAreaClassify(10);
         db.SeedArea(2001, 10);
         db.SeedRole(3001, 1001, 2001);
         var issuer = new ClientApiTokenIssuer(FakeOptionsProvider.WithTokenPolicy("unit-test-signing-key", 60));
-        var accessToken = await issuer.IssueAsync(await db.TenantDb.Queryable<GameUserEntity>().FirstAsync(u => u.Id == 1001), "Guest");
+        var accessToken = await issuer.IssueAsync(await db.MainDb.Queryable<GameUserEntity>().FirstAsync(u => u.Id == 1001), "Guest");
         var controller = CreateController(db, ClientApiRecordingHttpHandler.WithGameServerDefaults(), issuer);
         db.AttachContext(controller);
 
@@ -188,7 +188,7 @@ public sealed class ClientApiRoleEndpointTests
         db.SeedRole(3001, 1001, 2001);
         db.InitBusinessTables(typeof(GameUserEntity));
         var issuer = new ClientApiTokenIssuer(FakeOptionsProvider.WithTokenPolicy("unit-test-signing-key", 60));
-        var accessToken = await issuer.IssueAsync(await db.TenantDb.Queryable<GameUserEntity>().FirstAsync(u => u.Id == 1001), "Guest");
+        var accessToken = await issuer.IssueAsync(await db.MainDb.Queryable<GameUserEntity>().FirstAsync(u => u.Id == 1001), "Guest");
         var handler = ClientApiRecordingHttpHandler.WithGameServerDefaults();
         var controller = CreateController(db, handler, issuer);
         db.AttachContext(controller);
@@ -232,7 +232,7 @@ public sealed class ClientApiRoleEndpointTests
             db.SeedRole(3001, 1001, 2001);
             db.InitBusinessTables(typeof(GameUserEntity));
             var issuer = new ClientApiTokenIssuer(FakeOptionsProvider.WithTokenPolicy("unit-test-signing-key", 60));
-            var accessToken = await issuer.IssueAsync(await db.TenantDb.Queryable<GameUserEntity>().FirstAsync(user => user.Id == 1001), "Guest");
+            var accessToken = await issuer.IssueAsync(await db.MainDb.Queryable<GameUserEntity>().FirstAsync(user => user.Id == 1001), "Guest");
             var handler = ClientApiRecordingHttpHandler.WithGameServerDefaults();
             var controller = CreateController(db, handler, issuer);
             db.AttachContext(controller);
@@ -261,7 +261,7 @@ public sealed class ClientApiRoleEndpointTests
         using var db = new ClientApiTestDb();
         var role = db.SeedRole(3001, 1001, 2001, name: "Old");
         role.RowVersion = 7;
-        await db.TenantDb.Updateable(role).ExecuteCommandAsync();
+        await db.MainDb.Updateable(role).ExecuteCommandAsync();
         var controller = CreateController(db);
         db.AttachContext(controller);
 

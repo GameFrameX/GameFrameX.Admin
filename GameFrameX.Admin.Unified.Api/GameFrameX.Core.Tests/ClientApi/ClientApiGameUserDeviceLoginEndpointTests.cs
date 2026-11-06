@@ -31,7 +31,7 @@ public sealed class ClientApiGameUserDeviceLoginEndpointTests
 
             var root = ClientApiResultReader.Read(result);
             var data = ClientApiResultReader.Data(root);
-            var saved = await db.TenantDb.Queryable<GameUserEntity>().FirstAsync(u => u.DeviceId == "device-c320-a1");
+            var saved = await db.MainDb.Queryable<GameUserEntity>().FirstAsync(u => u.DeviceId == "device-c320-a1");
             Assert.Equal(0, ClientApiResultReader.Code(root));
             Assert.True(data.GetProperty("IsNewRegister").GetBoolean());
             Assert.Equal("Device", data.GetProperty("Provider").GetString());
@@ -62,7 +62,7 @@ public sealed class ClientApiGameUserDeviceLoginEndpointTests
             var secondRoot = ClientApiResultReader.Read(second);
             var firstData = ClientApiResultReader.Data(firstRoot);
             var secondData = ClientApiResultReader.Data(secondRoot);
-            var count = await db.TenantDb.Queryable<GameUserEntity>().CountAsync(u => u.DeviceId == "device-c320-a2");
+            var count = await db.MainDb.Queryable<GameUserEntity>().CountAsync(u => u.DeviceId == "device-c320-a2");
             Assert.Equal(0, ClientApiResultReader.Code(secondRoot));
             // 二次登录找号复用既有账号：IsNewRegister=false 且不重复建号
             Assert.True(firstData.GetProperty("IsNewRegister").GetBoolean());

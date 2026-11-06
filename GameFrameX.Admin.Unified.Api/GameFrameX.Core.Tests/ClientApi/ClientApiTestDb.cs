@@ -28,29 +28,16 @@ internal sealed class ClientApiTestDb : IDisposable
 {
     private readonly List<string> _dbPaths = new();
 
-    public ClientApiTestDb(long tenantId = 1080001, long appId = 1081001)
+    public ClientApiTestDb()
     {
-        TenantId = tenantId;
-        AppId = appId;
         MainDb = CreateScope("main");
-        DbPath = CreateDatabasePath("tenant");
+        MainDbPath = CreateDatabasePath("main");
 
-
-        DbProvider = MainDb;
-        TenantDb = DbProvider;
     }
-
-    public long TenantId { get; }
-
-    public long AppId { get; }
 
     public SqlSugarScope MainDb { get; }
 
-    public ISqlSugarClient TenantDb { get; }
-
-    public string DbPath { get; }
-
-    public ISqlSugarClient DbProvider { get; }
+    public string MainDbPath { get; }
 
 
     public Repository<T> Repository<T>() where T : EntityBase, new()
@@ -60,23 +47,13 @@ internal sealed class ClientApiTestDb : IDisposable
 
     public ClientApiTestDb InitBusinessTables(params Type[] tableTypes)
     {
-        TenantDb.CodeFirst.InitTables(tableTypes);
+        MainDb.CodeFirst.InitTables(tableTypes);
         return this;
     }
 
-    public DefaultHttpContext CreateHttpContext(bool include = true, bool includeApp = true)
-    {
-        return CreateHttpContext(include, includeApp, null);
-    }
-
-    public DefaultHttpContext CreateHttpContext(bool include, bool includeApp, long? packageId)
+    public DefaultHttpContext CreateHttpContext(long? packageId = null)
     {
         var context = new DefaultHttpContext();
-        if (include)
-        {
-            context.Items["TenantId"] = TenantId;
-        }
-
         if (packageId.HasValue)
         {
             context.Items[PaymentOptionSettingProvider.PackageIdKey] = packageId.Value;
@@ -85,9 +62,9 @@ internal sealed class ClientApiTestDb : IDisposable
         return context;
     }
 
-    public void AttachContext(Controller controller, bool include = true, bool includeApp = true)
+    public void AttachContext(Controller controller, long? packageId = null)
     {
-        controller.ControllerContext = new ControllerContext { HttpContext = CreateHttpContext(include, includeApp), };
+        controller.ControllerContext = new ControllerContext { HttpContext = CreateHttpContext(packageId), };
     }
 
     public GameAppPackageEntity SeedPackage(long packageId, string packageName)
@@ -105,7 +82,7 @@ internal sealed class ClientApiTestDb : IDisposable
             IsEnabled = true,
             IsDeleted = false,
         });
-        TenantDb.Insertable(entity).ExecuteCommand();
+        MainDb.Insertable(entity).ExecuteCommand();
         return entity;
     }
 
@@ -127,7 +104,7 @@ internal sealed class ClientApiTestDb : IDisposable
             IsEnabled = true,
             IsDeleted = false,
         });
-        TenantDb.Insertable(entity).ExecuteCommand();
+        MainDb.Insertable(entity).ExecuteCommand();
         return entity;
     }
 
@@ -161,7 +138,7 @@ internal sealed class ClientApiTestDb : IDisposable
             AppVersion = "1.0.0",
         });
         entity.IsEnabled = isEnabled;
-        TenantDb.Insertable(entity).ExecuteCommand();
+        MainDb.Insertable(entity).ExecuteCommand();
         return entity;
     }
 
@@ -169,7 +146,7 @@ internal sealed class ClientApiTestDb : IDisposable
     {
         InitBusinessTables(typeof(GameAppFeatureSwitchEntity));
         WithBasic(entity);
-        TenantDb.Insertable(entity).ExecuteCommand();
+        MainDb.Insertable(entity).ExecuteCommand();
         return entity;
     }
 
@@ -192,7 +169,7 @@ internal sealed class ClientApiTestDb : IDisposable
             RolloutPercent = 100,
             Description = "C108 global info",
         });
-        TenantDb.Insertable(entity).ExecuteCommand();
+        MainDb.Insertable(entity).ExecuteCommand();
         return entity;
     }
 
@@ -214,7 +191,7 @@ internal sealed class ClientApiTestDb : IDisposable
             Announcement = "Upgrade now",
             Description = "C108 app version",
         });
-        TenantDb.Insertable(entity).ExecuteCommand();
+        MainDb.Insertable(entity).ExecuteCommand();
         return entity;
     }
 
@@ -234,7 +211,7 @@ internal sealed class ClientApiTestDb : IDisposable
             ResourceVersion = "2026.07.18",
             Description = "C108 asset package",
         });
-        TenantDb.Insertable(entity).ExecuteCommand();
+        MainDb.Insertable(entity).ExecuteCommand();
         return entity;
     }
 
@@ -255,7 +232,7 @@ internal sealed class ClientApiTestDb : IDisposable
             IsEnabled = true,
             IsDeleted = false,
         });
-        TenantDb.Insertable(entity).ExecuteCommand();
+        MainDb.Insertable(entity).ExecuteCommand();
         return entity;
     }
 
@@ -290,11 +267,11 @@ internal sealed class ClientApiTestDb : IDisposable
             IsEnabled = true,
             IsDeleted = false,
         });
-        TenantDb.Insertable(entity).ExecuteCommand();
+        MainDb.Insertable(entity).ExecuteCommand();
         return entity;
     }
 
-    public GameRoleEntity SeedRole(long roleId, long userId, long areaId, long appId = 0, string name = "Role", bool isSandbox = false)
+    public GameRoleEntity SeedRole(long roleId, long userId, long areaId, string name = "Role", bool isSandbox = false)
     {
         InitBusinessTables(typeof(GameRoleEntity));
         var entity = WithSelect(new GameRoleEntity
@@ -316,7 +293,7 @@ internal sealed class ClientApiTestDb : IDisposable
             AllRecharge = 0,
             OnlineTime = 0,
         });
-        TenantDb.Insertable(entity).ExecuteCommand();
+        MainDb.Insertable(entity).ExecuteCommand();
         return entity;
     }
 
@@ -334,7 +311,7 @@ internal sealed class ClientApiTestDb : IDisposable
             IsEnabled = isEnabled,
             IsDeleted = false,
         });
-        TenantDb.Insertable(entity).ExecuteCommand();
+        MainDb.Insertable(entity).ExecuteCommand();
         return entity;
     }
 
@@ -355,7 +332,7 @@ internal sealed class ClientApiTestDb : IDisposable
             Sales = 0,
             Weight = weight,
         });
-        TenantDb.Insertable(entity).ExecuteCommand();
+        MainDb.Insertable(entity).ExecuteCommand();
         return entity;
     }
 
@@ -395,7 +372,7 @@ internal sealed class ClientApiTestDb : IDisposable
             AppleVerifiedTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
             ProviderTransactionId = providerTransactionId ?? string.Empty,
         });
-        TenantDb.Insertable(entity).ExecuteCommand();
+        MainDb.Insertable(entity).ExecuteCommand();
         return entity;
     }
 
@@ -416,7 +393,7 @@ internal sealed class ClientApiTestDb : IDisposable
             EndTime = endTime != null ? new DateTimeOffset(endTime.Value).ToUnixTimeSeconds() : DateTimeOffset.Now.AddHours(1).ToUnixTimeSeconds(),
             Contents = contents,
         });
-        TenantDb.Insertable(entity).ExecuteCommand();
+        MainDb.Insertable(entity).ExecuteCommand();
         return entity;
     }
 
@@ -429,7 +406,7 @@ internal sealed class ClientApiTestDb : IDisposable
             Name = name,
             RoleUsageLimit = roleUsageLimit,
         });
-        TenantDb.Insertable(entity).ExecuteCommand();
+        MainDb.Insertable(entity).ExecuteCommand();
         return entity;
     }
 
@@ -446,7 +423,7 @@ internal sealed class ClientApiTestDb : IDisposable
             OrderStatus = orderStatus,
             OrderId = $"webshop-{orderId}",
         });
-        TenantDb.Insertable(entity).ExecuteCommand();
+        MainDb.Insertable(entity).ExecuteCommand();
         return entity;
     }
 
@@ -483,7 +460,7 @@ internal sealed class ClientApiTestDb : IDisposable
             IsEnabled = true,
             IsDeleted = false,
         });
-        TenantDb.Insertable(entity).ExecuteCommand();
+        MainDb.Insertable(entity).ExecuteCommand();
         return entity;
     }
 

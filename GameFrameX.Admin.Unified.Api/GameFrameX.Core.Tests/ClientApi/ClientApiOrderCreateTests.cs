@@ -39,7 +39,7 @@ public sealed class ClientApiOrderCreateTests
 
         var root = ClientApiResultReader.Read(result);
         var data = ClientApiResultReader.Data(root);
-        var saved = await db.TenantDb.Queryable<GameOrderEntity>().FirstAsync(u => u.RoleId == "3001");
+        var saved = await db.MainDb.Queryable<GameOrderEntity>().FirstAsync(u => u.RoleId == "3001");
         Assert.Equal(0, ClientApiResultReader.Code(root));
         Assert.Equal("provider-order-1", data.GetProperty("OrderId").GetString());
         Assert.Equal(OrderStatusEnum.Unpaid, saved.Status);
@@ -51,7 +51,7 @@ public sealed class ClientApiOrderCreateTests
     {
         using var db = new ClientApiTestDb();
         var controller = CreateController(db, new TestPaymentChannelFactory(new TestPaymentChannelHandler("testpay")));
-        db.AttachContext(controller, includeApp: false);
+        db.AttachContext(controller);
 
         var result = await controller.Create(new CreateGameOrderEntityRequest
         {
@@ -93,7 +93,7 @@ public sealed class ClientApiOrderCreateTests
         });
 
         var root = ClientApiResultReader.Read(result);
-        var orderCount = await db.TenantDb.Queryable<GameOrderEntity>().CountAsync();
+        var orderCount = await db.MainDb.Queryable<GameOrderEntity>().CountAsync();
         Assert.Equal((int)PaymentErrorCode.PayChannelNotSupported, ClientApiResultReader.Code(root));
         Assert.Equal("不支持的支付渠道", ClientApiResultReader.Message(root));
         Assert.Equal(0, orderCount);
@@ -107,7 +107,7 @@ public sealed class ClientApiOrderCreateTests
             FakeOptionsProvider.WithAreaPolicy(false),
             db.Repository<GameRoleEntity>(),
             new HttpClient(ClientApiRecordingHttpHandler.WithGameServerDefaults(), false),
-            new GameOrderShipService(db.TenantDb, new ClientApiTestHttpClientFactory(ClientApiRecordingHttpHandler.WithGameServerDefaults())),
+            new GameOrderShipService(db.MainDb, new ClientApiTestHttpClientFactory(ClientApiRecordingHttpHandler.WithGameServerDefaults())),
             factory,
             new TestGooglePubSubPushAuthenticator(),
             new TestGooglePlayPurchaseService());

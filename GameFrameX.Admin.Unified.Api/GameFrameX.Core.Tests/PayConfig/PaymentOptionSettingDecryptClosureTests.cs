@@ -26,24 +26,22 @@ public sealed class PaymentOptionSettingDecryptClosureTests
     [PostgreSqlFact]
     public void GetOptionSetting_SensitiveJsonFieldDecrypts()
     {
-        const long tenantId = 1900000004001;
-        const long appId = 1900000004101;
         var originalKey = Environment.GetEnvironmentVariable(SecretCrypto.KeyEnvironmentVariable);
         Environment.SetEnvironmentVariable(SecretCrypto.KeyEnvironmentVariable, "unit-test-secret-key");
         _ = Assembly.Load("GameFrameX.Payment.AliPay");
         try
         {
-            using var fixture = new PostgresPaymentFixture(tenantId, appId);
+            using var fixture = new PostgresPaymentFixture();
             var configJson = PaymentConfigCrypto.EncryptConfigJson("alipay",
                 "{\"AliPayAppId\":\"2021001\",\"AliPayMerchantPrivateKey\":\"plain-merchant-key\",\"AliPayGatewayUrl\":\"https://openapi.alipay.com/gateway.do\"}");
-            fixture.TenantDb.Insertable(new GamePaymentConfigEntity
+            fixture.MainDb.Insertable(new GamePaymentConfigEntity
             {
                 Id = 1900000004201, IsEnabled = true, PayChannel = "alipay", ConfigJson = configJson,
             }).ExecuteCommand();
 
             var httpContext = new DefaultHttpContext();
             httpContext.Items[GameFrameX.Core.Middleware.PublicCallbackRouteContext.ItemKey] = true;
-            var provider = new PaymentOptionSettingProvider(fixture.DbProvider, new HttpContextAccessor { HttpContext = httpContext, });
+            var provider = new PaymentOptionSettingProvider(fixture.MainDb, new HttpContextAccessor { HttpContext = httpContext, });
 
             var setting = provider.GetOptionSetting<AliPayOptionSetting>("alipay");
 
@@ -65,7 +63,7 @@ public sealed class PaymentOptionSettingDecryptClosureTests
     {
         private readonly string _databaseName;
 
-        public PostgresPaymentFixture(long tenantId, long appId)
+        public PostgresPaymentFixture()
         {
             _databaseName = ("gfx_c372_pay_" + Guid.NewGuid().ToString("N")).ToLowerInvariant();
             ExecuteAdminCommand($"CREATE DATABASE \"{_databaseName}\"");
@@ -74,17 +72,11 @@ public sealed class PaymentOptionSettingDecryptClosureTests
             MainDb = new SqlSugarScope(mainConfig);
 
 
-            DbProvider = MainDb;
-            TenantDb = DbProvider;
-            TenantDb.CodeFirst.InitTables(typeof(GamePaymentConfigEntity));
-            _ = appId;
+            MainDb.CodeFirst.InitTables(typeof(GamePaymentConfigEntity));
         }
 
         public SqlSugarScope MainDb { get; }
 
-        public ISqlSugarClient TenantDb { get; }
-
-        public ISqlSugarClient DbProvider { get; }
 
 
         public void Dispose()

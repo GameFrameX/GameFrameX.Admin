@@ -64,7 +64,7 @@ public sealed class ClientApiFeatureSwitchEndpointTests
     private static GameFeatureSwitchController CreateController(ClientApiTestDb db)
     {
         var resolver = new FeatureSwitchDeliveryResolver(db.Repository<GameAppFeatureSwitchEntity>());
-        var packageResolver = new GameAppPackageResolver(db.DbProvider);
+        var packageResolver = new GameAppPackageResolver(db.MainDb);
         return new GameFeatureSwitchController(resolver, packageResolver);
     }
 
@@ -137,7 +137,7 @@ public sealed class ClientApiFeatureSwitchEndpointTests
         var oldVersion = first.GetProperty("Version").GetString();
 
         row.ValueJson = "{\"v\":2}";
-        db.TenantDb.Updateable(row).ExecuteCommand();
+        db.MainDb.Updateable(row).ExecuteCommand();
 
         var second = ClientApiResultReader.Data(ClientApiResultReader.Read(await controller.GetInfo(Request(version: oldVersion))));
 
@@ -237,12 +237,12 @@ public sealed class ClientApiFeatureSwitchEndpointTests
     /// 无租户上下文仍从主库读取有效开关。
     /// </summary>
     [Fact]
-    public async Task GetInfo_WithoutTenantContext_ReadsMainDatabase()
+    public async Task GetInfo_WithoutRequestContext_ReadsMainDatabase()
     {
         using var db = new ClientApiTestDb();
         db.InitBusinessTables(typeof(GameAppFeatureSwitchEntity), typeof(GameAppPackageEntity));
         var controller = CreateController(db);
-        db.AttachContext(controller, include: false);
+        db.AttachContext(controller);
 
         db.SeedFeatureSwitch(Row(1, "activity.main"));
         var result = ClientApiResultReader.Read(await controller.GetInfo(Request()));
@@ -259,7 +259,7 @@ public sealed class ClientApiFeatureSwitchEndpointTests
         using var db = new ClientApiTestDb();
         db.InitBusinessTables(typeof(GameAppFeatureSwitchEntity), typeof(GameAppPackageEntity));
         var controller = CreateController(db);
-        db.AttachContext(controller, includeApp: false);
+        db.AttachContext(controller);
 
         db.SeedFeatureSwitch(Row(1, "activity.main"));
         var result = ClientApiResultReader.Read(await controller.GetInfo(Request()));

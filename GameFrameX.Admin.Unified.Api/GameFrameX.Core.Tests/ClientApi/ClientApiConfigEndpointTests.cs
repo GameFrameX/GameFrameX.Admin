@@ -31,10 +31,10 @@ public sealed class ClientApiConfigEndpointTests
     {
         using var db = new ClientApiTestDb();
         db.SeedAppVersion(1, "com.gameframex.c108");
-        var resolver = new GameAppPackageResolver(db.DbProvider);
+        var resolver = new GameAppPackageResolver(db.MainDb);
         var matcher = new AppVersionFallbackMatcher(db.Repository<GameAppReleaseVersionEntity>(), resolver);
         var controller = new GameAppVersionController(db.Repository<GameAppReleaseVersionEntity>(), matcher);
-        db.AttachContext(controller, include: false, includeApp: false);
+        db.AttachContext(controller);
 
         var result = await controller.GetInfo(new GameAppVersionRequest
         {
@@ -58,13 +58,13 @@ public sealed class ClientApiConfigEndpointTests
     {
         using var db = new ClientApiTestDb();
         db.SeedAssetPackageVersion(1, "com.gameframex.c108");
-        var resolver = new GameAppPackageResolver(db.DbProvider);
+        var resolver = new GameAppPackageResolver(db.MainDb);
         var matcher = new AssetPackageVersionFallbackMatcher(db.Repository<GameAppAssetPackageVersionEntity>(), resolver);
         var controller = new GameAssetPackageVersionController(
             db.Repository<GameAppAssetPackageVersionEntity>(),
             db.Repository<GameAppDeviceEntity>(),
             matcher);
-        db.AttachContext(controller, include: false, includeApp: false);
+        db.AttachContext(controller);
 
         var result = await controller.GetInfo(new AssetPackageVersionRequest
         {
@@ -80,7 +80,7 @@ public sealed class ClientApiConfigEndpointTests
         var root = ClientApiResultReader.Read(result);
         var data = ClientApiResultReader.Data(root);
         // GFX-706：GetInfo 纯只读——设备注册副作用已拆至 RegisterDevice，携带标识调用也不写设备表
-        var deviceCount = await db.TenantDb.Queryable<GameAppDeviceEntity>().CountAsync();
+        var deviceCount = await db.MainDb.Queryable<GameAppDeviceEntity>().CountAsync();
         Assert.Equal(0, ClientApiResultReader.Code(root));
         Assert.Equal(0, deviceCount);
         Assert.Equal("2026.07.18", data.GetProperty("Version").GetString());
@@ -92,13 +92,13 @@ public sealed class ClientApiConfigEndpointTests
     {
         using var db = new ClientApiTestDb();
         db.SeedAssetPackageVersion(1, "com.gameframex.c108");
-        var resolver = new GameAppPackageResolver(db.DbProvider);
+        var resolver = new GameAppPackageResolver(db.MainDb);
         var matcher = new AssetPackageVersionFallbackMatcher(db.Repository<GameAppAssetPackageVersionEntity>(), resolver);
         var controller = new GameAssetPackageVersionController(
             db.Repository<GameAppAssetPackageVersionEntity>(),
             db.Repository<GameAppDeviceEntity>(),
             matcher);
-        db.AttachContext(controller, include: false, includeApp: false);
+        db.AttachContext(controller);
 
         var first = await controller.RegisterDevice(new DeviceRegisterRequest
         {
@@ -111,7 +111,7 @@ public sealed class ClientApiConfigEndpointTests
 
         var firstRoot = ClientApiResultReader.Read(first);
         var secondRoot = ClientApiResultReader.Read(second);
-        var deviceCount = await db.TenantDb.Queryable<GameAppDeviceEntity>().CountAsync();
+        var deviceCount = await db.MainDb.Queryable<GameAppDeviceEntity>().CountAsync();
         Assert.Equal(0, ClientApiResultReader.Code(firstRoot));
         Assert.Equal(0, ClientApiResultReader.Code(secondRoot));
         // 幂等：两次注册仅落一行，DeviceId 一致
@@ -128,10 +128,10 @@ public sealed class ClientApiConfigEndpointTests
         using var db = new ClientApiTestDb();
         db.InitBusinessTables(typeof(GameAppPackageEntity));
         db.SeedRemoteConfig(1, "com.gameframex.c108", "{\"feature\":\"on\"}");
-        var resolver = new GameAppPackageResolver(db.DbProvider);
+        var resolver = new GameAppPackageResolver(db.MainDb);
         var delivery = new RemoteConfigDeliveryService(db.Repository<GameAppRemoteConfigEntity>(), resolver);
         var controller = new GameRemoteConfigController(db.Repository<GameAppRemoteConfigEntity>(), delivery);
-        db.AttachContext(controller, include: false, includeApp: false);
+        db.AttachContext(controller);
 
         var result = await controller.GetInfo(new RemoteConfigRequest
         {
@@ -159,7 +159,7 @@ public sealed class ClientApiConfigEndpointTests
         db.SeedArea(100, 10);
         db.SeedArea(101, 10, false);
         var controller = new GameAreaController(db.Repository<GameAreaEntity>(), FakeOptionsProvider.WithAreaPolicy(false));
-        db.AttachContext(controller, include: false, includeApp: false);
+        db.AttachContext(controller);
 
         var result = await controller.GetAreaList(new GameAreaGetAreaListRequest());
 
@@ -179,7 +179,7 @@ public sealed class ClientApiConfigEndpointTests
         db.SeedAnnouncement(2, 100, "fr-FR", "Inactive localized", false);
         db.SeedAnnouncement(3, null, "default", "Global default");
         var controller = new GameAnnouncementController(db.Repository<GameAnnouncementEntity>());
-        db.AttachContext(controller, include: false, includeApp: false);
+        db.AttachContext(controller);
 
         var result = await controller.ListByAreaId(new GameAnnouncementListRequest { Id = 100, Language = "fr-FR", });
 
@@ -196,8 +196,8 @@ public sealed class ClientApiConfigEndpointTests
     {
         var resolver = new StaticGameLoginTicketKeyResolver();
         var controller = new GameLoginTicketKeyController(resolver);
-        using var db = new ClientApiTestDb(10, 20);
-        db.AttachContext(controller, include: false, includeApp: false);
+        using var db = new ClientApiTestDb();
+        db.AttachContext(controller);
 
         var result = await controller.PublicKeys();
 
@@ -214,8 +214,8 @@ public sealed class ClientApiConfigEndpointTests
     {
         var resolver = new StaticGameLoginTicketKeyResolver();
         var controller = new GameLoginTicketKeyController(resolver);
-        using var db = new ClientApiTestDb(10, 20);
-        db.AttachContext(controller, include: false, includeApp: false);
+        using var db = new ClientApiTestDb();
+        db.AttachContext(controller);
 
         var result = await controller.PublicKeys();
 
@@ -229,19 +229,19 @@ public sealed class ClientApiConfigEndpointTests
     [Fact]
     public async Task GameLoginTicketKeyResolver_PublicKeys_DoesNotAutoCreateSigningKey()
     {
-        using var db = new ClientApiTestDb(10, 20);
+        using var db = new ClientApiTestDb();
         db.InitBusinessTables(typeof(GameLoginTicketKeyEntity));
-        var resolver = new GameLoginTicketKeyResolver(db.DbProvider, FakeOptionsProvider.WithTicketPolicy(DateTimeOffset.UtcNow.ToUnixTimeSeconds() + 60));
+        var resolver = new GameLoginTicketKeyResolver(db.MainDb, FakeOptionsProvider.WithTicketPolicy(DateTimeOffset.UtcNow.ToUnixTimeSeconds() + 60));
 
         var publicKeys = await resolver.GetPublicKeysAsync();
 
         Assert.Empty(publicKeys);
-        Assert.Equal(0, await db.TenantDb.Queryable<GameLoginTicketKeyEntity>().CountAsync());
+        Assert.Equal(0, await db.MainDb.Queryable<GameLoginTicketKeyEntity>().CountAsync());
 
         var signingKey = await resolver.ResolveSigningKeyAsync();
 
         Assert.False(string.IsNullOrWhiteSpace(signingKey.Kid));
-        Assert.Equal(1, await db.TenantDb.Queryable<GameLoginTicketKeyEntity>().CountAsync());
+        Assert.Equal(1, await db.MainDb.Queryable<GameLoginTicketKeyEntity>().CountAsync());
         Assert.Single(await resolver.GetPublicKeysAsync());
     }
 

@@ -58,7 +58,7 @@ public sealed class GameUserRankTests
             Assert.Equal("badge5001", own.GetProperty("Badge").GetString());
             Assert.Equal(100, own.GetProperty("Score").GetInt64());
 
-            var rows = db.TenantDb.Queryable<GameRankEntryEntity>().Where(x => x.GroupId == groupId).ToList();
+            var rows = db.MainDb.Queryable<GameRankEntryEntity>().Where(x => x.GroupId == groupId).ToList();
             Assert.Equal(GameUserRankController.BoardSize, rows.Count);
             var ownEntity = rows.Single(x => x.UserId == 5001);
             Assert.Equal(1, ownEntity.RankType);
@@ -81,14 +81,14 @@ public sealed class GameUserRankTests
             Assert.Equal(first.GetProperty("GroupId").GetString(), second.GetProperty("GroupId").GetString());
             // 同组第二人后不再补机器人（已到榜单规模）
             var sharedGroupId = first.GetProperty("GroupId").GetString();
-            var sharedRows = db.TenantDb.Queryable<GameRankEntryEntity>().Where(x => x.GroupId == sharedGroupId).ToList();
+            var sharedRows = db.MainDb.Queryable<GameRankEntryEntity>().Where(x => x.GroupId == sharedGroupId).ToList();
             Assert.Equal(GameUserRankController.BoardSize + 1, sharedRows.Count);
 
             // token 变化（活动代币增长）= 新一轮次令牌 → 开新组
             var third = ClientApiResultReader.Data(ClientApiResultReader.Read(await controller.JoinRank(MakeJoin(5003, 200))));
             var newGroupId = third.GetProperty("GroupId").GetString();
             Assert.NotEqual(sharedGroupId, newGroupId);
-            var ownEntity = db.TenantDb.Queryable<GameRankEntryEntity>().Single(x => x.UserId == 5003);
+            var ownEntity = db.MainDb.Queryable<GameRankEntryEntity>().Single(x => x.UserId == 5003);
             Assert.Equal(200, ownEntity.RoundToken);
             Assert.Equal(200, ownEntity.Score);
         }
@@ -111,7 +111,7 @@ public sealed class GameUserRankTests
             var groupId = data.GetProperty("GroupId").GetString();
             Assert.NotEqual("g_seed", groupId);
             // 新组 = 本人 + 机器人凑满榜单规模
-            var rows = db.TenantDb.Queryable<GameRankEntryEntity>().Where(x => x.GroupId == groupId).ToList();
+            var rows = db.MainDb.Queryable<GameRankEntryEntity>().Where(x => x.GroupId == groupId).ToList();
             Assert.Equal(GameUserRankController.BoardSize, rows.Count);
             Assert.Contains(rows, x => x.UserId == 5201);
         }
@@ -141,7 +141,7 @@ public sealed class GameUserRankTests
             Assert.Equal(3, ranks[2].GetProperty("Rank").GetInt64());
 
             // 分数变化后重算（心跳推进 7001 反超）
-            var row7001 = db.TenantDb.Queryable<GameRankEntryEntity>().Single(x => x.UserId == 7001);
+            var row7001 = db.MainDb.Queryable<GameRankEntryEntity>().Single(x => x.UserId == 7001);
             row7001.Score = 999;
             await repository.UpdateAsync(row7001);
             var replay = ClientApiResultReader.Data(ClientApiResultReader.Read(await controller.Query(
@@ -183,10 +183,10 @@ public sealed class GameUserRankTests
             Assert.Equal(0, data.GetProperty("MultiRank").GetInt64());
             Assert.Equal(0, data.GetProperty("Weekly2Rank").GetInt64());
 
-            var bakeout = db.TenantDb.Queryable<GameRankEntryEntity>().Single(x => x.UserId == 8001 && x.RankType == 1);
+            var bakeout = db.MainDb.Queryable<GameRankEntryEntity>().Single(x => x.UserId == 8001 && x.RankType == 1);
             Assert.Equal(120, bakeout.Score);
             Assert.Equal(2, bakeout.Rank);
-            var weekly1 = db.TenantDb.Queryable<GameRankEntryEntity>().Single(x => x.UserId == 8001 && x.RankType == 3);
+            var weekly1 = db.MainDb.Queryable<GameRankEntryEntity>().Single(x => x.UserId == 8001 && x.RankType == 3);
             Assert.Equal(5, weekly1.Score);
         }
     }

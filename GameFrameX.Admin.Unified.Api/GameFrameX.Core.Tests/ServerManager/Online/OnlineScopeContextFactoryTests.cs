@@ -19,11 +19,8 @@ namespace GameFrameX.Core.Tests.ServerManager.Online;
 // S3/C401 断链修复点
 public sealed class OnlineScopeContextFactoryTests : IDisposable
 {
-    private const long TenantA = 1001;
-    private const long App100 = 100;
-    private const long App200 = 200;
-    private const long Area1001 = 2001; // 归属 App100
-    private const long Area2001 = 3001; // 归属 App200（构造跨应用区服场景）
+    private const long Area1001 = 2001;
+    private const long Area2001 = 3001;
 
     private readonly string _dbPath = Path.Combine(Path.GetTempPath(), $"online_scope_{Guid.NewGuid():N}.db");
     private readonly SqlSugarScope _scopeOwner;
@@ -84,7 +81,7 @@ public sealed class OnlineScopeContextFactoryTests : IDisposable
     /// （MonitorLogging 在 action 层自动落库；此处锁定 LogOperationEntity 表对 322 段拒绝留痕的承载能力）。
     /// </summary>
     [Fact]
-    public async Task RejectedScope_IsAuditableInTenantOperationLog()
+    public async Task RejectedScope_IsAuditableInOperationLog()
     {
         await SeedAsync();
 
@@ -147,11 +144,11 @@ public sealed class OnlineScopeContextFactoryTests : IDisposable
     {
         var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
-        await _db.Insertable(NewArea(Area1001, App100, now)).ExecuteCommandAsync();
-        await _db.Insertable(NewArea(Area2001, App200, now)).ExecuteCommandAsync();
+        await _db.Insertable(NewArea(Area1001, now)).ExecuteCommandAsync();
+        await _db.Insertable(NewArea(Area2001, now)).ExecuteCommandAsync();
     }
 
-    private static GameAreaEntity NewArea(long id, long gameAppId, long now)
+    private static GameAreaEntity NewArea(long id, long now)
     {
         return new GameAreaEntity
         {

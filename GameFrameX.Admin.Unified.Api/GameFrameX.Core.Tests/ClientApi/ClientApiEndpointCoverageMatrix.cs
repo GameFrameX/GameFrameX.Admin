@@ -11,25 +11,25 @@ internal static class ClientApiEndpointCoverageMatrix
         Endpoint("GameAdWebHook.AdMobNotify", "GET", "api/GameAdWebHook/AdMobNotify/{packageId:long?}", "ad-callback", false, false, false, true, "valid AdMob callback grants reward once", "invalid-route", "signature-failed", "duplicate-callback", "cross-package"),
         Endpoint("GameAdWebHook.UnityAdsNotify", "GET", "api/GameAdWebHook/UnityAdsNotify/{packageId:long?}", "ad-callback", false, false, false, true, "valid UnityAds callback grants reward once", "invalid-route", "signature-failed", "duplicate-callback"),
 
-        Endpoint("GameAnnouncement.List", "GET", "api/GameAnnouncementService/List", "announcement", true, true, false, false, "lists enabled announcements by language", "missing-tenant", "disabled-record-hidden"),
-        Endpoint("GameAnnouncement.ListByAreaId", "POST", "api/GameAnnouncementService/ListByAreaId", "announcement", true, true, false, false, "lists enabled area announcements", "missing-tenant", "area-not-found"),
+        Endpoint("GameAnnouncement.List", "GET", "api/GameAnnouncementService/List", "announcement", true, true, false, false, "lists enabled announcements by language", "missing-context", "disabled-record-hidden"),
+        Endpoint("GameAnnouncement.ListByAreaId", "POST", "api/GameAnnouncementService/ListByAreaId", "announcement", true, true, false, false, "lists enabled area announcements", "missing-context", "area-not-found"),
 
-        Endpoint("GameAppVersion.GetInfo", "POST", "api/GameAppVersion/GetInfo", "client-config", true, true, false, false, "matches release version by app/package/platform/channel", "missing-app", "not-found", "disabled-record-hidden", "fallback-boundary"),
-        Endpoint("GameArea.GetAreaList", "POST", "api/GameArea/GetAreaList", "area", true, true, false, false, "returns visible area tree", "missing-app", "closed-area-filter", "package-fallback"),
-        Endpoint("GameAssetPackageVersion.GetInfo", "POST", "api/GameAssetPackageVersion/GetInfo", "client-config", true, true, false, false, "matches asset package version", "missing-app", "not-found", "disabled-record-hidden", "package-boundary"),
-        Endpoint("GameAssetPackageVersion.RegisterDevice", "POST", "api/GameAssetPackageVersion/RegisterDevice", "client-config", true, true, false, false, "registers device idempotently by app and identifier", "missing-app", "empty-identifier"),
-        Endpoint("GameFeatureSwitch.GetInfo", "POST", "api/GameFeatureSwitch/GetInfo", "client-config", true, true, false, false, "returns versioned feature switches with unchanged short-circuit", "missing-tenant", "missing-app", "audience-server-hidden", "out-of-window-hidden", "rollout-miss", "pascal-case"),
-        Endpoint("GameRemoteConfig.GetInfo", "POST", "api/GameRemoteConfig/GetInfo", "client-config", true, true, false, false, "returns rollout-matched global info", "missing-app", "rollout-miss", "whitelist-boundary", "pascal-case"),
-        Endpoint("GameLoginTicketKey.PublicKeys", "GET", "api/GameLoginTicketKey/PublicKeys", "ticket", true, true, false, false, "returns tenant-app public keys only", "missing-tenant", "missing-app", "private-key-not-returned"),
+        Endpoint("GameAppVersion.GetInfo", "POST", "api/GameAppVersion/GetInfo", "client-config", true, true, false, false, "matches release version by app/package/platform/channel", "missing-package", "not-found", "disabled-record-hidden", "fallback-boundary"),
+        Endpoint("GameArea.GetAreaList", "POST", "api/GameArea/GetAreaList", "area", true, true, false, false, "returns visible area tree", "missing-package", "closed-area-filter", "package-fallback"),
+        Endpoint("GameAssetPackageVersion.GetInfo", "POST", "api/GameAssetPackageVersion/GetInfo", "client-config", true, true, false, false, "matches asset package version", "missing-package", "not-found", "disabled-record-hidden", "package-boundary"),
+        Endpoint("GameAssetPackageVersion.RegisterDevice", "POST", "api/GameAssetPackageVersion/RegisterDevice", "client-config", true, true, false, false, "registers device idempotently by app and identifier", "missing-package", "empty-identifier"),
+        Endpoint("GameFeatureSwitch.GetInfo", "POST", "api/GameFeatureSwitch/GetInfo", "client-config", true, true, false, false, "returns versioned feature switches with unchanged short-circuit", "missing-context", "missing-package", "audience-server-hidden", "out-of-window-hidden", "rollout-miss", "pascal-case"),
+        Endpoint("GameRemoteConfig.GetInfo", "POST", "api/GameRemoteConfig/GetInfo", "client-config", true, true, false, false, "returns rollout-matched global info", "missing-package", "rollout-miss", "whitelist-boundary", "pascal-case"),
+        Endpoint("GameLoginTicketKey.PublicKeys", "GET", "api/GameLoginTicketKey/PublicKeys", "ticket", true, true, false, false, "returns game public keys only", "missing-context", "missing-package", "private-key-not-returned"),
 
-        Endpoint("GameOrder.Create", "POST", "api/GameOrder/Create", "payment", true, true, false, false, "creates order and payment payload", "missing-app", "area-not-found", "role-not-found", "unsupported-channel", "amount-boundary"),
+        Endpoint("GameOrder.Create", "POST", "api/GameOrder/Create", "payment", true, true, false, false, "creates order and payment payload", "missing-package", "area-not-found", "role-not-found", "unsupported-channel", "amount-boundary"),
         Endpoint("GameOrder.NotifyAliPay", "POST", "api/GameOrder/NotifyAliPay/{packageId:long?}", "payment-callback", false, false, false, true, "valid AliPay notify ships once", "invalid-route", "signature-failed", "order-not-found", "amount-mismatch", "duplicate-callback"),
         Endpoint("GameOrder.NotifyApple", "POST", "api/GameOrder/NotifyApple/{packageId:long?}", "payment-callback", false, false, false, true, "valid Apple notification ships once", "invalid-route", "signature-failed", "order-not-found", "duplicate-callback", "refund-boundary"),
         Endpoint("GameOrder.NotifyGoogle", "POST", "api/GameOrder/NotifyGoogle/{packageId:long?}", "payment-callback", false, false, false, true, "valid Google Pub/Sub ships once", "invalid-route", "jwt-failed", "purchase-invalid", "order-not-found", "duplicate-callback"),
         Endpoint("GameOrder.NotifyWeChatPay", "POST", "api/GameOrder/NotifyWeChatPay/{packageId:long?}", "payment-callback", false, false, false, true, "valid WeChat Pay callback ships once", "invalid-route", "signature-failed", "amount-mismatch", "duplicate-callback"),
         Endpoint("GameOrder.NotifyXsolla", "POST", "api/GameOrder/NotifyXsolla/{packageId:long?}", "payment-callback", false, false, false, true, "valid Xsolla webhook ships once", "invalid-route", "signature-failed", "notification-unsupported", "order-not-found", "duplicate-callback"),
 
-        Endpoint("GameRedeemCode.Consume", "POST", "api/GameRedeemCode/Consume", "redeem-code", true, true, false, false, "consumes active code once and sends item", "missing-app", "code-not-found", "not-active", "expired", "limit-exhausted", "already-used", "area-not-found"),
+        Endpoint("GameRedeemCode.Consume", "POST", "api/GameRedeemCode/Consume", "redeem-code", true, true, false, false, "consumes active code once and sends item", "missing-package", "code-not-found", "not-active", "expired", "limit-exhausted", "already-used", "area-not-found"),
 
         Endpoint("GameRole.ChangePlayerName", "POST", "api/GameRole/ChangePlayerName", "role", true, true, false, false, "changes owned role name", "role-not-found", "duplicate-name", "invalid-name"),
         Endpoint("GameRole.Add", "POST", "api/GameRole/Add", "role", true, true, false, false, "creates role in open area", "area-not-found", "duplicate-role", "area-closed", "area-full"),
@@ -72,9 +72,9 @@ internal static class ClientApiEndpointCoverageMatrix
         Endpoint("GameUserArchive.Download", "POST", "api/GameUserArchive/Download", "archive", true, true, false, false, "downloads owned archive snapshot", "archive-not-found"),
         Endpoint("GameUserArchive.GetOtherProgress", "POST", "api/GameUserArchive/GetOtherProgress", "archive", true, true, false, false, "returns other players progress summary", "progress-not-found"),
 
-        Endpoint("GameUserEmail.SendRegister", "POST", "api/GameUserEmail/SendRegister", "email-code", true, true, false, false, "sends register code through tenant email", "missing-app", "rate-limited", "daily-limit", "email-missing"),
+        Endpoint("GameUserEmail.SendRegister", "POST", "api/GameUserEmail/SendRegister", "email-code", true, true, false, false, "sends register code through configured email", "missing-package", "rate-limited", "daily-limit", "email-missing"),
         Endpoint("GameUserEmail.VerifyCode", "POST", "api/GameUserEmail/VerifyCode", "email-code", true, true, false, false, "verifies active code", "code-not-found", "code-expired"),
-        Endpoint("GameUserEmail.SendReset", "POST", "api/GameUserEmail/SendReset", "email-code", true, true, false, false, "sends reset code for existing account", "missing-app", "account-not-found", "rate-limited", "email-missing"),
+        Endpoint("GameUserEmail.SendReset", "POST", "api/GameUserEmail/SendReset", "email-code", true, true, false, false, "sends reset code for existing account", "missing-package", "account-not-found", "rate-limited", "email-missing"),
 
         Endpoint("GameUserMisc.MarkLogout", "POST", "api/GameUserMisc/MarkLogout", "misc", true, true, false, false, "marks user logout state", "account-not-found"),
         Endpoint("GameUserMisc.RandomRobots", "POST", "api/GameUserMisc/RandomRobots", "misc", true, true, false, false, "returns random robot users excluding caller", "empty-robot-pool"),
@@ -95,7 +95,7 @@ internal static class ClientApiEndpointCoverageMatrix
 
         Endpoint("GameUserSession.Login", "POST", "api/GameUserSession/Login", "session", true, true, false, false, "establishes login session and returns heartbeat intervals", "client-version-blocked", "account-deleting", "account-not-found"),
 
-        Endpoint("GameWebShop.Get", "GET", "api/GameWebShop/Get", "web-shop", true, true, false, false, "lists enabled webshop goods", "missing-tenant", "disabled-goods-hidden"),
+        Endpoint("GameWebShop.Get", "GET", "api/GameWebShop/Get", "web-shop", true, true, false, false, "lists enabled webshop goods", "missing-context", "disabled-goods-hidden"),
         Endpoint("GameWebShop.Buy", "POST", "api/GameWebShop/Buy", "web-shop", true, true, false, false, "creates webshop buy request", "role-not-found", "area-not-found", "area-cannot-buy", "goods-not-found", "notify-url-context-missing"),
         Endpoint("GameWebShop.NotifyWebShop", "GET", "api/GameWebShop/NotifyWebShop/{packageId:long?}", "web-shop-callback", false, false, false, true, "valid webshop notify sends mail once", "invalid-route", "signature-failed", "role-not-found", "goods-not-found", "duplicate-callback"),
     };

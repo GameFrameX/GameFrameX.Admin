@@ -25,7 +25,7 @@ public sealed class PublicCallbackSingleMainTests
             var configJson = channel == "alipay"
                 ? JsonSerializer.Serialize(new AliPayOptionSetting { AliPayNotifyUrl = "https://example.test", })
                 : JsonSerializer.Serialize(new WechatPayOptionSetting { WechatPayNotifyUrl = "https://example.test", });
-            database.TenantDb.Insertable(new GamePaymentConfigEntity
+            database.MainDb.Insertable(new GamePaymentConfigEntity
             {
                 Id = 1900000005101,
                 PackageIdNormalized = 0,
@@ -37,7 +37,7 @@ public sealed class PublicCallbackSingleMainTests
 
             var context = new DefaultHttpContext();
             context.Request.QueryString = new QueryString("?tenantId=123&appId=456"); // c406-keep
-            var provider = new PaymentOptionSettingProvider(database.DbProvider, new HttpContextAccessor { HttpContext = context });
+            var provider = new PaymentOptionSettingProvider(database.MainDb, new HttpContextAccessor { HttpContext = context });
 
             var expectedRoute = channel == "alipay" ? "api/GameOrder/NotifyAliPay" : "api/GameOrder/NotifyWeChatPay";
             var notifyUrl = channel == "alipay"
