@@ -5,40 +5,24 @@ using GameFrameX.Core.Middleware;
 namespace GameFrameX.Core.Tests.Middleware;
 
 /// <summary>
-/// C270 共享中间件错误响应 writer 行为测试：两种 wire 形态（PascalCase 通用错误 / camelCase 信封码）与 Code 回退语义。
+/// C270 共享中间件错误响应 writer 行为测试：两种 wire 形态（PascalCase 通用错误 / camelCase 信封码）。
 /// </summary>
 public sealed class MiddlewareResponseWriterTests
 {
     [Fact]
-    public async Task WriteRejectedAsync_WithoutErrorCode_CodeFallsBackToStatusCode()
+    public async Task WriteRejectedAsync_PascalCaseShape_CodeEqualsStatusCode()
     {
         var context = CreateContext();
 
-        await MiddlewareResponseWriter.WriteRejectedAsync(context, StatusCodes.Status401Unauthorized, "无效的应用 ID");
+        await MiddlewareResponseWriter.WriteRejectedAsync(context, StatusCodes.Status401Unauthorized, "无效的签名头");
 
         Assert.Equal(StatusCodes.Status401Unauthorized, context.Response.StatusCode);
         Assert.Equal("application/json", context.Response.ContentType);
         using (var document = await ParseBodyAsync(context))
         {
             Assert.Equal(StatusCodes.Status401Unauthorized, document.RootElement.GetProperty("Code").GetInt32());
-            Assert.Equal("无效的应用 ID", document.RootElement.GetProperty("Message").GetString());
+            Assert.Equal("无效的签名头", document.RootElement.GetProperty("Message").GetString());
             Assert.False(document.RootElement.TryGetProperty("code", out _));
-        }
-    }
-
-    [Fact]
-    public async Task WriteRejectedAsync_WithErrorCode_CodeUsesErrorCode()
-    {
-        var context = CreateContext();
-
-        await MiddlewareResponseWriter.WriteRejectedAsync(context, StatusCodes.Status403Forbidden, "租户已禁用", 30600006);
-
-        Assert.Equal(StatusCodes.Status403Forbidden, context.Response.StatusCode);
-        Assert.Equal("application/json", context.Response.ContentType);
-        using (var document = await ParseBodyAsync(context))
-        {
-            Assert.Equal(30600006, document.RootElement.GetProperty("Code").GetInt32());
-            Assert.Equal("租户已禁用", document.RootElement.GetProperty("Message").GetString());
         }
     }
 
