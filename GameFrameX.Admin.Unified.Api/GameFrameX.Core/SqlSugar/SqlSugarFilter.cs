@@ -102,13 +102,6 @@ public static class SqlSugarFilter
             dataScopeFilter = new ConcurrentDictionary<Type, LambdaExpression>();
             foreach (var entityType in entityTypes)
             {
-                // 排除非当前数据库实体
-                var tAtt = entityType.GetCustomAttribute<TenantAttribute>();
-                if (tAtt != null && db.CurrentConnectionConfig.ConfigId.ToString() != tAtt.configId.ToString())
-                {
-                    continue;
-                }
-
                 var lambda = DynamicExpressionParser.ParseLambda(new[]
                                                                  {
                                                                      Expression.Parameter(entityType, "u"),

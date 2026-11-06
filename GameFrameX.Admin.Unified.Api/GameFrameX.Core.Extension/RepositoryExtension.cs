@@ -1,5 +1,4 @@
 using System.Linq.Expressions;
-using System.Reflection;
 using GameFrameX.Core.BaseInputOutput;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Foundation.Orm.Entity;
@@ -382,14 +381,7 @@ public static class RepositoryExtension
         // 确保 .AS() 多库读写用的表名与 CodeFirst 建表名恒等（C30 对齐）。
         var entityType = typeof(T);
         var physicalName = SqlSugarEntityBoundary.GetPhysicalTableName(entityType, entityType.Name);
-        var attr = entityType.GetCustomAttribute<TenantAttribute>();
-        if (attr == null)
-        {
-            return physicalName;
-        }
-
-        var configId = attr.configId.ToString() ?? string.Empty;
-        return string.IsNullOrWhiteSpace(configId) ? physicalName : $"{configId}.{physicalName}";
+        return physicalName;
     }
 
     /// <summary>
