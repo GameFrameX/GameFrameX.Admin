@@ -18,7 +18,6 @@ public class GameMailService
         AddTenantGameMailEntityRequest, UpdateTenantGameMailEntityRequest,
         GameMailResponse, PageTenantGameMailEntityRequest>
 {
-    private ScheduledTaskHostedService SendEmailJob { get; }
     private readonly SqlSugarRepository<Entity.Tenant.Game.TenantGameAreaEntity> _gameAreaEntityRepository;
     private readonly HttpClient _httpClientFactory;
 
@@ -28,13 +27,11 @@ public class GameMailService
     /// <param name="repository"></param>
     /// <param name="systemTenantGameAreaEntity"></param>
     /// <param name="httpClientFactory"></param>
-    /// <param name="sendEmailJob"></param>
-    public GameMailService(SqlSugarRepository<Entity.Tenant.Game.TenantGameMailEntity> repository, SqlSugarRepository<Entity.Tenant.Game.TenantGameAreaEntity> systemTenantGameAreaEntity, HttpClient httpClientFactory, ScheduledTaskHostedService sendEmailJob)
+    public GameMailService(SqlSugarRepository<Entity.Tenant.Game.TenantGameMailEntity> repository, SqlSugarRepository<Entity.Tenant.Game.TenantGameAreaEntity> systemTenantGameAreaEntity, HttpClient httpClientFactory)
         : base(repository)
     {
         _httpClientFactory = httpClientFactory;
         _gameAreaEntityRepository = systemTenantGameAreaEntity;
-        SendEmailJob = sendEmailJob;
     }
 
     protected override ISugarQueryable<GameMailResponse> BuildPageQuery(PageTenantGameMailEntityRequest input)

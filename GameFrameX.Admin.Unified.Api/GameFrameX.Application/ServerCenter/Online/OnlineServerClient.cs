@@ -49,7 +49,10 @@ public sealed class OnlineServerClient : IOnlineServerClient
     /// </summary>
     private async Task<string> ResolveUrlAsync(string action, OnlineScopeContext scope)
     {
-        var gameArea = await _gameAreaRepository.GetFirstAsync(u => u.Id == scope.ServerId);
+        var gameArea = scope.AllowDisabledServer
+            ? await _gameAreaRepository.AsQueryable().Filter(null, true)
+                .Where(area => area.IsDeleted == false).FirstAsync(area => area.Id == scope.ServerId)
+            : await _gameAreaRepository.GetFirstAsync(u => u.Id == scope.ServerId);
         if (gameArea == null)
         {
             throw BusinessError.Oh(OnlineErrorCode.ServerScopeDenied, new { serverId = scope.ServerId, });

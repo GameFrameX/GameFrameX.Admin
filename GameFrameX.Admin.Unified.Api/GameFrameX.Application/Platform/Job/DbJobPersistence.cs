@@ -250,6 +250,95 @@ public class DbJobPersistence : IJobPersistence
         return Task.CompletedTask;
     }
 
+    /// <summary>
+    /// 注册期持久化（C404 §9.8）：扫描 / 预载合并后的作业与触发器 upsert 进数据库。
+    /// <para>内置作业此前从未落库，「任务调度」页因此看不到它们；本方法在注册完成后
+    /// 按存在性 insert / update（既有行以内存合并值为准——Preload 已把库值并入内存，写回等值幂等），
+    /// 并保留 CreateType / ScriptCode 等脚本作业专属列不被覆盖。</para>
+    /// </summary>
+    public async Task PersistRegisteredAsync(JobDetail jobDetail, IReadOnlyList<Trigger> triggers, CancellationToken stoppingToken)
+    {
+        using (var scope = _serviceScopeFactory.CreateScope())
+        {
+            var jobDetailRepository = scope.ServiceProvider.GetRequiredService<SqlSugarRepository<SystemJobDetailEntity>>();
+            var jobTriggerRepository = scope.ServiceProvider.GetRequiredService<SqlSugarRepository<SystemJobTriggerEntity>>();
+
+            var detailEntity = ToDetailEntity(jobDetail);
+            if (await jobDetailRepository.IsAnyAsync(u => u.JobId == detailEntity.JobId, stoppingToken))
+            {
+                await jobDetailRepository.AsUpdateable(detailEntity)
+                                         .WhereColumns(u => new { u.JobId, })
+                                         .IgnoreColumns(u => new { u.Id, u.CreateType, u.ScriptCode, })
+                                         .ExecuteCommandAsync(stoppingToken);
+            }
+            else
+            {
+                await jobDetailRepository.AsInsertable(detailEntity).ExecuteCommandAsync(stoppingToken);
+            }
+
+            foreach (var trigger in triggers)
+            {
+                var triggerEntity = ToTriggerEntity(trigger);
+                if (await jobTriggerRepository.IsAnyAsync(u => u.JobId == triggerEntity.JobId && u.TriggerId == triggerEntity.TriggerId, stoppingToken))
+                {
+                    await jobTriggerRepository.AsUpdateable(triggerEntity)
+                                              .WhereColumns(u => new { u.TriggerId, u.JobId, })
+                                              .IgnoreColumns(u => new { u.Id, })
+                                              .ExecuteCommandAsync(stoppingToken);
+                }
+                else
+                {
+                    await jobTriggerRepository.AsInsertable(triggerEntity).ExecuteCommandAsync(stoppingToken);
+                }
+            }
+        }
+    }
+
+    private static SystemJobDetailEntity ToDetailEntity(JobDetail jobDetail)
+    {
+        // 项目强制规则（C144）：*Time 字段一律 UTC 秒级 long?；边界处只允许 ScheduleTimeBridge 显式编码。
+        return new SystemJobDetailEntity
+        {
+            JobId = jobDetail.JobId ?? string.Empty,
+            GroupName = jobDetail.GroupName,
+            JobType = jobDetail.JobType,
+            AssemblyName = jobDetail.AssemblyName,
+            Description = jobDetail.Description,
+            Concurrent = jobDetail.Concurrent,
+            IncludeAnnotations = jobDetail.IncludeAnnotations,
+            Properties = jobDetail.Properties ?? "{}",
+            UpdatedTime = ScheduleTimeBridge.ToUnixSeconds(jobDetail.UpdatedTime),
+        };
+    }
+
+    private static SystemJobTriggerEntity ToTriggerEntity(Trigger trigger)
+    {
+        return new SystemJobTriggerEntity
+        {
+            TriggerId = trigger.TriggerId ?? string.Empty,
+            JobId = trigger.JobId ?? string.Empty,
+            TriggerType = trigger.TriggerType,
+            AssemblyName = trigger.AssemblyName,
+            Args = trigger.Args,
+            Description = trigger.Description,
+            Status = trigger.Status,
+            StartTime = ScheduleTimeBridge.ToUnixSeconds(trigger.StartTime),
+            EndTime = ScheduleTimeBridge.ToUnixSeconds(trigger.EndTime),
+            LastRunTime = ScheduleTimeBridge.ToUnixSeconds(trigger.LastRunTime),
+            NextRunTime = ScheduleTimeBridge.ToUnixSeconds(trigger.NextRunTime),
+            NumberOfRuns = trigger.NumberOfRuns,
+            MaxNumberOfRuns = trigger.MaxNumberOfRuns,
+            NumberOfErrors = trigger.NumberOfErrors,
+            MaxNumberOfErrors = trigger.MaxNumberOfErrors,
+            NumRetries = trigger.NumRetries,
+            RetryTimeout = trigger.RetryTimeout,
+            StartNow = trigger.StartNow,
+            RunOnStart = trigger.RunOnStart,
+            ResetOnlyOnce = trigger.ResetOnlyOnce,
+            UpdatedTime = ScheduleTimeBridge.ToUnixSeconds(trigger.UpdatedTime),
+        };
+    }
+
 
     public Task OnExecutionRecordAsync(PersistenceExecutionRecordContext context)
     {

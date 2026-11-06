@@ -5,6 +5,7 @@ using GameFrameX.Application.Platform.Job;
 using GameFrameX.Application.ServerCenter.Mail;
 using GameFrameX.Application.GmCenter.LiveOps.Dispatch;
 using GameFrameX.Application.ServerCenter.Online;
+using GameFrameX.Application.ServerCenter.GameAreaMerge;
 using GameFrameX.Application.ClientDelivery.GamePaymentConfig;
 using GameFrameX.Advertisement.Abstract;
 using GameFrameX.Payment.Abstract;
@@ -59,6 +60,8 @@ public class Startup
 
         // 配置选项
         services.AddProjectOptions();
+        // C404 / GFX-1216 R3：审计留存配置（Configuration/AuditRetention.json，默认值在 AuditRetentionOptions）
+        services.Configure<GameFrameX.Application.Audit.Retention.AuditRetentionOptions>(configuration.GetSection(GameFrameX.Application.Audit.Retention.AuditRetentionOptions.ConfigurationSectionName));
         services.AddProjectDependencyInjection();
         // 密码哈希统一 Argon2id（C214），无需启动期密钥注入；密码强度策略由 PlatformPasswordPolicyConfigProvider 快照驱动。
 
@@ -87,8 +90,10 @@ public class Startup
         services.AddHttpClient<IMailCampaignServerClient, MailCampaignServerClient>();
         // C339 / vault:C2 S1.7：Online 平台管理客户端基座（作用域注入 + 镜像错误码映射）。
         services.AddScoped<OnlineScopeContextFactory>();
+        services.AddScoped<GameFrameX.Application.ServerCenter.GameAreaProvision.GameAreaProvisionService>();
         services.AddScoped<IOnlineServerEndpointResolver, OnlineServerEndpointResolver>();
         services.AddHttpClient<IOnlineServerClient, OnlineServerClient>();
+        services.AddGameAreaMergeClient();
         // C343 / vault:C8 S7.7：LiveOps 统一下发单一入口（业务层唯一消费 IOnlineServerClient 的调度面）。
         services.AddScoped<IOnlineLiveOpsDispatchService, OnlineLiveOpsDispatchService>();
         // C200：外网 IP 查询命名客户端（ComputerUtility.GetIpFromOnlineAsync 使用），配置超时避免国外部署 myip.ipip.net 挂死。
@@ -144,15 +149,16 @@ public class Startup
 
         // 共享健康检查注册（C261，GFX-668）：与三 host 同口径收敛至 Core Bootstrap（self live + database ready）
         services.AddHostHealthChecks();
+        // 业务定时任务实现（非控制器，显式注册供 GameTimeJobDispatchJob 按名解析执行）。
+        services.AddScoped<EmailTask>();
         if (enableSchedule)
         {
             services.AddAdminSchedule(true);
             services.AddGameSchedule();
-            services.AddSingleton<ScheduledTaskHostedService>();
-            services.AddHostedService(sp => sp.GetRequiredService<ScheduledTaskHostedService>());
         }
         else
         {
+            // GFX_DISABLE_SCHEDULE=1：仅注册调度服务占位，不启用持久化与触发循环（既有开关语义）。
             services.AddAdminSchedule(false);
             services.AddGameSchedule();
         }

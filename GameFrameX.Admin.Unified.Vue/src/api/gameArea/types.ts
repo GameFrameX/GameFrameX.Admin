@@ -15,6 +15,8 @@ export enum GameServerStatus {
   Maintenance = 3,
   /** 满员 */
   Full = 4,
+  /** 已合服 */
+  Merged = 5,
 }
 
 /** @format int32 */
@@ -246,6 +248,8 @@ export interface GameAreaResponse {
   /** 大区分类Id */
   classifyId?: string;
   serverStatus?: GameServerStatus;
+  /** 已合入的目标区服。 */
+  mergedIntoServerId?: string | null;
   /** Http 管理连接地址 */
   httpManageUrl?: string | null;
   /** TcpSocket 连接地址 */

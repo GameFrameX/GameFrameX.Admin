@@ -1,6 +1,7 @@
 // コンテンツを定義
 export default {
     menu: {
+        gameAreaMerge: 'サーバー統合',
         dashboard: '概要',
         serverCenter: 'サーバー',
         noticeCenter: 'コンテンツ運営',

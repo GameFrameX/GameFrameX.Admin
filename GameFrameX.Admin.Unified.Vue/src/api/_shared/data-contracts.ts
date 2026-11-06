@@ -747,6 +747,8 @@ export * from "../gameAppServerConfig/types";
 export * from "../gameAppVersionDefinition/types";
 export * from "../gameArea/types";
 export * from "../gameAreaClassify/types";
+export * from "../gameAreaMerge/types";
+export * from "../gameAreaProvision/types";
 export * from "../gameBannerAnnouncement/types";
 export * from "../gameCommodity/types";
 export * from "../gameDockerTag/types";

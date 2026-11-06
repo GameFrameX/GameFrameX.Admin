@@ -3,9 +3,13 @@ import { expectOverview, SUPERADMIN_LEAVES, superadminPage } from '../helpers';
 import { expectNoApiAnomaly, installApiRecorder, sweepGroup } from '../module-coverage';
 import { selectGlobalServer } from '../server-selection';
 
-const ADMIN_MODULES = [
+const ADMIN_MODULES: ReadonlyArray<{
+  group: string; minLeaves: number; minRequests: number; timeout: number; skipLeaves?: string[];
+}> = [
   { group: '总览', minLeaves: 1, minRequests: 1, timeout: 120_000 },
-  { group: '区服', minLeaves: 3, minRequests: 3, timeout: 240_000 },
+  // C404：区服新增「开服向导」「合服」两个流程页叶子——计数含它们（3→5），
+  // 但通用 CRUD 探针跳过（流程页无 SearchForm/行级 CRUD，专属用例覆盖真实流程）。
+  { group: '区服', minLeaves: 5, minRequests: 3, timeout: 240_000, skipLeaves: ['开服向导', '合服'] },
   { group: '内容运营', minLeaves: 8, minRequests: 6, timeout: 420_000 },
   { group: '在线运维', minLeaves: 13, minRequests: 10, timeout: 900_000 },
   { group: '玩家', minLeaves: 7, minRequests: 7, timeout: 480_000 },
@@ -13,7 +17,7 @@ const ADMIN_MODULES = [
   { group: 'C 端交付', minLeaves: 18, minRequests: 12, timeout: 900_000 },
   { group: '审计', minLeaves: 4, minRequests: 4, timeout: 240_000 },
   { group: '系统', minLeaves: 5, minRequests: 5, timeout: 480_000 },
-] as const;
+];
 
 test.describe('单 shell 普通管理员模块覆盖', () => {
   for (const module of ADMIN_MODULES) {
@@ -23,7 +27,7 @@ test.describe('单 shell 普通管理员模块覆盖', () => {
       await page.goto('/');
       await expectOverview(page);
       if (module.group === '在线运维') await selectGlobalServer(page);
-      const reports = await sweepGroup(page, module.group, { minLeaves: module.minLeaves, actions: true });
+      const reports = await sweepGroup(page, module.group, { minLeaves: module.minLeaves, actions: true, skipLeaves: module.skipLeaves });
       expect(reports.every(report => !report.is404)).toBe(true);
       await expectNoApiAnomaly(page, module.minRequests);
     });

@@ -1,0 +1,51 @@
+export default {
+  "menu": {
+    "gameAreaProvision": "開服精靈"
+  },
+  "gameAreaProvision": {
+    "title": "開服精靈",
+    "hint": "選擇範本並填寫新區服差異設定；登記成功後才會啟用。失敗時請處理原因後重試，可輸入已有區服編號繼續查詢。",
+    "template": "範本區服",
+    "cloneTitle": "將從範本複製的設定",
+    "resetHint": "預設服、推薦、用戶端除錯均關閉；活動、負載、容器識別碼和維護時間不繼承。",
+    "start": "建立並開服",
+    "retry": "重試未完成步驟",
+    "query": "查詢狀態",
+    "newServer": "開始另一個開服",
+    "record": "區服記錄",
+    "container": "遊戲容器",
+    "registration": "開服登記",
+    "enabled": "啟用區服",
+    "complete": "已完成",
+    "pending": "待完成",
+    "success": "開服成功，新區服已啟用。",
+    "failed": "操作失敗，請查詢狀態後重試。",
+    "invalidIdentifier": "請輸入有效的正整數區服編號。",
+    "fields": {
+      "ServerId": "新區服編號",
+      "Name": "新區服名稱",
+      "HttpManageUrl": "遊戲服 HTTP 管理位址",
+      "TcpSocketUrl": "TCP 連線位址",
+      "WebSocketUrl": "WebSocket 連線位址",
+      "ServerParameters": "容器環境變數覆寫項（JSON 字串字典）",
+      "Description": "描述",
+      "ClassifyId": "區服分類",
+      "Capacity": "容量",
+      "ServerVersion": "伺服器版本",
+      "ServerType": "區服類型",
+      "LocalizationKey": "本地化鍵",
+      "Language": "語言",
+      "AllowedPlayerProfile": "玩家准入策略",
+      "AccessControls": "存取控制",
+      "ChannelId": "通路編號",
+      "PlatformId": "平台編號",
+      "PackageId": "套件編號",
+      "AppVersion": "用戶端版本",
+      "ClientDispatchApiPrefix": "用戶端轉發前綴",
+      "FulfillmentApiPrefix": "履約前綴",
+      "GmApiPrefix": "GM 前綴",
+      "ControlApiPrefix": "管理控制前綴",
+      "OnlineAdminApiPrefix": "Online 管理前綴"
+    }
+  }
+};

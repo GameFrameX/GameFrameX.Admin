@@ -14,6 +14,10 @@ public static class ProjectDependencyInjectionSetup
         "GameFrameX.Core.EventBus.AppEventSubscriber",
         "GameFrameX.Core.Service.Cache.SystemCacheService",
         "GameFrameX.Core.Job.DynamicJobCompiler",
+        // C404：ProjectSchedulerFactory 名以 Factory 结尾会被按 Transient 转发 ISchedulerFactory，
+        // 与 AddSchedule 的 TryAddSingleton 并存时形成"宿主服务一份、SystemJobService 每请求一份"的分裂
+        //（手动执行/触发器管理端点全部 NotFound）。登记 Singleton 保持全进程单一实例。
+        "GameFrameX.Core.Job.ProjectSchedulerFactory",
         "GameFrameX.Core.Service.PlatformCaptcha.PlatformCaptchaStorage",
         "GameFrameX.Core.Service.PlatformRateLimit.PlatformRateLimitConfigProvider",
     };

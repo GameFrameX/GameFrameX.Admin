@@ -1,3 +1,4 @@
+using GameFrameX.Core.Extension;
 using System.Collections.Generic;
 using System.Net;
 using System.Security.Claims;
@@ -247,6 +248,25 @@ public sealed class OnlineServerClientTests : IDisposable
     /// <summary>
     /// 测试业务载荷（嵌套类型遵守 one-type-per-file 例外）。
     /// </summary>
+    [Fact]
+    public async Task ProvisioningClient_ResolvesDisabledOnlyWithProvisioningContext()
+    {
+        await SeedAsync();
+        var factory = new OnlineScopeContextFactory(Repository<TenantGameAreaEntity>());
+        var ordinary = await factory.CreateAsync(Area1001);
+        SqlSugarUnifiedConfig.ConfigureClientFilters(_db);
+        await _db.Updateable<TenantGameAreaEntity>().SetColumns(area => area.IsEnabled == false)
+            .Where(area => area.Id == Area1001).ExecuteCommandAsync();
+        var client = CreateClient(new FakeHandler(SuccessEnvelope(new OnlineDemoData { PlayerId = "provision" })));
+        await Assert.ThrowsAsync<BusinessException>(() => client.PostAsync<OnlineDemoData>("query_server_calendar", new { }, ordinary));
+        var scope = await factory.CreateForProvisioningAsync(Area1001);
+        Assert.Equal("provision", (await client.PostAsync<OnlineDemoData>("query_server_calendar", new { }, scope)).PlayerId);
+        var deleted = await _db.Queryable<TenantGameAreaEntity>().Filter(null, true).FirstAsync(area => area.Id == Area1001);
+        deleted.IsDeleted = true;
+        await _db.Updateable(deleted).AS().ExecuteCommandAsync();
+        await Assert.ThrowsAsync<BusinessException>(() => client.PostAsync<OnlineDemoData>("query_server_calendar", new { }, scope));
+    }
+
     private sealed class OnlineDemoData
     {
         public string PlayerId { get; set; } = string.Empty;

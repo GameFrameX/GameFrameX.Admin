@@ -39,6 +39,7 @@ public partial class GlobalMenuSeedData : ISqlSugarEntitySeedData<GlobalMenuEnti
         menus.AddRange(TrustCenterMenus());
         menus.AddRange(GoodsMenus());
         menus.AddRange(OpsMenus());
+        menus.AddRange(ServerProvisionMenus());
         menus.AddRange(RedeemCodeMenus());
         menus.AddRange(WebShopMenus());
         menus.AddRange(AutomationMenus());
@@ -47,6 +48,7 @@ public partial class GlobalMenuSeedData : ISqlSugarEntitySeedData<GlobalMenuEnti
         menus.AddRange(OnlineSocialMenus());
         menus.AddRange(OnlineMenus());
         menus.AddRange(OnlineMatchMenus());
+        menus.AddRange(ServerMergeMenus());
         return menus;
     }
 }

@@ -44,6 +44,10 @@ public class TenantGameAreaEntity : EntityBasicSelect
     [SugarColumn(ColumnDescription = "状态", DefaultValue = "0")]
     public GameServerStatus ServerStatus { get; set; }
 
+    /// <summary>已合入的目标区服。</summary>
+    [SugarColumn(ColumnDescription = "合入目标区服", IsNullable = true)]
+    public long? MergedIntoServerId { get; set; }
+
     /// <summary>
     /// Http 管理连接地址
     /// </summary>

@@ -15,12 +15,27 @@ public sealed class ProjectSchedulerFactory : ISchedulerFactory
 
     public void AddJob(JobBuilder builder)
     {
-        if (string.IsNullOrWhiteSpace(builder.JobId))
+        AddJob(SchedulerBuilder.Create(builder));
+    }
+
+    /// <summary>
+    /// 注册作业并保留其触发器（触发循环按触发器评估执行；JobBuilder-only 重载不携带触发器）。
+    /// </summary>
+    public void AddJob(SchedulerBuilder builder)
+    {
+        var jobBuilder = builder.GetJobBuilder();
+        if (string.IsNullOrWhiteSpace(jobBuilder.JobId))
         {
             return;
         }
 
-        _jobs[builder.JobId] = new ProjectScheduler(builder, _serviceProvider, _persistences);
+        var scheduler = new ProjectScheduler(jobBuilder, _serviceProvider, _persistences);
+        foreach (var triggerBuilder in builder.GetEnumerable())
+        {
+            scheduler.AttachTriggerBuilder(triggerBuilder);
+        }
+
+        _jobs[jobBuilder.JobId] = scheduler;
     }
 
     public ProjectScheduler? GetJob(string jobId)
@@ -33,6 +48,14 @@ public sealed class ProjectSchedulerFactory : ISchedulerFactory
         _jobs.TryRemove(jobId, out _);
     }
 
+    /// <summary>
+    /// 当前作业快照（触发循环评估用）。
+    /// </summary>
+    public IReadOnlyCollection<ProjectScheduler> GetJobSnapshot()
+    {
+        return _jobs.Values.ToArray();
+    }
+
     public void PauseAll()
     {
         _paused = true;
@@ -43,6 +66,14 @@ public sealed class ProjectSchedulerFactory : ISchedulerFactory
         _paused = false;
     }
 
+    /// <summary>
+    /// 是否全局暂停（PauseAllJob 生效时触发循环整轮跳过，C404：循环此前不读该标记）。
+    /// </summary>
+    internal bool IsPausedAll()
+    {
+        return _paused;
+    }
+
     public async Task<ScheduleResult> TryRunJobAsync(string jobId)
     {
         if (_paused || !_jobs.TryGetValue(jobId, out var scheduler))
@@ -51,6 +82,15 @@ public sealed class ProjectSchedulerFactory : ISchedulerFactory
         }
 
         await scheduler.RunAsync(CancellationToken.None);
+        // 手动执行同样推进触发器运行态并写回（C404 §9.8）：该路径不经过触发循环的 Fire，
+        // 不补统计的话「任务调度」页的运行次数/最近运行时间会与真实执行脱节。
+        foreach (var trigger in scheduler.GetTriggerSnapshot())
+        {
+            trigger.NumberOfRuns++;
+            trigger.LastRunTime = DateTime.Now;
+            await scheduler.PersistTriggerRuntimeAsync(trigger);
+        }
+
         return ScheduleResult.Succeed;
     }
 

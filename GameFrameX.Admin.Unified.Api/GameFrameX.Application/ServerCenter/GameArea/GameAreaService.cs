@@ -62,6 +62,7 @@ public class GameAreaService : GenericCrudSelectService<Entity.Tenant.Game.Tenan
                              ClassifyIdName = SqlFunc.Subqueryable<Entity.Tenant.Game.TenantGameAreaClassifyEntity>().Where(classifyid => classifyid.Id == u.ClassifyId).Select(classifyid => classifyid.Name),
                              IsEnabled = u.IsEnabled,
                              ServerStatus = u.ServerStatus,
+                             MergedIntoServerId = u.MergedIntoServerId,
                              HttpManageUrl = u.HttpManageUrl,
                              TcpSocketUrl = u.TcpSocketUrl,
                              WebSocketUrl = u.WebSocketUrl,
@@ -212,7 +213,16 @@ public class GameAreaService : GenericCrudSelectService<Entity.Tenant.Game.Tenan
         }
 
         var gameAreaClassify = await _classifyRepository.GetByIdAsync(entity.ClassifyId);
-        var url = gameAreaClassify.HttpManagerUrl;
+        var url = gameAreaClassify?.HttpManagerUrl;
+        if (string.IsNullOrWhiteSpace(url))
+        {
+            throw BusinessError.Oh(AreaProvisionErrorCode.ContainerFailed);
+        }
+
+        if (!string.IsNullOrWhiteSpace(entity.ServerContainerId))
+        {
+            return;
+        }
 
         var createDockerContainer = new CreateDockerContainer
         {
@@ -239,14 +249,13 @@ public class GameAreaService : GenericCrudSelectService<Entity.Tenant.Game.Tenan
         if (!string.IsNullOrEmpty(url))
         {
             // 执行创建服务
-            var content = await _httpClient.PostJsonToStringAsync(url + "api/Containers/CreateAndStart", createDockerContainer);
+            var content = await _httpClient.PostJsonToStringAsync(url.TrimEnd('/') + "/api/Containers/CreateAndStart", createDockerContainer);
             try
             {
                 var resultData = JsonHelper.Deserialize<RespCreateDockerContainer>(content);
-                if (resultData.Code != 0)
+                if (resultData == null || resultData.Code != 0 || string.IsNullOrWhiteSpace(resultData.Data))
                 {
-                    Console.WriteLine(content);
-                    return;
+                    throw BusinessError.Oh(AreaProvisionErrorCode.ContainerFailed, new { managerCode = resultData?.Code, reason = resultData?.Message });
                 }
 
                 entity.ServerContainerId = resultData.Data;

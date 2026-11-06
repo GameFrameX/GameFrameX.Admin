@@ -1,0 +1,51 @@
+export default {
+  "menu": {
+    "gameAreaProvision": "서버 개설 마법사"
+  },
+  "gameAreaProvision": {
+    "title": "서버 개설 마법사",
+    "hint": "템플릿을 선택하고 새 서버 설정을 입력하세요. 등록에 성공한 후에만 활성화됩니다. 실패 원인을 해결한 뒤 다시 시도하거나 기존 서버 번호로 상태를 확인하세요.",
+    "template": "템플릿 서버",
+    "cloneTitle": "템플릿에서 복사할 설정",
+    "resetHint": "기본 서버, 추천 및 클라이언트 디버깅은 꺼집니다. 이벤트, 부하, 컨테이너 식별자와 점검 시간은 초기화됩니다.",
+    "start": "생성 및 개설",
+    "retry": "미완료 단계 재시도",
+    "query": "상태 확인",
+    "newServer": "다른 서버 개설",
+    "record": "서버 레코드",
+    "container": "게임 컨테이너",
+    "registration": "개설 등록",
+    "enabled": "서버 활성화",
+    "complete": "완료",
+    "pending": "대기 중",
+    "success": "개설 완료. 새 서버가 활성화되었습니다.",
+    "failed": "작업에 실패했습니다. 상태를 확인하고 다시 시도하세요.",
+    "invalidIdentifier": "유효한 양의 정수 서버 번호를 입력하세요.",
+    "fields": {
+      "ServerId": "새 서버 번호",
+      "Name": "새 서버 이름",
+      "HttpManageUrl": "게임 서버 HTTP 관리 주소",
+      "TcpSocketUrl": "TCP 연결 주소",
+      "WebSocketUrl": "WebSocket 연결 주소",
+      "ServerParameters": "컨테이너 환경 변수 재정의 (JSON 문자열 사전)",
+      "Description": "설명",
+      "ClassifyId": "서버 분류",
+      "Capacity": "수용 인원",
+      "ServerVersion": "서버 버전",
+      "ServerType": "서버 유형",
+      "LocalizationKey": "번역 키",
+      "Language": "언어",
+      "AllowedPlayerProfile": "플레이어 입장 정책",
+      "AccessControls": "접근 제어",
+      "ChannelId": "채널 번호",
+      "PlatformId": "플랫폼 번호",
+      "PackageId": "패키지 번호",
+      "AppVersion": "클라이언트 버전",
+      "ClientDispatchApiPrefix": "클라이언트 전달 접두사",
+      "FulfillmentApiPrefix": "이행 접두사",
+      "GmApiPrefix": "GM 접두사",
+      "ControlApiPrefix": "제어 접두사",
+      "OnlineAdminApiPrefix": "Online 관리 접두사"
+    }
+  }
+};

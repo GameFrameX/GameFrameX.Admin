@@ -1,0 +1,51 @@
+export default {
+  "menu": {
+    "gameAreaProvision": "开服向导"
+  },
+  "gameAreaProvision": {
+    "title": "开服向导",
+    "hint": "选择模板并填写新区服差异配置；登记成功后才会启用。失败时请处理原因后重试，可输入已有区服编号继续查询。",
+    "template": "模板区服",
+    "cloneTitle": "将从模板复制的配置",
+    "resetHint": "默认服、推荐、客户端调试均关闭；活动、负载、容器标识和维护时间不继承。",
+    "start": "创建并开服",
+    "retry": "重试未完成步骤",
+    "query": "查询状态",
+    "newServer": "开始另一个开服",
+    "record": "区服记录",
+    "container": "游戏容器",
+    "registration": "开服登记",
+    "enabled": "启用区服",
+    "complete": "已完成",
+    "pending": "待完成",
+    "success": "开服成功，新区服已启用。",
+    "failed": "操作失败，请查询状态后重试。",
+    "invalidIdentifier": "请输入有效的正整数区服编号。",
+    "fields": {
+      "ServerId": "新区服编号",
+      "Name": "新区服名称",
+      "HttpManageUrl": "游戏服 HTTP 管理地址",
+      "TcpSocketUrl": "TCP 连接地址",
+      "WebSocketUrl": "WebSocket 连接地址",
+      "ServerParameters": "容器环境变量覆盖项（JSON 字符串字典）",
+      "Description": "描述",
+      "ClassifyId": "区服分类",
+      "Capacity": "容量",
+      "ServerVersion": "服务端版本",
+      "ServerType": "区服类型",
+      "LocalizationKey": "本地化键",
+      "Language": "语言",
+      "AllowedPlayerProfile": "玩家准入策略",
+      "AccessControls": "访问控制",
+      "ChannelId": "渠道编号",
+      "PlatformId": "平台编号",
+      "PackageId": "包编号",
+      "AppVersion": "客户端版本",
+      "ClientDispatchApiPrefix": "客户端转发前缀",
+      "FulfillmentApiPrefix": "履约前缀",
+      "GmApiPrefix": "GM 前缀",
+      "ControlApiPrefix": "管理控制前缀",
+      "OnlineAdminApiPrefix": "Online 管理前缀"
+    }
+  }
+};

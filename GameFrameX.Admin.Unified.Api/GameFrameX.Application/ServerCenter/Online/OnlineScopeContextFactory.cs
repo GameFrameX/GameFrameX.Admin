@@ -29,4 +29,21 @@ public sealed class OnlineScopeContextFactory
 
         return new OnlineScopeContext(serverId, requestSummary);
     }
+    /// <summary>开服登记专用：允许未启用的区服，但仍拒绝已软删区服。</summary>
+    public async Task<OnlineScopeContext> CreateForProvisioningAsync(long serverId, string requestSummary = "")
+    {
+        if (serverId <= 0)
+        {
+            throw BusinessError.Oh(OnlineErrorCode.ScopeMissing);
+        }
+
+        var gameArea = await _gameAreaRepository.AsQueryable().Filter(null, true)
+            .Where(area => area.IsDeleted == false).FirstAsync(area => area.Id == serverId);
+        if (gameArea == null)
+        {
+            throw BusinessError.Oh(OnlineErrorCode.ScopeDenied, new { serverId });
+        }
+
+        return new OnlineScopeContext(serverId, requestSummary, true);
+    }
 }

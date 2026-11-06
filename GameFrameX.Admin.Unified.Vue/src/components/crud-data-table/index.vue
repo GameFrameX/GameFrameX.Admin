@@ -75,6 +75,11 @@
       </template>
       <!-- 默认 slot 模式：未传 columns 时向后兼容，使用方继续手摆 <Column> -->
       <slot v-else />
+      <!-- 行展开插槽透传（C404）：使用方的 #expansion 需要直达内部 DataTable 才能渲染展开行；
+           仅在使用方提供时启用，不影响其他页面 -->
+      <template v-if="$slots.expansion" #expansion="expansionProps">
+        <slot name="expansion" v-bind="expansionProps" />
+      </template>
       <Column
         v-if="showActionColumn"
         :header="resolvedActionHeader"

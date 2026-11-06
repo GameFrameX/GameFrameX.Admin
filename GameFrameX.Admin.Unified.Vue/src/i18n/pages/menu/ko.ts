@@ -1,6 +1,7 @@
 // 콘텐츠 정의
 export default {
     menu: {
+        gameAreaMerge: '서버 통합',
         dashboard: '개요',
         serverCenter: '서버',
         noticeCenter: '콘텐츠 운영',

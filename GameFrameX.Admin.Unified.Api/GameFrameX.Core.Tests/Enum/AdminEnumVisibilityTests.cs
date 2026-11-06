@@ -58,9 +58,11 @@ public class AdminEnumVisibilityTests
         "GameFrameX.Core.Enum.Errors.AreaErrorCode",
         "GameFrameX.Core.Enum.Errors.ArchiveErrorCode",
         "GameFrameX.Core.Enum.Errors.GameHomeErrorCode",
+        "GameFrameX.Core.Enum.Errors.AreaProvisionErrorCode",
         "GameFrameX.Core.Enum.Errors.OrderErrorCode",
         "GameFrameX.Core.Enum.Errors.RedeemCodeErrorCode",
         "GameFrameX.Core.Enum.Errors.PaymentErrorCode",
+        "GameFrameX.Core.Enum.Errors.AreaMergeErrorCode",
         // C265（GFX-671）：Admin 业务域错误码枚举同规则豁免（服务端出站 + 码表由本地化 JSON 导出，不进前端枚举下拉）。
         "GameFrameX.Core.Enum.Errors.SystemUserErrorCode",
         "GameFrameX.Core.Enum.Errors.RoleMenuErrorCode",
@@ -84,6 +86,7 @@ public class AdminEnumVisibilityTests
         "GameFrameX.Entity.Game.Mail.MailCampaignExpirePolicy",
         "GameFrameX.Entity.Game.Mail.MailCampaignPublishStatus",
         "GameFrameX.Entity.Game.Mail.MailCampaignServerCode",
+        "GameFrameX.Entity.Enum.GameAreaMergePlanStatus",
     };
 
     /// <summary>
