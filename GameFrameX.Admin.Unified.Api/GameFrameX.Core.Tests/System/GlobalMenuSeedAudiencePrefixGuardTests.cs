@@ -38,7 +38,6 @@ public class GlobalMenuSeedAudiencePrefixGuardTests
     public void Menus_UseConsoleScopeAndRetainSuperAdminBoundary()
     {
         var menus = GlobalMenuSeedData.BuildData();
-        Assert.All(menus, menu => Assert.Equal(MenuAppScopeEnum.Console, menu.AppScope));
         var protectedKeys = new HashSet<string>(StringComparer.Ordinal)
         {
             "route:platformJwtConfig", "route:platformRateLimitConfig", "route:platformLoggingConfig",

@@ -224,11 +224,10 @@ public class SqlSugarDatabaseInitializationTests : IDisposable
         var createdTimeColumn = ColumnName(mainDb, typeof(GlobalMenuEntity), nameof(GlobalMenuEntity.CreatedTime));
         var createdNameColumn = ColumnName(mainDb, typeof(GlobalMenuEntity), nameof(GlobalMenuEntity.CreatedName));
         var updateCountColumn = ColumnName(mainDb, typeof(GlobalMenuEntity), nameof(GlobalMenuEntity.UpdateCount));
-        var appScopeColumn = ColumnName(mainDb, typeof(GlobalMenuEntity), nameof(GlobalMenuEntity.AppScope));
         mainDb.Ado.ExecuteCommand(
-            $"INSERT INTO {tableName} ({idColumn}, {pidColumn}, {keyColumn}, {titleColumn}, {typeColumn}, {isHideColumn}, {isIframeColumn}, {isKeepAliveColumn}, {isAffixColumn}, {orderNoColumn}, {superAdminOnlyColumn}, {allowColumn}, {isEnabledColumn}, {isDeletedColumn}, {createdIdColumn}, {createdTimeColumn}, {createdNameColumn}, {updateCountColumn}, {appScopeColumn}) " +
-            "VALUES (@legacyId, @pid, @legacyKey, @legacyTitle, @type, @falseValue, @falseValue, @trueValue, @falseValue, @orderNo, @falseValue, @falseValue, @trueValue, @falseValue, @createdId, @createdTime, @createdName, @updateCount, @appScope), " +
-            "(@autoId, @pid, @autoKey, @autoTitle, @type, @trueValue, @falseValue, @trueValue, @falseValue, @orderNo, @falseValue, @falseValue, @trueValue, @falseValue, @createdId, @createdTime, @createdName, @updateCount, @appScope)",
+            $"INSERT INTO {tableName} ({idColumn}, {pidColumn}, {keyColumn}, {titleColumn}, {typeColumn}, {isHideColumn}, {isIframeColumn}, {isKeepAliveColumn}, {isAffixColumn}, {orderNoColumn}, {superAdminOnlyColumn}, {allowColumn}, {isEnabledColumn}, {isDeletedColumn}, {createdIdColumn}, {createdTimeColumn}, {createdNameColumn}, {updateCountColumn}) " +
+            "VALUES (@legacyId, @pid, @legacyKey, @legacyTitle, @type, @falseValue, @falseValue, @trueValue, @falseValue, @orderNo, @falseValue, @falseValue, @trueValue, @falseValue, @createdId, @createdTime, @createdName, @updateCount), " +
+            "(@autoId, @pid, @autoKey, @autoTitle, @type, @trueValue, @falseValue, @trueValue, @falseValue, @orderNo, @falseValue, @falseValue, @trueValue, @falseValue, @createdId, @createdTime, @createdName, @updateCount)",
             new SugarParameter("@legacyId", legacyId),
             new SugarParameter("@pid", 0),
             new SugarParameter("@legacyKey", "legacy:menu"),
@@ -243,8 +242,7 @@ public class SqlSugarDatabaseInitializationTests : IDisposable
             new SugarParameter("@createdName", "test"),
             new SugarParameter("@updateCount", 0),
             new SugarParameter("@trueValue", true),
-            new SugarParameter("@falseValue", false),
-            new SugarParameter("@appScope", (int)MenuAppScopeEnum.Console));
+            new SugarParameter("@falseValue", false));
 
         ResetMenuSeedCatalogDbCache();
         MenuSeedCatalog.LoadFromDb(mainDb);

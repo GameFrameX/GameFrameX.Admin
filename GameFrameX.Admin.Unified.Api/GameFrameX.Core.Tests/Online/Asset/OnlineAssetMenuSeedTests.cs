@@ -20,7 +20,6 @@ public sealed class OnlineAssetMenuSeedTests
         // C403：在线运维是独立根目录，排序由共享契约固定。
         Assert.Equal("/gmCenter", container.Path);
         Assert.Equal(0, container.Pid);
-        Assert.Equal(MenuAppScopeEnum.Console, container.AppScope);
         Assert.Equal("message.menu.gmCenter", container.TitleCode);
         Assert.Equal("在线运维", container.Title);
         Assert.Equal(300, container.OrderNo);
@@ -38,7 +37,6 @@ public sealed class OnlineAssetMenuSeedTests
         var page = Assert.Single(menus, m => m.Key == key);
 
         Assert.Equal(MenuTypeEnum.Menu, page.Type);
-        Assert.Equal(MenuAppScopeEnum.Console, page.AppScope);
         Assert.Equal(StableSeedId.Menu("route:gmCenter"), page.Pid);
         Assert.Equal(title, page.Title);
         Assert.Equal(titleCode, page.TitleCode);

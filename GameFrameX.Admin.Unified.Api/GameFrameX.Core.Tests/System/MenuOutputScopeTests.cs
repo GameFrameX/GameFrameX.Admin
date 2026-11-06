@@ -8,8 +8,7 @@ using Mapster;
 namespace GameFrameX.Core.Tests.System;
 
 /// <summary>
-/// 映射器将 global_menu.app_scope 枚举直传为 meta.appScope，并派生 meta.menuContext。
-/// 路径前缀推断已删除，作用域是显式数据列 global_menu.app_scope（由种子 GlobalMenuSeedData.* 显式声明）。
+/// 映射器派生 meta.menuContext。
 /// </summary>
 public class MenuOutputScopeTests
 {
@@ -19,9 +18,8 @@ public class MenuOutputScopeTests
         var config = new TypeAdapterConfig();
         new SystemMenuMapper().Register(config);
 
-        var output = new GlobalMenuEntity { AppScope = MenuAppScopeEnum.Console, }.Adapt<MenuResponse>(config);
+        var output = new GlobalMenuEntity { }.Adapt<MenuResponse>(config);
 
-        Assert.Equal("console", output.Meta.AppScope);
         Assert.Equal("console", output.Meta.MenuContext);
     }
 }

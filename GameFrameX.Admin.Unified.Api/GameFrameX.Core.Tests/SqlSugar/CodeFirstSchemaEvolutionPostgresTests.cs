@@ -55,19 +55,17 @@ public sealed class CodeFirstSchemaEvolutionPostgresTests
             // 模拟 2026-07 之前的存量库：DROP 三个存活列（老行对应数据随列丢弃）
             mainDatabase.Ado.ExecuteCommand("ALTER TABLE global_menu_entity DROP COLUMN super_admin_only");
             mainDatabase.Ado.ExecuteCommand("ALTER TABLE global_menu_entity DROP COLUMN allow_admin_when_super_admin_only");
-            mainDatabase.Ado.ExecuteCommand("ALTER TABLE global_menu_entity DROP COLUMN app_scope");
 
             // 二次初始化 = 生产升级重放：CodeFirst 检出缺列 → ALTER ADD COLUMN NOT NULL DEFAULT（零重写）
             SqlSugarSetup.InitDatabase(scope, config, new[] { typeof(GlobalMenuEntity), typeof(SystemUserEntity), });
 
             var legacyRow = mainDatabase.Ado.SqlQuery<dynamic>(
-                "SELECT super_admin_only, allow_admin_when_super_admin_only, app_scope FROM global_menu_entity WHERE id = @id",
+                "SELECT super_admin_only, allow_admin_when_super_admin_only FROM global_menu_entity WHERE id = @id",
                 new SugarParameter("@id", LegacyMenuId)).Single();
 
             // 老行读到实体 DefaultValue（与原 EnsureColumn 回填值一致：false/0/false/Business=0）
             Assert.False((bool)legacyRow.super_admin_only);
             Assert.False((bool)legacyRow.allow_admin_when_super_admin_only);
-            Assert.Equal((int)MenuAppScopeEnum.Console, (int)legacyRow.app_scope);
         }
     }
 

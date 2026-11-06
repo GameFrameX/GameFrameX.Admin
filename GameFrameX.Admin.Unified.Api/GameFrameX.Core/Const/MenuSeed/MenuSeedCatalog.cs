@@ -178,8 +178,7 @@ public static class MenuSeedCatalog
                 dbMenu.CreatedTime,
                 dbMenu.UpdateTime ?? dbMenu.CreatedTime,
                 dbMenu.SuperAdminOnly,
-                dbMenu.AllowAdminWhenSuperAdminOnly,
-                dbMenu.AppScope);
+                dbMenu.AllowAdminWhenSuperAdminOnly);
         }).ToArray();
 
         _dbMenus = dbMenus;
@@ -232,11 +231,6 @@ public static class MenuSeedCatalog
 
 
 
-        var invalidAppScope = dbMenus.FirstOrDefault(u => !global::System.Enum.IsDefined(typeof(MenuAppScopeEnum), u.AppScope));
-        if (invalidAppScope != null)
-        {
-            throw new InvalidOperationException($"global_menu.AppScope 非法值: Key={invalidAppScope.Key}, AppScope={invalidAppScope.AppScope}。");
-        }
 
         EnsureNoCycles(dbMenus);
     }

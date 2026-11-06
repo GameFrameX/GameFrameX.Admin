@@ -25,7 +25,6 @@ public partial class GlobalMenuSeedData
                 Type = MenuTypeEnum.Menu,
                 Name = "gameTimeJobEntity",
                 Path = "/system/gameTimeJobEntity",
-                AppScope = MenuAppScopeEnum.Console,
                 Component = "/system/gameTimeJobEntity/index",
                 Redirect = null,
                 Permission = null,

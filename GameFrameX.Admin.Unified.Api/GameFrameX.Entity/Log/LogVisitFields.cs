@@ -9,10 +9,6 @@ namespace GameFrameX.Entity.Log;
 /// </summary>
 public class LogVisitFields : EntityBase
 {
-    /// <summary>历史审计归属，仅保留既有记录，不参与路由或自动填充。</summary>
-    [SugarColumn(ColumnDescription = "历史租户标识", IsNullable = true)]
-    public long? Id { get; set; }
-
     /// <summary>
     /// 模块名称
     /// </summary>

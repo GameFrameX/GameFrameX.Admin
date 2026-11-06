@@ -133,11 +133,6 @@ public sealed class GlobalMenuEntity : EntityBasic
     [SugarColumn(ColumnDescription = "超管专属允许租户只读", DefaultValue = "false")]
     public bool AllowAdminWhenSuperAdminOnly { get; set; }
 
-    /// <summary>
-    /// 控制台作用域。所有菜单共用工作台，可见权限由用户角色与超管标记控制。
-    /// </summary>
-    [SugarColumn(ColumnDescription = "控制台作用域", DefaultValue = "0")]
-    public MenuAppScopeEnum AppScope { get; set; }
 
     /// <summary>
     /// 菜单子项
