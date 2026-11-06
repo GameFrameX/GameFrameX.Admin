@@ -18,7 +18,11 @@ namespace GameFrameX.Client.Api.GameRole;
 /// </summary>
 public class GameRoleController : BaseController<TenantGameRoleEntity>
 {
-    private static readonly string[] IdentityOverrideFieldNames = { "userId", "accountId", };
+    private static readonly string[] IdentityOverrideFieldNames =
+    {
+        "userId", // 覆盖令牌解析出的账号身份
+        "accountId", // 覆盖同一账号身份的别名
+    };
 
     private readonly HttpClient _httpClientFactory;
     private readonly ClientApiTokenIssuer _clientApiTokenIssuer;
