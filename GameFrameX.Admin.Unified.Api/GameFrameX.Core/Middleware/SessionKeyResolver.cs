@@ -1,5 +1,5 @@
-using GameFrameX.Core.Service.Tenant;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Core.Service.Business;
+using GameFrameX.Entity.Business.Game;
 
 namespace GameFrameX.Core.Middleware;
 
@@ -33,7 +33,7 @@ public sealed class SessionKeyResolver : ISessionKeyResolver
     /// <para>结果到中间件拒收信封码的映射见 <see cref="SessionKeyLookupResult"/>；Expire 判定为严格大于
     /// （now == Expire 即到期），与 SignatureKeyResolver / LoginTicket key 查询口径一致。</para>
     /// </summary>
-    internal static SessionKeyLookupResult Judge(TenantSessionKeyEntity key, long now)
+    internal static SessionKeyLookupResult Judge(SessionKeyEntity key, long now)
     {
         if (key.IsEnabled == false)
         {
@@ -53,10 +53,10 @@ public sealed class SessionKeyResolver : ISessionKeyResolver
         return SessionKeyLookupResult.Active;
     }
 
-    private async Task<TenantSessionKeyEntity?> GetKeyAsync(string kid)
+    private async Task<SessionKeyEntity?> GetKeyAsync(string kid)
     {
         // 元数据不缓存，跨宿主轮换、同秒撤销、删除与租约修改在下一请求立即生效。
-        return await _database.Queryable<TenantSessionKeyEntity>().ClearFilter()
+        return await _database.Queryable<SessionKeyEntity>().ClearFilter()
             .Where(key => key.Kid == kid && key.IsDeleted == false).FirstAsync();
     }
 

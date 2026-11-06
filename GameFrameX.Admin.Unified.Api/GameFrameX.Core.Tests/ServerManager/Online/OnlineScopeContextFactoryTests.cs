@@ -8,7 +8,7 @@ using GameFrameX.Core.Exceptions;
 using GameFrameX.Core.Service.User;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Entity.Log;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 using GameFrameX.Foundation.Orm.Entity;
 using Microsoft.AspNetCore.Http;
 using SqlSugar;
@@ -47,8 +47,8 @@ public sealed class OnlineScopeContextFactoryTests : IDisposable
         _db = _scopeOwner.GetConnectionScope("online-scope");
         SqlSugarUnifiedConfig.ConfigureBaseFilters(_db);
         _db.CodeFirst.InitTables(
-            typeof(TenantGameAreaEntity),
-            typeof(TenantLogOperationEntity));
+            typeof(GameAreaEntity),
+            typeof(LogOperationEntity));
     }
 
     [Theory]
@@ -56,7 +56,7 @@ public sealed class OnlineScopeContextFactoryTests : IDisposable
     [InlineData(-1)]
     public async Task CreateAsync_RejectsMissingServer(long serverId)
     {
-        var factory = new OnlineScopeContextFactory(Repository<TenantGameAreaEntity>());
+        var factory = new OnlineScopeContextFactory(Repository<GameAreaEntity>());
         var exception = await Assert.ThrowsAsync<BusinessException>(() => factory.CreateAsync(serverId));
         Assert.Equal(32200005, exception.Code);
     }
@@ -64,7 +64,7 @@ public sealed class OnlineScopeContextFactoryTests : IDisposable
     [Fact]
     public async Task CreateAsync_RejectsNonexistentServer()
     {
-        var factory = new OnlineScopeContextFactory(Repository<TenantGameAreaEntity>());
+        var factory = new OnlineScopeContextFactory(Repository<GameAreaEntity>());
         var exception = await Assert.ThrowsAsync<BusinessException>(() => factory.CreateAsync(9999));
         Assert.Equal(32200001, exception.Code);
     }
@@ -73,7 +73,7 @@ public sealed class OnlineScopeContextFactoryTests : IDisposable
     public async Task CreateAsync_ReturnsExistingServerWithoutUserContext()
     {
         await SeedAsync();
-        var factory = new OnlineScopeContextFactory(Repository<TenantGameAreaEntity>());
+        var factory = new OnlineScopeContextFactory(Repository<GameAreaEntity>());
         var scope = await factory.CreateAsync(Area1001, "unit-test");
         Assert.Equal(Area1001, scope.ServerId);
         Assert.Equal("unit-test", scope.RequestSummary);
@@ -81,14 +81,14 @@ public sealed class OnlineScopeContextFactoryTests : IDisposable
 
     /// <summary>
     /// 审计承载断言：拒绝异常（镜像数字码 + 本地化文案 + errors JSON）可完整写入租户操作日志并查回往返
-    /// （MonitorLogging 在 action 层自动落库；此处锁定 TenantLogOperationEntity 表对 322 段拒绝留痕的承载能力）。
+    /// （MonitorLogging 在 action 层自动落库；此处锁定 LogOperationEntity 表对 322 段拒绝留痕的承载能力）。
     /// </summary>
     [Fact]
     public async Task RejectedScope_IsAuditableInTenantOperationLog()
     {
         await SeedAsync();
 
-        var factory = new OnlineScopeContextFactory(Repository<TenantGameAreaEntity>());
+        var factory = new OnlineScopeContextFactory(Repository<GameAreaEntity>());
 
         // 本地化文案断言依赖请求语言，显式固定 zh-CN（与 ErrorCodeContractTests 的 BusinessException 行为测试同姿势）。
         var originalCulture = CultureInfo.CurrentUICulture;
@@ -99,7 +99,7 @@ public sealed class OnlineScopeContextFactoryTests : IDisposable
             var exception = await Assert.ThrowsAsync<BusinessException>(() => factory.CreateAsync(9999));
             Assert.Equal(32200001, exception.Code);
 
-            var log = new TenantLogOperationEntity
+            var log = new LogOperationEntity
             {
                 Message = exception.Message,
                 Exception = exception.ToString(),
@@ -109,7 +109,7 @@ public sealed class OnlineScopeContextFactoryTests : IDisposable
             };
             await _db.Insertable(log).ExecuteCommandAsync();
 
-            var persisted = await _db.Queryable<TenantLogOperationEntity>().FirstAsync(u => u.Message == exception.Message);
+            var persisted = await _db.Queryable<LogOperationEntity>().FirstAsync(u => u.Message == exception.Message);
             Assert.NotNull(persisted);
             persistedMessage = persisted.Message;
         }
@@ -127,12 +127,12 @@ public sealed class OnlineScopeContextFactoryTests : IDisposable
     {
         await SeedAsync();
         SqlSugarUnifiedConfig.ConfigureClientFilters(_db);
-        await _db.Updateable<TenantGameAreaEntity>().SetColumns(area => area.IsEnabled == false)
+        await _db.Updateable<GameAreaEntity>().SetColumns(area => area.IsEnabled == false)
             .Where(area => area.Id == Area1001).ExecuteCommandAsync();
-        var factory = new OnlineScopeContextFactory(Repository<TenantGameAreaEntity>());
+        var factory = new OnlineScopeContextFactory(Repository<GameAreaEntity>());
         await Assert.ThrowsAsync<BusinessException>(() => factory.CreateAsync(Area1001));
         Assert.Equal(Area1001, (await factory.CreateForProvisioningAsync(Area1001)).ServerId);
-        var deleted = await _db.Queryable<TenantGameAreaEntity>().Filter(null, true).FirstAsync(area => area.Id == Area1001);
+        var deleted = await _db.Queryable<GameAreaEntity>().Filter(null, true).FirstAsync(area => area.Id == Area1001);
         deleted.IsDeleted = true;
         await _db.Updateable(deleted).AS().ExecuteCommandAsync();
         await Assert.ThrowsAsync<BusinessException>(() => factory.CreateForProvisioningAsync(Area1001));
@@ -151,9 +151,9 @@ public sealed class OnlineScopeContextFactoryTests : IDisposable
         await _db.Insertable(NewArea(Area2001, App200, now)).ExecuteCommandAsync();
     }
 
-    private static TenantGameAreaEntity NewArea(long id, long gameAppId, long now)
+    private static GameAreaEntity NewArea(long id, long gameAppId, long now)
     {
-        return new TenantGameAreaEntity
+        return new GameAreaEntity
         {
             Id = id,
             Name = $"area-{id}",

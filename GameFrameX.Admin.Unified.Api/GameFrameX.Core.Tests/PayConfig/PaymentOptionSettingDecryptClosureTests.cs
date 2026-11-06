@@ -4,11 +4,11 @@ using GameFrameX.Client.Api.Middleware;
 using GameFrameX.Client.Api.Services;
 using GameFrameX.Core.Enum;
 using GameFrameX.Core.Middleware;
-using GameFrameX.Core.Service.Tenant;
+using GameFrameX.Core.Service.Business;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Entity.Enum;
 using GameFrameX.Entity.System;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 using GameFrameX.Payment.AliPay;
 using Microsoft.AspNetCore.Http;
 using SqlSugar;
@@ -28,22 +28,22 @@ public sealed class PaymentOptionSettingDecryptClosureTests
     {
         const long tenantId = 1900000004001;
         const long appId = 1900000004101;
-        var originalKey = Environment.GetEnvironmentVariable(TenantSecretCrypto.KeyEnvironmentVariable);
-        Environment.SetEnvironmentVariable(TenantSecretCrypto.KeyEnvironmentVariable, "unit-test-secret-key");
+        var originalKey = Environment.GetEnvironmentVariable(SecretCrypto.KeyEnvironmentVariable);
+        Environment.SetEnvironmentVariable(SecretCrypto.KeyEnvironmentVariable, "unit-test-secret-key");
         _ = Assembly.Load("GameFrameX.Payment.AliPay");
         try
         {
             using var fixture = new PostgresPaymentFixture(tenantId, appId);
             var configJson = PaymentConfigCrypto.EncryptConfigJson("alipay",
                 "{\"AliPayAppId\":\"2021001\",\"AliPayMerchantPrivateKey\":\"plain-merchant-key\",\"AliPayGatewayUrl\":\"https://openapi.alipay.com/gateway.do\"}");
-            fixture.TenantDb.Insertable(new TenantGamePaymentConfigEntity
+            fixture.TenantDb.Insertable(new GamePaymentConfigEntity
             {
                 Id = 1900000004201, IsEnabled = true, PayChannel = "alipay", ConfigJson = configJson,
             }).ExecuteCommand();
 
             var httpContext = new DefaultHttpContext();
             httpContext.Items[GameFrameX.Core.Middleware.PublicCallbackRouteContext.ItemKey] = true;
-            var provider = new PaymentOptionSettingProvider(fixture.TenantDbProvider, new HttpContextAccessor { HttpContext = httpContext, });
+            var provider = new PaymentOptionSettingProvider(fixture.DbProvider, new HttpContextAccessor { HttpContext = httpContext, });
 
             var setting = provider.GetOptionSetting<AliPayOptionSetting>("alipay");
 
@@ -53,7 +53,7 @@ public sealed class PaymentOptionSettingDecryptClosureTests
         }
         finally
         {
-            Environment.SetEnvironmentVariable(TenantSecretCrypto.KeyEnvironmentVariable, originalKey);
+            Environment.SetEnvironmentVariable(SecretCrypto.KeyEnvironmentVariable, originalKey);
         }
     }
 
@@ -74,9 +74,9 @@ public sealed class PaymentOptionSettingDecryptClosureTests
             MainDb = new SqlSugarScope(mainConfig);
 
 
-            TenantDbProvider = MainDb;
-            TenantDb = TenantDbProvider;
-            TenantDb.CodeFirst.InitTables(typeof(TenantGamePaymentConfigEntity));
+            DbProvider = MainDb;
+            TenantDb = DbProvider;
+            TenantDb.CodeFirst.InitTables(typeof(GamePaymentConfigEntity));
             _ = appId;
         }
 
@@ -84,7 +84,7 @@ public sealed class PaymentOptionSettingDecryptClosureTests
 
         public ISqlSugarClient TenantDb { get; }
 
-        public ISqlSugarClient TenantDbProvider { get; }
+        public ISqlSugarClient DbProvider { get; }
 
 
         public void Dispose()

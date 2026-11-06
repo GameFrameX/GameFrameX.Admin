@@ -3,13 +3,13 @@ using GameFrameX.Core.Cache;
 using GameFrameX.Core.Middleware;
 using GameFrameX.Core.Option;
 using GameFrameX.Core.Service.Cache;
-using GameFrameX.Core.Service.Tenant;
+using GameFrameX.Core.Service.Business;
 using GameFrameX.Core.SignatureAuth;
 using GameFrameX.Core.Service.User;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Core.Tests.ClientApi;
-using GameFrameX.Entity.Tenant;
-using GameFrameX.Entity.Tenant.Game.App;
+using GameFrameX.Entity.Business;
+using GameFrameX.Entity.Business.Game.App;
 using GameFrameX.Hub.Api.Middleware;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,32 +21,32 @@ namespace GameFrameX.Core.Tests.HubApi;
 // C372（GFX-838）T3/T5/T6：Hub.Api 开放访问中间件凭证解密收口——密文凭证（C371 起库内形态）
 // 经完整 InvokeAsync 管线验签通过；密文存在而密钥缺失 fail-closed 抛错。
 // change：gfx-doc/dev/client-api/changes/C372-runtime-credential-decrypt-closure/change.md
-public sealed class TenantGameAppOpenAccessDecryptClosureTests : IDisposable
+public sealed class GameAppOpenAccessDecryptClosureTests : IDisposable
 {
     private readonly ClientApiTestDb _db = new();
     private readonly string? _originalKey;
 
-    public TenantGameAppOpenAccessDecryptClosureTests()
+    public GameAppOpenAccessDecryptClosureTests()
     {
-        _originalKey = Environment.GetEnvironmentVariable(TenantSecretCrypto.KeyEnvironmentVariable);
-        Environment.SetEnvironmentVariable(TenantSecretCrypto.KeyEnvironmentVariable, "unit-test-secret-key");
-        _db.InitTenantTables(typeof(TenantGameAppOpenAccessEntity), typeof(TenantUserEntity));
+        _originalKey = Environment.GetEnvironmentVariable(SecretCrypto.KeyEnvironmentVariable);
+        Environment.SetEnvironmentVariable(SecretCrypto.KeyEnvironmentVariable, "unit-test-secret-key");
+        _db.InitBusinessTables(typeof(GameAppOpenAccessEntity), typeof(UserEntity));
     }
 
     public void Dispose()
     {
-        Environment.SetEnvironmentVariable(TenantSecretCrypto.KeyEnvironmentVariable, _originalKey);
+        Environment.SetEnvironmentVariable(SecretCrypto.KeyEnvironmentVariable, _originalKey);
         _db.Dispose();
     }
 
     [Fact]
     public async Task EncryptedCredential_SignedRequest_PassesFullPipeline()
     {
-        SeedCredential(TenantSecretCrypto.Encrypt("hub-open-access-secret")!);
+        SeedCredential(SecretCrypto.Encrypt("hub-open-access-secret")!);
         var httpContext = CreateSignedRequest("hub-open-access-secret");
         var nextCalled = false;
 
-        var middleware = new TenantGameAppOpenAccessAuthMiddleware(context =>
+        var middleware = new GameAppOpenAccessAuthMiddleware(context =>
         {
             nextCalled = true;
             context.Response.StatusCode = StatusCodes.Status200OK;
@@ -62,16 +62,16 @@ public sealed class TenantGameAppOpenAccessDecryptClosureTests : IDisposable
     [Fact]
     public async Task EncryptedCredential_MissingKey_FailsClosed()
     {
-        SeedCredential(TenantSecretCrypto.Encrypt("hub-open-access-secret")!);
+        SeedCredential(SecretCrypto.Encrypt("hub-open-access-secret")!);
         var httpContext = CreateSignedRequest("hub-open-access-secret");
-        Environment.SetEnvironmentVariable(TenantSecretCrypto.KeyEnvironmentVariable, null);
+        Environment.SetEnvironmentVariable(SecretCrypto.KeyEnvironmentVariable, null);
 
-        var middleware = new TenantGameAppOpenAccessAuthMiddleware(_ => Task.CompletedTask);
+        var middleware = new GameAppOpenAccessAuthMiddleware(_ => Task.CompletedTask);
 
         // 密文存在而密钥缺失：fail-closed 抛 InvalidOperationException（指向环境变量，不回显密文）
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(
             () => middleware.InvokeAsync(httpContext, CreateCacheService()));
-        Assert.Contains(TenantSecretCrypto.KeyEnvironmentVariable, exception.Message, StringComparison.Ordinal);
+        Assert.Contains(SecretCrypto.KeyEnvironmentVariable, exception.Message, StringComparison.Ordinal);
     }
 
     [Theory]
@@ -83,8 +83,8 @@ public sealed class TenantGameAppOpenAccessDecryptClosureTests : IDisposable
     [InlineData("tampered", 401)]
     public async Task MainDatabaseCredential_InvalidStateOrRequest_IsRejected(string scenario, int expectedStatus)
     {
-        SeedCredential(TenantSecretCrypto.Encrypt("hub-open-access-secret")!);
-        var credential = _db.MainDb.Queryable<TenantGameAppOpenAccessEntity>().First();
+        SeedCredential(SecretCrypto.Encrypt("hub-open-access-secret")!);
+        var credential = _db.MainDb.Queryable<GameAppOpenAccessEntity>().First();
         switch (scenario)
         {
             case "disabled":
@@ -112,7 +112,7 @@ public sealed class TenantGameAppOpenAccessDecryptClosureTests : IDisposable
         }
 
         var nextCalled = false;
-        var middleware = new TenantGameAppOpenAccessAuthMiddleware(_ =>
+        var middleware = new GameAppOpenAccessAuthMiddleware(_ =>
         {
             nextCalled = true;
             return Task.CompletedTask;
@@ -126,11 +126,11 @@ public sealed class TenantGameAppOpenAccessDecryptClosureTests : IDisposable
     [Fact]
     public async Task MainDatabaseCredential_ReplayIsRejectedAndOperatorHasNoTenantClaim()
     {
-        SeedCredential(TenantSecretCrypto.Encrypt("hub-open-access-secret")!);
+        SeedCredential(SecretCrypto.Encrypt("hub-open-access-secret")!);
         var first = CreateSignedRequest("hub-open-access-secret");
         var cache = CreateCacheService();
         var nextCount = 0;
-        var middleware = new TenantGameAppOpenAccessAuthMiddleware(context =>
+        var middleware = new GameAppOpenAccessAuthMiddleware(context =>
         {
             nextCount++;
             Assert.Equal("7801", context.User.FindFirst(GameFrameX.Core.Const.ClaimConst.UserId)?.Value);
@@ -148,13 +148,13 @@ public sealed class TenantGameAppOpenAccessDecryptClosureTests : IDisposable
 
     private void SeedCredential(string storedAccessSecret)
     {
-        var bindUser = new TenantUserEntity
+        var bindUser = new UserEntity
         {
             Id = 7801, Account = "ci-user", RealName = "CI", Password = "not-a-real-password",
         };
-        TenantUserService.NormalizeNewUser(bindUser); // 补齐 NOT NULL 字符串列默认值
+        UserService.NormalizeNewUser(bindUser); // 补齐 NOT NULL 字符串列默认值
         _db.TenantDb.Insertable(bindUser).ExecuteCommand();
-        _db.TenantDb.Insertable(new TenantGameAppOpenAccessEntity
+        _db.TenantDb.Insertable(new GameAppOpenAccessEntity
         {
             Id = 7802, BindUserId = 7801,
             Scenario = "ci", Purpose = "unit-test", SubjectName = "unit-test",
@@ -190,7 +190,7 @@ public sealed class TenantGameAppOpenAccessDecryptClosureTests : IDisposable
     {
         var services = new ServiceCollection();
         services.AddSingleton<ISqlSugarClient>(_db.MainDb);
-        services.AddSingleton<ISqlSugarClient>(_db.TenantDbProvider);
+        services.AddSingleton<ISqlSugarClient>(_db.DbProvider);
         services.AddScoped(typeof(Repository<>));
         return services.BuildServiceProvider();
     }

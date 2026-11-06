@@ -4,29 +4,29 @@ using GameFrameX.Advertisement.AdMob;
 using GameFrameX.Advertisement.Pangle;
 using GameFrameX.Client.Api.Integrations.Advertisement.Dto;
 using GameFrameX.Client.Api.Services;
-using GameFrameX.Client.Api.Services.ClientApiTenantOptions;
+using GameFrameX.Client.Api.Services.ClientApiOptions;
 using GameFrameX.Core.Service;
 
 namespace GameFrameX.Client.Api.Integrations.Advertisement;
 
 /// <summary>
 /// 广告服务器回调。
-/// <para>广告网络回调不携带 <c>X-Api-Key</c>，必须先由公开回调 URL 路由参数建立租户上下文，再通过 <see cref="IClientApiTenantOptionsProvider"/> 读取该租户的验签材料。</para>
+/// <para>广告网络回调不携带 <c>X-Api-Key</c>，必须先由公开回调 URL 路由参数建立租户上下文，再通过 <see cref="IClientApiOptionsProvider"/> 读取该租户的验签材料。</para>
 /// <para>无法解析租户或租户未配置验签材料时安全拒绝，禁止逐租户扫描或回落到进程级 key。</para>
 /// <para>TopOn / AdMob / UnityAds 的验签 + 幂等账本 + 发奖链路由 <see cref="GameAdvertisementRewardService"/> 统一处理（C114 / GFX-110）；Pangle 验签由 <see cref="PangleAdvertisementCallbackHandler"/> 处理（仅验签，不进发奖链路）。</para>
 /// </summary>
-public class GameAdWebHookController : BaseController<TenantGameRoleAdvertisementEntity>
+public class GameAdWebHookController : BaseController<GameRoleAdvertisementEntity>
 {
-    private readonly IClientApiTenantOptionsProvider _optionsProvider;
-    private readonly Repository<TenantGameRoleEntity> _roleRepository;
+    private readonly IClientApiOptionsProvider _optionsProvider;
+    private readonly Repository<GameRoleEntity> _roleRepository;
     private readonly GameAdvertisementRewardService _advertisementRewardService;
     private readonly IAdvertisementCallbackFactory _advertisementCallbackFactory;
 
     /// <summary>
     /// </summary>
-    public GameAdWebHookController(SqlSugarRepository<TenantGameRoleAdvertisementEntity> service,
-        Repository<TenantGameRoleEntity> roleRepository,
-        IClientApiTenantOptionsProvider optionsProvider,
+    public GameAdWebHookController(SqlSugarRepository<GameRoleAdvertisementEntity> service,
+        Repository<GameRoleEntity> roleRepository,
+        IClientApiOptionsProvider optionsProvider,
         GameAdvertisementRewardService advertisementRewardService,
         IAdvertisementCallbackFactory advertisementCallbackFactory) : base(service)
     {
@@ -83,7 +83,7 @@ public class GameAdWebHookController : BaseController<TenantGameRoleAdvertisemen
     /// <summary>
     /// Google AdMob奖励视频广告回调通知。
     /// <para>验签 + 幂等账本 + 发奖由 <see cref="GameAdvertisementRewardService.ReceiveAdMobAsync"/> 处理。</para>
-    /// <para>发放成功后保留对 <see cref="TenantGameRoleAdvertisementEntity"/> 的写入（C75/C91 应用作用域事实，范围外不动）。</para>
+    /// <para>发放成功后保留对 <see cref="GameRoleAdvertisementEntity"/> 的写入（C75/C91 应用作用域事实，范围外不动）。</para>
     /// </summary>
     [PublicCallbackEndpoint("admob", "ad")]
     [HttpGet("{packageId:long?}")]
@@ -116,7 +116,7 @@ public class GameAdWebHookController : BaseController<TenantGameRoleAdvertisemen
     }
 
     /// <summary>
-    /// 发放成功后写入 <see cref="TenantGameRoleAdvertisementEntity"/> 角色广告事实（C75/C91 应用作用域，保留不改）。
+    /// 发放成功后写入 <see cref="GameRoleAdvertisementEntity"/> 角色广告事实（C75/C91 应用作用域，保留不改）。
     /// </summary>
     private async Task WriteAdMobRoleAdvertisementFactAsync(AdMobCallbackRequest input)
     {
@@ -143,7 +143,7 @@ public class GameAdWebHookController : BaseController<TenantGameRoleAdvertisemen
                 return;
             }
 
-            var gameRoleAdvertisementEntity = new TenantGameRoleAdvertisementEntity
+            var gameRoleAdvertisementEntity = new GameRoleAdvertisementEntity
             {
                 TransId = input.TransactionId,
                 UserId = userId,
@@ -156,7 +156,7 @@ public class GameAdWebHookController : BaseController<TenantGameRoleAdvertisemen
         }
         catch (Exception ex)
         {
-            LogHelper.Error($"AdMob TenantGameRoleAdvertisementEntity 写入异常: {ex.Message}", ex);
+            LogHelper.Error($"AdMob GameRoleAdvertisementEntity 写入异常: {ex.Message}", ex);
         }
     }
 

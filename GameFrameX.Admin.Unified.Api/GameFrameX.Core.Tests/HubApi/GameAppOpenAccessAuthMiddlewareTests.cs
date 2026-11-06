@@ -1,16 +1,16 @@
 using System.Text;
 using GameFrameX.Core.SignatureAuth;
-using GameFrameX.Entity.Tenant.Game.App;
+using GameFrameX.Entity.Business.Game.App;
 using GameFrameX.Hub.Api.Middleware;
 
 namespace GameFrameX.Core.Tests.HubApi;
 
 /// <summary>
-/// TenantGameAppOpenAccessAuthMiddleware 签名段单元测试（C267-C：规范 B → 规范 A 迁移）。
+/// GameAppOpenAccessAuthMiddleware 签名段单元测试（C267-C：规范 B → 规范 A 迁移）。
 /// 覆盖：v2 单头解析（合法/旧格式拒绝/坏 Base64）、canonical 消息串验签通过、
 /// body 篡改拒（body 入签证据）、按原始乱序 query 拼串签名拒（canonical 强制证据）。
 /// </summary>
-public sealed class TenantGameAppOpenAccessAuthMiddlewareTests
+public sealed class GameAppOpenAccessAuthMiddlewareTests
 {
     private const string AccessKey = "ak-hub-vector-001";
     private const string AccessSecret = "GFX-C267-HUB-OPENACCESS-SECRET";
@@ -18,9 +18,9 @@ public sealed class TenantGameAppOpenAccessAuthMiddlewareTests
     private const string Nonce = "n-9f3c1b";
     private const string Body = "{\"package\":\"pkg-1001\",\"status\":\"ok\"}";
 
-    private static TenantGameAppOpenAccessEntity Credential()
+    private static GameAppOpenAccessEntity Credential()
     {
-        return new TenantGameAppOpenAccessEntity
+        return new GameAppOpenAccessEntity
         {
             AccessKey = AccessKey,
             AccessSecret = AccessSecret,
@@ -41,7 +41,7 @@ public sealed class TenantGameAppOpenAccessAuthMiddlewareTests
         var signatureBase64 = ClientSign("POST", "/api/PackageBuildReport", "serverId=9&channel=ios", Encoding.UTF8.GetBytes(Body));
         var header = "v2;" + AccessKey + ";" + Ts + ";" + Nonce + ";" + Convert.ToBase64String(signatureBase64);
 
-        var parsed = TenantGameAppOpenAccessAuthMiddleware.TryParseSignatureHeader(header, out var accessKey, out var timestamp, out var nonce, out var provided);
+        var parsed = GameAppOpenAccessAuthMiddleware.TryParseSignatureHeader(header, out var accessKey, out var timestamp, out var nonce, out var provided);
 
         Assert.True(parsed);
         Assert.Equal(AccessKey, accessKey);
@@ -55,13 +55,13 @@ public sealed class TenantGameAppOpenAccessAuthMiddlewareTests
     {
         // C267 前的 4 个独立头（accessKey/timestamp/nonce/sign）不再支持：缺 Signature 单头直接解析失败；
         // 段数不足 / 非 v2 前缀 / 坏 Base64 同样拒绝
-        Assert.False(TenantGameAppOpenAccessAuthMiddleware.TryParseSignatureHeader(null, out _, out _, out _, out _));
-        Assert.False(TenantGameAppOpenAccessAuthMiddleware.TryParseSignatureHeader(string.Empty, out _, out _, out _, out _));
-        Assert.False(TenantGameAppOpenAccessAuthMiddleware.TryParseSignatureHeader("v1;" + AccessKey + ";" + Ts + ";" + Nonce + ";AAAA", out _, out _, out _, out _));
-        Assert.False(TenantGameAppOpenAccessAuthMiddleware.TryParseSignatureHeader("v2;" + AccessKey + ";" + Ts + ";" + Nonce, out _, out _, out _, out _));
-        Assert.False(TenantGameAppOpenAccessAuthMiddleware.TryParseSignatureHeader("v2;" + AccessKey + ";not-a-ts;" + Nonce + ";AAAA", out _, out _, out _, out _));
-        Assert.False(TenantGameAppOpenAccessAuthMiddleware.TryParseSignatureHeader("v2;;" + Ts + ";" + Nonce + ";AAAA", out _, out _, out _, out _));
-        Assert.False(TenantGameAppOpenAccessAuthMiddleware.TryParseSignatureHeader("v2;" + AccessKey + ";" + Ts + ";" + Nonce + ";***not-base64***", out _, out _, out _, out _));
+        Assert.False(GameAppOpenAccessAuthMiddleware.TryParseSignatureHeader(null, out _, out _, out _, out _));
+        Assert.False(GameAppOpenAccessAuthMiddleware.TryParseSignatureHeader(string.Empty, out _, out _, out _, out _));
+        Assert.False(GameAppOpenAccessAuthMiddleware.TryParseSignatureHeader("v1;" + AccessKey + ";" + Ts + ";" + Nonce + ";AAAA", out _, out _, out _, out _));
+        Assert.False(GameAppOpenAccessAuthMiddleware.TryParseSignatureHeader("v2;" + AccessKey + ";" + Ts + ";" + Nonce, out _, out _, out _, out _));
+        Assert.False(GameAppOpenAccessAuthMiddleware.TryParseSignatureHeader("v2;" + AccessKey + ";not-a-ts;" + Nonce + ";AAAA", out _, out _, out _, out _));
+        Assert.False(GameAppOpenAccessAuthMiddleware.TryParseSignatureHeader("v2;;" + Ts + ";" + Nonce + ";AAAA", out _, out _, out _, out _));
+        Assert.False(GameAppOpenAccessAuthMiddleware.TryParseSignatureHeader("v2;" + AccessKey + ";" + Ts + ";" + Nonce + ";***not-base64***", out _, out _, out _, out _));
     }
 
     [Fact]
@@ -70,7 +70,7 @@ public sealed class TenantGameAppOpenAccessAuthMiddlewareTests
         var body = Encoding.UTF8.GetBytes(Body);
         var provided = ClientSign("POST", "/api/PackageBuildReport", "serverId=9&channel=ios", body);
 
-        var verified = TenantGameAppOpenAccessAuthMiddleware.VerifySignature(
+        var verified = GameAppOpenAccessAuthMiddleware.VerifySignature(
             Credential(), "POST", "/api/PackageBuildReport", "serverId=9&channel=ios", Ts, Nonce, body, provided);
 
         Assert.True(verified);
@@ -83,7 +83,7 @@ public sealed class TenantGameAppOpenAccessAuthMiddlewareTests
         var body = Encoding.UTF8.GetBytes(Body);
         var provided = ClientSign("POST", "/api/PackageBuildReport", "serverId=9", body);
 
-        var verified = TenantGameAppOpenAccessAuthMiddleware.VerifySignature(
+        var verified = GameAppOpenAccessAuthMiddleware.VerifySignature(
             Credential(), "POST", "/api/PackageBuildReport", "serverId=9", Ts, Nonce,
             Encoding.UTF8.GetBytes("{\"package\":\"pkg-1001\",\"status\":\"tampered\"}"), provided);
 
@@ -100,7 +100,7 @@ public sealed class TenantGameAppOpenAccessAuthMiddlewareTests
                               + CanonicalRequestBuilder.BodyHashHex(body);
         var provided = CanonicalRequestBuilder.HmacSha256(Encoding.UTF8.GetBytes(AccessSecret), rawOrderMessage);
 
-        var verified = TenantGameAppOpenAccessAuthMiddleware.VerifySignature(
+        var verified = GameAppOpenAccessAuthMiddleware.VerifySignature(
             Credential(), "POST", "/api/PackageBuildReport", "serverId=9&channel=ios", Ts, Nonce, body, provided);
 
         Assert.False(verified);

@@ -54,7 +54,7 @@ public sealed class PublicCallbackLegacyRouteRejectionTests
             context.Request.RouteValues["appId"] = 888; // c406-keep
             context.Request.RouteValues["gameAppId"] = 777; // c406-keep
             var invoked = false;
-            var middleware = new PublicCallbackTenantResolutionMiddleware(request =>
+            var middleware = new PublicCallbackResolutionMiddleware(request =>
             {
                 invoked = true;
                 Assert.Single(request.Items);

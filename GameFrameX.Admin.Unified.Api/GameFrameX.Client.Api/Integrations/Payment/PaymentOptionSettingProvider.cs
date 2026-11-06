@@ -1,9 +1,9 @@
 using GameFrameX.Client.Api.Services.PublicCallback;
-using GameFrameX.Entity.Tenant.Game.App;
+using GameFrameX.Entity.Business.Game.App;
 using System.Text.Json;
 using GameFrameX.Application.ClientDelivery.GamePaymentConfig;
 using GameFrameX.Client.Api.Services;
-using GameFrameX.Core.Service.Tenant;
+using GameFrameX.Core.Service.Business;
 using GameFrameX.Payment.Abstract;
 using GameFrameX.Payment.AliPay;
 using GameFrameX.Payment.Wechat;
@@ -117,14 +117,14 @@ public class PaymentOptionSettingProvider : IPaymentOptionSettingProvider
     /// <param name="channelName">渠道名称（已小写规范化）。</param>
     /// <param name="packageId">当前上下文分包标识。</param>
     /// <returns>候选支付配置列表。</returns>
-    private List<TenantGamePaymentConfigEntity> GetPaymentConfigs(string channelName, long? packageId)
+    private List<GamePaymentConfigEntity> GetPaymentConfigs(string channelName, long? packageId)
     {
         var context = _httpContextAccessor.HttpContext;
         var db = _database;
         var environments = GetRequestedEnvironments(context);
         var hasPackageId = packageId.HasValue;
         var packageIdValue = packageId.GetValueOrDefault();
-        var query = db.Queryable<TenantGamePaymentConfigEntity>()
+        var query = db.Queryable<GamePaymentConfigEntity>()
                       .Where(u => u.PayChannel == channelName && u.IsEnabled == true &&
                                   (u.PackageIdNormalized == 0 ||
                                    (hasPackageId && u.PackageIdNormalized == packageIdValue)));
@@ -137,7 +137,7 @@ public class PaymentOptionSettingProvider : IPaymentOptionSettingProvider
         return query.ToList()
                     .GroupBy(u => u.IsSandbox)
                     .Select(group => GamePaymentConfigService.PickBestConfig(group, packageId))
-                    .OfType<TenantGamePaymentConfigEntity>()
+                    .OfType<GamePaymentConfigEntity>()
                     .OrderBy(u => u.IsSandbox)
                     .ToList();
     }
@@ -222,7 +222,7 @@ public class PaymentOptionSettingProvider : IPaymentOptionSettingProvider
         var packageId = GetCurrentPackageId(context);
         if (packageId.HasValue)
         {
-            var package = db.Queryable<TenantGameAppPackageEntity>()
+            var package = db.Queryable<GameAppPackageEntity>()
                             .First(u => u.Id == packageId.Value && u.IsEnabled == true);
             return PackageMatchesScope(package) ? packageId : null;
         }
@@ -233,12 +233,12 @@ public class PaymentOptionSettingProvider : IPaymentOptionSettingProvider
             return null;
         }
 
-        var namedPackage = db.Queryable<TenantGameAppPackageEntity>()
+        var namedPackage = db.Queryable<GameAppPackageEntity>()
                              .First(u => u.PackageName == packageName.Trim() && u.IsEnabled == true);
         return PackageMatchesScope(namedPackage) ? namedPackage.Id : null;
     }
 
-    public static bool PackageMatchesScope(TenantGameAppPackageEntity? package)
+    public static bool PackageMatchesScope(GameAppPackageEntity? package)
     {
         return package != null && package.IsEnabled == true;
     }

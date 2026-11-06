@@ -299,9 +299,9 @@ public partial class GameOrderController
         return new AppStoreServerApiClient(privateKey, keyId, issuerId, bundleId, ApplePayEnvironment.Sandbox, _httpClient);
     }
 
-    private async Task<TenantGameOrderEntity?> FindAppleOrderAsync(JWSTransactionDecodedPayload transactionInfo)
+    private async Task<GameOrderEntity?> FindAppleOrderAsync(JWSTransactionDecodedPayload transactionInfo)
     {
-        TenantGameOrderEntity? gameOrderEntity = null;
+        GameOrderEntity? gameOrderEntity = null;
         if (!string.IsNullOrWhiteSpace(transactionInfo.TransactionId))
         {
             gameOrderEntity = await PRepository.GetSingleAsync(m => m.AppleTransactionId == transactionInfo.TransactionId);

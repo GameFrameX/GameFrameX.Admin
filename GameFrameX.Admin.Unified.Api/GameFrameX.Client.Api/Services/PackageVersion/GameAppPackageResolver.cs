@@ -1,4 +1,4 @@
-using GameFrameX.Entity.Tenant.Game.App;
+using GameFrameX.Entity.Business.Game.App;
 using System.Collections.Concurrent;
 using GameFrameX.Entity.Enum;
 using SqlSugar;
@@ -9,7 +9,7 @@ namespace GameFrameX.Client.Api.Services.PackageVersion;
 /// 包名解析服务：将子包包名解析为母包包名，供客户端 Fallback 匹配器与远程配置投放做第 2 轮母包回退。
 /// </summary>
 /// <remarks>
-/// 运行时继承语义（与 <see cref="TenantGameAppPackageEntity.PlatformInheritanceMode"/> 对齐）：
+/// 运行时继承语义（与 <see cref="GameAppPackageEntity.PlatformInheritanceMode"/> 对齐）：
 /// <list type="bullet">
 /// <item><description><see cref="InheritanceModeEnum.Inherit"/>：子包允许母包回退，参与子包名→母包名映射。</description></item>
 /// <item><description><see cref="InheritanceModeEnum.Override"/>：子包自洽配置，不回退母包（Resolve 返回子包原名）。</description></item>
@@ -77,7 +77,7 @@ public class GameAppPackageResolver
     private static PackageCache RefreshCache(ISqlSugarClient db, PackageCacheSignal signal)
     {
         // 仅"继承"模式的启用子包才允许母包回退；Override/DisableAsync 与禁用子包不进入映射。
-        var children = db.Queryable<TenantGameAppPackageEntity>()
+        var children = db.Queryable<GameAppPackageEntity>()
                          .Where(p => p.IsEnabled == true && p.IsDeleted == false)
                          .Where(p => p.ParentPackageId != null)
                          .Where(p => p.PlatformInheritanceMode == InheritanceModeEnum.Inherit)
@@ -85,11 +85,11 @@ public class GameAppPackageResolver
 
         var masterIds = children.Select(p => p.ParentPackageId!.Value).Distinct().ToList();
         var masters = masterIds.Count > 0
-                          ? db.Queryable<TenantGameAppPackageEntity>()
+                          ? db.Queryable<GameAppPackageEntity>()
                               .Where(p => p.IsEnabled == true && p.IsDeleted == false)
                               .In(masterIds)
                               .ToList()
-                          : new List<TenantGameAppPackageEntity>();
+                          : new List<GameAppPackageEntity>();
 
         var cache = new ConcurrentDictionary<string, string>();
         foreach (var pkg in children)
@@ -110,7 +110,7 @@ public class GameAppPackageResolver
     /// </summary>
     private static PackageCacheSignal GetSignal(ISqlSugarClient db)
     {
-        var participantQuery = db.Queryable<TenantGameAppPackageEntity>()
+        var participantQuery = db.Queryable<GameAppPackageEntity>()
                                  .Where(p => p.IsEnabled == true && p.IsDeleted == false)
                                  .Where(p => p.ParentPackageId != null || p.PackageKind == PackageKindEnum.Master);
 

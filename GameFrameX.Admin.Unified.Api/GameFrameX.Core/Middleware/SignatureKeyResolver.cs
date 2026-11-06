@@ -1,5 +1,5 @@
-using GameFrameX.Core.Service.Tenant;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Core.Service.Business;
+using GameFrameX.Entity.Business.Game;
 
 namespace GameFrameX.Core.Middleware;
 
@@ -32,7 +32,7 @@ public sealed class SignatureKeyResolver : ISignatureKeyResolver
     public async Task<IReadOnlyList<SignatureKeyMaterial>> GetActiveKeysAsync()
     {
         var now = TimerHelper.UnixTimeSeconds();
-        var keys = await _database.Queryable<TenantAppSignatureKeyEntity>().ClearFilter()
+        var keys = await _database.Queryable<AppSignatureKeyEntity>().ClearFilter()
             .Where(key => key.IsDeleted == false && key.IsEnabled == true
                 && (key.NotBeforeTime == null || key.NotBeforeTime <= now)
                 && (key.ExpireTime == null || key.ExpireTime > now)).ToListAsync();
@@ -48,7 +48,7 @@ public sealed class SignatureKeyResolver : ISignatureKeyResolver
     /// <para>结果到中间件拒签码的映射见 <see cref="SignatureKeyLookupResult"/>；Expire 判定为严格大于
     /// （now == Expire 即到期），与 LoginTicket key 查询口径一致。</para>
     /// </summary>
-    internal static SignatureKeyLookupResult Judge(TenantAppSignatureKeyEntity key, long now)
+    internal static SignatureKeyLookupResult Judge(AppSignatureKeyEntity key, long now)
     {
         if (key.IsEnabled == false)
         {
@@ -68,10 +68,10 @@ public sealed class SignatureKeyResolver : ISignatureKeyResolver
         return SignatureKeyLookupResult.Active;
     }
 
-    private async Task<TenantAppSignatureKeyEntity?> GetKeyAsync(string kid)
+    private async Task<AppSignatureKeyEntity?> GetKeyAsync(string kid)
     {
         // 元数据不缓存，跨宿主轮换、同秒撤销、删除与租约修改在下一请求立即生效。
-        return await _database.Queryable<TenantAppSignatureKeyEntity>().ClearFilter()
+        return await _database.Queryable<AppSignatureKeyEntity>().ClearFilter()
             .Where(key => key.Kid == kid && key.IsDeleted == false).FirstAsync();
     }
 

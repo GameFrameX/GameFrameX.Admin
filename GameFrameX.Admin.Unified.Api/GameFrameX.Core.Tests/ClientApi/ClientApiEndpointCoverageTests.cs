@@ -63,7 +63,7 @@ public sealed class ClientApiEndpointCoverageTests
             Assert.Contains("invalid-route", endpoint.FailureCases);
             Assert.DoesNotContain("{tenantId:long}", endpoint.Route); // c406-keep
             Assert.DoesNotContain("{appId:long}", endpoint.Route); // c406-keep
-            Assert.False(endpoint.RequiresTenant);
+            Assert.False(endpoint.Requires);
             Assert.False(endpoint.RequiresApp);
         }
     }

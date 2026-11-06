@@ -1,52 +1,52 @@
-using GameFrameX.Core.Service.Tenant;
+using GameFrameX.Core.Service.Business;
 using SqlSugar;
 using System.Text.Json;
 using GameFrameX.Advertisement.Abstract;
 using GameFrameX.Client.Api.Middleware;
 using GameFrameX.Client.Api.Services.Email;
-using GameFrameX.Entity.Tenant.ClientApiConfig;
+using GameFrameX.Entity.Business.ClientApiConfig;
 
-namespace GameFrameX.Client.Api.Services.ClientApiTenantOptions;
+namespace GameFrameX.Client.Api.Services.ClientApiOptions;
 
 /// <summary>
 /// 从唯一主库读取 Client API 请求期业务配置。
 /// <para>所有策略节共享启用且 Id 最大的配置行，并在请求内缓存。</para>
 /// </summary>
-public sealed class ClientApiTenantOptionsProvider : IClientApiTenantOptionsProvider
+public sealed class ClientApiOptionsProvider : IClientApiOptionsProvider
 {
     private readonly ISqlSugarClient _database;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
-    private TenantClientApiPolicyEntity? _effectivePolicyRow;
+    private ClientApiPolicyEntity? _effectivePolicyRow;
     private bool _effectivePolicyRowFetched;
 
-    public ClientApiTenantOptionsProvider(ISqlSugarClient database, IHttpContextAccessor httpContextAccessor)
+    public ClientApiOptionsProvider(ISqlSugarClient database, IHttpContextAccessor httpContextAccessor)
     {
         _database = database;
         _httpContextAccessor = httpContextAccessor;
     }
 
     /// <inheritdoc />
-#pragma warning disable CS8603 // 接口 IClientApiTenantOptionsProvider 签名非空（跨项目共享），但语义允许返回 null（未配置）；改返回类型会级联到测试 fake
-    public async Task<TenantEmailOptions> GetEmailOptionsAsync()
+#pragma warning disable CS8603 // 接口 IClientApiOptionsProvider 签名非空（跨项目共享），但语义允许返回 null（未配置）；改返回类型会级联到测试 fake
+    public async Task<EmailOptions> GetEmailOptionsAsync()
     {
         var db = _database;
-        var entity = await TenantEmailConfigSelector.SelectAsync(db, 0);
+        var entity = await EmailConfigSelector.SelectAsync(db, 0);
         return entity == null
                    ? null
-                   : new TenantEmailOptions
+                   : new EmailOptions
                    {
                        FromEmailAddress = entity.FromEmailAddress,
                        // C372（GFX-838）：凭证读取边界解密（C371 起库内密文；无前缀明文直通）
-                       FromEmailSecretId = TenantSecretCrypto.DecryptCached(entity.FromEmailSecretId) ?? string.Empty,
-                       FromEmailSecretKey = TenantSecretCrypto.DecryptCached(entity.FromEmailSecretKey) ?? string.Empty,
+                       FromEmailSecretId = SecretCrypto.DecryptCached(entity.FromEmailSecretId) ?? string.Empty,
+                       FromEmailSecretKey = SecretCrypto.DecryptCached(entity.FromEmailSecretKey) ?? string.Empty,
                    };
     }
 #pragma warning restore CS8603
 
     /// <inheritdoc />
-#pragma warning disable CS8603 // 接口 IClientApiTenantOptionsProvider 签名非空（跨项目共享），但语义允许返回 null（未配置）；改返回类型会级联到测试 fake
-    public async Task<TenantAdvertisementCallbackOptions> GetAdvertisementCallbackOptionsAsync()
+#pragma warning disable CS8603 // 接口 IClientApiOptionsProvider 签名非空（跨项目共享），但语义允许返回 null（未配置）；改返回类型会级联到测试 fake
+    public async Task<AdvertisementCallbackOptions> GetAdvertisementCallbackOptionsAsync()
     {
         var entity = await PickAdvertisementCallbackConfigAsync();
         if (entity == null)
@@ -67,7 +67,7 @@ public sealed class ClientApiTenantOptionsProvider : IClientApiTenantOptionsProv
 
         var signingSecret = GetConfigValue(configValues, "signingSecret");
         var verificationKeys = GetConfigValue(configValues, "verificationKeys");
-        return new TenantAdvertisementCallbackOptions
+        return new AdvertisementCallbackOptions
         {
             Provider = entity.Provider,
             CallbackUrl = GetConfigValue(configValues, "callbackUrl", entity.CallbackUrl),
@@ -82,11 +82,11 @@ public sealed class ClientApiTenantOptionsProvider : IClientApiTenantOptionsProv
     }
 #pragma warning restore CS8603
 
-    private async Task<TenantAdvertisementCallbackConfigEntity?> PickAdvertisementCallbackConfigAsync()
+    private async Task<AdvertisementCallbackConfigEntity?> PickAdvertisementCallbackConfigAsync()
     {
         var db = _database;
         var provider = ResolvePublicCallbackProvider(_httpContextAccessor.HttpContext);
-        var query = db.Queryable<TenantAdvertisementCallbackConfigEntity>()
+        var query = db.Queryable<AdvertisementCallbackConfigEntity>()
                       .Where(c => c.IsEnabled == true);
         var candidates = await query.ToListAsync();
         if (!string.IsNullOrWhiteSpace(provider))
@@ -102,13 +102,13 @@ public sealed class ClientApiTenantOptionsProvider : IClientApiTenantOptionsProv
     }
 
     /// <inheritdoc />
-    public async Task<TenantClientApiTokenPolicyOptions> GetTokenPolicyAsync()
+    public async Task<ClientApiTokenPolicyOptions> GetTokenPolicyAsync()
     {
         var entity = await GetEffectivePolicyRowAsync();
-        return new TenantClientApiTokenPolicyOptions
+        return new ClientApiTokenPolicyOptions
         {
             // C372（GFX-838）：令牌签名密钥读取边界解密（C371 起库内密文；无前缀明文直通）
-            SigningKey = string.IsNullOrWhiteSpace(entity?.SigningKey) ? null : TenantSecretCrypto.DecryptCached(entity.SigningKey),
+            SigningKey = string.IsNullOrWhiteSpace(entity?.SigningKey) ? null : SecretCrypto.DecryptCached(entity.SigningKey),
             LifetimeMinutes = entity == null
                                   ? ClientApiPlatformDefaults.ClientApiTokenLifetimeMinutesDefault
                                   : ClientApiPlatformDefaults.ClampTokenLifetimeMinutes(entity.LifetimeMinutes),
@@ -116,11 +116,11 @@ public sealed class ClientApiTenantOptionsProvider : IClientApiTenantOptionsProv
     }
 
     /// <inheritdoc />
-    public async Task<TenantGameLoginTicketPolicyOptions> GetGameLoginTicketPolicyAsync()
+    public async Task<GameLoginTicketPolicyOptions> GetGameLoginTicketPolicyAsync()
     {
         var entity = await GetEffectivePolicyRowAsync();
         var now = TimerHelper.UnixTimeSeconds();
-        return new TenantGameLoginTicketPolicyOptions
+        return new GameLoginTicketPolicyOptions
         {
             TicketExpireTime = ClientApiPlatformDefaults.NormalizeGameLoginTicketExpireTime(entity?.TicketExpireTime ?? 0, now),
             EnableKeyAutoCreate = entity?.EnableKeyAutoCreate ?? ClientApiPlatformDefaults.GameLoginTicketKeyAutoCreateDefault,
@@ -128,30 +128,30 @@ public sealed class ClientApiTenantOptionsProvider : IClientApiTenantOptionsProv
     }
 
     /// <inheritdoc />
-    public async Task<TenantOrderPolicyOptions> GetOrderPolicyAsync()
+    public async Task<OrderPolicyOptions> GetOrderPolicyAsync()
     {
         var entity = await GetEffectivePolicyRowAsync();
-        return new TenantOrderPolicyOptions
+        return new OrderPolicyOptions
         {
             EnableSandBoxRecharge = entity?.EnableSandBoxRecharge ?? false,
         };
     }
 
     /// <inheritdoc />
-    public async Task<TenantAreaPolicyOptions> GetAreaPolicyAsync()
+    public async Task<AreaPolicyOptions> GetAreaPolicyAsync()
     {
         var entity = await GetEffectivePolicyRowAsync();
-        return new TenantAreaPolicyOptions
+        return new AreaPolicyOptions
         {
             EnableReturnHttpManager = entity?.EnableReturnHttpManager ?? false,
         };
     }
 
-    private async Task<TenantClientApiPolicyEntity?> GetEffectivePolicyRowAsync()
+    private async Task<ClientApiPolicyEntity?> GetEffectivePolicyRowAsync()
     {
         if (!_effectivePolicyRowFetched)
         {
-            _effectivePolicyRow = await _database.Queryable<TenantClientApiPolicyEntity>()
+            _effectivePolicyRow = await _database.Queryable<ClientApiPolicyEntity>()
                 .Where(c => c.IsEnabled == true)
                 .OrderByDescending(c => c.Id)
                 .FirstAsync();

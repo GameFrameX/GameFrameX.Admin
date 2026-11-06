@@ -4,15 +4,15 @@ using GameFrameX.Client.Api.Services.PackageVersion;
 using GameFrameX.Client.Api.Services.RemoteConfig;
 using GameFrameX.Client.Api.Services.PublicCallback;
 using GameFrameX.Client.Api.Services.PayVerification;
-using GameFrameX.Entity.Tenant.Game.RemoteConfig;
-using GameFrameX.Entity.Tenant.Game.Release;
+using GameFrameX.Entity.Business.Game.RemoteConfig;
+using GameFrameX.Entity.Business.Game.Release;
 using GameFrameX.Application.PlayerCenter.GamePenalty;
 using GameFrameX.Application.PlayerCenter.GameUser;
 using GameFrameX.Application.CommerceCenter.GameOrder;
 using GameFrameX.Client.Api.Filter;
 using GameFrameX.Client.Api.Middleware;
 using GameFrameX.Client.Api.Services;
-using GameFrameX.Client.Api.Services.ClientApiTenantOptions;
+using GameFrameX.Client.Api.Services.ClientApiOptions;
 using GameFrameX.Client.Api.Services.Email;
 using GameFrameX.Client.Api.Integrations.Payment;
 using GameFrameX.Client.Api.GameAppVersion.Dto;
@@ -22,7 +22,7 @@ using GameFrameX.Client.Api.Integrations.Advertisement;
 using GameFrameX.Core.Bootstrap;
 using GameFrameX.Core.Cache;
 using GameFrameX.Core.Service.Cache;
-using GameFrameX.Core.Service.Tenant;
+using GameFrameX.Core.Service.Business;
 using GameFrameX.Foundation.Extensions;
 using GameFrameX.Foundation.Options;
 using Serilog;
@@ -111,18 +111,18 @@ internal static class Program
         builder.Services.AddSingleton<GameAppPackageResolver>(); // 包名解析服务
         builder.Services.AddSingleton<PublicCallbackRouteResolver>(); // 公开 provider 回调 URL -> 分包上下文解析
         // Client API 请求期配置 Provider：依赖 IHttpContextAccessor + ISqlSugarClient，按请求读取主库配置
-        builder.Services.AddScoped<IClientApiTenantOptionsProvider, ClientApiTenantOptionsProvider>();
-        // 广告奖励发放账本服务（C114 / GFX-110）：依赖 Repository<T> + IClientApiTenantOptionsProvider + HttpClient + IHttpContextAccessor
+        builder.Services.AddScoped<IClientApiOptionsProvider, ClientApiOptionsProvider>();
+        // 广告奖励发放账本服务（C114 / GFX-110）：依赖 Repository<T> + IClientApiOptionsProvider + HttpClient + IHttpContextAccessor
         builder.Services.AddAdvertisementCallbacks();
         builder.Services.AddScoped<GameAdvertisementRewardService>();
         builder.Services.AddScoped<RemoteConfigDeliveryService>();
         // 活动/功能开关投放解析器（C345 共享实现，依赖 Scoped 主库仓储，随请求作用域解析）
         builder.Services.AddScoped<GameFrameX.Application.ClientDelivery.FeatureSwitch.FeatureSwitchDeliveryResolver>();
         // 邮件分域：租户业务邮件（玩家注册 / 找回密码）；平台系统邮件（SystemMessageService 等）走 ISystemEmailSender
-        builder.Services.AddScoped<ITenantEmailSender, TenantEmailSender>();
+        builder.Services.AddScoped<IEmailSender, EmailSender>();
         builder.Services.AddSingleton<Core.Service.Message.ISystemEmailSender,
             GameFrameX.Application.Platform.Email.SystemEmailSender>();
-        // Token / Ticket 签发服务依赖 IClientApiTenantOptionsProvider（Scoped），必须随之降为 Scoped
+        // Token / Ticket 签发服务依赖 IClientApiOptionsProvider（Scoped），必须随之降为 Scoped
         builder.Services.AddScoped<ClientApiTokenIssuer>();
         // C7 登录会话密钥签发：依赖 Scoped 主库仓储（SqlSugarRepository<>），随请求作用域
         builder.Services.AddScoped<ClientApiSessionKeyIssuer>();
@@ -134,9 +134,9 @@ internal static class Program
         builder.Services.AddScoped<GameUserPasswordService>();
 
         // 注册 Fallback 匹配器
-        builder.Services.AddScoped<IFallbackMatcher<GameAppVersionRequest, TenantGameAppReleaseVersionEntity>, AppVersionFallbackMatcher>();
-        builder.Services.AddScoped<IFallbackMatcher<RemoteConfigRequest, TenantGameAppRemoteConfigEntity>, RemoteConfigFallbackMatcher>();
-        builder.Services.AddScoped<IFallbackMatcher<AssetPackageVersionRequest, TenantGameAppAssetPackageVersionEntity>, AssetPackageVersionFallbackMatcher>();
+        builder.Services.AddScoped<IFallbackMatcher<GameAppVersionRequest, GameAppReleaseVersionEntity>, AppVersionFallbackMatcher>();
+        builder.Services.AddScoped<IFallbackMatcher<RemoteConfigRequest, GameAppRemoteConfigEntity>, RemoteConfigFallbackMatcher>();
+        builder.Services.AddScoped<IFallbackMatcher<AssetPackageVersionRequest, GameAppAssetPackageVersionEntity>, AssetPackageVersionFallbackMatcher>();
 
         builder.Services.AddSerilog();
         builder.Services.AddHostHealthChecks();
@@ -177,7 +177,7 @@ internal static class Program
         app.UseRouting();
 
         // 公开 provider 回调路由解析中间件
-        app.UseMiddleware<PublicCallbackTenantResolutionMiddleware>();
+        app.UseMiddleware<PublicCallbackResolutionMiddleware>();
 
         // 协议版本中间件（C5 server-envelope-middleware）：X-Proto-Ver 缺头拒绝，未知版本 AuditOnly 只告警不拦截
         app.UseMiddleware<ProtoVersionMiddleware>();
