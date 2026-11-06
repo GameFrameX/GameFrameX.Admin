@@ -1,7 +1,7 @@
 using GameFrameX.Core.Option;
-using GameFrameX.Core.Service.Tenant;
+using GameFrameX.Core.Service.Business;
 using GameFrameX.Core.SqlSugar;
-using GameFrameX.Entity.Tenant.ObjectStorage;
+using GameFrameX.Entity.Business.ObjectStorage;
 using SqlSugar;
 using GameFrameX.Core.Extension;
 
@@ -26,10 +26,10 @@ public class ObjectStorageActiveConfigConcurrencyTests : IDisposable
     public async Task ConcurrentEnableTransitions_WithSerialLock_LeaveExactlyOneEnabled()
     {
         var tenantId = 1300000000001L;
-        var db = OpenTenantDb(tenantId);
+        var db = OpenDb(tenantId);
 
         // 预置 1 条启用配置
-        var seed = DefaultTenantDatabaseSeeder.BuildDefaultObjectStorageConfig();
+        var seed = DefaultDatabaseSeeder.BuildDefaultObjectStorageConfig();
         db.Insertable(seed).ExecuteCommand();
 
         // 复刻 service 的串行纪律：SemaphoreSlim(1,1) 包裹“停用其它 + 写当前启用”事务
@@ -37,7 +37,7 @@ public class ObjectStorageActiveConfigConcurrencyTests : IDisposable
         var tasks = Enumerable.Range(0, 8).Select(i => Task.Run(async () =>
         {
             var newId = 2000000000000L + i;
-            var entity = DefaultTenantDatabaseSeeder.BuildDefaultObjectStorageConfig();
+            var entity = DefaultDatabaseSeeder.BuildDefaultObjectStorageConfig();
             entity.Id = newId;
             entity.Remark = "concurrent-" + i;
 
@@ -46,8 +46,8 @@ public class ObjectStorageActiveConfigConcurrencyTests : IDisposable
             {
                 db.Ado.UseTran(() =>
                 {
-                    db.Updateable<TenantObjectStorageConfigEntity>()
-                      .SetColumns(e => new TenantObjectStorageConfigEntity { IsEnabled = false, })
+                    db.Updateable<ObjectStorageConfigEntity>()
+                      .SetColumns(e => new ObjectStorageConfigEntity { IsEnabled = false, })
                       .Where(e => e.IsEnabled == true && e.Id != newId)
                       .ExecuteCommand();
                     db.Insertable(entity).ExecuteCommand();
@@ -60,7 +60,7 @@ public class ObjectStorageActiveConfigConcurrencyTests : IDisposable
         })).ToArray();
         await Task.WhenAll(tasks);
 
-        var enabledCount = db.Queryable<TenantObjectStorageConfigEntity>().Count(e => e.IsEnabled == true);
+        var enabledCount = db.Queryable<ObjectStorageConfigEntity>().Count(e => e.IsEnabled == true);
         Assert.Equal(1, enabledCount);
     }
 
@@ -68,28 +68,28 @@ public class ObjectStorageActiveConfigConcurrencyTests : IDisposable
     public void DeactivateOthers_Mechanism_LeavesOnlyCurrentEnabled()
     {
         var tenantId = 1300000000002L;
-        var db = OpenTenantDb(tenantId);
+        var db = OpenDb(tenantId);
 
-        var first = DefaultTenantDatabaseSeeder.BuildDefaultObjectStorageConfig();
+        var first = DefaultDatabaseSeeder.BuildDefaultObjectStorageConfig();
         db.Insertable(first).ExecuteCommand();
 
         // 切换：停用其它 + 写当前启用
         var newId = 999L;
-        db.Updateable<TenantObjectStorageConfigEntity>()
-          .SetColumns(e => new TenantObjectStorageConfigEntity { IsEnabled = false, })
+        db.Updateable<ObjectStorageConfigEntity>()
+          .SetColumns(e => new ObjectStorageConfigEntity { IsEnabled = false, })
           .Where(e => e.IsEnabled == true && e.Id != newId)
           .ExecuteCommand();
-        var fresh = DefaultTenantDatabaseSeeder.BuildDefaultObjectStorageConfig();
+        var fresh = DefaultDatabaseSeeder.BuildDefaultObjectStorageConfig();
         fresh.Id = newId;
         db.Insertable(fresh).ExecuteCommand();
 
-        var enabledCount = db.Queryable<TenantObjectStorageConfigEntity>().Count(e => e.IsEnabled == true);
-        var firstEnabled = db.Queryable<TenantObjectStorageConfigEntity>().First(e => e.Id == first.Id).IsEnabled;
+        var enabledCount = db.Queryable<ObjectStorageConfigEntity>().Count(e => e.IsEnabled == true);
+        var firstEnabled = db.Queryable<ObjectStorageConfigEntity>().First(e => e.Id == first.Id).IsEnabled;
         Assert.Equal(1, enabledCount);
         Assert.False(firstEnabled == true);
     }
 
-    private ISqlSugarClient OpenTenantDb(long tenantId)
+    private ISqlSugarClient OpenDb(long tenantId)
     {
         var dbPath = Path.Combine(Path.GetTempPath(), $"gfx_active_config_{tenantId}_{Guid.NewGuid():N}.db");
         _dbPaths.Add(dbPath);
@@ -105,7 +105,7 @@ public class ObjectStorageActiveConfigConcurrencyTests : IDisposable
         SqlSugarUnifiedConfig.ConfigureBaseSettings(tenantConfig);
         var scope = new SqlSugarScope(tenantConfig);
         var db = scope.GetConnectionScope(tenantId.ToString());
-        db.CodeFirst.InitTables(typeof(TenantObjectStorageConfigEntity));
+        db.CodeFirst.InitTables(typeof(ObjectStorageConfigEntity));
         return db;
     }
 

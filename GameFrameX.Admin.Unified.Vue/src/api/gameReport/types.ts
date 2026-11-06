@@ -30,7 +30,7 @@ export enum ReportStatusEnum {
 }
 
 /** 举报新增输入参数。Status / HandlerId 服务端强制（Status=Pending，HandlerId=null）。 */
-export interface AddTenantGameReportEntityRequest {
+export interface AddGameReportEntityRequest {
   /**
    * 举报人 UserId。
    * @min 1
@@ -112,7 +112,7 @@ export interface GameReportResponseSqlSugarPagedList {
 }
 
 /** 举报关联处罚输入参数。仅 Confirmed 举报可关联；不自动创建处罚（创建走 GamePenaltyService.AddAsync）。 */
-export interface LinkPenaltyTenantGameReportEntityRequest {
+export interface LinkPenaltyGameReportEntityRequest {
   /**
    * 举报 Id。
    * @min 1
@@ -128,7 +128,7 @@ export interface LinkPenaltyTenantGameReportEntityRequest {
 }
 
 /** 举报分页查询输入参数。 */
-export interface PageTenantGameReportEntityRequest {
+export interface PageGameReportEntityRequest {
   searchKey?: string | null;
   /**
    * @format int32
@@ -152,7 +152,7 @@ export interface PageTenantGameReportEntityRequest {
 }
 
 /** 举报更新输入参数。举报为事实源，不支持直接编辑；保留此类型仅为满足通用 CRUD 基类泛型约束。 */
-export interface UpdateTenantGameReportEntityRequest {
+export interface UpdateGameReportEntityRequest {
   /**
    * @min 1
    * @max 9223372036854776000

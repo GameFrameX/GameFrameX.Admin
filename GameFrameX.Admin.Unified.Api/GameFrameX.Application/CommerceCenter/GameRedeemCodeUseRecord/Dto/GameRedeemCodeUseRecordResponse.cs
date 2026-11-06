@@ -3,7 +3,7 @@ namespace GameFrameX.Application.CommerceCenter.GameRedeemCodeUseRecord.Dto;
 /// <summary>
 /// 兑换记录输出参数
 /// </summary>
-public class GameRedeemCodeUseRecordResponse : IBasePageResponse<Entity.Tenant.Game.TenantGameRedeemCodeUseRecordEntity>
+public class GameRedeemCodeUseRecordResponse : IBasePageResponse<Entity.Business.Game.GameRedeemCodeUseRecordEntity>
 {
     /// <summary>
     /// Id
@@ -62,12 +62,12 @@ public class GameRedeemCodeUseRecordResponse : IBasePageResponse<Entity.Tenant.G
     public string PlayerIdString { get; set; } = null!;
 
     /// <summary>
-    /// 兑换码渠道/分组ID（来自关联的 TenantGameRedeemCodeEntity.ChannelId）
+    /// 兑换码渠道/分组ID（来自关联的 GameRedeemCodeEntity.ChannelId）
     /// </summary>
     public long? ChannelId { get; set; }
 
     /// <summary>
-    /// 兑换码渠道/分组名称（来自关联的 TenantGameRedeemCodeChannelEntity.Name）
+    /// 兑换码渠道/分组名称（来自关联的 GameRedeemCodeChannelEntity.Name）
     /// </summary>
     public string ChannelName { get; set; } = null!;
 }

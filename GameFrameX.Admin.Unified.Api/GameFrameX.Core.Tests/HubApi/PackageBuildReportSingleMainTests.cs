@@ -1,6 +1,6 @@
 using GameFrameX.Core.Tests.ClientApi;
-using GameFrameX.Entity.Tenant.Game.App;
-using GameFrameX.Entity.Tenant.Game.Release;
+using GameFrameX.Entity.Business.Game.App;
+using GameFrameX.Entity.Business.Game.Release;
 using GameFrameX.Hub.Api.Controllers;
 using GameFrameX.Hub.Api.Dto.PackageBuildReport;
 using Microsoft.AspNetCore.Http;
@@ -36,15 +36,15 @@ public sealed class PackageBuildReportSingleMainTests
             var result = ClientApiResultReader.Read(await controller.Report(request));
 
             Assert.Equal(0, ClientApiResultReader.Code(result));
-            Assert.Equal(1, database.MainDb.Queryable<TenantGameAppAssetPackageVersionEntity>().Count());
-            Assert.Equal(1, database.MainDb.Queryable<TenantGameAppReleaseVersionEntity>().Count());
+            Assert.Equal(1, database.MainDb.Queryable<GameAppAssetPackageVersionEntity>().Count());
+            Assert.Equal(1, database.MainDb.Queryable<GameAppReleaseVersionEntity>().Count());
             if (reportType == "asset")
             {
-                Assert.Equal("new-resource", database.MainDb.Queryable<TenantGameAppAssetPackageVersionEntity>().First().ResourceVersion);
+                Assert.Equal("new-resource", database.MainDb.Queryable<GameAppAssetPackageVersionEntity>().First().ResourceVersion);
             }
             else
             {
-                Assert.Equal(request.DownloadUrl, database.MainDb.Queryable<TenantGameAppReleaseVersionEntity>().First().DownloadUrl);
+                Assert.Equal(request.DownloadUrl, database.MainDb.Queryable<GameAppReleaseVersionEntity>().First().DownloadUrl);
             }
         }
     }
@@ -56,7 +56,7 @@ public sealed class PackageBuildReportSingleMainTests
     {
         using (var database = new ClientApiTestDb())
         {
-            database.InitTenantTables(typeof(TenantGameAppPackageEntity), typeof(TenantGameAppAssetPackageVersionEntity), typeof(TenantGameAppReleaseVersionEntity));
+            database.InitBusinessTables(typeof(GameAppPackageEntity), typeof(GameAppAssetPackageVersionEntity), typeof(GameAppReleaseVersionEntity));
             if (seedDisabledPackage)
             {
                 var package = database.SeedPackage(1, "com.example.game");
@@ -68,14 +68,14 @@ public sealed class PackageBuildReportSingleMainTests
             var result = ClientApiResultReader.Read(await controller.Report(new PackageBuildReportRequest { PackageId = 1, ReportType = "asset" }));
 
             Assert.NotEqual(0, ClientApiResultReader.Code(result));
-            Assert.Equal(0, database.MainDb.Queryable<TenantGameAppAssetPackageVersionEntity>().Count());
+            Assert.Equal(0, database.MainDb.Queryable<GameAppAssetPackageVersionEntity>().Count());
         }
     }
 
     private static PackageBuildReportController CreateController(ClientApiTestDb database)
     {
-        return new PackageBuildReportController(database.Repository<TenantGameAppPackageEntity>(),
-            database.Repository<TenantGameAppAssetPackageVersionEntity>(), database.Repository<TenantGameAppReleaseVersionEntity>())
+        return new PackageBuildReportController(database.Repository<GameAppPackageEntity>(),
+            database.Repository<GameAppAssetPackageVersionEntity>(), database.Repository<GameAppReleaseVersionEntity>())
         {
             ControllerContext = new ControllerContext { HttpContext = new DefaultHttpContext() }
         };

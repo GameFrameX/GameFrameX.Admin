@@ -14,7 +14,7 @@ using GameFrameX.Core.Extension;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Core.Tests.ClientApi;
 using GameFrameX.Entity.Enum;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 using GameFrameX.Foundation.Http.Normalization;
 using GameFrameX.Foundation.Orm.Entity;
 using SqlSugar;
@@ -41,11 +41,11 @@ public sealed class GameAreaProvisionServiceTests : IDisposable
         _database = _owner.GetConnectionScope("gamearea-provision");
         SqlSugarUnifiedConfig.ConfigureBaseFilters(_database);
         SqlSugarUnifiedConfig.ConfigureClientFilters(_database);
-        _database.CodeFirst.InitTables<TenantGameAreaEntity, TenantGameAreaClassifyEntity>();
+        _database.CodeFirst.InitTables<GameAreaEntity, GameAreaClassifyEntity>();
         _httpClient = new HttpClient(_handler);
-        var repository = Repository<TenantGameAreaEntity>();
+        var repository = Repository<GameAreaEntity>();
         _service = new GameAreaProvisionService(repository,
-            new GameAreaService(repository, Repository<TenantGameAreaClassifyEntity>(), _httpClient),
+            new GameAreaService(repository, Repository<GameAreaClassifyEntity>(), _httpClient),
             new OnlineScopeContextFactory(repository),
             new OnlineServerClient(_httpClient, new OnlineServerEndpointResolver(), repository));
         Seed();
@@ -66,7 +66,7 @@ public sealed class GameAreaProvisionServiceTests : IDisposable
         Assert.True(result.IsEnabled && result.Registered && result.ContainerCreated);
         Assert.Equal(200, _handler.LastServerId);
         Assert.Equal("200", _handler.LastContainerName);
-        var area = await Repository<TenantGameAreaEntity>().GetByIdAsync(200);
+        var area = await Repository<GameAreaEntity>().GetByIdAsync(200);
         Assert.Equal(1000, area.Capacity);
         Assert.Equal(GameServerStatus.Online, area.ServerStatus);
         Assert.Equal(_handler.OpenedAt / 1000, area.CreationTime);
@@ -80,7 +80,7 @@ public sealed class GameAreaProvisionServiceTests : IDisposable
     {
         await _service.CreateAsync(Request());
         await _service.ExecuteAsync(new BaseIdRequest { Id = 200 });
-        var area = await Repository<TenantGameAreaEntity>().GetByIdAsync(200);
+        var area = await Repository<GameAreaEntity>().GetByIdAsync(200);
         var parameters = JsonSerializer.Deserialize<Dictionary<string, string>>(area.ServerParams)!;
         Assert.Equal("template", parameters["Shared"]);
         Assert.Equal("new", parameters["Override"]);
@@ -100,7 +100,7 @@ public sealed class GameAreaProvisionServiceTests : IDisposable
         _handler.ContainerCode = 0;
         await _service.CreateAsync(Request());
         Assert.True((await _service.ExecuteAsync(new BaseIdRequest { Id = 200 })).IsEnabled);
-        Assert.Equal(2, await _database.Queryable<TenantGameAreaEntity>().Filter(null, true).CountAsync());
+        Assert.Equal(2, await _database.Queryable<GameAreaEntity>().Filter(null, true).CountAsync());
     }
 
     [Fact]
@@ -148,7 +148,7 @@ public sealed class GameAreaProvisionServiceTests : IDisposable
     public async Task Provision_EnabledServerAppearsInRealClientAreaList()
     {
         await _service.CreateAsync(Request());
-        var controller = new GameAreaController(Repository<TenantGameAreaEntity>(), FakeOptionsProvider.WithAreaPolicy(false));
+        var controller = new GameAreaController(Repository<GameAreaEntity>(), FakeOptionsProvider.WithAreaPolicy(false));
         var before = await controller.GetAreaList(new GameAreaGetAreaListRequest());
         Assert.DoesNotContain(before.Data.SelectMany(category => category.GameAreaList), area => area.Id == 200);
         await _service.ExecuteAsync(new BaseIdRequest { Id = 200 });
@@ -161,7 +161,7 @@ public sealed class GameAreaProvisionServiceTests : IDisposable
     {
         await _service.CreateAsync(Request());
         await _service.ExecuteAsync(new BaseIdRequest { Id = 200 });
-        var area = await Repository<TenantGameAreaEntity>().GetByIdAsync(200);
+        var area = await Repository<GameAreaEntity>().GetByIdAsync(200);
         area.IsEnabled = false;
         await _database.Updateable(area).AS().ExecuteCommandAsync();
         Assert.Equal(60600009, (await Assert.ThrowsAsync<BusinessException>(() => _service.ExecuteAsync(new BaseIdRequest { Id = 200 }))).Code);
@@ -177,7 +177,7 @@ public sealed class GameAreaProvisionServiceTests : IDisposable
         request.ServerId = 100;
         await Assert.ThrowsAsync<BusinessException>(() => _service.CreateAsync(request));
         await _service.CreateAsync(Request());
-        var area = await _database.Queryable<TenantGameAreaEntity>().Filter(null, true).FirstAsync(area => area.Id == 200);
+        var area = await _database.Queryable<GameAreaEntity>().Filter(null, true).FirstAsync(area => area.Id == 200);
         area.IsDeleted = true;
         await _database.Updateable(area).AS().ExecuteCommandAsync();
         Assert.Equal(60600003, (await Assert.ThrowsAsync<BusinessException>(() => _service.CreateAsync(Request()))).Code);
@@ -216,13 +216,13 @@ public sealed class GameAreaProvisionServiceTests : IDisposable
 
     private void Seed()
     {
-        _database.Insertable(new TenantGameAreaClassifyEntity
+        _database.Insertable(new GameAreaClassifyEntity
         {
             Id = 10, Name = "classify", LocalizationKey = "classify", HttpManagerUrl = "http://provision.test/",
             DockerRegister = "registry", ImageName = "gameframex-server", DockerUserName = "", DockerPassword = "",
             ContainerNetName = "gameframex", ContainerSubnet = "", ContainerGateway = "", IsEnabled = true, IsDeleted = false,
         }).ExecuteCommand();
-        _database.Insertable(new TenantGameAreaEntity
+        _database.Insertable(new GameAreaEntity
         {
             Id = 100, ClassifyId = 10, Name = "template", Description = "template", HttpManageUrl = "http://template.test",
             TcpSocketUrl = "tcp://template.test", WebSocketUrl = "ws://template.test", Capacity = 1000,

@@ -10,7 +10,7 @@
  */
 
 import {
-  AddTenantDeviceGroupRequest,
+  AddDeviceGroupRequest,
   DeviceGroupAddPostData,
   DeviceGroupDeletePostData,
   DeviceGroupDetailGetData,
@@ -19,7 +19,7 @@ import {
   DeviceGroupSelectPostData,
   DeviceGroupSelectStringPostData,
   DeviceGroupUpdatePostData,
-  UpdateTenantDeviceGroupRequest,
+  UpdateDeviceGroupRequest,
 } from "./types";
 import {
   BaseDeleteRequest,
@@ -44,7 +44,7 @@ export class DeviceGroup<SecurityDataType = unknown> {
    * @request POST:/api/deviceGroup/add
    */
   deviceGroupAddPost = (
-    data: AddTenantDeviceGroupRequest,
+    data: AddDeviceGroupRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<DeviceGroupAddPostData, any>({
@@ -169,7 +169,7 @@ export class DeviceGroup<SecurityDataType = unknown> {
    * @request POST:/api/deviceGroup/update
    */
   deviceGroupUpdatePost = (
-    data: UpdateTenantDeviceGroupRequest,
+    data: UpdateDeviceGroupRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<DeviceGroupUpdatePostData, any>({

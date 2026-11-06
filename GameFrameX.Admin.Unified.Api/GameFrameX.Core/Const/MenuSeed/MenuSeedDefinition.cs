@@ -28,5 +28,4 @@ public sealed record MenuSeedDefinition(
     long CreatedTime,
     long UpdateTime,
     bool SuperAdminOnly,
-    bool AllowTenantWhenSuperAdminOnly,
-    MenuAppScopeEnum AppScope);
+    bool AllowAdminWhenSuperAdminOnly);

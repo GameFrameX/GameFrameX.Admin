@@ -11,7 +11,7 @@ public sealed class DbSettings
     public bool EnableInitDb { get; set; } = true;
 
     /// <summary>
-    /// 启用库表差异日志。默认 true：写操作的差异快照经 AOP 落 system_log_diff / tenant_log_diff。
+    /// 启用库表差异日志。默认 true：写操作的差异快照经 AOP 落 system_log_diff / log_diff。
     /// </summary>
     public bool EnableDiffLog { get; set; } = true;
 }

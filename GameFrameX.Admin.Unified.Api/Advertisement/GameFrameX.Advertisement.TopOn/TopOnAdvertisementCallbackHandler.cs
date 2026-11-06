@@ -2,7 +2,7 @@ using System.Security.Cryptography;
 using System.Text;
 using GameFrameX.Advertisement.Abstract;
 using GameFrameX.Core.SqlSugar;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 using Microsoft.AspNetCore.Http;
 
 namespace GameFrameX.Advertisement.TopOn;
@@ -17,11 +17,11 @@ public sealed class TopOnAdvertisementCallbackHandler : AdvertisementCallbackHan
         get { return "TopOn"; }
     }
 
-    public TopOnAdvertisementCallbackHandler(Repository<TenantGameRoleEntity> roleRepository) : base(roleRepository)
+    public TopOnAdvertisementCallbackHandler(Repository<GameRoleEntity> roleRepository) : base(roleRepository)
     {
     }
 
-    public OptionVerification Verify(TenantAdvertisementCallbackOptions advertisementOptions, IQueryCollection query)
+    public OptionVerification Verify(AdvertisementCallbackOptions advertisementOptions, IQueryCollection query)
     {
         var option = DeserializeOption<TopOnAdvertisementCallbackOption>(advertisementOptions);
         if (option == null || string.IsNullOrWhiteSpace(option.signingSecret))

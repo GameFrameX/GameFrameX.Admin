@@ -1,7 +1,7 @@
 using System.Text.Json.Nodes;
 using GameFrameX.Advertisement.Abstract;
 using GameFrameX.Core.Service;
-using GameFrameX.Core.Service.Tenant;
+using GameFrameX.Core.Service.Business;
 using GameFrameX.Application.ClientDelivery.AdvertisementCallbackConfig.Dto;
 
 #pragma warning disable CS8604, CS8629 // SqlSugar WhereIF(condition, lambda)：lambda 仅在 condition=true 时执行；NRT 无法跨方法传播条件守卫，lambda 内 .Trim()/.Value 实际安全
@@ -14,22 +14,22 @@ namespace GameFrameX.Application.ClientDelivery.AdvertisementCallbackConfig;
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 111)]
 public class AdvertisementCallbackConfigService
-    : GenericCrudService<Entity.Tenant.ClientApiConfig.TenantAdvertisementCallbackConfigEntity,
-        AddTenantAdvertisementCallbackConfigRequest, UpdateTenantAdvertisementCallbackConfigRequest,
-        AdvertisementCallbackConfigResponse, PageTenantAdvertisementCallbackConfigRequest>
+    : GenericCrudService<Entity.Business.ClientApiConfig.AdvertisementCallbackConfigEntity,
+        AddAdvertisementCallbackConfigRequest, UpdateAdvertisementCallbackConfigRequest,
+        AdvertisementCallbackConfigResponse, PageAdvertisementCallbackConfigRequest>
 {
     private readonly IAdvertisementCallbackConfigSchemaProvider _schemaProvider;
     private const string SupportedProviderMessage = "广告平台只支持 TopOn、GoogleAdMob、Pangle、UnityAds";
 
     public AdvertisementCallbackConfigService(
-        SqlSugarRepository<Entity.Tenant.ClientApiConfig.TenantAdvertisementCallbackConfigEntity> repository,
+        SqlSugarRepository<Entity.Business.ClientApiConfig.AdvertisementCallbackConfigEntity> repository,
         IAdvertisementCallbackConfigSchemaProvider schemaProvider)
         : base(repository)
     {
         _schemaProvider = schemaProvider;
     }
 
-    protected override ISugarQueryable<AdvertisementCallbackConfigResponse> BuildPageQuery(PageTenantAdvertisementCallbackConfigRequest input)
+    protected override ISugarQueryable<AdvertisementCallbackConfigResponse> BuildPageQuery(PageAdvertisementCallbackConfigRequest input)
     {
         var searchKey = input.SearchKey?.Trim();
         var provider = NormalizeProvider(input.Provider, false);
@@ -43,19 +43,19 @@ public class AdvertisementCallbackConfigService
     /// <summary>
     /// 新增广告回调配置（主库内 Provider 唯一）。
     /// </summary>
-    public override async Task<AdvertisementCallbackConfigResponse> AddAsync(AddTenantAdvertisementCallbackConfigRequest input)
+    public override async Task<AdvertisementCallbackConfigResponse> AddAsync(AddAdvertisementCallbackConfigRequest input)
     {
         var provider = NormalizeProvider(input.Provider, true);
         var configJson = NormalizeConfigJson(provider, input.ConfigJson, null);
         await CheckUniqueScopeAsync(provider, null);
 
-        var entity = input.Adapt<Entity.Tenant.ClientApiConfig.TenantAdvertisementCallbackConfigEntity>();
+        var entity = input.Adapt<Entity.Business.ClientApiConfig.AdvertisementCallbackConfigEntity>();
         entity.Provider = provider;
         entity.ConfigJson = configJson;
         ApplyConfigSummary(entity, configJson);
         // C371：确定最终明文之后、落库之前加密——汇总列整列密文 + ConfigJson 敏感字段级密文（Encrypt 幂等兼容存量明文/密文）
-        entity.SigningSecret = TenantSecretCrypto.Encrypt(entity.SigningSecret) ?? string.Empty;
-        entity.VerificationKeys = TenantSecretCrypto.Encrypt(entity.VerificationKeys) ?? string.Empty;
+        entity.SigningSecret = SecretCrypto.Encrypt(entity.SigningSecret) ?? string.Empty;
+        entity.VerificationKeys = SecretCrypto.Encrypt(entity.VerificationKeys) ?? string.Empty;
         entity.ConfigJson = AdvertisementCallbackConfigCrypto.EncryptConfigJson(provider, configJson);
         entity.ParameterPurposeJson = BuildParameterPurposeJson(provider);
         entity.IsEnabled = input.IsEnabled;
@@ -66,7 +66,7 @@ public class AdvertisementCallbackConfigService
     /// <summary>
     /// 更新广告回调配置。敏感字段回传 <c>******</c> 时保留原值。
     /// </summary>
-    public override async Task UpdateAsync(UpdateTenantAdvertisementCallbackConfigRequest input)
+    public override async Task UpdateAsync(UpdateAdvertisementCallbackConfigRequest input)
     {
         var entity = await Repository.GetFirstAsync(e => e.Id == input.Id);
         if (entity == null)
@@ -81,8 +81,8 @@ public class AdvertisementCallbackConfigService
         entity.ConfigJson = configJson;
         ApplyConfigSummary(entity, configJson);
         // C371：确定最终明文之后、落库之前加密——保留语义下 NormalizeConfigJson 回填的可能是存量密文，Encrypt 幂等跳过不换密文
-        entity.SigningSecret = TenantSecretCrypto.Encrypt(entity.SigningSecret) ?? string.Empty;
-        entity.VerificationKeys = TenantSecretCrypto.Encrypt(entity.VerificationKeys) ?? string.Empty;
+        entity.SigningSecret = SecretCrypto.Encrypt(entity.SigningSecret) ?? string.Empty;
+        entity.VerificationKeys = SecretCrypto.Encrypt(entity.VerificationKeys) ?? string.Empty;
         entity.ConfigJson = AdvertisementCallbackConfigCrypto.EncryptConfigJson(provider, configJson);
         entity.ParameterPurposeJson = BuildParameterPurposeJson(provider);
         entity.IsEnabled = input.IsEnabled;
@@ -109,7 +109,7 @@ public class AdvertisementCallbackConfigService
     /// </summary>
     [HttpPost(CrudActionRoutes.Page)]
     [ApiDescriptionSettings(Name = "Page")]
-    public override async Task<SqlSugarPagedList<AdvertisementCallbackConfigResponse>> PageAsync(PageTenantAdvertisementCallbackConfigRequest input)
+    public override async Task<SqlSugarPagedList<AdvertisementCallbackConfigResponse>> PageAsync(PageAdvertisementCallbackConfigRequest input)
     {
         var result = await base.PageAsync(input);
         foreach (var item in result.Items)
@@ -265,7 +265,7 @@ public class AdvertisementCallbackConfigService
         return field.Sensitive || field.Type == "secret";
     }
 
-    private static void ApplyConfigSummary(Entity.Tenant.ClientApiConfig.TenantAdvertisementCallbackConfigEntity entity, string configJson)
+    private static void ApplyConfigSummary(Entity.Business.ClientApiConfig.AdvertisementCallbackConfigEntity entity, string configJson)
     {
         entity.CallbackUrl = GetConfigString(configJson, "callbackUrl");
         entity.SigningSecret = GetConfigString(configJson, "signingSecret");

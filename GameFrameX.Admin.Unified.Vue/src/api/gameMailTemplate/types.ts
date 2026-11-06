@@ -4,7 +4,7 @@
 import type { BaseSelectPageResponse, BaseSelectPageStringResponse, GameMailType } from "../_shared/data-contracts";
 
 /** 邮件模板增加输入参数 */
-export interface AddTenantGameMailTemplateEntityRequest {
+export interface AddGameMailTemplateEntityRequest {
   /**
    * 名称
    * @minLength 1
@@ -111,7 +111,7 @@ export interface GameMailTemplateResponseSqlSugarPagedList {
 }
 
 /** 邮件模板分页查询输入参数 */
-export interface PageTenantGameMailTemplateEntityRequest {
+export interface PageGameMailTemplateEntityRequest {
   searchKey?: string | null;
   /**
    * @format int32
@@ -136,7 +136,7 @@ export interface PageTenantGameMailTemplateEntityRequest {
 }
 
 /** 邮件模板更新输入参数 */
-export interface UpdateTenantGameMailTemplateEntityRequest {
+export interface UpdateGameMailTemplateEntityRequest {
   /**
    * 名称
    * @minLength 1

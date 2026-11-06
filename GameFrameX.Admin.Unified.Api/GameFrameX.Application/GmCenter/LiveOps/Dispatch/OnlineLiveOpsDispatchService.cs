@@ -12,11 +12,11 @@ using GameFrameX.Core.Enum.Errors;
 using GameFrameX.Core.Service.User;
 using GameFrameX.Entity.Game.Mail;
 using GameFrameX.Entity.Game.Online;
-using GameFrameX.Entity.Tenant.Device;
-using GameFrameX.Entity.Tenant.Game;
-using GameFrameX.Entity.Tenant.Game.Announcement;
-using GameFrameX.Entity.Tenant.Game.Online;
-using GameFrameX.Entity.Tenant.Game.RemoteConfig;
+using GameFrameX.Entity.Business.Device;
+using GameFrameX.Entity.Business.Game;
+using GameFrameX.Entity.Business.Game.Announcement;
+using GameFrameX.Entity.Business.Game.Online;
+using GameFrameX.Entity.Business.Game.RemoteConfig;
 
 // S3/C401 断链修复点
 namespace GameFrameX.Application.GmCenter.LiveOps.Dispatch;
@@ -72,11 +72,11 @@ public class OnlineLiveOpsDispatchService : IOnlineLiveOpsDispatchService, IAdmi
 
     private readonly IOnlineServerClient _onlineServerClient;
     private readonly OnlineScopeContextFactory _scopeFactory;
-    private readonly SqlSugarRepository<TenantGameAppRemoteConfigEntity> _remoteConfigRepository;
-    private readonly SqlSugarRepository<TenantGameAppDeviceGroupEntity> _deviceGroupRepository;
-    private readonly SqlSugarRepository<TenantGameTimeJobEntity> _timeJobRepository;
-    private readonly SqlSugarRepository<TenantGameAnnouncementEntity> _announcementRepository;
-    private readonly SqlSugarRepository<TenantGameMailCampaignEntity> _mailCampaignRepository;
+    private readonly SqlSugarRepository<GameAppRemoteConfigEntity> _remoteConfigRepository;
+    private readonly SqlSugarRepository<GameAppDeviceGroupEntity> _deviceGroupRepository;
+    private readonly SqlSugarRepository<GameTimeJobEntity> _timeJobRepository;
+    private readonly SqlSugarRepository<GameAnnouncementEntity> _announcementRepository;
+    private readonly SqlSugarRepository<GameMailCampaignEntity> _mailCampaignRepository;
 
     /// <summary>
     ///
@@ -90,11 +90,11 @@ public class OnlineLiveOpsDispatchService : IOnlineLiveOpsDispatchService, IAdmi
     /// <param name="mailCampaignRepository"></param>
     public OnlineLiveOpsDispatchService(IOnlineServerClient onlineServerClient,
         OnlineScopeContextFactory scopeFactory,
-        SqlSugarRepository<TenantGameAppRemoteConfigEntity> remoteConfigRepository,
-        SqlSugarRepository<TenantGameAppDeviceGroupEntity> deviceGroupRepository,
-        SqlSugarRepository<TenantGameTimeJobEntity> timeJobRepository,
-        SqlSugarRepository<TenantGameAnnouncementEntity> announcementRepository,
-        SqlSugarRepository<TenantGameMailCampaignEntity> mailCampaignRepository)
+        SqlSugarRepository<GameAppRemoteConfigEntity> remoteConfigRepository,
+        SqlSugarRepository<GameAppDeviceGroupEntity> deviceGroupRepository,
+        SqlSugarRepository<GameTimeJobEntity> timeJobRepository,
+        SqlSugarRepository<GameAnnouncementEntity> announcementRepository,
+        SqlSugarRepository<GameMailCampaignEntity> mailCampaignRepository)
     {
         _onlineServerClient = onlineServerClient;
         _scopeFactory = scopeFactory;
@@ -217,7 +217,7 @@ public class OnlineLiveOpsDispatchService : IOnlineLiveOpsDispatchService, IAdmi
 
     /// <inheritdoc />
     [NonAction]
-    public async Task<OnlinePlayerSegmentSyncResponse> SyncSegmentToOnlineAsync(TenantGameOnlinePlayerSegmentEntity segment, long serverId, string reason)
+    public async Task<OnlinePlayerSegmentSyncResponse> SyncSegmentToOnlineAsync(GameOnlinePlayerSegmentEntity segment, long serverId, string reason)
     {
         var scope = await _scopeFactory.CreateAsync(serverId, ActionSyncPlayerSegment + ":" + segment.Id);
         var ack = await _onlineServerClient.PostAsync<OnlineLiveOpsResponse>(ActionSyncPlayerSegment,
@@ -242,7 +242,7 @@ public class OnlineLiveOpsDispatchService : IOnlineLiveOpsDispatchService, IAdmi
 
     /// <inheritdoc />
     [NonAction]
-    public async Task<OnlineConfigRolloutDispatchResponse> PublishRolloutToOnlineAsync(TenantGameOnlineConfigRolloutEntity rollout)
+    public async Task<OnlineConfigRolloutDispatchResponse> PublishRolloutToOnlineAsync(GameOnlineConfigRolloutEntity rollout)
     {
         var scope = await _scopeFactory.CreateAsync(rollout.ServerId, ActionPublishConfigRollout + ":" + rollout.ConfigKey + ":v" + rollout.ConfigVersion);
         var ack = await _onlineServerClient.PostAsync<OnlineLiveOpsResponse>(ActionPublishConfigRollout,
@@ -262,7 +262,7 @@ public class OnlineLiveOpsDispatchService : IOnlineLiveOpsDispatchService, IAdmi
 
     /// <inheritdoc />
     [NonAction]
-    public async Task<OnlineConfigRolloutDispatchResponse> RollbackRolloutToOnlineAsync(TenantGameOnlineConfigRolloutEntity rollout)
+    public async Task<OnlineConfigRolloutDispatchResponse> RollbackRolloutToOnlineAsync(GameOnlineConfigRolloutEntity rollout)
     {
         // 回滚 = 版本化新下发：以新 ConfigVersion 行下发 rollbackConfigRollout，TargetVersion 指向要恢复的历史版本（语义对照见 OnlineRolloutSemanticMap）。
         var scope = await _scopeFactory.CreateAsync(rollout.ServerId, ActionRollbackConfigRollout + ":" + rollout.ConfigKey + ":v" + rollout.ConfigVersion + "->" + rollout.TargetVersion);

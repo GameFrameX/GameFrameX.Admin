@@ -3,7 +3,7 @@ global using GameFrameX.Hub.Api.Dto;
 global using GameFrameX.Core.Extension;
 global using Mapster;
 global using Microsoft.AspNetCore.Mvc;
-global using GameFrameX.Entity.Tenant.Game.Release;
+global using GameFrameX.Entity.Business.Game.Release;
 global using GameFrameX.Entity;
 global using GameFrameX.Core.Enum;
 global using GameFrameX.Core.SqlSugar;

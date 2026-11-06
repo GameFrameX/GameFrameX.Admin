@@ -3,7 +3,7 @@ namespace GameFrameX.Application.CommerceCenter.GameWebShop.Dto;
 /// <summary>
 /// 游戏邮件输出参数
 /// </summary>
-public class GameWebShopResponse : IBasePageResponse<Entity.Tenant.Game.TenantGameWebShopEntity>
+public class GameWebShopResponse : IBasePageResponse<Entity.Business.Game.GameWebShopEntity>
 {
     /// <summary>
     /// Id

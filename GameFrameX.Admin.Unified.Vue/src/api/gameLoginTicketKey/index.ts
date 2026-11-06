@@ -17,7 +17,7 @@ import {
   GameLoginTicketKeyPagePostData,
   GameLoginTicketKeyRotatePostData,
   GameLoginTicketKeyRotateRequest,
-  PageTenantGameLoginTicketKeyRequest,
+  PageGameLoginTicketKeyRequest,
 } from "./types";
 import {
   BaseDeleteRequest,
@@ -125,7 +125,7 @@ export class GameLoginTicketKey<SecurityDataType = unknown> {
    * @request POST:/api/gameLoginTicketKey/page
    */
   gameLoginTicketKeyPagePost = (
-    data: PageTenantGameLoginTicketKeyRequest,
+    data: PageGameLoginTicketKeyRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameLoginTicketKeyPagePostData, any>({

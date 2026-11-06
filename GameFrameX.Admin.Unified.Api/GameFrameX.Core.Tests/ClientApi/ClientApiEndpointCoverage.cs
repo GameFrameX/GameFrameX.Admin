@@ -5,7 +5,7 @@ internal sealed record ClientApiEndpointCoverage(
     string HttpMethod,
     string Route,
     string Group,
-    bool RequiresTenant,
+    bool Requires,
     bool RequiresApp,
     bool RequiresAccessToken,
     bool IsPublicCallback,

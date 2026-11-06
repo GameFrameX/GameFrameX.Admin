@@ -35,7 +35,7 @@ public class MailCampaignEntityServiceContractTests
     [Fact]
     public void PageInput_Carries_Required_Filter_Fields()
     {
-        var props = PropNames<PageTenantGameMailCampaignEntityRequest>();
+        var props = PropNames<PageGameMailCampaignEntityRequest>();
 
         Assert.DoesNotContain("AppId", props);
         Assert.Contains("AreaId", props);
@@ -49,7 +49,7 @@ public class MailCampaignEntityServiceContractTests
     [Fact]
     public void AddInput_Carries_Server_Contract_Fields()
     {
-        var props = PropNames<AddTenantGameMailCampaignEntityRequest>();
+        var props = PropNames<AddGameMailCampaignEntityRequest>();
 
         Assert.DoesNotContain("AppId", props);
         Assert.Contains("AreaId", props);

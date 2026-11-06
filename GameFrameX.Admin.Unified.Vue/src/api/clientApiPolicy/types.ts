@@ -2,7 +2,7 @@
 /* tslint:disable */
 
 /** 租户 Client API 运行策略新增输入参数 */
-export interface AddTenantClientApiPolicyRequest {
+export interface AddClientApiPolicyRequest {
   /** 是否要求请求签名。 */
   signatureRequired?: boolean;
   /** 是否要求设备证明。 */
@@ -96,7 +96,7 @@ export interface ClientApiPolicyResponseSqlSugarPagedList {
 }
 
 /** 租户 Client API 运行策略分页查询输入参数 */
-export interface PageTenantClientApiPolicyRequest {
+export interface PageClientApiPolicyRequest {
   searchKey?: string | null;
   /**
    * @format int32
@@ -116,7 +116,7 @@ export interface PageTenantClientApiPolicyRequest {
 }
 
 /** 租户 Client API 运行策略更新输入参数 */
-export interface UpdateTenantClientApiPolicyRequest {
+export interface UpdateClientApiPolicyRequest {
   /**
    * @min 1
    * @max 9223372036854776000

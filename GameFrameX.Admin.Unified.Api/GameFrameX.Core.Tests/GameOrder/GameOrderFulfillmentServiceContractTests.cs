@@ -33,7 +33,7 @@ public class GameOrderFulfillmentServiceContractTests
     [Fact]
     public void PageInput_Carries_Required_Filter_Fields()
     {
-        var props = typeof(PageTenantGameOrderFulfillmentEntityRequest)
+        var props = typeof(PageGameOrderFulfillmentEntityRequest)
                     .GetProperties()
                     .Select(p => p.Name)
                     .ToHashSet();
@@ -55,7 +55,7 @@ public class GameOrderFulfillmentServiceContractTests
     [Fact]
     public void PageInput_Status_Is_FulfillmentStatusEnum_Not_OrderStatusEnum()
     {
-        var statusProperty = typeof(PageTenantGameOrderFulfillmentEntityRequest).GetProperty("Status");
+        var statusProperty = typeof(PageGameOrderFulfillmentEntityRequest).GetProperty("Status");
         Assert.NotNull(statusProperty);
         Assert.Equal(typeof(FulfillmentStatusEnum?), statusProperty!.PropertyType);
     }

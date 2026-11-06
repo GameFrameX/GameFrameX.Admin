@@ -3,10 +3,10 @@ using System.Reflection;
 using System.Text.Json.Nodes;
 using GameFrameX.Payment.Abstract;
 
-namespace GameFrameX.Core.Service.Tenant;
+namespace GameFrameX.Core.Service.Business;
 
 /// <summary>
-/// 支付配置 ConfigJson 敏感字段级加解密收口（C371 / GFX-838，对齐 C370 TenantObjectStorageConfigCrypto）：
+/// 支付配置 ConfigJson 敏感字段级加解密收口（C371 / GFX-838，对齐 C370 ObjectStorageConfigCrypto）：
 /// 写入侧在 ValidateConfigJson 校验之后、落库之前调用 <see cref="EncryptConfigJson"/>；
 /// 读取侧（PaymentOptionSettingProvider 反序列化前）调用 <see cref="DecryptConfigJson"/>。
 /// <para>敏感字段集合由渠道 Option 类的 <c>[PaymentField(Sensitive = true)]</c> 标注驱动（与表单 schema 反射同源），
@@ -41,7 +41,7 @@ public static class PaymentConfigCrypto
     /// <returns>敏感字段已加密的 ConfigJson（或无可加密内容时的原值）</returns>
     public static string EncryptConfigJson(string payChannel, string configJson)
     {
-        return TransformSensitiveFields(payChannel, configJson, TenantSecretCrypto.Encrypt);
+        return TransformSensitiveFields(payChannel, configJson, SecretCrypto.Encrypt);
     }
 
     /// <summary>
@@ -53,14 +53,14 @@ public static class PaymentConfigCrypto
     /// <returns>敏感字段为明文的 ConfigJson</returns>
     public static string DecryptConfigJson(string payChannel, string configJson)
     {
-        if (string.IsNullOrWhiteSpace(configJson) || !configJson.Contains(TenantSecretCrypto.EncryptedPrefix, StringComparison.Ordinal))
+        if (string.IsNullOrWhiteSpace(configJson) || !configJson.Contains(SecretCrypto.EncryptedPrefix, StringComparison.Ordinal))
         {
             return configJson;
         }
 
         // 缓存 key 必须含渠道：敏感字段集合由渠道 Option 反射决定，同一密文字符串在不同渠道下的解密结果不同
         // ponytail: 并发首次 miss 会各自解密一次后竞争写入（最后者胜），浪费一次派生但不产生错误数据；下单读取并发度可控，不值得加锁。
-        return DecryptCache.GetOrAdd(payChannel + "\n" + configJson, _ => TransformSensitiveFields(payChannel, configJson, TenantSecretCrypto.Decrypt));
+        return DecryptCache.GetOrAdd(payChannel + "\n" + configJson, _ => TransformSensitiveFields(payChannel, configJson, SecretCrypto.Decrypt));
     }
 
     /// <summary>

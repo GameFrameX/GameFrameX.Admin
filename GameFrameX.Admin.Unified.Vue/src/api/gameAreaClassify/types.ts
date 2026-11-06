@@ -4,7 +4,7 @@
 import type { BaseSelectPageResponse, BaseSelectPageStringResponse } from "../_shared/data-contracts";
 
 /** 游戏大区分类增加输入参数 */
-export interface AddTenantGameAreaClassifyEntityRequest {
+export interface AddGameAreaClassifyEntityRequest {
   /**
    * 名称
    * @minLength 1
@@ -94,7 +94,7 @@ export interface GameAreaClassifyResponseSqlSugarPagedList {
 }
 
 /** 游戏大区分类分页查询输入参数 */
-export interface PageTenantGameAreaClassifyEntityRequest {
+export interface PageGameAreaClassifyEntityRequest {
   searchKey?: string | null;
   /**
    * @format int32
@@ -115,7 +115,7 @@ export interface PageTenantGameAreaClassifyEntityRequest {
 }
 
 /** 游戏大区分类更新输入参数 */
-export interface UpdateTenantGameAreaClassifyEntityRequest {
+export interface UpdateGameAreaClassifyEntityRequest {
   /**
    * @min 1
    * @max 9223372036854776000

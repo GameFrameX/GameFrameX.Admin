@@ -1,7 +1,7 @@
 using GameFrameX.Application.GmCenter.GameAntiCheatEvent.Dto;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 using GameFrameX.Core.Const;
-using GameFrameX.Core.Service.Tenant;
+using GameFrameX.Core.Service.Business;
 using GameFrameX.Entity.Enum;
 using GameFrameX.Foundation.Idempotency;
 
@@ -14,7 +14,7 @@ namespace GameFrameX.Application.GmCenter.GameAntiCheatEvent;
 /// </summary>
 [ApiDescriptionSettings(Order = 100)]
 public sealed class GameAntiCheatEventService
-    : BaseService<TenantGameAntiCheatEventEntity>
+    : BaseService<GameAntiCheatEventEntity>
 {
     /// <summary>
     /// 合法的人工复核目标状态（Pending → Approved/Rejected/Escalated 单向迁移）。
@@ -27,7 +27,7 @@ public sealed class GameAntiCheatEventService
             ManualReviewStateEnum.Escalated,
         };
 
-    public GameAntiCheatEventService(SqlSugarRepository<TenantGameAntiCheatEventEntity> repository)
+    public GameAntiCheatEventService(SqlSugarRepository<GameAntiCheatEventEntity> repository)
         : base(repository)
     {
     }
@@ -38,7 +38,7 @@ public sealed class GameAntiCheatEventService
     [HttpPost(CrudActionRoutes.Page)]
     [ApiDescriptionSettings(Name = "Page")]
     public async Task<SqlSugarPagedList<GameAntiCheatEventResponse>> PageAsync(
-        PageTenantGameAntiCheatEventRequest input)
+        PageGameAntiCheatEventRequest input)
     {
         var targetId = string.IsNullOrWhiteSpace(input.TargetId) ? null : input.TargetId.Trim();
         var query = Repository.AsQueryable()
@@ -76,7 +76,7 @@ public sealed class GameAntiCheatEventService
     /// </summary>
     [HttpPost("submit")]
     [ApiDescriptionSettings(Name = "Submit")]
-    public async Task<GameAntiCheatEventResponse> SubmitAsync(AddTenantGameAntiCheatEventRequest input)
+    public async Task<GameAntiCheatEventResponse> SubmitAsync(AddGameAntiCheatEventRequest input)
     {
         var idempotencyKey = input.IdempotencyKey?.Trim() ?? string.Empty;
         if (idempotencyKey.Length == 0)
@@ -84,7 +84,7 @@ public sealed class GameAntiCheatEventService
             throw BusinessError.Oh("幂等键不能为空");
         }
 
-        var entity = input.Adapt<TenantGameAntiCheatEventEntity>();
+        var entity = input.Adapt<GameAntiCheatEventEntity>();
         entity.ManualReviewState = ManualReviewStateEnum.Pending;
 #pragma warning disable CS8625 // 新建反作弊事件初始化字段为 null（DB schema 允许 null；= null! 仅满足 CS8618）
         entity.ReviewerId = null;
@@ -117,7 +117,7 @@ public sealed class GameAntiCheatEventService
     /// </summary>
     [HttpPost("review")]
     [ApiDescriptionSettings(Name = "Review")]
-    public async Task ReviewAsync(UpdateTenantGameAntiCheatEventReviewRequest input)
+    public async Task ReviewAsync(UpdateGameAntiCheatEventReviewRequest input)
     {
         if (!ValidReviewTargets.Contains(input.ManualReviewState))
         {

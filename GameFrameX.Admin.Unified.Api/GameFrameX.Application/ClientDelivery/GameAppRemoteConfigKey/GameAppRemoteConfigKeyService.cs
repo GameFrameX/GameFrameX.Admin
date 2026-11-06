@@ -6,11 +6,11 @@ namespace GameFrameX.Application.ClientDelivery.GameAppRemoteConfigKey;
 /// 远程配置内容键定义管理服务
 /// </summary>
 [ApiDescriptionSettings(ClientConst.GroupName, Order = 100)]
-public class GameAppRemoteConfigKeyService : GenericCrudService<Entity.Tenant.Game.RemoteConfig.TenantGameAppRemoteConfigKeyEntity, AddGameAppRemoteConfigKeyRequest, UpdateGameAppRemoteConfigKeyRequest, GameAppRemoteConfigKeyResponse, PageGameAppRemoteConfigKeyRequest>
+public class GameAppRemoteConfigKeyService : GenericCrudService<Entity.Business.Game.RemoteConfig.GameAppRemoteConfigKeyEntity, AddGameAppRemoteConfigKeyRequest, UpdateGameAppRemoteConfigKeyRequest, GameAppRemoteConfigKeyResponse, PageGameAppRemoteConfigKeyRequest>
 {
     private static readonly string[] AllowedValueTypes = { "string", "bool", "long", };
 
-    public GameAppRemoteConfigKeyService(SqlSugarRepository<Entity.Tenant.Game.RemoteConfig.TenantGameAppRemoteConfigKeyEntity> repository) : base(repository)
+    public GameAppRemoteConfigKeyService(SqlSugarRepository<Entity.Business.Game.RemoteConfig.GameAppRemoteConfigKeyEntity> repository) : base(repository)
     {
     }
 

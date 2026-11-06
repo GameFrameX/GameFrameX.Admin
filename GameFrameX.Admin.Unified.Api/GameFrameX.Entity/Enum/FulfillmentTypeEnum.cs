@@ -1,7 +1,7 @@
 namespace GameFrameX.Entity.Enum;
 
 /// <summary>
-/// 权益发放类型。权益发货账本（TenantGameOrderFulfillmentEntity）的发放动作分类。
+/// 权益发放类型。权益发货账本（GameOrderFulfillmentEntity）的发放动作分类。
 /// </summary>
 [Description("权益发放类型")]
 [AdminEnum]

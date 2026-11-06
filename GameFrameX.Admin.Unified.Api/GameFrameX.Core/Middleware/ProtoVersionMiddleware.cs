@@ -6,7 +6,7 @@ namespace GameFrameX.Core.Middleware;
 /// endpoint metadata 实现 <see cref="IProtoVersionExempt"/> 的入口（外部平台 S2S 回调）豁免。</para>
 /// <para><b>AuditOnly 语义</b>：头值不在白名单（<see cref="ProtoVersionOptions.AllowedVersions"/>）只记 Warning 日志放行，
 /// <b>不拦截</b>——待不兼容 major 变更时才收紧为强制拒绝。</para>
-/// <para>挂载点：管线最外层就近（TenantResolution 之后），先于签名/信封——版本观察与密钥态无关。</para>
+/// <para>挂载点：管线最外层就近（Resolution 之后），先于签名/信封——版本观察与密钥态无关。</para>
 /// </summary>
 public sealed class ProtoVersionMiddleware
 {

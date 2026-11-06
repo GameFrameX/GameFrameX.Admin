@@ -1,5 +1,5 @@
 using GameFrameX.Core.Middleware;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 
 namespace GameFrameX.Core.Tests.ClientApi;
 
@@ -10,17 +10,17 @@ public sealed class KeyResolverQueryTests
     {
         using (var database = new ClientApiTestDb())
         {
-            database.InitTenantTables(typeof(TenantSessionKeyEntity), typeof(TenantAppSignatureKeyEntity));
+            database.InitBusinessTables(typeof(SessionKeyEntity), typeof(AppSignatureKeyEntity));
             database.MainDb.Insertable(new[]
             {
-                new TenantSessionKeyEntity { Id = 1, Kid = "active", Secret = "active-secret", IsEnabled = true },
-                new TenantSessionKeyEntity { Id = 2, Kid = "unrelated", Secret = "enc:sec:v1:invalid", IsEnabled = false },
+                new SessionKeyEntity { Id = 1, Kid = "active", Secret = "active-secret", IsEnabled = true },
+                new SessionKeyEntity { Id = 2, Kid = "unrelated", Secret = "enc:sec:v1:invalid", IsEnabled = false },
             }).ExecuteCommand();
             database.MainDb.Insertable(new[]
             {
-                new TenantAppSignatureKeyEntity { Id = 1, Kid = "active", Secret = "active-secret", IsEnabled = true },
-                new TenantAppSignatureKeyEntity { Id = 2, Kid = "disabled", Secret = "enc:sec:v1:invalid", IsEnabled = false },
-                new TenantAppSignatureKeyEntity { Id = 3, Kid = "expired", Secret = "enc:sec:v1:invalid", IsEnabled = true, ExpireTime = 1 },
+                new AppSignatureKeyEntity { Id = 1, Kid = "active", Secret = "active-secret", IsEnabled = true },
+                new AppSignatureKeyEntity { Id = 2, Kid = "disabled", Secret = "enc:sec:v1:invalid", IsEnabled = false },
+                new AppSignatureKeyEntity { Id = 3, Kid = "expired", Secret = "enc:sec:v1:invalid", IsEnabled = true, ExpireTime = 1 },
             }).ExecuteCommand();
             var statements = new List<string>();
             database.MainDb.Aop.OnLogExecuting = (sql, parameters) => statements.Add(sql);
@@ -31,9 +31,9 @@ public sealed class KeyResolverQueryTests
             Assert.All(statements, sql => Assert.Contains("WHERE", sql, StringComparison.OrdinalIgnoreCase));
             Assert.Equal(SignatureKeyLookupResult.Disabled, (await signature.ResolveAsync("disabled")).Result);
             Assert.Equal("active", Assert.Single(await signature.GetActiveKeysAsync()).Kid);
-            database.MainDb.Updateable<TenantAppSignatureKeyEntity>().SetColumns(key => key.Secret == "changed-secret").Where(key => key.Id == 1).ExecuteCommand();
+            database.MainDb.Updateable<AppSignatureKeyEntity>().SetColumns(key => key.Secret == "changed-secret").Where(key => key.Id == 1).ExecuteCommand();
             Assert.Equal("changed-secret", (await signature.ResolveAsync("active")).Secret);
-            database.MainDb.Deleteable<TenantSessionKeyEntity>().Where(key => key.Id == 1).ExecuteCommand();
+            database.MainDb.Deleteable<SessionKeyEntity>().Where(key => key.Id == 1).ExecuteCommand();
             Assert.Equal(SessionKeyLookupResult.NotFound, (await session.ResolveAsync("active")).Result);
         }
     }

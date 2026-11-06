@@ -1,5 +1,5 @@
-using GameFrameX.Client.Api.Services.ClientApiTenantOptions;
-using GameFrameX.Entity.Tenant.ClientApiConfig;
+using GameFrameX.Client.Api.Services.ClientApiOptions;
+using GameFrameX.Entity.Business.ClientApiConfig;
 using Microsoft.AspNetCore.Http;
 
 namespace GameFrameX.Core.Tests.ClientApi;
@@ -10,7 +10,7 @@ public sealed class ClientApiPolicyScopeResolutionTests : IDisposable
 
     public ClientApiPolicyScopeResolutionTests()
     {
-        _database.InitTenantTables(typeof(TenantClientApiPolicyEntity));
+        _database.InitBusinessTables(typeof(ClientApiPolicyEntity));
     }
 
     [Fact]
@@ -19,11 +19,11 @@ public sealed class ClientApiPolicyScopeResolutionTests : IDisposable
         var expireTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds() + 3600;
         _database.MainDb.Insertable(new[]
         {
-            new TenantClientApiPolicyEntity { Id = 1, SigningKey = "old-key", IsEnabled = true, },
-            new TenantClientApiPolicyEntity { Id = 2, SigningKey = "current-key", LifetimeMinutes = 60,
+            new ClientApiPolicyEntity { Id = 1, SigningKey = "old-key", IsEnabled = true, },
+            new ClientApiPolicyEntity { Id = 2, SigningKey = "current-key", LifetimeMinutes = 60,
                 TicketExpireTime = expireTime, EnableKeyAutoCreate = true, EnableSandBoxRecharge = true,
                 EnableReturnHttpManager = true, IsEnabled = true, },
-            new TenantClientApiPolicyEntity { Id = 3, SigningKey = "disabled-key", IsEnabled = false, },
+            new ClientApiPolicyEntity { Id = 3, SigningKey = "disabled-key", IsEnabled = false, },
         }).ExecuteCommand();
         var provider = CreateProvider();
 
@@ -36,7 +36,7 @@ public sealed class ClientApiPolicyScopeResolutionTests : IDisposable
     [Fact]
     public async Task DisabledRows_AreNotConsumed()
     {
-        _database.MainDb.Insertable(new TenantClientApiPolicyEntity
+        _database.MainDb.Insertable(new ClientApiPolicyEntity
         {
             Id = 1, SigningKey = "disabled", IsEnabled = false, EnableSandBoxRecharge = true,
         }).ExecuteCommand();
@@ -60,13 +60,13 @@ public sealed class ClientApiPolicyScopeResolutionTests : IDisposable
     [Fact]
     public async Task AllSections_ShareOneRequestSnapshot()
     {
-        _database.MainDb.Insertable(new TenantClientApiPolicyEntity
+        _database.MainDb.Insertable(new ClientApiPolicyEntity
         {
             Id = 1, SigningKey = "cached-key", IsEnabled = true,
         }).ExecuteCommand();
         var provider = CreateProvider();
         Assert.Equal("cached-key", (await provider.GetTokenPolicyAsync()).SigningKey);
-        _database.MainDb.Insertable(new TenantClientApiPolicyEntity
+        _database.MainDb.Insertable(new ClientApiPolicyEntity
         {
             Id = 2, SigningKey = "new-key", IsEnabled = true, EnableSandBoxRecharge = true,
         }).ExecuteCommand();
@@ -76,9 +76,9 @@ public sealed class ClientApiPolicyScopeResolutionTests : IDisposable
         Assert.True((await CreateProvider().GetOrderPolicyAsync()).EnableSandBoxRecharge);
     }
 
-    private ClientApiTenantOptionsProvider CreateProvider()
+    private ClientApiOptionsProvider CreateProvider()
     {
-        return new ClientApiTenantOptionsProvider(_database.MainDb, new HttpContextAccessor());
+        return new ClientApiOptionsProvider(_database.MainDb, new HttpContextAccessor());
     }
 
     public void Dispose()

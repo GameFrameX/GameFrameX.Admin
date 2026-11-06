@@ -10,14 +10,14 @@
  */
 
 import {
-  AddTenantGameRedeemCodeEntityRequest,
+  AddGameRedeemCodeEntityRequest,
   GameRedeemCodeAddPostData,
   GameRedeemCodeDeletePostData,
   GameRedeemCodeDetailGetData,
   GameRedeemCodePagePostData,
   GameRedeemCodeUpdatePostData,
-  PageTenantGameRedeemCodeEntityRequest,
-  UpdateTenantGameRedeemCodeEntityRequest,
+  PageGameRedeemCodeEntityRequest,
+  UpdateGameRedeemCodeEntityRequest,
 } from "./types";
 import {
   BaseDeleteRequest,
@@ -41,7 +41,7 @@ export class GameRedeemCode<SecurityDataType = unknown> {
    * @request POST:/api/gameRedeemCode/add
    */
   gameRedeemCodeAddPost = (
-    data: AddTenantGameRedeemCodeEntityRequest,
+    data: AddGameRedeemCodeEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameRedeemCodeAddPostData, any>({
@@ -106,7 +106,7 @@ export class GameRedeemCode<SecurityDataType = unknown> {
    * @request POST:/api/gameRedeemCode/page
    */
   gameRedeemCodePagePost = (
-    data: PageTenantGameRedeemCodeEntityRequest,
+    data: PageGameRedeemCodeEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameRedeemCodePagePostData, any>({
@@ -126,7 +126,7 @@ export class GameRedeemCode<SecurityDataType = unknown> {
    * @request POST:/api/gameRedeemCode/update
    */
   gameRedeemCodeUpdatePost = (
-    data: UpdateTenantGameRedeemCodeEntityRequest,
+    data: UpdateGameRedeemCodeEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameRedeemCodeUpdatePostData, any>({

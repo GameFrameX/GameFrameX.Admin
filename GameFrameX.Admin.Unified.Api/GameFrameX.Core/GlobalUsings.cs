@@ -42,5 +42,5 @@ global using GameFrameX.Core.Enum;
 global using GameFrameX.Core.Enum.Errors;
 global using GameFrameX.Core.Service.Config;
 global using GameFrameX.Core.SqlSugar;
-global using GameFrameX.Entity.Tenant;
+global using GameFrameX.Entity.Business;
 global using GameFrameX.Foundation.Utility;

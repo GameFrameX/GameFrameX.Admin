@@ -3,7 +3,7 @@ namespace GameFrameX.Application.ServerCenter.GameDockerTag.Dto;
 /// <summary>
 /// 游戏大区分类输出参数
 /// </summary>
-public class GameDockerTagResponse : IBasePageResponse<Entity.Tenant.Game.TenantGameDockerTagEntity>
+public class GameDockerTagResponse : IBasePageResponse<Entity.Business.Game.GameDockerTagEntity>
 {
     /// <summary>
     /// Id

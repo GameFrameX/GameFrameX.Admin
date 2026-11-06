@@ -2,7 +2,7 @@ using System.Net;
 using System.Text.Json;
 using GameFrameX.Application.ServerCenter.Mail;
 using GameFrameX.Entity.Game.Mail;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 using GameFrameX.Foundation.Http.Normalization;
 using GameFrameX.Foundation.Json;
 
@@ -226,9 +226,9 @@ public class MailCampaignServerClientTests
         return new MailCampaignServerClient(httpClient);
     }
 
-    private static TenantGameAreaEntity CreateArea(string httpManageUrl = HttpManageUrl, string fulfillmentPrefix = "game/api")
+    private static GameAreaEntity CreateArea(string httpManageUrl = HttpManageUrl, string fulfillmentPrefix = "game/api")
     {
-        return new TenantGameAreaEntity
+        return new GameAreaEntity
         {
             HttpManageUrl = httpManageUrl,
             FulfillmentApiPrefix = fulfillmentPrefix,

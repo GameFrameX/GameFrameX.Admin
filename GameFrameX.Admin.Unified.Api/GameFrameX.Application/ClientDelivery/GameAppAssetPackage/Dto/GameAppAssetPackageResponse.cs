@@ -1,11 +1,11 @@
-using GameFrameX.Entity.Tenant.Game.Resource;
+using GameFrameX.Entity.Business.Game.Resource;
 
 namespace GameFrameX.Application.ClientDelivery.GameAppAssetPackage.Dto;
 
 /// <summary>
 /// 资源包输出参数
 /// </summary>
-public class GameAppAssetPackageResponse : IBasePageResponse<TenantGameAppAssetPackageEntity>
+public class GameAppAssetPackageResponse : IBasePageResponse<GameAppAssetPackageEntity>
 {
     /// <summary>
     /// Id

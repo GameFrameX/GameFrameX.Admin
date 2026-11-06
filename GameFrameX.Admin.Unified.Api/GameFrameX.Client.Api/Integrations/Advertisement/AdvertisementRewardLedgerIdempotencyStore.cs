@@ -1,5 +1,5 @@
 using GameFrameX.Entity.Enum;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 using GameFrameX.Foundation.Idempotency;
 using SqlSugar;
 
@@ -31,19 +31,19 @@ public sealed class AdvertisementRewardLedgerIdempotencyStore : IIdempotencyStor
     /// </summary>
     public const string RequestDigest = "ad-reward-key-replay";
 
-    private readonly SqlSugarRepository<TenantGameAdvertisementRewardEntity> _repository;
+    private readonly SqlSugarRepository<GameAdvertisementRewardEntity> _repository;
 
     /// <summary>
     /// 占位模板：携带回调 payload 侧字段（Provider / TransactionId / AdUnit / 奖励项 / 沙盒标记），角色侧字段由服务在 Execute 分支补写。
     /// </summary>
-    private readonly TenantGameAdvertisementRewardEntity _ledgerTemplate;
+    private readonly GameAdvertisementRewardEntity _ledgerTemplate;
 
     /// <summary>
     /// 初始化存储。
     /// </summary>
     /// <param name="repository">账本仓储（租户路由）。</param>
     /// <param name="ledgerTemplate">占位模板（payload 字段已就绪，IdempotencyKey 以占位记录为准覆盖）。</param>
-    public AdvertisementRewardLedgerIdempotencyStore(SqlSugarRepository<TenantGameAdvertisementRewardEntity> repository, TenantGameAdvertisementRewardEntity ledgerTemplate)
+    public AdvertisementRewardLedgerIdempotencyStore(SqlSugarRepository<GameAdvertisementRewardEntity> repository, GameAdvertisementRewardEntity ledgerTemplate)
     {
         _repository = repository;
         _ledgerTemplate = ledgerTemplate;

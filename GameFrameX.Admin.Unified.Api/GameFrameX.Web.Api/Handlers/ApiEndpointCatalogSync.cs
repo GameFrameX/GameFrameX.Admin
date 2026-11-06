@@ -301,7 +301,7 @@ public sealed class ApiEndpointCatalogSync : IHostedService
 
     /// <summary>
     /// 一次性迁移：读 DB global_menu 按钮 Permission（routeName）→ RoutePath → 匹配 api_endpoint → 回填 global_menu_endpoint。
-    /// 幂等。**不**读 .g.cs 文件，保证 C43 删源生成器后仍可迁移。**不**动 Id/Key/tenant_role_menu。
+    /// 幂等。**不**读 .g.cs 文件，保证 C43 删源生成器后仍可迁移。**不**动 Id/Key/role_menu。
     /// </summary>
     private async Task MigrateBindingsFromMenuPermissionAsync(
         SqlSugarRepository<GlobalMenuEntity> menuRepository,

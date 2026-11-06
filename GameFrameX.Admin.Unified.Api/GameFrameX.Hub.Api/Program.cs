@@ -90,11 +90,11 @@ internal static class Program
         app.UseAuthorization();
         // 机器凭证、签名和授权范围校验。
         app.UseWhen(context => context.Request.Path.StartsWithSegments("/api/PackageBuildReport", StringComparison.OrdinalIgnoreCase),
-                    branch => branch.UseMiddleware<TenantGameAppOpenAccessAuthMiddleware>());
+                    branch => branch.UseMiddleware<GameAppOpenAccessAuthMiddleware>());
 
         // 功能开关服务器同步（C347）：游戏服务器机器凭证同步通道，同一 OpenAccess 中间件鉴权（scope = FeatureSwitchSync 路由前缀）
         app.UseWhen(context => context.Request.Path.StartsWithSegments("/api/" + GameFrameX.Hub.Api.Const.OpenAccessScopeConst.FeatureSwitchSync, StringComparison.OrdinalIgnoreCase),
-                    branch => branch.UseMiddleware<TenantGameAppOpenAccessAuthMiddleware>());
+                    branch => branch.UseMiddleware<GameAppOpenAccessAuthMiddleware>());
 
         app.MapHostHealthChecks();
         app.MapControllers();

@@ -4,7 +4,7 @@
 import type { BaseSelectPageResponse } from "../_shared/data-contracts";
 
 /** 兑换记录增加输入参数 */
-export interface AddTenantGameRedeemCodeUseRecordEntityRequest {
+export interface AddGameRedeemCodeUseRecordEntityRequest {
   /** 主键Id */
   id: string;
 }
@@ -39,9 +39,9 @@ export interface GameRedeemCodeUseRecordResponse {
   rowVersion?: string | null;
   /** 角色ID */
   playerIdString?: string | null;
-  /** 兑换码渠道/分组ID（来自关联的 TenantGameRedeemCodeEntity.ChannelId） */
+  /** 兑换码渠道/分组ID（来自关联的 GameRedeemCodeEntity.ChannelId） */
   channelId?: string | null;
-  /** 兑换码渠道/分组名称（来自关联的 TenantGameRedeemCodeChannelEntity.Name） */
+  /** 兑换码渠道/分组名称（来自关联的 GameRedeemCodeChannelEntity.Name） */
   channelName?: string | null;
 }
 
@@ -60,7 +60,7 @@ export interface GameRedeemCodeUseRecordResponseSqlSugarPagedList {
 }
 
 /** 兑换记录分页查询输入参数 */
-export interface PageTenantGameRedeemCodeUseRecordEntityRequest {
+export interface PageGameRedeemCodeUseRecordEntityRequest {
   searchKey?: string | null;
   /**
    * @format int32
@@ -81,12 +81,12 @@ export interface PageTenantGameRedeemCodeUseRecordEntityRequest {
   code?: string | null;
   /** 角色ID */
   playerId?: string | null;
-  /** 兑换码渠道/分组ID（关联 TenantGameRedeemCodeEntity.ChannelId 过滤） */
+  /** 兑换码渠道/分组ID（关联 GameRedeemCodeEntity.ChannelId 过滤） */
   channelId?: string | null;
 }
 
 /** 兑换记录更新输入参数 */
-export interface UpdateTenantGameRedeemCodeUseRecordEntityRequest {
+export interface UpdateGameRedeemCodeUseRecordEntityRequest {
   /**
    * @min 1
    * @max 9223372036854776000
@@ -149,7 +149,7 @@ export interface GameRedeemCodeUseRecordDetailGetData {
   extras: object | null;
 }
 
-export interface GameRedeemCodeUseRecordPagePostData {
+export interface GameRedeemCodeUseRecordGameAreaEntityAreaIdDropdownGetData {
   /**
    * 响应码，0 表示成功，失败时承载统一数字业务错误码（模块枚举 8 位数值，见 GameFrameX.Core/Enum/Errors 与 error-codes.json 码表）
    * @format int32
@@ -157,7 +157,7 @@ export interface GameRedeemCodeUseRecordPagePostData {
   code: number;
   /** 错误或提示信息 */
   message: string;
-  data: GameRedeemCodeUseRecordResponseSqlSugarPagedList;
+  data: BaseSelectPageResponse[];
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
   /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
@@ -172,7 +172,7 @@ export interface GameRedeemCodeUseRecordPagePostData {
   extras: object | null;
 }
 
-export interface GameRedeemCodeUseRecordTenantGameAreaEntityAreaIdDropdownGetData {
+export interface GameRedeemCodeUseRecordPagePostData {
   /**
    * 响应码，0 表示成功，失败时承载统一数字业务错误码（模块枚举 8 位数值，见 GameFrameX.Core/Enum/Errors 与 error-codes.json 码表）
    * @format int32
@@ -180,7 +180,7 @@ export interface GameRedeemCodeUseRecordTenantGameAreaEntityAreaIdDropdownGetDat
   code: number;
   /** 错误或提示信息 */
   message: string;
-  data: BaseSelectPageResponse[];
+  data: GameRedeemCodeUseRecordResponseSqlSugarPagedList;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
   /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */

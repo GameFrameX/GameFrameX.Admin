@@ -4,19 +4,19 @@ using GameFrameX.Entity.Log;
 namespace GameFrameX.Application.Audit.Logging;
 
 /// <summary>
-/// 系统差异日志服务。C156 起：SuperAdmin 查询主库 system_log_diff，普通租户查询当前租户库 tenant_log_diff。
+/// 系统差异日志服务。C156 起：SuperAdmin 查询主库 system_log_diff，普通租户查询当前租户库 log_diff。
 /// </summary>
 [ApiDescriptionSettings(Order = 330)]
-public class LogDiffService : BaseLogService<SystemLogDiffEntity, TenantLogDiffEntity, LogDiffFields>
+public class LogDiffService : BaseLogService<SystemLogDiffEntity, LogDiffEntity, LogDiffFields>
 {
     /// <summary>
     /// 构造函数
     /// </summary>
     /// <param name="systemLogDiffRepository">平台差异日志仓储（主库）</param>
-    /// <param name="tenantLogDiffRepository">租户差异日志仓储（当前租户库）</param>
+    /// <param name="logDiffRepository">租户差异日志仓储（当前租户库）</param>
     /// <param name="currentUserContext">当前登录用户</param>
-    public LogDiffService(SqlSugarRepository<SystemLogDiffEntity> systemLogDiffRepository, SqlSugarRepository<TenantLogDiffEntity> tenantLogDiffRepository, CurrentUserContext currentUserContext)
-        : base(systemLogDiffRepository, tenantLogDiffRepository, currentUserContext)
+    public LogDiffService(SqlSugarRepository<SystemLogDiffEntity> systemLogDiffRepository, SqlSugarRepository<LogDiffEntity> logDiffRepository, CurrentUserContext currentUserContext)
+        : base(systemLogDiffRepository, logDiffRepository, currentUserContext)
     {
     }
 

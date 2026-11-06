@@ -4,7 +4,7 @@
 import type { BaseSelectPageResponse, BaseSelectPageStringResponse } from "../_shared/data-contracts";
 
 /** 奖励模板分组增加输入参数。 */
-export interface AddTenantGameRewardTemplateGroupEntityRequest {
+export interface AddGameRewardTemplateGroupEntityRequest {
   /**
    * 名称。
    * @minLength 1
@@ -69,7 +69,7 @@ export interface GameRewardTemplateGroupResponseSqlSugarPagedList {
 }
 
 /** 奖励模板分组分页查询输入参数。 */
-export interface PageTenantGameRewardTemplateGroupEntityRequest {
+export interface PageGameRewardTemplateGroupEntityRequest {
   searchKey?: string | null;
   /**
    * @format int32
@@ -92,7 +92,7 @@ export interface PageTenantGameRewardTemplateGroupEntityRequest {
 }
 
 /** 奖励模板分组更新输入参数。 */
-export interface UpdateTenantGameRewardTemplateGroupEntityRequest {
+export interface UpdateGameRewardTemplateGroupEntityRequest {
   /**
    * @min 1
    * @max 9223372036854776000

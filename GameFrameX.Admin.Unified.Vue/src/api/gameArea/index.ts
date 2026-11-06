@@ -10,7 +10,7 @@
  */
 
 import {
-  AddTenantGameAreaEntityRequest,
+  AddGameAreaEntityRequest,
   GameAreaAddPostData,
   GameAreaDeletePostData,
   GameAreaDetailGetData,
@@ -22,8 +22,8 @@ import {
   GameAreaSelectStringPostData,
   GameAreaStopPostData,
   GameAreaUpdatePostData,
-  PageTenantGameAreaEntityRequest,
-  UpdateTenantGameAreaEntityRequest,
+  PageGameAreaEntityRequest,
+  UpdateGameAreaEntityRequest,
 } from "./types";
 import {
   BaseDeleteRequest,
@@ -49,7 +49,7 @@ export class GameArea<SecurityDataType = unknown> {
    * @request POST:/api/gameArea/add
    */
   gameAreaAddPost = (
-    data: AddTenantGameAreaEntityRequest,
+    data: AddGameAreaEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameAreaAddPostData, any>({
@@ -146,7 +146,7 @@ export class GameArea<SecurityDataType = unknown> {
    * @request POST:/api/gameArea/page
    */
   gameAreaPagePost = (
-    data: PageTenantGameAreaEntityRequest,
+    data: PageGameAreaEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameAreaPagePostData, any>({
@@ -238,7 +238,7 @@ export class GameArea<SecurityDataType = unknown> {
    * @request POST:/api/gameArea/update
    */
   gameAreaUpdatePost = (
-    data: UpdateTenantGameAreaEntityRequest,
+    data: UpdateGameAreaEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameAreaUpdatePostData, any>({

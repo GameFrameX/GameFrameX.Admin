@@ -1,4 +1,4 @@
-namespace GameFrameX.Client.Api.Services.ClientApiTenantOptions;
+namespace GameFrameX.Client.Api.Services.ClientApiOptions;
 
 /// <summary>
 /// Client API 平台默认策略常量（SuperAdmin 视角的非秘密默认值与安全上限）。

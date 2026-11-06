@@ -4,7 +4,7 @@ using GameFrameX.Client.Api.GameUserSession.Dto;
 using GameFrameX.Client.Api.Services;
 using GameFrameX.Core.Service;
 using GameFrameX.Entity.Enum;
-using GameFrameX.Entity.Tenant.Game.ServerConfig;
+using GameFrameX.Entity.Business.Game.ServerConfig;
 
 namespace GameFrameX.Client.Api.GameUserSession;
 
@@ -29,10 +29,10 @@ public class GameUserSessionController : BaseController
     /// </summary>
     private static long _sessionSeq;
 
-    private readonly Repository<TenantGameUserArchiveEntity> _archiveRepository;
-    private readonly Repository<TenantGameUserEntity> _userRepository;
-    private readonly Repository<TenantGameOrderEntity> _orderRepository;
-    private readonly Repository<TenantGameAppServerConfigEntity> _serverConfigRepository;
+    private readonly Repository<GameUserArchiveEntity> _archiveRepository;
+    private readonly Repository<GameUserEntity> _userRepository;
+    private readonly Repository<GameOrderEntity> _orderRepository;
+    private readonly Repository<GameAppServerConfigEntity> _serverConfigRepository;
 
     /// <summary>
     ///
@@ -41,10 +41,10 @@ public class GameUserSessionController : BaseController
     /// <param name="userRepository">玩家账号仓储（注销判定）</param>
     /// <param name="orderRepository">支付订单仓储（累计充值汇总）</param>
     /// <param name="serverConfigRepository">游戏运营配置主库仓储</param>
-    public GameUserSessionController(Repository<TenantGameUserArchiveEntity> archiveRepository,
-        Repository<TenantGameUserEntity> userRepository,
-        Repository<TenantGameOrderEntity> orderRepository,
-        Repository<TenantGameAppServerConfigEntity> serverConfigRepository)
+    public GameUserSessionController(Repository<GameUserArchiveEntity> archiveRepository,
+        Repository<GameUserEntity> userRepository,
+        Repository<GameOrderEntity> orderRepository,
+        Repository<GameAppServerConfigEntity> serverConfigRepository)
     {
         _archiveRepository = archiveRepository;
         _userRepository = userRepository;

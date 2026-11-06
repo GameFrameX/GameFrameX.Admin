@@ -11,9 +11,9 @@ namespace GameFrameX.Application.ServerCenter.GameArea;
 /// 游戏区服服务
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
-public class GameAreaService : GenericCrudSelectService<Entity.Tenant.Game.TenantGameAreaEntity, AddTenantGameAreaEntityRequest, UpdateTenantGameAreaEntityRequest, GameAreaResponse, PageTenantGameAreaEntityRequest>
+public class GameAreaService : GenericCrudSelectService<Entity.Business.Game.GameAreaEntity, AddGameAreaEntityRequest, UpdateGameAreaEntityRequest, GameAreaResponse, PageGameAreaEntityRequest>
 {
-    private readonly SqlSugarRepository<Entity.Tenant.Game.TenantGameAreaClassifyEntity> _classifyRepository;
+    private readonly SqlSugarRepository<Entity.Business.Game.GameAreaClassifyEntity> _classifyRepository;
     private readonly HttpClient _httpClient;
 
     /// <summary>
@@ -22,7 +22,7 @@ public class GameAreaService : GenericCrudSelectService<Entity.Tenant.Game.Tenan
     /// <param name="repository"></param>
     /// <param name="classifyRepository"></param>
     /// <param name="httpClient"></param>
-    public GameAreaService(SqlSugarRepository<Entity.Tenant.Game.TenantGameAreaEntity> repository, SqlSugarRepository<Entity.Tenant.Game.TenantGameAreaClassifyEntity> classifyRepository, HttpClient httpClient) : base(repository)
+    public GameAreaService(SqlSugarRepository<Entity.Business.Game.GameAreaEntity> repository, SqlSugarRepository<Entity.Business.Game.GameAreaClassifyEntity> classifyRepository, HttpClient httpClient) : base(repository)
     {
         _classifyRepository = classifyRepository;
         _httpClient = httpClient;
@@ -31,7 +31,7 @@ public class GameAreaService : GenericCrudSelectService<Entity.Tenant.Game.Tenan
     /// <summary>
     /// 构建分页查询条件（含外键关联）
     /// </summary>
-    protected override ISugarQueryable<GameAreaResponse> BuildPageQuery(PageTenantGameAreaEntityRequest input)
+    protected override ISugarQueryable<GameAreaResponse> BuildPageQuery(PageGameAreaEntityRequest input)
     {
         // 区服启用标记 C301 起归一基类 IsEnabled，会被全局 ISafeEnabledFilter 隐藏禁用行；
         // 管理列表必须能看到禁用区服（否则无法重新启用，参照 GameAppPackageService 的 C67 FixPattern），
@@ -59,7 +59,7 @@ public class GameAreaService : GenericCrudSelectService<Entity.Tenant.Game.Tenan
                              IsDefault = u.IsDefault,
                              IsRecommend = u.IsRecommend,
                              ClassifyId = u.ClassifyId,
-                             ClassifyIdName = SqlFunc.Subqueryable<Entity.Tenant.Game.TenantGameAreaClassifyEntity>().Where(classifyid => classifyid.Id == u.ClassifyId).Select(classifyid => classifyid.Name),
+                             ClassifyIdName = SqlFunc.Subqueryable<Entity.Business.Game.GameAreaClassifyEntity>().Where(classifyid => classifyid.Id == u.ClassifyId).Select(classifyid => classifyid.Name),
                              IsEnabled = u.IsEnabled,
                              ServerStatus = u.ServerStatus,
                              MergedIntoServerId = u.MergedIntoServerId,
@@ -100,7 +100,7 @@ public class GameAreaService : GenericCrudSelectService<Entity.Tenant.Game.Tenan
     /// 按 Id 取区服（含禁用行）。启用标记在基类 IsEnabled（C301 归一）后受全局 ISafeEnabledFilter 过滤，
     /// 管理/转发操作必须触达禁用区服，故按 FixPattern 绕过全部过滤器并手动补软删条件。
     /// </summary>
-    private async Task<Entity.Tenant.Game.TenantGameAreaEntity> GetAreaForManagementAsync(long id)
+    private async Task<Entity.Business.Game.GameAreaEntity> GetAreaForManagementAsync(long id)
     {
         return await Repository.AsQueryable()
                                .Filter(null, true)
@@ -122,7 +122,7 @@ public class GameAreaService : GenericCrudSelectService<Entity.Tenant.Game.Tenan
     /// <summary>
     /// 新增前归一化区服接口前缀。
     /// </summary>
-    protected override Task OnAddingAsync(AddTenantGameAreaEntityRequest input)
+    protected override Task OnAddingAsync(AddGameAreaEntityRequest input)
     {
         NormalizeEndpointPrefixes(input);
         return Task.CompletedTask;
@@ -131,7 +131,7 @@ public class GameAreaService : GenericCrudSelectService<Entity.Tenant.Game.Tenan
     /// <summary>
     /// 更新前归一化接口前缀并验证区服存在。
     /// </summary>
-    protected override async Task OnUpdatingAsync(UpdateTenantGameAreaEntityRequest input)
+    protected override async Task OnUpdatingAsync(UpdateGameAreaEntityRequest input)
     {
         NormalizeEndpointPrefixes(input);
         var existing = await GetAreaForManagementAsync(input.Id);

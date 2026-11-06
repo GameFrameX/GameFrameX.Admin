@@ -66,8 +66,8 @@ public static class SqlSugarFilter
         else
         {
             var currentUserId = long.Parse(userId);
-            var roleList = db.Queryable<TenantUserRoleEntity>()
-                             .LeftJoin<TenantRoleEntity>((userRole, role) => userRole.RoleId == role.Id)
+            var roleList = db.Queryable<UserRoleEntity>()
+                             .LeftJoin<RoleEntity>((userRole, role) => userRole.RoleId == role.Id)
                              .Where((userRole, role) => userRole.UserId == currentUserId)
                              .Select((userRole, role) => role.DataScope)
                              .ToList();

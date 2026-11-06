@@ -142,7 +142,7 @@ export class GlobalMenu<SecurityDataType = unknown> {
    *
    * @tags globalMenu
    * @name GlobalMenuOwnMenuIdListGet
-   * @summary 获取当前用户已授权的菜单Id集合（缓存，含目录/菜单/按钮，来自 TenantRoleMenuEntity）。 供基于稳定身份（Key）的鉴权使用：M:GameFrameX.Core.Const.MenuSeed.StableSeedId.Menu(System.String) 由 Key 派生的 Id 与本集合比对。
+   * @summary 获取当前用户已授权的菜单Id集合（缓存，含目录/菜单/按钮，来自 RoleMenuEntity）。 供基于稳定身份（Key）的鉴权使用：M:GameFrameX.Core.Const.MenuSeed.StableSeedId.Menu(System.String) 由 Key 派生的 Id 与本集合比对。
    * @request GET:/api/globalMenu/ownMenuIdList
    */
   globalMenuOwnMenuIdListGet = (params: RequestParams = {}) =>

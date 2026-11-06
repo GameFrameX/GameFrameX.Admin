@@ -27,7 +27,7 @@ public sealed class ApiEndpointIdentityTests
 
     [Theory]
     [InlineData("systemUser:page", "api/systemuser/page")]
-    [InlineData("tenantRole:list", "api/tenantrole/list")]
+    [InlineData("role:list", "api/role/list")]
     [InlineData("SYSTEMUSER:PAGE", "api/systemuser/page")]
     public void RouteNameToRoutePath_ColonBecomesSlashAndLowercased(string routeName, string expected)
     {
@@ -46,7 +46,7 @@ public sealed class ApiEndpointIdentityTests
     [Theory]
     [InlineData("/api/systemUser/page", "api/systemuser/page")]
     [InlineData(null, "")]
-    [InlineData("/api/tenantRole/list", "api/tenantrole/list")]
+    [InlineData("/api/role/list", "api/role/list")]
     public void FromRequestPath_EqualsNormalize(string? requestPath, string expected)
     {
         Assert.Equal(expected, ApiEndpointIdentity.FromRequestPath(requestPath));

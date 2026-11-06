@@ -16,10 +16,8 @@ GameFrameX.Client.Api/Google/*.json
 error-codes.json
 
 # 本地零配置 SQLite 数据目录（DataSource=./db/...，仓根执行 dotnet run 时生成）
-# db/* 而非 db/：db/ 会整目录排除导致 !db/tenant-isolation/ 反排除失效（git 不进入被排除目录）
-db/*
-!db/tenant-isolation/
-!db/single-main/
+# db/ 本地 SQLite 运行目录整体排除
+db/
 *.db
 .sonarqube
 postgres-data

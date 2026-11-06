@@ -1,7 +1,7 @@
 namespace GameFrameX.Core.Service.User.Dto;
 
 /// <summary>
-/// 重置密码结果（平台用户与租户管理员重置共用）
+/// 重置密码结果（平台用户与管理员角色重置共用）
 /// </summary>
 public class ResetPwdResponse
 {

@@ -38,13 +38,13 @@ public sealed class LogPageSearchKeyFilterTests : IDisposable
         _db.CodeFirst.InitTables(
             typeof(GameFrameX.Entity.System.SystemUserEntity),
             typeof(SystemLogVisitEntity),
-            typeof(TenantLogVisitEntity),
+            typeof(LogVisitEntity),
             typeof(SystemLogOperationEntity),
-            typeof(TenantLogOperationEntity),
+            typeof(LogOperationEntity),
             typeof(SystemLogExceptionEntity),
-            typeof(TenantLogExceptionEntity),
+            typeof(LogExceptionEntity),
             typeof(SystemLogDiffEntity),
-            typeof(TenantLogDiffEntity));
+            typeof(LogDiffEntity));
     }
 
     public void Dispose()
@@ -111,14 +111,14 @@ public sealed class LogPageSearchKeyFilterTests : IDisposable
     [Fact]
     public async Task OperationLog_SearchKey_MatchesRequestUrlAndMessage()
     {
-        await SeedOperationAsync("GET", "/api/tenantUser/page", "user list", "ok");
-        await SeedOperationAsync("POST", "/api/tenantUser/add", "user create", "ok");
+        await SeedOperationAsync("GET", "/api/user/page", "user list", "ok");
+        await SeedOperationAsync("POST", "/api/user/add", "user create", "ok");
         await SeedOperationAsync("GET", "/api/globalDictionary/page", "dict list", "ok");
 
         var service = BuildOperationService();
 
         // 命中 RequestUrl
-        var byUrl = await service.PageAsync(new PageLogRequest { Page = 1, PageSize = 20, SearchKey = "tenantUser", });
+        var byUrl = await service.PageAsync(new PageLogRequest { Page = 1, PageSize = 20, SearchKey = "user", });
         Assert.Equal(2, byUrl.Total);
 
         // 命中 Message
@@ -207,10 +207,10 @@ public sealed class LogPageSearchKeyFilterTests : IDisposable
         await SeedOperationAsync("POST", "/current", "current operation", "200");
         await SeedExceptionAsync("POST", "/current", "current exception");
         await SeedDiffAsync("Insert", "current SQL", "before");
-        await _db.Insertable(new TenantLogVisitEntity { Id = 100, Account = "historical", CreatedTime = 1 }).ExecuteCommandAsync();
-        await _db.Insertable(new TenantLogOperationEntity { Id = 100, Message = "historical", CreatedTime = 1 }).ExecuteCommandAsync();
-        await _db.Insertable(new TenantLogExceptionEntity { Id = 100, Message = "historical", CreatedTime = 1 }).ExecuteCommandAsync();
-        await _db.Insertable(new TenantLogDiffEntity { Id = 100, DiffType = "historical", CreatedTime = 1 }).ExecuteCommandAsync();
+        await _db.Insertable(new LogVisitEntity { Id = 100, Account = "historical", CreatedTime = 1 }).ExecuteCommandAsync();
+        await _db.Insertable(new LogOperationEntity { Id = 100, Message = "historical", CreatedTime = 1 }).ExecuteCommandAsync();
+        await _db.Insertable(new LogExceptionEntity { Id = 100, Message = "historical", CreatedTime = 1 }).ExecuteCommandAsync();
+        await _db.Insertable(new LogDiffEntity { Id = 100, DiffType = "historical", CreatedTime = 1 }).ExecuteCommandAsync();
         var context = BuildContext(superAdmin);
         var visits = new LogVisitService(new() { Context = _db }, new() { Context = _db }, context);
         var operations = new LogOperationService(new() { Context = _db }, new() { Context = _db }, context);
@@ -324,7 +324,7 @@ public sealed class LogPageSearchKeyFilterTests : IDisposable
             new SystemLogOperationEntity { Id = 503, Account = "operator", CreatedId = 2001, Message = "{\"Password\":\"" + plain + "\",\"AccessToken\":\"" + plain + "\"}" },
             new SystemLogOperationEntity { Id = 504, Account = "renamed-account", CreatedId = 999, Message = "root-id-record" },
         }).ExecuteCommandAsync();
-        await _db.Insertable(new TenantLogOperationEntity { Id = 601, Account = "renamed-root", CreatedId = 0, Message = "historical-root-login-record" }).ExecuteCommandAsync();
+        await _db.Insertable(new LogOperationEntity { Id = 601, Account = "renamed-root", CreatedId = 0, Message = "historical-root-login-record" }).ExecuteCommandAsync();
         var service = new LogOperationService(new() { Context = _db }, new() { Context = _db }, BuildContext(false));
         var page = await service.PageAsync(new PageLogRequest { Page = 1, PageSize = 20 });
         var own = Assert.Single(page.Items);
@@ -355,29 +355,29 @@ public sealed class LogPageSearchKeyFilterTests : IDisposable
     private LogVisitService BuildVisitService()
     {
         var systemRepo = new SqlSugarRepository<SystemLogVisitEntity> { Context = _db };
-        var tenantRepo = new SqlSugarRepository<TenantLogVisitEntity> { Context = _db };
-        return new LogVisitService(systemRepo, tenantRepo, BuildContext());
+        var repo = new SqlSugarRepository<LogVisitEntity> { Context = _db };
+        return new LogVisitService(systemRepo, repo, BuildContext());
     }
 
     private LogOperationService BuildOperationService()
     {
         var systemRepo = new SqlSugarRepository<SystemLogOperationEntity> { Context = _db };
-        var tenantRepo = new SqlSugarRepository<TenantLogOperationEntity> { Context = _db };
-        return new LogOperationService(systemRepo, tenantRepo, BuildContext());
+        var repo = new SqlSugarRepository<LogOperationEntity> { Context = _db };
+        return new LogOperationService(systemRepo, repo, BuildContext());
     }
 
     private LogExceptionService BuildExceptionService()
     {
         var systemRepo = new SqlSugarRepository<SystemLogExceptionEntity> { Context = _db };
-        var tenantRepo = new SqlSugarRepository<TenantLogExceptionEntity> { Context = _db };
-        return new LogExceptionService(systemRepo, tenantRepo, BuildContext());
+        var repo = new SqlSugarRepository<LogExceptionEntity> { Context = _db };
+        return new LogExceptionService(systemRepo, repo, BuildContext());
     }
 
     private LogDiffService BuildDiffService()
     {
         var systemRepo = new SqlSugarRepository<SystemLogDiffEntity> { Context = _db };
-        var tenantRepo = new SqlSugarRepository<TenantLogDiffEntity> { Context = _db };
-        return new LogDiffService(systemRepo, tenantRepo, BuildContext());
+        var repo = new SqlSugarRepository<LogDiffEntity> { Context = _db };
+        return new LogDiffService(systemRepo, repo, BuildContext());
     }
 
     /// <summary>

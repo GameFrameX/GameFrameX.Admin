@@ -128,7 +128,7 @@ export enum GameLanguage {
 }
 
 /** 游戏区服增加输入参数 */
-export interface AddTenantGameAreaEntityRequest {
+export interface AddGameAreaEntityRequest {
   /**
    * @min 1
    * @max 9223372036854776000
@@ -348,7 +348,7 @@ export interface GameAreaResponseSqlSugarPagedList {
 }
 
 /** 游戏区服分页查询输入参数 */
-export interface PageTenantGameAreaEntityRequest {
+export interface PageGameAreaEntityRequest {
   searchKey?: string | null;
   /**
    * @format int32
@@ -376,7 +376,7 @@ export interface PageTenantGameAreaEntityRequest {
 }
 
 /** 游戏区服更新输入参数 */
-export interface UpdateTenantGameAreaEntityRequest {
+export interface UpdateGameAreaEntityRequest {
   /**
    * @min 1
    * @max 9223372036854776000

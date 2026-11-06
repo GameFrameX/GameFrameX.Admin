@@ -1,5 +1,5 @@
 using GameFrameX.Core.Const;
-using GameFrameX.Entity.Tenant.Game.Release;
+using GameFrameX.Entity.Business.Game.Release;
 using GameFrameX.Client.Api.GameAssetPackageVersion.Dto;
 using System.Linq.Expressions;
 
@@ -9,15 +9,15 @@ namespace GameFrameX.Client.Api.Services.PackageVersion;
 /// 资源包版本 Fallback 匹配器实现
 /// </summary>
 /// <remarks>
-/// 针对 TenantGameAppAssetPackageVersionEntity 实体的 Fallback 匹配实现，复用基类的 2 轮（原始包名 + 母包包名）与 6 级 Fallback 序列，
+/// 针对 GameAppAssetPackageVersionEntity 实体的 Fallback 匹配实现，复用基类的 2 轮（原始包名 + 母包包名）与 6 级 Fallback 序列，
 /// </remarks>
-public class AssetPackageVersionFallbackMatcher : GameAppPackageFallbackMatcher<AssetPackageVersionRequest, TenantGameAppAssetPackageVersionEntity>
+public class AssetPackageVersionFallbackMatcher : GameAppPackageFallbackMatcher<AssetPackageVersionRequest, GameAppAssetPackageVersionEntity>
 {
     /// <summary>
     /// 初始化匹配器
     /// </summary>
     public AssetPackageVersionFallbackMatcher(
-        Repository<TenantGameAppAssetPackageVersionEntity> repository,
+        Repository<GameAppAssetPackageVersionEntity> repository,
         GameAppPackageResolver resolver)
         : base(repository, resolver)
     {
@@ -26,7 +26,7 @@ public class AssetPackageVersionFallbackMatcher : GameAppPackageFallbackMatcher<
     /// <summary>
     /// 构建完全匹配所有参数的查询条件
     /// </summary>
-    protected override Expression<Func<TenantGameAppAssetPackageVersionEntity, bool>> BuildExactPredicates(AssetPackageVersionRequest request)
+    protected override Expression<Func<GameAppAssetPackageVersionEntity, bool>> BuildExactPredicates(AssetPackageVersionRequest request)
     {
         return m => m.AssetPackageName == request.AssetPackageName &&
                     m.Platform == request.Platform &&
@@ -39,7 +39,7 @@ public class AssetPackageVersionFallbackMatcher : GameAppPackageFallbackMatcher<
     /// <summary>
     /// 构建使用默认语言的查询条件
     /// </summary>
-    protected override Expression<Func<TenantGameAppAssetPackageVersionEntity, bool>> BuildPredicatesWithDefaultLanguage(AssetPackageVersionRequest request)
+    protected override Expression<Func<GameAppAssetPackageVersionEntity, bool>> BuildPredicatesWithDefaultLanguage(AssetPackageVersionRequest request)
     {
         return m => m.AssetPackageName == request.AssetPackageName &&
                     m.Platform == request.Platform &&
@@ -52,7 +52,7 @@ public class AssetPackageVersionFallbackMatcher : GameAppPackageFallbackMatcher<
     /// <summary>
     /// 构建使用默认渠道的查询条件
     /// </summary>
-    protected override Expression<Func<TenantGameAppAssetPackageVersionEntity, bool>> BuildPredicatesWithDefaultChannel(AssetPackageVersionRequest request)
+    protected override Expression<Func<GameAppAssetPackageVersionEntity, bool>> BuildPredicatesWithDefaultChannel(AssetPackageVersionRequest request)
     {
         return m => m.AssetPackageName == request.AssetPackageName &&
                     m.Platform == request.Platform &&
@@ -65,7 +65,7 @@ public class AssetPackageVersionFallbackMatcher : GameAppPackageFallbackMatcher<
     /// <summary>
     /// 构建使用默认版本的查询条件
     /// </summary>
-    protected override Expression<Func<TenantGameAppAssetPackageVersionEntity, bool>> BuildPredicatesWithDefaultVersion(AssetPackageVersionRequest request)
+    protected override Expression<Func<GameAppAssetPackageVersionEntity, bool>> BuildPredicatesWithDefaultVersion(AssetPackageVersionRequest request)
     {
         return m => m.AssetPackageName == request.AssetPackageName &&
                     m.Platform == request.Platform &&
@@ -78,7 +78,7 @@ public class AssetPackageVersionFallbackMatcher : GameAppPackageFallbackMatcher<
     /// <summary>
     /// 构建使用默认包名的查询条件
     /// </summary>
-    protected override Expression<Func<TenantGameAppAssetPackageVersionEntity, bool>> BuildPredicatesWithDefaultPackage(AssetPackageVersionRequest request)
+    protected override Expression<Func<GameAppAssetPackageVersionEntity, bool>> BuildPredicatesWithDefaultPackage(AssetPackageVersionRequest request)
     {
         return m => m.AssetPackageName == request.AssetPackageName &&
                     m.Platform == request.Platform &&
@@ -91,7 +91,7 @@ public class AssetPackageVersionFallbackMatcher : GameAppPackageFallbackMatcher<
     /// <summary>
     /// 构建使用默认平台的查询条件
     /// </summary>
-    protected override Expression<Func<TenantGameAppAssetPackageVersionEntity, bool>> BuildPredicatesWithDefaultPlatform(AssetPackageVersionRequest request)
+    protected override Expression<Func<GameAppAssetPackageVersionEntity, bool>> BuildPredicatesWithDefaultPlatform(AssetPackageVersionRequest request)
     {
         return m => m.AssetPackageName == request.AssetPackageName &&
                     m.Platform == GameDimensionConst.PlatformDefault &&

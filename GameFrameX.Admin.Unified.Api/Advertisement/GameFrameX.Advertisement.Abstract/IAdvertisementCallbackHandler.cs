@@ -13,7 +13,7 @@ public interface IAdvertisementCallbackHandler
     string ProviderName { get; }
 
     /// <summary>schema 取参 + 按平台算法验签。</summary>
-    OptionVerification Verify(TenantAdvertisementCallbackOptions advertisementOptions, IQueryCollection query);
+    OptionVerification Verify(AdvertisementCallbackOptions advertisementOptions, IQueryCollection query);
 
     /// <summary>从已验签 Option + query 解析角色 + 用户。</summary>
     Task<RoleResolution?> ResolveRoleAsync(object option, IQueryCollection query);

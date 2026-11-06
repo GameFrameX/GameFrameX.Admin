@@ -1,4 +1,4 @@
-using GameFrameX.Entity.Tenant.Game.RemoteConfig;
+using GameFrameX.Entity.Business.Game.RemoteConfig;
 using GameFrameX.Core.SqlSugar;
 
 namespace GameFrameX.Application.SeedData.Client;
@@ -6,14 +6,14 @@ namespace GameFrameX.Application.SeedData.Client;
 /// <summary>
 /// 客户端远程配置内容键定义表 种子数据
 /// </summary>
-public class GameAppRemoteConfigKeySeedData : ISqlSugarEntitySeedData<TenantGameAppRemoteConfigKeyEntity>
+public class GameAppRemoteConfigKeySeedData : ISqlSugarEntitySeedData<GameAppRemoteConfigKeyEntity>
 {
     /// <summary>
     /// 种子数据
     /// </summary>
-    public IEnumerable<TenantGameAppRemoteConfigKeyEntity> HasData()
+    public IEnumerable<GameAppRemoteConfigKeyEntity> HasData()
     {
-        var records = new List<TenantGameAppRemoteConfigKeyEntity>
+        var records = new List<GameAppRemoteConfigKeyEntity>
         {
             new()
             {

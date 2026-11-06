@@ -22,7 +22,6 @@ public partial class GlobalMenuSeedData
                 Name = "gameAreaProvision",
                 Path = "/serverCenter/gameAreaProvision",
                 Component = "/serverCenter/gameAreaProvision/index",
-                AppScope = MenuAppScopeEnum.Console,
                 Title = "开服向导",
                 TitleCode = "message.menu.gameAreaProvision",
                 Icon = "fa-solid fa-server",

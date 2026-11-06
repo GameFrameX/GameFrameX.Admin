@@ -15,11 +15,11 @@ namespace GameFrameX.Application.Audit.Logging;
 /// <typeparamref name="TDto"/> 为统一投影目标（共享字段基类），保证前端字段形状不随实体拆分而变化。
 /// </summary>
 /// <typeparam name="TSystemLog">主库新日志实体</typeparam>
-/// <typeparam name="TTenantLog">主库历史日志实体</typeparam>
+/// <typeparam name="TLog">主库历史日志实体</typeparam>
 /// <typeparam name="TDto">日志投影 DTO，字段与实体共享基类一致</typeparam>
-public abstract class BaseLogService<TSystemLog, TTenantLog, TDto> : IAdminApiController
+public abstract class BaseLogService<TSystemLog, TLog, TDto> : IAdminApiController
     where TSystemLog : EntityBase, new()
-    where TTenantLog : EntityBase, new()
+    where TLog : EntityBase, new()
     where TDto : class, new()
 {
     /// <summary>
@@ -28,9 +28,9 @@ public abstract class BaseLogService<TSystemLog, TTenantLog, TDto> : IAdminApiCo
     protected readonly SqlSugarRepository<TSystemLog> SystemLogRepository;
 
     /// <summary>
-    /// 租户日志仓储（主库 tenant_log_* 历史表）
+    /// 租户日志仓储（主库 log_* 历史表）
     /// </summary>
-    protected readonly SqlSugarRepository<TTenantLog> TenantLogRepository;
+    protected readonly SqlSugarRepository<TLog> LogRepository;
 
     /// <summary>
     /// 当前登录用户。
@@ -41,12 +41,12 @@ public abstract class BaseLogService<TSystemLog, TTenantLog, TDto> : IAdminApiCo
     /// 构造函数
     /// </summary>
     /// <param name="systemLogRepository">平台日志仓储</param>
-    /// <param name="tenantLogRepository">租户日志仓储</param>
+    /// <param name="logRepository">租户日志仓储</param>
     /// <param name="currentUserContext">当前登录用户</param>
-    protected BaseLogService(SqlSugarRepository<TSystemLog> systemLogRepository, SqlSugarRepository<TTenantLog> tenantLogRepository, CurrentUserContext currentUserContext)
+    protected BaseLogService(SqlSugarRepository<TSystemLog> systemLogRepository, SqlSugarRepository<TLog> logRepository, CurrentUserContext currentUserContext)
     {
         SystemLogRepository = systemLogRepository;
-        TenantLogRepository = tenantLogRepository;
+        LogRepository = logRepository;
         CurrentUserContext = currentUserContext;
     }
 
@@ -74,7 +74,7 @@ public abstract class BaseLogService<TSystemLog, TTenantLog, TDto> : IAdminApiCo
     {
         var timestampRange = ConvertToTimestampRange(input);
         var current = QueryFiltered(SystemLogRepository, input, timestampRange).Select<TDto>();
-        var historical = QueryFiltered(TenantLogRepository, input, timestampRange).Select<TDto>();
+        var historical = QueryFiltered(LogRepository, input, timestampRange).Select<TDto>();
         var page = await SystemLogRepository.Context.UnionAll(current, historical)
                                         .OrderBy(BuildProjectionOrder(input))
                                         .ToPagedListAsync(input.Page, input.PageSize);
@@ -114,7 +114,7 @@ public abstract class BaseLogService<TSystemLog, TTenantLog, TDto> : IAdminApiCo
     public virtual async Task<bool> ClearAsync()
     {
         var count = await SystemLogRepository.AsDeleteable().Where(u => u.Id > 0).ExecuteCommandAsync();
-        count += await TenantLogRepository.AsDeleteable().Where(u => u.Id > 0).ExecuteCommandAsync();
+        count += await LogRepository.AsDeleteable().Where(u => u.Id > 0).ExecuteCommandAsync();
         return count > 0;
     }
 
@@ -128,7 +128,7 @@ public abstract class BaseLogService<TSystemLog, TTenantLog, TDto> : IAdminApiCo
         var timestampRange = ConvertToTimestampRange(input);
         var pageInput = new PageLogRequest { StartTime = input.StartTime, EndTime = input.EndTime };
         var current = QueryFiltered(SystemLogRepository, pageInput, timestampRange).Select<ExportLogResponse>();
-        var historical = QueryFiltered(TenantLogRepository, pageInput, timestampRange).Select<ExportLogResponse>();
+        var historical = QueryFiltered(LogRepository, pageInput, timestampRange).Select<ExportLogResponse>();
         var rows = await SystemLogRepository.Context.UnionAll(current, historical)
                                         .OrderBy(u => u.LogDateTime, OrderByType.Desc)
                                         .ToListAsync();

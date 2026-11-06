@@ -24,15 +24,15 @@ public class EmailTask : IScheduleJob
     private readonly ILogger<EmailTask> _logger;
     private readonly HttpClient _httpClientFactory;
     private readonly SystemCacheService _systemCacheService;
-    private readonly SqlSugarRepository<TenantGameMailEntity> _mailRepository;
-    private readonly SqlSugarRepository<TenantGameAreaEntity> _gameAreaEntityRepository;
-    private readonly SqlSugarRepository<TenantGameRoleEntity> _gameRoleEntityRepository;
+    private readonly SqlSugarRepository<GameMailEntity> _mailRepository;
+    private readonly SqlSugarRepository<GameAreaEntity> _gameAreaEntityRepository;
+    private readonly SqlSugarRepository<GameRoleEntity> _gameRoleEntityRepository;
 
-    public EmailTask(ILogger<EmailTask> logger, SqlSugarRepository<TenantGameMailEntity> mailRepository, SqlSugarRepository<TenantGameAreaEntity> systemTenantGameAreaEntity, SqlSugarRepository<TenantGameRoleEntity> systemTenantGameRoleEntity, HttpClient httpClientFactory, SystemCacheService systemCacheService)
+    public EmailTask(ILogger<EmailTask> logger, SqlSugarRepository<GameMailEntity> mailRepository, SqlSugarRepository<GameAreaEntity> systemGameAreaEntity, SqlSugarRepository<GameRoleEntity> systemGameRoleEntity, HttpClient httpClientFactory, SystemCacheService systemCacheService)
     {
         _mailRepository = mailRepository;
-        _gameAreaEntityRepository = systemTenantGameAreaEntity;
-        _gameRoleEntityRepository = systemTenantGameRoleEntity;
+        _gameAreaEntityRepository = systemGameAreaEntity;
+        _gameRoleEntityRepository = systemGameRoleEntity;
         _logger = logger;
         _httpClientFactory = httpClientFactory;
         _systemCacheService = systemCacheService;

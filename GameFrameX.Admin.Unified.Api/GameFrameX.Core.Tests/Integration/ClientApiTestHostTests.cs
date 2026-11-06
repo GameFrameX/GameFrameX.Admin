@@ -22,7 +22,7 @@ public class ClientApiTestHostTests
 
         response.EnsureSuccessStatusCode();
         Assert.Equal("*", response.Headers.GetValues("Access-Control-Allow-Origin").Single());
-        Assert.Equal(new[] { "TenantResolution", "TenantExpiration", "AppResolution", "Endpoint", }, observedSteps);
+        Assert.Equal(new[] { "Resolution", "Expiration", "AppResolution", "Endpoint", }, observedSteps);
     }
 
     private static async Task<IHost> CreateHostAsync(ICollection<string> observedSteps)
@@ -50,12 +50,12 @@ public class ClientApiTestHostTests
                            app.UseCors("CorsPolicy");
                            app.Use(async (context, next) =>
                            {
-                               observedSteps.Add("TenantResolution");
+                               observedSteps.Add("Resolution");
                                await next();
                            });
                            app.Use(async (context, next) =>
                            {
-                               observedSteps.Add("TenantExpiration");
+                               observedSteps.Add("Expiration");
                                await next();
                            });
                            app.Use(async (context, next) =>

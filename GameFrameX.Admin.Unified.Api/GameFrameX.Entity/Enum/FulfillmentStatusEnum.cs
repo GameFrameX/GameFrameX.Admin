@@ -1,7 +1,7 @@
 namespace GameFrameX.Entity.Enum;
 
 /// <summary>
-/// 权益发放状态。权益发货账本（TenantGameOrderFulfillmentEntity）的单笔发放生命周期状态。
+/// 权益发放状态。权益发货账本（GameOrderFulfillmentEntity）的单笔发放生命周期状态。
 /// 与订单 OrderStatusEnum 独立：账本记录「权益实际发放结果」，订单记录「订单交易状态」。
 /// </summary>
 [Description("权益发放状态")]

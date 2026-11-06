@@ -10,7 +10,7 @@ using GameFrameX.Core.Exceptions;
 using GameFrameX.Core.Service.User;
 using GameFrameX.Core.SqlSugar;
 using GameFrameX.Entity.Enum;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 using GameFrameX.Foundation.Orm.Entity;
 using Microsoft.AspNetCore.Http;
 using SqlSugar;
@@ -48,8 +48,8 @@ public sealed class OnlinePenaltyLinkCommandServiceTests : IDisposable
         SqlSugarUnifiedConfig.ConfigureBaseFilters(_db);
         _db.CodeFirst.InitTables(
 
-            typeof(TenantGameAreaEntity),
-            typeof(TenantGamePenaltyEntity));
+            typeof(GameAreaEntity),
+            typeof(GamePenaltyEntity));
     }
 
     /// <summary>
@@ -134,7 +134,7 @@ public sealed class OnlinePenaltyLinkCommandServiceTests : IDisposable
         Assert.False(result.TokenRevokedConfirmed);
 
         // 事实源保持 Active 原状（不因联动失败被改动）——重试入口不变。
-        var penalty = await _db.Queryable<TenantGamePenaltyEntity>().FirstAsync(u => u.Id == penaltyId);
+        var penalty = await _db.Queryable<GamePenaltyEntity>().FirstAsync(u => u.Id == penaltyId);
         Assert.Equal(PenaltyStatusEnum.Active, penalty.Status);
     }
 
@@ -221,10 +221,10 @@ public sealed class OnlinePenaltyLinkCommandServiceTests : IDisposable
     private OnlinePenaltyLinkCommandService CreateService(IOnlineServerClient onlineServerClient)
     {
         var userContext = CreateUserContext(TenantA);
-        var factory = new OnlineScopeContextFactory(Repository<TenantGameAreaEntity>());
+        var factory = new OnlineScopeContextFactory(Repository<GameAreaEntity>());
         return new OnlinePenaltyLinkCommandService(
-            Repository<TenantGamePenaltyEntity>(),
-            Repository<TenantGameAreaEntity>(),
+            Repository<GamePenaltyEntity>(),
+            Repository<GameAreaEntity>(),
             onlineServerClient,
             factory);
     }
@@ -242,7 +242,7 @@ public sealed class OnlinePenaltyLinkCommandServiceTests : IDisposable
 
     private async Task<long> SeedPenaltyAsync(PenaltyActionTypeEnum actionType, long? areaId, string targetId, PenaltyStatusEnum status = PenaltyStatusEnum.Active)
     {
-        var penalty = new TenantGamePenaltyEntity
+        var penalty = new GamePenaltyEntity
         {
             AreaId = areaId,
             TargetType = PenaltyTargetTypeEnum.Account,
@@ -259,9 +259,9 @@ public sealed class OnlinePenaltyLinkCommandServiceTests : IDisposable
         return penalty.Id;
     }
 
-    private static TenantGameAreaEntity NewArea(long id, long now)
+    private static GameAreaEntity NewArea(long id, long now)
     {
-        return new TenantGameAreaEntity
+        return new GameAreaEntity
         {
             Id = id,
             Name = $"area-{id}",

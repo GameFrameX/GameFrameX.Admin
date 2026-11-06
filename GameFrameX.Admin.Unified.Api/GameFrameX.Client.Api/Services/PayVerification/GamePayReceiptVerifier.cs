@@ -38,7 +38,7 @@ public sealed class GamePayReceiptVerifier : IPayReceiptVerifier
     /// <param name="order">待验真订单</param>
     /// <param name="request">验真请求</param>
     /// <returns>验真结果三态</returns>
-    public async Task<GamePayVerifyResponse> VerifyAsync(TenantGameOrderEntity order, GameUserPayVerifyRequest request)
+    public async Task<GamePayVerifyResponse> VerifyAsync(GameOrderEntity order, GameUserPayVerifyRequest request)
     {
         var channelName = MapChannelName(order.PayChannel);
         if (channelName.Length == 0)
@@ -229,7 +229,7 @@ public sealed class GamePayReceiptVerifier : IPayReceiptVerifier
         return third ?? string.Empty;
     }
 
-    private static string GetAccountId(TenantGameOrderEntity order)
+    private static string GetAccountId(GameOrderEntity order)
     {
         if (!string.IsNullOrWhiteSpace(order.AccountId))
         {
@@ -239,7 +239,7 @@ public sealed class GamePayReceiptVerifier : IPayReceiptVerifier
         return order.RoleId;
     }
 
-    private static string GetProductId(TenantGameOrderEntity order)
+    private static string GetProductId(GameOrderEntity order)
     {
         if (!string.IsNullOrWhiteSpace(order.ProductId))
         {

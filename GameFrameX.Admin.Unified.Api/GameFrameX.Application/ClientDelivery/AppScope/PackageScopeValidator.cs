@@ -1,4 +1,4 @@
-using GameFrameX.Entity.Tenant.Game.App;
+using GameFrameX.Entity.Business.Game.App;
 
 namespace GameFrameX.Application.ClientDelivery.AppScope;
 
@@ -9,7 +9,7 @@ public static class PackageScopeValidator
     public const string DefaultPackage = "default";
 
     /// <summary>空值及默认包放行，其它包名必须存在且启用。</summary>
-    public static async Task ValidateAsync(string? package, ISugarQueryable<TenantGameAppPackageEntity> packageQuery)
+    public static async Task ValidateAsync(string? package, ISugarQueryable<GameAppPackageEntity> packageQuery)
     {
         var normalized = string.IsNullOrWhiteSpace(package) ? string.Empty : package.Trim();
         if (normalized.Length == 0 || normalized == DefaultPackage)

@@ -69,7 +69,7 @@ export interface GameLoginTicketKeyRotateRequest {
 }
 
 /** 租户 Game 登录票据签名密钥分页查询输入参数。 */
-export interface PageTenantGameLoginTicketKeyRequest {
+export interface PageGameLoginTicketKeyRequest {
   searchKey?: string | null;
   /**
    * @format int32

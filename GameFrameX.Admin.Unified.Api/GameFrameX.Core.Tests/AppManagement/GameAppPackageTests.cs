@@ -1,4 +1,4 @@
-using GameFrameX.Entity.Tenant.Game.App;
+using GameFrameX.Entity.Business.Game.App;
 using System.ComponentModel.DataAnnotations;
 using GameFrameX.Application.ClientDelivery.GameAppPackage.Dto;
 using GameFrameX.Application.ClientDelivery.GameAppPackage;
@@ -15,7 +15,7 @@ public class GameAppPackageTests
     [Fact]
     public void GameAppPackage_Defaults_AreEnabledAndNotDefault()
     {
-        var package = new TenantGameAppPackageEntity();
+        var package = new GameAppPackageEntity();
 
         Assert.True(package.IsEnabled);
         Assert.False(package.IsDefault);
@@ -38,7 +38,7 @@ public class GameAppPackageTests
     [Fact]
     public void GameAppPackage_CapturesDistributionIdentity()
     {
-        var package = new TenantGameAppPackageEntity
+        var package = new GameAppPackageEntity
         {
             Name = "iOS Global",
             PackageName = "com.demo.game",
@@ -94,7 +94,7 @@ public class GameAppPackageTests
     public void ChannelEnums_UseStableMigrationValues()
     {
         Assert.Equal(1, (int)ChannelScopeEnum.System);
-        Assert.Equal(2, (int)ChannelScopeEnum.Tenant);
+        Assert.Equal(2, (int)ChannelScopeEnum.Business);
         Assert.Equal(1, (int)ChannelTypeEnum.Official);
         Assert.Equal(2, (int)ChannelTypeEnum.Store);
         Assert.Equal(3, (int)ChannelTypeEnum.Ad);
@@ -115,7 +115,7 @@ public class GameAppPackageTests
     [Fact]
     public void GameAppPackage_CapturesParentPackageInheritance()
     {
-        var package = new TenantGameAppPackageEntity
+        var package = new GameAppPackageEntity
         {
             ParentPackageId = 123,
             PackageKind = PackageKindEnum.Derived,
@@ -159,8 +159,8 @@ public class GameAppPackageTests
     public void NormalizePackageKind_WithParent_ForcesDerived()
     {
         // 指定母包即视为子包，Master/Normal 自动纠正为 Derived。
-        var masterDeclared = new TenantGameAppPackageEntity { ParentPackageId = 9201, PackageKind = PackageKindEnum.Master, };
-        var normalDeclared = new TenantGameAppPackageEntity { ParentPackageId = 9201, PackageKind = PackageKindEnum.Normal, };
+        var masterDeclared = new GameAppPackageEntity { ParentPackageId = 9201, PackageKind = PackageKindEnum.Master, };
+        var normalDeclared = new GameAppPackageEntity { ParentPackageId = 9201, PackageKind = PackageKindEnum.Normal, };
 
         GameAppPackageService.NormalizePackageKind(masterDeclared);
         GameAppPackageService.NormalizePackageKind(normalDeclared);
@@ -172,8 +172,8 @@ public class GameAppPackageTests
     [Fact]
     public void NormalizePackageKind_WithoutParent_PreservesDeclaredKind()
     {
-        var master = new TenantGameAppPackageEntity { ParentPackageId = null, PackageKind = PackageKindEnum.Master, };
-        var normal = new TenantGameAppPackageEntity { ParentPackageId = null, PackageKind = PackageKindEnum.Normal, };
+        var master = new GameAppPackageEntity { ParentPackageId = null, PackageKind = PackageKindEnum.Master, };
+        var normal = new GameAppPackageEntity { ParentPackageId = null, PackageKind = PackageKindEnum.Normal, };
 
         GameAppPackageService.NormalizePackageKind(master);
         GameAppPackageService.NormalizePackageKind(normal);

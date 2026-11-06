@@ -239,7 +239,7 @@ public class GameOrderShipService
     /// 创建发货链路的协调器 + 账本表即 Store（占位模板携带订单快照全字段）。
     /// </summary>
     private FulfillmentIdempotencyContext CreateFulfillmentCoordinator(
-        Entity.Tenant.Game.TenantGameOrderEntity order, FulfillmentTypeEnum type, long operatorId, string idempotencyScope)
+        Entity.Business.Game.GameOrderEntity order, FulfillmentTypeEnum type, long operatorId, string idempotencyScope)
     {
         var idempotencyKey = BuildFulfillmentIdempotencyKey(type, order, operatorId);
         var template = BuildFulfillmentTemplate(order, type, GetItemsJson(order), operatorId);
@@ -255,13 +255,13 @@ public class GameOrderShipService
     /// <summary>
     /// 构造占位账本模板（订单快照全字段；并发恰一由账本唯一索引在库层仲裁）。
     /// </summary>
-    private static TenantGameOrderFulfillmentEntity BuildFulfillmentTemplate(
-        Entity.Tenant.Game.TenantGameOrderEntity order, FulfillmentTypeEnum type, string itemsJson, long operatorId)
+    private static GameOrderFulfillmentEntity BuildFulfillmentTemplate(
+        Entity.Business.Game.GameOrderEntity order, FulfillmentTypeEnum type, string itemsJson, long operatorId)
     {
         var now = TimerHelper.UnixTimeSeconds();
         var operatorName = operatorId > 0 ? "admin" : "system";
 
-        return new TenantGameOrderFulfillmentEntity
+        return new GameOrderFulfillmentEntity
         {
             OrderId = order.Id,
             PayChannel = order.PayChannel ?? string.Empty,
@@ -300,7 +300,7 @@ public class GameOrderShipService
     /// </summary>
     private async Task WriteFailureReasonAsync(string idempotencyKey, string failureReason)
     {
-        await _db.Updateable<Entity.Tenant.Game.TenantGameOrderFulfillmentEntity>()
+        await _db.Updateable<Entity.Business.Game.GameOrderFulfillmentEntity>()
                  .SetColumns(u => u.FailureReason == failureReason)
                  .Where(u => u.IdempotencyKey == idempotencyKey)
                  .ExecuteCommandAsync();
@@ -311,7 +311,7 @@ public class GameOrderShipService
     /// </summary>
     private async Task SettleVoidedAsync(string idempotencyKey)
     {
-        await _db.Updateable<Entity.Tenant.Game.TenantGameOrderFulfillmentEntity>()
+        await _db.Updateable<Entity.Business.Game.GameOrderFulfillmentEntity>()
                  .SetColumns(u => u.Status == FulfillmentStatusEnum.Voided)
                  .SetColumns(u => u.FailureReason == null)
                  .Where(u => u.IdempotencyKey == idempotencyKey)
@@ -321,7 +321,7 @@ public class GameOrderShipService
     /// <summary>
     /// 调游戏服 req_player_send_item 发货。ShipAsync 与 CompensateAsync 共用。
     /// </summary>
-    private async Task<SendItemOutcome> SendItemsAsync(Entity.Tenant.Game.TenantGameOrderEntity gameOrderEntity, bool isRecharge, bool forceSandbox)
+    private async Task<SendItemOutcome> SendItemsAsync(Entity.Business.Game.GameOrderEntity gameOrderEntity, bool isRecharge, bool forceSandbox)
     {
         var gameAreaEntity = await GetGameAreaAsync(gameOrderEntity);
         var roleId = await GetRoleIdAsync(gameOrderEntity);
@@ -356,7 +356,7 @@ public class GameOrderShipService
         };
     }
 
-    private static string GetItemsJson(Entity.Tenant.Game.TenantGameOrderEntity gameOrderEntity)
+    private static string GetItemsJson(Entity.Business.Game.GameOrderEntity gameOrderEntity)
     {
         var playerCreateOrderResult = GetPlayerCreateOrderResult(gameOrderEntity);
         return JsonHelper.Serialize(playerCreateOrderResult.RewardsItem, EmbeddedJsonOptions.Instance);
@@ -365,7 +365,7 @@ public class GameOrderShipService
     /// <summary>
     /// 构造权益发货幂等键。规则见 change C113 §3。
     /// </summary>
-    private static string BuildFulfillmentIdempotencyKey(FulfillmentTypeEnum type, Entity.Tenant.Game.TenantGameOrderEntity order, long operatorId)
+    private static string BuildFulfillmentIdempotencyKey(FulfillmentTypeEnum type, Entity.Business.Game.GameOrderEntity order, long operatorId)
     {
         var channel = order.PayChannel ?? string.Empty;
         var providerTx = !string.IsNullOrWhiteSpace(order.ProviderTransactionId)
@@ -388,26 +388,26 @@ public class GameOrderShipService
         }
     }
 
-    private async Task<Entity.Tenant.Game.TenantGameOrderEntity> GetOrderAsync(long orderId)
+    private async Task<Entity.Business.Game.GameOrderEntity> GetOrderAsync(long orderId)
     {
-        return await _db.Queryable<Entity.Tenant.Game.TenantGameOrderEntity>().FirstAsync(u => u.Id == orderId)
+        return await _db.Queryable<Entity.Business.Game.GameOrderEntity>().FirstAsync(u => u.Id == orderId)
                ?? throw BusinessError.Oh(CommonErrorCode.RecordNotFound);
     }
 
-    private async Task<Entity.Tenant.Game.TenantGameAreaEntity> GetGameAreaAsync(Entity.Tenant.Game.TenantGameOrderEntity gameOrderEntity)
+    private async Task<Entity.Business.Game.GameAreaEntity> GetGameAreaAsync(Entity.Business.Game.GameOrderEntity gameOrderEntity)
     {
-        return await _db.Queryable<Entity.Tenant.Game.TenantGameAreaEntity>().Filter(null, true).Where(u => u.IsDeleted == false).FirstAsync(u => u.Id == gameOrderEntity.AreaId)
+        return await _db.Queryable<Entity.Business.Game.GameAreaEntity>().Filter(null, true).Where(u => u.IsDeleted == false).FirstAsync(u => u.Id == gameOrderEntity.AreaId)
                ?? throw new Exception("区服不存在");
     }
 
-    private async Task<long> GetRoleIdAsync(Entity.Tenant.Game.TenantGameOrderEntity gameOrderEntity)
+    private async Task<long> GetRoleIdAsync(Entity.Business.Game.GameOrderEntity gameOrderEntity)
     {
         if (!long.TryParse(gameOrderEntity.RoleId, out var roleId))
         {
             throw new Exception("角色ID无效");
         }
 
-        var gameRoleEntity = await _db.Queryable<Entity.Tenant.Game.TenantGameRoleEntity>().FirstAsync(u => u.Id == roleId);
+        var gameRoleEntity = await _db.Queryable<Entity.Business.Game.GameRoleEntity>().FirstAsync(u => u.Id == roleId);
         if (gameRoleEntity == null)
         {
             throw new Exception("角色不存在");
@@ -416,7 +416,7 @@ public class GameOrderShipService
         return roleId;
     }
 
-    private static PlayerCreateOrderResponse GetPlayerCreateOrderResult(Entity.Tenant.Game.TenantGameOrderEntity gameOrderEntity)
+    private static PlayerCreateOrderResponse GetPlayerCreateOrderResult(Entity.Business.Game.GameOrderEntity gameOrderEntity)
     {
         if (string.IsNullOrWhiteSpace(gameOrderEntity.Content))
         {
@@ -429,7 +429,7 @@ public class GameOrderShipService
 
     private async Task UpdateStatusAsync(long orderId, OrderStatusEnum status)
     {
-        await _db.Updateable<Entity.Tenant.Game.TenantGameOrderEntity>()
+        await _db.Updateable<Entity.Business.Game.GameOrderEntity>()
                  .SetColumns(u => u.Status == status)
                  .Where(u => u.Id == orderId)
                  .ExecuteCommandAsync();
@@ -447,7 +447,7 @@ public class GameOrderShipService
             return;
         }
 
-        await _db.Updateable<Entity.Tenant.Game.TenantGameRoleEntity>()
+        await _db.Updateable<Entity.Business.Game.GameRoleEntity>()
                  .SetColumns(u => u.AllRecharge == (u.AllRecharge ?? 0) + amountInt)
                  .Where(u => u.Id == roleId)
                  .ExecuteCommandAsync();

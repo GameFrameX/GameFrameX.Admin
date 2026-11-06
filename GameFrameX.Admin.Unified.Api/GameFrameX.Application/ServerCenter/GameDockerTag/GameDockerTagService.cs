@@ -8,12 +8,12 @@ namespace GameFrameX.Application.ServerCenter.GameDockerTag;
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
 public class GameDockerTagService
-    : GenericCrudSelectService<Entity.Tenant.Game.TenantGameDockerTagEntity,
-        AddTenantGameDockerTagEntityRequest, UpdateTenantGameDockerTagEntityRequest,
-        GameDockerTagResponse, PageTenantGameDockerTagEntityRequest>
+    : GenericCrudSelectService<Entity.Business.Game.GameDockerTagEntity,
+        AddGameDockerTagEntityRequest, UpdateGameDockerTagEntityRequest,
+        GameDockerTagResponse, PageGameDockerTagEntityRequest>
 {
 
-    public GameDockerTagService(SqlSugarRepository<Entity.Tenant.Game.TenantGameDockerTagEntity> repository)
+    public GameDockerTagService(SqlSugarRepository<Entity.Business.Game.GameDockerTagEntity> repository)
         : base(repository)
     {
     }
@@ -21,7 +21,7 @@ public class GameDockerTagService
     /// <summary>
     /// 更新前验证记录存在。
     /// </summary>
-    protected override async Task OnUpdatingAsync(UpdateTenantGameDockerTagEntityRequest input)
+    protected override async Task OnUpdatingAsync(UpdateGameDockerTagEntityRequest input)
     {
         var existing = await Repository.GetFirstAsync(u => u.Id == input.Id);
         if (existing == null)
@@ -31,7 +31,7 @@ public class GameDockerTagService
 
     }
 
-    protected override ISugarQueryable<GameDockerTagResponse> BuildPageQuery(PageTenantGameDockerTagEntityRequest input)
+    protected override ISugarQueryable<GameDockerTagResponse> BuildPageQuery(PageGameDockerTagEntityRequest input)
     {
         return Repository.AsQueryable()
                          .WhereIF(!string.IsNullOrWhiteSpace(input.Name), u => u.Name.Contains(input.Name.Trim()))

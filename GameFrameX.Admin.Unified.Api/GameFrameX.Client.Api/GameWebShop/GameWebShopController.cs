@@ -20,14 +20,14 @@ namespace GameFrameX.Client.Api.GameWebShop;
 /// <summary>
 /// 网页商城
 /// </summary>
-public class GameWebShopController : BaseController<TenantGameWebShopEntity>
+public class GameWebShopController : BaseController<GameWebShopEntity>
 {
     private readonly HttpClient _httpClientFactory;
 
-    private readonly Repository<TenantGameRoleEntity> _roleService;
-    private readonly Repository<TenantGameAreaEntity> _areaService;
-    private readonly Repository<TenantGameWebShopOrderEntity> _webShopOrderService;
-    private readonly Repository<TenantGameOrderEntity> _gameOrderEntity;
+    private readonly Repository<GameRoleEntity> _roleService;
+    private readonly Repository<GameAreaEntity> _areaService;
+    private readonly Repository<GameWebShopOrderEntity> _webShopOrderService;
+    private readonly Repository<GameOrderEntity> _gameOrderEntity;
     private readonly Repository<SystemConfigEntity> _systemConfigService;
 
     /// <summary>
@@ -52,11 +52,11 @@ public class GameWebShopController : BaseController<TenantGameWebShopEntity>
     /// <param name="systemConfigService"></param>
     public GameWebShopController(
         HttpClient httpClientFactory,
-        SqlSugarRepository<TenantGameWebShopEntity> service,
-        Repository<TenantGameRoleEntity> roleService,
-        Repository<TenantGameAreaEntity> areaService,
-        Repository<TenantGameWebShopOrderEntity> webShopOrderService,
-        Repository<TenantGameOrderEntity> gameOrderEntity,
+        SqlSugarRepository<GameWebShopEntity> service,
+        Repository<GameRoleEntity> roleService,
+        Repository<GameAreaEntity> areaService,
+        Repository<GameWebShopOrderEntity> webShopOrderService,
+        Repository<GameOrderEntity> gameOrderEntity,
         Repository<SystemConfigEntity> systemConfigService) : base(service)
     {
         _httpClientFactory = httpClientFactory;
@@ -85,20 +85,20 @@ public class GameWebShopController : BaseController<TenantGameWebShopEntity>
     /// </summary>
     /// <returns></returns>
     [HttpPost]
-    [ProducesResponseType(200, Type = typeof(TenantGameWebShopEntityBuyResponse))]
-    public async Task<HttpJsonResultData<TenantGameWebShopEntityBuyResponse>> Buy([FromBody] TenantGameWebShopEntityBuyRequest input)
+    [ProducesResponseType(200, Type = typeof(GameWebShopEntityBuyResponse))]
+    public async Task<HttpJsonResultData<GameWebShopEntityBuyResponse>> Buy([FromBody] GameWebShopEntityBuyRequest input)
     {
         var role = await _roleService.GetByIdAsync(input.RoleId);
         //角色不存在
         if (role == null)
         {
-            return GameApiResult.Error<TenantGameWebShopEntityBuyResponse>(GameRoleErrorCode.RoleNotFound, "角色不存在");
+            return GameApiResult.Error<GameWebShopEntityBuyResponse>(GameRoleErrorCode.RoleNotFound, "角色不存在");
         }
 
         //区服不一致
         if (role.AreaId != input.AreaId)
         {
-            return GameApiResult.Error<TenantGameWebShopEntityBuyResponse>(AreaErrorCode.AreaNotFound, "区服不一致");
+            return GameApiResult.Error<GameWebShopEntityBuyResponse>(AreaErrorCode.AreaNotFound, "区服不一致");
         }
 
         var gameAreaEntity = await _areaService.AsQueryable().Filter(null, true).Where(u => u.IsDeleted == false).FirstAsync(u => u.Id == input.AreaId);
@@ -107,20 +107,20 @@ public class GameWebShopController : BaseController<TenantGameWebShopEntity>
                                     || gameAreaEntity.ServerStatus == GameServerStatus.Offline
                                     || gameAreaEntity.ServerStatus == GameServerStatus.Maintenance)
         {
-            return GameApiResult.Error<TenantGameWebShopEntityBuyResponse>(AreaErrorCode.AreaCannotBuy, "当前状态不能购买");
+            return GameApiResult.Error<GameWebShopEntityBuyResponse>(AreaErrorCode.AreaCannotBuy, "当前状态不能购买");
         }
 
         //查询商品
         var shop = await PRepository.GetAsync(g => g.Id == input.Id && g.IsUp);
         if (shop == null)
         {
-            return GameApiResult.Error<TenantGameWebShopEntityBuyResponse>(OrderErrorCode.WebShopNotFound, "商品不存在");
+            return GameApiResult.Error<GameWebShopEntityBuyResponse>(OrderErrorCode.WebShopNotFound, "商品不存在");
         }
 
         //判断支付方式
         if (input.Type == "")
         {
-            return GameApiResult.Error<TenantGameWebShopEntityBuyResponse>(OrderErrorCode.WebShopNotFound, "支付方式不正确");
+            return GameApiResult.Error<GameWebShopEntityBuyResponse>(OrderErrorCode.WebShopNotFound, "支付方式不正确");
         }
 
         var param = new Dictionary<string, string>();
@@ -132,7 +132,7 @@ public class GameWebShopController : BaseController<TenantGameWebShopEntity>
         var systemConfig = await _systemConfigService.GetAsync(g => g.Code == "web_shop_params");
         if (systemConfig == null)
         {
-            return GameApiResult.Error<TenantGameWebShopEntityBuyResponse>(AreaErrorCode.AreaCannotBuy, "订单服务器参数错误");
+            return GameApiResult.Error<GameWebShopEntityBuyResponse>(AreaErrorCode.AreaCannotBuy, "订单服务器参数错误");
         }
 
         try
@@ -140,7 +140,7 @@ public class GameWebShopController : BaseController<TenantGameWebShopEntity>
             var systemConfigParams = JsonHelper.Deserialize<GameWebConfig>(systemConfig.Value);
             if (!decimal.TryParse(shop.RealPrice, out var realPrice))
             {
-                return GameApiResult.Error<TenantGameWebShopEntityBuyResponse>(OrderErrorCode.WebShopNotFound, "商品价格不正确");
+                return GameApiResult.Error<GameWebShopEntityBuyResponse>(OrderErrorCode.WebShopNotFound, "商品价格不正确");
             }
 
             // out_trade_no 用 Foundation 雪花 ID 作全局幂等键（替代时间戳+随机数，回调按其查重防重放）
@@ -153,7 +153,7 @@ public class GameWebShopController : BaseController<TenantGameWebShopEntity>
             var notifyUrl = PublicCallbackNotifyUrlBuilder.Build(systemConfigParams.NotifyUrl, WebShopNotifyCallbackRoute, PaymentOptionSettingProvider.GetCurrentPackageId(HttpContext));
             if (notifyUrl == null)
             {
-                return GameApiResult.Error<TenantGameWebShopEntityBuyResponse>(AreaErrorCode.AreaCannotBuy, "支付回调地址配置无效，无法构造完整支付回调路由");
+                return GameApiResult.Error<GameWebShopEntityBuyResponse>(AreaErrorCode.AreaCannotBuy, "支付回调地址配置无效，无法构造完整支付回调路由");
             }
 
             postParams["notify_url"] = notifyUrl;
@@ -167,7 +167,7 @@ public class GameWebShopController : BaseController<TenantGameWebShopEntity>
             // 预创建 Unpaid 订单落参数快照，回调只信此单；预创建失败则不向网关提交
             if (!await InsertPreCreatedOrderAsync(input, role, shop, outTradeNo, realPrice))
             {
-                return GameApiResult.Error<TenantGameWebShopEntityBuyResponse>(OrderErrorCode.WebShopNotFound, "预创建订单失败");
+                return GameApiResult.Error<GameWebShopEntityBuyResponse>(OrderErrorCode.WebShopNotFound, "预创建订单失败");
             }
 
             // 发送POST请求
@@ -180,20 +180,20 @@ public class GameWebShopController : BaseController<TenantGameWebShopEntity>
                 var match = regex.Match(responseContent);
                 if (match.Success)
                 {
-                    var output = new TenantGameWebShopEntityBuyResponse();
+                    var output = new GameWebShopEntityBuyResponse();
                     output.Html = "https://zlpay.zilancreative.com" + match.Groups[1].Value;
                     output.OrderId = postParams["out_trade_no"];
-                    return HttpJsonResultData<TenantGameWebShopEntityBuyResponse>.Success(output);
+                    return HttpJsonResultData<GameWebShopEntityBuyResponse>.Success(output);
                 }
 
-                return GameApiResult.Error<TenantGameWebShopEntityBuyResponse>(OrderErrorCode.WebShopNotFound, responseContent);
+                return GameApiResult.Error<GameWebShopEntityBuyResponse>(OrderErrorCode.WebShopNotFound, responseContent);
             }
 
-            return GameApiResult.Error<TenantGameWebShopEntityBuyResponse>(OrderErrorCode.WebShopNotFound, JsonHelper.Serialize(response));
+            return GameApiResult.Error<GameWebShopEntityBuyResponse>(OrderErrorCode.WebShopNotFound, JsonHelper.Serialize(response));
         }
         catch (Exception e)
         {
-            return GameApiResult.Error<TenantGameWebShopEntityBuyResponse>(OrderErrorCode.WebShopNotFound, JsonHelper.Serialize(e));
+            return GameApiResult.Error<GameWebShopEntityBuyResponse>(OrderErrorCode.WebShopNotFound, JsonHelper.Serialize(e));
         }
     }
 
@@ -208,7 +208,7 @@ public class GameWebShopController : BaseController<TenantGameWebShopEntity>
     /// <returns></returns>
     [PublicCallbackEndpoint("webshop", "payment")]
     [HttpGet("{packageId:long?}")]
-    public async Task<HttpJsonResultData<BaseOperationAckResponse>> NotifyWebShop([FromQuery] TenantGameWebShopEntityBuyNotifyRequest data)
+    public async Task<HttpJsonResultData<BaseOperationAckResponse>> NotifyWebShop([FromQuery] GameWebShopEntityBuyNotifyRequest data)
     {
         if (data.TradeStatus != "TRADE_SUCCESS")
         {
@@ -275,7 +275,7 @@ public class GameWebShopController : BaseController<TenantGameWebShopEntity>
             var newList = new List<PropertyItemResponse>();
             foreach (var propertyItem in snapshotItems)
             {
-                var gameGoodsEntity = await PRepository.AsSugarClient().Queryable<TenantGameGoodsEntity>().SingleAsync(m => m.Id == propertyItem.Id);
+                var gameGoodsEntity = await PRepository.AsSugarClient().Queryable<GameGoodsEntity>().SingleAsync(m => m.Id == propertyItem.Id);
                 if (gameGoodsEntity != null)
                 {
                     propertyItem.Id = gameGoodsEntity.ConfigId;
@@ -283,7 +283,7 @@ public class GameWebShopController : BaseController<TenantGameWebShopEntity>
                 }
             }
 
-            var entity = new TenantGameWebShopOrderEntity
+            var entity = new GameWebShopOrderEntity
             {
                 RoleId = roleId,
                 AreaId = areaId,
@@ -446,7 +446,7 @@ public class GameWebShopController : BaseController<TenantGameWebShopEntity>
     /// <param name="outTradeNo">雪花 ID 幂等键。</param>
     /// <param name="realPrice">实付金额（元，已 TryParse 校验）。</param>
     /// <returns>预创建是否成功。</returns>
-    private async Task<bool> InsertPreCreatedOrderAsync(TenantGameWebShopEntityBuyRequest input, TenantGameRoleEntity role, TenantGameWebShopEntity shop, string outTradeNo, decimal realPrice)
+    private async Task<bool> InsertPreCreatedOrderAsync(GameWebShopEntityBuyRequest input, GameRoleEntity role, GameWebShopEntity shop, string outTradeNo, decimal realPrice)
     {
         var snapshot = new PlayerCreateOrderResponse
         {
@@ -456,7 +456,7 @@ public class GameWebShopController : BaseController<TenantGameWebShopEntity>
             IsNeedPay = true,
             RewardsItem = JsonHelper.Deserialize<List<PropertyItemResponse>>(shop.ItemJson) ?? new List<PropertyItemResponse>(),
         };
-        var order = new TenantGameOrderEntity
+        var order = new GameOrderEntity
         {
             Sku = input.Id,
             AreaId = input.AreaId,
@@ -481,7 +481,7 @@ public class GameWebShopController : BaseController<TenantGameWebShopEntity>
     /// </summary>
     /// <param name="data">网关回传参数。</param>
     /// <returns>参与 MD5 签名的业务参数字典。</returns>
-    private static Dictionary<string, string> BuildNotifySignParameters(TenantGameWebShopEntityBuyNotifyRequest data)
+    private static Dictionary<string, string> BuildNotifySignParameters(GameWebShopEntityBuyNotifyRequest data)
     {
         return new Dictionary<string, string>
         {
@@ -506,7 +506,7 @@ public class GameWebShopController : BaseController<TenantGameWebShopEntity>
     /// <param name="reason">失败原因。</param>
     private async Task InsertFailedWebShopOrderAsync(string outTradeNo, long roleId, long areaId, long gameShopId, string reason)
     {
-        await _webShopOrderService.InsertAsync(new TenantGameWebShopOrderEntity
+        await _webShopOrderService.InsertAsync(new GameWebShopOrderEntity
         {
             RoleId = roleId,
             AreaId = areaId,

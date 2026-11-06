@@ -11,11 +11,11 @@ public sealed class OnlineServerClient : IOnlineServerClient
 {
     private readonly HttpClient _httpClient;
     private readonly IOnlineServerEndpointResolver _endpointResolver;
-    private readonly SqlSugarRepository<TenantGameAreaEntity> _gameAreaRepository;
+    private readonly SqlSugarRepository<GameAreaEntity> _gameAreaRepository;
 
     public OnlineServerClient(HttpClient httpClient,
         IOnlineServerEndpointResolver endpointResolver,
-        SqlSugarRepository<TenantGameAreaEntity> gameAreaRepository)
+        SqlSugarRepository<GameAreaEntity> gameAreaRepository)
     {
         _httpClient = httpClient;
         _endpointResolver = endpointResolver;

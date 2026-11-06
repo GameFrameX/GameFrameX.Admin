@@ -8,16 +8,16 @@ namespace GameFrameX.Application.Audit.Logging;
 /// 系统异常日志服务。统一查询主库新日志与历史日志。
 /// </summary>
 [ApiDescriptionSettings(Order = 350)]
-public class LogExceptionService : BaseLogService<SystemLogExceptionEntity, TenantLogExceptionEntity, LogOperationFields>
+public class LogExceptionService : BaseLogService<SystemLogExceptionEntity, LogExceptionEntity, LogOperationFields>
 {
     /// <summary>
     /// 构造函数
     /// </summary>
     /// <param name="systemLogExceptionRepository">平台异常日志仓储（主库）</param>
-    /// <param name="tenantLogExceptionRepository">租户异常日志仓储（当前租户库）</param>
+    /// <param name="logExceptionRepository">租户异常日志仓储（当前租户库）</param>
     /// <param name="currentUserContext">当前登录用户</param>
-    public LogExceptionService(SqlSugarRepository<SystemLogExceptionEntity> systemLogExceptionRepository, SqlSugarRepository<TenantLogExceptionEntity> tenantLogExceptionRepository, CurrentUserContext currentUserContext)
-        : base(systemLogExceptionRepository, tenantLogExceptionRepository, currentUserContext)
+    public LogExceptionService(SqlSugarRepository<SystemLogExceptionEntity> systemLogExceptionRepository, SqlSugarRepository<LogExceptionEntity> logExceptionRepository, CurrentUserContext currentUserContext)
+        : base(systemLogExceptionRepository, logExceptionRepository, currentUserContext)
     {
     }
 

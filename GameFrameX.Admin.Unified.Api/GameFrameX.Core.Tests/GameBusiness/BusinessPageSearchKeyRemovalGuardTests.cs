@@ -71,7 +71,7 @@ public sealed class BusinessPageSearchKeyRemovalGuardTests
     public void RoleAndUserPageRequests_HaveNoSearchKeyShadowing()
     {
         // 回归 BasePageRequest.SearchKey 基类字段后，分页 DTO 本地不得再出现任何 SearchKey 声明（含 new 遮蔽）。
-        var source = ReadSource("PageTenantGameRoleEntityRequest") + "\n" + ReadSource("PageTenantGameUserEntityRequest");
+        var source = ReadSource("PageGameRoleEntityRequest") + "\n" + ReadSource("PageGameUserEntityRequest");
         Assert.DoesNotContain("SearchKey", source, StringComparison.Ordinal);
     }
 
@@ -79,7 +79,7 @@ public sealed class BusinessPageSearchKeyRemovalGuardTests
     public void TimeJob_KeepsExplicitNameCondition()
     {
         // TimeJob 原本没有 SearchKey 条件（前端关键词框是死 UI）：删除关键词框的同时补 Name 明确条件 + DTO 属性。
-        var requestSource = ReadSource("PageTenantGameTimeJobEntityRequest");
+        var requestSource = ReadSource("PageGameTimeJobEntityRequest");
         Assert.Contains("public string Name", requestSource, StringComparison.Ordinal);
         Assert.DoesNotContain("SearchKey", requestSource, StringComparison.Ordinal);
 

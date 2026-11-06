@@ -6,7 +6,7 @@ using GameFrameX.Client.Api.GameWebShop.Dto;
 using GameFrameX.Core.Enum;
 using GameFrameX.Entity.Enum;
 using GameFrameX.Entity.System;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 using GameFrameX.Foundation.Http.Normalization;
 using GameFrameX.Foundation.Json;
 using Microsoft.AspNetCore.Mvc;
@@ -46,7 +46,7 @@ public sealed class ClientApiWebShopEndpointTests
         var controller = CreateController(db, handler);
         controller.ControllerContext = new ControllerContext { HttpContext = db.CreateHttpContext(true, true, 7001), };
 
-        var result = await controller.Buy(new TenantGameWebShopEntityBuyRequest
+        var result = await controller.Buy(new GameWebShopEntityBuyRequest
         {
             Id = 5001,
             AreaId = 2001,
@@ -74,7 +74,7 @@ public sealed class ClientApiWebShopEndpointTests
         var controller = CreateController(db, handler);
         controller.ControllerContext = new ControllerContext { HttpContext = db.CreateHttpContext(true, true, 7001), };
 
-        var result = await controller.Buy(new TenantGameWebShopEntityBuyRequest
+        var result = await controller.Buy(new GameWebShopEntityBuyRequest
         {
             Id = 5001,
             AreaId = 2001,
@@ -103,7 +103,7 @@ public sealed class ClientApiWebShopEndpointTests
         var controller = CreateController(db, handler);
         db.AttachContext(controller);
 
-        var result = await controller.Buy(new TenantGameWebShopEntityBuyRequest
+        var result = await controller.Buy(new GameWebShopEntityBuyRequest
         {
             Id = 5001,
             AreaId = 2001,
@@ -115,7 +115,7 @@ public sealed class ClientApiWebShopEndpointTests
         // 无法映射到回调路由的地址在下单前拒绝：不提交网关、不预创建订单
         Assert.Equal((int)AreaErrorCode.AreaCannotBuy, ClientApiResultReader.Code(root));
         Assert.DoesNotContain("/submit.php", handler.RequestPaths);
-        Assert.Equal(0, await db.MainDb.Queryable<TenantGameOrderEntity>().CountAsync());
+        Assert.Equal(0, await db.MainDb.Queryable<GameOrderEntity>().CountAsync());
     }
 
     [Fact]
@@ -130,7 +130,7 @@ public sealed class ClientApiWebShopEndpointTests
         var controller = CreateController(db);
         db.AttachContext(controller, includeApp: false);
 
-        var result = await controller.Buy(new TenantGameWebShopEntityBuyRequest
+        var result = await controller.Buy(new GameWebShopEntityBuyRequest
         {
             Id = 5001,
             AreaId = 2001,
@@ -155,7 +155,7 @@ public sealed class ClientApiWebShopEndpointTests
         var controller = CreateController(db, handler);
         db.AttachContext(controller);
 
-        var result = await controller.Buy(new TenantGameWebShopEntityBuyRequest
+        var result = await controller.Buy(new GameWebShopEntityBuyRequest
         {
             Id = 5001,
             AreaId = 2001,
@@ -165,7 +165,7 @@ public sealed class ClientApiWebShopEndpointTests
 
         var root = ClientApiResultReader.Read(result);
         Assert.Equal(0, ClientApiResultReader.Code(root));
-        Assert.Equal(1, await db.MainDb.Queryable<TenantGameOrderEntity>().CountAsync());
+        Assert.Equal(1, await db.MainDb.Queryable<GameOrderEntity>().CountAsync());
         Assert.Contains(handler.RequestBodies, requestBody => requestBody.Contains("NotifyWebShop", StringComparison.Ordinal));
     }
 
@@ -187,8 +187,8 @@ public sealed class ClientApiWebShopEndpointTests
         var result = await controller.NotifyWebShop(BuildSignedNotifyRequest(outTradeNo, 6.50m, "sign-secret"));
 
         var root = ClientApiResultReader.Read(result);
-        var order = await db.TenantDb.Queryable<TenantGameOrderEntity>().FirstAsync(u => u.OrderId == outTradeNo);
-        var role = await db.TenantDb.Queryable<TenantGameRoleEntity>().FirstAsync(u => u.Id == 3001);
+        var order = await db.TenantDb.Queryable<GameOrderEntity>().FirstAsync(u => u.OrderId == outTradeNo);
+        var role = await db.TenantDb.Queryable<GameRoleEntity>().FirstAsync(u => u.Id == 3001);
         Assert.Equal(0, ClientApiResultReader.Code(root));
         Assert.Equal(OrderStatusEnum.Shipped, order.Status);
         Assert.Equal(650, role.AllRecharge);
@@ -215,9 +215,9 @@ public sealed class ClientApiWebShopEndpointTests
         var result = await controller.NotifyWebShop(BuildSignedNotifyRequest(outTradeNo, 6.50m, "sign-secret", "forged-sign"));
 
         var root = ClientApiResultReader.Read(result);
-        var order = await db.TenantDb.Queryable<TenantGameOrderEntity>().FirstAsync(u => u.OrderId == outTradeNo);
-        var role = await db.TenantDb.Queryable<TenantGameRoleEntity>().FirstAsync(u => u.Id == 3001);
-        var failedOrders = await db.TenantDb.Queryable<TenantGameWebShopOrderEntity>().ToListAsync();
+        var order = await db.TenantDb.Queryable<GameOrderEntity>().FirstAsync(u => u.OrderId == outTradeNo);
+        var role = await db.TenantDb.Queryable<GameRoleEntity>().FirstAsync(u => u.Id == 3001);
+        var failedOrders = await db.TenantDb.Queryable<GameWebShopOrderEntity>().ToListAsync();
         // 验签缺省强制：伪造签名一律拒绝且不发货（不再有 log 灰度放行）
         Assert.Equal((int)AuthErrorCode.SignatureVerifyFailed, ClientApiResultReader.Code(root));
         Assert.Equal(OrderStatusEnum.Unpaid, order.Status);
@@ -247,8 +247,8 @@ public sealed class ClientApiWebShopEndpointTests
         var result = await controller.NotifyWebShop(BuildSignedNotifyRequest(outTradeNo, 6.50m, "sign-secret"));
 
         var root = ClientApiResultReader.Read(result);
-        var order = await db.TenantDb.Queryable<TenantGameOrderEntity>().FirstAsync(u => u.OrderId == outTradeNo);
-        var role = await db.TenantDb.Queryable<TenantGameRoleEntity>().FirstAsync(u => u.Id == 3001);
+        var order = await db.TenantDb.Queryable<GameOrderEntity>().FirstAsync(u => u.OrderId == outTradeNo);
+        var role = await db.TenantDb.Queryable<GameRoleEntity>().FirstAsync(u => u.Id == 3001);
         Assert.Equal(0, ClientApiResultReader.Code(root));
         Assert.Equal(OrderStatusEnum.Shipped, order.Status);
         Assert.Equal(650, role.AllRecharge);
@@ -276,9 +276,9 @@ public sealed class ClientApiWebShopEndpointTests
         var outTradeNo = await SeedUnpaidOrderAsync(db);
         var failed = ClientApiResultReader.Read(await controller.NotifyWebShop(BuildSignedNotifyRequest(outTradeNo, 6.50m, "sign-secret")));
 
-        var orderAfterFailure = await db.TenantDb.Queryable<TenantGameOrderEntity>().FirstAsync(u => u.OrderId == outTradeNo);
-        var roleAfterFailure = await db.TenantDb.Queryable<TenantGameRoleEntity>().FirstAsync(u => u.Id == 3001);
-        var failedRows = await db.TenantDb.Queryable<TenantGameWebShopOrderEntity>().ToListAsync();
+        var orderAfterFailure = await db.TenantDb.Queryable<GameOrderEntity>().FirstAsync(u => u.OrderId == outTradeNo);
+        var roleAfterFailure = await db.TenantDb.Queryable<GameRoleEntity>().FirstAsync(u => u.Id == 3001);
+        var failedRows = await db.TenantDb.Queryable<GameWebShopOrderEntity>().ToListAsync();
         // 发货失败：订单不能停在已完成，保留 NotShipped 可重试状态，累充不增加
         Assert.Equal((int)AreaErrorCode.AreaCannotBuy, ClientApiResultReader.Code(failed));
         Assert.Equal(OrderStatusEnum.NotShipped, orderAfterFailure.Status);
@@ -289,8 +289,8 @@ public sealed class ClientApiWebShopEndpointTests
         handler.SetJson("/game/api/post_mail", HttpJsonResultData<string>.Success(JsonHelper.Serialize(new GameWebShpBuySendMailResponse { ErrorCode = 0, })).ToString());
         var retried = ClientApiResultReader.Read(await controller.NotifyWebShop(BuildSignedNotifyRequest(outTradeNo, 6.50m, "sign-secret")));
 
-        var orderAfterRetry = await db.TenantDb.Queryable<TenantGameOrderEntity>().FirstAsync(u => u.OrderId == outTradeNo);
-        var roleAfterRetry = await db.TenantDb.Queryable<TenantGameRoleEntity>().FirstAsync(u => u.Id == 3001);
+        var orderAfterRetry = await db.TenantDb.Queryable<GameOrderEntity>().FirstAsync(u => u.OrderId == outTradeNo);
+        var roleAfterRetry = await db.TenantDb.Queryable<GameRoleEntity>().FirstAsync(u => u.Id == 3001);
         Assert.Equal(0, ClientApiResultReader.Code(retried));
         Assert.Equal(OrderStatusEnum.Shipped, orderAfterRetry.Status);
         Assert.Equal(650, roleAfterRetry.AllRecharge);
@@ -316,8 +316,8 @@ public sealed class ClientApiWebShopEndpointTests
         var first = ClientApiResultReader.Read(await controller.NotifyWebShop(request));
         var second = ClientApiResultReader.Read(await controller.NotifyWebShop(request));
 
-        var order = await db.TenantDb.Queryable<TenantGameOrderEntity>().FirstAsync(u => u.OrderId == outTradeNo);
-        var role = await db.TenantDb.Queryable<TenantGameRoleEntity>().FirstAsync(u => u.Id == 3001);
+        var order = await db.TenantDb.Queryable<GameOrderEntity>().FirstAsync(u => u.OrderId == outTradeNo);
+        var role = await db.TenantDb.Queryable<GameRoleEntity>().FirstAsync(u => u.Id == 3001);
         Assert.Equal(0, ClientApiResultReader.Code(first));
         Assert.Equal(0, ClientApiResultReader.Code(second));
         Assert.Equal(OrderStatusEnum.Shipped, order.Status);
@@ -345,8 +345,8 @@ public sealed class ClientApiWebShopEndpointTests
         var result = await controller.NotifyWebShop(BuildSignedNotifyRequest(outTradeNo, 6.50m, "sign-secret"));
 
         var root = ClientApiResultReader.Read(result);
-        var order = await db.TenantDb.Queryable<TenantGameOrderEntity>().FirstAsync(u => u.OrderId == outTradeNo);
-        var role = await db.TenantDb.Queryable<TenantGameRoleEntity>().FirstAsync(u => u.Id == 3001);
+        var order = await db.TenantDb.Queryable<GameOrderEntity>().FirstAsync(u => u.OrderId == outTradeNo);
+        var role = await db.TenantDb.Queryable<GameRoleEntity>().FirstAsync(u => u.Id == 3001);
         Assert.Equal(0, ClientApiResultReader.Code(root));
         Assert.Equal(status, order.Status);
         Assert.Equal(0, role.AllRecharge);
@@ -371,9 +371,9 @@ public sealed class ClientApiWebShopEndpointTests
         var result = await controller.NotifyWebShop(BuildSignedNotifyRequest(outTradeNo, 1.00m, "sign-secret"));
 
         var root = ClientApiResultReader.Read(result);
-        var order = await db.TenantDb.Queryable<TenantGameOrderEntity>().FirstAsync(u => u.OrderId == outTradeNo);
-        var role = await db.TenantDb.Queryable<TenantGameRoleEntity>().FirstAsync(u => u.Id == 3001);
-        var failedOrders = await db.TenantDb.Queryable<TenantGameWebShopOrderEntity>().ToListAsync();
+        var order = await db.TenantDb.Queryable<GameOrderEntity>().FirstAsync(u => u.OrderId == outTradeNo);
+        var role = await db.TenantDb.Queryable<GameRoleEntity>().FirstAsync(u => u.Id == 3001);
+        var failedOrders = await db.TenantDb.Queryable<GameWebShopOrderEntity>().ToListAsync();
         Assert.Equal((int)OrderErrorCode.NotifyAmountMismatch, ClientApiResultReader.Code(root));
         Assert.Equal(OrderStatusEnum.Unpaid, order.Status);
         Assert.Equal(0, role.AllRecharge);
@@ -399,9 +399,9 @@ public sealed class ClientApiWebShopEndpointTests
         var result = await controller.NotifyWebShop(BuildSignedNotifyRequest("999999999999999999", 6.50m, "sign-secret"));
 
         var root = ClientApiResultReader.Read(result);
-        var orderCount = await db.TenantDb.Queryable<TenantGameOrderEntity>().CountAsync(u => u.OrderId == "999999999999999999");
-        var role = await db.TenantDb.Queryable<TenantGameRoleEntity>().FirstAsync(u => u.Id == 3001);
-        var failedOrders = await db.TenantDb.Queryable<TenantGameWebShopOrderEntity>().ToListAsync();
+        var orderCount = await db.TenantDb.Queryable<GameOrderEntity>().CountAsync(u => u.OrderId == "999999999999999999");
+        var role = await db.TenantDb.Queryable<GameRoleEntity>().FirstAsync(u => u.Id == 3001);
+        var failedOrders = await db.TenantDb.Queryable<GameWebShopOrderEntity>().ToListAsync();
         Assert.Equal((int)OrderErrorCode.NotifyOrderNotFound, ClientApiResultReader.Code(root));
         Assert.Equal(0, orderCount);
         Assert.Equal(0, role.AllRecharge);
@@ -416,7 +416,7 @@ public sealed class ClientApiWebShopEndpointTests
         var controller = CreateController(db);
         db.AttachContext(controller, includeApp: false);
 
-        var result = await controller.NotifyWebShop(new TenantGameWebShopEntityBuyNotifyRequest { OutTradeNo = "unknown-order", TradeStatus = "TRADE_SUCCESS", });
+        var result = await controller.NotifyWebShop(new GameWebShopEntityBuyNotifyRequest { OutTradeNo = "unknown-order", TradeStatus = "TRADE_SUCCESS", });
 
         var root = ClientApiResultReader.Read(result);
         Assert.Equal((int)AreaErrorCode.AreaCannotBuy, ClientApiResultReader.Code(root));
@@ -427,7 +427,7 @@ public sealed class ClientApiWebShopEndpointTests
     private static async Task<string> SeedUnpaidOrderAsync(ClientApiTestDb db, OrderStatusEnum status = OrderStatusEnum.Unpaid)
     {
         const string orderId = "800000000000001";
-        await db.MainDb.Insertable(new TenantGameOrderEntity
+        await db.MainDb.Insertable(new GameOrderEntity
         {
             Id = 800000000000001,
             OrderId = orderId,
@@ -459,13 +459,13 @@ public sealed class ClientApiWebShopEndpointTests
     /// <summary>
     /// 按易支付 MD5 口径构造带正确签名的回调请求，模拟 zlpay notify 合法回传；overrideSign 用于伪造签名场景。
     /// </summary>
-    private static TenantGameWebShopEntityBuyNotifyRequest BuildSignedNotifyRequest(
+    private static GameWebShopEntityBuyNotifyRequest BuildSignedNotifyRequest(
         string outTradeNo,
         decimal money,
         string signKey,
         string? overrideSign = null)
     {
-        var request = new TenantGameWebShopEntityBuyNotifyRequest
+        var request = new GameWebShopEntityBuyNotifyRequest
         {
             Pid = 1001,
             TradeNo = "provider-" + outTradeNo,
@@ -484,7 +484,7 @@ public sealed class ClientApiWebShopEndpointTests
     /// <summary>
     /// 与 NotifyWebShop 验签侧同口径重建回传业务参数字典（money 用 invariant 无尾零格式，排除 sign/sign_type）。
     /// </summary>
-    private static Dictionary<string, string> BuildNotifySignParameters(TenantGameWebShopEntityBuyNotifyRequest request)
+    private static Dictionary<string, string> BuildNotifySignParameters(GameWebShopEntityBuyNotifyRequest request)
     {
         return new Dictionary<string, string>
         {
@@ -501,21 +501,21 @@ public sealed class ClientApiWebShopEndpointTests
 
     private static GameWebShopController CreateController(ClientApiTestDb db, ClientApiRecordingHttpHandler? handler = null)
     {
-        db.InitTenantTables(
-            typeof(TenantGameWebShopEntity),
-            typeof(TenantGameRoleEntity),
-            typeof(TenantGameAreaEntity),
-            typeof(TenantGameWebShopOrderEntity),
-            typeof(TenantGameOrderEntity),
-            typeof(TenantGameGoodsEntity),
+        db.InitBusinessTables(
+            typeof(GameWebShopEntity),
+            typeof(GameRoleEntity),
+            typeof(GameAreaEntity),
+            typeof(GameWebShopOrderEntity),
+            typeof(GameOrderEntity),
+            typeof(GameGoodsEntity),
             typeof(SystemConfigEntity));
         return new GameWebShopController(
             new HttpClient(handler ?? ClientApiRecordingHttpHandler.WithGameServerDefaults(), false),
-            db.Repository<TenantGameWebShopEntity>(),
-            db.Repository<TenantGameRoleEntity>(),
-            db.Repository<TenantGameAreaEntity>(),
-            db.Repository<TenantGameWebShopOrderEntity>(),
-            db.Repository<TenantGameOrderEntity>(),
+            db.Repository<GameWebShopEntity>(),
+            db.Repository<GameRoleEntity>(),
+            db.Repository<GameAreaEntity>(),
+            db.Repository<GameWebShopOrderEntity>(),
+            db.Repository<GameOrderEntity>(),
             db.Repository<SystemConfigEntity>());
     }
 

@@ -1,7 +1,7 @@
 using System.Text.Json.Nodes;
 using GameFrameX.Core.Extension.Const;
 using GameFrameX.Core.Service.PlatformLogging;
-using GameFrameX.Core.Service.Tenant;
+using GameFrameX.Core.Service.Business;
 using GameFrameX.Entity.Enum;
 using GameFrameX.Entity.System;
 using GameFrameX.Entity.Log;
@@ -162,7 +162,7 @@ public class DatabaseLoggingWriter : IDatabaseLoggingWriter, IDisposable
     }
 
     /// <summary>
-    /// 填充访问日志公共字段（SystemLogVisitEntity / TenantLogVisitEntity 共享 LogVisitFields）。
+    /// 填充访问日志公共字段（SystemLogVisitEntity / LogVisitEntity 共享 LogVisitFields）。
     /// </summary>
     private static void FillVisitFields(LogVisitFields target, LogContext ctx)
     {
@@ -186,7 +186,7 @@ public class DatabaseLoggingWriter : IDatabaseLoggingWriter, IDisposable
     }
 
     /// <summary>
-    /// 填充操作/异常日志公共字段（SystemLogOperationEntity/Exception、TenantLogOperationEntity/Exception 共享 LogOperationFields）。
+    /// 填充操作/异常日志公共字段（SystemLogOperationEntity/Exception、LogOperationEntity/Exception 共享 LogOperationFields）。
     /// Exception 字段由调用方按日志种类决定（异常日志始终序列化，操作日志空值保持 null）。
     /// </summary>
     private static void FillOperationFields(LogOperationFields target, LogContext ctx)

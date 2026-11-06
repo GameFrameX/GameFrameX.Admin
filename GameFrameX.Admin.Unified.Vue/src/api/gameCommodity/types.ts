@@ -2,13 +2,13 @@
 /* tslint:disable */
 
 /** 游戏商品交易增加输入参数 */
-export interface AddTenantGameCommodityEntityRequest {
+export interface AddGameCommodityEntityRequest {
   /**
    * 状态
    * @minLength 1
    */
   status: string;
-  /** 类别Id。引用 TenantGameGoodsCatalogueEntity.Id；Id 后缀契约兼容数字/字符串提交。 */
+  /** 类别Id。引用 GameGoodsCatalogueEntity.Id；Id 后缀契约兼容数字/字符串提交。 */
   categoryId: string;
   /** 多少rmb */
   cost: boolean;
@@ -69,7 +69,7 @@ export interface GameCommodityResponseSqlSugarPagedList {
 }
 
 /** 游戏商品交易分页查询输入参数 */
-export interface PageTenantGameCommodityEntityRequest {
+export interface PageGameCommodityEntityRequest {
   searchKey?: string | null;
   /**
    * @format int32
@@ -103,7 +103,7 @@ export interface PageTenantGameCommodityEntityRequest {
 }
 
 /** 游戏商品交易更新输入参数 */
-export interface UpdateTenantGameCommodityEntityRequest {
+export interface UpdateGameCommodityEntityRequest {
   /**
    * @min 1
    * @max 9223372036854776000

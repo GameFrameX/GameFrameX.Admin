@@ -8,7 +8,7 @@ using GameFrameX.Client.Api.GameUserArchive.Dto;
 using GameFrameX.Client.Api.GameUserRace.Dto;
 using GameFrameX.Client.Api.Services;
 using GameFrameX.Core.SqlSugar;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GameFrameX.Core.Tests.GameApi;
@@ -144,9 +144,9 @@ public sealed class GameUserRaceTests
     {
         using (var db = new ClientApiTestDb())
         {
-            db.InitTenantTables(typeof(TenantGameUserArchiveEntity));
-            var tenantDbProvider = db.MainDb;
-            var archiveRepository = new Repository<TenantGameUserArchiveEntity>(db.MainDb);
+            db.InitBusinessTables(typeof(GameUserArchiveEntity));
+            var dbProvider = db.MainDb;
+            var archiveRepository = new Repository<GameUserArchiveEntity>(db.MainDb);
             var archiveController = new GameUserArchiveController(archiveRepository);
             await archiveController.Upload(MakeUpload(9101, "real_a", "icon_a"));
             await archiveController.Upload(MakeUpload(9102, "real_b", "icon_b"));
@@ -182,9 +182,9 @@ public sealed class GameUserRaceTests
 
     private static GameUserRaceController CreateController(ClientApiTestDb db)
     {
-        db.InitTenantTables(typeof(TenantGameUserArchiveEntity));
-        var tenantDbProvider = db.MainDb;
-        var archiveRepository = new Repository<TenantGameUserArchiveEntity>(db.MainDb);
+        db.InitBusinessTables(typeof(GameUserArchiveEntity));
+        var dbProvider = db.MainDb;
+        var archiveRepository = new Repository<GameUserArchiveEntity>(db.MainDb);
         return new GameUserRaceController(archiveRepository);
     }
 

@@ -14,24 +14,24 @@ public interface IMailCampaignServerClient
     /// <summary>
     /// 发布 Campaign（写入不可变快照，返回 CampaignId + Version）。
     /// </summary>
-    /// <param name="area">目标区服 <c>TenantGameAreaEntity</c>，提供 <c>HttpManageUrl</c> 根地址与 <c>FulfillmentApiPrefix</c> 能力前缀。</param>
-    Task<PublishMailCampaignResponse> PublishAsync(TenantGameAreaEntity area, PublishMailCampaignRequest request);
+    /// <param name="area">目标区服 <c>GameAreaEntity</c>，提供 <c>HttpManageUrl</c> 根地址与 <c>FulfillmentApiPrefix</c> 能力前缀。</param>
+    Task<PublishMailCampaignResponse> PublishAsync(GameAreaEntity area, PublishMailCampaignRequest request);
 
     /// <summary>
     /// 预览 / 校验 Campaign（不落库，返回预估命中玩家数）。
     /// </summary>
-    /// <param name="area">目标区服 <c>TenantGameAreaEntity</c>，提供 <c>HttpManageUrl</c> 根地址与 <c>FulfillmentApiPrefix</c> 能力前缀。</param>
-    Task<PreviewMailCampaignResponse> PreviewAsync(TenantGameAreaEntity area, PreviewMailCampaignRequest request);
+    /// <param name="area">目标区服 <c>GameAreaEntity</c>，提供 <c>HttpManageUrl</c> 根地址与 <c>FulfillmentApiPrefix</c> 能力前缀。</param>
+    Task<PreviewMailCampaignResponse> PreviewAsync(GameAreaEntity area, PreviewMailCampaignRequest request);
 
     /// <summary>
     /// 撤回 Campaign（撤回不可逆 B3）。
     /// </summary>
-    /// <param name="area">目标区服 <c>TenantGameAreaEntity</c>，提供 <c>HttpManageUrl</c> 根地址与 <c>FulfillmentApiPrefix</c> 能力前缀。</param>
-    Task<RevokeMailCampaignResponse> RevokeAsync(TenantGameAreaEntity area, RevokeMailCampaignRequest request);
+    /// <param name="area">目标区服 <c>GameAreaEntity</c>，提供 <c>HttpManageUrl</c> 根地址与 <c>FulfillmentApiPrefix</c> 能力前缀。</param>
+    Task<RevokeMailCampaignResponse> RevokeAsync(GameAreaEntity area, RevokeMailCampaignRequest request);
 
     /// <summary>
     /// 查询 Campaign 发布状态。
     /// </summary>
-    /// <param name="area">目标区服 <c>TenantGameAreaEntity</c>，提供 <c>HttpManageUrl</c> 根地址与 <c>FulfillmentApiPrefix</c> 能力前缀。</param>
-    Task<QueryMailCampaignResponse> QueryAsync(TenantGameAreaEntity area, QueryMailCampaignRequest request);
+    /// <param name="area">目标区服 <c>GameAreaEntity</c>，提供 <c>HttpManageUrl</c> 根地址与 <c>FulfillmentApiPrefix</c> 能力前缀。</param>
+    Task<QueryMailCampaignResponse> QueryAsync(GameAreaEntity area, QueryMailCampaignRequest request);
 }

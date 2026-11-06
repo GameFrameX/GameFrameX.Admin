@@ -9,13 +9,13 @@ namespace GameFrameX.Client.Api.GameRedeemCode;
 /// <summary>
 /// 兑换码控制器
 /// </summary>
-public class GameRedeemCodeController : BaseController<TenantGameRedeemCodeEntity>
+public class GameRedeemCodeController : BaseController<GameRedeemCodeEntity>
 {
-    private readonly Repository<TenantGameRedeemCodeUseRecordEntity> _recordService;
-    private readonly Repository<TenantGameRedeemCodeChannelEntity> _channelRepository;
-    private readonly Repository<TenantGameRedeemCodeChannelRoleUsageEntity> _channelRoleUsageRepository;
+    private readonly Repository<GameRedeemCodeUseRecordEntity> _recordService;
+    private readonly Repository<GameRedeemCodeChannelEntity> _channelRepository;
+    private readonly Repository<GameRedeemCodeChannelRoleUsageEntity> _channelRoleUsageRepository;
     private readonly HttpClient _httpClientFactory;
-    private readonly Repository<TenantGameAreaEntity> _areaRepository;
+    private readonly Repository<GameAreaEntity> _areaRepository;
 
     /// <summary>
     /// </summary>
@@ -26,11 +26,11 @@ public class GameRedeemCodeController : BaseController<TenantGameRedeemCodeEntit
     /// <param name="areaService"></param>
     /// <param name="httpClientFactory"></param>
     public GameRedeemCodeController(
-        SqlSugarRepository<TenantGameRedeemCodeEntity> service,
-        Repository<TenantGameRedeemCodeUseRecordEntity> recordService,
-        Repository<TenantGameRedeemCodeChannelEntity> channelRepository,
-        Repository<TenantGameRedeemCodeChannelRoleUsageEntity> channelRoleUsageRepository,
-        Repository<TenantGameAreaEntity> areaService,
+        SqlSugarRepository<GameRedeemCodeEntity> service,
+        Repository<GameRedeemCodeUseRecordEntity> recordService,
+        Repository<GameRedeemCodeChannelEntity> channelRepository,
+        Repository<GameRedeemCodeChannelRoleUsageEntity> channelRoleUsageRepository,
+        Repository<GameAreaEntity> areaService,
         HttpClient httpClientFactory) : base(service)
     {
         _recordService = recordService;
@@ -70,7 +70,7 @@ public class GameRedeemCodeController : BaseController<TenantGameRedeemCodeEntit
             return GameApiResult.Error<BaseOperationAckResponse>(RedeemCodeErrorCode.RedeemCodeExpired, "兑换码已过期");
         }
 
-        TenantGameAreaEntity gameAreaEntity;
+        GameAreaEntity gameAreaEntity;
         // 如果兑换码没有指定区服，则使用默认区服
         if (gameRedeemCodeEntity.AreaId <= 0)
         {
@@ -133,7 +133,7 @@ public class GameRedeemCodeController : BaseController<TenantGameRedeemCodeEntit
             // 更新兑换码信息
             gameRedeemCodeEntity.UsedCount++;
             // 更新兑换码使用记录
-            var gameRedeemCodeUseRecord = new TenantGameRedeemCodeUseRecordEntity
+            var gameRedeemCodeUseRecord = new GameRedeemCodeUseRecordEntity
             {
                 AreaId = gameAreaEntity.Id,
                 PlayerId = input.RoleId,
@@ -159,7 +159,7 @@ public class GameRedeemCodeController : BaseController<TenantGameRedeemCodeEntit
     /// 解析兑换码归属渠道/分组并预检组级角色次数。客户端不传 ChannelId，服务端从兑换码反推。
     /// <para>无 ChannelId / 渠道未配置限制时返回 Neutral；渠道不存在返回 Rejected；次数达上限返回 LimitReached。</para>
     /// </summary>
-    private async Task<ChannelRoleUsageContext> ResolveChannelRoleUsageAsync(TenantGameRedeemCodeEntity code, long roleId)
+    private async Task<ChannelRoleUsageContext> ResolveChannelRoleUsageAsync(GameRedeemCodeEntity code, long roleId)
     {
         if (!code.ChannelId.HasValue || code.ChannelId.Value <= 0)
         {
@@ -194,7 +194,7 @@ public class GameRedeemCodeController : BaseController<TenantGameRedeemCodeEntit
     /// <para>事务边界：与使用记录插入、兑换码 UsedCount 递增同处发奖成功路径；累计写失败不回滚已发奖励，由日志显性化（与既有使用记录写失败同款风险）。</para>
     /// <para>并发兜底：累计表 ux_redeem_channel_role_usage 唯一约束保证 (ChannelId, RoleId) 只有一行；递增走条件更新 WHERE UsedCount &lt; limit 避免超计数。</para>
     /// </summary>
-    private async Task AccumulateChannelRoleUsageAsync(ChannelRoleUsageContext context, TenantGameRedeemCodeEntity code, long roleId)
+    private async Task AccumulateChannelRoleUsageAsync(ChannelRoleUsageContext context, GameRedeemCodeEntity code, long roleId)
     {
         if (!context.ShouldAccumulate)
         {
@@ -207,7 +207,7 @@ public class GameRedeemCodeController : BaseController<TenantGameRedeemCodeEntit
             // 预检时该角色尚无累计行；唯一约束兜底并发插入，竞争失败方回落到条件递增。
             try
             {
-                await _channelRoleUsageRepository.InsertAsync(new TenantGameRedeemCodeChannelRoleUsageEntity
+                await _channelRoleUsageRepository.InsertAsync(new GameRedeemCodeChannelRoleUsageEntity
                 {
                     ChannelId = context.ChannelId,
                     RoleId = roleId,
@@ -226,7 +226,7 @@ public class GameRedeemCodeController : BaseController<TenantGameRedeemCodeEntit
         // 条件递增：仅当当前累计未达上限时 +1，避免并发竞争导致超计数
         var limit = context.RoleUsageLimit;
         await _channelRoleUsageRepository.AsUpdateable()
-                                         .SetColumns(u => new TenantGameRedeemCodeChannelRoleUsageEntity
+                                         .SetColumns(u => new GameRedeemCodeChannelRoleUsageEntity
                                          {
                                              UsedCount = u.UsedCount + 1,
                                              LastCode = code.Code,
@@ -248,7 +248,7 @@ public class GameRedeemCodeController : BaseController<TenantGameRedeemCodeEntit
 
         public int RoleUsageLimit { get; private set; }
 
-        public TenantGameRedeemCodeChannelRoleUsageEntity? Existing { get; private set; }
+        public GameRedeemCodeChannelRoleUsageEntity? Existing { get; private set; }
 
         public static ChannelRoleUsageContext Neutral()
         {
@@ -265,7 +265,7 @@ public class GameRedeemCodeController : BaseController<TenantGameRedeemCodeEntit
             return new ChannelRoleUsageContext { LimitReached = true, };
         }
 
-        public static ChannelRoleUsageContext Tracked(TenantGameRedeemCodeChannelEntity channel, TenantGameRedeemCodeChannelRoleUsageEntity? existing)
+        public static ChannelRoleUsageContext Tracked(GameRedeemCodeChannelEntity channel, GameRedeemCodeChannelRoleUsageEntity? existing)
         {
             return new ChannelRoleUsageContext
             {

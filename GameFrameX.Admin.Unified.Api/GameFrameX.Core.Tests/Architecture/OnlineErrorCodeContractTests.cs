@@ -96,7 +96,7 @@ public sealed class OnlineErrorCodeContractTests
         new VaultMemberRow("SessionInvalid", 32100003),
         // 段 322 ← 协议段 3xxx
         new VaultMemberRow("ScopeDenied", 32200001),
-        new VaultMemberRow("CrossTenantDenied", 32200002),
+        new VaultMemberRow("CrossDenied", 32200002),
         new VaultMemberRow("CrossAppDenied", 32200003),
         new VaultMemberRow("ServerScopeDenied", 32200004),
         new VaultMemberRow("ScopeMissing", 32200005),

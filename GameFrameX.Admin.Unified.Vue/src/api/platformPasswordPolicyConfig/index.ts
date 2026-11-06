@@ -44,7 +44,7 @@ export class PlatformPasswordPolicyConfig<SecurityDataType = unknown> {
    *
    * @tags platformPasswordPolicyConfig
    * @name PlatformPasswordPolicyConfigUpdatePost
-   * @summary 保存平台密码策略配置。CAS 乐观锁冲突重试；成功后刷新同 Host 快照并镜像同步 CryptogramUtility 密码策略静态属性， 后续 TenantUserService.ChangePwdAsync 立即按新规则校验。
+   * @summary 保存平台密码策略配置。CAS 乐观锁冲突重试；成功后刷新同 Host 快照并镜像同步 CryptogramUtility 密码策略静态属性， 后续 UserService.ChangePwdAsync 立即按新规则校验。
    * @request POST:/api/platformPasswordPolicyConfig/update
    */
   platformPasswordPolicyConfigUpdatePost = (

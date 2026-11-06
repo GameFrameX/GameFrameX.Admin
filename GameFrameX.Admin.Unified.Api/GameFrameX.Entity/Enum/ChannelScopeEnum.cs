@@ -15,5 +15,5 @@ public enum ChannelScopeEnum
     /// <summary>
     /// 租户自定义渠道
     /// </summary>
-    [Description("租户")] Tenant = 2,
+    [Description("租户")] Business = 2,
 }

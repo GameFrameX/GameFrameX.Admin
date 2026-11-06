@@ -4,7 +4,7 @@
 import type { BaseSelectPageResponse, BaseSelectPageStringResponse } from "../_shared/data-contracts";
 
 /** 游戏资源增加输入参数 */
-export interface AddTenantGameGoodsEntityRequest {
+export interface AddGameGoodsEntityRequest {
   /**
    * 配置ID
    * @format int32
@@ -76,7 +76,7 @@ export interface GameGoodsResponseSqlSugarPagedList {
 }
 
 /** 游戏资源分页查询输入参数 */
-export interface PageTenantGameGoodsEntityRequest {
+export interface PageGameGoodsEntityRequest {
   searchKey?: string | null;
   /**
    * @format int32
@@ -102,7 +102,7 @@ export interface PageTenantGameGoodsEntityRequest {
 }
 
 /** 游戏资源更新输入参数 */
-export interface UpdateTenantGameGoodsEntityRequest {
+export interface UpdateGameGoodsEntityRequest {
   /**
    * @min 1
    * @max 9223372036854776000

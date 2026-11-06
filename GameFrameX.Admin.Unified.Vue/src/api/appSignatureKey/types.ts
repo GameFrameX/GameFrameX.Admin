@@ -123,7 +123,7 @@ export interface AppSignatureKeyRotateRequest {
 }
 
 /** App 传输签名密钥分页查询输入参数。 */
-export interface PageTenantAppSignatureKeyRequest {
+export interface PageAppSignatureKeyRequest {
   searchKey?: string | null;
   /**
    * @format int32

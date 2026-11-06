@@ -4,10 +4,10 @@ using System.Security.Cryptography;
 using System.Text.Json;
 using GameFrameX.Client.Api.GameRole.Dto;
 using GameFrameX.Client.Api.Services;
-using GameFrameX.Client.Api.Services.ClientApiTenantOptions;
+using GameFrameX.Client.Api.Services.ClientApiOptions;
 using GameFrameX.Core.Enum;
 using GameFrameX.Entity.Enum;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 using Microsoft.IdentityModel.JsonWebTokens;
 
 namespace GameFrameX.Core.Tests.ClientApi;
@@ -19,7 +19,7 @@ public class ClientApiTokenIssuerTests
     {
         var provider = FakeOptionsProvider.WithTokenPolicy("unit-test-signing-key", 60);
         var issuer = new ClientApiTokenIssuer(provider);
-        var user = new TenantGameUserEntity
+        var user = new GameUserEntity
         {
             Id = 1001,
             Status = GameUserStatus.Active,
@@ -178,7 +178,7 @@ public class ClientApiTokenIssuerTests
         {
             using (var rsa = RSA.Create(2048))
             {
-                var kid = "tenant-10-app-20-test";
+                var kid = "10-app-20-test";
                 var privateKeyPem = rsa.ExportPkcs8PrivateKeyPem();
                 var publicKeyPem = rsa.ExportSubjectPublicKeyInfoPem();
                 return new TestGameLoginTicketKeyResolver(GameLoginTicketSigningKey.CreateRsa(kid, privateKeyPem, publicKeyPem), kid);

@@ -17,7 +17,7 @@ public enum SystemEmailPurpose
     /// <summary>
     /// 租户生命周期通知（开通、到期、账单）。
     /// </summary>
-    TenantLifecycle = 1,
+    Lifecycle = 1,
 
     /// <summary>
     /// 平台安全通知（异常登录、密钥泄露告警等）。

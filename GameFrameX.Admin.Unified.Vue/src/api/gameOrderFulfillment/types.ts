@@ -55,7 +55,7 @@ export interface FulfillmentActionResponse {
 export interface GameOrderFulfillmentResponse {
   /** Id */
   id?: string;
-  /** 来源订单 Id（TenantGameOrderEntity.Id）。 */
+  /** 来源订单 Id（GameOrderEntity.Id）。 */
   orderId?: string;
   /** 支付渠道/Provider（alipay/apple/google/xsolla），来自订单。 */
   payChannel?: string | null;
@@ -122,7 +122,7 @@ export interface GameOrderFulfillmentResponseSqlSugarPagedList {
 }
 
 /** 权益发货账本分页查询输入参数（C120）。过滤字段严格锁定见 change C120 §3 BuildPageQuery 表。 */
-export interface PageTenantGameOrderFulfillmentEntityRequest {
+export interface PageGameOrderFulfillmentEntityRequest {
   searchKey?: string | null;
   /**
    * @format int32
@@ -166,7 +166,7 @@ export interface PageTenantGameOrderFulfillmentEntityRequest {
  * 权益发货账本更新输入参数（C120）。仅满足 GenericCrudService 的 TUpdateRequest 泛型约束；
  * UpdateAsync 端点已由 OnUpdatingAsync 抛错关闭（账本为事实数据，不支持修改）。
  */
-export interface UpdateTenantGameOrderFulfillmentEntityRequest {
+export interface UpdateGameOrderFulfillmentEntityRequest {
   /**
    * @min 1
    * @max 9223372036854776000

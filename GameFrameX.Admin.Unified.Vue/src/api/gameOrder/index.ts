@@ -10,7 +10,7 @@
  */
 
 import {
-  AddTenantGameOrderEntityRequest,
+  AddGameOrderEntityRequest,
   GameOrderAddPostData,
   GameOrderDeletePostData,
   GameOrderDetailGetData,
@@ -18,8 +18,8 @@ import {
   GameOrderSendPostData,
   GameOrderSummaryPostData,
   GameOrderUpdatePostData,
-  PageTenantGameOrderEntityRequest,
-  UpdateTenantGameOrderEntityRequest,
+  PageGameOrderEntityRequest,
+  UpdateGameOrderEntityRequest,
 } from "./types";
 import {
   BaseDeleteRequest,
@@ -43,7 +43,7 @@ export class GameOrder<SecurityDataType = unknown> {
    * @request POST:/api/gameOrder/add
    */
   gameOrderAddPost = (
-    data: AddTenantGameOrderEntityRequest,
+    data: AddGameOrderEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameOrderAddPostData, any>({
@@ -105,7 +105,7 @@ export class GameOrder<SecurityDataType = unknown> {
    * @request POST:/api/gameOrder/page
    */
   gameOrderPagePost = (
-    data: PageTenantGameOrderEntityRequest,
+    data: PageGameOrderEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameOrderPagePostData, any>({
@@ -125,7 +125,7 @@ export class GameOrder<SecurityDataType = unknown> {
    * @request POST:/api/gameOrder/send
    */
   gameOrderSendPost = (
-    data: AddTenantGameOrderEntityRequest,
+    data: AddGameOrderEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameOrderSendPostData, any>({
@@ -144,7 +144,7 @@ export class GameOrder<SecurityDataType = unknown> {
    * @request POST:/api/gameOrder/summary
    */
   gameOrderSummaryPost = (
-    data: PageTenantGameOrderEntityRequest,
+    data: PageGameOrderEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameOrderSummaryPostData, any>({
@@ -164,7 +164,7 @@ export class GameOrder<SecurityDataType = unknown> {
    * @request POST:/api/gameOrder/update
    */
   gameOrderUpdatePost = (
-    data: UpdateTenantGameOrderEntityRequest,
+    data: UpdateGameOrderEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameOrderUpdatePostData, any>({

@@ -1,5 +1,5 @@
 using GameFrameX.Entity.Enum;
-using GameFrameX.Entity.Tenant.ClientApiConfig;
+using GameFrameX.Entity.Business.ClientApiConfig;
 
 namespace GameFrameX.Core.Middleware;
 
@@ -18,7 +18,7 @@ public class GameAppRiskEnforcementModeResolver : IGameAppRiskEnforcementModeRes
     /// <inheritdoc />
     public RiskEnforcementModeEnum Resolve()
     {
-        var policy = _database.Queryable<TenantClientApiPolicyEntity>()
+        var policy = _database.Queryable<ClientApiPolicyEntity>()
                               .Where(entity => entity.IsEnabled == true)
                               .OrderByDescending(entity => entity.Id)
                               .First();

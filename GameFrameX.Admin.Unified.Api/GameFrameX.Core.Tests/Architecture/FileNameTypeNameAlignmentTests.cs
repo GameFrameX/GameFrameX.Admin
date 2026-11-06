@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 namespace GameFrameX.Core.Tests.Architecture;
 
 // C285（GFX-694）：文件名 = 主类型名守护测试。全仓 .cs 文件的主（首个）类型名必须等于文件基名。
-// 背景：Application.Platform 服务类统一加 Tenant 前缀重构后文件未同步 git mv（C210 等），2026-08-22 命名审查盘点 36 处不一致，本测试防回潮。
+// 背景：Application.Platform 服务类统一加 Business 前缀重构后文件未同步 git mv（C210 等），2026-08-22 命名审查盘点 36 处不一致，本测试防回潮。
 // 豁免三类既有约定（豁免规则本身即规范，无静态例外清单，双向断言：新增违规失败）：
 //   E1 partial 分片 TypeName.Suffix.cs——文件声明同名 partial 类型（如 GlobalMenuSeedData.*.cs、GameOrderController.*.cs、GooglePlayApiManager.UploadSku.cs）；
 //   E2 泛型 OfT 后缀——文件名 TypeNameOfT.cs 声明泛型 TypeName<T>（IBaseRequestOfT / IConfigurableOptionsOfT / BaseControllerOfT 3 处）；

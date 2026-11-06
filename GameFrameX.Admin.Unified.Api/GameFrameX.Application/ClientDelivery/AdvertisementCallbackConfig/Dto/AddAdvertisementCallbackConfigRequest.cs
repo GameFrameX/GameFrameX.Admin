@@ -1,0 +1,49 @@
+namespace GameFrameX.Application.ClientDelivery.AdvertisementCallbackConfig.Dto;
+
+/// <summary>
+/// 租户广告回调配置新增输入参数
+/// </summary>
+public class AddAdvertisementCallbackConfigRequest : BaseAddRequest
+{
+    /// <summary>
+    /// 广告平台 Provider。当前首批配置支持 <c>TopOn</c>、<c>GoogleAdMob</c>、<c>Pangle</c>、<c>UnityAds</c>。
+    /// </summary>
+    [Required(ErrorMessage = "广告平台不能为空")]
+    public string Provider { get; set; } = null!;
+
+    /// <summary>
+    /// 广告平台后台配置的回调 URL。
+    /// </summary>
+    public string CallbackUrl { get; set; } = null!;
+
+    /// <summary>
+    /// 签名密钥或共享密钥。TopOn 对应 sec_key，Pangle 对应 security key，Unity Ads 对应 secret。
+    /// </summary>
+    public string SigningSecret { get; set; } = null!;
+
+    /// <summary>
+    /// 验签公钥或验证材料。Google AdMob 可记录 key_id=base64key。
+    /// </summary>
+    public string VerificationKeys { get; set; } = null!;
+
+    /// <summary>
+    /// 广告回调动态配置 JSON。字段由 Provider schema 决定。
+    /// </summary>
+    [Required(ErrorMessage = "广告回调配置不能为空")]
+    public string ConfigJson { get; set; } = null!;
+
+    /// <summary>
+    /// 参数作用说明 JSON。
+    /// </summary>
+    public string ParameterPurposeJson { get; set; } = null!;
+
+    /// <summary>
+    /// 是否启用。
+    /// </summary>
+    public bool IsEnabled { get; set; } = true;
+
+    /// <summary>
+    /// 备注。
+    /// </summary>
+    public string Remark { get; set; } = null!;
+}

@@ -10,15 +10,15 @@
  */
 
 import {
-  AddTenantClientApiPolicyRequest,
+  AddClientApiPolicyRequest,
   ClientApiPolicyAddPostData,
   ClientApiPolicyDeletePostData,
   ClientApiPolicyDetailGetData,
   ClientApiPolicyPagePostData,
   ClientApiPolicyRotatePostData,
   ClientApiPolicyUpdatePostData,
-  PageTenantClientApiPolicyRequest,
-  UpdateTenantClientApiPolicyRequest,
+  PageClientApiPolicyRequest,
+  UpdateClientApiPolicyRequest,
 } from "./types";
 import {
   BaseDeleteRequest,
@@ -43,7 +43,7 @@ export class ClientApiPolicy<SecurityDataType = unknown> {
    * @request POST:/api/clientApiPolicy/add
    */
   clientApiPolicyAddPost = (
-    data: AddTenantClientApiPolicyRequest,
+    data: AddClientApiPolicyRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<ClientApiPolicyAddPostData, any>({
@@ -108,7 +108,7 @@ export class ClientApiPolicy<SecurityDataType = unknown> {
    * @request POST:/api/clientApiPolicy/page
    */
   clientApiPolicyPagePost = (
-    data: PageTenantClientApiPolicyRequest,
+    data: PageClientApiPolicyRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<ClientApiPolicyPagePostData, any>({
@@ -147,7 +147,7 @@ export class ClientApiPolicy<SecurityDataType = unknown> {
    * @request POST:/api/clientApiPolicy/update
    */
   clientApiPolicyUpdatePost = (
-    data: UpdateTenantClientApiPolicyRequest,
+    data: UpdateClientApiPolicyRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<ClientApiPolicyUpdatePostData, any>({

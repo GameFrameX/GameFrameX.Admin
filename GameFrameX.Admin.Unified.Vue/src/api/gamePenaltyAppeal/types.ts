@@ -12,7 +12,7 @@ export enum AppealStatusEnum {
 }
 
 /** 申诉新增输入参数。关联处罚由服务端验证。 */
-export interface AddTenantGamePenaltyAppealEntityRequest {
+export interface AddGamePenaltyAppealEntityRequest {
   /**
    * 关联处罚 Id（必须为生效中处罚）。
    * @min 1
@@ -37,7 +37,7 @@ export interface AddTenantGamePenaltyAppealEntityRequest {
 export interface GamePenaltyAppealResponse {
   /** Id */
   id?: string;
-  /** 关联处罚 Id（TenantGamePenaltyEntity.Id）。 */
+  /** 关联处罚 Id（GamePenaltyEntity.Id）。 */
   penaltyId?: string;
   /** 申诉人 = 被处罚账号 UserId。 */
   appellantId?: string;
@@ -88,7 +88,7 @@ export interface GamePenaltyAppealResponseSqlSugarPagedList {
 }
 
 /** 申诉分页查询输入参数。 */
-export interface PageTenantGamePenaltyAppealEntityRequest {
+export interface PageGamePenaltyAppealEntityRequest {
   searchKey?: string | null;
   /**
    * @format int32
@@ -110,7 +110,7 @@ export interface PageTenantGamePenaltyAppealEntityRequest {
 }
 
 /** 申诉审核输入参数。Approve=true 通过（同步撤销关联处罚）；Approve=false 驳回。 */
-export interface ReviewTenantGamePenaltyAppealEntityRequest {
+export interface ReviewGamePenaltyAppealEntityRequest {
   /**
    * 申诉 Id。
    * @min 1
@@ -127,7 +127,7 @@ export interface ReviewTenantGamePenaltyAppealEntityRequest {
 }
 
 /** 申诉更新输入参数。申诉为事实源，不支持直接编辑；保留此类型仅为满足通用 CRUD 基类泛型约束。 */
-export interface UpdateTenantGamePenaltyAppealEntityRequest {
+export interface UpdateGamePenaltyAppealEntityRequest {
   /**
    * @min 1
    * @max 9223372036854776000

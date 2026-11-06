@@ -4,7 +4,7 @@ using GameFrameX.Application.ServerCenter.Online;
 using GameFrameX.Core.Tests.Online.Asset;
 using GameFrameX.Core.Exceptions;
 using GameFrameX.Core.SqlSugar;
-using GameFrameX.Entity.Tenant.Game;
+using GameFrameX.Entity.Business.Game;
 using SqlSugar;
 
 // S3/C401 断链修复点
@@ -33,7 +33,7 @@ public sealed class OnlineControlledCommandServiceTests : IDisposable
         SqlSugarUnifiedConfig.ConfigureBaseFilters(_db);
         _db.CodeFirst.InitTables(
 
-            typeof(TenantGameAreaEntity));
+            typeof(GameAreaEntity));
     }
 
     /// <summary>
@@ -281,7 +281,7 @@ public sealed class OnlineControlledCommandServiceTests : IDisposable
 
     private OnlineControlledCommandService CreateService(IOnlineServerClient onlineServerClient)
     {
-        var factory = new OnlineScopeContextFactory(OnlineAssetTestSupport.Repository<TenantGameAreaEntity>(_db));
+        var factory = new OnlineScopeContextFactory(OnlineAssetTestSupport.Repository<GameAreaEntity>(_db));
         return new OnlineControlledCommandService(onlineServerClient, factory);
     }
 

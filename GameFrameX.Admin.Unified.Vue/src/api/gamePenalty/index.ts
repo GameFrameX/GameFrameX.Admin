@@ -10,7 +10,7 @@
  */
 
 import {
-  AddTenantGamePenaltyEntityRequest,
+  AddGamePenaltyEntityRequest,
   GamePenaltyAddPostData,
   GamePenaltyDeletePostData,
   GamePenaltyDetailGetData,
@@ -18,10 +18,10 @@ import {
   GamePenaltyRevokePostData,
   GamePenaltySyncOnlineRuntimePostData,
   GamePenaltyUpdatePostData,
-  PageTenantGamePenaltyEntityRequest,
-  RevokeTenantGamePenaltyEntityRequest,
-  SyncOnlineRuntimeTenantGamePenaltyRequest,
-  UpdateTenantGamePenaltyEntityRequest,
+  PageGamePenaltyEntityRequest,
+  RevokeGamePenaltyEntityRequest,
+  SyncOnlineRuntimeGamePenaltyRequest,
+  UpdateGamePenaltyEntityRequest,
 } from "./types";
 import {
   BaseDeleteRequest,
@@ -45,7 +45,7 @@ export class GamePenalty<SecurityDataType = unknown> {
    * @request POST:/api/gamePenalty/add
    */
   gamePenaltyAddPost = (
-    data: AddTenantGamePenaltyEntityRequest,
+    data: AddGamePenaltyEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GamePenaltyAddPostData, any>({
@@ -110,7 +110,7 @@ export class GamePenalty<SecurityDataType = unknown> {
    * @request POST:/api/gamePenalty/page
    */
   gamePenaltyPagePost = (
-    data: PageTenantGamePenaltyEntityRequest,
+    data: PageGamePenaltyEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GamePenaltyPagePostData, any>({
@@ -130,7 +130,7 @@ export class GamePenalty<SecurityDataType = unknown> {
    * @request POST:/api/gamePenalty/revoke
    */
   gamePenaltyRevokePost = (
-    data: RevokeTenantGamePenaltyEntityRequest,
+    data: RevokeGamePenaltyEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GamePenaltyRevokePostData, any>({
@@ -149,7 +149,7 @@ export class GamePenalty<SecurityDataType = unknown> {
    * @request POST:/api/gamePenalty/syncOnlineRuntime
    */
   gamePenaltySyncOnlineRuntimePost = (
-    data: SyncOnlineRuntimeTenantGamePenaltyRequest,
+    data: SyncOnlineRuntimeGamePenaltyRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GamePenaltySyncOnlineRuntimePostData, any>({
@@ -169,7 +169,7 @@ export class GamePenalty<SecurityDataType = unknown> {
    * @request POST:/api/gamePenalty/update
    */
   gamePenaltyUpdatePost = (
-    data: UpdateTenantGamePenaltyEntityRequest,
+    data: UpdateGamePenaltyEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GamePenaltyUpdatePostData, any>({

@@ -8,28 +8,28 @@ namespace GameFrameX.Application.NoticeCenter.GameMailTemplate;
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
 public class GameMailTemplateService
-    : GenericCrudSelectService<Entity.Tenant.Game.TenantGameMailTemplateEntity,
-        AddTenantGameMailTemplateEntityRequest, UpdateTenantGameMailTemplateEntityRequest,
-        GameMailTemplateResponse, PageTenantGameMailTemplateEntityRequest>
+    : GenericCrudSelectService<Entity.Business.Game.GameMailTemplateEntity,
+        AddGameMailTemplateEntityRequest, UpdateGameMailTemplateEntityRequest,
+        GameMailTemplateResponse, PageGameMailTemplateEntityRequest>
 {
-    private readonly SqlSugarRepository<Entity.Tenant.Game.TenantGameMailTemplateCategoryEntity> _categoryRepository;
+    private readonly SqlSugarRepository<Entity.Business.Game.GameMailTemplateCategoryEntity> _categoryRepository;
 
     public GameMailTemplateService(
-        SqlSugarRepository<Entity.Tenant.Game.TenantGameMailTemplateEntity> repository,
-        SqlSugarRepository<Entity.Tenant.Game.TenantGameMailTemplateCategoryEntity> categoryRepository)
+        SqlSugarRepository<Entity.Business.Game.GameMailTemplateEntity> repository,
+        SqlSugarRepository<Entity.Business.Game.GameMailTemplateCategoryEntity> categoryRepository)
         : base(repository)
     {
         _categoryRepository = categoryRepository;
     }
 
-    protected override ISugarQueryable<GameMailTemplateResponse> BuildPageQuery(PageTenantGameMailTemplateEntityRequest input)
+    protected override ISugarQueryable<GameMailTemplateResponse> BuildPageQuery(PageGameMailTemplateEntityRequest input)
     {
         return Repository.AsQueryable()
                          .WhereIF(!string.IsNullOrWhiteSpace(input.SearchKey), u => u.Name.Contains(input.SearchKey.Trim()))
                          .WhereIF(!string.IsNullOrWhiteSpace(input.Name), u => u.Name.Contains(input.Name.Trim()))
                          .WhereIF(input.CategoryId.HasValue, u => u.CategoryId == input.CategoryId.Value)
                          .WhereIF(input.IsEnabled.HasValue, u => u.IsEnabled == input.IsEnabled.Value)
-                         .LeftJoin<Entity.Tenant.Game.TenantGameMailTemplateCategoryEntity>((t, c) => t.CategoryId == c.Id)
+                         .LeftJoin<Entity.Business.Game.GameMailTemplateCategoryEntity>((t, c) => t.CategoryId == c.Id)
                          .Select((t, c) => new GameMailTemplateResponse
                          {
                              Id = t.Id,
@@ -58,7 +58,7 @@ public class GameMailTemplateService
     /// <summary>
     /// 更新前校验记录存在。
     /// </summary>
-    protected override async Task OnUpdatingAsync(UpdateTenantGameMailTemplateEntityRequest input)
+    protected override async Task OnUpdatingAsync(UpdateGameMailTemplateEntityRequest input)
     {
         var existing = await Repository.GetFirstAsync(u => u.Id == input.Id);
         if (existing == null)

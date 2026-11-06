@@ -7,8 +7,8 @@ using GameFrameX.Core.SqlSugar;
 using GameFrameX.Entity.Enum;
 using GameFrameX.Entity.Game.Online;
 using GameFrameX.Entity.Log;
-using GameFrameX.Entity.Tenant.Game;
-using GameFrameX.Entity.Tenant.Game.Online;
+using GameFrameX.Entity.Business.Game;
+using GameFrameX.Entity.Business.Game.Online;
 using SqlSugar;
 
 // S3/C401 断链修复点
@@ -44,11 +44,11 @@ public sealed class OnlineAuditSearchServiceTests : IDisposable
         SqlSugarUnifiedConfig.ConfigureBaseFilters(_db);
         _db.CodeFirst.InitTables(
 
-            typeof(TenantGameAreaEntity),
-            typeof(TenantLogOperationEntity),
+            typeof(GameAreaEntity),
+            typeof(LogOperationEntity),
             typeof(SystemLogOperationEntity),
-            typeof(TenantGamePenaltyEntity),
-            typeof(TenantGameOnlineConfigRolloutEntity));
+            typeof(GamePenaltyEntity),
+            typeof(GameOnlineConfigRolloutEntity));
     }
 
     /// <summary>
@@ -258,7 +258,7 @@ public sealed class OnlineAuditSearchServiceTests : IDisposable
             TraceId = "trace-1",
         }).ExecuteCommandAsync();
 
-        await _db.Insertable(new TenantLogOperationEntity
+        await _db.Insertable(new LogOperationEntity
         {
             Id = 2,
             HttpMethod = "POST",
@@ -273,7 +273,7 @@ public sealed class OnlineAuditSearchServiceTests : IDisposable
             Message = "ok",
         }).ExecuteCommandAsync();
 
-        await _db.Insertable(new TenantGamePenaltyEntity
+        await _db.Insertable(new GamePenaltyEntity
         {
             AreaId = OnlineAssetTestSupport.Area1001,
             TargetType = PenaltyTargetTypeEnum.Account,
@@ -285,7 +285,7 @@ public sealed class OnlineAuditSearchServiceTests : IDisposable
             CreatedTime = T2,
         }).ExecuteCommandAsync();
 
-        await _db.Insertable(new TenantGameOnlineConfigRolloutEntity
+        await _db.Insertable(new GameOnlineConfigRolloutEntity
         {
             ServerId = OnlineAssetTestSupport.Area1001,
             ConfigKind = OnlineConfigRolloutKind.RemoteConfig,
@@ -303,11 +303,11 @@ public sealed class OnlineAuditSearchServiceTests : IDisposable
 
     private OnlineAuditSearchService CreateService(IOnlineServerClient onlineServerClient)
     {
-        var factory = new OnlineScopeContextFactory(OnlineAssetTestSupport.Repository<TenantGameAreaEntity>(_db));
+        var factory = new OnlineScopeContextFactory(OnlineAssetTestSupport.Repository<GameAreaEntity>(_db));
         return new OnlineAuditSearchService(
             new SqlSugarRepository<SystemLogOperationEntity> { Context = _db, },
-            OnlineAssetTestSupport.Repository<TenantGamePenaltyEntity>(_db),
-            OnlineAssetTestSupport.Repository<TenantGameOnlineConfigRolloutEntity>(_db),
+            OnlineAssetTestSupport.Repository<GamePenaltyEntity>(_db),
+            OnlineAssetTestSupport.Repository<GameOnlineConfigRolloutEntity>(_db),
             onlineServerClient,
             factory);
     }

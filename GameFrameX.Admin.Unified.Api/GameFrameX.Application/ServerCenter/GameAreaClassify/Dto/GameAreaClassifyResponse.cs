@@ -3,7 +3,7 @@ namespace GameFrameX.Application.ServerCenter.GameAreaClassify.Dto;
 /// <summary>
 /// 游戏大区分类输出参数
 /// </summary>
-public class GameAreaClassifyResponse : IBasePageResponse<Entity.Tenant.Game.TenantGameAreaClassifyEntity>
+public class GameAreaClassifyResponse : IBasePageResponse<Entity.Business.Game.GameAreaClassifyEntity>
 {
     /// <summary>
     /// Id

@@ -7,7 +7,7 @@ namespace GameFrameX.Core.Service.PlatformPasswordPolicy;
 /// 平台密码策略配置提供器（C173）。维护同一 Admin Host 内的内存快照：启动期由
 /// PlatformPasswordPolicyStartupLoader（Web.Core）调 <see cref="RefreshAsync"/>
 /// 从主库 <see cref="SystemConfigEntity"/> 加载；SuperAdmin 保存配置后由配置服务调用 <see cref="RefreshAsync"/>
-/// 刷新快照并镜像同步 <see cref="CryptogramUtility"/> 密码策略静态属性，使后续 <c>TenantUserService.ChangePwdAsync</c>
+/// 刷新快照并镜像同步 <see cref="CryptogramUtility"/> 密码策略静态属性，使后续 <c>UserService.ChangePwdAsync</c>
 /// 读到最新密码强度规则。密钥（CryptoType/PublicKey/PrivateKey）不在此处管理，保持启动期 Secret。
 /// </summary>
 public sealed class PlatformPasswordPolicyConfigProvider
@@ -141,7 +141,7 @@ public sealed class PlatformPasswordPolicyConfigProvider
     }
 
     /// <summary>
-    /// 将密码策略快照镜像同步到 CryptogramUtility 静态属性，使 TenantUserService.ChangePwdAsync 读到最新值（同 Host 动态生效）。
+    /// 将密码策略快照镜像同步到 CryptogramUtility 静态属性，使 UserService.ChangePwdAsync 读到最新值（同 Host 动态生效）。
     /// </summary>
     private static void ApplyToCryptogramUtility(PlatformPasswordPolicySettings settings)
     {

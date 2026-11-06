@@ -10,7 +10,7 @@
  */
 
 import {
-  AddTenantGameRewardTemplateGroupEntityRequest,
+  AddGameRewardTemplateGroupEntityRequest,
   GameRewardTemplateGroupAddPostData,
   GameRewardTemplateGroupDeletePostData,
   GameRewardTemplateGroupDetailGetData,
@@ -18,8 +18,8 @@ import {
   GameRewardTemplateGroupSelectPostData,
   GameRewardTemplateGroupSelectStringPostData,
   GameRewardTemplateGroupUpdatePostData,
-  PageTenantGameRewardTemplateGroupEntityRequest,
-  UpdateTenantGameRewardTemplateGroupEntityRequest,
+  PageGameRewardTemplateGroupEntityRequest,
+  UpdateGameRewardTemplateGroupEntityRequest,
 } from "./types";
 import {
   BaseDeleteRequest,
@@ -44,7 +44,7 @@ export class GameRewardTemplateGroup<SecurityDataType = unknown> {
    * @request POST:/api/gameRewardTemplateGroup/add
    */
   gameRewardTemplateGroupAddPost = (
-    data: AddTenantGameRewardTemplateGroupEntityRequest,
+    data: AddGameRewardTemplateGroupEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameRewardTemplateGroupAddPostData, any>({
@@ -109,7 +109,7 @@ export class GameRewardTemplateGroup<SecurityDataType = unknown> {
    * @request POST:/api/gameRewardTemplateGroup/page
    */
   gameRewardTemplateGroupPagePost = (
-    data: PageTenantGameRewardTemplateGroupEntityRequest,
+    data: PageGameRewardTemplateGroupEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameRewardTemplateGroupPagePostData, any>({
@@ -169,7 +169,7 @@ export class GameRewardTemplateGroup<SecurityDataType = unknown> {
    * @request POST:/api/gameRewardTemplateGroup/update
    */
   gameRewardTemplateGroupUpdatePost = (
-    data: UpdateTenantGameRewardTemplateGroupEntityRequest,
+    data: UpdateGameRewardTemplateGroupEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameRewardTemplateGroupUpdatePostData, any>({
