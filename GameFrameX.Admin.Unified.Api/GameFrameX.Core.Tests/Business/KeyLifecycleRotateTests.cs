@@ -68,8 +68,8 @@ public sealed class KeyLifecycleRotateTests : IDisposable
             IsEnabled = true,
             Remark = "seed",
         };
-        _db.TenantDb.Insertable(oldKey).ExecuteCommand();
-        return _db.TenantDb.Queryable<GameLoginTicketKeyEntity>().First(u => u.Kid == "kid-old-active");
+        _db.MainDb.Insertable(oldKey).ExecuteCommand();
+        return _db.MainDb.Queryable<GameLoginTicketKeyEntity>().First(u => u.Kid == "kid-old-active");
     }
 
     [Fact]
@@ -81,14 +81,14 @@ public sealed class KeyLifecycleRotateTests : IDisposable
         await CreateTicketKeyService().RotateAsync(new GameLoginTicketKeyRotateRequest { });
 
         var after = TimerHelper.UnixTimeSeconds();
-        var storedOld = _db.TenantDb.Queryable<GameLoginTicketKeyEntity>().First(u => u.Id == oldKey.Id);
+        var storedOld = _db.MainDb.Queryable<GameLoginTicketKeyEntity>().First(u => u.Id == oldKey.Id);
         Assert.NotNull(storedOld.RotatedTime);
         Assert.InRange(storedOld.RotatedTime.Value, before, after);
         Assert.InRange(storedOld.ExpireTime!.Value, before + GameLoginTicketKeyService.OldKeyDefaultExpireSeconds,
                        after + GameLoginTicketKeyService.OldKeyDefaultExpireSeconds);
 
         // 新钥立即生效（NotBefore ∈ [before, after]），且未被标记轮换
-        var newKey = _db.TenantDb.Queryable<GameLoginTicketKeyEntity>().First(u => u.Kid != "kid-old-active");
+        var newKey = _db.MainDb.Queryable<GameLoginTicketKeyEntity>().First(u => u.Kid != "kid-old-active");
         Assert.InRange(newKey.NotBeforeTime!.Value, before, after);
         Assert.Null(newKey.RotatedTime);
     }
@@ -102,7 +102,7 @@ public sealed class KeyLifecycleRotateTests : IDisposable
 
         await CreateTicketKeyService().RotateAsync(new GameLoginTicketKeyRotateRequest { OldKeyExpireTime = explicitExpire, });
 
-        var storedOld = _db.TenantDb.Queryable<GameLoginTicketKeyEntity>().First(u => u.Id == oldKey.Id);
+        var storedOld = _db.MainDb.Queryable<GameLoginTicketKeyEntity>().First(u => u.Id == oldKey.Id);
         Assert.Equal(explicitExpire, storedOld.ExpireTime);
         Assert.NotNull(storedOld.RotatedTime);
     }
@@ -139,7 +139,7 @@ public sealed class KeyLifecycleRotateTests : IDisposable
         // 无旧钥场景（首把密钥轮换）：仅生成新钥，不抛错
         await CreateTicketKeyService().RotateAsync(new GameLoginTicketKeyRotateRequest { });
 
-        var count = _db.TenantDb.Queryable<GameLoginTicketKeyEntity>().Count();
+        var count = _db.MainDb.Queryable<GameLoginTicketKeyEntity>().Count();
         Assert.Equal(1, count);
     }
 
@@ -152,7 +152,7 @@ public sealed class KeyLifecycleRotateTests : IDisposable
             LifetimeMinutes = 30,
             TicketExpireTime = 0,
         });
-        var cipherBefore = _db.TenantDb.Queryable<ClientApiPolicyEntity>().Filter(null, true).First(u => u.Id == added.Id).SigningKey;
+        var cipherBefore = _db.MainDb.Queryable<ClientApiPolicyEntity>().Filter(null, true).First(u => u.Id == added.Id).SigningKey;
         var plainBefore = SecretCrypto.Decrypt(cipherBefore);
         Assert.StartsWith(SecretCrypto.EncryptedPrefix, cipherBefore, StringComparison.Ordinal);
 
@@ -160,7 +160,7 @@ public sealed class KeyLifecycleRotateTests : IDisposable
         await CreatePolicyService().RotateAsync(new BaseIdRequest { Id = added.Id, });
         var after = TimerHelper.UnixTimeSeconds();
 
-        var stored = _db.TenantDb.Queryable<ClientApiPolicyEntity>().Filter(null, true).First(u => u.Id == added.Id);
+        var stored = _db.MainDb.Queryable<ClientApiPolicyEntity>().Filter(null, true).First(u => u.Id == added.Id);
         // 新密文 ≠ 旧密文（旧值即刻作废），仍为密文形态且可解密为新 64-hex
         Assert.NotEqual(cipherBefore, stored.SigningKey);
         Assert.StartsWith(SecretCrypto.EncryptedPrefix, stored.SigningKey, StringComparison.Ordinal);

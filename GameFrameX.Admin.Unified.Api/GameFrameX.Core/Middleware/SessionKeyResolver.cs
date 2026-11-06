@@ -8,11 +8,11 @@ namespace GameFrameX.Core.Middleware;
 /// </summary>
 public sealed class SessionKeyResolver : ISessionKeyResolver
 {
-    private readonly ISqlSugarClient _dbProvider;
+    private readonly ISqlSugarClient _database;
 
-    public SessionKeyResolver(ISqlSugarClient dbProvider)
+    public SessionKeyResolver(ISqlSugarClient database)
     {
-        _dbProvider = dbProvider;
+        _database = database;
     }
 
     /// <inheritdoc />
@@ -56,7 +56,7 @@ public sealed class SessionKeyResolver : ISessionKeyResolver
     private async Task<SessionKeyEntity?> GetKeyAsync(string kid)
     {
         // 元数据不缓存，跨宿主轮换、同秒撤销、删除与租约修改在下一请求立即生效。
-        return await _dbProvider.Queryable<SessionKeyEntity>().ClearFilter()
+        return await _database.Queryable<SessionKeyEntity>().ClearFilter()
             .Where(key => key.Kid == kid && key.IsDeleted == false).FirstAsync();
     }
 

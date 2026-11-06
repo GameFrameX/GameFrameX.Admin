@@ -12,12 +12,12 @@ namespace GameFrameX.Client.Api.Services.GameLoginTicket;
 /// </summary>
 public sealed class GameLoginTicketKeyResolver : IGameLoginTicketKeyResolver
 {
-    private readonly ISqlSugarClient _dbProvider;
+    private readonly ISqlSugarClient _database;
     private readonly IClientApiOptionsProvider _optionsProvider;
 
-    public GameLoginTicketKeyResolver(ISqlSugarClient dbProvider, IClientApiOptionsProvider optionsProvider)
+    public GameLoginTicketKeyResolver(ISqlSugarClient database, IClientApiOptionsProvider optionsProvider)
     {
-        _dbProvider = dbProvider;
+        _database = database;
         _optionsProvider = optionsProvider;
     }
 
@@ -65,7 +65,7 @@ public sealed class GameLoginTicketKeyResolver : IGameLoginTicketKeyResolver
     /// </summary>
     private async Task<List<GameLoginTicketKeyEntity>> GetActiveKeyEntitiesAsync(long now)
     {
-        var db = _dbProvider;
+        var db = _database;
         return await db.Queryable<GameLoginTicketKeyEntity>()
                        .Where(x => x.IsEnabled != false &&
                                    x.Algorithm == GameLoginTicketSigningKey.AlgorithmRs256 &&
@@ -81,7 +81,7 @@ public sealed class GameLoginTicketKeyResolver : IGameLoginTicketKeyResolver
     /// </summary>
     private async Task CreateRsaKeyEntityAsync(long now)
     {
-        var db = _dbProvider;
+        var db = _database;
         using (var rsa = RSA.Create(2048))
         {
             var entity = new GameLoginTicketKeyEntity

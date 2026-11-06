@@ -17,7 +17,7 @@ public sealed class ClientApiPenaltyEnforcementTests
     {
         using var db = new ClientApiTestDb();
         db.InitBusinessTables(typeof(GamePenaltyEntity));
-        SeedPenalty(db, 1, PenaltyActionTypeEnum.Ban, PenaltyStatusEnum.Active, null, db.AppId);
+        SeedPenalty(db, 1, PenaltyActionTypeEnum.Ban, PenaltyStatusEnum.Active, null);
 
         var service = new GamePenaltyEnforcementService(db.Repository<GamePenaltyEntity>());
         var hit = await service.GetLoginBlockingPenaltyAsync(PenaltyTargetTypeEnum.Account, "user-1001");
@@ -31,7 +31,7 @@ public sealed class ClientApiPenaltyEnforcementTests
     {
         using var db = new ClientApiTestDb();
         db.InitBusinessTables(typeof(GamePenaltyEntity));
-        SeedPenalty(db, 2, PenaltyActionTypeEnum.RestrictLogin, PenaltyStatusEnum.Active, null, db.AppId);
+        SeedPenalty(db, 2, PenaltyActionTypeEnum.RestrictLogin, PenaltyStatusEnum.Active, null);
 
         var service = new GamePenaltyEnforcementService(db.Repository<GamePenaltyEntity>());
         var hit = await service.GetLoginBlockingPenaltyAsync(PenaltyTargetTypeEnum.Account, "user-1001");
@@ -44,7 +44,7 @@ public sealed class ClientApiPenaltyEnforcementTests
     {
         using var db = new ClientApiTestDb();
         db.InitBusinessTables(typeof(GamePenaltyEntity));
-        SeedPenalty(db, 3, PenaltyActionTypeEnum.Mute, PenaltyStatusEnum.Active, null, db.AppId);
+        SeedPenalty(db, 3, PenaltyActionTypeEnum.Mute, PenaltyStatusEnum.Active, null);
 
         var service = new GamePenaltyEnforcementService(db.Repository<GamePenaltyEntity>());
         var hit = await service.GetLoginBlockingPenaltyAsync(PenaltyTargetTypeEnum.Account, "user-1001");
@@ -57,7 +57,7 @@ public sealed class ClientApiPenaltyEnforcementTests
     {
         using var db = new ClientApiTestDb();
         db.InitBusinessTables(typeof(GamePenaltyEntity));
-        SeedPenalty(db, 4, PenaltyActionTypeEnum.Ban, PenaltyStatusEnum.Revoked, null, db.AppId);
+        SeedPenalty(db, 4, PenaltyActionTypeEnum.Ban, PenaltyStatusEnum.Revoked, null);
 
         var service = new GamePenaltyEnforcementService(db.Repository<GamePenaltyEntity>());
         var hit = await service.GetLoginBlockingPenaltyAsync(PenaltyTargetTypeEnum.Account, "user-1001");
@@ -70,7 +70,7 @@ public sealed class ClientApiPenaltyEnforcementTests
     {
         using var db = new ClientApiTestDb();
         db.InitBusinessTables(typeof(GamePenaltyEntity));
-        SeedPenalty(db, 5, PenaltyActionTypeEnum.Ban, PenaltyStatusEnum.Active, DateTimeOffset.UtcNow.AddMinutes(-1), db.AppId);
+        SeedPenalty(db, 5, PenaltyActionTypeEnum.Ban, PenaltyStatusEnum.Active, DateTimeOffset.UtcNow.AddMinutes(-1));
 
         var service = new GamePenaltyEnforcementService(db.Repository<GamePenaltyEntity>());
         var hit = await service.GetLoginBlockingPenaltyAsync(PenaltyTargetTypeEnum.Account, "user-1001");
@@ -83,7 +83,7 @@ public sealed class ClientApiPenaltyEnforcementTests
     {
         using var db = new ClientApiTestDb();
         db.InitBusinessTables(typeof(GamePenaltyEntity));
-        SeedPenalty(db, 6, PenaltyActionTypeEnum.Ban, PenaltyStatusEnum.Active, null, 0);
+        SeedPenalty(db, 6, PenaltyActionTypeEnum.Ban, PenaltyStatusEnum.Active, null);
 
         var service = new GamePenaltyEnforcementService(db.Repository<GamePenaltyEntity>());
         var hit = await service.GetLoginBlockingPenaltyAsync(PenaltyTargetTypeEnum.Account, "user-1001");
@@ -96,7 +96,7 @@ public sealed class ClientApiPenaltyEnforcementTests
     {
         using var db = new ClientApiTestDb();
         db.InitBusinessTables(typeof(GamePenaltyEntity));
-        SeedPenalty(db, 7, PenaltyActionTypeEnum.Ban, PenaltyStatusEnum.Active, null, db.AppId, 2001);
+        SeedPenalty(db, 7, PenaltyActionTypeEnum.Ban, PenaltyStatusEnum.Active, null, 2001);
 
         var service = new GamePenaltyEnforcementService(db.Repository<GamePenaltyEntity>());
 
@@ -115,7 +115,6 @@ public sealed class ClientApiPenaltyEnforcementTests
         PenaltyActionTypeEnum actionType,
         PenaltyStatusEnum status,
         DateTimeOffset? expiresAt,
-        long appId,
         long? areaId = null)
     {
         var entity = new GamePenaltyEntity
@@ -130,6 +129,6 @@ public sealed class ClientApiPenaltyEnforcementTests
             ExpireTime = expiresAt?.ToUnixTimeSeconds(),
             OperatorId = 1,
         };
-        db.TenantDb.Insertable(entity).ExecuteCommand();
+        db.MainDb.Insertable(entity).ExecuteCommand();
     }
 }

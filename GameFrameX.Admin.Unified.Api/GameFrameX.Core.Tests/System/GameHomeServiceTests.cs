@@ -16,19 +16,18 @@ namespace GameFrameX.Core.Tests.System;
 // 用 Sqlite 双库 SqlSugarScope 种子数据，伪造 HttpMessageHandler 验证聚合、降级、计数与趋势桶行为。
 public class GameHomeServiceTests : IDisposable
 {
-    private const long TenantId = 1001L;
     private const string ConfigId = "1001";
 
     private readonly string _dbPath = Path.Combine(Path.GetTempPath(), $"game_home_{Guid.NewGuid():N}.db");
     private readonly SqlSugarScope _db;
-    private readonly FakeDbConnectionProvider _dbProvider;
+    private readonly ISqlSugarClient _database;
 
     public GameHomeServiceTests()
     {
         SqlSugarCache.Configure(new FakeCache());
         // AuthTestHost 判例：连接配置必须经 SqlSugarSetup.SetDbConfig 装配 ConfigureExternalServices
         // （实体列名/类型服务，[BusinessTable] 实体前缀 mutate 也在此链路），否则 ORM 写读列映射不一致
-        // （实测种子 ControlApiPrefix 落 NULL、读回空导致 Build 抛降级）。建表与种子统一走租户库 scope。
+        // （实测种子 ControlApiPrefix 落 NULL、读回空导致 Build 抛降级）。建表与种子统一走业务测试连接 scope。
         var config = new DbConnectionConfig
         {
             ConfigId = ConfigId,
@@ -41,18 +40,18 @@ public class GameHomeServiceTests : IDisposable
         };
         SqlSugarSetup.SetDbConfig(config);
         _db = new SqlSugarScope(new List<ConnectionConfig> { config, });
-        var tenantScope = _db.GetConnectionScope(ConfigId);
-        tenantScope.CodeFirst.InitTables<GameAreaEntity>();
-        tenantScope.CodeFirst.InitTables<GameOrderEntity>();
-        tenantScope.CodeFirst.InitTables<GameUserEntity>();
-        tenantScope.CodeFirst.InitTables<GameHomeOnlineSampleEntity>();
-        _dbProvider = new FakeDbConnectionProvider(_db, ConfigId);
+        var businessScope = _db.GetConnectionScope(ConfigId);
+        businessScope.CodeFirst.InitTables<GameAreaEntity>();
+        businessScope.CodeFirst.InitTables<GameOrderEntity>();
+        businessScope.CodeFirst.InitTables<GameUserEntity>();
+        businessScope.CodeFirst.InitTables<GameHomeOnlineSampleEntity>();
+        _database = _db.GetConnectionScope(ConfigId);
     }
 
     private GameHomeService CreateService(HttpClient? httpClient = null)
     {
         var client = httpClient ?? new HttpClient(new StubHandler(_ => throw new InvalidOperationException("should not call")));
-        return new GameHomeService(new StubHttpClientFactory(client), _dbProvider.Database);
+        return new GameHomeService(new StubHttpClientFactory(client), _database);
     }
 
 

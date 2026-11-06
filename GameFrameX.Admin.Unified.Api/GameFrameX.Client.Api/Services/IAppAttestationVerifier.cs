@@ -10,8 +10,7 @@ public interface IAppAttestationVerifier
     /// <summary>
     /// 校验当前请求是否满足应用签名 / 设备证明要求。
     /// </summary>
-    /// <param name="appId">当前应用 ID</param>
     /// <param name="context">当前 HTTP 上下文</param>
     /// <returns>校验通过返回 true，否则 false</returns>
-    Task<bool> VerifyAsync(long appId, HttpContext context);
+    Task<bool> VerifyAsync(HttpContext context);
 }

@@ -27,7 +27,6 @@ namespace GameFrameX.Core.Tests.ServerManager.Online;
 // 作用域构造后区服被删的时序漂移拒绝。
 public sealed class OnlineServerClientTests : IDisposable
 {
-    private const long TenantA = 1001;
     private const long App100 = 100;
     private const long Area1001 = 2001;
 
@@ -94,8 +93,7 @@ public sealed class OnlineServerClientTests : IDisposable
     }
 
     /// <summary>
-    /// 作用域注入：POST 请求体顶层强制携带 ServerId，丢弃旧租户与应用字段；业务体自带的伪作用域字段被鉴权值覆盖
-    ///（「以鉴权与服务端路由为准，客户端字段不可直接覆盖」vault 契约）；业务字段原样保留。
+    /// 作用域注入：POST 请求体顶层强制携带 ServerId，未知字段被白名单丢弃；业务体自带的伪作用域字段被鉴权值覆盖。
     /// </summary>
     [Fact]
     public async Task PostAsync_MergesScopeIntoPayload_OverridingClientScopeFields()
@@ -105,11 +103,15 @@ public sealed class OnlineServerClientTests : IDisposable
         var handler = new FakeHandler(SuccessEnvelope(new OnlineDemoData { PlayerId = "p-1", }));
         var client = CreateClient(handler);
 
-        await client.PostAsync<OnlineDemoData>("kick_player", new { TenantId = 999L, AppId = 888L, ServerId = 777L, RequestId = "request-1", IdempotencyKey = "key-1", Reason = 3, }, await CreateScopeAsync());
+        await client.PostAsync<OnlineDemoData>("kick_player", new { tenantId = 999L, appId = 888L, gameAppId = 777L, ServerId = 777L, RequestId = "request-1", IdempotencyKey = "key-1", Reason = 3, UnknownField = "drop-me", }, await CreateScopeAsync()); // c406-keep
 
         var body = handler.LastRequestBodyJson;
-        Assert.False(body.ContainsKey("TenantId"));
-        Assert.False(body.ContainsKey("AppId"));
+        Assert.False(body.ContainsKey("TenantId")); // c406-keep
+        Assert.False(body.ContainsKey("AppId")); // c406-keep
+        Assert.False(body.ContainsKey("tenantId")); // c406-keep
+        Assert.False(body.ContainsKey("appId")); // c406-keep
+        Assert.False(body.ContainsKey("gameAppId")); // c406-keep
+        Assert.False(body.ContainsKey("UnknownField"));
         Assert.Equal(Area1001, Convert.ToInt64(body["ServerId"]?.ToString()));
         Assert.Equal("request-1", body["RequestId"]?.ToString());
         Assert.Equal("key-1", body["IdempotencyKey"]?.ToString());

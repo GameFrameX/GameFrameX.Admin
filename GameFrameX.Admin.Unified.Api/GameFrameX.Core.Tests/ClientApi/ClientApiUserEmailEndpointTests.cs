@@ -53,7 +53,7 @@ public sealed class ClientApiUserEmailEndpointTests
     {
         var controller = new GameUserEmailController(database.Repository<GameUserEmailEntity>(),
             database.Repository<GameUserEntity>(), sender);
-        database.AttachContext(controller, include: false, includeApp: false);
+        database.AttachContext(controller);
         return controller;
     }
 

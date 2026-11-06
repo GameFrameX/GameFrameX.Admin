@@ -16,8 +16,6 @@ namespace GameFrameX.Core.Tests.Online.Asset;
 // IOnlineServerClient fake 与 OnlineCall 记录类都内嵌为私有嵌套类型，避免平级多类型破规。
 internal static class OnlineAssetTestSupport
 {
-    public const long TenantA = 4001;
-    public const long App100 = 100;
     public const long Area1001 = 2001;
     public const long Area1002 = 2002;
 
@@ -63,16 +61,15 @@ internal static class OnlineAssetTestSupport
         return new SqlSugarRepository<T> { Context = db, };
     }
 
-    public static CurrentUserContext CreateUserContext(long tenantId = TenantA)
+    public static CurrentUserContext CreateUserContext()
     {
         var identity = new global::System.Security.Claims.ClaimsIdentity("TestAuth");
-        identity.AddClaim(new global::System.Security.Claims.Claim("TenantId", tenantId.ToString()));
         var httpContext = new DefaultHttpContext { User = new global::System.Security.Claims.ClaimsPrincipal(identity), };
         var accessor = new HttpContextAccessor { HttpContext = httpContext, };
         return new CurrentUserContext(accessor);
     }
 
-    public static GameAreaEntity NewArea(long id, long appId, long now)
+    public static GameAreaEntity NewArea(long id, long now)
     {
         return new GameAreaEntity
         {
@@ -102,10 +99,10 @@ internal static class OnlineAssetTestSupport
     public static async Task SeedScopeAsync(SqlSugarScopeProvider db, bool secondArea = false)
     {
         var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-        await db.Insertable(NewArea(Area1001, App100, now)).ExecuteCommandAsync();
+        await db.Insertable(NewArea(Area1001, now)).ExecuteCommandAsync();
         if (secondArea)
         {
-            await db.Insertable(NewArea(Area1002, App100, now)).ExecuteCommandAsync();
+            await db.Insertable(NewArea(Area1002, now)).ExecuteCommandAsync();
         }
     }
 }

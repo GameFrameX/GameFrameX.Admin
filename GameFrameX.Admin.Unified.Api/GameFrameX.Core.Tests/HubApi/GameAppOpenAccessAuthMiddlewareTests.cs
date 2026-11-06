@@ -38,7 +38,7 @@ public sealed class GameAppOpenAccessAuthMiddlewareTests
     [Fact]
     public void TryParseSignatureHeader_ValidV2Header_ParsesAllSegments()
     {
-        var signatureBase64 = ClientSign("POST", "/api/PackageBuildReport", "appId=9&channel=ios", Encoding.UTF8.GetBytes(Body));
+        var signatureBase64 = ClientSign("POST", "/api/PackageBuildReport", "serverId=9&channel=ios", Encoding.UTF8.GetBytes(Body));
         var header = "v2;" + AccessKey + ";" + Ts + ";" + Nonce + ";" + Convert.ToBase64String(signatureBase64);
 
         var parsed = GameAppOpenAccessAuthMiddleware.TryParseSignatureHeader(header, out var accessKey, out var timestamp, out var nonce, out var provided);
@@ -68,10 +68,10 @@ public sealed class GameAppOpenAccessAuthMiddlewareTests
     public void VerifySignature_ClientCanonicalMessage_Passes()
     {
         var body = Encoding.UTF8.GetBytes(Body);
-        var provided = ClientSign("POST", "/api/PackageBuildReport", "appId=9&channel=ios", body);
+        var provided = ClientSign("POST", "/api/PackageBuildReport", "serverId=9&channel=ios", body);
 
         var verified = GameAppOpenAccessAuthMiddleware.VerifySignature(
-            Credential(), "POST", "/api/PackageBuildReport", "appId=9&channel=ios", Ts, Nonce, body, provided);
+            Credential(), "POST", "/api/PackageBuildReport", "serverId=9&channel=ios", Ts, Nonce, body, provided);
 
         Assert.True(verified);
     }
@@ -81,10 +81,10 @@ public sealed class GameAppOpenAccessAuthMiddlewareTests
     {
         // body 入签（C267 前规范 B 不把 body 进签 —— 这是本迁移的关键收紧点）：篡改 body 后原签名必失效
         var body = Encoding.UTF8.GetBytes(Body);
-        var provided = ClientSign("POST", "/api/PackageBuildReport", "appId=9", body);
+        var provided = ClientSign("POST", "/api/PackageBuildReport", "serverId=9", body);
 
         var verified = GameAppOpenAccessAuthMiddleware.VerifySignature(
-            Credential(), "POST", "/api/PackageBuildReport", "appId=9", Ts, Nonce,
+            Credential(), "POST", "/api/PackageBuildReport", "serverId=9", Ts, Nonce,
             Encoding.UTF8.GetBytes("{\"package\":\"pkg-1001\",\"status\":\"tampered\"}"), provided);
 
         Assert.False(verified);
@@ -96,12 +96,12 @@ public sealed class GameAppOpenAccessAuthMiddlewareTests
         // 客户端按「原始乱序 query 串」拼消息签名（未按 canonical 排序）→ 拒绝，
         // 证明 Hub 侧同样强制 canonical query（与 SignatureValidationMiddleware 同一规范）
         var body = Encoding.UTF8.GetBytes(Body);
-        var rawOrderMessage = "v2\nPOST\n/api/PackageBuildReport\nchannel=ios&appId=9\n" + AccessKey + "\n" + Ts + "\n" + Nonce + "\n"
+        var rawOrderMessage = "v2\nPOST\n/api/PackageBuildReport\nchannel=ios&serverId=9\n" + AccessKey + "\n" + Ts + "\n" + Nonce + "\n"
                               + CanonicalRequestBuilder.BodyHashHex(body);
         var provided = CanonicalRequestBuilder.HmacSha256(Encoding.UTF8.GetBytes(AccessSecret), rawOrderMessage);
 
         var verified = GameAppOpenAccessAuthMiddleware.VerifySignature(
-            Credential(), "POST", "/api/PackageBuildReport", "appId=9&channel=ios", Ts, Nonce, body, provided);
+            Credential(), "POST", "/api/PackageBuildReport", "serverId=9&channel=ios", Ts, Nonce, body, provided);
 
         Assert.False(verified);
     }

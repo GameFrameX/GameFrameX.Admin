@@ -18,6 +18,12 @@ namespace GameFrameX.Client.Api.GameRole;
 /// </summary>
 public class GameRoleController : BaseController<GameRoleEntity>
 {
+    private static readonly string[] IdentityOverrideFieldNames =
+    {
+        "userId", // 覆盖令牌解析出的账号身份
+        "accountId", // 覆盖同一账号身份的别名
+    };
+
     private readonly HttpClient _httpClientFactory;
     private readonly ClientApiTokenIssuer _clientApiTokenIssuer;
     private readonly GameLoginTicketIssuer _gameLoginTicketIssuer;
@@ -222,9 +228,9 @@ public class GameRoleController : BaseController<GameRoleEntity>
     [ProducesResponseType(200, Type = typeof(GameLoginTicketResponse))]
     public async Task<HttpJsonResultData<GameLoginTicketResponse>> Login([FromBody] GamePlayerLoginRequest input)
     {
-        if (HasForbiddenContextField(input))
+        if (HasForbiddenIdentityOverrideField(input))
         {
-            return GameApiResult.Error<GameLoginTicketResponse>(AuthErrorCode.AuthorizeInvalid, "请求体不能包含租户、应用或账号上下文字段");
+            return GameApiResult.Error<GameLoginTicketResponse>(AuthErrorCode.AuthorizeInvalid, "请求体不能包含身份覆盖字段");
         }
 
         var tokenValidation = await _clientApiTokenIssuer.ValidateAsync(input.AccessToken);
@@ -359,17 +365,14 @@ public class GameRoleController : BaseController<GameRoleEntity>
         return long.TryParse(item.ToString(), out value);
     }
 
-    private static bool HasForbiddenContextField(GamePlayerLoginRequest input)
+    private static bool HasForbiddenIdentityOverrideField(GamePlayerLoginRequest input)
     {
         if (input.ExtraFields == null)
         {
             return false;
         }
 
-        return input.ExtraFields.Keys.Any(k =>
-                                              string.Equals(k, "tenantId", StringComparison.OrdinalIgnoreCase) ||
-                                              string.Equals(k, "appId", StringComparison.OrdinalIgnoreCase) ||
-                                              string.Equals(k, "userId", StringComparison.OrdinalIgnoreCase));
+        return input.ExtraFields.Keys.Any(key => IdentityOverrideFieldNames.Contains(key, StringComparer.OrdinalIgnoreCase));
     }
 
     private static string BuildRouteTarget(GameAreaEntity area)

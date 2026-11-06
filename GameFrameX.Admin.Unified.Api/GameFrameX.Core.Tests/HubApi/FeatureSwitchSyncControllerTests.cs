@@ -23,13 +23,11 @@ namespace GameFrameX.Core.Tests.HubApi;
 /// <summary>
 /// C347 功能开关服务器通道（FeatureSwitchSyncController + OpenAccess 鉴权面）端点级测试。
 /// <para>覆盖：消费方过滤（client 行不下发，server|both 命中）、四维无上下文仅命中 Default 哨兵行、
-/// 服务器通道不做设备灰度、AppId 只取凭证绑定注入、版本协议三态、缺凭证上下文拒绝，
+/// 服务器通道不做设备灰度，凭证由机器通道注入、版本协议三态、缺凭证上下文拒绝，
 /// 以及 scope = FeatureSwitchSync 的路由放行 / 越权 403 语义与 HMAC v2 签名链路对本路由的适用性。</para>
 /// </summary>
 public sealed class FeatureSwitchSyncControllerTests : IDisposable
 {
-    private const long TenantId = 2090001;
-    private const long CredentialAppId = 2091001;
 
     private readonly string _mainDbPath = Path.Combine(Path.GetTempPath(), $"gfx_hub_switch_main_{Guid.NewGuid():N}.db");
     private readonly string _dbPath = Path.Combine(Path.GetTempPath(), $"gfx_hub_switch_{Guid.NewGuid():N}.db");
@@ -49,11 +47,11 @@ public sealed class FeatureSwitchSyncControllerTests : IDisposable
         provider.CodeFirst.InitTables(typeof(GameAppFeatureSwitchEntity));
     }
 
-    private FeatureSwitchSyncController CreateController(out ISqlSugarClient tenantDb, bool includeContext = true)
+    private FeatureSwitchSyncController CreateController(out ISqlSugarClient mainDb, bool includeContext = true)
     {
         var provider = _mainDb;
         var repository = new Repository<GameAppFeatureSwitchEntity>(_mainDb);
-        tenantDb = provider;
+        mainDb = provider;
         var controller = new FeatureSwitchSyncController(new FeatureSwitchDeliveryResolver(repository));
         var context = new DefaultHttpContext();
         controller.ControllerContext = new ControllerContext { HttpContext = context, };
@@ -65,7 +63,6 @@ public sealed class FeatureSwitchSyncControllerTests : IDisposable
         string switchKey,
         string valueJson = "{}",
         string audience = FeatureSwitchAudienceValues.Both,
-        long? appId = CredentialAppId,
         string platform = GameDimensionConst.PlatformDefault,
         int rolloutPercent = 100)
     {
@@ -93,13 +90,13 @@ public sealed class FeatureSwitchSyncControllerTests : IDisposable
     [Fact]
     public async Task Sync_FiltersByAudienceFromMainDatabase()
     {
-        var controller = CreateController(out var tenantDb);
-        tenantDb.Insertable(new[]
+        var controller = CreateController(out var mainDb);
+        mainDb.Insertable(new[]
         {
             Row(1, "economy.drop_rate", "{\"rate\":2}", audience: FeatureSwitchAudienceValues.Server),
             Row(2, "login.banner", "{\"v\":1}", audience: FeatureSwitchAudienceValues.Both),
             Row(3, "client.only", "{\"v\":3}", audience: FeatureSwitchAudienceValues.Client),
-            Row(4, "other.app", "{\"v\":4}", audience: FeatureSwitchAudienceValues.Server, appId: CredentialAppId + 1),
+            Row(4, "other.app", "{\"v\":4}", audience: FeatureSwitchAudienceValues.Server),
         }).ExecuteCommand();
 
         var root = ClientApiResultReader.Read(await controller.Sync(new FeatureSwitchSyncRequest()));
@@ -120,8 +117,8 @@ public sealed class FeatureSwitchSyncControllerTests : IDisposable
     [Fact]
     public async Task Sync_WithoutDimensionContext_OnlyDefaultSentinelRowsDelivered()
     {
-        var controller = CreateController(out var tenantDb);
-        tenantDb.Insertable(new[]
+        var controller = CreateController(out var mainDb);
+        mainDb.Insertable(new[]
         {
             Row(1, "activity.android_only", "{\"v\":1}", platform: "android"),
             Row(2, "activity.everyone", "{\"v\":2}"),
@@ -140,8 +137,8 @@ public sealed class FeatureSwitchSyncControllerTests : IDisposable
     [Fact]
     public async Task Sync_ServerChannel_IgnoresDeviceRollout()
     {
-        var controller = CreateController(out var tenantDb);
-        tenantDb.Insertable(new[]
+        var controller = CreateController(out var mainDb);
+        mainDb.Insertable(new[]
         {
             Row(1, "economy.zero_rollout", "{\"rate\":5}", rolloutPercent: 0),
         }).ExecuteCommand();
@@ -159,9 +156,9 @@ public sealed class FeatureSwitchSyncControllerTests : IDisposable
     [Fact]
     public async Task Sync_VersionProtocol_FirstPullUnchangedShortCircuitAndChange()
     {
-        var controller = CreateController(out var tenantDb);
+        var controller = CreateController(out var mainDb);
         var row = Row(1, "economy.drop_rate", "{\"rate\":1}");
-        tenantDb.Insertable(row).ExecuteCommand();
+        mainDb.Insertable(row).ExecuteCommand();
 
         var firstResult = await controller.Sync(new FeatureSwitchSyncRequest());
         var first = ClientApiResultReader.Data(ClientApiResultReader.Read(firstResult));
@@ -177,7 +174,7 @@ public sealed class FeatureSwitchSyncControllerTests : IDisposable
         Assert.Equal(0, unchanged.GetProperty("Switches").GetArrayLength());
 
         row.ValueJson = "{\"rate\":9}";
-        tenantDb.Updateable(row).ExecuteCommand();
+        mainDb.Updateable(row).ExecuteCommand();
         var changedResult = await controller.Sync(new FeatureSwitchSyncRequest { Version = version, });
         var changed = ClientApiResultReader.Data(ClientApiResultReader.Read(changedResult));
         Assert.False(changed.GetProperty("Unchanged").GetBoolean());

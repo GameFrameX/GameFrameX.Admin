@@ -53,7 +53,7 @@ public sealed class OnlineAuditSearchServiceTests : IDisposable
 
     /// <summary>
     /// 三来源归并（作用域锚定）：按 OccurredAt 倒序混排，来源标注正确；
-    /// Online 事件行回填查询锚定作用域；无作用域提取值的操作日志行（AppId=null）被作用域过滤排除。
+    /// Online 事件行回填查询锚定区服；无区服提取值的操作日志行被作用域过滤排除。
     /// </summary>
     [Fact]
     public async Task PageAsync_MergesThreeSources_InOccurredAtOrder()
@@ -155,7 +155,7 @@ public sealed class OnlineAuditSearchServiceTests : IDisposable
     }
 
     /// <summary>
-    /// Online 来源参与前置：未锚定 AppId+ServerId 时该来源静默跳过（零 Online 调用），
+    /// Online 来源参与前置：未锚定 ServerId 时该来源静默跳过（零 Online 调用），
     /// 本地两来源仍全量检索（含无作用域提取值的操作日志行）。
     /// </summary>
     [Fact]
@@ -246,7 +246,7 @@ public sealed class OnlineAuditSearchServiceTests : IDisposable
             Id = 1,
             HttpMethod = "POST",
             RequestUrl = "/api/onlinePenaltyLinkCommand/execute",
-            RequestParam = $"{{\"input\":{{\"appId\":{OnlineAssetTestSupport.App100},\"serverId\":{OnlineAssetTestSupport.Area1001},\"playerId\":\"player-9\",\"ticketId\":\"t-77\"}}}}",
+            RequestParam = $"{{\"input\":{{\"serverId\":{OnlineAssetTestSupport.Area1001},\"playerId\":\"player-9\",\"ticketId\":\"t-77\"}}}}",
             ControllerName = "OnlinePenaltyLinkCommand",
             ActionName = "Execute",
             DisplayTitle = "处罚联动执行",

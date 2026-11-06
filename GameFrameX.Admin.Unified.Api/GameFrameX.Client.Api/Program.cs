@@ -109,14 +109,14 @@ internal static class Program
         builder.Services.AddSingleton<SystemCacheService>(); // 仅依赖 ICache + IOptions<CacheOptions>
         builder.Services.AddTransient<GameOrderShipService>(); // 订单发货/退款服务
         builder.Services.AddSingleton<GameAppPackageResolver>(); // 包名解析服务
-        builder.Services.AddSingleton<PublicCallbackRouteResolver>(); // 公开 provider 回调 URL -> 租户/应用上下文解析
-        // Client API 请求期租户配置 Provider：依赖 IHttpContextAccessor + ISqlSugarClient，按请求作用域读取租户库配置
+        builder.Services.AddSingleton<PublicCallbackRouteResolver>(); // 公开 provider 回调 URL -> 分包上下文解析
+        // Client API 请求期配置 Provider：依赖 IHttpContextAccessor + ISqlSugarClient，按请求读取主库配置
         builder.Services.AddScoped<IClientApiOptionsProvider, ClientApiOptionsProvider>();
         // 广告奖励发放账本服务（C114 / GFX-110）：依赖 Repository<T> + IClientApiOptionsProvider + HttpClient + IHttpContextAccessor
         builder.Services.AddAdvertisementCallbacks();
         builder.Services.AddScoped<GameAdvertisementRewardService>();
         builder.Services.AddScoped<RemoteConfigDeliveryService>();
-        // 活动/功能开关投放解析器（C345 共享实现，依赖 Scoped 租户仓储，随请求作用域解析）
+        // 活动/功能开关投放解析器（C345 共享实现，依赖 Scoped 主库仓储，随请求作用域解析）
         builder.Services.AddScoped<GameFrameX.Application.ClientDelivery.FeatureSwitch.FeatureSwitchDeliveryResolver>();
         // 邮件分域：租户业务邮件（玩家注册 / 找回密码）；平台系统邮件（SystemMessageService 等）走 ISystemEmailSender
         builder.Services.AddScoped<IEmailSender, EmailSender>();
@@ -124,7 +124,7 @@ internal static class Program
             GameFrameX.Application.Platform.Email.SystemEmailSender>();
         // Token / Ticket 签发服务依赖 IClientApiOptionsProvider（Scoped），必须随之降为 Scoped
         builder.Services.AddScoped<ClientApiTokenIssuer>();
-        // C7 登录会话密钥签发：依赖 Scoped 租户仓储（SqlSugarRepository<>），随请求作用域
+        // C7 登录会话密钥签发：依赖 Scoped 主库仓储（SqlSugarRepository<>），随请求作用域
         builder.Services.AddScoped<ClientApiSessionKeyIssuer>();
         builder.Services.AddScoped<IGameLoginTicketKeyResolver, GameLoginTicketKeyResolver>();
         builder.Services.AddScoped<GameLoginTicketIssuer>();

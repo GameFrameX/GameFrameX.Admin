@@ -129,17 +129,15 @@ public sealed class GameAppPackageResolverInheritanceTests : IDisposable
         Assert.Equal("com.test.master.b", fixture.Resolver.Resolve("com.test.child"));
     }
 
-    private ResolverFixture BuildFixture(long tenantId)
+    private ResolverFixture BuildFixture(long fixtureId)
     {
-        var mainConfig = CreateConfig("main");
-        var tenantConfig = CreateConfig(tenantId.ToString());
+        var mainConfig = CreateConfig($"main-{fixtureId}");
         var scope = new SqlSugarScope(mainConfig);
 
-        var provider = scope;
-        var tenantDb = provider;
-        tenantDb.CodeFirst.InitTables(typeof(GameAppPackageEntity));
+        var mainDb = scope;
+        mainDb.CodeFirst.InitTables(typeof(GameAppPackageEntity));
 
-        return new ResolverFixture(scope, provider, tenantDb, tenantId);
+        return new ResolverFixture(scope, mainDb);
     }
 
     private ConnectionConfig CreateConfig(string configId)
@@ -172,34 +170,32 @@ public sealed class GameAppPackageResolverInheritanceTests : IDisposable
     private sealed class ResolverFixture
     {
         private readonly SqlSugarScope _scope;
-        private readonly ISqlSugarClient _tenantDb;
-        private readonly long _tenantId;
+        private readonly ISqlSugarClient _mainDb;
 
-        public ResolverFixture(SqlSugarScope scope, ISqlSugarClient provider, ISqlSugarClient tenantDb, long tenantId)
+        public ResolverFixture(SqlSugarScope scope, ISqlSugarClient mainDb)
         {
             _scope = scope;
-            _tenantDb = tenantDb;
-            _tenantId = tenantId;
-            Resolver = new GameAppPackageResolver(provider);
+            _mainDb = mainDb;
+            Resolver = new GameAppPackageResolver(mainDb);
         }
 
         public GameAppPackageResolver Resolver { get; }
 
         public void SeedMaster(long id, string packageName, bool isEnabled = true, long updateTime = 0)
         {
-            _tenantDb.Insertable(BuildEntity(id, packageName, null, PackageKindEnum.Master, InheritanceModeEnum.Override, isEnabled, updateTime))
+            _mainDb.Insertable(BuildEntity(id, packageName, null, PackageKindEnum.Master, InheritanceModeEnum.Override, isEnabled, updateTime))
                      .ExecuteCommand();
         }
 
         public void SeedChild(long id, string packageName, long parentPackageId, InheritanceModeEnum mode, bool isEnabled = true, long updateTime = 0)
         {
-            _tenantDb.Insertable(BuildEntity(id, packageName, parentPackageId, PackageKindEnum.Derived, mode, isEnabled, updateTime))
+            _mainDb.Insertable(BuildEntity(id, packageName, parentPackageId, PackageKindEnum.Derived, mode, isEnabled, updateTime))
                      .ExecuteCommand();
         }
 
         public void UpdatePackage(long id, string? packageName = null, long? parentPackageId = null, InheritanceModeEnum? mode = null, long updateTime = 0)
         {
-            var existing = _tenantDb.Queryable<GameAppPackageEntity>().First(p => p.Id == id);
+            var existing = _mainDb.Queryable<GameAppPackageEntity>().First(p => p.Id == id);
             if (existing == null)
             {
                 return;
@@ -221,7 +217,7 @@ public sealed class GameAppPackageResolverInheritanceTests : IDisposable
             }
 
             existing.UpdateTime = updateTime;
-            _tenantDb.Updateable(existing).ExecuteCommand();
+            _mainDb.Updateable(existing).ExecuteCommand();
         }
 
         private GameAppPackageEntity BuildEntity(long id, string packageName, long? parentPackageId, PackageKindEnum kind, InheritanceModeEnum mode, bool isEnabled, long updateTime)

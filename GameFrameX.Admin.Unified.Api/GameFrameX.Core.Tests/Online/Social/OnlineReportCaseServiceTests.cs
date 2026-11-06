@@ -24,7 +24,6 @@ namespace GameFrameX.Core.Tests.Online.Social;
 // 案件回写失败落响应原因不阻断；Mute 缺时长服务端兜底拒绝；Page 过滤透传与游标往返。
 public sealed class OnlineReportCaseServiceTests : IDisposable
 {
-    private const long TenantA = 4001;
     private const long App100 = 100;
     private const long Area1001 = 2001;
     private const long OperatorUserId = 77;
@@ -265,7 +264,7 @@ public sealed class OnlineReportCaseServiceTests : IDisposable
 
     private OnlineReportCaseService CreateService(IOnlineServerClient onlineServerClient)
     {
-        var userContext = CreateUserContext(TenantA, OperatorUserId);
+        var userContext = CreateUserContext(OperatorUserId);
         var factory = new OnlineScopeContextFactory(Repository<GameAreaEntity>());
         var linkService = new OnlinePenaltyLinkCommandService(
             Repository<GamePenaltyEntity>(),
@@ -313,10 +312,9 @@ public sealed class OnlineReportCaseServiceTests : IDisposable
         return new SqlSugarRepository<T> { Context = _db, };
     }
 
-    private static CurrentUserContext CreateUserContext(long tenantId, long userId)
+    private static CurrentUserContext CreateUserContext(long userId)
     {
         var identity = new ClaimsIdentity("TestAuth");
-        identity.AddClaim(new Claim("TenantId", tenantId.ToString()));
         identity.AddClaim(new Claim(ClaimConst.UserId, userId.ToString()));
         var httpContext = new DefaultHttpContext { User = new ClaimsPrincipal(identity), };
         var accessor = new HttpContextAccessor { HttpContext = httpContext, };

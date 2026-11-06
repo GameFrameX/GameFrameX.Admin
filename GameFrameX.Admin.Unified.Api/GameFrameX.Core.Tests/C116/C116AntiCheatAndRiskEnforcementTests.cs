@@ -32,7 +32,7 @@ public class C116AntiCheatAndRiskEnforcementTests
     public async Task NullAppAttestationVerifier_Throws_And_Never_Passes()
     {
         var verifier = new NullAppAttestationVerifier();
-        await Assert.ThrowsAsync<NotImplementedException>(() => verifier.VerifyAsync(1, null!));
+        await Assert.ThrowsAsync<NotImplementedException>(() => verifier.VerifyAsync(null!));
     }
 
     [Fact]

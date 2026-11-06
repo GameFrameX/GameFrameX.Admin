@@ -21,7 +21,6 @@ namespace GameFrameX.Core.Tests.Online.LiveOps;
 // 被灰度版本行引用的分群不可删除。
 public sealed class GameOnlinePlayerSegmentServiceTests : IDisposable
 {
-    private const long TenantA = 1001;
     private const long App100 = 100;
 
     private readonly string _dbPath = Path.Combine(Path.GetTempPath(), $"online_segment_{Guid.NewGuid():N}.db");

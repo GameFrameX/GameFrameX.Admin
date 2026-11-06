@@ -24,7 +24,6 @@ namespace GameFrameX.Core.Tests.Online.Social;
 // 单区服失败（Online 业务码 / 传输层）不抛不回滚事实源、非 Active / 纯落账动作 / 全区服无目标拒绝。
 public sealed class OnlinePenaltyLinkCommandServiceTests : IDisposable
 {
-    private const long TenantA = 3001;
     private const long App100 = 100;
     private const long Area1001 = 2001;
     private const long Area1002 = 2002;
@@ -220,7 +219,7 @@ public sealed class OnlinePenaltyLinkCommandServiceTests : IDisposable
 
     private OnlinePenaltyLinkCommandService CreateService(IOnlineServerClient onlineServerClient)
     {
-        var userContext = CreateUserContext(TenantA);
+        var userContext = CreateUserContext();
         var factory = new OnlineScopeContextFactory(Repository<GameAreaEntity>());
         return new OnlinePenaltyLinkCommandService(
             Repository<GamePenaltyEntity>(),
@@ -291,10 +290,9 @@ public sealed class OnlinePenaltyLinkCommandServiceTests : IDisposable
         return new SqlSugarRepository<T> { Context = _db, };
     }
 
-    private static CurrentUserContext CreateUserContext(long tenantId)
+    private static CurrentUserContext CreateUserContext()
     {
         var identity = new ClaimsIdentity("TestAuth");
-        identity.AddClaim(new Claim("TenantId", tenantId.ToString()));
         var httpContext = new DefaultHttpContext { User = new ClaimsPrincipal(identity), };
         var accessor = new HttpContextAccessor { HttpContext = httpContext, };
         return new CurrentUserContext(accessor);

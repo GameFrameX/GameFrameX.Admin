@@ -6,7 +6,7 @@ namespace GameFrameX.Core.Middleware;
 /// endpoint metadata 实现 <see cref="IProtoVersionExempt"/> 的入口（外部平台 S2S 回调）豁免。</para>
 /// <para><b>AuditOnly 语义</b>：头值不在白名单（<see cref="ProtoVersionOptions.AllowedVersions"/>）只记 Warning 日志放行，
 /// <b>不拦截</b>——待不兼容 major 变更时才收紧为强制拒绝。</para>
-/// <para>挂载点：管线最外层就近（Resolution 之后），先于签名/信封——版本观察与密钥态无关。</para>
+/// <para>挂载点：请求上下文建立之后，先于签名/信封——版本观察与密钥态无关。</para>
 /// </summary>
 public sealed class ProtoVersionMiddleware
 {
@@ -34,7 +34,7 @@ public sealed class ProtoVersionMiddleware
                 return;
             }
 
-            // 缺版本头一律拒绝；记录 path/appId 便于定位未携带头的接入方
+            // 缺版本头一律拒绝；记录路径便于定位未携带头的接入方
             logger.LogWarning("缺失协议版本头，拒绝请求：path={Path}", context.Request.Path);
             await MiddlewareResponseWriter.WriteRejectedAsync(context, StatusCodes.Status400BadRequest, "缺少协议版本头（X-Proto-Ver）");
             return;
@@ -43,7 +43,7 @@ public sealed class ProtoVersionMiddleware
         var options = optionsAccessor.Value;
         if (!options.AllowedVersions.Contains(headerValue, StringComparer.Ordinal))
         {
-            // AuditOnly：只告警不拦截（major 变更时才收紧）；记录 appId/租户便于定位未升级客户端
+            // AuditOnly：只告警不拦截（major 变更时才收紧）
             logger.LogWarning("未知协议版本放行（AuditOnly）：protoVer={ProtoVer} allowed=[{Allowed}] path={Path}",
                               headerValue, string.Join(",", options.AllowedVersions), context.Request.Path);
         }

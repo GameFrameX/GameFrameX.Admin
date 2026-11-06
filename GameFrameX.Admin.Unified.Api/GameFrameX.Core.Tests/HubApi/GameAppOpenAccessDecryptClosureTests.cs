@@ -124,7 +124,7 @@ public sealed class GameAppOpenAccessDecryptClosureTests : IDisposable
     }
 
     [Fact]
-    public async Task MainDatabaseCredential_ReplayIsRejectedAndOperatorHasNoTenantClaim()
+    public async Task MainDatabaseCredential_ReplayIsRejectedAndOperatorHasNoLegacyScopeClaim()
     {
         SeedCredential(SecretCrypto.Encrypt("hub-open-access-secret")!);
         var first = CreateSignedRequest("hub-open-access-secret");
@@ -134,7 +134,7 @@ public sealed class GameAppOpenAccessDecryptClosureTests : IDisposable
         {
             nextCount++;
             Assert.Equal("7801", context.User.FindFirst(GameFrameX.Core.Const.ClaimConst.UserId)?.Value);
-            Assert.Null(context.User.FindFirst("TenantId"));
+            Assert.Null(context.User.FindFirst("TenantId")); // c406-keep
             return Task.CompletedTask;
         });
         await middleware.InvokeAsync(first, cache);
@@ -153,8 +153,8 @@ public sealed class GameAppOpenAccessDecryptClosureTests : IDisposable
             Id = 7801, Account = "ci-user", RealName = "CI", Password = "not-a-real-password",
         };
         UserService.NormalizeNewUser(bindUser); // 补齐 NOT NULL 字符串列默认值
-        _db.TenantDb.Insertable(bindUser).ExecuteCommand();
-        _db.TenantDb.Insertable(new GameAppOpenAccessEntity
+        _db.MainDb.Insertable(bindUser).ExecuteCommand();
+        _db.MainDb.Insertable(new GameAppOpenAccessEntity
         {
             Id = 7802, BindUserId = 7801,
             Scenario = "ci", Purpose = "unit-test", SubjectName = "unit-test",
@@ -190,7 +190,7 @@ public sealed class GameAppOpenAccessDecryptClosureTests : IDisposable
     {
         var services = new ServiceCollection();
         services.AddSingleton<ISqlSugarClient>(_db.MainDb);
-        services.AddSingleton<ISqlSugarClient>(_db.DbProvider);
+        services.AddSingleton<ISqlSugarClient>(_db.MainDb);
         services.AddScoped(typeof(Repository<>));
         return services.BuildServiceProvider();
     }

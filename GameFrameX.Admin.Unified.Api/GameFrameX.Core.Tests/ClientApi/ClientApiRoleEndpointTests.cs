@@ -21,7 +21,7 @@ public sealed class ClientApiRoleEndpointTests
         db.SeedArea(2001, 10);
         var handler = ClientApiRecordingHttpHandler.WithGameServerDefaults(3001);
         var controller = CreateController(db, handler);
-        db.AttachContext(controller, includeApp: false);
+        db.AttachContext(controller);
 
         var result = await controller.Add(new AddGameRoleEntityRequest
         {
@@ -33,7 +33,7 @@ public sealed class ClientApiRoleEndpointTests
         });
 
         var root = ClientApiResultReader.Read(result);
-        var saved = await db.TenantDb.Queryable<GameRoleEntity>().FirstAsync(u => u.Id == 3001);
+        var saved = await db.MainDb.Queryable<GameRoleEntity>().FirstAsync(u => u.Id == 3001);
         Assert.Equal(0, ClientApiResultReader.Code(root));
         Assert.Equal(1001, saved.UserId);
         Assert.Equal(1, handler.Count("/game/api/req_player_create"));
@@ -44,7 +44,7 @@ public sealed class ClientApiRoleEndpointTests
     {
         using var db = new ClientApiTestDb();
         var controller = CreateController(db);
-        db.AttachContext(controller, includeApp: false);
+        db.AttachContext(controller);
 
         var result = await controller.Add(new AddGameRoleEntityRequest { UserId = 1001, AreaId = 2001, Name = "Hero", });
 
@@ -67,7 +67,7 @@ public sealed class ClientApiRoleEndpointTests
         var result = await controller.ChangePlayerName(new GamePlayerChangeNameRequest { PlayerId = 3001, AreaId = 2001, Name = "New", });
 
         var root = ClientApiResultReader.Read(result);
-        var saved = await db.TenantDb.Queryable<GameRoleEntity>().FirstAsync(u => u.Id == 3001);
+        var saved = await db.MainDb.Queryable<GameRoleEntity>().FirstAsync(u => u.Id == 3001);
         Assert.Equal(0, ClientApiResultReader.Code(root));
         Assert.Equal("New", saved.Name);
     }
@@ -146,7 +146,7 @@ public sealed class ClientApiRoleEndpointTests
         var result = await controller.Delete(new DeleteGameRoleEntityRequest { Id = 3001, });
 
         var root = ClientApiResultReader.Read(result);
-        var saved = await db.TenantDb.Queryable<GameRoleEntity>().Filter(null, true).FirstAsync(u => u.Id == 3001);
+        var saved = await db.MainDb.Queryable<GameRoleEntity>().Filter(null, true).FirstAsync(u => u.Id == 3001);
         Assert.Equal(0, ClientApiResultReader.Code(root));
         Assert.True(saved.IsDeleted);
     }
@@ -154,13 +154,13 @@ public sealed class ClientApiRoleEndpointTests
     [Fact]
     public async Task GameRole_Login_IssuesGameTicketForOwnedRole()
     {
-        using var db = new ClientApiTestDb(10, 20);
+        using var db = new ClientApiTestDb();
         db.SeedUser(1001, "ticket-user");
         db.SeedAreaClassify(10);
         db.SeedArea(2001, 10);
         db.SeedRole(3001, 1001, 2001);
         var issuer = new ClientApiTokenIssuer(FakeOptionsProvider.WithTokenPolicy("unit-test-signing-key", 60));
-        var accessToken = await issuer.IssueAsync(await db.TenantDb.Queryable<GameUserEntity>().FirstAsync(u => u.Id == 1001), "Guest");
+        var accessToken = await issuer.IssueAsync(await db.MainDb.Queryable<GameUserEntity>().FirstAsync(u => u.Id == 1001), "Guest");
         var controller = CreateController(db, ClientApiRecordingHttpHandler.WithGameServerDefaults(), issuer);
         db.AttachContext(controller);
 
@@ -179,26 +179,80 @@ public sealed class ClientApiRoleEndpointTests
     }
 
     [Fact]
-    public async Task GameRole_Login_RejectsBodyContextOverrideFields()
+    public async Task GameRole_Login_IgnoresUnknownLegacyContextFields()
     {
         using var db = new ClientApiTestDb();
-        var controller = CreateController(db);
+        db.SeedUser(1001, "legacy-fields-user");
+        db.SeedAreaClassify(10);
+        db.SeedArea(2001, 10);
+        db.SeedRole(3001, 1001, 2001);
+        db.InitBusinessTables(typeof(GameUserEntity));
+        var issuer = new ClientApiTokenIssuer(FakeOptionsProvider.WithTokenPolicy("unit-test-signing-key", 60));
+        var accessToken = await issuer.IssueAsync(await db.MainDb.Queryable<GameUserEntity>().FirstAsync(u => u.Id == 1001), "Guest");
+        var handler = ClientApiRecordingHttpHandler.WithGameServerDefaults();
+        var controller = CreateController(db, handler, issuer);
         db.AttachContext(controller);
 
         var result = await controller.Login(new GamePlayerLoginRequest
         {
             PlayerId = 3001,
             AreaId = 2001,
-            AccessToken = "token",
+            AccessToken = accessToken.Token,
             ExtraFields = new Dictionary<string, JsonElement>
             {
-                ["tenantId"] = JsonDocument.Parse("10").RootElement.Clone(),
+                ["tenantId"] = JsonDocument.Parse("10").RootElement.Clone(), // c406-keep
+                ["appId"] = JsonDocument.Parse("20").RootElement.Clone(), // c406-keep
+                ["gameAppId"] = JsonDocument.Parse("30").RootElement.Clone(), // c406-keep
             },
         });
 
         var root = ClientApiResultReader.Read(result);
-        Assert.Equal((int)AuthErrorCode.AuthorizeInvalid, ClientApiResultReader.Code(root));
-        Assert.Equal("请求体不能包含租户、应用或账号上下文字段", ClientApiResultReader.Message(root));
+        Assert.Equal(0, ClientApiResultReader.Code(root));
+        Assert.Single(handler.RequestBodies);
+        using (var body = JsonDocument.Parse(handler.RequestBodies.Single()))
+        {
+            Assert.DoesNotContain("tenantId", body.RootElement.EnumerateObject().Select(property => property.Name), StringComparer.OrdinalIgnoreCase); // c406-keep
+            Assert.DoesNotContain("appId", body.RootElement.EnumerateObject().Select(property => property.Name), StringComparer.OrdinalIgnoreCase); // c406-keep
+            Assert.DoesNotContain("gameAppId", body.RootElement.EnumerateObject().Select(property => property.Name), StringComparer.OrdinalIgnoreCase); // c406-keep
+        }
+
+        Assert.DoesNotContain(handler.RequestUris, uri => uri.Contains("tenantId", StringComparison.OrdinalIgnoreCase)); // c406-keep
+        Assert.DoesNotContain(handler.RequestUris, uri => uri.Contains("appId", StringComparison.OrdinalIgnoreCase)); // c406-keep
+        Assert.DoesNotContain(handler.RequestUris, uri => uri.Contains("gameAppId", StringComparison.OrdinalIgnoreCase)); // c406-keep
+    }
+
+    [Fact]
+    public async Task GameRole_Login_RejectsIdentityOverrideUserId()
+    {
+        using (var db = new ClientApiTestDb())
+        {
+            db.SeedUser(1001, "identity-override-user");
+            db.SeedAreaClassify(10);
+            db.SeedArea(2001, 10);
+            db.SeedRole(3001, 1001, 2001);
+            db.InitBusinessTables(typeof(GameUserEntity));
+            var issuer = new ClientApiTokenIssuer(FakeOptionsProvider.WithTokenPolicy("unit-test-signing-key", 60));
+            var accessToken = await issuer.IssueAsync(await db.MainDb.Queryable<GameUserEntity>().FirstAsync(user => user.Id == 1001), "Guest");
+            var handler = ClientApiRecordingHttpHandler.WithGameServerDefaults();
+            var controller = CreateController(db, handler, issuer);
+            db.AttachContext(controller);
+
+            var result = await controller.Login(new GamePlayerLoginRequest
+            {
+                PlayerId = 3001,
+                AreaId = 2001,
+                AccessToken = accessToken.Token,
+                ExtraFields = new Dictionary<string, JsonElement>
+                {
+                    ["userId"] = JsonDocument.Parse("9999").RootElement.Clone(), // c406-keep
+                },
+            });
+
+            var root = ClientApiResultReader.Read(result);
+            Assert.Equal((int)AuthErrorCode.AuthorizeInvalid, ClientApiResultReader.Code(root));
+            Assert.Equal("请求体不能包含身份覆盖字段", ClientApiResultReader.Message(root));
+            Assert.Empty(handler.RequestBodies);
+        }
     }
 
     [Fact]
@@ -207,7 +261,7 @@ public sealed class ClientApiRoleEndpointTests
         using var db = new ClientApiTestDb();
         var role = db.SeedRole(3001, 1001, 2001, name: "Old");
         role.RowVersion = 7;
-        await db.TenantDb.Updateable(role).ExecuteCommandAsync();
+        await db.MainDb.Updateable(role).ExecuteCommandAsync();
         var controller = CreateController(db);
         db.AttachContext(controller);
 

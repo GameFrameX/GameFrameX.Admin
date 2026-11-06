@@ -8,7 +8,7 @@ namespace GameFrameX.Client.Api.Services;
 public class NullAppAttestationVerifier : IAppAttestationVerifier
 {
     /// <inheritdoc />
-    public Task<bool> VerifyAsync(long appId, HttpContext context)
+    public Task<bool> VerifyAsync(HttpContext context)
     {
         throw new NotImplementedException("应用签名/设备证明校验由衍生 change 实现");
     }

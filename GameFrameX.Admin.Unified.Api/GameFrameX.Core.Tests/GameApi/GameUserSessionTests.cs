@@ -37,7 +37,7 @@ public sealed class GameUserSessionTests
             Assert.Equal("uuid-a", data.GetProperty("InstallationId").GetString());
             Assert.Equal("iPhone13", data.GetProperty("UpdateDeviceModel").GetString());
             // P0-2：会话列成对写回存档行（SessionId == 下发 Session）
-            var row = db.TenantDb.Queryable<GameUserArchiveEntity>().Single(x => x.UserId == 8001);
+            var row = db.MainDb.Queryable<GameUserArchiveEntity>().Single(x => x.UserId == 8001);
             Assert.Equal(data.GetProperty("Session").GetInt64(), row.SessionId);
             Assert.Equal("SM-G991B", row.SessionDeviceModel);
             // 常量回显与请求回显
@@ -63,7 +63,7 @@ public sealed class GameUserSessionTests
             Assert.Equal(string.Empty, data.GetProperty("UpdateDeviceModel").GetString());
             Assert.True(data.GetProperty("Session").GetInt64() > 0);
             // 存档行由 C8 存档链路负责建行，登录不代建
-            Assert.Equal(0, db.TenantDb.Queryable<GameUserArchiveEntity>().Count(x => x.UserId == 8002));
+            Assert.Equal(0, db.MainDb.Queryable<GameUserArchiveEntity>().Count(x => x.UserId == 8002));
         }
     }
 
@@ -81,7 +81,7 @@ public sealed class GameUserSessionTests
             Assert.NotEqual(first.GetProperty("Session").GetInt64(), second.GetProperty("Session").GetInt64());
 
             // ponytail: 单副本起步——后登录覆盖（顶号），不保留历史会话
-            var row = db.TenantDb.Queryable<GameUserArchiveEntity>().Single(x => x.UserId == 8003);
+            var row = db.MainDb.Queryable<GameUserArchiveEntity>().Single(x => x.UserId == 8003);
             Assert.Equal(second.GetProperty("Session").GetInt64(), row.SessionId);
             Assert.Equal("device-B", row.SessionDeviceModel);
         }
