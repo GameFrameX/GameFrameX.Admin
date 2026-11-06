@@ -287,6 +287,11 @@ pnpm run dev    # 默认 http://localhost:20800
 
 打开浏览器 → 看到登录页 → 找后端同学要账号。
 
+首次部署的账号从哪来（后端侧两个环境变量，见仓库根 `.env.example`）：
+
+- `GFX_SUPERADMIN_INITIAL_PASSWORD`：超级管理员 `superadmin` 的初始密码；不设则首次打开登录页走首装向导设置。
+- `GAMEFRAMEX_ADMIN_INITIAL_ACCOUNT` + `GAMEFRAMEX_ADMIN_INITIAL_PASSWORD`：成对设置时，后端启动会自动创建**首个业务管理员**账号（绑定 `sys_admin` 角色、授权全部非超管菜单），前端用它登录即可进业务后台；只在主库还没有任何业务管理员时生效一次。
+
 ### 卡住了？
 
 | 现象 | 大概率原因 |
