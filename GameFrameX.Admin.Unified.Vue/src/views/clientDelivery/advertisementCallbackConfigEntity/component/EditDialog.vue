@@ -259,6 +259,11 @@ const onProviderChange = async (form: any) => {
 const beforeOpen = async (form: any) => {
   const normalized = {...defaultForm(), ...form}
 
+  // 后端 long 序列化为字符串（openapi: packageId type=string），分包选项 value 是数字；
+  // 不归一化时编辑回显匹配不到选项，选择器显示占位符。
+  normalized.packageId = normalized.packageId === undefined || normalized.packageId === null || normalized.packageId === ''
+      ? undefined
+      : Number(normalized.packageId)
   normalized.provider = normalized.provider || 'TopOn'
   normalized.isEnabled = normalized.isEnabled !== false
   const next = await loadSchema(normalized.provider)
