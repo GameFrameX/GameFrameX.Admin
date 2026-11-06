@@ -10,15 +10,15 @@
  */
 
 import {
-  AddTenantGameAnnouncementEntityRequest,
+  AddGameAnnouncementEntityRequest,
   GameAnnouncementAddPostData,
   GameAnnouncementDeletePostData,
   GameAnnouncementDetailGetData,
   GameAnnouncementDispatchOnlinePostData,
   GameAnnouncementPagePostData,
   GameAnnouncementUpdatePostData,
-  PageTenantGameAnnouncementEntityRequest,
-  UpdateTenantGameAnnouncementEntityRequest,
+  PageGameAnnouncementEntityRequest,
+  UpdateGameAnnouncementEntityRequest,
 } from "./types";
 import {
   BaseDeleteRequest,
@@ -43,7 +43,7 @@ export class GameAnnouncement<SecurityDataType = unknown> {
    * @request POST:/api/gameAnnouncement/add
    */
   gameAnnouncementAddPost = (
-    data: AddTenantGameAnnouncementEntityRequest,
+    data: AddGameAnnouncementEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameAnnouncementAddPostData, any>({
@@ -128,7 +128,7 @@ export class GameAnnouncement<SecurityDataType = unknown> {
    * @request POST:/api/gameAnnouncement/page
    */
   gameAnnouncementPagePost = (
-    data: PageTenantGameAnnouncementEntityRequest,
+    data: PageGameAnnouncementEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameAnnouncementPagePostData, any>({
@@ -148,7 +148,7 @@ export class GameAnnouncement<SecurityDataType = unknown> {
    * @request POST:/api/gameAnnouncement/update
    */
   gameAnnouncementUpdatePost = (
-    data: UpdateTenantGameAnnouncementEntityRequest,
+    data: UpdateGameAnnouncementEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameAnnouncementUpdatePostData, any>({

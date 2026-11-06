@@ -2,7 +2,7 @@
 /* tslint:disable */
 
 /** 兑换码增加输入参数 */
-export interface AddTenantGameRedeemCodeEntityRequest {
+export interface AddGameRedeemCodeEntityRequest {
   /** 主键Id */
   id: string;
   /** 区服ID */
@@ -119,7 +119,7 @@ export interface GameRedeemCodeResponseSqlSugarPagedList {
 }
 
 /** 兑换码分页查询输入参数 */
-export interface PageTenantGameRedeemCodeEntityRequest {
+export interface PageGameRedeemCodeEntityRequest {
   searchKey?: string | null;
   /**
    * @format int32
@@ -155,7 +155,7 @@ export interface PageTenantGameRedeemCodeEntityRequest {
 }
 
 /** 兑换码更新输入参数 */
-export interface UpdateTenantGameRedeemCodeEntityRequest {
+export interface UpdateGameRedeemCodeEntityRequest {
   /**
    * @min 1
    * @max 9223372036854776000

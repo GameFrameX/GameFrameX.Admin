@@ -4,7 +4,7 @@
 import type { BaseSelectPageResponse, BaseSelectPageStringResponse } from "../_shared/data-contracts";
 
 /** 游戏定时任务增加输入参数 */
-export interface AddTenantGameTimeJobEntityRequest {
+export interface AddGameTimeJobEntityRequest {
   /** 主键Id */
   id: string;
   /**
@@ -77,7 +77,7 @@ export interface GameTimeJobResponseSqlSugarPagedList {
 }
 
 /** 游戏定时任务分页查询输入参数 */
-export interface PageTenantGameTimeJobEntityRequest {
+export interface PageGameTimeJobEntityRequest {
   searchKey?: string | null;
   /**
    * @format int32
@@ -98,7 +98,7 @@ export interface PageTenantGameTimeJobEntityRequest {
 }
 
 /** 游戏定时任务更新输入参数 */
-export interface UpdateTenantGameTimeJobEntityRequest {
+export interface UpdateGameTimeJobEntityRequest {
   /**
    * @min 1
    * @max 9223372036854776000

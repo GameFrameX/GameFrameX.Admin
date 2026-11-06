@@ -180,7 +180,7 @@ export interface PageUserRequest {
   phone?: string | null;
 }
 
-/** 重置密码结果（平台用户与租户管理员重置共用） */
+/** 重置密码结果（平台用户与管理员角色重置共用） */
 export interface ResetPwdResponse {
   /** 重置后的初始密码（取自系统密码配置；一次性明文返回，仅本次响应可见，禁止落日志/缓存） */
   newPassword?: string | null;
@@ -190,7 +190,7 @@ export interface ResetPwdResponseHttpJsonResultData {
   /** @format int32 */
   code?: number;
   message?: string | null;
-  /** 重置密码结果（平台用户与租户管理员重置共用） */
+  /** 重置密码结果（平台用户与管理员角色重置共用） */
   data?: ResetPwdResponse;
   trackId?: string | null;
   errorCode?: string | null;
@@ -208,7 +208,80 @@ export interface ResetPwdUserRequest {
   id: string;
 }
 
-export interface TenantUserEntity {
+export interface UpdateUserRequest {
+  /** 主键Id（新增为 0，编辑由前端回填） */
+  id?: string;
+  /** 乐观锁版本号 */
+  rowVersion?: string | null;
+  /**
+   * 账号
+   * @minLength 1
+   */
+  account: string;
+  /**
+   * 真实姓名
+   * @minLength 1
+   */
+  realName: string;
+  /** 昵称 */
+  nickName?: string | null;
+  /** 头像 */
+  avatar?: string | null;
+  sex?: GenderEnum;
+  /**
+   * 年龄
+   * @format int32
+   */
+  age?: number;
+  /**
+   * 出生日期
+   * @format int64
+   */
+  birthdayTime?: number | null;
+  /** 民族 */
+  nation?: string | null;
+  /** 手机号码 */
+  phone?: string | null;
+  cardType?: CardTypeEnum;
+  /** 身份证号 */
+  idCardNum?: string | null;
+  /** 邮箱 */
+  email?: string | null;
+  /** 地址 */
+  address?: string | null;
+  cultureLevel?: CultureLevelEnum;
+  /** 政治面貌 */
+  politicalOutlook?: string | null;
+  /** 毕业院校 */
+  college?: string | null;
+  /** 办公电话 */
+  officePhone?: string | null;
+  /** 紧急联系人 */
+  emergencyContact?: string | null;
+  /** 紧急联系人电话 */
+  emergencyPhone?: string | null;
+  /** 紧急联系人地址 */
+  emergencyAddress?: string | null;
+  /**
+   * 排序
+   * @format int32
+   */
+  orderNo?: number;
+  /** 备注 */
+  remark?: string | null;
+  accountType?: AccountTypeEnum;
+  /** 工号 */
+  jobNum?: string | null;
+  /**
+   * 入职日期
+   * @format int64
+   */
+  joinTime?: number | null;
+  /** 角色集合 */
+  roleIdList?: number[] | null;
+}
+
+export interface UserEntity {
   /** 主键Id */
   id: string;
   /** 创建人Id */
@@ -286,7 +359,7 @@ export interface TenantUserEntity {
   remark?: string | null;
   accountType?: AccountTypeEnum;
   managerUserId?: string | null;
-  managerUser?: TenantUserEntity;
+  managerUser?: UserEntity;
   jobNum?: string | null;
   posLevel?: string | null;
   posTitle?: string | null;
@@ -303,8 +376,18 @@ export interface TenantUserEntity {
   signature?: string | null;
 }
 
+export interface UserRequest {
+  /**
+   * @min 1
+   * @max 9223372036854776000
+   */
+  id: string;
+  /** 是否启用 */
+  isEnabled?: boolean;
+}
+
 /** 租户用户输出参数 */
-export interface TenantUserResponse {
+export interface UserResponse {
   /** Id */
   id?: string;
   /** 账号 */
@@ -412,7 +495,7 @@ export interface TenantUserResponse {
   rowVersion?: string | null;
 }
 
-export interface TenantUserResponseSqlSugarPagedList {
+export interface UserResponseSqlSugarPagedList {
   /** @format int32 */
   page?: number;
   /** @format int32 */
@@ -421,92 +504,9 @@ export interface TenantUserResponseSqlSugarPagedList {
   total?: number;
   /** @format int32 */
   totalPages?: number;
-  items?: TenantUserResponse[] | null;
+  items?: UserResponse[] | null;
   hasPrevPage?: boolean;
   hasNextPage?: boolean;
-}
-
-export interface UpdateUserRequest {
-  /** 主键Id（新增为 0，编辑由前端回填） */
-  id?: string;
-  /** 乐观锁版本号 */
-  rowVersion?: string | null;
-  /**
-   * 账号
-   * @minLength 1
-   */
-  account: string;
-  /**
-   * 真实姓名
-   * @minLength 1
-   */
-  realName: string;
-  /** 昵称 */
-  nickName?: string | null;
-  /** 头像 */
-  avatar?: string | null;
-  sex?: GenderEnum;
-  /**
-   * 年龄
-   * @format int32
-   */
-  age?: number;
-  /**
-   * 出生日期
-   * @format int64
-   */
-  birthdayTime?: number | null;
-  /** 民族 */
-  nation?: string | null;
-  /** 手机号码 */
-  phone?: string | null;
-  cardType?: CardTypeEnum;
-  /** 身份证号 */
-  idCardNum?: string | null;
-  /** 邮箱 */
-  email?: string | null;
-  /** 地址 */
-  address?: string | null;
-  cultureLevel?: CultureLevelEnum;
-  /** 政治面貌 */
-  politicalOutlook?: string | null;
-  /** 毕业院校 */
-  college?: string | null;
-  /** 办公电话 */
-  officePhone?: string | null;
-  /** 紧急联系人 */
-  emergencyContact?: string | null;
-  /** 紧急联系人电话 */
-  emergencyPhone?: string | null;
-  /** 紧急联系人地址 */
-  emergencyAddress?: string | null;
-  /**
-   * 排序
-   * @format int32
-   */
-  orderNo?: number;
-  /** 备注 */
-  remark?: string | null;
-  accountType?: AccountTypeEnum;
-  /** 工号 */
-  jobNum?: string | null;
-  /**
-   * 入职日期
-   * @format int64
-   */
-  joinTime?: number | null;
-  /** 角色集合 */
-  roleIdList?: number[] | null;
-}
-
-export interface UserRequest {
-  /**
-   * @min 1
-   * @max 9223372036854776000
-   */
-  id: string;
-  /** 是否启用 */
-  isEnabled?: boolean;
 }
 
 /** 授权用户角色 */
@@ -517,7 +517,7 @@ export interface UserRoleRequest {
   roleIdList?: number[] | null;
 }
 
-export interface TenantUserAddPostData {
+export interface UserAddPostData {
   /**
    * 响应码，0 表示成功，失败时承载统一数字业务错误码（模块枚举 8 位数值，见 GameFrameX.Core/Enum/Errors 与 error-codes.json 码表）
    * @format int32
@@ -541,7 +541,7 @@ export interface TenantUserAddPostData {
   extras: object | null;
 }
 
-export interface TenantUserBaseInfoGetData {
+export interface UserBaseInfoGetData {
   /**
    * 响应码，0 表示成功，失败时承载统一数字业务错误码（模块枚举 8 位数值，见 GameFrameX.Core/Enum/Errors 与 error-codes.json 码表）
    * @format int32
@@ -550,7 +550,7 @@ export interface TenantUserBaseInfoGetData {
   /** 错误或提示信息 */
   message: string;
   /** 租户用户输出参数 */
-  data: TenantUserResponse;
+  data: UserResponse;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
   /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
@@ -565,7 +565,7 @@ export interface TenantUserBaseInfoGetData {
   extras: object | null;
 }
 
-export interface TenantUserBaseInfoPostData {
+export interface UserBaseInfoPostData {
   /**
    * 响应码，0 表示成功，失败时承载统一数字业务错误码（模块枚举 8 位数值，见 GameFrameX.Core/Enum/Errors 与 error-codes.json 码表）
    * @format int32
@@ -589,7 +589,7 @@ export interface TenantUserBaseInfoPostData {
   extras: object | null;
 }
 
-export interface TenantUserChangePwdPostData {
+export interface UserChangePwdPostData {
   /**
    * 响应码，0 表示成功，失败时承载统一数字业务错误码（模块枚举 8 位数值，见 GameFrameX.Core/Enum/Errors 与 error-codes.json 码表）
    * @format int32
@@ -613,11 +613,11 @@ export interface TenantUserChangePwdPostData {
   extras: object | null;
 }
 
-export type TenantUserDeletePostData = any;
+export type UserDeletePostData = any;
 
-export type TenantUserGrantRolePostData = any;
+export type UserGrantRolePostData = any;
 
-export interface TenantUserOwnRoleListGetData {
+export interface UserOwnRoleListGetData {
   /**
    * 响应码，0 表示成功，失败时承载统一数字业务错误码（模块枚举 8 位数值，见 GameFrameX.Core/Enum/Errors 与 error-codes.json 码表）
    * @format int32
@@ -640,7 +640,7 @@ export interface TenantUserOwnRoleListGetData {
   extras: object | null;
 }
 
-export interface TenantUserPagePostData {
+export interface UserPagePostData {
   /**
    * 响应码，0 表示成功，失败时承载统一数字业务错误码（模块枚举 8 位数值，见 GameFrameX.Core/Enum/Errors 与 error-codes.json 码表）
    * @format int32
@@ -648,7 +648,7 @@ export interface TenantUserPagePostData {
   code: number;
   /** 错误或提示信息 */
   message: string;
-  data: TenantUserResponseSqlSugarPagedList;
+  data: UserResponseSqlSugarPagedList;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
   /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
@@ -663,9 +663,9 @@ export interface TenantUserPagePostData {
   extras: object | null;
 }
 
-export type TenantUserResetPwdPostData = ResetPwdResponseHttpJsonResultData;
+export type UserResetPwdPostData = ResetPwdResponseHttpJsonResultData;
 
-export interface TenantUserSetStatusPostData {
+export interface UserSetStatusPostData {
   /**
    * 响应码，0 表示成功，失败时承载统一数字业务错误码（模块枚举 8 位数值，见 GameFrameX.Core/Enum/Errors 与 error-codes.json 码表）
    * @format int32
@@ -689,4 +689,4 @@ export interface TenantUserSetStatusPostData {
   extras: object | null;
 }
 
-export type TenantUserUpdatePostData = any;
+export type UserUpdatePostData = any;

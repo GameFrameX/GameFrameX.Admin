@@ -20,7 +20,7 @@ import {
   AppSignatureKeyRenewRequest,
   AppSignatureKeyRotatePostData,
   AppSignatureKeyRotateRequest,
-  PageTenantAppSignatureKeyRequest,
+  PageAppSignatureKeyRequest,
 } from "./types";
 import {
   BaseDeleteRequest,
@@ -122,7 +122,7 @@ export class AppSignatureKey<SecurityDataType = unknown> {
    * @request POST:/api/appSignatureKey/page
    */
   appSignatureKeyPagePost = (
-    data: PageTenantAppSignatureKeyRequest,
+    data: PageAppSignatureKeyRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<AppSignatureKeyPagePostData, any>({

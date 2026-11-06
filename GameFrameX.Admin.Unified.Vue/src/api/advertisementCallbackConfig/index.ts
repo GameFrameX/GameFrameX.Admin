@@ -10,7 +10,7 @@
  */
 
 import {
-  AddTenantAdvertisementCallbackConfigRequest,
+  AddAdvertisementCallbackConfigRequest,
   AdvertisementCallbackConfigAddPostData,
   AdvertisementCallbackConfigDeletePostData,
   AdvertisementCallbackConfigDetailGetData,
@@ -18,8 +18,8 @@ import {
   AdvertisementCallbackConfigProvidersGetData,
   AdvertisementCallbackConfigSchemaGetData,
   AdvertisementCallbackConfigUpdatePostData,
-  PageTenantAdvertisementCallbackConfigRequest,
-  UpdateTenantAdvertisementCallbackConfigRequest,
+  PageAdvertisementCallbackConfigRequest,
+  UpdateAdvertisementCallbackConfigRequest,
 } from "./types";
 import {
   BaseDeleteRequest,
@@ -43,7 +43,7 @@ export class AdvertisementCallbackConfig<SecurityDataType = unknown> {
    * @request POST:/api/advertisementCallbackConfig/add
    */
   advertisementCallbackConfigAddPost = (
-    data: AddTenantAdvertisementCallbackConfigRequest,
+    data: AddAdvertisementCallbackConfigRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<AdvertisementCallbackConfigAddPostData, any>({
@@ -108,7 +108,7 @@ export class AdvertisementCallbackConfig<SecurityDataType = unknown> {
    * @request POST:/api/advertisementCallbackConfig/page
    */
   advertisementCallbackConfigPagePost = (
-    data: PageTenantAdvertisementCallbackConfigRequest,
+    data: PageAdvertisementCallbackConfigRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<AdvertisementCallbackConfigPagePostData, any>({
@@ -164,7 +164,7 @@ export class AdvertisementCallbackConfig<SecurityDataType = unknown> {
    * @request POST:/api/advertisementCallbackConfig/update
    */
   advertisementCallbackConfigUpdatePost = (
-    data: UpdateTenantAdvertisementCallbackConfigRequest,
+    data: UpdateAdvertisementCallbackConfigRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<AdvertisementCallbackConfigUpdatePostData, any>({

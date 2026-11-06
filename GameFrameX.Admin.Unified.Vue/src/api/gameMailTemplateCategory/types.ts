@@ -4,7 +4,7 @@
 import type { BaseSelectPageResponse, BaseSelectPageStringResponse } from "../_shared/data-contracts";
 
 /** 邮件模板分类增加输入参数 */
-export interface AddTenantGameMailTemplateCategoryEntityRequest {
+export interface AddGameMailTemplateCategoryEntityRequest {
   /** 主键Id */
   id: string;
   /**
@@ -75,7 +75,7 @@ export interface GameMailTemplateCategoryResponseSqlSugarPagedList {
 }
 
 /** 邮件模板分类分页查询输入参数 */
-export interface PageTenantGameMailTemplateCategoryEntityRequest {
+export interface PageGameMailTemplateCategoryEntityRequest {
   searchKey?: string | null;
   /**
    * @format int32
@@ -98,7 +98,7 @@ export interface PageTenantGameMailTemplateCategoryEntityRequest {
 }
 
 /** 邮件模板分类更新输入参数 */
-export interface UpdateTenantGameMailTemplateCategoryEntityRequest {
+export interface UpdateGameMailTemplateCategoryEntityRequest {
   /**
    * @min 1
    * @max 9223372036854776000

@@ -140,43 +140,7 @@ export interface RoleResponse {
   code?: string | null;
 }
 
-/** 系统角色输出参数 */
-export interface TenantRoleResponse {
-  /** Id */
-  id?: string;
-  /** 名称 */
-  name?: string | null;
-  /** 编码 */
-  code?: string | null;
-  /**
-   * 排序
-   * @format int32
-   */
-  orderNo?: number;
-  dataScope?: DataScopeEnum;
-  /** 备注 */
-  remark?: string | null;
-  /** 是否启用 */
-  isEnabled?: boolean | null;
-  /**
-   * 创建时间
-   * @format int64
-   */
-  createdTime?: number;
-  /** 创建人 */
-  createdName?: string | null;
-  /**
-   * 更新时间
-   * @format int64
-   */
-  updateTime?: number | null;
-  /** 更新人 */
-  updatedName?: string | null;
-  /** 行版本号（乐观锁） */
-  rowVersion?: string | null;
-}
-
-export interface TenantRoleResponseSqlSugarPagedList {
+export interface RoleResponseSqlSugarPagedList {
   /** @format int32 */
   page?: number;
   /** @format int32 */
@@ -185,7 +149,7 @@ export interface TenantRoleResponseSqlSugarPagedList {
   total?: number;
   /** @format int32 */
   totalPages?: number;
-  items?: TenantRoleResponse[] | null;
+  items?: RoleResponse[] | null;
   hasPrevPage?: boolean;
   hasNextPage?: boolean;
 }
@@ -254,13 +218,13 @@ export interface UpdateRoleRequest {
   menuIdList?: number[] | null;
 }
 
-export type TenantRoleAddPostData = any;
+export type RoleAddPostData = any;
 
-export type TenantRoleDeletePostData = any;
+export type RoleDeletePostData = any;
 
-export type TenantRoleGrantMenuPostData = any;
+export type RoleGrantMenuPostData = any;
 
-export interface TenantRoleListGetData {
+export interface RoleListGetData {
   /**
    * 响应码，0 表示成功，失败时承载统一数字业务错误码（模块枚举 8 位数值，见 GameFrameX.Core/Enum/Errors 与 error-codes.json 码表）
    * @format int32
@@ -283,7 +247,7 @@ export interface TenantRoleListGetData {
   extras: object | null;
 }
 
-export interface TenantRoleOwnMenuListGetData {
+export interface RoleOwnMenuListGetData {
   /**
    * 响应码，0 表示成功，失败时承载统一数字业务错误码（模块枚举 8 位数值，见 GameFrameX.Core/Enum/Errors 与 error-codes.json 码表）
    * @format int32
@@ -306,7 +270,7 @@ export interface TenantRoleOwnMenuListGetData {
   extras: object | null;
 }
 
-export interface TenantRolePagePostData {
+export interface RolePagePostData {
   /**
    * 响应码，0 表示成功，失败时承载统一数字业务错误码（模块枚举 8 位数值，见 GameFrameX.Core/Enum/Errors 与 error-codes.json 码表）
    * @format int32
@@ -314,7 +278,7 @@ export interface TenantRolePagePostData {
   code: number;
   /** 错误或提示信息 */
   message: string;
-  data: TenantRoleResponseSqlSugarPagedList;
+  data: RoleResponseSqlSugarPagedList;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
   /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
@@ -329,7 +293,7 @@ export interface TenantRolePagePostData {
   extras: object | null;
 }
 
-export interface TenantRoleSetStatusPostData {
+export interface RoleSetStatusPostData {
   /**
    * 响应码，0 表示成功，失败时承载统一数字业务错误码（模块枚举 8 位数值，见 GameFrameX.Core/Enum/Errors 与 error-codes.json 码表）
    * @format int32
@@ -353,4 +317,4 @@ export interface TenantRoleSetStatusPostData {
   extras: object | null;
 }
 
-export type TenantRoleUpdatePostData = any;
+export type RoleUpdatePostData = any;

@@ -4,7 +4,7 @@
 import type { BaseSelectPageResponse, BaseSelectPageStringResponse } from "../_shared/data-contracts";
 
 /** 游戏角色增加输入参数 */
-export interface AddTenantGameRoleEntityRequest {
+export interface AddGameRoleEntityRequest {
   /** 角色Id */
   roleId?: string | null;
   /** 用户ID */
@@ -97,7 +97,7 @@ export interface GameRoleResponseSqlSugarPagedList {
 }
 
 /** 游戏角色分页查询输入参数 */
-export interface PageTenantGameRoleEntityRequest {
+export interface PageGameRoleEntityRequest {
   searchKey?: string | null;
   /**
    * @format int32
@@ -144,7 +144,7 @@ export interface PageTenantGameRoleEntityRequest {
 }
 
 /** 游戏角色更新输入参数 */
-export interface UpdateTenantGameRoleEntityRequest {
+export interface UpdateGameRoleEntityRequest {
   /** 用户ID */
   userId?: string;
   /** 区服Id */

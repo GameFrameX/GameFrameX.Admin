@@ -10,7 +10,7 @@
  */
 
 import {
-  AddTenantGameAreaClassifyEntityRequest,
+  AddGameAreaClassifyEntityRequest,
   GameAreaClassifyAddPostData,
   GameAreaClassifyDeletePostData,
   GameAreaClassifyDetailGetData,
@@ -18,8 +18,8 @@ import {
   GameAreaClassifySelectPostData,
   GameAreaClassifySelectStringPostData,
   GameAreaClassifyUpdatePostData,
-  PageTenantGameAreaClassifyEntityRequest,
-  UpdateTenantGameAreaClassifyEntityRequest,
+  PageGameAreaClassifyEntityRequest,
+  UpdateGameAreaClassifyEntityRequest,
 } from "./types";
 import {
   BaseDeleteRequest,
@@ -44,7 +44,7 @@ export class GameAreaClassify<SecurityDataType = unknown> {
    * @request POST:/api/gameAreaClassify/add
    */
   gameAreaClassifyAddPost = (
-    data: AddTenantGameAreaClassifyEntityRequest,
+    data: AddGameAreaClassifyEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameAreaClassifyAddPostData, any>({
@@ -109,7 +109,7 @@ export class GameAreaClassify<SecurityDataType = unknown> {
    * @request POST:/api/gameAreaClassify/page
    */
   gameAreaClassifyPagePost = (
-    data: PageTenantGameAreaClassifyEntityRequest,
+    data: PageGameAreaClassifyEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameAreaClassifyPagePostData, any>({
@@ -169,7 +169,7 @@ export class GameAreaClassify<SecurityDataType = unknown> {
    * @request POST:/api/gameAreaClassify/update
    */
   gameAreaClassifyUpdatePost = (
-    data: UpdateTenantGameAreaClassifyEntityRequest,
+    data: UpdateGameAreaClassifyEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameAreaClassifyUpdatePostData, any>({

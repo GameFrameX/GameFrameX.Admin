@@ -4,7 +4,7 @@
 import type { OnlineLiveOpsDispatchResponse } from "../_shared/data-contracts";
 
 /** 游戏公告增加输入参数 */
-export interface AddTenantGameAnnouncementEntityRequest {
+export interface AddGameAnnouncementEntityRequest {
   language?: string | null;
   areaId?: string | null;
   /** @minLength 1 */
@@ -103,7 +103,7 @@ export interface GameAnnouncementResponseSqlSugarPagedList {
 }
 
 /** 游戏公告分页查询输入参数 */
-export interface PageTenantGameAnnouncementEntityRequest {
+export interface PageGameAnnouncementEntityRequest {
   searchKey?: string | null;
   /**
    * @format int32
@@ -141,7 +141,7 @@ export interface PageTenantGameAnnouncementEntityRequest {
 }
 
 /** 游戏公告更新输入参数 */
-export interface UpdateTenantGameAnnouncementEntityRequest {
+export interface UpdateGameAnnouncementEntityRequest {
   language?: string | null;
   areaId?: string | null;
   /** @minLength 1 */

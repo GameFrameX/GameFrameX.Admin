@@ -4,7 +4,7 @@
 import type { BaseSelectPageResponse, BaseSelectPageStringResponse } from "../_shared/data-contracts";
 
 /** 奖励模板增加输入参数。 */
-export interface AddTenantGameRewardTemplateEntityRequest {
+export interface AddGameRewardTemplateEntityRequest {
   /**
    * 名称。
    * @minLength 1
@@ -118,7 +118,7 @@ export interface GameRewardTemplateSnapshotResponse {
 }
 
 /** 奖励模板分页查询输入参数。 */
-export interface PageTenantGameRewardTemplateEntityRequest {
+export interface PageGameRewardTemplateEntityRequest {
   searchKey?: string | null;
   /**
    * @format int32
@@ -143,7 +143,7 @@ export interface PageTenantGameRewardTemplateEntityRequest {
 }
 
 /** 奖励模板更新输入参数。 */
-export interface UpdateTenantGameRewardTemplateEntityRequest {
+export interface UpdateGameRewardTemplateEntityRequest {
   /**
    * @min 1
    * @max 9223372036854776000

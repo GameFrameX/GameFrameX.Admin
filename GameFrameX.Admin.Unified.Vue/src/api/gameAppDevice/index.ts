@@ -10,7 +10,7 @@
  */
 
 import {
-  AddTenantGameAppDeviceRequest,
+  AddGameAppDeviceRequest,
   GameAppDeviceAddPostData,
   GameAppDeviceDeletePostData,
   GameAppDeviceDetailGetData,
@@ -19,7 +19,7 @@ import {
   GameAppDeviceSelectPostData,
   GameAppDeviceSelectStringPostData,
   GameAppDeviceUpdatePostData,
-  UpdateTenantGameAppDeviceRequest,
+  UpdateGameAppDeviceRequest,
 } from "./types";
 import {
   BaseDeleteRequest,
@@ -44,7 +44,7 @@ export class GameAppDevice<SecurityDataType = unknown> {
    * @request POST:/api/gameAppDevice/add
    */
   gameAppDeviceAddPost = (
-    data: AddTenantGameAppDeviceRequest,
+    data: AddGameAppDeviceRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameAppDeviceAddPostData, any>({
@@ -169,7 +169,7 @@ export class GameAppDevice<SecurityDataType = unknown> {
    * @request POST:/api/gameAppDevice/update
    */
   gameAppDeviceUpdatePost = (
-    data: UpdateTenantGameAppDeviceRequest,
+    data: UpdateGameAppDeviceRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameAppDeviceUpdatePostData, any>({

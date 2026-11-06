@@ -4,7 +4,7 @@
 import type { BaseSelectPageResponse, BaseSelectPageStringResponse } from "../_shared/data-contracts";
 
 /** 机器码增加输入参数 */
-export interface AddTenantGameAppDeviceRequest {
+export interface AddGameAppDeviceRequest {
   description?: string | null;
   createdName?: string | null;
   updatedName?: string | null;
@@ -86,7 +86,7 @@ export interface GameAppDeviceResponseSqlSugarPagedList {
 }
 
 /** 机器码更新输入参数 */
-export interface UpdateTenantGameAppDeviceRequest {
+export interface UpdateGameAppDeviceRequest {
   name?: string | null;
   description?: string | null;
   createdName?: string | null;

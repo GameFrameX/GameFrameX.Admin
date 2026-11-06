@@ -12,7 +12,7 @@ export enum OnlinePlayerSegmentSyncStatus {
 }
 
 /** 新增玩家分群输入。 */
-export interface AddTenantGameOnlinePlayerSegmentRequest {
+export interface AddGameOnlinePlayerSegmentRequest {
   /**
    * @min 1
    * @max 9223372036854776000
@@ -90,7 +90,7 @@ export interface GameOnlinePlayerSegmentResponseSqlSugarPagedList {
 }
 
 /** 玩家分群分页查询输入。 */
-export interface PageTenantGameOnlinePlayerSegmentRequest {
+export interface PageGameOnlinePlayerSegmentRequest {
   searchKey?: string | null;
   /**
    * @format int32
@@ -150,7 +150,7 @@ export interface SyncPlayerSegmentOnlineResponse {
 }
 
 /** 更新玩家分群输入（编辑定义后须重新 syncOnline 生效）。 */
-export interface UpdateTenantGameOnlinePlayerSegmentRequest {
+export interface UpdateGameOnlinePlayerSegmentRequest {
   /**
    * @min 1
    * @max 9223372036854776000

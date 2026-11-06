@@ -10,15 +10,15 @@
  */
 
 import {
-  AddTenantGameRedeemCodeUseRecordEntityRequest,
+  AddGameRedeemCodeUseRecordEntityRequest,
   GameRedeemCodeUseRecordAddPostData,
   GameRedeemCodeUseRecordDeletePostData,
   GameRedeemCodeUseRecordDetailGetData,
+  GameRedeemCodeUseRecordGameAreaEntityAreaIdDropdownGetData,
   GameRedeemCodeUseRecordPagePostData,
-  GameRedeemCodeUseRecordTenantGameAreaEntityAreaIdDropdownGetData,
   GameRedeemCodeUseRecordUpdatePostData,
-  PageTenantGameRedeemCodeUseRecordEntityRequest,
-  UpdateTenantGameRedeemCodeUseRecordEntityRequest,
+  PageGameRedeemCodeUseRecordEntityRequest,
+  UpdateGameRedeemCodeUseRecordEntityRequest,
 } from "./types";
 import {
   BaseDeleteRequest,
@@ -42,7 +42,7 @@ export class GameRedeemCodeUseRecord<SecurityDataType = unknown> {
    * @request POST:/api/gameRedeemCodeUseRecord/add
    */
   gameRedeemCodeUseRecordAddPost = (
-    data: AddTenantGameRedeemCodeUseRecordEntityRequest,
+    data: AddGameRedeemCodeUseRecordEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameRedeemCodeUseRecordAddPostData, any>({
@@ -102,12 +102,32 @@ export class GameRedeemCodeUseRecord<SecurityDataType = unknown> {
    * No description
    *
    * @tags gameRedeemCodeUseRecord
+   * @name GameRedeemCodeUseRecordGameAreaEntityAreaIdDropdownGet
+   * @summary 获取区服下拉列表（AreaId 外键关联）
+   * @request GET:/api/gameRedeemCodeUseRecord/gameAreaEntityAreaIdDropdown
+   */
+  gameRedeemCodeUseRecordGameAreaEntityAreaIdDropdownGet = (
+    params: RequestParams = {},
+  ) =>
+    this.http.request<
+      GameRedeemCodeUseRecordGameAreaEntityAreaIdDropdownGetData,
+      any
+    >({
+      path: `/api/gameRedeemCodeUseRecord/gameAreaEntityAreaIdDropdown`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags gameRedeemCodeUseRecord
    * @name GameRedeemCodeUseRecordPagePost
    * @summary 分页查询
    * @request POST:/api/gameRedeemCodeUseRecord/page
    */
   gameRedeemCodeUseRecordPagePost = (
-    data: PageTenantGameRedeemCodeUseRecordEntityRequest,
+    data: PageGameRedeemCodeUseRecordEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameRedeemCodeUseRecordPagePostData, any>({
@@ -122,32 +142,12 @@ export class GameRedeemCodeUseRecord<SecurityDataType = unknown> {
    * No description
    *
    * @tags gameRedeemCodeUseRecord
-   * @name GameRedeemCodeUseRecordTenantGameAreaEntityAreaIdDropdownGet
-   * @summary 获取区服下拉列表（AreaId 外键关联）
-   * @request GET:/api/gameRedeemCodeUseRecord/tenantGameAreaEntityAreaIdDropdown
-   */
-  gameRedeemCodeUseRecordTenantGameAreaEntityAreaIdDropdownGet = (
-    params: RequestParams = {},
-  ) =>
-    this.http.request<
-      GameRedeemCodeUseRecordTenantGameAreaEntityAreaIdDropdownGetData,
-      any
-    >({
-      path: `/api/gameRedeemCodeUseRecord/tenantGameAreaEntityAreaIdDropdown`,
-      method: "GET",
-      format: "json",
-      ...params,
-    });
-  /**
-   * No description
-   *
-   * @tags gameRedeemCodeUseRecord
    * @name GameRedeemCodeUseRecordUpdatePost
    * @summary 更新
    * @request POST:/api/gameRedeemCodeUseRecord/update
    */
   gameRedeemCodeUseRecordUpdatePost = (
-    data: UpdateTenantGameRedeemCodeUseRecordEntityRequest,
+    data: UpdateGameRedeemCodeUseRecordEntityRequest,
     params: RequestParams = {},
   ) =>
     this.http.request<GameRedeemCodeUseRecordUpdatePostData, any>({
@@ -162,6 +162,6 @@ export class GameRedeemCodeUseRecord<SecurityDataType = unknown> {
 export const gameRedeemCodeUseRecordAddPost = (...args: Parameters<InstanceType<typeof GameRedeemCodeUseRecord>['gameRedeemCodeUseRecordAddPost']>) => getAPI(GameRedeemCodeUseRecord).gameRedeemCodeUseRecordAddPost(...args);
 export const gameRedeemCodeUseRecordDeletePost = (...args: Parameters<InstanceType<typeof GameRedeemCodeUseRecord>['gameRedeemCodeUseRecordDeletePost']>) => getAPI(GameRedeemCodeUseRecord).gameRedeemCodeUseRecordDeletePost(...args);
 export const gameRedeemCodeUseRecordDetailGet = (...args: Parameters<InstanceType<typeof GameRedeemCodeUseRecord>['gameRedeemCodeUseRecordDetailGet']>) => getAPI(GameRedeemCodeUseRecord).gameRedeemCodeUseRecordDetailGet(...args);
+export const gameRedeemCodeUseRecordGameAreaEntityAreaIdDropdownGet = (...args: Parameters<InstanceType<typeof GameRedeemCodeUseRecord>['gameRedeemCodeUseRecordGameAreaEntityAreaIdDropdownGet']>) => getAPI(GameRedeemCodeUseRecord).gameRedeemCodeUseRecordGameAreaEntityAreaIdDropdownGet(...args);
 export const gameRedeemCodeUseRecordPagePost = (...args: Parameters<InstanceType<typeof GameRedeemCodeUseRecord>['gameRedeemCodeUseRecordPagePost']>) => getAPI(GameRedeemCodeUseRecord).gameRedeemCodeUseRecordPagePost(...args);
-export const gameRedeemCodeUseRecordTenantGameAreaEntityAreaIdDropdownGet = (...args: Parameters<InstanceType<typeof GameRedeemCodeUseRecord>['gameRedeemCodeUseRecordTenantGameAreaEntityAreaIdDropdownGet']>) => getAPI(GameRedeemCodeUseRecord).gameRedeemCodeUseRecordTenantGameAreaEntityAreaIdDropdownGet(...args);
 export const gameRedeemCodeUseRecordUpdatePost = (...args: Parameters<InstanceType<typeof GameRedeemCodeUseRecord>['gameRedeemCodeUseRecordUpdatePost']>) => getAPI(GameRedeemCodeUseRecord).gameRedeemCodeUseRecordUpdatePost(...args);
