@@ -123,6 +123,19 @@ public sealed class AdvertisementCallbackPackageBindingTests : IDisposable
         Assert.Empty(await db.MainDb.Queryable<GameAdvertisementRewardEntity>().ToListAsync());
     }
 
+    [Fact]
+    public async Task EmptyRouteProvider_FailsClosed_EvenWithSingleConfig()
+    {
+        using var db = CreateDb();
+        // F4 #22：路由上下文缺 provider 时不得退化为「该分包唯一配置」兜底选取，必须直接拒绝
+        InsertConfig(db, 7401, PackageA, "secret-alpha");
+
+        var context = new DefaultHttpContext();
+        context.Items[PublicCallbackRouteContext.ItemKey] = new PublicCallbackRouteContext(string.Empty, "ad", PackageA);
+        var provider = new ClientApiOptionsProvider(db.MainDb, new HttpContextAccessor { HttpContext = context });
+        Assert.Null(await provider.GetAdvertisementCallbackOptionsAsync());
+    }
+
     private static AddAdvertisementCallbackConfigRequest BuildAddRequest(long packageId, string signingSecret)
     {
         return new AddAdvertisementCallbackConfigRequest

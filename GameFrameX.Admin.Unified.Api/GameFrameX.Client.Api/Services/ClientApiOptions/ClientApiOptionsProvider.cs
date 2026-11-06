@@ -93,15 +93,19 @@ public sealed class ClientApiOptionsProvider : IClientApiOptionsProvider
             return null;
         }
 
-        var query = db.Queryable<AdvertisementCallbackConfigEntity>()
-                      .Where(c => c.IsEnabled == true && c.PackageId == packageId.Value);
-        var candidates = await query.ToListAsync();
-        if (!string.IsNullOrWhiteSpace(provider))
+        // R5 精确命中要求「分包 + provider + 启用」三要素齐备：provider 缺失时不得退化为该分包唯一配置的兜底选取，
+        // 直接拒绝（fail closed），避免请求上下文异常时误用其他 provider 的验签材料。
+        if (string.IsNullOrWhiteSpace(provider))
         {
-            candidates = candidates
-                         .Where(c => string.Equals(NormalizeAdvertisementProvider(c.Provider), provider, StringComparison.OrdinalIgnoreCase))
-                         .ToList();
+            return null;
         }
+
+        var candidates = await db.Queryable<AdvertisementCallbackConfigEntity>()
+                                 .Where(c => c.IsEnabled == true && c.PackageId == packageId.Value)
+                                 .ToListAsync();
+        candidates = candidates
+                     .Where(c => string.Equals(NormalizeAdvertisementProvider(c.Provider), provider, StringComparison.OrdinalIgnoreCase))
+                     .ToList();
 
         return candidates.Count == 1 ? candidates[0] : null;
     }
