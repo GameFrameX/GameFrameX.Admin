@@ -418,7 +418,7 @@ test.describe('广告回调配置分包闭环（F2）', () => {
 
     await page.goto('/');
     await expectOverview(page);
-    await navigateByMenu(page, '广告回调配置', 'C 端交付');
+    await navigateByMenu(page, '广告回调验签', 'C 端交付');
     await expect(page.locator('.p-datatable-tbody')).toBeVisible({ timeout: 20_000 });
 
     // —— 新增：Provider 默认 TopOn（schema 参数区异步加载后出现）；分包选择器在 Provider 之后 ——

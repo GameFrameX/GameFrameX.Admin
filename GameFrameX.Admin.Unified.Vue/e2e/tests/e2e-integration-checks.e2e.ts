@@ -1,12 +1,17 @@
 import { createHmac, createHash } from 'node:crypto';
 import { expect, test, type Page } from '@playwright/test';
-import { expectOverview, navigateByMenu, shot, signIn, logoutByMenu } from './helpers';
-import { installApiRecorder, readApiRecords } from './module-coverage';
+import { ADMIN_ROOTS, expectOverview, navigateByMenu, shot, signIn, logoutByMenu } from './helpers';
+import { renderedMenuGroups } from './module-coverage';
 
-// C406 / GFX-1232 集成轮专项断言（round-integration-spec 第 8 步 a–g）。
+// C406 / GFX-1232 集成轮专项断言（第 1 轮 a–g + 第 2 轮 h/i/j）。
 // 全部走真实菜单 / 真实表单 / 浏览器内 fetch；每项独立用例并 shot() 留证。
 
 const HUB_API = process.env.E2E_HUB_API_URL;
+const CLIENT_API = process.env.E2E_CLIENT_API_URL;
+
+// 第 2 轮 (i)/(j) 的分包夹具（evidence-integration-2 环境准备 SQL 预置，is_enabled=true）
+const FIXTURE_PACKAGE_A = { id: 9200000000101, label: 'E2E 分包甲' };
+const FIXTURE_PACKAGE_B = { id: 9200000000102, label: 'E2E 分包乙' };
 
 // —— (a) 登录页没有租户字段，admin 与超管都能通过表单登录 ——
 test('a 登录表单无租户字段且双身份表单登录', async ({ browser }) => {
@@ -315,4 +320,148 @@ test('g Hub 机器通道 HMAC 鉴权与旧租户头被忽略', async ({ page }) 
   });
   expect(withLegacy.status, '附带旧租户/应用头不得改变结果').toBe(accepted.status);
   expect(withLegacy.code, '附带旧租户/应用头不得改变业务码').toBe(accepted.code);
+});
+
+// —— (h) 新装首启后，引导出来的业务管理员第一次表单登录即成功，菜单九根 ——
+test('h 引导业务管理员首启表单登录成功且九根齐全', async ({ browser }) => {
+  const context = await browser.newContext({ storageState: { cookies: [], origins: [] } });
+  const page = await context.newPage();
+  // 账号由 Web.Api 首启种子引导创建（GAMEFRAMEX_ADMIN_INITIAL_ACCOUNT/_PASSWORD 与 E2E_* 同值），
+  // 不经任何写库；第一次表单登录必须直接落地运营首页。
+  await signIn(page, process.env.E2E_ACCOUNT ?? 'admin', process.env.E2E_PASSWORD ?? '123456');
+  await expectOverview(page);
+  expect((await renderedMenuGroups(page)).map(group => group.group)).toEqual([...ADMIN_ROOTS]);
+  await shot(page, 'c406-h-bootstrap-admin-first-login-nine-roots');
+  await context.close();
+});
+
+// —— (i) 广告回调配置：真实界面选分包新增、编辑回显；回调地址只有 {packageId} 一种形态 ——
+test('i 广告回调配置分包选择回显且回调地址单 packageId 形态', async ({ page, request }) => {
+  if (!CLIENT_API) {
+    throw new Error('缺少 E2E_CLIENT_API_URL（隔离 Client.Api 地址）');
+  }
+  const token = `GFX_E2E_ADCI_${Date.now().toString(36)}`;
+
+  await page.goto('/');
+  await expectOverview(page);
+  await navigateByMenu(page, '广告回调验签', 'C 端交付');
+  await expect(page.locator('.p-datatable-tbody')).toBeVisible({ timeout: 20_000 });
+
+  // 新增：真实界面选择分包（R5：分包是配置身份的一部分）
+  await page.locator('role=button[name="新增"]').first().click();
+  const dialog = page.locator('.p-dialog');
+  await expect(dialog).toBeVisible({ timeout: 10_000 });
+  await expect(dialog.locator('.parameter-panel')).toBeVisible({ timeout: 10_000 });
+  await dialog.locator('role=combobox >> nth=1').click();
+  const optionA = page.locator('role=option', { hasText: FIXTURE_PACKAGE_A.label }).first();
+  await optionA.waitFor({ state: 'visible', timeout: 8_000 });
+  await optionA.click();
+  const chosenLabel = (await dialog.locator('role=combobox >> nth=1').evaluate((el) => {
+    return (el.closest('.p-select')?.querySelector('.p-select-label')?.textContent ?? '').trim();
+  }));
+  expect(chosenLabel, '分包选择器未回显所选标签').toContain(FIXTURE_PACKAGE_A.label);
+  await dialog.locator('role=textbox >> nth=0').fill(`https://cb.example.test/${token}`);
+  await dialog.locator('.p-password input').first().fill('E2eAdSecret-Alpha-001');
+  await shot(page, 'c406-i-adconfig-package-selected');
+  await dialog.locator('role=button[name="确定"]').first().click();
+  await expect(page.locator('.p-datatable-tbody')).toContainText(token, { timeout: 20_000 });
+
+  // 编辑回显：分包标签与新增时一致
+  await page.locator(`tr:has-text("${token}") >> text=编辑`).first().click();
+  await expect(dialog).toBeVisible({ timeout: 10_000 });
+  await expect(dialog.locator('.parameter-panel')).toBeVisible({ timeout: 10_000 });
+  const echoedLabel = (await dialog.locator('role=combobox >> nth=1').evaluate((el) => {
+    return (el.closest('.p-select')?.querySelector('.p-select-label')?.textContent ?? '').trim();
+  }));
+  expect(echoedLabel, '编辑弹窗必须回显新增时所选分包').toContain(FIXTURE_PACKAGE_A.label);
+  await shot(page, 'c406-i-adconfig-edit-echo-package');
+  await dialog.locator('role=button[name="确定"]').first().click();
+  await page.waitForTimeout(600);
+
+  // 回调地址只有 {packageId} 一种形态：带分包段命中端点（非 404，验签拒绝为 601），
+  // 缺分包段直接 404——不存在旧的多段路由形态。
+  const withPackage = await request.get(`${CLIENT_API}/api/GameAdWebHook/TopOnNotify/${FIXTURE_PACKAGE_A.id}`);
+  expect(withPackage.status(), '带 packageId 的回调地址必须命中端点').toBe(601);
+  const withoutPackage = await request.get(`${CLIENT_API}/api/GameAdWebHook/TopOnNotify`);
+  expect(withoutPackage.status(), '缺 packageId 的回调地址必须 404').toBe(404);
+  await shot(page, 'c406-i-adconfig-callback-url-form');
+
+  // 清理本轮配置（保持 (PackageId, Provider) 可被后续用例复用）
+  await page.locator(`tr:has-text("${token}") >> text=删除`).first().click();
+  await page.locator('role=button[name="确定"]').first().click();
+  await expect(page.locator('.p-datatable-tbody')).not.toContainText(token, { timeout: 20_000 });
+});
+
+// —— (j) 接口级补充证据：同 provider 双分包不同密钥，跨包密钥被拒；缺 packageId 404 ——
+function topOnSign(secret: string, transId: string): string {
+  const raw = `trans_id=${transId}&placement_id=p-1&adsource_id=a-1&reward_amount=10&reward_name=coin&sec_key=${secret}`;
+  return createHash('md5').update(raw, 'utf8').digest('hex');
+}
+
+function topOnCallbackUrl(packageId: number, secret: string, transId: string): string {
+  const query = new URLSearchParams({
+    trans_id: transId,
+    placement_id: 'p-1',
+    adsource_id: 'a-1',
+    reward_amount: '10',
+    reward_name: 'coin',
+    user_id: '9200000000201',
+    is_test: '0',
+    sign: topOnSign(secret, transId),
+  });
+  return `${CLIENT_API}/api/GameAdWebHook/TopOnNotify/${packageId}?${query.toString()}`;
+}
+
+test('j 广告回调跨包密钥被拒且缺分包 404', async ({ page, request }) => {
+  if (!CLIENT_API) {
+    throw new Error('缺少 E2E_CLIENT_API_URL（隔离 Client.Api 地址）');
+  }
+  const tokenAlpha = `GFX_E2E_ADCJ_A_${Date.now().toString(36)}`;
+  const tokenBeta = `GFX_E2E_ADCJ_B_${Date.now().toString(36)}`;
+  const secretAlpha = 'E2eAdSecret-Alpha-101';
+  const secretBeta = 'E2eAdSecret-Beta-202';
+
+  await page.goto('/');
+  await expectOverview(page);
+  await navigateByMenu(page, '广告回调验签', 'C 端交付');
+  await expect(page.locator('.p-datatable-tbody')).toBeVisible({ timeout: 20_000 });
+
+  // 同一 provider（TopOn）下两个分包各配一条不同密钥的配置（真实界面）
+  for (const [fixture, urlToken, secret] of [
+    [FIXTURE_PACKAGE_A, tokenAlpha, secretAlpha],
+    [FIXTURE_PACKAGE_B, tokenBeta, secretBeta],
+  ] as const) {
+    await page.locator('role=button[name="新增"]').first().click();
+    const dialog = page.locator('.p-dialog');
+    await expect(dialog).toBeVisible({ timeout: 10_000 });
+    await expect(dialog.locator('.parameter-panel')).toBeVisible({ timeout: 10_000 });
+    await dialog.locator('role=combobox >> nth=1').click();
+    const option = page.locator('role=option', { hasText: fixture.label }).first();
+    await option.waitFor({ state: 'visible', timeout: 8_000 });
+    await option.click();
+    await dialog.locator('role=textbox >> nth=0').fill(`https://cb.example.test/${urlToken}`);
+    await dialog.locator('.p-password input').first().fill(secret);
+    await dialog.locator('role=button[name="确定"]').first().click();
+    await expect(page.locator('.p-datatable-tbody')).toContainText(urlToken, { timeout: 20_000 });
+  }
+  await shot(page, 'c406-j-two-package-configs');
+
+  // 1. A 包回调用 B 包密钥签名 → 601 拒绝（R5：配置按『分包 + provider』精确命中）
+  const crossKey = await request.get(topOnCallbackUrl(FIXTURE_PACKAGE_A.id, secretBeta, 'TX-CROSS-KEY'));
+  expect(crossKey.status(), '跨包密钥签名必须被拒绝（601）').toBe(601);
+
+  // 2. A 包回调用 A 包自身密钥签名 → 非 601（签名被接受；业务后续校验失败属预期，无角色夹具）
+  const ownKey = await request.get(topOnCallbackUrl(FIXTURE_PACKAGE_A.id, secretAlpha, 'TX-OWN-KEY'));
+  expect(ownKey.status(), '本包密钥签名应通过验签（结果不应再是 601）').not.toBe(601);
+
+  // 3. 缺 packageId → 404（路由必填，唯一 URL 形态）
+  const missingPackage = await request.get(`${CLIENT_API}/api/GameAdWebHook/TopOnNotify?trans_id=tx`);
+  expect(missingPackage.status(), '缺 packageId 必须返回 404').toBe(404);
+
+  // 清理两条配置
+  for (const urlToken of [tokenAlpha, tokenBeta]) {
+    await page.locator(`tr:has-text("${urlToken}") >> text=删除`).first().click();
+    await page.locator('role=button[name="确定"]').first().click();
+    await expect(page.locator('.p-datatable-tbody')).not.toContainText(urlToken, { timeout: 20_000 });
+  }
 });
