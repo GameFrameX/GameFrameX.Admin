@@ -73,7 +73,7 @@ public class PackageBuildReportController : BaseController
         }
         catch (VersionExceptions)
         {
-            // 乐观锁冲突透传（对齐 GameAssetPackageVersionController 既有模式）
+            // 乐观锁冲突透传，保持版本写入端点的既有语义。
             throw;
         }
         catch (Exception ex)
