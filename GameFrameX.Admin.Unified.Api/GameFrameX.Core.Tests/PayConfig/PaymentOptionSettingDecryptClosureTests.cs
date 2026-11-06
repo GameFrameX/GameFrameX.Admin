@@ -20,7 +20,7 @@ namespace GameFrameX.Core.Tests.PayConfig;
 // change：gfx-doc/dev/client-api/changes/C372-runtime-credential-decrypt-closure/change.md
 // PG 真库回归：作用域 Where 的 Nullable.HasValue 闭包曾使 SqlSugar 生成非法 SQL
 // （SQLite 报 near "IS"、PG 报 near "NOT"，真机冒烟发现 PG 同样失败），已提为局部布尔修复；
-// 与 PublicCallbackTenantRoutingTests 同款 PG fixture。SQLite 侧等价回归见 RuntimeCredentialDecryptClosureTests。
+// 与公开回调测试同款 PG fixture。SQLite 侧等价回归见 RuntimeCredentialDecryptClosureTests。
 public sealed class PaymentOptionSettingDecryptClosureTests
 {
     [PostgreSqlFact]
@@ -58,7 +58,7 @@ public sealed class PaymentOptionSettingDecryptClosureTests
     }
 
     /// <summary>
-    /// 独立 PG 测试库 fixture（镜像 PublicCallbackTenantRoutingTests 私有实现，不跨测试类共享状态）：
+    /// 独立 PG 测试库 fixture（不跨测试类共享状态）：
     /// 建库 → 主库注册租户行 → 租户库建租户表，Dispose 整库删除。
     /// </summary>
     private sealed class PostgresPaymentFixture : IDisposable
@@ -119,7 +119,7 @@ public sealed class PaymentOptionSettingDecryptClosureTests
     }
 
     /// <summary>
-    /// 本地 PG（127.0.0.1:5432 postgres/postgres）不可用时跳过，语义同 PublicCallbackTenantRoutingTests.PostgreSqlFactAttribute。
+    /// 本地 PG（127.0.0.1:5432 postgres/postgres）不可用时跳过。
     /// </summary>
     private sealed class PostgreSqlFactAttribute : FactAttribute
     {
