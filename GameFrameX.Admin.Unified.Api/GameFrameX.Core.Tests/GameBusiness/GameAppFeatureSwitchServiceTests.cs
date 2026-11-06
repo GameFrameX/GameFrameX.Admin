@@ -126,7 +126,7 @@ public sealed class GameAppFeatureSwitchServiceTests : IDisposable
         var service = CreateService();
         await InsertAsync("switch.layered", App100);
 
-        var default = NewRequest("switch.layered");
+        var defaultRow = NewRequest("switch.layered");
 
         await Assert.ThrowsAsync<BusinessException>(() => service.AddAsync(default));
     }

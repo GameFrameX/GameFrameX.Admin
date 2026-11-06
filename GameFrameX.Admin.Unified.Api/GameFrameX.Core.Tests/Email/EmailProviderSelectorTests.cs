@@ -64,10 +64,10 @@ public class EmailProviderSelectorTests : IDisposable
     [Fact]
     public async Task TenantSelector_ExactPurposeBeatsDefaultPriority()
     {
-        await InsertAsync(1, 100, 0, 0, 999, 40, true);
-        await InsertAsync(2, 100, 0, 7, 1, 5, true);
-        await InsertAsync(3, 100, 200, 0, 999, 20, true);
-        await InsertAsync(4, 100, 200, 7, 1, 10, true);
+        await InsertAsync(1, 0, 0, 999, 40, true);
+        await InsertAsync(2, 0, 7, 1, 5, true);
+        await InsertAsync(3, 200, 0, 999, 20, true);
+        await InsertAsync(4, 200, 7, 1, 10, true);
 
         var selected = await EmailConfigSelector.SelectAsync(_db, 7);
 
@@ -78,10 +78,10 @@ public class EmailProviderSelectorTests : IDisposable
     [Fact]
     public async Task TenantSelector_UsesPriorityUpdateTimeAndIdTieBreakAndIgnoresDisabled()
     {
-        await InsertAsync(1, 100, 200, 7, 300, 30, false);
-        await InsertAsync(2, 100, 200, 7, 100, 10, true);
-        await InsertAsync(3, 100, 200, 7, 200, 20, true);
-        await InsertAsync(4, 100, 200, 7, 200, 20, true);
+        await InsertAsync(1, 200, 7, 300, 30, false);
+        await InsertAsync(2, 200, 7, 100, 10, true);
+        await InsertAsync(3, 200, 7, 200, 20, true);
+        await InsertAsync(4, 200, 7, 200, 20, true);
 
         var selected = await EmailConfigSelector.SelectAsync(_db, 7);
 
@@ -92,7 +92,7 @@ public class EmailProviderSelectorTests : IDisposable
     [Fact]
     public async Task TenantSelector_DefaultPurposeFallbackWorksWithoutRequestContext()
     {
-        await InsertAsync(1, 100, 200, 0, 100, 10, true);
+        await InsertAsync(1, 200, 0, 100, 10, true);
         var selected = await EmailConfigSelector.SelectAsync(_db, 7);
 
         Assert.Equal(1, selected?.Id);
@@ -101,8 +101,8 @@ public class EmailProviderSelectorTests : IDisposable
     [Fact]
     public async Task TenantSelector_ReturnsNullWhenNoEnabledProvider()
     {
-        await InsertAsync(1, 999, 200, 7, 100, 10, false);
-        await InsertAsync(2, 100, 200, 7, 100, 10, false);
+        await InsertAsync(1, 200, 7, 100, 10, false);
+        await InsertAsync(2, 200, 7, 100, 10, false);
 
         var selected = await EmailConfigSelector.SelectAsync(_db, 7);
 
@@ -137,7 +137,7 @@ public class EmailProviderSelectorTests : IDisposable
         }).ExecuteCommandAsync();
     }
 
-    private async Task InsertAsync(long id, long id, long appId, int purpose, int priority, long updateTime, bool enabled)
+    private async Task InsertAsync(long id, long appId, int purpose, int priority, long updateTime, bool enabled)
     {
         await _db.Insertable(new EmailConfigEntity
         {

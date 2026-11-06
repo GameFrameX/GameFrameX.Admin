@@ -32,7 +32,6 @@ public class SqlSugarEntityBoundaryTests
     {
         Assert.True(SqlSugarEntityBoundary.IsBusinessTable(typeof(GameAppDeviceEntity)));
         Assert.False(SqlSugarEntityBoundary.IsPlatformTable(typeof(GameAppDeviceEntity)));
-        Assert.False(SqlSugarEntityBoundary.RequiresContext(typeof(GameAppDeviceEntity)));
     }
 
     [Fact]
@@ -40,7 +39,6 @@ public class SqlSugarEntityBoundaryTests
     {
         Assert.True(SqlSugarEntityBoundary.IsMainDatabaseTable(typeof(UserEntity)));
         Assert.True(SqlSugarEntityBoundary.IsBusinessTable(typeof(UserEntity)));
-        Assert.False(SqlSugarEntityBoundary.RequiresContext(typeof(UserEntity)));
         Assert.Equal("user_entity", SqlSugarEntityBoundary.GetPhysicalTableName(typeof(UserEntity), nameof(UserEntity)));
     }
 
@@ -81,7 +79,6 @@ public class SqlSugarEntityBoundaryTests
     {
         Assert.True(SqlSugarEntityBoundary.IsMainDatabaseTable(typeof(GameTimeJobEntity)));
         Assert.True(SqlSugarEntityBoundary.IsBusinessTable(typeof(GameTimeJobEntity)));
-        Assert.False(SqlSugarEntityBoundary.RequiresContext(typeof(GameTimeJobEntity)));
     }
 
     [Fact]
@@ -97,7 +94,6 @@ public class SqlSugarEntityBoundaryTests
         Assert.True(SqlSugarEntityBoundary.IsPlatformTable(typeof(SystemLogOperationEntity)));
         Assert.True(SqlSugarEntityBoundary.IsMainDatabaseTable(typeof(SystemLogOperationEntity)));
         Assert.False(SqlSugarEntityBoundary.IsBusinessTable(typeof(SystemLogOperationEntity)));
-        Assert.False(SqlSugarEntityBoundary.RequiresContext(typeof(SystemLogOperationEntity)));
         Assert.Equal("system_log_operation_entity", SqlSugarEntityBoundary.GetPhysicalTableName(typeof(SystemLogOperationEntity), nameof(SystemLogOperationEntity)));
     }
 
@@ -106,7 +102,6 @@ public class SqlSugarEntityBoundaryTests
     {
         Assert.False(SqlSugarEntityBoundary.IsPlatformTable(typeof(LogOperationEntity)));
         Assert.True(SqlSugarEntityBoundary.IsBusinessTable(typeof(LogOperationEntity)));
-        Assert.False(SqlSugarEntityBoundary.RequiresContext(typeof(LogOperationEntity)));
         Assert.Equal("log_operation_entity", SqlSugarEntityBoundary.GetPhysicalTableName(typeof(LogOperationEntity), nameof(LogOperationEntity)));
     }
 
@@ -134,13 +129,11 @@ public class SqlSugarEntityBoundaryTests
         Assert.True(SqlSugarEntityBoundary.IsMainDatabaseTable(typeof(GlobalDictionaryTypeEntity)));
         Assert.False(SqlSugarEntityBoundary.IsPlatformTable(typeof(GlobalDictionaryTypeEntity)));
         Assert.False(SqlSugarEntityBoundary.IsBusinessTable(typeof(GlobalDictionaryTypeEntity)));
-        Assert.False(SqlSugarEntityBoundary.RequiresContext(typeof(GlobalDictionaryTypeEntity)));
         Assert.Equal("global_dictionary_type_entity", SqlSugarEntityBoundary.GetPhysicalTableName(typeof(GlobalDictionaryTypeEntity), nameof(GlobalDictionaryTypeEntity)));
 
         Assert.True(SqlSugarEntityBoundary.IsMainDatabaseTable(typeof(GlobalDictionaryDataEntity)));
         Assert.False(SqlSugarEntityBoundary.IsPlatformTable(typeof(GlobalDictionaryDataEntity)));
         Assert.False(SqlSugarEntityBoundary.IsBusinessTable(typeof(GlobalDictionaryDataEntity)));
-        Assert.False(SqlSugarEntityBoundary.RequiresContext(typeof(GlobalDictionaryDataEntity)));
         Assert.Equal("global_dictionary_data_entity", SqlSugarEntityBoundary.GetPhysicalTableName(typeof(GlobalDictionaryDataEntity), nameof(GlobalDictionaryDataEntity)));
     }
 
@@ -166,7 +159,6 @@ public class SqlSugarEntityBoundaryTests
 
         Assert.True(SqlSugarEntityBoundary.IsMainDatabaseTable(typeof(EmailConfigEntity)));
         Assert.True(SqlSugarEntityBoundary.IsBusinessTable(typeof(EmailConfigEntity)));
-        Assert.False(SqlSugarEntityBoundary.RequiresContext(typeof(EmailConfigEntity)));
         Assert.Equal("email_config_entity", SqlSugarEntityBoundary.GetPhysicalTableName(typeof(EmailConfigEntity), nameof(EmailConfigEntity)));
     }
 

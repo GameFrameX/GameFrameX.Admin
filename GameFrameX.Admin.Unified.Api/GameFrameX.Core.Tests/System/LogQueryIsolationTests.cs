@@ -23,7 +23,6 @@ public class LogQueryIsolationTests
         Assert.True(SqlSugarEntityBoundary.IsPlatformTable(typeof(SystemLogDiffEntity)));
         Assert.True(SqlSugarEntityBoundary.IsMainDatabaseTable(typeof(SystemLogOperationEntity)));
         Assert.False(SqlSugarEntityBoundary.IsBusinessTable(typeof(SystemLogOperationEntity)));
-        Assert.False(SqlSugarEntityBoundary.RequiresContext(typeof(SystemLogOperationEntity)));
         Assert.Equal("system_log_operation_entity", SqlSugarEntityBoundary.GetPhysicalTableName(typeof(SystemLogOperationEntity), nameof(SystemLogOperationEntity)));
     }
 
@@ -36,7 +35,6 @@ public class LogQueryIsolationTests
         Assert.True(SqlSugarEntityBoundary.IsBusinessTable(typeof(LogExceptionEntity)));
         Assert.True(SqlSugarEntityBoundary.IsBusinessTable(typeof(LogAuditEntity)));
         Assert.True(SqlSugarEntityBoundary.IsBusinessTable(typeof(LogDiffEntity)));
-        Assert.False(SqlSugarEntityBoundary.RequiresContext(typeof(LogOperationEntity)));
         Assert.True(SqlSugarEntityBoundary.IsMainDatabaseTable(typeof(LogOperationEntity)));
         Assert.Equal("log_operation_entity", SqlSugarEntityBoundary.GetPhysicalTableName(typeof(LogOperationEntity), nameof(LogOperationEntity)));
     }

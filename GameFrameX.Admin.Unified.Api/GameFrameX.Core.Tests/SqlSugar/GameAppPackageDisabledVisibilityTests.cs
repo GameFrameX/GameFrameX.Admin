@@ -33,8 +33,8 @@ public sealed class GameAppPackageDisabledVisibilityTests : IDisposable
     [Fact]
     public async Task GlobalEnabledFilter_HidesDisabledPackage_ReproducesBla28()
     {
-        await SeedAsync(1, true, false, null);
-        await SeedAsync(2, false, false, null);
+        await SeedAsync(1, true, false);
+        await SeedAsync(2, false, false);
 
         // 旧 BuildPageQuery 行为：AsQueryable() 未绕过过滤器 → 禁用记录被 ISafeEnabledFilter 排除。
         var rows = await _db.Queryable<GameAppPackageEntity>().ToListAsync();
@@ -47,9 +47,9 @@ public sealed class GameAppPackageDisabledVisibilityTests : IDisposable
     [Fact]
     public async Task FixPattern_FilterNullTrue_ExposesDisabledAndKeepsSoftDelete()
     {
-        await SeedAsync(1, true, false, null);
-        await SeedAsync(2, false, false, null);
-        await SeedAsync(3, true, true, null);
+        await SeedAsync(1, true, false);
+        await SeedAsync(2, false, false);
+        await SeedAsync(3, true, true);
 
         // 修复后 BuildPageQuery 行为：绕过全部过滤器，手动补 IsDeleted==false。
         var rows = await _db.Queryable<GameAppPackageEntity>()
@@ -65,9 +65,9 @@ public sealed class GameAppPackageDisabledVisibilityTests : IDisposable
     [Fact]
     public async Task FixPattern_MainDatabase_ReturnsAllActivePackages()
     {
-        await SeedAsync(1, false, false, 1);
-        await SeedAsync(2, false, false, 2);
-        await SeedAsync(3, false, false, null);
+        await SeedAsync(1, false, false);
+        await SeedAsync(2, false, false);
+        await SeedAsync(3, false, false);
 
         long? id = 1;
         // 修复后查询：绕过过滤器 + IsDeleted==false + 租户隔离 WhereIF（精确复刻 ConfigureAdminFilters 谓词）。
@@ -83,7 +83,7 @@ public sealed class GameAppPackageDisabledVisibilityTests : IDisposable
     [Fact]
     public async Task FixPattern_SetStatusLookup_FindsDisabledPackageById()
     {
-        await SeedAsync(1, false, false, null);
+        await SeedAsync(1, false, false);
 
         // 旧 SetStatusAsync 行为：GetFirstAsync 受 ISafeEnabledFilter 影响，找不到禁用记录（抛“分包不存在”）。
         var blocked = await _db.Queryable<GameAppPackageEntity>().FirstAsync(u => u.Id == 1);
@@ -101,7 +101,7 @@ public sealed class GameAppPackageDisabledVisibilityTests : IDisposable
         Assert.False(found.IsEnabled);
     }
 
-    private async Task SeedAsync(long id, bool? isEnabled, bool isDeleted, long? id)
+    private async Task SeedAsync(long id, bool? isEnabled, bool isDeleted)
     {
         var entity = new GameAppPackageEntity
         {

@@ -9,7 +9,7 @@ public class ChannelDefinitionNamingTests
     [Fact]
     public void ChannelDefinition_IsCanonicalEntityName()
     {
-        var channel = new GlobalChannelDefinitionEntity
+        var globalChannel = new GlobalChannelDefinitionEntity
         {
             Code = "official",
             Name = "Official",
@@ -19,9 +19,9 @@ public class ChannelDefinitionNamingTests
             IsSystemLocked = true,
         };
 
-        Assert.Equal("official", channel.Code);
-        Assert.Equal(ChannelScopeEnum.System, channel.Scope);
-        Assert.Equal(ChannelTypeEnum.Official, channel.ChannelType);
+        Assert.Equal("official", globalChannel.Code);
+        Assert.Equal(ChannelScopeEnum.System, globalChannel.Scope);
+        Assert.Equal(ChannelTypeEnum.Official, globalChannel.ChannelType);
 
         var channel = new ChannelDefinitionEntity
         {

@@ -43,7 +43,7 @@ public sealed class FeatureSwitchDeliveryResolverTests : IDisposable
     [Fact]
     public void Resolve_NewerRowWinsRegardlessOfLegacyApplication()
     {
-        var default = Row("login.banner", id: 1, appId: null, valueJson: "{\"v\":\"tenant\"}");
+        var defaultRow = Row("login.banner", id: 1, appId: null, valueJson: "{\"v\":\"base\"}");
         var appRow = Row("login.banner", id: 2, appId: App100, valueJson: "{\"v\":\"app\"}");
 
         var result = FeatureSwitchDeliveryResolver.Resolve(new[] { default, appRow, }, Query());
