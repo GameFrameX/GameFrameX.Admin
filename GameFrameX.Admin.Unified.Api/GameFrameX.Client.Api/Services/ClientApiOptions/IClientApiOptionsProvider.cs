@@ -8,12 +8,12 @@ namespace GameFrameX.Client.Api.Services.ClientApiOptions;
 public interface IClientApiOptionsProvider
 {
     /// <summary>
-    /// 读取租户业务邮件配置；未配置返回 null，调用方必须返回明确错误，不得 fallback 到系统邮件。
+    /// 读取业务邮件配置；未配置返回 null，调用方必须返回明确错误，不得 fallback 到系统邮件。
     /// </summary>
     Task<EmailOptions> GetEmailOptionsAsync();
 
     /// <summary>
-    /// 读取租户广告回调验签配置；未配置返回 null。
+    /// 读取广告回调验签配置；未配置返回 null。
     /// </summary>
     Task<AdvertisementCallbackOptions> GetAdvertisementCallbackOptionsAsync();
 

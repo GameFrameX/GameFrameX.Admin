@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Http;
 namespace GameFrameX.Advertisement.Pangle;
 
 /// <summary>
-/// Pangle 广告回调处理器（SHA256(SecurityKey:TransId) 验签，密钥取租户配置 <see cref="AdvertisementCallbackOptions.PangleSecurityKey"/>）。
+/// Pangle 广告回调处理器（SHA256(SecurityKey:TransId) 验签，密钥取数据库配置行 <see cref="AdvertisementCallbackOptions.PangleSecurityKey"/>）。
 /// <para>与 TopOn / AdMob / UnityAds 不同：不进发奖链路，仅由宿主 Controller 调用 <see cref="Verify"/> 验签，保持既有 HTTP 响应行为。</para>
 /// </summary>
 public sealed class PangleAdvertisementCallbackHandler : AdvertisementCallbackHandlerBase, IAdvertisementCallbackHandler

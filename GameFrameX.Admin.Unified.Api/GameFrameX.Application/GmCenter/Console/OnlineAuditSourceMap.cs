@@ -11,7 +11,7 @@ namespace GameFrameX.Application.GmCenter.Console;
 /// <para>
 /// 三来源口径（Admin 侧零事件镜像，全部实时读取原表/透传 Online）：
 /// <list type="number">
-/// <item><description><b>AdminOperation</b>：<see cref="LogOperationEntity"/>（租户操作日志，
+/// <item><description><b>AdminOperation</b>：<see cref="LogOperationEntity"/>（管理员操作日志，
 /// MonitorLogging 全 action 自动落库）——操作者取账号，目标对象/作用域从 <c>RequestParam</c> JSON 尽力提取
 /// （提取不到即 null，不伪造）；命令类型取 Controller.Action；时间取 LogDateTime。</description></item>
 /// <item><description><b>OnlineAuditEvent</b>：Online 审计事件（经 <c>IOnlineServerClient</c> 实时透传）——五维直映。</description></item>

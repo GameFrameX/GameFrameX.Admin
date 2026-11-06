@@ -12,7 +12,7 @@ namespace GameFrameX.Advertisement.Abstract;
 /// 非敏感字段（callbackUrl 等）保持明文可读；字段值为密文形态（<c>enc:sec:v1:</c> 前缀）时幂等跳过。</para>
 /// <para>性能约束：底层 PBKDF2 派生单次数百毫秒级——<see cref="DecryptConfigJson"/> 按「密文原文 → 明文 JSON」做进程级缓存，
 /// 同一密文只解密一次；任何配置写入都会产生新密文（每次加密随机 Salt + Nonce），缓存 key 随之失效。</para>
-/// <para>ponytail: 缓存字典无淘汰上限（key 为整段密文 JSON）；广告回调配置行数极少（每租户个位数），增长天花板可忽略。
+/// <para>ponytail: 缓存字典无淘汰上限（key 为整段密文 JSON）；广告回调配置行数极少（每作用域个位数），增长天花板可忽略。
 /// 升级路径：按配置行 Id 失效或换 LRU。</para>
 /// </summary>
 public static class AdvertisementCallbackConfigCrypto

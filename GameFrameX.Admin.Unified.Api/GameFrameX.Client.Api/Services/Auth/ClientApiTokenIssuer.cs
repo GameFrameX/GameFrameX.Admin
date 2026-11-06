@@ -74,7 +74,7 @@ public sealed class ClientApiTokenIssuer
         var policy = await _optionsProvider.GetTokenPolicyAsync();
         if (policy.SigningKey == null)
         {
-            // 当前租户未配置签名密钥，无法校验任何令牌
+            // 当前策略行未配置签名密钥，无法校验任何令牌
             return ClientApiTokenValidationResponse.Fail;
         }
 

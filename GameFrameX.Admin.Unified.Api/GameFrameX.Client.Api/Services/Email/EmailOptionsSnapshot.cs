@@ -1,7 +1,7 @@
 namespace GameFrameX.Client.Api.Services.Email;
 
 /// <summary>
-/// 租户业务邮件配置快照（运行期只读视图）。
+/// 业务邮件配置快照（运行期只读视图）。
 /// <para>封装 <see cref="GameFrameX.Entity.Business.ClientApiConfig.EmailConfigEntity"/> 的关键字段；调用方按需读取，禁止修改。</para>
 /// </summary>
 public sealed class EmailOptionsSnapshot

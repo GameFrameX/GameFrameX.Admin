@@ -11,8 +11,8 @@ namespace GameFrameX.Client.Api.Integrations.Advertisement;
 
 /// <summary>
 /// 广告服务器回调。
-/// <para>广告网络回调不携带 <c>X-Api-Key</c>，必须先由公开回调 URL 路由参数建立租户上下文，再通过 <see cref="IClientApiOptionsProvider"/> 读取该租户的验签材料。</para>
-/// <para>无法解析租户或租户未配置验签材料时安全拒绝，禁止逐租户扫描或回落到进程级 key。</para>
+/// <para>广告网络回调不携带 <c>X-Api-Key</c>，必须先由公开回调 URL 的 packageId 路由参数建立包上下文，再通过 <see cref="IClientApiOptionsProvider"/> 读取该包的验签材料。</para>
+/// <para>无法解析包或包未配置验签材料时安全拒绝，禁止全表扫描或回落到进程级 key。</para>
 /// <para>TopOn / AdMob / UnityAds 的验签 + 幂等账本 + 发奖链路由 <see cref="GameAdvertisementRewardService"/> 统一处理（C114 / GFX-110）；Pangle 验签由 <see cref="PangleAdvertisementCallbackHandler"/> 处理（仅验签，不进发奖链路）。</para>
 /// </summary>
 public class GameAdWebHookController : BaseController<GameRoleAdvertisementEntity>
@@ -51,7 +51,7 @@ public class GameAdWebHookController : BaseController<GameRoleAdvertisementEntit
 
     /// <summary>
     /// PangleGlobal通知。
-    /// <para>租户身份只来自公开回调 URL 路由上下文；验签走 <see cref="PangleAdvertisementCallbackHandler"/>（仅验签，不进发奖链路），签名通过后才允许查询广告发放记录。</para>
+    /// <para>包身份只来自公开回调 URL 路由上下文；验签走 <see cref="PangleAdvertisementCallbackHandler"/>（仅验签，不进发奖链路），签名通过后才允许查询广告发放记录。</para>
     /// </summary>
     [PublicCallbackEndpoint("pangle", "ad")]
     [HttpGet("{packageId:long?}")]

@@ -1,7 +1,7 @@
 namespace GameFrameX.Client.Api.Services.ClientApiOptions;
 
 /// <summary>
-/// 租户 Client API 访问令牌策略。SigningKey 为 null 表示该租户尚未配置签名密钥。
+/// Client API 访问令牌策略。SigningKey 为 null 表示尚未配置签名密钥。
 /// </summary>
 public sealed class ClientApiTokenPolicyOptions
 {

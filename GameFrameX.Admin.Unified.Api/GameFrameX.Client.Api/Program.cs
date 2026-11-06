@@ -118,7 +118,7 @@ internal static class Program
         builder.Services.AddScoped<RemoteConfigDeliveryService>();
         // 活动/功能开关投放解析器（C345 共享实现，依赖 Scoped 主库仓储，随请求作用域解析）
         builder.Services.AddScoped<GameFrameX.Application.ClientDelivery.FeatureSwitch.FeatureSwitchDeliveryResolver>();
-        // 邮件分域：租户业务邮件（玩家注册 / 找回密码）；平台系统邮件（SystemMessageService 等）走 ISystemEmailSender
+        // 邮件分域：业务邮件（玩家注册 / 找回密码）；平台系统邮件（SystemMessageService 等）走 ISystemEmailSender
         builder.Services.AddScoped<IEmailSender, EmailSender>();
         builder.Services.AddSingleton<Core.Service.Message.ISystemEmailSender,
             GameFrameX.Application.Platform.Email.SystemEmailSender>();

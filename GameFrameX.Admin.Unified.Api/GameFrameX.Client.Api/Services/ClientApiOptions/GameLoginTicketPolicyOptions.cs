@@ -1,7 +1,7 @@
 namespace GameFrameX.Client.Api.Services.ClientApiOptions;
 
 /// <summary>
-/// 租户 Game 登录票据策略（非 key 部分）。
+/// Game 登录票据策略（非 key 部分）。
 /// </summary>
 public sealed class GameLoginTicketPolicyOptions
 {
@@ -11,7 +11,7 @@ public sealed class GameLoginTicketPolicyOptions
     public long TicketExpireTime { get; init; }
 
     /// <summary>
-    /// 是否允许首次签发自动创建租户应用级 RSA key。
+    /// 是否允许首次签发自动创建应用级 RSA key。
     /// </summary>
     public bool EnableKeyAutoCreate { get; init; }
 }

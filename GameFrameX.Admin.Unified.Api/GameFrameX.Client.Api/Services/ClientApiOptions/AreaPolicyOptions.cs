@@ -1,7 +1,7 @@
 namespace GameFrameX.Client.Api.Services.ClientApiOptions;
 
 /// <summary>
-/// 租户区服信息输出策略。
+/// 区服信息输出策略。
 /// </summary>
 public sealed class AreaPolicyOptions
 {

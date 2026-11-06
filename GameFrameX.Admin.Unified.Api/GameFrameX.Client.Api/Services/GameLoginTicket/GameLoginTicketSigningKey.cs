@@ -5,7 +5,7 @@ namespace GameFrameX.Client.Api.Services.GameLoginTicket;
 
 /// <summary>
 /// Game 登录票据签名 Key。
-/// <para>HMAC fallback 随 C13 删除（P1 决策），生产签名唯一路径为租户应用级 RSA；本类不再保留 HMAC 构造工厂。</para>
+/// <para>HMAC fallback 随 C13 删除（P1 决策），生产签名唯一路径为应用级 RSA；本类不再保留 HMAC 构造工厂。</para>
 /// </summary>
 public sealed class GameLoginTicketSigningKey
 {

@@ -24,13 +24,13 @@ public sealed class EmailSender : IEmailSender
         var snapshot = await GetSnapshotAsync(purpose);
         if (snapshot == null)
         {
-            LogHelper.Warning($"租户业务邮件未配置或凭据不完整，purpose={purpose}, receiver={receiverEmail}；禁止 fallback 到系统邮件。");
+            LogHelper.Warning($"业务邮件未配置或凭据不完整，purpose={purpose}, receiver={receiverEmail}；禁止 fallback 到系统邮件。");
             return false;
         }
 
         if (!EmailSenderRegistry.TryGet(snapshot.Provider, out var sender))
         {
-            LogHelper.Warning($"租户业务邮件 Provider 未注册：{snapshot.Provider}；禁止 fallback 到系统邮件。");
+            LogHelper.Warning($"业务邮件 Provider 未注册：{snapshot.Provider}；禁止 fallback 到系统邮件。");
             return false;
         }
 

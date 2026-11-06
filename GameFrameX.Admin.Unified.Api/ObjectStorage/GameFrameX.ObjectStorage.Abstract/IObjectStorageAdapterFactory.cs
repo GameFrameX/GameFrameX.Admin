@@ -1,7 +1,7 @@
 namespace GameFrameX.ObjectStorage.Abstract;
 
 /// <summary>
-/// 对象存储 Adapter 工厂。按 Provider 名解析 Adapter，并把租户配置（ConfigJson + 路径模板）
+/// 对象存储 Adapter 工厂。按 Provider 名解析 Adapter，并把对象存储配置（ConfigJson + 路径模板）
 /// 解析为运行时上下文。DI 注入；FileService 与 TestConnection 端点共用此工厂。
 /// </summary>
 public interface IObjectStorageAdapterFactory

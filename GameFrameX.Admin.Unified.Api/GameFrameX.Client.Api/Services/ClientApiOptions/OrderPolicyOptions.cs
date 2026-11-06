@@ -1,7 +1,7 @@
 namespace GameFrameX.Client.Api.Services.ClientApiOptions;
 
 /// <summary>
-/// 租户订单 / 支付测试策略。
+/// 订单 / 支付测试策略。
 /// </summary>
 public sealed class OrderPolicyOptions
 {

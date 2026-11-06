@@ -1,7 +1,7 @@
 namespace GameFrameX.Advertisement.Abstract;
 
 /// <summary>
-/// 租户广告回调配置快照。null 引用表示该作用域未配置广告回调材料。
+/// 广告回调配置快照。null 引用表示该作用域未配置广告回调材料。
 /// </summary>
 public sealed class AdvertisementCallbackOptions
 {

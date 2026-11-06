@@ -29,7 +29,7 @@ public class GameUserPayController : BaseController
     ///
     /// </summary>
     /// <param name="payOrderRepository">支付订单仓储</param>
-    /// <param name="optionsProvider">租户配置 Provider（沙箱充值发货开关，C378 起读策略合并表）</param>
+    /// <param name="optionsProvider">运行配置 Provider（沙箱充值发货开关，C378 起读策略合并表）</param>
     /// <param name="payReceiptVerifier">支付收据验真器</param>
     public GameUserPayController(Repository<GameOrderEntity> payOrderRepository,
         IClientApiOptionsProvider optionsProvider,
@@ -42,8 +42,8 @@ public class GameUserPayController : BaseController
 
     /// <summary>
     /// 支付下单（生成对外单号落库，Status=Unpaid）。
-    /// <para>沙箱判定服务端权威（防客户端伪造免支付白嫖）：读租户订单策略表 EnableSandBoxRecharge，
-    /// 与 Client.Api 下单尾部同源同优先级（应用级 &gt; 租户默认）；命中 → Status=Shipped + IsNeedPay=false
+    /// <para>沙箱判定服务端权威（防客户端伪造免支付白嫖）：读订单策略表 EnableSandBoxRecharge，
+    /// 与 Client.Api 下单尾部同源同优先级；命中 → Status=Shipped + IsNeedPay=false
     /// （沙箱直发闭环，免 Verify）；未命中 → IsNeedPay=true。</para>
     /// </summary>
     /// <param name="request"></param>
