@@ -79,6 +79,8 @@ test('c 改名页面经真实菜单请求改名接口并渲染表格', async ({ 
   await page.goto('/#/clientDelivery/gameAdvertisementRewardEntity');
   await expect(page).toHaveURL(HIDDEN_RENAMED_PAGE.urlPart);
   await expect(page.locator('.p-datatable')).toBeVisible();
+  // 该页 useCrudTable immediate:false —— 点真实「查询」按钮触发分页请求
+  await page.getByRole('button', { name: /查询|搜索/ }).first().click();
   expect(hiddenApiRequested, '广告奖励账本应请求改名后的接口').toBe(true);
   await shot(page, 'c406-c-广告奖励账本-隐藏页直达');
 });
@@ -90,7 +92,7 @@ const WALK_LEAVES: Array<{ leaf: string; root?: string }> = [
   { leaf: '开服向导', root: '区服' },
   { leaf: '游戏公告', root: '内容运营' },
   { leaf: '活动/功能开关', root: 'C 端交付' },
-  { leaf: '远程配置', root: '内容运维' },
+  { leaf: '远程配置', root: 'C 端交付' },
   { leaf: '在线总览', root: '在线运维' },
   { leaf: '游戏用户', root: '玩家' },
   { leaf: '订单', root: '商业化' },
@@ -169,12 +171,17 @@ test('f 支付配置回调地址为单 packageId 形态', async ({ page, context
 
   // 新装库无支付配置行：经真实 UI 新增一条（渠道字段由 schema 默认值自动填充）
   await page.getByRole('button', { name: '新增' }).first().click();
-  await expect(page.locator('.p-dialog')).toBeVisible();
-  await page.locator('.p-dialog .p-select').first().click();
-  await page.locator('.p-select-option').first().click();
+  const paymentDialog = page.locator('.p-dialog:visible').first();
+  await expect(paymentDialog).toBeVisible();
+  await paymentDialog.getByRole('combobox').first().click();
+  const channelOption = page.locator('.p-select-option:visible').first();
+  await channelOption.waitFor({ state: 'visible', timeout: 8_000 });
+  await channelOption.click();
+  await page.waitForTimeout(600);
   await page.screenshot({ path: test.info().outputPath('c406-f-payment-dialog.png') });
   await page.locator('.p-dialog-footer button', { hasText: '确定' }).first().click();
-  await expect(page.locator('.p-datatable-tbody tr').first()).toBeVisible({ timeout: 20_000 });
+  await expect(paymentDialog).toBeHidden({ timeout: 20_000 });
+  await expect(page.locator('.p-datatable-tbody tr:not(:has-text("暂无数据"))').first()).toBeVisible({ timeout: 20_000 });
 
   // 复制回调地址 → 校验剪贴板 URL 形态：/api/gameOrder/notify{Channel}(/packageId)?，不出现旧三段数字
   await page.locator('.p-datatable-tbody tr').first().getByText('复制回调地址').click();
