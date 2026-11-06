@@ -13,8 +13,14 @@ GameFrameX.Admin.Unified.Api/GameFrameX.Application/Audit/Retention/AuditRetenti
 GameFrameX.Admin.Unified.Api/GameFrameX.Core/SqlSugar/SqlSugarFilter.cs	Tenant	SqlSugar 原生 TenantAttribute 反射判断，D2.5 不改名
 GameFrameX.Admin.Unified.Api/GameFrameX.Core.Extension/RepositoryExtension.cs	Tenant	SqlSugar 原生 TenantAttribute 反射判断，D2.5 不改名
 # D2.5：第三方支付生态原生 AppId（微信/支付宝/Apple/Google 协议字段）
-GameFrameX.Admin.Unified.Api/Payment/**	AppId	支付平台协议字段或配置（微信/支付宝/Apple/Google），D2.5 保留
-GameFrameX.Admin.Unified.Api/Payment/**	appId	支付平台 wire 字段，D2.5 保留
+GameFrameX.Admin.Unified.Api/Payment/GameFrameX.Payment.AliPay/AliPayOptionSetting.cs	AppId	支付宝原生 AppId 协议配置，D2.5 保留（R2-a：目录级 Payment/** 收窄为实际命中文件）
+GameFrameX.Admin.Unified.Api/Payment/GameFrameX.Payment.AliPay/AliPayPaymentHandler.cs	AppId	支付宝原生 AppId 协议字段，D2.5 保留
+GameFrameX.Admin.Unified.Api/Payment/GameFrameX.Payment.AliPay/Refund/AliPayRefundManager.cs	AppId	支付宝原生 AppId 协议字段，D2.5 保留
+GameFrameX.Admin.Unified.Api/Payment/GameFrameX.Payment.Wechat/WechatPayOptionSetting.cs	AppId	微信支付原生 AppId 协议配置，D2.5 保留
+GameFrameX.Admin.Unified.Api/Payment/GameFrameX.Payment.Wechat/Option/WechatPayOptions.cs	AppId	微信支付原生 AppId 协议配置，D2.5 保留
+GameFrameX.Admin.Unified.Api/Payment/GameFrameX.Payment.Wechat/WechatPaymentHandler.cs	AppId	微信支付原生 AppId 协议字段，D2.5 保留
+GameFrameX.Admin.Unified.Api/Payment/GameFrameX.Payment.Wechat/WechatTenpayClientFactory.cs	AppId	微信支付原生 AppId 协议字段，D2.5 保留
+GameFrameX.Admin.Unified.Api/Payment/GameFrameX.Payment.Wechat/WechatCreateOrderResponse.cs	appId	微信下单响应原生 appId wire 字段，D2.5 保留
 GameFrameX.Admin.Unified.Api/GameFrameX.Entity/System/SystemWechatPayEntity.cs	AppId	微信支付原生 AppId 配置列，D2.5 保留
 GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/PayConfig/PaymentOptionSettingDecryptClosureTests.cs	AppId	支付宝原生 AliPayAppId 加解密闭环样本，D2.5 保留
 GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/ClientApi/RuntimeCredentialDecryptClosureTests.cs	AppId	支付宝原生 AliPayAppId 加解密闭环样本，D2.5 保留
@@ -69,5 +75,8 @@ GameFrameX.Admin.Unified.Vue/src/views/gmCenter/controlledOperation/commandForm.
 GameFrameX.Admin.Unified.Vue/src/views/clientDelivery/gamePaymentConfigEntity/notifyUrl.test.ts	tenant	D12 负向断言：公开回调 URL 不含旧查询字段（c406-keep）
 GameFrameX.Admin.Unified.Vue/src/views/clientDelivery/gamePaymentConfigEntity/notifyUrl.test.ts	appId	D12 负向断言：公开回调 URL 不含旧查询字段（c406-keep）
 GameFrameX.Admin.Unified.Vue/scripts/check-frontend-standards.mjs	tenant	D12 负向自检：退役目录段必须被 views 白名单拒绝（c406-keep）
+GameFrameX.Admin.Unified.Vue/e2e/tests/client-api-protocol.e2e.ts	Tenant	D12 负向断言：旧三头发送后行为与不带完全一致（c406-keep）
+GameFrameX.Admin.Unified.Vue/e2e/tests/e2e-integration-checks.e2e.ts	tenant	D12 负向断言：登录表单无租户字段 / 请求线缆与日志列残留扫描（c406-keep）
+GameFrameX.Admin.Unified.Vue/e2e/tests/e2e-integration-checks.e2e.ts	Tenant	D12 负向断言：日志审计页无 TenantId 列（c406-keep）
 # D13 执行机制自引用：守护测试自身的扫描正则与说明文字必然包含全部 token
 GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/Architecture/LegacyScopeResidualGuardTests.cs	AsTenant|ITenant|TenantTable|GameAppId|gameAppId|AppId|appId|app_id|tenant_|Tenant|tenant	D13 阻断测试自身（扫描正则与机制说明，文件名已按 R4 去 tenant）
