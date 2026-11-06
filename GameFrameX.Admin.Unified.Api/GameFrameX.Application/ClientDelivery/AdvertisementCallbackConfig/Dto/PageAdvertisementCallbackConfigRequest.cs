@@ -6,6 +6,11 @@ namespace GameFrameX.Application.ClientDelivery.AdvertisementCallbackConfig.Dto;
 public class PageAdvertisementCallbackConfigRequest : BaseAppActivePageRequest
 {
     /// <summary>
+    /// 按游戏应用分包 Id 过滤。
+    /// </summary>
+    public long? PackageId { get; set; }
+
+    /// <summary>
     /// 广告平台 Provider。
     /// </summary>
     public string Provider { get; set; } = null!;

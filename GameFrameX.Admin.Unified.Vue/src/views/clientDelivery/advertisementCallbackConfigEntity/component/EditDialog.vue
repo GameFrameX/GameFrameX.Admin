@@ -30,6 +30,13 @@
         <Message v-if="invalid" severity="error" size="small" variant="simple">{{ error }}</Message>
       </FormField>
 
+      <FormLabel name="packageId">分包</FormLabel>
+      <FormField name="packageId" v-slot="{ props: fProps, invalid, error }">
+        <Select filter v-bind="fProps" v-model="ruleForm.packageId" :options="packageOptions"
+                optionLabel="label" optionValue="value" placeholder="请选择分包" class="w-full"/>
+        <Message v-if="invalid" severity="error" size="small" variant="simple">{{ error }}</Message>
+      </FormField>
+
       <div v-if="schema" class="full-span parameter-panel">
         <div class="parameter-title">
           <span>{{ schema.label }} 参数配置</span>
@@ -121,6 +128,8 @@ import {TextareaField} from '../../../../components/crud-form-fields'
 
 import {showError} from '../../../../utils/message.ts'
 import { advertisementCallbackConfigAddPost, advertisementCallbackConfigProvidersGet, advertisementCallbackConfigSchemaGet, advertisementCallbackConfigUpdatePost } from '../../../../api/advertisementCallbackConfig'
+import {MAX_SELECT_SIZE} from '../../../../constants/pagination.ts'
+import {gameAppPackageSelectPost} from '../../../../api/gameAppPackage'
 import {isEnabled} from '../../../../utils/isEnabled.ts'
 
 interface AdCallbackFieldOption {
@@ -153,10 +162,12 @@ const dialogRef = ref()
 const SECRET_MASK = '******'
 
 const providerOptions = ref<{value: string; label: string}[]>([])
+const packageOptions = ref<{value: number; label: string}[]>([])
 const schema = ref<AdCallbackSchema | null>(null)
 
 const defaultForm = () => ({
   id: 0,
+  packageId: undefined,
   provider: 'TopOn',
   configJson: '',
   isEnabled: true,
@@ -164,6 +175,7 @@ const defaultForm = () => ({
 })
 
 const rules = {
+  packageId: [{required: true, message: '请选择分包', trigger: 'change'}],
   provider: [{required: true, message: '请选择 Provider', trigger: 'change'}],
 }
 
@@ -255,6 +267,10 @@ const beforeOpen = async (form: any) => {
 }
 
 const beforeSubmit = (form: any, isEditor: boolean) => {
+  if (!form.packageId) {
+    showError('请选择分包')
+    return false
+  }
   if (!form.provider) {
     showError('请选择 Provider')
     return false
@@ -287,6 +303,7 @@ const beforeSubmit = (form: any, isEditor: boolean) => {
 
   return {
     id: form.id,
+    packageId: form.packageId,
     provider: form.provider || 'TopOn',
     configJson: JSON.stringify(configObj),
     isEnabled: isEnabled(form),
@@ -301,6 +318,13 @@ onMounted(async () => {
     providerOptions.value = (list || []).map((item: any) => ({value: item.value, label: item.label}))
   } catch {
     providerOptions.value = []
+  }
+  try {
+    const res: any = await gameAppPackageSelectPost({pageSize: MAX_SELECT_SIZE})
+    // Select 响应的 value 是包名、id 才是分包 Id；绑定 PackageId 必须取 id
+    packageOptions.value = (res.data?.data ?? []).map((item: any) => ({label: item.label, value: Number(item.id)}))
+  } catch {
+    packageOptions.value = []
   }
 })
 

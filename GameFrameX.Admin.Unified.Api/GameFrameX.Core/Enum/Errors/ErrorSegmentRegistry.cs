@@ -33,6 +33,7 @@ public static class ErrorSegmentRegistry
         new(315, ErrorDomain.AdminBusiness, "Print", null, false, "Admin 打印模板（已退役，号段永久保留，禁止复用）"),
         new(316, ErrorDomain.AdminBusiness, "Plugin", null, false, "Admin 动态插件（已退役，号段永久保留，禁止复用）"),
         new(317, ErrorDomain.AdminBusiness, "OnlineModeration", nameof(OnlineModerationErrorCode), false, "Admin Online 社交治理（消息审计/举报处置/处罚联动，C350）"),
+        new(318, ErrorDomain.AdminBusiness, "AdvertisementCallbackConfig", nameof(AdvertisementCallbackConfigErrorCode), false, "Admin 广告回调配置"),
         // Online 平台 8 子段（C339 / vault:C2 S1.3，一一镜像 vault 1xxx～8xxx 八段；协议段 Nxxx ↔ 镜像段 32(N-1)）。
         new(320, ErrorDomain.AdminBusiness, "OnlineSystem", nameof(OnlineErrorCode), false, "Online 镜像：系统与网络（vault 1xxx）"),
         new(321, ErrorDomain.AdminBusiness, "OnlineSession", nameof(OnlineErrorCode), false, "Online 镜像：鉴权与 Session（vault 2xxx）"),

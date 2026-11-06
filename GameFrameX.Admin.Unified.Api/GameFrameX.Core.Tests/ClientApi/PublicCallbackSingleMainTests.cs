@@ -61,14 +61,15 @@ public sealed class PublicCallbackSingleMainTests
             var middleware = new PublicCallbackResolutionMiddleware(request =>
             {
                 invoked = true;
-                Assert.Single(request.Items);
-                Assert.Equal(new PublicCallbackRouteContext("pangle", "ad", null), request.Items[PublicCallbackRouteContext.ItemKey]);
                 return Task.CompletedTask;
             });
 
             await middleware.InvokeAsync(context, new PublicCallbackRouteResolver(database.MainDb));
 
-            Assert.True(invoked);
+            // 旧段不构成包上下文：广告回调必须有 packageId 路由段，旧三段请求 400 短路且不写入任何上下文
+            Assert.False(invoked);
+            Assert.Equal(StatusCodes.Status400BadRequest, context.Response.StatusCode);
+            Assert.False(context.Items.ContainsKey(PaymentOptionSettingProvider.PackageIdKey));
         }
     }
 }

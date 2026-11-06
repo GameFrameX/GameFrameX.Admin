@@ -69,6 +69,7 @@ public sealed class ClientApiOptionsProvider : IClientApiOptionsProvider
         var verificationKeys = GetConfigValue(configValues, "verificationKeys");
         return new AdvertisementCallbackOptions
         {
+            PackageId = entity.PackageId,
             Provider = entity.Provider,
             CallbackUrl = GetConfigValue(configValues, "callbackUrl", entity.CallbackUrl),
             SigningSecret = signingSecret,
@@ -86,8 +87,14 @@ public sealed class ClientApiOptionsProvider : IClientApiOptionsProvider
     {
         var db = _database;
         var provider = ResolvePublicCallbackProvider(_httpContextAccessor.HttpContext);
+        var packageId = ResolvePublicCallbackPackageId(_httpContextAccessor.HttpContext);
+        if (!packageId.HasValue)
+        {
+            return null;
+        }
+
         var query = db.Queryable<AdvertisementCallbackConfigEntity>()
-                      .Where(c => c.IsEnabled == true);
+                      .Where(c => c.IsEnabled == true && c.PackageId == packageId.Value);
         var candidates = await query.ToListAsync();
         if (!string.IsNullOrWhiteSpace(provider))
         {
@@ -96,9 +103,7 @@ public sealed class ClientApiOptionsProvider : IClientApiOptionsProvider
                          .ToList();
         }
 
-        return candidates
-               .OrderByDescending(c => c.Id)
-               .FirstOrDefault();
+        return candidates.Count == 1 ? candidates[0] : null;
     }
 
     /// <inheritdoc />
@@ -168,6 +173,16 @@ public sealed class ClientApiOptionsProvider : IClientApiOptionsProvider
                routeContextObj is PublicCallbackRouteContext routeContext
                    ? NormalizeAdvertisementProvider(routeContext.Provider)
                    : string.Empty;
+    }
+
+    private static long? ResolvePublicCallbackPackageId(HttpContext? context)
+    {
+        return context != null &&
+               context.Items.TryGetValue(PublicCallbackRouteContext.ItemKey, out var routeContextObj) &&
+               routeContextObj is PublicCallbackRouteContext routeContext &&
+               routeContext.PackageId is > 0
+                   ? routeContext.PackageId.Value
+                   : null;
     }
 
     internal static string NormalizeAdvertisementProvider(string provider)

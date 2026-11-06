@@ -10,7 +10,7 @@
         "tags": [
           "advertisementCallbackConfig"
         ],
-        "summary": "新增广告回调配置（主库内 Provider 唯一）。",
+        "summary": "新增广告回调配置（同一分组的 (PackageId, Provider) 唯一）。",
         "operationId": "AdvertisementCallbackConfigAddPost",
         "requestBody": {
           "content": {
@@ -72869,6 +72869,11 @@
         ],
         "type": "object",
         "properties": {
+          "PackageId": {
+            "type": "string",
+            "description": "关联的游戏应用分包 Id。",
+            "nullable": true
+          },
           "Provider": {
             "minLength": 1,
             "type": "string",
@@ -76436,6 +76441,10 @@
       "AdvertisementCallbackConfigResponse": {
         "type": "object",
         "properties": {
+          "PackageId": {
+            "type": "string",
+            "description": "关联的游戏应用分包 Id。"
+          },
           "Id": {
             "type": "string",
             "description": "Id"
@@ -88786,6 +88795,11 @@
             "type": "boolean",
             "nullable": true
           },
+          "PackageId": {
+            "type": "string",
+            "description": "按游戏应用分包 Id 过滤。",
+            "nullable": true
+          },
           "Provider": {
             "type": "string",
             "description": "广告平台 Provider。",
@@ -94864,6 +94878,11 @@
             "maximum": 9.223372036854776E+18,
             "minimum": 0,
             "type": "string"
+          },
+          "PackageId": {
+            "type": "string",
+            "description": "关联的游戏应用分包 Id。",
+            "nullable": true
           },
           "Provider": {
             "minLength": 1,

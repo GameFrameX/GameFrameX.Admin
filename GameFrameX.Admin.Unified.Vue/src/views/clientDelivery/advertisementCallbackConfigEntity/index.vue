@@ -29,6 +29,9 @@
           <template #body-provider="{ data }">
             <Tag :value="formatProvider(data.provider)"/>
           </template>
+          <template #body-packageId="{ data }">
+            {{ formatPackage(data.packageId) }}
+          </template>
           <template #body-signingSecret="{ data }">
             <Tag :value="hasSecret(data.signingSecret) ? '已配置' : '未配置'" :severity="hasSecret(data.signingSecret) ? 'info' : 'secondary'"/>
           </template>
@@ -58,11 +61,14 @@ import {formatUnix} from '../../../utils/formatTime.ts'
 
 import editDialog from './component/EditDialog.vue'
 import { advertisementCallbackConfigPagePost, advertisementCallbackConfigDeletePost, advertisementCallbackConfigDetailGet, advertisementCallbackConfigProvidersGet } from '../../../api/advertisementCallbackConfig'
+import {gameAppPackageSelectPost} from '../../../api/gameAppPackage'
+import {MAX_SELECT_SIZE} from '../../../constants/pagination.ts'
 
 const editDialogRef = ref()
 const editTitle = ref('')
 
 const providerOptions = ref<{label: string; value: string}[]>([])
+const packageOptions = ref<{label: string; value: number}[]>([])
 
 const statusOptions = [
   {label: '启用', value: true},
@@ -71,10 +77,12 @@ const statusOptions = [
 
 const searchFields = computed(() => [
   {key: 'provider', label: 'Provider', type: 'select' as const, options: providerOptions.value, placeholder: 'Provider'},
+  {key: 'packageId', label: '分包', type: 'select' as const, options: packageOptions.value, placeholder: '分包'},
   {key: 'isActive', label: '状态', type: 'select' as const, options: statusOptions, placeholder: '状态'},
 ])
 
 const columns = computed<CrudColumnConfig[]>(() => [
+  {field: 'packageId', header: '分包', width: '180px', bodyKey: 'packageId'},
   {field: 'provider', header: 'Provider', width: '150px', align: 'center', bodyKey: 'provider'},
   {field: 'callbackUrl', header: '回调 URL', width: '260px'},
   {field: 'signingSecret', header: '签名密钥', width: '120px', align: 'center', bodyKey: 'signingSecret', sensitive: true},
@@ -127,6 +135,7 @@ const actions = {
 }
 
 const formatProvider = (value: string) => providerOptions.value.find((item) => item.value === value)?.label ?? (value || '-')
+const formatPackage = (value: number) => packageOptions.value.find((item) => item.value === Number(value))?.label ?? String(value || '-')
 const hasSecret = (value: any) => !!String(value ?? '').trim()
 
 onMounted(async () => {
@@ -137,6 +146,15 @@ onMounted(async () => {
     providerOptions.value = (list || []).map((item: any) => ({label: item.label, value: item.value}))
   } catch {
     providerOptions.value = []
+  }
+
+
+  try {
+    const res: any = await gameAppPackageSelectPost({pageSize: MAX_SELECT_SIZE})
+    // Select 响应的 value 是包名、id 才是分包 Id；过滤与展示绑定都取 id
+    packageOptions.value = (res.data?.data ?? []).map((item: any) => ({label: item.label, value: Number(item.id)}))
+  } catch {
+    packageOptions.value = []
   }
 })
 </script>

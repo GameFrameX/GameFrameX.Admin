@@ -7,6 +7,11 @@ namespace GameFrameX.Application.ClientDelivery.AdvertisementCallbackConfig.Dto;
 public class UpdateAdvertisementCallbackConfigRequest : BaseUpdateRequest
 {
     /// <summary>
+    /// 关联的游戏应用分包 Id。
+    /// </summary>
+    public long? PackageId { get; set; }
+
+    /// <summary>
     /// 广告平台 Provider。当前首批配置支持 <c>TopOn</c>、<c>GoogleAdMob</c>、<c>Pangle</c>、<c>UnityAds</c>。
     /// </summary>
     [Required(ErrorMessage = "广告平台不能为空")]

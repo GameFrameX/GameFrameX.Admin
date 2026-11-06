@@ -3,6 +3,8 @@
 
 /** 广告回调配置新增输入参数 */
 export interface AddAdvertisementCallbackConfigRequest {
+  /** 关联的游戏应用分包 Id。 */
+  packageId?: string | null;
   /**
    * 广告平台 Provider。当前首批配置支持 `TopOn`、`GoogleAdMob`、`Pangle`、`UnityAds`。
    * @minLength 1
@@ -45,6 +47,8 @@ export interface AdvertisementCallbackConfigOption {
 
 /** 广告回调配置输出参数（敏感字段已脱敏） */
 export interface AdvertisementCallbackConfigResponse {
+  /** 关联的游戏应用分包 Id。 */
+  packageId?: string;
   /** Id */
   id?: string;
   /** 广告平台 Provider。当前首批配置支持 TopOn、GoogleAdMob、Pangle、UnityAds。 */
@@ -124,6 +128,8 @@ export interface PageAdvertisementCallbackConfigRequest {
   orderBy?: string | null;
   isDescending?: boolean;
   isActive?: boolean | null;
+  /** 按游戏应用分包 Id 过滤。 */
+  packageId?: string | null;
   /** 广告平台 Provider。 */
   provider?: string | null;
 }
@@ -144,6 +150,8 @@ export interface UpdateAdvertisementCallbackConfigRequest {
    * @max 9223372036854776000
    */
   rowVersion: string;
+  /** 关联的游戏应用分包 Id。 */
+  packageId?: string | null;
   /**
    * 广告平台 Provider。当前首批配置支持 `TopOn`、`GoogleAdMob`、`Pangle`、`UnityAds`。
    * @minLength 1

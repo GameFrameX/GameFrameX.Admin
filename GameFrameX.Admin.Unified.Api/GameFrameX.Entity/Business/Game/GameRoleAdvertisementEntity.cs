@@ -13,6 +13,13 @@ public class GameRoleAdvertisementEntity : EntityBase
 {
 
     /// <summary>
+    /// 广告回调命中的游戏应用分包 Id（与 <see cref="Game.App.GameAppPackageEntity.Id"/> 一致），来自公开回调 URL 的 packageId 路由段；
+    /// 与该笔回调验签所选配置的分包一致。新装库才有值，历史行为 0。
+    /// </summary>
+    [SugarColumn(ColumnDescription = "回调命中游戏应用分包Id", DefaultValue = "0")]
+    public long PackageId { get; set; }
+
+    /// <summary>
     /// 用户ID
     /// </summary>
     [SugarColumn(ColumnDescription = "用户ID", DefaultValue = "0")]
