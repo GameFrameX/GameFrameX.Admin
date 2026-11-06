@@ -60,8 +60,8 @@ public class ClientApiTokenIssuerTests
         Assert.Equal(ClientApiPlatformDefaults.GameLoginTicketAudience, jwt.Audiences.Single());
         Assert.Equal(keyResolver.Kid, jwt.Kid);
         Assert.Equal(keyResolver.Kid, ticket.Kid);
-        Assert.DoesNotContain(jwt.Claims, claim => claim.Type == "tenantId");
-        Assert.DoesNotContain(jwt.Claims, claim => claim.Type == "appId");
+        Assert.DoesNotContain(jwt.Claims, claim => claim.Type == "tenantId"); // c406-keep
+        Assert.DoesNotContain(jwt.Claims, claim => claim.Type == "appId"); // c406-keep
         Assert.Equal("30", jwt.Claims.Single(c => c.Type == "userId").Value);
         Assert.Equal("40", jwt.Claims.Single(c => c.Type == "playerId").Value);
         Assert.Equal("50", jwt.Claims.Single(c => c.Type == "areaId").Value);
@@ -149,17 +149,17 @@ public class ClientApiTokenIssuerTests
                                + "\"PlayerId\":40,"
                                + "\"AreaId\":50,"
                                + "\"AccessToken\":\"token\","
-                               + "\"UserId\":30,"
-                               + "\"tenantId\":10,"
-                               + "\"appId\":20"
+                               + "\"UserId\":30," // c406-keep
+                               + "\"tenantId\":10," // c406-keep
+                               + "\"appId\":20" // c406-keep
                                + "}";
 
         var input = JsonSerializer.Deserialize<GamePlayerLoginRequest>(payload);
 
         Assert.NotNull(input);
-        Assert.Contains(input!.ExtraFields.Keys, key => string.Equals(key, "UserId", StringComparison.OrdinalIgnoreCase));
-        Assert.Contains(input.ExtraFields.Keys, key => string.Equals(key, "tenantId", StringComparison.OrdinalIgnoreCase));
-        Assert.Contains(input.ExtraFields.Keys, key => string.Equals(key, "appId", StringComparison.OrdinalIgnoreCase));
+        Assert.Contains(input!.ExtraFields.Keys, key => string.Equals(key, "UserId", StringComparison.OrdinalIgnoreCase)); // c406-keep
+        Assert.Contains(input.ExtraFields.Keys, key => string.Equals(key, "tenantId", StringComparison.OrdinalIgnoreCase)); // c406-keep
+        Assert.Contains(input.ExtraFields.Keys, key => string.Equals(key, "appId", StringComparison.OrdinalIgnoreCase)); // c406-keep
     }
 
     private sealed class TestGameLoginTicketKeyResolver : IGameLoginTicketKeyResolver

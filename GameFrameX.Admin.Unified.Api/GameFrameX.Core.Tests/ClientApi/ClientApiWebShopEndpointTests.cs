@@ -69,7 +69,7 @@ public sealed class ClientApiWebShopEndpointTests
         db.SeedArea(2001, 10);
         db.SeedRole(3001, 1001, 2001);
         db.SeedWebShop(5001, "6.50", ItemJson());
-        db.SeedSystemConfig("web_shop_params", WebShopConfigJson("https://client.example.test/api/GameWebShop/NotifyWebShop/123/456/7001"));
+        db.SeedSystemConfig("web_shop_params", WebShopConfigJson("https://client.example.test/api/GameWebShop/NotifyWebShop/123/456/7001")); // c406-keep
         var handler = ClientApiRecordingHttpHandler.WithGameServerDefaults();
         var controller = CreateController(db, handler);
         controller.ControllerContext = new ControllerContext { HttpContext = db.CreateHttpContext(true, true, 7001), };

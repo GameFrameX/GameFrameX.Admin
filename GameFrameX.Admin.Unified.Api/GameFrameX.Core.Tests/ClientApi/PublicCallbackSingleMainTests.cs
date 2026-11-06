@@ -18,7 +18,7 @@ public sealed class PublicCallbackSingleMainTests
     public void OutboundPayment_BuildsNotifyUrlFromSiteRootThroughProvider(string channel)
     {
         // 出站下单通知地址经 PaymentOptionSettingProvider 真实构造：站点根地址自动补全新回调路由段
-        //（旧 tenantId/appId 查询作用域不参与），生成的 notify_url 能命中公开回调端点。
+        //（旧 tenantId/appId 查询作用域不参与），生成的 notify_url 能命中公开回调端点。 // c406-keep
         using (var database = new ClientApiTestDb())
         {
             database.InitTenantTables(typeof(TenantGamePaymentConfigEntity));
@@ -36,7 +36,7 @@ public sealed class PublicCallbackSingleMainTests
             }).ExecuteCommand();
 
             var context = new DefaultHttpContext();
-            context.Request.QueryString = new QueryString("?tenantId=123&appId=456");
+            context.Request.QueryString = new QueryString("?tenantId=123&appId=456"); // c406-keep
             var provider = new PaymentOptionSettingProvider(database.TenantDbProvider, new HttpContextAccessor { HttpContext = context });
 
             var expectedRoute = channel == "alipay" ? "api/GameOrder/NotifyAliPay" : "api/GameOrder/NotifyWeChatPay";
@@ -55,8 +55,8 @@ public sealed class PublicCallbackSingleMainTests
             var context = new DefaultHttpContext();
             context.SetEndpoint(new Endpoint(_ => Task.CompletedTask,
                 new EndpointMetadataCollection(new PublicCallbackEndpointAttribute("pangle", "ad")), "callback"));
-            context.Request.RouteValues["tenantId"] = 999;
-            context.Request.RouteValues["appId"] = 888;
+            context.Request.RouteValues["tenantId"] = 999; // c406-keep
+            context.Request.RouteValues["appId"] = 888; // c406-keep
             var invoked = false;
             var middleware = new PublicCallbackTenantResolutionMiddleware(request =>
             {

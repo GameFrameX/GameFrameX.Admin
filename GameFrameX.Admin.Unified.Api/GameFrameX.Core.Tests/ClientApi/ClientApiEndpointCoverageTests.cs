@@ -61,8 +61,8 @@ public sealed class ClientApiEndpointCoverageTests
         foreach (var endpoint in callbacks)
         {
             Assert.Contains("invalid-route", endpoint.FailureCases);
-            Assert.DoesNotContain("{tenantId:long}", endpoint.Route);
-            Assert.DoesNotContain("{appId:long}", endpoint.Route);
+            Assert.DoesNotContain("{tenantId:long}", endpoint.Route); // c406-keep
+            Assert.DoesNotContain("{appId:long}", endpoint.Route); // c406-keep
             Assert.False(endpoint.RequiresTenant);
             Assert.False(endpoint.RequiresApp);
         }
@@ -100,7 +100,7 @@ public sealed class ClientApiEndpointCoverageTests
                          .StartAsync();
 
         using var client = host.GetTestClient();
-        var response = await client.GetAsync("/api/GameAdWebHook/TopOnNotify/100/200/300");
+        var response = await client.GetAsync("/api/GameAdWebHook/TopOnNotify/100/200/300"); // c406-keep
 
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
