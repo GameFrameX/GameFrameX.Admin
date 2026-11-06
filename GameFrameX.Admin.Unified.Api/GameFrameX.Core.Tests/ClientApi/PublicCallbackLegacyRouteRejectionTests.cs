@@ -13,8 +13,13 @@ namespace GameFrameX.Core.Tests.ClientApi;
 
 public sealed class PublicCallbackLegacyRouteRejectionTests
 {
-    [Fact]
-    public async Task AdvertisementCallback_LegacyThreeSegmentRoute_ReturnsNotFound()
+    [Theory]
+    [InlineData("/api/GameAdWebHook/TopOnNotify/100/200/300")] // c406-keep
+    [InlineData("/api/GameAdWebHook/TopOnNotify")]
+    [InlineData("/api/GameAdWebHook/PangleGlobalNotify")]
+    [InlineData("/api/GameAdWebHook/AdMobNotify")]
+    [InlineData("/api/GameAdWebHook/UnityAdsNotify")]
+    public async Task AdvertisementCallback_RouteWithoutPackageIdSegment_ReturnsNotFound(string path)
     {
         using (var host = await new HostBuilder()
                            .ConfigureWebHost(webBuilder =>
@@ -35,7 +40,7 @@ public sealed class PublicCallbackLegacyRouteRejectionTests
         {
             using (var client = host.GetTestClient())
             {
-                var response = await client.GetAsync("/api/GameAdWebHook/TopOnNotify/100/200/300"); // c406-keep
+                var response = await client.GetAsync(path);
 
                 Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
             }
@@ -43,7 +48,7 @@ public sealed class PublicCallbackLegacyRouteRejectionTests
     }
 
     [Fact]
-    public async Task Middleware_LegacyContextFieldsAreIgnored()
+    public async Task Middleware_AdvertisementRouteWithoutPackageId_IsRejected_AndLegacyFieldsIgnored()
     {
         using (var database = new ClientApiTestDb())
         {
@@ -57,17 +62,19 @@ public sealed class PublicCallbackLegacyRouteRejectionTests
             var middleware = new PublicCallbackResolutionMiddleware(request =>
             {
                 invoked = true;
-                Assert.Single(request.Items);
-                Assert.Equal(new PublicCallbackRouteContext("pangle", "ad", null), request.Items[PublicCallbackRouteContext.ItemKey]);
-                Assert.DoesNotContain(request.Items.Keys, key => string.Equals(key?.ToString(), "TenantId", StringComparison.OrdinalIgnoreCase)); // c406-keep
-                Assert.DoesNotContain(request.Items.Keys, key => string.Equals(key?.ToString(), "AppId", StringComparison.OrdinalIgnoreCase)); // c406-keep
-                Assert.DoesNotContain(request.Items.Keys, key => string.Equals(key?.ToString(), "GameAppId", StringComparison.OrdinalIgnoreCase)); // c406-keep
                 return Task.CompletedTask;
             });
 
             await middleware.InvokeAsync(context, new PublicCallbackRouteResolver(database.MainDb));
 
-            Assert.True(invoked);
+            // 广告回调缺 packageId：解析层 fail-closed（纵深防御），中间件 400 短路，不进入端点；
+            // 旧作用域字段不触发任何解析，Items 不含旧键
+            Assert.False(invoked);
+            Assert.Equal(StatusCodes.Status400BadRequest, context.Response.StatusCode);
+            Assert.False(context.Items.ContainsKey(PublicCallbackRouteContext.ItemKey));
+            Assert.DoesNotContain(context.Items.Keys, key => string.Equals(key?.ToString(), "TenantId", StringComparison.OrdinalIgnoreCase)); // c406-keep
+            Assert.DoesNotContain(context.Items.Keys, key => string.Equals(key?.ToString(), "AppId", StringComparison.OrdinalIgnoreCase)); // c406-keep
+            Assert.DoesNotContain(context.Items.Keys, key => string.Equals(key?.ToString(), "GameAppId", StringComparison.OrdinalIgnoreCase)); // c406-keep
         }
     }
 }

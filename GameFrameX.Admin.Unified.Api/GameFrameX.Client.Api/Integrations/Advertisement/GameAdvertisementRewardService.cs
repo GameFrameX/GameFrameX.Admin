@@ -136,7 +136,7 @@ public sealed class GameAdvertisementRewardService
         // 4. 幂等判定（Foundation 协调器 + 账本表即 Store）：占位 → 执行 → 完成落定 / 失败落定
         var normalizedProvider = ClientApiOptionsProvider.NormalizeAdvertisementProvider(providerCanonical);
         var idempotencyKey = "adreward:" + normalizedProvider + ":" + payload.TransactionId;
-        var ledgerTemplate = BuildLedger(providerCanonical, idempotencyKey, payload, null, TimerHelper.UnixTimeSeconds());
+        var ledgerTemplate = BuildLedger(providerCanonical, advertisementOptions.PackageId, idempotencyKey, payload, null, TimerHelper.UnixTimeSeconds());
         var store = new AdvertisementRewardLedgerIdempotencyStore(_rewardRepository, ledgerTemplate);
         var coordinator = new IdempotencyCoordinator(store, SystemClock.Instance, AdvertisementRewardLedgerIdempotencyStore.CreateCoordinatorOptions());
         var identifier = new IdempotencyRecordIdentifier(AdvertisementRewardLedgerIdempotencyStore.IdempotencyScope, idempotencyKey);
@@ -253,6 +253,7 @@ public sealed class GameAdvertisementRewardService
     }
 
     private static GameAdvertisementRewardEntity BuildLedger(string providerCanonical,
+        long packageId,
         string idempotencyKey,
         VerifiedPayload payload,
         RoleResolution? resolution,
@@ -260,6 +261,7 @@ public sealed class GameAdvertisementRewardService
     {
         return new GameAdvertisementRewardEntity
         {
+            PackageId = packageId,
             Provider = providerCanonical,
             TransactionId = payload.TransactionId,
             AdvertisementUnit = payload.AdvertisementUnit,

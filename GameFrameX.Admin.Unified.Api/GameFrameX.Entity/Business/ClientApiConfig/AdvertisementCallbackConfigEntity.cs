@@ -16,7 +16,7 @@ public class AdvertisementCallbackConfigEntity : EntityBasic
     /// <summary>
     /// 关联的游戏应用分包 Id，对应 <see cref="Game.App.GameAppPackageEntity.Id"/>；广告回调验签材料严格绑定此分包。
     /// </summary>
-    [SugarColumn(ColumnDescription = "游戏应用分包Id")]
+    [SugarColumn(ColumnDescription = "游戏应用分包Id", DefaultValue = "0")]
     public long PackageId { get; set; }
 
     /// <summary>

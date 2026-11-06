@@ -6,6 +6,11 @@ namespace GameFrameX.Advertisement.Abstract;
 public sealed class AdvertisementCallbackOptions
 {
     /// <summary>
+    /// 广告回调验签配置绑定的游戏应用分包 Id。
+    /// </summary>
+    public long PackageId { get; init; }
+
+    /// <summary>
     /// 广告平台 Provider。
     /// </summary>
     public string? Provider { get; init; }

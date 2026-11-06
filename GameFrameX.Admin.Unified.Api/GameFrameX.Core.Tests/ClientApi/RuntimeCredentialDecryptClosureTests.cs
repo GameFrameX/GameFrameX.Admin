@@ -119,7 +119,7 @@ public sealed class RuntimeCredentialDecryptClosureTests : IDisposable
             Id = 7401, SigningKey = SecretCrypto.Encrypt("policy-signing-key")!, IsEnabled = true,
         }).ExecuteCommand();
 
-        var provider = new ClientApiOptionsProvider(_db.MainDb, new HttpContextAccessor { HttpContext = _db.CreateHttpContext(), });
+        var provider = new ClientApiOptionsProvider(_db.MainDb, new HttpContextAccessor { HttpContext = CreateAdvertisementContext(7500), });
 
         var policy = await provider.GetTokenPolicyAsync();
 
@@ -134,12 +134,12 @@ public sealed class RuntimeCredentialDecryptClosureTests : IDisposable
             "{\"callbackUrl\":\"https://cb.example.com/hook\",\"signingSecret\":\"ad-json-secret\"}");
         _db.MainDb.Insertable(new AdvertisementCallbackConfigEntity
         {
-            Id = 7501, Provider = "Pangle",
+            Id = 7501, PackageId = 7500, Provider = "Pangle",
             SigningSecret = SecretCrypto.Encrypt("ad-column-secret")!, VerificationKeys = string.Empty,
             ConfigJson = configJson, IsEnabled = true,
         }).ExecuteCommand();
 
-        var provider = new ClientApiOptionsProvider(_db.MainDb, new HttpContextAccessor { HttpContext = _db.CreateHttpContext(), });
+        var provider = new ClientApiOptionsProvider(_db.MainDb, new HttpContextAccessor { HttpContext = CreateAdvertisementContext(7500), });
 
         var options = await provider.GetAdvertisementCallbackOptionsAsync();
 
@@ -157,12 +157,12 @@ public sealed class RuntimeCredentialDecryptClosureTests : IDisposable
         // ConfigJson 是验签材料唯一来源：Pangle 缺 signingSecret 直接 fail-closed，不再回落汇总列
         _db.MainDb.Insertable(new AdvertisementCallbackConfigEntity
         {
-            Id = 7511, Provider = "Pangle",
+            Id = 7511, PackageId = 7511, Provider = "Pangle",
             SigningSecret = SecretCrypto.Encrypt("ad-column-secret")!, VerificationKeys = string.Empty,
             ConfigJson = "{\"callbackUrl\":\"https://cb.example.com/hook\"}", IsEnabled = true,
         }).ExecuteCommand();
 
-        var provider = new ClientApiOptionsProvider(_db.MainDb, new HttpContextAccessor { HttpContext = _db.CreateHttpContext(), });
+        var provider = new ClientApiOptionsProvider(_db.MainDb, new HttpContextAccessor { HttpContext = CreateAdvertisementContext(7511), });
 
         var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => provider.GetAdvertisementCallbackOptionsAsync());
         Assert.Contains("signingSecret", ex.Message, StringComparison.Ordinal);
@@ -175,11 +175,11 @@ public sealed class RuntimeCredentialDecryptClosureTests : IDisposable
         // AdMob 行必填 verificationKeys；signingSecret 缺失不影响（AdMob 用 verificationKeys 验签）
         _db.MainDb.Insertable(new AdvertisementCallbackConfigEntity
         {
-            Id = 7512, Provider = "GoogleAdMob",
+            Id = 7512, PackageId = 7512, Provider = "GoogleAdMob",
             ConfigJson = "{\"callbackUrl\":\"https://cb.example.com/admob\",\"verificationKeys\":\"k1=base64key\"}", IsEnabled = true,
         }).ExecuteCommand();
 
-        var provider = new ClientApiOptionsProvider(_db.MainDb, new HttpContextAccessor { HttpContext = _db.CreateHttpContext(), });
+        var provider = new ClientApiOptionsProvider(_db.MainDb, new HttpContextAccessor { HttpContext = CreateAdvertisementContext(7512, "admob"), });
 
         var options = await provider.GetAdvertisementCallbackOptionsAsync();
 
@@ -254,5 +254,12 @@ public sealed class RuntimeCredentialDecryptClosureTests : IDisposable
         Assert.Equal("plain-value", SecretCrypto.DecryptCached("plain-value"));
         Assert.Equal("cached-secret", SecretCrypto.DecryptCached(cipher));
         Assert.Equal("cached-secret", SecretCrypto.DecryptCached(cipher));
+    }
+
+    private static DefaultHttpContext CreateAdvertisementContext(long packageId, string provider = "pangle")
+    {
+        var context = new DefaultHttpContext();
+        context.Items[PublicCallbackRouteContext.ItemKey] = new PublicCallbackRouteContext(provider, "ad", packageId);
+        return context;
     }
 }

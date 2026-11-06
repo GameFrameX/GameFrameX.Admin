@@ -190,7 +190,7 @@ public sealed class AdminActionStyleContractTests
         { "GameFrameX.Application/ClientDelivery/GamePaymentConfig/GamePaymentConfigService.cs", 6 },
         { "GameFrameX.Application/Platform/Email/SystemEmailProviderService.cs", 10 },
         { "GameFrameX.Application/ClientDelivery/LoginTicket/GameLoginTicketKey/GameLoginTicketKeyService.cs", 2 },
-        { "GameFrameX.Application/ClientDelivery/AdvertisementCallbackConfig/AdvertisementCallbackConfigService.cs", 7 },
+        { "GameFrameX.Application/ClientDelivery/AdvertisementCallbackConfig/AdvertisementCallbackConfigService.cs", 6 },
         { "GameFrameX.Application/CommerceCenter/GameRedeemCodeChannel/GameRedeemCodeChannelService.cs", 1 },
         { "GameFrameX.Application/ClientDelivery/GameAppRemoteConfigMode/GameAppRemoteConfigModeService.cs", 2 },
         { "GameFrameX.Application/ClientDelivery/GameAppReleaseVersion/GameAppReleaseVersionService.cs", 1 },

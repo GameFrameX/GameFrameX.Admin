@@ -177,13 +177,13 @@ public class AdvertisementCallbackConfigService
     {
         if (packageId == null || packageId <= 0)
         {
-            throw BusinessError.Oh("分包 Id 必须为正数");
+            throw BusinessError.Oh(AdvertisementCallbackConfigErrorCode.PackageIdRequired);
         }
 
         var package = await _packageRepository.GetFirstAsync(x => x.Id == packageId.Value && x.IsEnabled == true);
         if (package == null)
         {
-            throw BusinessError.Oh("分包不存在或未启用");
+            throw BusinessError.Oh(AdvertisementCallbackConfigErrorCode.PackageNotFound);
         }
 
         return packageId.Value;
