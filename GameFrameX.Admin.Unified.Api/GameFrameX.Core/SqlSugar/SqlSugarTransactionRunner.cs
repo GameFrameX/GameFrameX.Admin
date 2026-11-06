@@ -45,24 +45,24 @@ public sealed class SqlSugarTransactionRunner
             return;
         }
 
-        var tenant = _sqlSugarClient.AsTenant();
-        tenant.BeginTran();
+        var multiDatabaseClient = _sqlSugarClient.AsTenant(); // SqlSugar 多库事务客户端（D2.5 原生 API）
+        multiDatabaseClient.BeginTran();
         CurrentDepth.Value++;
         try
         {
             var shouldCommit = await action();
             if (shouldCommit)
             {
-                tenant.CommitTran();
+                multiDatabaseClient.CommitTran();
             }
             else
             {
-                tenant.RollbackTran();
+                multiDatabaseClient.RollbackTran();
             }
         }
         catch
         {
-            tenant.RollbackTran();
+            multiDatabaseClient.RollbackTran();
             throw;
         }
         finally
