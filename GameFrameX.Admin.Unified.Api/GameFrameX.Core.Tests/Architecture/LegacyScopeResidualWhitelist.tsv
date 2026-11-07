@@ -30,6 +30,7 @@ GameFrameX.Admin.Unified.Vue/src/i18n/pages/errors/zh-tw.ts	32200002	R3-a 协议
 GameFrameX.Admin.Unified.Vue/src/i18n/pages/errors/ja.ts	32200002	R3-a 协议镜像（32200002 ja テナント译文；同上登记备查）
 GameFrameX.Admin.Unified.Vue/src/i18n/pages/errors/ko.ts	32200002	R3-a 协议镜像（32200002 ko 테넌트译文；同上登记备查）
 GameFrameX.Admin.Unified.Api/GameFrameX.Entity/Enum/WechatReturnCodeEnum.cs	appId	微信返回码原生字段（不合法的APPID 等 5 处，D2.5 生态原生；大小写变体不在 TOKEN_RE 扫描范围，登记备查）
+GameFrameX.Admin.Unified.Api/ObjectStorage/GameFrameX.ObjectStorage.TencentCos/TencentCosOptionSetting.cs	APPID	腾讯云 COS 原生 Bucket 格式术语（名称-APPID，官方命名 2 处；全大写变体不在 TOKEN_RE 扫描范围，登记备查）
 # D12：旧字段/旧路径负向测试（R2-b：明确断言旧三段 404、旧字段不解析不透传、旧属性不回归；行已标 c406-keep）
 GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/ClientApi/ClientApiRoleEndpointTests.cs	tenant	D12 负向断言：旧字段不出站（body/query/URI）
 GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/ClientApi/ClientApiRoleEndpointTests.cs	appId	D12 负向断言：旧字段不出站（body/query/URI）
