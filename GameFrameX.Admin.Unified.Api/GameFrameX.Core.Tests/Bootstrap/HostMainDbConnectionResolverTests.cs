@@ -25,6 +25,30 @@ public class HostMainDbConnectionResolverTests
     }
 
     [Fact]
+    public void Resolve_BindsCommandLineArgumentsSection()
+    {
+        // 命令行 args 与环境变量同走标准配置管线：--DbConnection:... 形式的参数构成显式节，优先级高于 GFX_MAIN_DB_* 与共享文件
+        WithEnvironmentVariables(new Dictionary<string, string?>
+        {
+            ["GFX_MAIN_DB_TYPE"] = null,
+            ["GFX_MAIN_DB_CONNECTION_STRING"] = null,
+        }, () =>
+        {
+            var configuration = new ConfigurationBuilder().AddCommandLine(new[]
+            {
+                "--DbConnection:ConnectionConfigs:0:ConfigId", "main",
+                "--DbConnection:ConnectionConfigs:0:DbType", "PostgreSQL",
+                "--DbConnection:ConnectionConfigs:0:ConnectionString", "Host=cli-args;Port=5432;Database=main;Username=u;Password=p;",
+            }).Build();
+
+            var main = HostMainDbConnectionResolver.Resolve(configuration, CreateEmptyBaseDirectory());
+
+            Assert.Equal(DbType.PostgreSQL, main.DbType);
+            Assert.Equal("Host=cli-args;Port=5432;Database=main;Username=u;Password=p;", main.ConnectionString);
+        });
+    }
+
+    [Fact]
     public void Resolve_ThrowsWhenGfxMainVariablesOnlyHalfSet()
     {
         WithEnvironmentVariables(new Dictionary<string, string?>
