@@ -29,7 +29,7 @@ export enum OnlineReportCaseStatusKind {
   Rejected = 4,
 }
 
-/** 举报案件条目（vault: 举报证据链全字段透传：举报人/被举报人/场景/MatchId/ChatMessageId/原因/证据/状态/处理结果）。 */
+/** 举报案件条目（vault:C7 举报证据链全字段透传：举报人/被举报人/场景/MatchId/ChatMessageId/原因/证据/状态/处理结果）。 */
 export interface OnlineReportCaseItemResponse {
   /** 案件 Id（Online 侧标识，字符串形态）。 */
   caseId?: string | null;
@@ -180,7 +180,7 @@ export interface OnlineReportCaseHandlePostData {
   data: OnlineReportHandleResponse;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;
@@ -204,7 +204,7 @@ export interface OnlineReportCasePagePostData {
   data: OnlineReportCasePageResponse;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;

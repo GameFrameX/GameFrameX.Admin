@@ -77,20 +77,12 @@ export interface AddGameMailCampaignEntityRequest {
   /** 模板 Id（0 = 无模板，裸文案发布）。 */
   templateId?: string;
   mailType?: MailCampaignMailType;
-  /**
-   * 多语言标题 JSON（ListAsync<MailLocalizedContent>）。
-   * @minLength 1
-   */
+  /** @minLength 1 */
   titlesJson: string;
-  /** 多语言正文 JSON（ListAsync<MailLocalizedContent>）。 */
   contentsJson?: string | null;
-  /** 多语言发件人名称 JSON（ListAsync<MailLocalizedContent>）。 */
   senderNamesJson?: string | null;
-  /** 附件列表 JSON（ListAsync<MailCampaignAttachment>）。 */
   attachmentsJson?: string | null;
-  /** 服务器 Id 白名单 JSON（ListAsync<int>）。 */
   serverIdsJson?: string | null;
-  /** 渠道 Id 白名单 JSON（ListAsync<int>）。 */
   channelIdsJson?: string | null;
   /**
    * 最低等级（含），0 表示不限。
@@ -302,7 +294,7 @@ export interface RevokeMailCampaignEntityResponse {
   message?: string | null;
 }
 
-/** 更新 Campaign 输入。仅 Draft 可更新（Published/Revoked 主体不可变）。 */
+/** 更新 Campaign 输入。仅 Draft 可更新（Published/Revoked 主体不可变 B1）。 */
 export interface UpdateGameMailCampaignEntityRequest {
   /**
    * @min 1
@@ -324,20 +316,12 @@ export interface UpdateGameMailCampaignEntityRequest {
   /** 模板 Id（0 = 无模板，裸文案发布）。 */
   templateId?: string;
   mailType?: MailCampaignMailType;
-  /**
-   * 多语言标题 JSON（ListAsync<MailLocalizedContent>）。
-   * @minLength 1
-   */
+  /** @minLength 1 */
   titlesJson: string;
-  /** 多语言正文 JSON（ListAsync<MailLocalizedContent>）。 */
   contentsJson?: string | null;
-  /** 多语言发件人名称 JSON（ListAsync<MailLocalizedContent>）。 */
   senderNamesJson?: string | null;
-  /** 附件列表 JSON（ListAsync<MailCampaignAttachment>）。 */
   attachmentsJson?: string | null;
-  /** 服务器 Id 白名单 JSON（ListAsync<int>）。 */
   serverIdsJson?: string | null;
-  /** 渠道 Id 白名单 JSON（ListAsync<int>）。 */
   channelIdsJson?: string | null;
   /**
    * 最低等级（含），0 表示不限。
@@ -374,7 +358,7 @@ export interface GameMailCampaignAddPostData {
   data: GameMailCampaignResponse;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;
@@ -400,7 +384,7 @@ export interface GameMailCampaignDetailGetData {
   data: GameMailCampaignResponse;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;
@@ -421,14 +405,14 @@ export interface GameMailCampaignDispatchOnlinePostData {
   /** 错误或提示信息 */
   message: string;
   /**
-   * LiveOps 统一下发回执（来源 change / vault: .7）。
+   * LiveOps 统一下发回执（来源 change C343 / vault:C8 S7.7）。
    *
    * 透传 Online 确认版本 / 状态供前端回显；`Merged` 标记邮件来源「同目标合并返回首次回执」路径。
    */
   data: OnlineLiveOpsDispatchResponse;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;
@@ -451,7 +435,7 @@ export interface GameMailCampaignPagePostData {
   data: GameMailCampaignResponseSqlSugarPagedList;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;
@@ -475,7 +459,7 @@ export interface GameMailCampaignPreviewPostData {
   data: PreviewMailCampaignEntityResponse;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;
@@ -499,7 +483,7 @@ export interface GameMailCampaignPublishPostData {
   data: PublishMailCampaignEntityResponse;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;
@@ -523,7 +507,7 @@ export interface GameMailCampaignRevokePostData {
   data: RevokeMailCampaignEntityResponse;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;

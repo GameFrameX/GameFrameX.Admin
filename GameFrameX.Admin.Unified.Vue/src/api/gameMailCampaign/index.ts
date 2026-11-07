@@ -65,7 +65,7 @@ export class GameMailCampaign<SecurityDataType = unknown> {
    *
    * @tags gameMailCampaign
    * @name GameMailCampaignDeletePost
-   * @summary 删除：仅 Draft/Failed 可删除（Published/Revoked 主体不可删 B1）。
+   * @summary 删除：仅 Draft/Failed 可删除（Published/Revoked 主体不可删）。
    * @request POST:/api/gameMailCampaign/delete
    */
   gameMailCampaignDeletePost = (
@@ -110,7 +110,7 @@ export class GameMailCampaign<SecurityDataType = unknown> {
    *
    * @tags gameMailCampaign
    * @name GameMailCampaignDispatchOnlinePost
-   * @summary 经 Online 统一下发当前 Campaign（来源 change C343 / vault:C8 S7.7，方案C）：转调 OnlineLiveOpsDispatchService 单一入口（publish_mail_campaign 通道）。 邮件不重复下发：单一入口只收 Published（同目标 ServerId==AreaId 合并返回首次发布回执）；Draft/Failed/Revoked 拒绝并指引走本服务 publish 链路。
+   * @summary 经 Online 统一下发当前 Campaign（来源 change / vault: .7，方案C）：转调 OnlineLiveOpsDispatchService 单一入口（publish_mail_campaign 通道）。 邮件不重复下发：单一入口只收 Published（同目标 ServerId==AreaId 合并返回首次发布回执）；Draft/Failed/Revoked 拒绝并指引走本服务 publish 链路。
    * @request POST:/api/gameMailCampaign/dispatchOnline
    */
   gameMailCampaignDispatchOnlinePost = (
@@ -170,7 +170,7 @@ export class GameMailCampaign<SecurityDataType = unknown> {
    *
    * @tags gameMailCampaign
    * @name GameMailCampaignPublishPost
-   * @summary 发布 Campaign：调用 Server publish。Ok 时回写 ServerCampaignId/PublishVersion/PublishedTime 并置 Published；非 Ok 时置 Failed 并记录 LastServerCode/Message，抛出友好错误。 仅 Draft/Failed 可发布（Published/Revoked 主体不可重复发布 B1）。
+   * @summary 发布 Campaign：调用 Server publish。Ok 时回写 ServerCampaignId/PublishVersion/PublishedTime 并置 Published；非 Ok 时置 Failed 并记录 LastServerCode/Message，抛出友好错误。 仅 Draft/Failed 可发布（Published/Revoked 主体不可重复发布）。
    * @request POST:/api/gameMailCampaign/publish
    */
   gameMailCampaignPublishPost = (
@@ -190,7 +190,7 @@ export class GameMailCampaign<SecurityDataType = unknown> {
    *
    * @tags gameMailCampaign
    * @name GameMailCampaignRevokePost
-   * @summary 撤回 Campaign：调用 Server revoke。仅 Published 可撤回（撤回不可逆 B3，已发放资产不回滚）。Ok 时回写 RevokedTime/RevokeOperator 并置 Revoked。
+   * @summary 撤回 Campaign：调用 Server revoke。仅 Published 可撤回（撤回不可逆，已发放资产不回滚）。Ok 时回写 RevokedTime/RevokeOperator 并置 Revoked。
    * @request POST:/api/gameMailCampaign/revoke
    */
   gameMailCampaignRevokePost = (

@@ -3630,7 +3630,7 @@
         "tags": [
           "clientApiPolicy"
         ],
-        "summary": "轮换策略签名密钥（C373）：生成新 64-hex 加密落库，旧值即刻作废——该密钥纯服务端内部使用，\n无双轨需求（区别于 HMAC 密钥环/票据 RSA 的租约退场模型）。\n\n响应不回显密钥（C368 背景已论证：任何响应均不回显明文/密文）。",
+        "summary": "轮换策略签名密钥：生成新 64-hex 加密落库，旧值即刻作废——该密钥纯服务端内部使用，\n无双轨需求（区别于 HMAC 密钥环/票据 RSA 的租约退场模型）。\n\n响应不回显密钥（背景已论证：任何响应均不回显明文/密文）。",
         "operationId": "ClientApiPolicyRotatePost",
         "requestBody": {
           "content": {
@@ -3663,7 +3663,7 @@
         "tags": [
           "clientApiPolicy"
         ],
-        "summary": "更新运行策略。SigningKey 回传 `******` 或留空均保留原值（C368：空白与掩码同义），新明文加密落库。",
+        "summary": "更新运行策略。SigningKey 回传 `******` 或留空均保留原值（空白与掩码同义），新明文加密落库。",
         "operationId": "ClientApiPolicyUpdatePost",
         "requestBody": {
           "content": {
@@ -8155,7 +8155,7 @@
         "tags": [
           "gameAntiCheatEvent"
         ],
-        "summary": "人工复核动作。\n\n<strong>合法状态迁移</strong>：仅 Pending → Approved/Rejected/Escalated；非 Pending 拒绝重审，目标状态非法拒绝。\n<strong>不写处罚表</strong>：本方法只更新事件自身的复核状态与审计字段；是否据此创建处罚属 C11-C（C115）与 C11-D-followup。",
+        "summary": "人工复核动作。\n\n<strong>合法状态迁移</strong>：仅 Pending → Approved/Rejected/Escalated；非 Pending 拒绝重审，目标状态非法拒绝。\n<strong>不写处罚表</strong>：本方法只更新事件自身的复核状态与审计字段；是否据此创建处罚属 -C与 -D-followup。",
         "operationId": "GameAntiCheatEventReviewPost",
         "requestBody": {
           "content": {
@@ -8188,7 +8188,7 @@
         "tags": [
           "gameAntiCheatEvent"
         ],
-        "summary": "反作弊事件上报接入（幂等）。\n\n<strong>幂等策略</strong>：统一走 Foundation 协调器 + 事件表即 Store（GameFrameX.Application.GmCenter.GameAntiCheatEvent.AntiCheatEventIdempotencyStore）——\n占位即入账（本站点执行 == 持久化，无外部副作用），并发同键由 `ux_anticheat_idempotency` 唯一索引仲裁，\n输家按 Replay 口径返回既有事件（不重复入账、不抛错）；ManualReviewState 固定为 Pending。\n<strong>建议不自动生效</strong>：SuggestedAction 仅落字段，本方法不创建任何处罚记录；\n处罚创建/撤销属 C11-C（C115）职责，复核通过后的映射由 C11-D-followup 承接。",
+        "summary": "反作弊事件上报接入（幂等）。\n\n<strong>幂等策略</strong>：统一走 Foundation 协调器 + 事件表即 Store（GameFrameX.Application.GmCenter.GameAntiCheatEvent.AntiCheatEventIdempotencyStore）——\n占位即入账（本站点执行 == 持久化，无外部副作用），并发同键由 `ux_anticheat_idempotency` 唯一索引仲裁，\n输家按 Replay 口径返回既有事件（不重复入账、不抛错）；ManualReviewState 固定为 Pending。\n<strong>建议不自动生效</strong>：SuggestedAction 仅落字段，本方法不创建任何处罚记录；\n处罚创建/撤销属 -C职责，复核通过后的映射由 -D-followup 承接。",
         "operationId": "GameAntiCheatEventSubmitPost",
         "requestBody": {
           "content": {
@@ -19385,7 +19385,7 @@
         "tags": [
           "gameArea"
         ],
-        "summary": "详情：绕过全局过滤器读取（禁用区服 IsEnabled=false 会被 ISafeEnabledFilter 隐藏，详情页必须可见，C301）。",
+        "summary": "详情：绕过全局过滤器读取（禁用区服 IsEnabled=false 会被 ISafeEnabledFilter 隐藏，详情页必须可见）。",
         "operationId": "GameAreaDetailGet",
         "parameters": [
           {
@@ -28155,7 +28155,7 @@
         "tags": [
           "gameHome"
         ],
-        "summary": "首页 24h 在线人数时序：最近 24 个整点桶回读采样表，桶内取最后一次采样，缺桶为 null（C321 / GFX-730）",
+        "summary": "首页 24h 在线人数时序：最近 24 个整点桶回读采样表，桶内取最后一次采样，缺桶为 null",
         "operationId": "GameHomeOnlineTrendPost",
         "responses": {
           "200": {
@@ -28186,7 +28186,7 @@
         "tags": [
           "gameHome"
         ],
-        "summary": "首页运营驾驶舱聚合读数：在线人数、今日订单（待发货/退款中细分）、玩家总数/今日新增、区服计数（C321 / GFX-730）",
+        "summary": "首页运营驾驶舱聚合读数：在线人数、今日订单（待发货/退款中细分）、玩家总数/今日新增、区服计数",
         "operationId": "GameHomeOverviewPost",
         "responses": {
           "200": {
@@ -29602,7 +29602,7 @@
         "tags": [
           "gameMailCampaign"
         ],
-        "summary": "删除：仅 Draft/Failed 可删除（Published/Revoked 主体不可删 B1）。",
+        "summary": "删除：仅 Draft/Failed 可删除（Published/Revoked 主体不可删）。",
         "operationId": "GameMailCampaignDeletePost",
         "requestBody": {
           "content": {
@@ -29823,7 +29823,7 @@
         "tags": [
           "gameMailCampaign"
         ],
-        "summary": "经 Online 统一下发当前 Campaign（来源 change C343 / vault:C8 S7.7，方案C）：转调 OnlineLiveOpsDispatchService 单一入口（publish_mail_campaign 通道）。\n\n邮件不重复下发：单一入口只收 Published（同目标 ServerId==AreaId 合并返回首次发布回执）；Draft/Failed/Revoked 拒绝并指引走本服务 publish 链路。",
+        "summary": "经 Online 统一下发当前 Campaign（来源 change / vault: .7，方案C）：转调 OnlineLiveOpsDispatchService 单一入口（publish_mail_campaign 通道）。\n\n邮件不重复下发：单一入口只收 Published（同目标 ServerId==AreaId 合并返回首次发布回执）；Draft/Failed/Revoked 拒绝并指引走本服务 publish 链路。",
         "operationId": "GameMailCampaignDispatchOnlinePost",
         "requestBody": {
           "content": {
@@ -30405,7 +30405,7 @@
         "tags": [
           "gameMailCampaign"
         ],
-        "summary": "发布 Campaign：调用 Server publish。Ok 时回写 ServerCampaignId/PublishVersion/PublishedTime 并置 Published；非 Ok 时置 Failed 并记录 LastServerCode/Message，抛出友好错误。\n\n仅 Draft/Failed 可发布（Published/Revoked 主体不可重复发布 B1）。",
+        "summary": "发布 Campaign：调用 Server publish。Ok 时回写 ServerCampaignId/PublishVersion/PublishedTime 并置 Published；非 Ok 时置 Failed 并记录 LastServerCode/Message，抛出友好错误。\n\n仅 Draft/Failed 可发布（Published/Revoked 主体不可重复发布）。",
         "operationId": "GameMailCampaignPublishPost",
         "requestBody": {
           "content": {
@@ -30599,7 +30599,7 @@
         "tags": [
           "gameMailCampaign"
         ],
-        "summary": "撤回 Campaign：调用 Server revoke。仅 Published 可撤回（撤回不可逆 B3，已发放资产不回滚）。Ok 时回写 RevokedTime/RevokeOperator 并置 Revoked。",
+        "summary": "撤回 Campaign：调用 Server revoke。仅 Published 可撤回（撤回不可逆，已发放资产不回滚）。Ok 时回写 RevokedTime/RevokeOperator 并置 Revoked。",
         "operationId": "GameMailCampaignRevokePost",
         "requestBody": {
           "content": {
@@ -35406,7 +35406,7 @@
         "tags": [
           "gameOrderFulfillment"
         ],
-        "summary": "人工补偿/补发（高风险）。委托 GameOrderShipService.CompensateAsync（C113）：按 Purchase 链路重发，账本落 CompensateAsync 类型 + OperatorId 审计。\n\nC223：Admin result 统一对象契约——失败抛 BusinessException 走 AdminResultFilter 统一错误路径，不再透传 HttpJsonResultData 双重信封。",
+        "summary": "人工补偿/补发（高风险）。委托 GameOrderShipService.CompensateAsync：按 Purchase 链路重发，账本落 CompensateAsync 类型 + OperatorId 审计。\n\n：Admin result 统一对象契约——失败抛 BusinessException 走 AdminResultFilter 统一错误路径，不再透传 HttpJsonResultData 双重信封。",
         "operationId": "GameOrderFulfillmentCompensatePost",
         "requestBody": {
           "content": {
@@ -36219,7 +36219,7 @@
         "tags": [
           "gameOrderFulfillment"
         ],
-        "summary": "退款扣除（高风险）。C310 / GFX-718 起两阶段：已支付订单先渠道退款（按 PayChannel 路由 IRefundManager——\n渠道失败 / 不支持主动退款 / 配置缺失抛统一错误码 PaymentErrorCode 段 704，本地账本不动），\n渠道成功后委托 GameOrderShipService.RefundAsync（C113）：按订单状态走作废 / 扣除路径，账本落 RefundAsync 类型 + 状态 + FailureReason。\nUnpaid 订单未收款，跳过渠道直接本地作废。\n\nC223：Admin result 统一对象契约——失败抛 BusinessException 走 AdminResultFilter 统一错误路径，不再透传 HttpJsonResultData 双重信封。",
+        "summary": "退款扣除（高风险）。 / 起两阶段：已支付订单先渠道退款（按 PayChannel 路由 IRefundManager——\n渠道失败 / 不支持主动退款 / 配置缺失抛统一错误码 PaymentErrorCode 段 704，本地账本不动），\n渠道成功后委托 GameOrderShipService.RefundAsync：按订单状态走作废 / 扣除路径，账本落 RefundAsync 类型 + 状态 + FailureReason。\nUnpaid 订单未收款，跳过渠道直接本地作废。\n\n：Admin result 统一对象契约——失败抛 BusinessException 走 AdminResultFilter 统一错误路径，不再透传 HttpJsonResultData 双重信封。",
         "operationId": "GameOrderFulfillmentRefundPost",
         "requestBody": {
           "content": {
@@ -36413,7 +36413,7 @@
         "tags": [
           "gameOrderFulfillment"
         ],
-        "summary": "重新发货（高风险）。收敛到 CompensateAsync（不新增发放类型枚举，C113 已锁定 Purchase/RefundAsync/CompensateAsync 三类）。\n\nC223：Admin result 统一对象契约，同 CompensateAsync。",
+        "summary": "重新发货（高风险）。收敛到 CompensateAsync（不新增发放类型枚举， 已锁定 Purchase/RefundAsync/CompensateAsync 三类）。\n\n：Admin result 统一对象契约，同 CompensateAsync。",
         "operationId": "GameOrderFulfillmentResendPost",
         "requestBody": {
           "content": {
@@ -54066,7 +54066,7 @@
         "tags": [
           "globalMenu"
         ],
-        "summary": "获取端点权限目录（U6/C42）：(HttpMethod, RoutePath) → GameFrameX.Core.Authorization.EndpointPermissionEntry。\n\n由 `ApiEndpointCatalogSync` 启动时构建并预热；此处请求期按需返回缓存，缓存缺失则即时重建。",
+        "summary": "获取端点权限目录：(HttpMethod, RoutePath) → GameFrameX.Core.Authorization.EndpointPermissionEntry。\n\n由 `ApiEndpointCatalogSync` 启动时构建并预热；此处请求期按需返回缓存，缓存缺失则即时重建。",
         "operationId": "GlobalMenuEndpointPermissionMapAsyncGet",
         "responses": {
           "200": {
@@ -59368,7 +59368,7 @@
         "tags": [
           "onlineControlledCommand"
         ],
-        "summary": "执行受控操作命令（高危端点）：四值命令路由 + 目标/方向校验 + 双人复核字段必填。\n\n幂等语义（vault:C9 VC-8.4 / vault:C2 S1.5）：每次调用按\nM:GameFrameX.Application.GmCenter.Console.OnlineControlledCommandService.BuildIdempotencyKey(System.String,System.Nullable{GameFrameX.Application.GmCenter.Console.Dto.ControlledCommandDirection},System.String,System.Int64) 规则派生 Online IdempotencyKey 下发——同一（命令, 方向, 目标, 区服）\n组合的重复调用携带相同幂等键，Online 侧按契约返回首次执行结果，不产生第二次副作用；\n因此网络重试 / 运营重复点击天然安全，失败可直接重试。",
+        "summary": "执行受控操作命令（高危端点）：四值命令路由 + 目标/方向校验 + 双人复核字段必填。\n\n幂等语义（vault: / vault: .5）：每次调用按\nM:GameFrameX.Application.GmCenter.Console.OnlineControlledCommandService.BuildIdempotencyKey(System.String,System.Nullable{GameFrameX.Application.GmCenter.Console.Dto.ControlledCommandDirection},System.String,System.Int64) 规则派生 Online IdempotencyKey 下发——同一（命令, 方向, 目标, 区服）\n组合的重复调用携带相同幂等键，Online 侧按契约返回首次执行结果，不产生第二次副作用；\n因此网络重试 / 运营重复点击天然安全，失败可直接重试。",
         "operationId": "OnlineControlledCommandExecutePost",
         "requestBody": {
           "description": "作用域（必填）+ 命令（严格四值）+ 目标标识 + 方向（开关型命令）+ 原因 + 复核人（均必填项见 DTO 注释）。",
@@ -72827,7 +72827,7 @@
           3
         ],
         "type": "integer",
-        "description": "异常 Ticket 检索类别（Admin 侧自有检索枚举，vault 无此概念；change C341 §3 A0）。\n\n定义在 Application.Platform（非 Core.Enum），不触碰 EnumContractTests SHA-256 契约锁。",
+        "description": "异常 Ticket 检索类别（Admin 侧自有检索枚举，vault 无此概念）。\n\n定义在 Application.Platform（非 Core.Enum），不触碰 EnumContractTests SHA-256 契约锁。",
         "format": "int32",
         "x-enum-varnames": [
           "LongWaiting",
@@ -74395,27 +74395,27 @@
           },
           "ClientDispatchApiPrefix": {
             "type": "string",
-            "description": "客户端转发 Server HTTP 路由前缀（来源 change C150 §3.2 / C175）。\n\nClient API 代理玩家普通请求（建角、改名、查角色、创建订单等）的 Server HTTP 路由前缀，默认 `game/api`。",
+            "description": "客户端转发 Server HTTP 路由前缀（来源 change /）。\n\nClient API 代理玩家普通请求（建角、改名、查角色、创建订单等）的 Server HTTP 路由前缀，默认 `game/api`。",
             "nullable": true
           },
           "FulfillmentApiPrefix": {
             "type": "string",
-            "description": "履约投递 Server HTTP 路由前缀（来源 change C150 §3.2 / C175）。\n\n后台履约、发货、退款、邮件投递、广告奖励、Campaign 发布、后台运营操作等资产或运营投递的前缀，默认 `game/api`。",
+            "description": "履约投递 Server HTTP 路由前缀（来源 change /）。\n\n后台履约、发货、退款、邮件投递、广告奖励、Campaign 发布、后台运营操作等资产或运营投递的前缀，默认 `game/api`。",
             "nullable": true
           },
           "GmApiPrefix": {
             "type": "string",
-            "description": "GM 命令 Server HTTP 路由前缀（来源 change C150 §3.2 / C175）。默认空，空表示 Admin 不构造 GM URL。",
+            "description": "GM 命令 Server HTTP 路由前缀（来源 change /）。默认空，空表示 Admin 不构造 GM URL。",
             "nullable": true
           },
           "ControlApiPrefix": {
             "type": "string",
-            "description": "管理控制 Server HTTP 路由前缀（来源 change C150 §3.2 / C175）。默认空，空表示 Admin 不构造控制 URL。",
+            "description": "管理控制 Server HTTP 路由前缀（来源 change /）。默认空，空表示 Admin 不构造控制 URL。",
             "nullable": true
           },
           "EnableClientGmApi": {
             "type": "boolean",
-            "description": "是否允许客户端调试 GM 通道（来源 change C150 §3.2 / C175）。仅 Admin 配置标记，最终放行由 Game Server 启动参数与环境门禁决定，默认关闭。"
+            "description": "是否允许客户端调试 GM 通道（来源 change /）。仅 Admin 配置标记，最终放行由 Game Server 启动参数与环境门禁决定，默认关闭。"
           },
           "IsEnabled": {
             "type": "boolean",
@@ -74647,32 +74647,26 @@
           },
           "TitlesJson": {
             "minLength": 1,
-            "type": "string",
-            "description": "多语言标题 JSON（ListAsync<MailLocalizedContent>）。"
+            "type": "string"
           },
           "ContentsJson": {
             "type": "string",
-            "description": "多语言正文 JSON（ListAsync<MailLocalizedContent>）。",
             "nullable": true
           },
           "SenderNamesJson": {
             "type": "string",
-            "description": "多语言发件人名称 JSON（ListAsync<MailLocalizedContent>）。",
             "nullable": true
           },
           "AttachmentsJson": {
             "type": "string",
-            "description": "附件列表 JSON（ListAsync<MailCampaignAttachment>）。",
             "nullable": true
           },
           "ServerIdsJson": {
             "type": "string",
-            "description": "服务器 Id 白名单 JSON（ListAsync<int>）。",
             "nullable": true
           },
           "ChannelIdsJson": {
             "type": "string",
-            "description": "渠道 Id 白名单 JSON（ListAsync<int>）。",
             "nullable": true
           },
           "MinLevel": {
@@ -78177,7 +78171,7 @@
           }
         },
         "additionalProperties": false,
-        "description": "请求期端点权限条目（U6/C42 缓存值）：由 `ApiEndpointCatalogSync` 在启动时构建并预热，\nJwtHandler 请求期按 RoutePath 查得，做端点→绑定按钮→已授权 MenuId 反向鉴权。"
+        "description": "请求期端点权限条目（缓存值）：由 `ApiEndpointCatalogSync` 在启动时构建并预热，\nJwtHandler 请求期按 RoutePath 查得，做端点→绑定按钮→已授权 MenuId 反向鉴权。"
       },
       "EnumItem": {
         "type": "object",
@@ -78397,7 +78391,7 @@
           }
         },
         "additionalProperties": false,
-        "description": "权益发货账本高风险动作输入参数（C120）：RefundAsync / CompensateAsync / ResendAsync 共用。\n兼作 GenericCrudService 的 TAddRequest（AddAsync 端点已由 OnAddingAsync 抛错关闭，与 GameOrderService 复用 AddInput 于 SendAsync 同款）。"
+        "description": "权益发货账本高风险动作输入参数：RefundAsync / CompensateAsync / ResendAsync 共用。\n兼作 GenericCrudService 的 TAddRequest（AddAsync 端点已由 OnAddingAsync 抛错关闭，与 GameOrderService 复用 AddInput 于 SendAsync 同款）。"
       },
       "FulfillmentActionResponse": {
         "type": "object",
@@ -78411,7 +78405,7 @@
           }
         },
         "additionalProperties": false,
-        "description": "权益发货账本高风险动作输出（C223 / GFX-644，U9 信封统一后为三 host 通用）：RefundAsync / CompensateAsync / ResendAsync 成功响应的 data 对象契约。\nAdmin 端点返回本对象交 AdminResultFilter 自动包装 HttpJsonResultData，失败走 BusinessException 统一错误路径。"
+        "description": "权益发货账本高风险动作输出（信封统一后为三 host 通用）：RefundAsync / CompensateAsync / ResendAsync 成功响应的 data 对象契约。\nAdmin 端点返回本对象交 AdminResultFilter 自动包装 HttpJsonResultData，失败走 BusinessException 统一错误路径。"
       },
       "FulfillmentStatusEnum": {
         "enum": [
@@ -78544,7 +78538,7 @@
           }
         },
         "additionalProperties": false,
-        "description": "广告奖励发放账本输出参数（C114 / GFX-111 后端跟进）。投影暴露实体全字段：\nProvider/TransactionId/AdvertisementUnit/RoleId/UserId/AreaId/RewardItem/RewardAmount/Status/IdempotencyKey/FailureReason/IsSandbox + 审计列。"
+        "description": "广告奖励发放账本输出参数（后端跟进）。投影暴露实体全字段：\nProvider/TransactionId/AdvertisementUnit/RoleId/UserId/AreaId/RewardItem/RewardAmount/Status/IdempotencyKey/FailureReason/IsSandbox + 审计列。"
       },
       "GameAdvertisementRewardResponseSqlSugarPagedList": {
         "type": "object",
@@ -81030,27 +81024,27 @@
           },
           "ClientDispatchApiPrefix": {
             "type": "string",
-            "description": "客户端转发 Server HTTP 路由前缀（来源 change C150 §3.2 / C175）。默认 game/api。",
+            "description": "客户端转发 Server HTTP 路由前缀（来源 change /）。默认 game/api。",
             "nullable": true
           },
           "FulfillmentApiPrefix": {
             "type": "string",
-            "description": "履约投递 Server HTTP 路由前缀（来源 change C150 §3.2 / C175）。默认 game/api。",
+            "description": "履约投递 Server HTTP 路由前缀（来源 change /）。默认 game/api。",
             "nullable": true
           },
           "GmApiPrefix": {
             "type": "string",
-            "description": "GM 命令 Server HTTP 路由前缀（来源 change C150 §3.2 / C175）。默认空，空表示不构造 GM URL。",
+            "description": "GM 命令 Server HTTP 路由前缀（来源 change /）。默认空，空表示不构造 GM URL。",
             "nullable": true
           },
           "ControlApiPrefix": {
             "type": "string",
-            "description": "管理控制 Server HTTP 路由前缀（来源 change C150 §3.2 / C175）。默认空，空表示不构造控制 URL。",
+            "description": "管理控制 Server HTTP 路由前缀（来源 change /）。默认空，空表示不构造控制 URL。",
             "nullable": true
           },
           "EnableClientGmApi": {
             "type": "boolean",
-            "description": "是否允许客户端调试 GM 通道（Admin 配置标记，来源 change C150 §3.2 / C175）。"
+            "description": "是否允许客户端调试 GM 通道（Admin 配置标记，来源 change /）。"
           },
           "IsEnabled": {
             "type": "boolean",
@@ -81690,7 +81684,7 @@
           }
         },
         "additionalProperties": false,
-        "description": "首页在线人数时序单点（C321 / GFX-730）"
+        "description": "首页在线人数时序单点"
       },
       "GameHomeOnlineTrendResponse": {
         "type": "object",
@@ -81705,7 +81699,7 @@
           }
         },
         "additionalProperties": false,
-        "description": "首页 24h 在线人数时序（C321 / GFX-730）\n\n最近 24 个整点桶（含当前进行中桶），桶内取该小时最后一次采样值；无采样数据的桶 OnlineCount 为 null（前端降级画 —）。"
+        "description": "首页 24h 在线人数时序\n\n最近 24 个整点桶（含当前进行中桶），桶内取该小时最后一次采样值；无采样数据的桶 OnlineCount 为 null（前端降级画 —）。"
       },
       "GameHomeOnlineTrendResponseHttpJsonResultData": {
         "type": "object",
@@ -81793,7 +81787,7 @@
           }
         },
         "additionalProperties": false,
-        "description": "首页运营驾驶舱聚合读数（C321 / GFX-730）\n\n纯聚合计数输出，非 CRUD Response，无 Id/RowVersion（同 `GameHomeOnlineResponse` / `GameOrderSummaryResponse` 先例）。"
+        "description": "首页运营驾驶舱聚合读数\n\n纯聚合计数输出，非 CRUD Response，无 Id/RowVersion（同 `GameHomeOnlineResponse` / `GameOrderSummaryResponse` 先例）。"
       },
       "GameHomeOverviewResponseHttpJsonResultData": {
         "type": "object",
@@ -82814,7 +82808,6 @@
           },
           "ConditionsJson": {
             "type": "string",
-            "description": "分群条件 JSON（List<GameFrameX.Application.GmCenter.LiveOps.PlayerSegment.OnlineSegmentCondition>）。",
             "nullable": true
           },
           "SyncStatus": {
@@ -82855,7 +82848,7 @@
           },
           "RowVersion": {
             "type": "string",
-            "description": "乐观锁版本号（C228：GenericCrudService TResponse 必含，乐观锁编辑链路与默认排序依赖）。"
+            "description": "乐观锁版本号（GenericCrudService TResponse 必含，乐观锁编辑链路与默认排序依赖）。"
           }
         },
         "additionalProperties": false,
@@ -83020,7 +83013,7 @@
           }
         },
         "additionalProperties": false,
-        "description": "权益发货账本输出参数（C120）。投影暴露实体全字段：\nType/Status/FailureReason/IdempotencyKey/OperatorId/ItemsJson/订单快照（OrderId/PayChannel/ProviderTransactionId/Sku/RoleId/AreaId/AccountId/Amount）/审计列。"
+        "description": "权益发货账本输出参数。投影暴露实体全字段：\nType/Status/FailureReason/IdempotencyKey/OperatorId/ItemsJson/订单快照（OrderId/PayChannel/ProviderTransactionId/Sku/RoleId/AreaId/AccountId/Amount）/审计列。"
       },
       "GameOrderFulfillmentResponseSqlSugarPagedList": {
         "type": "object",
@@ -87280,7 +87273,7 @@
           },
           "Source": {
             "type": "string",
-            "description": "来源（vault:C4 六类）。",
+            "description": "来源（vault: 六类）。",
             "nullable": true
           },
           "Reason": {
@@ -87318,7 +87311,7 @@
           }
         },
         "additionalProperties": false,
-        "description": "资产交易详情响应（Transaction/Grant 全字段：TransactionId、IdempotencyKey、状态、来源、原因、业务单号、操作者、Grant 明细、时间；\nvault:C4 交易不变量——每笔变更可追溯，VC-3.14 Admin 展示半边）。"
+        "description": "资产交易详情响应（Transaction/Grant 全字段：TransactionId、IdempotencyKey、状态、来源、原因、业务单号、操作者、Grant 明细、时间；\nvault: 交易不变量——每笔变更可追溯，.14 Admin 展示半边）。"
       },
       "OnlineAssetTransactionGrantItemResponse": {
         "type": "object",
@@ -87399,7 +87392,7 @@
           3
         ],
         "type": "integer",
-        "description": "统一审计行来源标识（change C344 / vault:C9 S8.2；三来源口径见 OnlineAuditSourceMap）。",
+        "description": "统一审计行来源标识（change / vault: .2；三来源口径见 OnlineAuditSourceMap）。",
         "format": "int32",
         "x-enum-varnames": [
           "AdminOperation",
@@ -87507,7 +87500,7 @@
           }
         },
         "additionalProperties": false,
-        "description": "受控操作命令回执（线缆/Admin 出参共用；vault:C9 S8.1 契约，mock 先行）。\n\n透传 Online 首次执行结果——同 IdempotencyKey 的重复调用拿到的是首次回执（VC-8.4），不产生第二次副作用。"
+        "description": "受控操作命令回执（线缆/Admin 出参共用；vault: .1 契约，mock 先行）。\n\n透传 Online 首次执行结果——同 IdempotencyKey 的重复调用拿到的是首次回执，不产生第二次副作用。"
       },
       "OnlineControlledCommandKind": {
         "enum": [
@@ -87731,7 +87724,7 @@
           }
         },
         "additionalProperties": false,
-        "description": "异常 Ticket 分页响应（change C341 §3 A0 字段终版：Items/NextCursor/HasMore + ServerTime）。"
+        "description": "异常 Ticket 分页响应（字段终版：Items/NextCursor/HasMore + ServerTime）。"
       },
       "OnlineMatchAbnormalTicketResponse": {
         "type": "object",
@@ -87828,7 +87821,7 @@
           }
         },
         "additionalProperties": false,
-        "description": "匹配失败原因分页响应（change C341 §3 A0 字段终版：Items/ReasonSummary/NextCursor/HasMore + ServerTime）。"
+        "description": "匹配失败原因分页响应（字段终版：Items/ReasonSummary/NextCursor/HasMore + ServerTime）。"
       },
       "OnlineMatchFailureReasonSummaryResponse": {
         "type": "object",
@@ -87935,7 +87928,7 @@
           }
         },
         "additionalProperties": false,
-        "description": "匹配队列总览响应（change C341 §3 A0 字段终版）。"
+        "description": "匹配队列总览响应（字段终版）。"
       },
       "OnlineMatchQueueSnapshotResponse": {
         "type": "object",
@@ -88208,11 +88201,11 @@
           },
           "TokenRevokedConfirmed": {
             "type": "boolean",
-            "description": "旧 Token 吊销确认（vault:C2 S1.4：命令生效后 Online 确认已吊销该玩家旧 Token；\n服务端旧 Token 被拒的验证归 vault 侧用例，Admin 断言展示层确认字段）。"
+            "description": "旧 Token 吊销确认（vault: .4：命令生效后 Online 确认已吊销该玩家旧 Token；\n服务端旧 Token 被拒的验证归 vault 侧用例，Admin 断言展示层确认字段）。"
           }
         },
         "additionalProperties": false,
-        "description": "单区服联动命令执行结果（VC-2.3 Admin 展示半边：旧 Token 吊销确认字段）。"
+        "description": "单区服联动命令执行结果（Admin 展示半边：旧 Token 吊销确认字段）。"
       },
       "OnlinePlayerSegmentSyncStatus": {
         "enum": [
@@ -89191,7 +89184,7 @@
           }
         },
         "additionalProperties": false,
-        "description": "广告奖励发放账本分页/导出查询输入参数（C114 / GFX-111 后端跟进）。\n\n过滤字段对齐前端检索表单：Provider/Status/RoleId 常用 + TransactionId/AdvertisementUnit/AreaId/时间范围 高级。"
+        "description": "广告奖励发放账本分页/导出查询输入参数（后端跟进）。\n\n过滤字段对齐前端检索表单：Provider/Status/RoleId 常用 + TransactionId/AdvertisementUnit/AreaId/时间范围 高级。"
       },
       "PageGameAnnouncementEntityRequest": {
         "type": "object",
@@ -90800,7 +90793,7 @@
           }
         },
         "additionalProperties": false,
-        "description": "权益发货账本分页查询输入参数（C120）。过滤字段严格锁定见 change C120 §3 BuildPageQuery 表。"
+        "description": "权益发货账本分页查询输入参数。过滤字段严格锁定见 change BuildPageQuery 表。"
       },
       "PageGamePaymentConfigRequest": {
         "type": "object",
@@ -91823,7 +91816,7 @@
           }
         },
         "additionalProperties": false,
-        "description": "异常 Ticket 分页查询输入参数（change C341 §3；按异常类别检索，Cursor 翻页透传 Online）。"
+        "description": "异常 Ticket 分页查询输入参数（change；按异常类别检索，Cursor 翻页透传 Online）。"
       },
       "PageOnlineMatchFailureRequest": {
         "required": [
@@ -91869,7 +91862,7 @@
           }
         },
         "additionalProperties": false,
-        "description": "匹配失败原因分页查询输入参数（change C341 §3；Cursor 翻页透传 Online）。"
+        "description": "匹配失败原因分页查询输入参数（change；Cursor 翻页透传 Online）。"
       },
       "PageOnlineMessageAuditRequest": {
         "required": [
@@ -92857,7 +92850,7 @@
           }
         },
         "additionalProperties": false,
-        "description": "平台密码策略配置输出（C173）。仅暴露密码强度策略字段，绝不回显 Cryptogram 密钥（CryptoType/PublicKey/PrivateKey）。"
+        "description": "平台密码策略配置输出。仅暴露密码强度策略字段，绝不回显 Cryptogram 密钥（CryptoType/PublicKey/PrivateKey）。"
       },
       "PlatformPasswordPolicyConfigUpdateRequest": {
         "type": "object",
@@ -93553,7 +93546,7 @@
           }
         },
         "additionalProperties": false,
-        "description": "灰度回滚输入（来源 change C343 / vault:C8 S7.8 / VC-7.12）。回滚 = 版本化新下发：恢复目标版本的 SegmentId/Percent 语义，生成新 ConfigVersion 行。"
+        "description": "灰度回滚输入（来源 change / vault: .8 / .12）。回滚 = 版本化新下发：恢复目标版本的 SegmentId/Percent 语义，生成新 ConfigVersion 行。"
       },
       "RollbackConfigRolloutResponse": {
         "type": "object",
@@ -96525,27 +96518,27 @@
           },
           "ClientDispatchApiPrefix": {
             "type": "string",
-            "description": "客户端转发 Server HTTP 路由前缀（来源 change C150 §3.2 / C175）。\n\nClient API 代理玩家普通请求（建角、改名、查角色、创建订单等）的 Server HTTP 路由前缀，默认 `game/api`。",
+            "description": "客户端转发 Server HTTP 路由前缀（来源 change /）。\n\nClient API 代理玩家普通请求（建角、改名、查角色、创建订单等）的 Server HTTP 路由前缀，默认 `game/api`。",
             "nullable": true
           },
           "FulfillmentApiPrefix": {
             "type": "string",
-            "description": "履约投递 Server HTTP 路由前缀（来源 change C150 §3.2 / C175）。\n\n后台履约、发货、退款、邮件投递、广告奖励、Campaign 发布、后台运营操作等资产或运营投递的前缀，默认 `game/api`。",
+            "description": "履约投递 Server HTTP 路由前缀（来源 change /）。\n\n后台履约、发货、退款、邮件投递、广告奖励、Campaign 发布、后台运营操作等资产或运营投递的前缀，默认 `game/api`。",
             "nullable": true
           },
           "GmApiPrefix": {
             "type": "string",
-            "description": "GM 命令 Server HTTP 路由前缀（来源 change C150 §3.2 / C175）。默认空，空表示 Admin 不构造 GM URL。",
+            "description": "GM 命令 Server HTTP 路由前缀（来源 change /）。默认空，空表示 Admin 不构造 GM URL。",
             "nullable": true
           },
           "ControlApiPrefix": {
             "type": "string",
-            "description": "管理控制 Server HTTP 路由前缀（来源 change C150 §3.2 / C175）。默认空，空表示 Admin 不构造控制 URL。",
+            "description": "管理控制 Server HTTP 路由前缀（来源 change /）。默认空，空表示 Admin 不构造控制 URL。",
             "nullable": true
           },
           "EnableClientGmApi": {
             "type": "boolean",
-            "description": "是否允许客户端调试 GM 通道（来源 change C150 §3.2 / C175）。仅 Admin 配置标记，最终放行由 Game Server 启动参数与环境门禁决定，默认关闭。"
+            "description": "是否允许客户端调试 GM 通道（来源 change /）。仅 Admin 配置标记，最终放行由 Game Server 启动参数与环境门禁决定，默认关闭。"
           },
           "IsEnabled": {
             "type": "boolean",
@@ -96827,32 +96820,26 @@
           },
           "TitlesJson": {
             "minLength": 1,
-            "type": "string",
-            "description": "多语言标题 JSON（ListAsync<MailLocalizedContent>）。"
+            "type": "string"
           },
           "ContentsJson": {
             "type": "string",
-            "description": "多语言正文 JSON（ListAsync<MailLocalizedContent>）。",
             "nullable": true
           },
           "SenderNamesJson": {
             "type": "string",
-            "description": "多语言发件人名称 JSON（ListAsync<MailLocalizedContent>）。",
             "nullable": true
           },
           "AttachmentsJson": {
             "type": "string",
-            "description": "附件列表 JSON（ListAsync<MailCampaignAttachment>）。",
             "nullable": true
           },
           "ServerIdsJson": {
             "type": "string",
-            "description": "服务器 Id 白名单 JSON（ListAsync<int>）。",
             "nullable": true
           },
           "ChannelIdsJson": {
             "type": "string",
-            "description": "渠道 Id 白名单 JSON（ListAsync<int>）。",
             "nullable": true
           },
           "MinLevel": {
@@ -97198,7 +97185,7 @@
           }
         },
         "additionalProperties": false,
-        "description": "权益发货账本更新输入参数（C120）。仅满足 GenericCrudService 的 TUpdateRequest 泛型约束；\nUpdateAsync 端点已由 OnUpdatingAsync 抛错关闭（账本为事实数据，不支持修改）。"
+        "description": "权益发货账本更新输入参数。仅满足 GenericCrudService 的 TUpdateRequest 泛型约束；\nUpdateAsync 端点已由 OnUpdatingAsync 抛错关闭（账本为事实数据，不支持修改）。"
       },
       "UpdateGamePaymentConfigRequest": {
         "required": [
@@ -99267,7 +99254,7 @@
     },
     {
       "name": "appSignatureKey",
-      "description": "App 传输签名密钥环管理服务（change C2 sig-keyring-server）。\n\n密钥明文仅服务端随机生成（不接受外部提交，避免弱密钥入环），仅 AddAsync/RotateAsync 响应一次性回显；\n列表/详情一律脱敏 ******；实体禁删（历史 key 是在途请求与多版本客户端的验签依据），退场走 DisableAsync 或租约到期。\n作用域：主库。路由前缀 /api/appSignatureKeyEntity（动态路由规则：去 Service 后缀 + lowerCamelCase）。"
+      "description": "App 传输签名密钥环管理服务（change sig-keyring-server）。\n\n密钥明文仅服务端随机生成（不接受外部提交，避免弱密钥入环），仅 AddAsync/RotateAsync 响应一次性回显；\n列表/详情一律脱敏 ******；实体禁删（历史 key 是在途请求与多版本客户端的验签依据），退场走 DisableAsync 或租约到期。\n作用域：主库。路由前缀 /api/appSignatureKeyEntity（动态路由规则：去 Service 后缀 + lowerCamelCase）。"
     },
     {
       "name": "channelDefinition",
@@ -99275,7 +99262,7 @@
     },
     {
       "name": "clientApiPolicy",
-      "description": "Client API 运行策略管理服务（C378 四表合一：Token / 登录票据 / 区服输出 / 订单策略单页管理）。\n\n主库保存唯一运行策略，所有请求读取同一行。\n敏感字段（SigningKey）承载 C368 空值防护语义：新增空白自动生成 64-hex、更新空白与 `******` 同义保留原值；\n输出恒为脱敏占位；该密钥纯服务端内部使用，任何响应均不回显明文。\n签名密钥以 GameFrameX.Core.Service.Business.SecretCrypto 密文落库（C371）：PreserveIfMasked 先换回库中原值（密文形态），\nEncrypt 幂等跳过已密文值，新明文在落库前加密。"
+      "description": "Client API 运行策略管理服务（四表合一：Token / 登录票据 / 区服输出 / 订单策略单页管理）。\n\n主库保存唯一运行策略，所有请求读取同一行。\n敏感字段（SigningKey）承载 空值防护语义：新增空白自动生成 64-hex、更新空白与 `******` 同义保留原值；\n输出恒为脱敏占位；该密钥纯服务端内部使用，任何响应均不回显明文。\n签名密钥以 GameFrameX.Core.Service.Business.SecretCrypto 密文落库：PreserveIfMasked 先换回库中原值（密文形态），\nEncrypt 幂等跳过已密文值，新明文在落库前加密。"
     },
     {
       "name": "deviceGroup",
@@ -99287,7 +99274,7 @@
     },
     {
       "name": "gameAdvertisementReward",
-      "description": "广告奖励发放账本 Admin 查询服务（C114 / GFX-110 事实源的管理面跟进，MENU-P2-03 欠账清理）。\n\n只读：PageAsync（继承基类）/ GetAsync 详情（继承基类）/ ExportAsync 导出当前过滤列表（上限 1000 行，文件化由前端处理）。\n事实数据铁律：OnAddingAsync / OnUpdatingAsync 抛错关闭默认 AddAsync/UpdateAsync 端点，无 DeleteAsync 端点。\n高风险动作 RetryAsync / MarkProcessedAsync 涉及 C114 幂等状态机（同 IdempotencyKey 复用账本行从 Failed 翻回），\n留待单独 change 落地；前端对应按钮已由 gameAdRewardEntity:retry / :markProcessed 权限码门控，未种码即隐藏。"
+      "description": "广告奖励发放账本 Admin 查询服务（事实源的管理面跟进，MENU-P2-03 欠账清理）。\n\n只读：PageAsync（继承基类）/ GetAsync 详情（继承基类）/ ExportAsync 导出当前过滤列表（上限 1000 行，文件化由前端处理）。\n事实数据铁律：OnAddingAsync / OnUpdatingAsync 抛错关闭默认 AddAsync/UpdateAsync 端点，无 DeleteAsync 端点。\n高风险动作 RetryAsync / MarkProcessedAsync 涉及 幂等状态机（同 IdempotencyKey 复用账本行从 Failed 翻回），\n留待单独 change 落地；前端对应按钮已由 gameAdRewardEntity:retry / :markProcessed 权限码门控，未种码即隐藏。"
     },
     {
       "name": "gameAnnouncement",
@@ -99399,7 +99386,7 @@
     },
     {
       "name": "gameMailCampaign",
-      "description": "运营邮件 Campaign 草稿/发布/撤回管理服务。路由前缀 /api/gameMailCampaignEntity（历史框架 去后缀 + lowerCamelCase）。\n\n状态机 B1/B3/B4：Draft 可自由增删改与发布重试；Published/Revoked 主体不可编辑/删除（B1），仅 Published 可撤回（撤回不可逆 B3）；Server 拒绝落 Failed。\n与既有 `GameMailService`（直发 post_mail）是两套独立系统，不合并。"
+      "description": "运营邮件 Campaign 草稿/发布/撤回管理服务。路由前缀 /api/gameMailCampaignEntity（历史框架 去后缀 + lowerCamelCase）。\n\n状态机 //：Draft 可自由增删改与发布重试；Published/Revoked 主体不可编辑/删除，仅 Published 可撤回（撤回不可逆）；Server 拒绝落 Failed。\n与既有 `GameMailService`（直发 post_mail）是两套独立系统，不合并。"
     },
     {
       "name": "gameMailTemplate",
@@ -99423,7 +99410,7 @@
     },
     {
       "name": "gameOrderFulfillment",
-      "description": "权益发货账本 Admin 查询/管理服务（C11-A / C120，承接 C113 账本事实源）。\n\n只读：PageAsync（继承基类）/ GetAsync 详情（继承基类）/ ExportAsync 导出当前过滤列表（上限 1000 行）。\n高风险动作：RefundAsync / CompensateAsync / ResendAsync，全部委托 GameOrderShipService（C113 已落地的账本写入 + 操作人审计 + 幂等链路）。\n事实数据铁律：OnAddingAsync / OnUpdatingAsync 抛错关闭默认 AddAsync/UpdateAsync 端点，无 DeleteAsync 端点。"
+      "description": "权益发货账本 Admin 查询/管理服务（-A /，承接 账本事实源）。\n\n只读：PageAsync（继承基类）/ GetAsync 详情（继承基类）/ ExportAsync 导出当前过滤列表（上限 1000 行）。\n高风险动作：RefundAsync / CompensateAsync / ResendAsync，全部委托 GameOrderShipService（已落地的账本写入 + 操作人审计 + 幂等链路）。\n事实数据铁律：OnAddingAsync / OnUpdatingAsync 抛错关闭默认 AddAsync/UpdateAsync 端点，无 DeleteAsync 端点。"
     },
     {
       "name": "gamePaymentConfig",
@@ -99531,7 +99518,7 @@
     },
     {
       "name": "onlineAssetGrantCommand",
-      "description": "Online 资产人工发放/撤销受限命令服务（高危；权限码 onlineAssetGrantCommand:grant / :revoke 仅同步管理员角色）。\n\n路由前缀 /api/onlineAssetGrantCommand（change C340 / vault:C4 S3.6「Admin 人工发放或撤销」六类来源之一）。\n经 GameFrameX.Application.ServerCenter.Online.IOnlineServerClient 调 Online Grant API——Admin 侧零直写（守护测试 OnlineAssetCommandWhitelistTests）；\n`Reason` 必填进审计；幂等键由服务端按业务单号规则生成（见 M:GameFrameX.Application.GmCenter.Asset.OnlineAssetGrantCommandService.ResolveBusinessOrderNumber(System.String,System.String)）。"
+      "description": "Online 资产人工发放/撤销受限命令服务（高危；权限码 onlineAssetGrantCommand:grant / :revoke 仅同步管理员角色）。\n\n路由前缀 /api/onlineAssetGrantCommand（change / vault: .6「Admin 人工发放或撤销」六类来源之一）。\n经 GameFrameX.Application.ServerCenter.Online.IOnlineServerClient 调 Online Grant API——Admin 侧零直写（守护测试 OnlineAssetCommandWhitelistTests）；\n`Reason` 必填进审计；幂等键由服务端按业务单号规则生成（见 M:GameFrameX.Application.GmCenter.Asset.OnlineAssetGrantCommandService.ResolveBusinessOrderNumber(System.String,System.String)）。"
     },
     {
       "name": "onlineAssetLedgerQuery",
@@ -99539,7 +99526,7 @@
     },
     {
       "name": "onlineAssetTransactionQuery",
-      "description": "Online 资产交易详情查询服务。路由前缀 /api/onlineAssetTransactionQuery（change C340 / vault:C4 S3.7、VC-3.14）。\n\n按 TransactionId 反查交易全字段（IdempotencyKey、来源、原因、业务单号、操作者、Grant 明细、时间）；\nAdmin 端点为 GET + `[FromQuery]` 复杂查询对象（C257 §4），Online 侧查询经 POST 通道携带 body。"
+      "description": "Online 资产交易详情查询服务。路由前缀 /api/onlineAssetTransactionQuery（change / vault: .7、.14）。\n\n按 TransactionId 反查交易全字段（IdempotencyKey、来源、原因、业务单号、操作者、Grant 明细、时间）；\nAdmin 端点为 GET + `[FromQuery]` 复杂查询对象，Online 侧查询经 POST 通道携带 body。"
     },
     {
       "name": "onlineAuditSearch",
@@ -99547,11 +99534,11 @@
     },
     {
       "name": "onlineControlledCommand",
-      "description": "Online 控制台受控操作命令服务（高危；权限码 onlineControlledCommand:execute 仅同步管理员角色）。\n\n路由前缀 /api/onlineControlledCommand（change C344 / vault:C9 S8.1）。\n只承载四条新命令（GameFrameX.Application.GmCenter.Console.Dto.OnlineControlledCommandKind 严格四值），经 GameFrameX.Application.ServerCenter.Online.IOnlineServerClient\n直调 Online 显式命令接口；命令 action 名唯一实现点集中本文件（守护测试 OnlineOverviewIsolationTests）。\n受控操作复用矩阵（禁平行实现）：踢下线/封禁/禁言经 C342 后端半边落地的\n`OnlinePenaltyLinkCommandService`（/api/onlinePenaltyLinkCommand/execute，承载 C350 处罚联动域），\n发放/撤销资产经 C340 `OnlineAssetGrantCommandService`（/api/onlineAssetGrantCommand/grant|revoke）\n——控制台操作面板直调上述既有端点，本服务不转发、不重新实现；\nOnline/Console 源码出现既有命令 token 即为违规（守护测试 + 既有白名单测试全域拦截）。\n高危复核口径：本端点整体高危——`Reason` 与 `ReviewerOperatorId` 对全部四命令必填（双人复核字段），\n审计经 MonitorLogging 全 action 自动落库 + Online 侧审计事件双通道留痕。"
+      "description": "Online 控制台受控操作命令服务（高危；权限码 onlineControlledCommand:execute 仅同步管理员角色）。\n\n路由前缀 /api/onlineControlledCommand（change / vault: .1）。\n只承载四条新命令（GameFrameX.Application.GmCenter.Console.Dto.OnlineControlledCommandKind 严格四值），经 GameFrameX.Application.ServerCenter.Online.IOnlineServerClient\n直调 Online 显式命令接口；命令 action 名唯一实现点集中本文件（守护测试 OnlineOverviewIsolationTests）。\n受控操作复用矩阵（禁平行实现）：踢下线/封禁/禁言经 后端半边落地的\n`OnlinePenaltyLinkCommandService`（api/onlinePenaltyLinkCommand/execute，承载 处罚联动域），\n发放/撤销资产经 `OnlineAssetGrantCommandService`（api/onlineAssetGrantCommand/grant|revoke）\n——控制台操作面板直调上述既有端点，本服务不转发、不重新实现；\nOnline/Console 源码出现既有命令 token 即为违规（守护测试 + 既有白名单测试全域拦截）。\n高危复核口径：本端点整体高危——`Reason` 与 `ReviewerOperatorId` 对全部四命令必填（双人复核字段），\n审计经 MonitorLogging 全 action 自动落库 + Online 侧审计事件双通道留痕。"
     },
     {
       "name": "onlineLiveOpsDispatch",
-      "description": "LiveOps 统一下发单一入口服务（来源 change C343 / vault:C8 S7.7）。路由前缀 /api/onlineLiveOpsDispatch（去后缀 + lowerCamelCase）。\n\n单一入口铁律：本服务是 Application.Platform 业务层唯一注入 GameFrameX.Application.ServerCenter.Online.IOnlineServerClient 的业务类\n（C339 既有管理通道除外），分群 / 灰度 / 既有运营域页面的「经 Online 下发」动作全部经\nGameFrameX.Application.GmCenter.LiveOps.Dispatch.IOnlineLiveOpsDispatchService 转调，禁止旁路自建 HTTP 直连 Online Runtime——\n作用域注入（Factory 三元组）、协议码镜像、审计摘要只在此处发生一次，由 OnlineLiveOpsSingleEntryTests 守护。\n五类来源路由表（Online admin API 命令名冻结于 change.md A0 契约对齐块，调整须回 change 评审）：\n<list type=\"table\"><listheader><term>来源</term><term>Online 命令</term><term>生效语义</term><term>幂等依据</term></listheader><item><term>RemoteConfig</term><description>publishRemoteConfig</description><description>按配置记录整体发布，Online 以最新 Content 生效</description><description>同 ConfigId 重复发布 = 覆盖式最新版，Online 天然幂等</description></item><item><term>DeviceGroup</term><description>syncDeviceGroup</description><description>设备分群定义同步，Online 重建分群成员视图</description><description>定义快照同步，重复同步收敛到同一状态</description></item><item><term>ScheduledTask</term><description>syncScheduledTask</description><description>定时任务定义同步，Online 按定义调度</description><description>定义快照同步，重复同步收敛到同一状态</description></item><item><term>Announcement</term><description>pushAnnouncement</description><description>公告推送，按公告记录当前内容生效</description><description>同 AnnouncementId 重复推送 = 覆盖式最新版</description></item><item><term>MailCampaign</term><description>publish_mail_campaign（既有链路标识）</description><description>不重复下发：仅收 Published，同目标合并返回首次发布回执（方案C）</description><description>发布动作本身由既有 Campaign publish 链路完成且幂等，本入口只做合并回执</description></item></list>\n入口校验序：越枚举拒绝（M:System.Enum.IsDefined(System.Type,System.Object)）→ 来源记录存在性 →\n目标区服（Factory：记录存在性）→ Online 调用（非 0 协议码由 Client 按八段镜像抛出）。"
+      "description": "LiveOps 统一下发单一入口服务（来源 change / vault: .7）。路由前缀 /api/onlineLiveOpsDispatch（去后缀 + lowerCamelCase）。\n\n单一入口铁律：本服务是 Application.Platform 业务层唯一注入 GameFrameX.Application.ServerCenter.Online.IOnlineServerClient 的业务类\n（既有管理通道除外），分群 / 灰度 / 既有运营域页面的「经 Online 下发」动作全部经\nGameFrameX.Application.GmCenter.LiveOps.Dispatch.IOnlineLiveOpsDispatchService 转调，禁止旁路自建 HTTP 直连 Online Runtime——\n作用域注入（Factory 三元组）、协议码镜像、审计摘要只在此处发生一次，由 OnlineLiveOpsSingleEntryTests 守护。\n五类来源路由表（Online admin API 命令名冻结于 契约对齐块，调整须回 change 评审）：\n<list type=\"table\"><listheader><term>来源</term><term>Online 命令</term><term>生效语义</term><term>幂等依据</term></listheader><item><term>RemoteConfig</term><description>publishRemoteConfig</description><description>按配置记录整体发布，Online 以最新 Content 生效</description><description>同 ConfigId 重复发布 = 覆盖式最新版，Online 天然幂等</description></item><item><term>DeviceGroup</term><description>syncDeviceGroup</description><description>设备分群定义同步，Online 重建分群成员视图</description><description>定义快照同步，重复同步收敛到同一状态</description></item><item><term>ScheduledTask</term><description>syncScheduledTask</description><description>定时任务定义同步，Online 按定义调度</description><description>定义快照同步，重复同步收敛到同一状态</description></item><item><term>Announcement</term><description>pushAnnouncement</description><description>公告推送，按公告记录当前内容生效</description><description>同 AnnouncementId 重复推送 = 覆盖式最新版</description></item><item><term>MailCampaign</term><description>publish_mail_campaign（既有链路标识）</description><description>不重复下发：仅收 Published，同目标合并返回首次发布回执（方案C）</description><description>发布动作本身由既有 Campaign publish 链路完成且幂等，本入口只做合并回执</description></item></list>\n入口校验序：越枚举拒绝（M:System.Enum.IsDefined(System.Type,System.Object)）→ 来源记录存在性 →\n目标区服（Factory：记录存在性）→ Online 调用（非 0 协议码由 Client 按八段镜像抛出）。"
     },
     {
       "name": "onlineMatchQueueQuery",
@@ -99559,7 +99546,7 @@
     },
     {
       "name": "onlineMatchTicketQuery",
-      "description": "Online 匹配 Ticket 明细查询服务。路由前缀 /api/onlineMatchTicketQuery（change C341 / vault:C5 S4.9）。\n\n纯只读观测：失败原因明细与异常 Ticket（长时间未分配/重复取消/孤儿）检索实时透传 Online，\n游标翻页往返；Admin 侧零持久化、零缓存。治理动作（如取消 Ticket）属 vault:C9 受控操作（C344），不在本服务。"
+      "description": "Online 匹配 Ticket 明细查询服务。路由前缀 /api/onlineMatchTicketQuery（change / vault: .9）。\n\n纯只读观测：失败原因明细与异常 Ticket（长时间未分配/重复取消/孤儿）检索实时透传 Online，\n游标翻页往返；Admin 侧零持久化、零缓存。治理动作（如取消 Ticket）属 vault: 受控操作，不在本服务。"
     },
     {
       "name": "onlineMessageAuditQuery",
@@ -99567,7 +99554,7 @@
     },
     {
       "name": "onlineOverviewQuery",
-      "description": "Online 在线总览查询服务。路由前缀 /api/onlineOverviewQuery（change C344 / vault:C9 S8.1）。\n\n快照语义：实时透传 Online 玩家侧查询 API，Admin 侧零持久化、零缓存——运行态快照非权威状态。\nX6 口径红线：数据源唯一 = Online 玩家侧查询 API，<b>不含管理员连接</b>——不得计入管理员浏览器\n连接链路（Hub 长连接与在线用户服务的管理员口径），也不得复用首页驾驶舱的在线计数口径\n（C321 产物，与玩家在线口径不同源）；守护测试 OnlineOverviewIsolationTests 锁定本 Service\n及其依赖闭包对相关四个类型的零引用（类型名清单见守护测试内）。"
+      "description": "Online 在线总览查询服务。路由前缀 /api/onlineOverviewQuery（change / vault: .1）。\n\n快照语义：实时透传 Online 玩家侧查询 API，Admin 侧零持久化、零缓存——运行态快照非权威状态。\nX6 口径红线：数据源唯一 = Online 玩家侧查询 API，<b>不含管理员连接</b>——不得计入管理员浏览器\n连接链路（Hub 长连接与在线用户服务的管理员口径），也不得复用首页驾驶舱的在线计数口径\n（产物，与玩家在线口径不同源）；守护测试 OnlineOverviewIsolationTests 锁定本 Service\n及其依赖闭包对相关四个类型的零引用（类型名清单见守护测试内）。"
     },
     {
       "name": "onlinePenaltyLinkCommand",
@@ -99583,23 +99570,23 @@
     },
     {
       "name": "platformCaptchaConfig",
-      "description": "平台图形验证码配置服务。\n\n宿主表说明（GFX-706）：本服务不持有独立宿主表，共享主库 SystemConfigEntity（system_config 表），以 Code 分区行 `platform_captcha_config`（PlatformCaptchaConfigConstants.ConfigCode）存储本域配置 JSON。Platform* 前缀指平台级配置域，名实相符保留类名。"
+      "description": "平台图形验证码配置服务。\n\n宿主表说明：本服务不持有独立宿主表，共享主库 SystemConfigEntity（system_config 表），以 Code 分区行 `platform_captcha_config`（PlatformCaptchaConfigConstants.ConfigCode）存储本域配置 JSON。Platform* 前缀指平台级配置域，名实相符保留类名。"
     },
     {
       "name": "platformJwtConfig",
-      "description": "平台 JWT 配置服务。\n\n宿主表说明（GFX-706）：本服务不持有独立宿主表，共享主库 SystemConfigEntity（system_config 表），以 Code 分区行 `platform_jwt_settings`（PlatformJwtConfigConstants.ConfigCode）存储本域配置 JSON。Platform* 前缀指平台级配置域，名实相符保留类名。"
+      "description": "平台 JWT 配置服务。\n\n宿主表说明：本服务不持有独立宿主表，共享主库 SystemConfigEntity（system_config 表），以 Code 分区行 `platform_jwt_settings`（PlatformJwtConfigConstants.ConfigCode）存储本域配置 JSON。Platform* 前缀指平台级配置域，名实相符保留类名。"
     },
     {
       "name": "platformLoggingConfig",
-      "description": "平台日志配置服务（SuperAdmin-only）。DetailAsync 不回显 ES 明文 URI；UpdateAsync 用 CAS 乐观锁写回并刷新同 Host 快照。\n\n宿主表说明（GFX-706）：本服务不持有独立宿主表，共享主库 SystemConfigEntity（system_config 表），以 Code 分区行 `platform_logging_config`（PlatformLoggingConfigConstants.ConfigCode）存储本域配置 JSON。Platform* 前缀指平台级配置域，名实相符保留类名。"
+      "description": "平台日志配置服务（SuperAdmin-only）。DetailAsync 不回显 ES 明文 URI；UpdateAsync 用 CAS 乐观锁写回并刷新同 Host 快照。\n\n宿主表说明：本服务不持有独立宿主表，共享主库 SystemConfigEntity（system_config 表），以 Code 分区行 `platform_logging_config`（PlatformLoggingConfigConstants.ConfigCode）存储本域配置 JSON。Platform* 前缀指平台级配置域，名实相符保留类名。"
     },
     {
       "name": "platformPasswordPolicyConfig",
-      "description": "平台密码策略配置服务（C173，SuperAdmin-only）。DetailAsync/UpdateAsync 仅暴露密码强度策略字段，\n绝不回显 Cryptogram 密钥；UpdateAsync 用 CAS 乐观锁写回并刷新同 Host 快照与 CryptogramUtility 镜像。\n\n宿主表说明（GFX-706）：本服务不持有独立宿主表，共享主库 SystemConfigEntity（system_config 表），以 Code 分区行 `platform_password_policy_config`（PlatformPasswordPolicyConfigConstants.ConfigCode）存储本域配置 JSON。Platform* 前缀指平台级配置域，名实相符保留类名。"
+      "description": "平台密码策略配置服务（SuperAdmin-only）。DetailAsync/UpdateAsync 仅暴露密码强度策略字段，\n绝不回显 Cryptogram 密钥；UpdateAsync 用 CAS 乐观锁写回并刷新同 Host 快照与 CryptogramUtility 镜像。\n\n宿主表说明：本服务不持有独立宿主表，共享主库 SystemConfigEntity（system_config 表），以 Code 分区行 `platform_password_policy_config`（PlatformPasswordPolicyConfigConstants.ConfigCode）存储本域配置 JSON。Platform* 前缀指平台级配置域，名实相符保留类名。"
     },
     {
       "name": "platformRateLimitConfig",
-      "description": "平台限流配置服务。\n\n宿主表说明（GFX-706）：本服务不持有独立宿主表，共享主库 SystemConfigEntity（system_config 表），以 Code 分区行 `platform_rate_limit_config`（PlatformRateLimitConfigConstants.ConfigCode）存储本域配置 JSON。Platform* 前缀指平台级配置域，名实相符保留类名。"
+      "description": "平台限流配置服务。\n\n宿主表说明：本服务不持有独立宿主表，共享主库 SystemConfigEntity（system_config 表），以 Code 分区行 `platform_rate_limit_config`（PlatformRateLimitConfigConstants.ConfigCode）存储本域配置 JSON。Platform* 前缀指平台级配置域，名实相符保留类名。"
     },
     {
       "name": "role",
@@ -99607,7 +99594,7 @@
     },
     {
       "name": "sessionKey",
-      "description": "App 会话密钥环管理服务（change C5 server-envelope-middleware；C7 登录自动签发见 Client.Api 的 ClientApiSessionKeyIssuer）。\n\n密钥明文仅服务端随机生成（不接受外部提交，避免弱密钥入环），仅 AddAsync/RotateAsync 响应一次性回显；\n列表/详情一律脱敏 ******；实体禁删（历史 key 是在途加密信封的解密依据），退场走 DisableAsync 或租约到期。\n作用域：主库。路由前缀 /api/sessionKeyEntity。"
+      "description": "App 会话密钥环管理服务（change server-envelope-middleware； 登录自动签发见 Client.Api 的 ClientApiSessionKeyIssuer）。\n\n密钥明文仅服务端随机生成（不接受外部提交，避免弱密钥入环），仅 AddAsync/RotateAsync 响应一次性回显；\n列表/详情一律脱敏 ******；实体禁删（历史 key 是在途加密信封的解密依据），退场走 DisableAsync 或租约到期。\n作用域：主库。路由前缀 /api/sessionKeyEntity。"
     },
     {
       "name": "systemAuth",

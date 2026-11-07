@@ -81,7 +81,7 @@ export class GameArea<SecurityDataType = unknown> {
    *
    * @tags gameArea
    * @name GameAreaDetailGet
-   * @summary 详情：绕过全局过滤器读取（禁用区服 IsEnabled=false 会被 ISafeEnabledFilter 隐藏，详情页必须可见，C301）。
+   * @summary 详情：绕过全局过滤器读取（禁用区服 IsEnabled=false 会被 ISafeEnabledFilter 隐藏，详情页必须可见）。
    * @request GET:/api/gameArea/detail
    */
   gameAreaDetailGet = (

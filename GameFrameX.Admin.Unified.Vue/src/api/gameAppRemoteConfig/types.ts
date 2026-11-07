@@ -221,7 +221,7 @@ export interface GameAppRemoteConfigAddPostData {
   data: GameAppRemoteConfigResponse;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;
@@ -247,7 +247,7 @@ export interface GameAppRemoteConfigDetailGetData {
   data: GameAppRemoteConfigResponse;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;
@@ -268,14 +268,14 @@ export interface GameAppRemoteConfigDispatchOnlinePostData {
   /** 错误或提示信息 */
   message: string;
   /**
-   * LiveOps 统一下发回执（来源 change / vault: .7）。
+   * LiveOps 统一下发回执（来源 change C343 / vault:C8 S7.7）。
    *
    * 透传 Online 确认版本 / 状态供前端回显；`Merged` 标记邮件来源「同目标合并返回首次回执」路径。
    */
   data: OnlineLiveOpsDispatchResponse;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;
@@ -298,7 +298,7 @@ export interface GameAppRemoteConfigPagePostData {
   data: GameAppRemoteConfigResponseSqlSugarPagedList;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;
