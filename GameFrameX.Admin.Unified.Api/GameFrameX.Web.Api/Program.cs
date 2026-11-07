@@ -11,11 +11,11 @@ var builder = WebApplication.CreateBuilder(args);
 // Foundation 日志管道进程级开关（Loki 等）：环境变量 / 命令行同 Client/Hub 口径（如 IsGrafanaLoki、GrafanaLokiUrl）
 var launcherOptions = OptionsBuilder.Create<LauncherOptions>(args);
 
-// 主库连接启动参数（--DbType/--ConnectionString 与 DBTYPE/CONNECTIONSTRING 环境变量，命令行优先）以最高优先级进入配置管线
-builder.Configuration.AddMainDatabaseFromLauncherOptions(launcherOptions);
-
-
 WebComponent.Load(builder, launcherOptions);
+
+// 主库连接启动参数（--DbType/--ConnectionString 与 DBTYPE/CONNECTIONSTRING 环境变量，命令行优先）以最高优先级进入配置管线；
+// 必须在 WebComponent.Load 的 Configuration 目录 JSON 扫描之后追加——provider 后加者覆盖，确保启动参数压过 Database.json 默认
+builder.Configuration.AddMainDatabaseFromLauncherOptions(launcherOptions);
 
 var startup = new Startup();
 startup.ConfigureServices(builder.Services);
