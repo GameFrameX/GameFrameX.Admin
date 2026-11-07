@@ -16,7 +16,7 @@ namespace GameFrameX.Application.Platform.Job;
 /// <item>行的 Cron/IsOnce/MailId/Name 变更（指纹比对）后重置 NextRun——增删改在一个扫描周期内生效
 /// （旧引擎需重启，此为任务要求的增强）。</item>
 /// <item><c>Name</c> 解析不到 <see cref="IScheduleJob"/> 实现时告警并推进 NextRun（旧引擎会因此空转刷日志，此处修正）。</item>
-/// <item><c>MailId</c> 仍经 <see cref="SystemCacheService"/> 的 "MailId" 键传给任务实现（与旧引擎同一通道）。</item>
+/// <item><c>MailId</c> 仍经 <see cref="SystemCacheService"/> 的 <see cref="MailIdCacheKey"/> 键传给任务实现（与旧引擎同一通道）。</item>
 /// </list>
 /// </summary>
 [JobDetail("job_gameTimeJobDispatch", Description = "业务定时任务扫描派发", GroupName = "default", Concurrent = false)]
@@ -27,6 +27,11 @@ public class GameTimeJobDispatchJob : IJob
     /// 扫描周期（秒）。到期执行的判定粒度受此周期影响（旧引擎为秒级精确等待，合一后最大延迟约一个扫描周期）。
     /// </summary>
     public const int ScanIntervalSeconds = 5;
+
+    /// <summary>
+    /// 派发侧与业务任务实现之间传递邮件 Id 的缓存键（旧引擎遗留通道，键值不可变）。
+    /// </summary>
+    public const string MailIdCacheKey = "MailId";
 
     private static readonly Dictionary<long, TrackedBusinessTask> TrackedTasks = new();
     private static readonly SemaphoreSlim ExecuteLock = new(1, 1);
@@ -165,7 +170,7 @@ public class GameTimeJobDispatchJob : IJob
                 }
 
                 var systemCacheService = scope.ServiceProvider.GetRequiredService<SystemCacheService>();
-                systemCacheService.Set("MailId", row.MailId > 0 ? row.MailId : 0);
+                systemCacheService.Set(MailIdCacheKey, row.MailId > 0 ? row.MailId : 0);
 
                 var innerTask = await job.ExecuteAsync(cancellationToken);
                 if (innerTask != null)

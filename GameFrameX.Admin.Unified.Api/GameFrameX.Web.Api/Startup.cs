@@ -149,7 +149,7 @@ public class Startup
         // 共享健康检查注册：与三 host 同口径收敛至 Core Bootstrap（self live + database ready）
         services.AddHostHealthChecks();
         // 业务定时任务实现（非控制器，显式注册供 GameTimeJobDispatchJob 按名解析执行）。
-        services.AddScoped<EmailTask>();
+        services.AddScoped<GameMailDeliveryJob>();
         if (enableSchedule)
         {
             services.AddAdminSchedule(true);

@@ -12,13 +12,21 @@ namespace GameFrameX.Core.Tests.Platform.Job;
 public sealed class BusinessJobTypeResolutionTests
 {
     [Fact]
-    public void DefaultResolver_ResolvesEmailTaskAsScheduleJob()
+    public void DefaultResolver_ResolvesGameMailDeliveryJobAsScheduleJob()
     {
-        var resolved = GameTimeJobDispatchJob.BusinessJobTypeResolver("EmailTask");
+        var resolved = GameTimeJobDispatchJob.BusinessJobTypeResolver("GameMailDeliveryJob");
 
         Assert.NotNull(resolved);
-        Assert.Equal("GameFrameX.Application.Platform.Job.EmailTask", resolved.FullName);
+        Assert.Equal("GameFrameX.Application.Platform.Job.GameMailDeliveryJob", resolved.FullName);
         Assert.True(typeof(IScheduleJob).IsAssignableFrom(resolved));
+    }
+
+    [Fact]
+    public void DefaultResolver_LegacyEmailTaskName_NoLongerResolves()
+    {
+        // 命名规范化（2026-11）：EmailTask 已改名 GameMailDeliveryJob（系统未上线，根治切换不留别名）；
+        // 存量 game_time_job 行如仍填旧名，将走"解析不到实现"告警路径。
+        Assert.Null(GameTimeJobDispatchJob.BusinessJobTypeResolver("EmailTask"));
     }
 
     [Fact]

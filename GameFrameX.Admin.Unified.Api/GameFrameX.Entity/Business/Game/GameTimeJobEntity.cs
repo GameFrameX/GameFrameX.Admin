@@ -3,7 +3,7 @@ using GameFrameX.Entity.Base;
 namespace GameFrameX.Entity.Business.Game;
 
 /// <summary>
-/// 游戏资源
+/// 定时任务
 /// </summary>
 [SugarTable(null, "定时任务")]
 [BusinessTable]

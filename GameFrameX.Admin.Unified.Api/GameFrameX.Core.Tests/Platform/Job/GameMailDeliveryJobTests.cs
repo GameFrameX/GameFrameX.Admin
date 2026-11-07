@@ -19,17 +19,17 @@ using SqlSugar;
 namespace GameFrameX.Core.Tests.Platform.Job;
 
 /// <summary>
-///  ：EmailTask 正向发送路径——草稿邮件经 Fulfillment 通道投递成功后状态变 Sent、
+///  ：GameMailDeliveryJob 正向发送路径——草稿邮件经 Fulfillment 通道投递成功后状态变 Sent、
 /// MailId 缓存键清除；非草稿邮件直接返回（不发起 HTTP）。
 /// </summary>
-public sealed class EmailTaskTests : IDisposable
+public sealed class GameMailDeliveryJobTests : IDisposable
 {
     private readonly ClientApiTestDb _database = new();
     private readonly TestRecordingCache _cache = new();
     private readonly ServiceProvider _provider;
     private readonly CapturingHttpMessageHandler _httpHandler = new();
 
-    public EmailTaskTests()
+    public GameMailDeliveryJobTests()
     {
         _database.InitBusinessTables(typeof(GameMailEntity), typeof(GameAreaEntity), typeof(GameRoleEntity));
         SeedArea(91);
@@ -54,7 +54,7 @@ public sealed class EmailTaskTests : IDisposable
     {
         InsertMail(601, GameMailStatus.Draft, isAllPost: false, playerIdListJson: "[]");
         var task = BuildTask();
-        _cache.Set("MailId", 601L);
+        _cache.Set(GameTimeJobDispatchJob.MailIdCacheKey, 601L);
 
         var innerTask = await task.ExecuteAsync(CancellationToken.None);
         await innerTask!;
@@ -62,11 +62,11 @@ public sealed class EmailTaskTests : IDisposable
         var mail = _database.MainDb.Queryable<GameMailEntity>().Single(u => u.Id == 601);
         Assert.Equal(GameMailStatus.Sent, mail.Status);
         // MailId 通道键已清除（与旧引擎行为一致）。
-        Assert.False(_cache.ContainsKey("MailId"));
+        Assert.False(_cache.ContainsKey(GameTimeJobDispatchJob.MailIdCacheKey));
         // Fulfillment 请求真实发出，载荷为 post_mail 的 PostMailRequest。
         var request = Assert.Single(_httpHandler.Requests);
         Assert.Equal("http://127.0.0.1:21991/game/api/post_mail", request.RequestUri!.ToString());
-        Assert.Contains("\"Title\":\"EmailTask 正向测试\"", request.Body!, StringComparison.Ordinal);
+        Assert.Contains("\"Title\":\"GameMailDeliveryJob 正向测试\"", request.Body!, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -74,7 +74,7 @@ public sealed class EmailTaskTests : IDisposable
     {
         InsertMail(602, GameMailStatus.Sent, isAllPost: false, playerIdListJson: "[]");
         var task = BuildTask();
-        _cache.Set("MailId", 602L);
+        _cache.Set(GameTimeJobDispatchJob.MailIdCacheKey, 602L);
 
         var innerTask = await task.ExecuteAsync(CancellationToken.None);
         if (innerTask != null)
@@ -84,14 +84,14 @@ public sealed class EmailTaskTests : IDisposable
 
         Assert.Empty(_httpHandler.Requests);
         Assert.Equal(GameMailStatus.Sent, _database.MainDb.Queryable<GameMailEntity>().Single(u => u.Id == 602).Status);
-        Assert.False(_cache.ContainsKey("MailId"));
+        Assert.False(_cache.ContainsKey(GameTimeJobDispatchJob.MailIdCacheKey));
     }
 
     [Fact]
     public async Task ZeroMailId_ReturnsImmediately()
     {
         var task = BuildTask();
-        _cache.Set("MailId", 0L);
+        _cache.Set(GameTimeJobDispatchJob.MailIdCacheKey, 0L);
 
         var innerTask = await task.ExecuteAsync(CancellationToken.None);
 
@@ -99,12 +99,12 @@ public sealed class EmailTaskTests : IDisposable
         Assert.Empty(_httpHandler.Requests);
     }
 
-    private EmailTask BuildTask()
+    private GameMailDeliveryJob BuildTask()
     {
         var scopeFactory = _provider.GetRequiredService<IServiceScopeFactory>();
         using (var scope = scopeFactory.CreateScope())
         {
-            return new EmailTask(NullLogger<EmailTask>.Instance,
+            return new GameMailDeliveryJob(NullLogger<GameMailDeliveryJob>.Instance,
                                  scope.ServiceProvider.GetRequiredService<SqlSugarRepository<GameMailEntity>>(),
                                  scope.ServiceProvider.GetRequiredService<SqlSugarRepository<GameAreaEntity>>(),
                                  scope.ServiceProvider.GetRequiredService<SqlSugarRepository<GameRoleEntity>>(),
@@ -118,7 +118,7 @@ public sealed class EmailTaskTests : IDisposable
         _database.MainDb.Insertable(new GameAreaEntity
         {
             Id = areaId,
-            Name = $"EmailTaskArea-{areaId}",
+            Name = $"GameMailDeliveryJobArea-{areaId}",
             ClassifyId = 1,
             IsEnabled = true,
             IsDeleted = false,
@@ -151,7 +151,7 @@ public sealed class EmailTaskTests : IDisposable
             AreaId = 91,
             PlayerIdListJson = playerIdListJson,
             IsAllPost = isAllPost,
-            Title = "EmailTask 正向测试",
+            Title = "GameMailDeliveryJob 正向测试",
             SubTitle = "sub",
             Body = "body",
             AttachmentsJson = "[]",

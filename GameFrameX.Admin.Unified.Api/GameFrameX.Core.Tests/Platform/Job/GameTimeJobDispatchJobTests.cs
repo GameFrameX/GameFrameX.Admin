@@ -197,7 +197,7 @@ public sealed class GameTimeJobDispatchJobTests : IDisposable
     }
 
     /// <summary>
-    /// 记录 MailId 的探针任务（模拟 EmailTask 从 SystemCacheService 取值的通道）。
+    /// 记录 MailId 的探针任务（模拟 GameMailDeliveryJob 从 SystemCacheService 取值的通道）。
     /// </summary>
     private sealed class ProbeScheduleJob : IScheduleJob
     {
@@ -212,7 +212,7 @@ public sealed class GameTimeJobDispatchJobTests : IDisposable
 
         public Task<Task> ExecuteAsync(CancellationToken cancellationToken)
         {
-            ReceivedMailIdentifiers.Add((long)_systemCacheService.GetValue("MailId")!);
+            ReceivedMailIdentifiers.Add((long)_systemCacheService.GetValue(GameTimeJobDispatchJob.MailIdCacheKey)!);
             return Task.FromResult(Task.CompletedTask);
         }
 
