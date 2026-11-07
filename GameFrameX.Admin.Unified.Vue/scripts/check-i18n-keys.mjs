@@ -9,7 +9,7 @@
  * 用法: node scripts/check-i18n-keys.mjs
  */
 
-import { readdirSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -137,7 +137,12 @@ function scanRuntimeKeys(baseKeys) {
   const files = collectSourceFiles(SRC_ROOT, ['.vue', '.ts', '.js'])
     .filter((file) => !file.startsWith(I18N_ROOT + '/') && !file.endsWith('.test.ts'));
   const seedRoot = join(__dirname, '..', '..', 'GameFrameX.Admin.Unified.Api', 'GameFrameX.Application', 'SeedData', 'System');
-  files.push(...collectSourceFiles(seedRoot, ['.cs']));
+  // Docker 构建上下文剔除后端仓（根 .dockerignore），缺种子目录时告警跳过（同 check-frontend-standards 口径）。
+  if (existsSync(seedRoot)) {
+    files.push(...collectSourceFiles(seedRoot, ['.cs']));
+  } else {
+    console.warn(`[i18n] warning: backend seed not found at ${seedRoot}. Skipping backend seed key scan.`);
+  }
   for (const file of files) {
     const content = readFileSync(file, 'utf8');
     for (const match of content.matchAll(/['"]((?:message\.)?[a-zA-Z][a-zA-Z0-9_.]+)['"]/g)) {
