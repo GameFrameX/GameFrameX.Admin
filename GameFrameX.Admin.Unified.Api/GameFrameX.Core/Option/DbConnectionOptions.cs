@@ -21,12 +21,22 @@ public sealed class DbConnectionOptions
 
     public void PostConfigure(DbConnectionOptions options, IConfiguration configuration)
     {
-        if (HasEnvironmentVariable("GFX_MAIN_DB_TYPE") != HasEnvironmentVariable("GFX_MAIN_DB_CONNECTION_STRING"))
-        {
-            throw new InvalidOperationException("GFX_MAIN_DB_TYPE 与 GFX_MAIN_DB_CONNECTION_STRING 必须成对设置。");
-        }
+        // 成对裸启动参数（--DbType/--ConnectionString）已作为最高优先级配置层写入标记：
+        // 此时跳过 GFX_MAIN_DB_* 成对校验与覆盖（命令行语义压过环境变量），只保留单连接与 provider 一致性校验
+        var startupArgumentsTakePrecedence = string.Equals(
+            configuration["DbConnection:MainDatabaseFromStartupArguments"],
+            bool.TrueString,
+            StringComparison.OrdinalIgnoreCase);
 
-        ApplyEnvironmentOverrides(options);
+        if (!startupArgumentsTakePrecedence)
+        {
+            if (HasEnvironmentVariable("GFX_MAIN_DB_TYPE") != HasEnvironmentVariable("GFX_MAIN_DB_CONNECTION_STRING"))
+            {
+                throw new InvalidOperationException("GFX_MAIN_DB_TYPE 与 GFX_MAIN_DB_CONNECTION_STRING 必须成对设置。");
+            }
+
+            ApplyEnvironmentOverrides(options);
+        }
 
         foreach (var dbConfig in options.ConnectionConfigs)
         {

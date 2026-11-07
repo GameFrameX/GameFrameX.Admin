@@ -177,7 +177,7 @@ GameFrameX.Admin.Unified.Api/
 
 - `GFX_MAIN_DB_TYPE=PostgreSQL` + `GFX_MAIN_DB_CONNECTION_STRING=Host=...`
 - 3 ホストは `ConfigId=main` のみを使用します。単一メイン DB がすべての DB であり、他の DB の自動作成・導出は行いません。
-- DB 接続の注入は標準設定パイプラインに統一：`Database.json` デフォルト &lt; ペアの `GFX_MAIN_DB_*` 環境変数（docker `-e`）&lt; 明示的な `DbConnection` セクション。セクションは appsettings・環境変数（`DbConnection__...`）・コマンドライン引数（`--DbConnection:ConnectionConfigs:0:DbType=PostgreSQL`）のどの経路でも構成できます。
+- DB 接続の注入は統一（低→高）：`Database.json` フォールバック &lt; 明示的な `DbConnection` セクション（appsettings / 環境変数 `DbConnection__...` / コマンドライン `--DbConnection:...`）&lt; ペアの `GFX_MAIN_DB_*` 環境変数（docker `-e`）&lt; ペアの裸起動引数 `--DbType PostgreSQL --ConnectionString "..."`（`=` 連結形式も可；必ずペアで）。
 - 他のデータベース（MySQL / Oracle / 達夢……全 34 種の DbType）への切り替えの接続文字列の書き方と例：[`GameFrameX.Application/Configuration/Database-ConnectionStrings.md`](GameFrameX.Application/Configuration/Database-ConnectionStrings.md)
 
 データベースについて、他にも知っておくべき決まりがいくつかあります：

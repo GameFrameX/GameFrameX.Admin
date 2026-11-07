@@ -38,6 +38,9 @@ internal static class Program
         CrashExitWatchdog.EnableDomainUnhandledExceptionFallback();
 
         var builder = WebApplication.CreateBuilder(args);
+
+        // 主库连接成对裸启动参数（--DbType/--ConnectionString）以最高优先级进入配置管线
+        builder.Configuration.AddMainDatabaseStartupArguments(args);
         // builder.WebHost.UseUrls("http://0.0.0.0:20808");
 
         // 存档整档上行上限（原 Game.Api，C268 合并迁入）：26 分表整档一次上行峰值。

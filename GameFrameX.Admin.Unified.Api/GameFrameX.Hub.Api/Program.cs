@@ -18,6 +18,9 @@ internal static class Program
         CrashExitWatchdog.EnableDomainUnhandledExceptionFallback();
 
         var builder = WebApplication.CreateBuilder(args);
+
+        // 主库连接成对裸启动参数（--DbType/--ConnectionString）以最高优先级进入配置管线
+        builder.Configuration.AddMainDatabaseStartupArguments(args);
         // builder.WebHost.UseUrls("http://0.0.0.0:20808");
         // builder.WebHost.UseSentry(options => { options.Dsn = "https://a680507a1eba0d3e2c458bc00b86d583@sentry.zilancreative.com/4"; });
 
