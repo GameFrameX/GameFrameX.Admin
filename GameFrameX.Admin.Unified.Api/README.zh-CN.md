@@ -175,9 +175,9 @@ GameFrameX.Admin.Unified.Api/
 
 **生产 / 容器（PostgreSQL，环境变量成对覆盖）**：覆盖数据库时类型和连接串必须**成对**设置，半套覆盖会在启动期直接报错。三个 host（Web / Client / Hub）用**同一对变量**：
 
-- `GFX_MAIN_DB_TYPE=PostgreSQL` + `GFX_MAIN_DB_CONNECTION_STRING=Host=...`
+- `DBTYPE=PostgreSQL` + `CONNECTIONSTRING=Host=...`
 - 三宿主仅使用 `ConfigId=main`，单主库即全部数据库，不存在其他库的创建或推导。
-- 主库连接注入统一（低到高）：`Database.json` 兜底 &lt; 显式 `DbConnection` 配置节 &lt; 启动参数（`LauncherOptions` 统一入口：`--DbType PostgreSQL --ConnectionString "..."` 与 `GFX_MAIN_DB_*` 环境变量同源，命令行优先，必须成对）。`DbConnectionOptions` 选项类已退役，装配与校验由 `LauncherOptions` + `MainDatabaseConnectionGuard` 直接承担。
+- 主库连接注入统一（低到高）：`Database.json` 兜底 &lt; 显式 `DbConnection` 配置节 &lt; 启动参数（`LauncherOptions` 统一入口：`--DbType PostgreSQL --ConnectionString "..."` 与 `DBTYPE/CONNECTIONSTRING` 环境变量同源，命令行优先，必须成对）。`DbConnectionOptions` 选项类已退役，装配与校验由 `LauncherOptions` + `MainDatabaseConnectionGuard` 直接承担。
 - 换其他数据库（MySQL / Oracle / 达梦……全部 34 种 DbType）的连接串写法与示例：[`GameFrameX.Application/Configuration/Database-ConnectionStrings.md`](GameFrameX.Application/Configuration/Database-ConnectionStrings.md)
 
 关于数据库，还有几个约定你要知道：
@@ -221,8 +221,8 @@ dotnet run --project GameFrameX.Hub.Api
 
 ```bash
 docker run -p 20802:20802 \
-  -e GFX_MAIN_DB_TYPE=PostgreSQL \
-  -e GFX_MAIN_DB_CONNECTION_STRING="Host=你的PG;Port=5432;Database=gameframex_admin;Username=...;Password=..." \
+  -e DBTYPE=PostgreSQL \
+  -e CONNECTIONSTRING="Host=你的PG;Port=5432;Database=gameframex_admin;Username=...;Password=..." \
   你的镜像
 ```
 
@@ -230,8 +230,8 @@ docker run -p 20802:20802 \
 
 | 现象 | 大概率原因 |
 |------|------------|
-| 启动报数据库连接失败 | `Database.json`（或 `GFX_MAIN_DB_*` 环境变量）连接串不对，或者 PG 没起 |
-| 启动报「DbType 为 Sqlite/PostgreSQL，但连接串不是 …风格」 | 环境变量半套覆盖了：`GFX_MAIN_DB_TYPE` 和 `GFX_MAIN_DB_CONNECTION_STRING` 必须成对设置 |
+| 启动报数据库连接失败 | `Database.json`（或 `DBTYPE/CONNECTIONSTRING` 环境变量）连接串不对，或者 PG 没起 |
+| 启动报「DbType 为 Sqlite/PostgreSQL，但连接串不是 …风格」 | 环境变量半套覆盖了：`DBTYPE` 和 `CONNECTIONSTRING` 必须成对设置 |
 | SQLite 库文件落错位置 | 连接串相对进程工作目录解析——回到仓库根目录执行 `dotnet run`；项目目录里跑出来的 `db/` 删掉即可 |
 | 表没建出来 | Code-First 开关默认在代码中全开（C278）；若显式配置过关闭项，检查 `Database.json` 或环境变量 |
 | Swagger 打不开 | 非开发环境默认不挂 Swagger，见下面的 [导出 OpenAPI](#导出-openapi-给前端) |

@@ -32,7 +32,7 @@ public static class LauncherOptionsMainDatabase
         if (!hasDatabaseType || !hasConnectionString)
         {
             throw new InvalidOperationException(
-                "启动参数必须成对提供：--DbType 与 --ConnectionString（环境变量形态 GFX_MAIN_DB_TYPE + GFX_MAIN_DB_CONNECTION_STRING 同理），半套会导致 provider 与连接串错配。");
+                "启动参数必须成对提供：--DbType 与 --ConnectionString（环境变量形态 DBTYPE + CONNECTIONSTRING 同理），半套会导致 provider 与连接串错配。");
         }
 
         return builder.AddInMemoryCollection(new Dictionary<string, string?>

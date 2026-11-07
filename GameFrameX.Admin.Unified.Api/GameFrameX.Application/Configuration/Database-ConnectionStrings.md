@@ -6,7 +6,7 @@
 ## 用法
 
 切换数据库时，把对应条目的值替换到 [Database.json](./Database.json) 中 main 项的 `DbType` / `ConnectionString` 字段
-（主库项必须唯一，勿解开成新的数组元素）；环境级覆盖用成对环境变量 `GFX_MAIN_DB_TYPE` + `GFX_MAIN_DB_CONNECTION_STRING`。
+（主库连接唯一，DbType/ConnectionString 直接位于 DbConnection 节下）；环境级覆盖用成对环境变量 `DBTYPE` + `CONNECTIONSTRING`。
 
 ## 速查表
 

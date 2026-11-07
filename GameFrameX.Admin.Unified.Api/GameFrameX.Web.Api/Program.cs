@@ -11,7 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Foundation 日志管道进程级开关（Loki 等）：环境变量 / 命令行同 Client/Hub 口径（如 IsGrafanaLoki、GrafanaLokiUrl）
 var launcherOptions = OptionsBuilder.Create<LauncherOptions>(args);
 
-// 主库连接启动参数（--DbType/--ConnectionString 与 GFX_MAIN_DB_*，命令行优先）以最高优先级进入配置管线
+// 主库连接启动参数（--DbType/--ConnectionString 与 DBTYPE/CONNECTIONSTRING 环境变量，命令行优先）以最高优先级进入配置管线
 builder.Configuration.AddMainDatabaseFromLauncherOptions(launcherOptions);
 
 

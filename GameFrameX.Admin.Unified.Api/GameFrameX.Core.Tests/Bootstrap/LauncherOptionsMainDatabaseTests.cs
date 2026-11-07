@@ -42,11 +42,11 @@ public class LauncherOptionsMainDatabaseTests
     [Fact]
     public void EnvironmentPair_FlowsThroughLauncherOptions_AndBeatsSharedFile()
     {
-        // 环境变量 GFX_MAIN_DB_* 与命令行参数是同一入口：无命令行时环境变量成对生效，压过共享 Database.json 兜底
+        // 环境变量 DBTYPE/CONNECTIONSTRING 与命令行参数是同一入口：无命令行时环境变量成对生效，压过共享 Database.json 兜底
         WithEnvironmentVariables(new Dictionary<string, string?>
         {
-            ["GFX_MAIN_DB_TYPE"] = "PostgreSQL",
-            ["GFX_MAIN_DB_CONNECTION_STRING"] = "Host=env-main;Port=5432;Database=main;Username=u;Password=p;",
+            ["DBTYPE"] = "PostgreSQL",
+            ["CONNECTIONSTRING"] = "Host=env-main;Port=5432;Database=main;Username=u;Password=p;",
         }, () =>
         {
             var launcherOptions = OptionsBuilder.Create<LauncherOptions>(Array.Empty<string>());
@@ -64,11 +64,11 @@ public class LauncherOptionsMainDatabaseTests
     [Fact]
     public void CommandLineArguments_BeatEnvironmentPair_ThroughUnifiedEntry()
     {
-        // 命令行优先是统一入口的内置语义：OptionsBuilder 合并后 --DbType/--ConnectionString 压过 GFX_MAIN_DB_*
+        // 命令行优先是统一入口的内置语义：OptionsBuilder 合并后 --DbType/--ConnectionString 压过 DBTYPE/CONNECTIONSTRING
         WithEnvironmentVariables(new Dictionary<string, string?>
         {
-            ["GFX_MAIN_DB_TYPE"] = "Sqlite",
-            ["GFX_MAIN_DB_CONNECTION_STRING"] = "DataSource=./db/env-default.db;",
+            ["DBTYPE"] = "Sqlite",
+            ["CONNECTIONSTRING"] = "DataSource=./db/env-default.db;",
         }, () =>
         {
             var launcherOptions = OptionsBuilder.Create<LauncherOptions>(new[] { "--DbType", "PostgreSQL", "--ConnectionString", "Host=cli-wins;Port=5432;Database=main;Username=u;Password=p;" });
@@ -89,8 +89,8 @@ public class LauncherOptionsMainDatabaseTests
         // 半套环境变量在统一入口处即拒绝（provider 与连接串错配防线从启动参数入口前移）
         WithEnvironmentVariables(new Dictionary<string, string?>
         {
-            ["GFX_MAIN_DB_TYPE"] = null,
-            ["GFX_MAIN_DB_CONNECTION_STRING"] = "Host=half-set;Port=5432;Database=main;Username=u;Password=p;",
+            ["DBTYPE"] = null,
+            ["CONNECTIONSTRING"] = "Host=half-set;Port=5432;Database=main;Username=u;Password=p;",
         }, () =>
         {
             var launcherOptions = OptionsBuilder.Create<LauncherOptions>(Array.Empty<string>());

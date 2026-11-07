@@ -3,9 +3,9 @@
 # 敏感变量只从 .env / 运行环境注入；此文件不包含可用凭据。
 
 x-main-db: &main-db
-  GFX_MAIN_DB_TYPE: PostgreSQL
+  DBTYPE: PostgreSQL
   # POSTGRES_PORT is the host-published port; service-to-service traffic always uses pg:5432.
-  GFX_MAIN_DB_CONNECTION_STRING: "Host=${POSTGRES_HOST:-pg};Port=5432;Database=gameframex_admin;Username=${POSTGRES_USER:-gameframex};Password=${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}"
+  CONNECTIONSTRING: "Host=${POSTGRES_HOST:-pg};Port=5432;Database=gameframex_admin;Username=${POSTGRES_USER:-gameframex};Password=${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}"
   GAMEFRAMEX_SECRET_ENCRYPTION_KEY: ${GAMEFRAMEX_SECRET_ENCRYPTION_KEY:-}
 
 x-grafana-otel: &grafana-otel

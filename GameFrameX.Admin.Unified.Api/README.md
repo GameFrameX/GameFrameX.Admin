@@ -175,9 +175,9 @@ Note: SQLite is for local development/debugging only. SQLite is forbidden in liv
 
 **Production / containers (PostgreSQL, override env vars in pairs)**: when overriding the database, the type and the connection string must be set **as a pair**; a half override fails outright at startup. All three hosts (Web / Client / Hub) use **the same pair of variables**:
 
-- `GFX_MAIN_DB_TYPE=PostgreSQL` + `GFX_MAIN_DB_CONNECTION_STRING=Host=...`
+- `DBTYPE=PostgreSQL` + `CONNECTIONSTRING=Host=...`
 - All three hosts use only `ConfigId=main`; the single main database is the entire database estate — no other databases are created or derived.
-- Database injection is unified (lowest to highest): `Database.json` fallback &lt; explicit `DbConnection` section &lt; startup parameters (single `LauncherOptions` entry: `--DbType PostgreSQL --ConnectionString "..."` and `GFX_MAIN_DB_*` env vars share one entry, command line wins, must be paired). The `DbConnectionOptions` options class is retired; wiring and validation are handled by `LauncherOptions` + `MainDatabaseConnectionGuard` directly.
+- Database injection is unified (lowest to highest): `Database.json` fallback &lt; explicit `DbConnection` section &lt; startup parameters (single `LauncherOptions` entry: `--DbType PostgreSQL --ConnectionString "..."` and `DBTYPE/CONNECTIONSTRING` env vars share one entry, command line wins, must be paired). The `DbConnectionOptions` options class is retired; wiring and validation are handled by `LauncherOptions` + `MainDatabaseConnectionGuard` directly.
 - For other databases (MySQL / Oracle / DM… all 34 DbTypes), connection string syntax and examples: [`GameFrameX.Application/Configuration/Database-ConnectionStrings.md`](GameFrameX.Application/Configuration/Database-ConnectionStrings.md)
 
 A few more database conventions worth knowing:
@@ -221,8 +221,8 @@ The default config inside the image is SQLite (starts with zero env vars; data l
 
 ```bash
 docker run -p 20802:20802 \
-  -e GFX_MAIN_DB_TYPE=PostgreSQL \
-  -e GFX_MAIN_DB_CONNECTION_STRING="Host=your-pg;Port=5432;Database=gameframex_admin;Username=...;Password=..." \
+  -e DBTYPE=PostgreSQL \
+  -e CONNECTIONSTRING="Host=your-pg;Port=5432;Database=gameframex_admin;Username=...;Password=..." \
   your-image
 ```
 
@@ -230,8 +230,8 @@ docker run -p 20802:20802 \
 
 | Symptom | Most Likely Cause |
 |------|------------|
-| Startup reports database connection failure | Wrong connection string in `Database.json` (or the `GFX_MAIN_DB_*` env vars), or PG isn't running |
-| Startup reports "DbType is Sqlite/PostgreSQL but the connection string is not in … style" | Half-overridden env vars: `GFX_MAIN_DB_TYPE` and `GFX_MAIN_DB_CONNECTION_STRING` must be set as a pair |
+| Startup reports database connection failure | Wrong connection string in `Database.json` (or the `DBTYPE/CONNECTIONSTRING` env vars), or PG isn't running |
+| Startup reports "DbType is Sqlite/PostgreSQL but the connection string is not in … style" | Half-overridden env vars: `DBTYPE` and `CONNECTIONSTRING` must be set as a pair |
 | SQLite database file in the wrong place | The connection string resolves relative to the process working directory — go back to the repository root and run `dotnet run`; just delete the stray `db/` that appeared in the project directory |
 | Tables not created | Code-First switches default to fully on in code (C278); if you explicitly configured them off, check `Database.json` or env vars |
 | Swagger won't open | Non-development environments don't mount Swagger by default; see [Exporting OpenAPI](#exporting-openapi-for-the-frontend) below |

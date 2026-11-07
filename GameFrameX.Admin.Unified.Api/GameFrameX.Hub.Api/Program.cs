@@ -24,7 +24,7 @@ internal static class Program
 
         var launcherOptions = OptionsBuilder.CreateWithDebug<LauncherOptions>(args);
 
-        // 主库连接启动参数（--DbType/--ConnectionString 与 GFX_MAIN_DB_*，命令行优先）以最高优先级进入配置管线
+        // 主库连接启动参数（--DbType/--ConnectionString 与 DBTYPE/CONNECTIONSTRING 环境变量，命令行优先）以最高优先级进入配置管线
         builder.Configuration.AddMainDatabaseFromLauncherOptions(launcherOptions);
 
         // 共享启动装配（C261，GFX-668）：日志 / 雪花 / CORS / JWT / MVC / HealthChecks / Swagger 收敛至 Core Bootstrap
@@ -48,7 +48,7 @@ internal static class Program
         builder.Services.AddSingleton<IHttpContextAccessor>(httpContextAccessor);
         builder.Services.AddHttpClient();
 
-        // 主库连接统一走 DbConnection 节 / 共享 Database.json + GFX_MAIN_DB_* 单一入口（C269）
+        // 主库连接统一走 DbConnection 节 / 共享 Database.json + DBTYPE/CONNECTIONSTRING 环境变量单一入口（C269）
         var mainDbConfig = HostMainDbConnectionResolver.Resolve(builder.Configuration);
         var sqlSugar = SqlSugarClientConfig.AddSqlSugarClientService(mainDbConfig, HubUserAuditHandler.Handle(httpContextAccessor));
 

@@ -18,7 +18,7 @@
 # =====================================================================================
 
 # ─────────────────────────────────────────────────────────────────
-# 共享数据库配置模板（C279：GFX_MAIN_DB_* 成对覆盖、单一入口管线，经 YAML anchor 合并进各 service environment；
+# 共享数据库配置模板（C279：DBTYPE/CONNECTIONSTRING 成对覆盖、单一入口管线，经 YAML anchor 合并进各 service environment；
 # 值由 .env 的 POSTGRES_HOST/PORT/USER/PASSWORD 插值，覆盖能力不变）
 #
 # 【这是什么】YAML 锚点（模板）：下面 web-api / client-api / hub-api 三个服务的
@@ -27,7 +27,7 @@
 # ─────────────────────────────────────────────────────────────────
 x-main-db: &main-db
   # 数据库类型，当前使用 PostgreSQL，一般不需要改
-  GFX_MAIN_DB_TYPE: PostgreSQL
+  DBTYPE: PostgreSQL
   # 主库连接串（三个 API 共用）。各字段含义：
   #   Host=postgres   → 数据库地址。postgres 是下方 postgres 服务在容器网络里的名字，
   #                      不要改成 localhost（容器里的 localhost 是容器自己，连不到数据库）；
@@ -35,7 +35,7 @@ x-main-db: &main-db
   #   Port            → 数据库端口，与下方 postgres 服务保持一致
   #   Database        → 业务主库库名（由 init.sql 预建，启动时会自动补建缺失的库）
   #   Username/Password → 登录账号/密码，默认值与下方 postgres 服务的初始化账号一致
-  GFX_MAIN_DB_CONNECTION_STRING: "Host=${POSTGRES_HOST:-postgres};Port=${POSTGRES_PORT:-5432};Database=gameframex_admin;Username=${POSTGRES_USER:-gameframex};Password=${POSTGRES_PASSWORD:-GameFrameX@Local2026}"
+  CONNECTIONSTRING: "Host=${POSTGRES_HOST:-postgres};Port=${POSTGRES_PORT:-5432};Database=gameframex_admin;Username=${POSTGRES_USER:-gameframex};Password=${POSTGRES_PASSWORD:-GameFrameX@Local2026}"
   # 运行凭证静态加密密钥（C370/C371，签名/会话/票据私钥/邮件/广告/支付等敏感列以 enc:sec:v1: 密文落库）：
   #   留空 = 降级模式（明文直存/直读，功能不阻断）；设置后三 host 必须同值，且不得再变更
   #   （密钥丢失 = 存量密文不可解）。同样写入根 .env（GAMEFRAMEX_SECRET_ENCRYPTION_KEY=...）。
@@ -171,7 +171,7 @@ services:
       start_period: 40s
 
   # ═══════════════════════ 客户端 API（端口 20808）═══════════════════════
-  # 面向游戏客户端的接口服务；主库连接同走 GFX_MAIN_DB_* 单一入口（C269）
+  # 面向游戏客户端的接口服务；主库连接同走 DBTYPE/CONNECTIONSTRING 单一入口（C269）
   client-api:
     build:
       context: ./GameFrameX.Admin.Unified.Api
@@ -212,7 +212,7 @@ services:
       start_period: 40s
 
   # ═══════════════════════ Hub API（端口 20806）═══════════════════════
-  # 面向长连接/推送的 Hub 服务；主库连接同走 GFX_MAIN_DB_* 单一入口（C269）
+  # 面向长连接/推送的 Hub 服务；主库连接同走 DBTYPE/CONNECTIONSTRING 单一入口（C269）
   hub-api:
     build:
       context: ./GameFrameX.Admin.Unified.Api

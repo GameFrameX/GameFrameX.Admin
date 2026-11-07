@@ -14,7 +14,7 @@ public static class SqlSugarClientConfig
     /// <summary>
     /// 添加 SqlSugarClient 服务
     /// </summary>
-    /// <param name="mainConfig">主库连接配置（由 HostMainDbConnectionResolver.Resolve 解析，含 GFX_MAIN_DB_* 覆盖与错配校验）。</param>
+    /// <param name="mainConfig">主库连接配置（由 HostMainDbConnectionResolver.Resolve 解析，含启动参数/环境变量覆盖与错配校验）。</param>
     /// <param name="userAuditHandler">
     /// 可选的操作人审计挂点，在基础审计之后逐事件回调。
     /// 承载依赖 Core 层类型（如 ClaimConst 操作人 claims）的 host 差异审计，例如 Hub 的

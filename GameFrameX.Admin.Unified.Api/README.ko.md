@@ -175,9 +175,9 @@ GameFrameX.Admin.Unified.Api/
 
 **프로덕션 / 컨테이너(PostgreSQL, 환경 변수 쌍으로 오버라이드)**: 데이터베이스를 오버라이드할 때는 타입과 연결 문자열을 반드시 **쌍으로** 설정해야 하며, 절반만 설정하면 시작 시 바로 오류가 발생합니다. 세 개의 host(Web / Client / Hub)는 **동일한 변수 쌍**을 사용합니다:
 
-- `GFX_MAIN_DB_TYPE=PostgreSQL` + `GFX_MAIN_DB_CONNECTION_STRING=Host=...`
+- `DBTYPE=PostgreSQL` + `CONNECTIONSTRING=Host=...`
 - 세 호스트는 `ConfigId=main`만 사용하며, 단일 메인 DB가 전부입니다. 다른 DB를 자동 생성하거나 유도하지 않습니다.
-- DB 연결 주입 통일(낮은 순): `Database.json` 폴백 &lt; 명시적 `DbConnection` 섹션 &lt; 시작 인자(`LauncherOptions` 단일 입구: `--DbType PostgreSQL --ConnectionString "..."`와 `GFX_MAIN_DB_*` 환경변수가 같은 입구, 커맨드라인 우선, 반드시 쌍으로). `DbConnectionOptions` 옵션 클래스는 폐기되었으며 조립과 검증은 `LauncherOptions` + `MainDatabaseConnectionGuard`가 직접 담당합니다.
+- DB 연결 주입 통일(낮은 순): `Database.json` 폴백 &lt; 명시적 `DbConnection` 섹션 &lt; 시작 인자(`LauncherOptions` 단일 입구: `--DbType PostgreSQL --ConnectionString "..."`와 `DBTYPE/CONNECTIONSTRING` 환경변수가 같은 입구, 커맨드라인 우선, 반드시 쌍으로). `DbConnectionOptions` 옵션 클래스는 폐기되었으며 조립과 검증은 `LauncherOptions` + `MainDatabaseConnectionGuard`가 직접 담당합니다.
 - 다른 데이터베이스(MySQL / Oracle / DM…… 전체 34종 DbType)로 전환하는 연결 문자열 작성법과 예시: [`GameFrameX.Application/Configuration/Database-ConnectionStrings.md`](GameFrameX.Application/Configuration/Database-ConnectionStrings.md)
 
 데이터베이스에 대해 알아야 할 몇 가지 규칙:
@@ -221,8 +221,8 @@ Admin API 첫 시작 시 SqlSugar Code-First가 자동으로 DB와 테이블을 
 
 ```bash
 docker run -p 20802:20802 \
-  -e GFX_MAIN_DB_TYPE=PostgreSQL \
-  -e GFX_MAIN_DB_CONNECTION_STRING="Host=PG호스트;Port=5432;Database=gameframex_admin;Username=...;Password=..." \
+  -e DBTYPE=PostgreSQL \
+  -e CONNECTIONSTRING="Host=PG호스트;Port=5432;Database=gameframex_admin;Username=...;Password=..." \
   사용할 이미지
 ```
 
@@ -230,8 +230,8 @@ docker run -p 20802:20802 \
 
 | 증상 | 가장 유력한 원인 |
 |------|------------|
-| 시작 시 데이터베이스 연결 실패 | `Database.json`(또는 `GFX_MAIN_DB_*` 환경 변수) 연결 문자열이 잘못되었거나 PG가 실행되지 않음 |
-| 시작 시 "DbType이 Sqlite/PostgreSQL인데 연결 문자열이 …스타일이 아님" 오류 | 환경 변수가 절반만 오버라이드됨: `GFX_MAIN_DB_TYPE`과 `GFX_MAIN_DB_CONNECTION_STRING`은 반드시 쌍으로 설정 |
+| 시작 시 데이터베이스 연결 실패 | `Database.json`(또는 `DBTYPE/CONNECTIONSTRING` 환경 변수) 연결 문자열이 잘못되었거나 PG가 실행되지 않음 |
+| 시작 시 "DbType이 Sqlite/PostgreSQL인데 연결 문자열이 …스타일이 아님" 오류 | 환경 변수가 절반만 오버라이드됨: `DBTYPE`과 `CONNECTIONSTRING`은 반드시 쌍으로 설정 |
 | SQLite DB 파일 위치가 잘못됨 | 연결 문자열은 프로세스 작업 디렉터리 기준으로 해석——리포지토리 루트 디렉터리에서 `dotnet run` 실행; 프로젝트 디렉터리에서 생긴 `db/`는 삭제하면 됨 |
 | 테이블이 생성되지 않음 | Code-First 스위치는 기본적으로 코드에서 모두 켜짐(C278); 명시적으로 끄는 항목을 구성한 적이 있다면 `Database.json` 또는 환경 변수 확인 |
 | Swagger가 열리지 않음 | 개발 환경이 아닌 경우 기본적으로 Swagger가 마운트되지 않음, 아래의 [OpenAPI 내보내기](#프런트엔드용-openapi-내보내기) 참조 |

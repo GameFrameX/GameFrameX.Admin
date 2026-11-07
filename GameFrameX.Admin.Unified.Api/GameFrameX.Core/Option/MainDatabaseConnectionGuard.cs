@@ -32,7 +32,7 @@ public static class MainDatabaseConnectionGuard
         if (string.IsNullOrWhiteSpace(connectionConfig.ConnectionString))
         {
             throw new InvalidOperationException(
-                "数据库主库连接配置缺失：请通过启动参数 --DbType + --ConnectionString（或 GFX_MAIN_DB_TYPE + GFX_MAIN_DB_CONNECTION_STRING 成对环境变量）提供，或在 DbConnection 配置节 / 输出目录共享 Database.json 中配置。");
+                "数据库主库连接配置缺失：请通过启动参数 --DbType + --ConnectionString（或 DBTYPE + CONNECTIONSTRING 成对环境变量）提供，或在 DbConnection 配置节 / 输出目录共享 Database.json 中配置。");
         }
 
         ValidateProviderConnectionStringConsistency(connectionConfig);
@@ -60,14 +60,14 @@ public static class MainDatabaseConnectionGuard
         {
             throw new InvalidOperationException(
                 $"数据库连接配置 {configId} 的 DbType 为 Sqlite，但连接串不是 DataSource= 风格（\"{connectionString[..Math.Min(30, connectionString.Length)]}...\"）。" +
-                "切换数据库时 --DbType 与 --ConnectionString（环境变量形态 GFX_MAIN_DB_TYPE 与 GFX_MAIN_DB_CONNECTION_STRING）必须成对设置。");
+                "切换数据库时 --DbType 与 --ConnectionString（环境变量形态 DBTYPE 与 CONNECTIONSTRING）必须成对设置。");
         }
 
         if (connectionConfig.DbType == DbType.PostgreSQL && isSqliteStyle)
         {
             throw new InvalidOperationException(
                 $"数据库连接配置 {configId} 的 DbType 为 PostgreSQL，但连接串是 DataSource= 风格（\"{connectionString[..Math.Min(30, connectionString.Length)]}...\"）。" +
-                "切换数据库时 --DbType 与 --ConnectionString（环境变量形态 GFX_MAIN_DB_TYPE 与 GFX_MAIN_DB_CONNECTION_STRING）必须成对设置。");
+                "切换数据库时 --DbType 与 --ConnectionString（环境变量形态 DBTYPE 与 CONNECTIONSTRING）必须成对设置。");
         }
     }
 }

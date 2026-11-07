@@ -26,11 +26,11 @@ public class HostMainDbConnectionResolverTests
     [Fact]
     public void Resolve_BindsCommandLineArgumentsSection()
     {
-        // 命令行 args 与环境变量同走标准配置管线：--DbConnection:... 形式的参数构成显式节，优先级高于 GFX_MAIN_DB_* 与共享文件
+        // 命令行 args 与环境变量同走标准配置管线：--DbConnection:... 形式的参数构成显式节，优先级高于 DBTYPE/CONNECTIONSTRING 与共享文件
         WithEnvironmentVariables(new Dictionary<string, string?>
         {
-            ["GFX_MAIN_DB_TYPE"] = null,
-            ["GFX_MAIN_DB_CONNECTION_STRING"] = null,
+            ["DBTYPE"] = null,
+            ["CONNECTIONSTRING"] = null,
         }, () =>
         {
             var configuration = new ConfigurationBuilder().AddCommandLine(new[]
@@ -49,11 +49,11 @@ public class HostMainDbConnectionResolverTests
     [Fact]
     public void Resolve_HalfEnvironmentPairAloneDoesNotProvideConnection()
     {
-        // 环境变量不是解析器的直接来源：GFX_MAIN_DB_* 由 LauncherOptions 统一入口合并并做成对校验（见 LauncherOptionsMainDatabaseTests）；
+        // 环境变量不是解析器的直接来源：DBTYPE/CONNECTIONSTRING 由 LauncherOptions 统一入口合并并做成对校验（见 LauncherOptionsMainDatabaseTests）；
         // 仅半套环境变量且无配置节 / 无共享文件时按配置缺失报错
         WithEnvironmentVariables(new Dictionary<string, string?>
         {
-            ["GFX_MAIN_DB_CONNECTION_STRING"] = "Host=half-set;Port=5432;Database=main;Username=u;Password=p;",
+            ["CONNECTIONSTRING"] = "Host=half-set;Port=5432;Database=main;Username=u;Password=p;",
         }, () =>
         {
             var configuration = new ConfigurationBuilder().Build();
@@ -67,11 +67,11 @@ public class HostMainDbConnectionResolverTests
     [Fact]
     public void Resolve_ThrowsWhenNoSourceConfigured()
     {
-        // 无 DbConnection 节、无 GFX_MAIN_DB_* 环境变量、输出目录无共享 Database.json：启动期明确报配置缺失
+        // 无 DbConnection 节、无 DBTYPE/CONNECTIONSTRING 环境变量、输出目录无共享 Database.json：启动期明确报配置缺失
         WithEnvironmentVariables(new Dictionary<string, string?>
         {
-            ["GFX_MAIN_DB_TYPE"] = null,
-            ["GFX_MAIN_DB_CONNECTION_STRING"] = null,
+            ["DBTYPE"] = null,
+            ["CONNECTIONSTRING"] = null,
         }, () =>
         {
             var configuration = new ConfigurationBuilder().Build();
@@ -91,8 +91,8 @@ public class HostMainDbConnectionResolverTests
         {
             WithEnvironmentVariables(new Dictionary<string, string?>
             {
-                ["GFX_MAIN_DB_TYPE"] = null,
-                ["GFX_MAIN_DB_CONNECTION_STRING"] = null,
+                ["DBTYPE"] = null,
+                ["CONNECTIONSTRING"] = null,
             }, () =>
             {
                 var configuration = new ConfigurationBuilder().Build();

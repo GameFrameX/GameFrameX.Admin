@@ -8,7 +8,7 @@ namespace GameFrameX.Core.Bootstrap;
 /// <remarks>
 /// 优先级从低到高：共享 Database.json 文件默认（仅 DbConnection 节为空时生效）
 /// &lt; 显式 DbConnection 配置节（appsettings / 环境变量 / 命令行，扁平键 DbType / ConnectionString）
-/// &lt; LauncherOptions 统一启动参数层（--DbType/--ConnectionString 与 GFX_MAIN_DB_*，命令行优先，经
+/// &lt; LauncherOptions 统一启动参数层（--DbType/--ConnectionString 与 DBTYPE/CONNECTIONSTRING 环境变量，命令行优先，经
 /// <see cref="LauncherOptionsMainDatabase"/> 以最高优先级追加进配置管线）。
 /// 环境变量与命令行的合并、成对校验全部由 LauncherOptions 承担；本类与 Web.Api 的 SqlSugarSetup 共用
 /// <see cref="MainDatabaseConnectionGuard"/> 做 main 标识、必填与 provider 一致性校验。
@@ -49,7 +49,7 @@ public static class HostMainDbConnectionResolver
         if (connectionConfig == null)
         {
             throw new InvalidOperationException(
-                "数据库主库连接配置缺失：请通过启动参数 --DbType + --ConnectionString（或 GFX_MAIN_DB_TYPE + GFX_MAIN_DB_CONNECTION_STRING 成对环境变量）提供，或在 DbConnection 配置节 / 输出目录共享 Database.json 中配置。");
+                "数据库主库连接配置缺失：请通过启动参数 --DbType + --ConnectionString（或 DBTYPE + CONNECTIONSTRING 成对环境变量）提供，或在 DbConnection 配置节 / 输出目录共享 Database.json 中配置。");
         }
 
         return MainDatabaseConnectionGuard.EnsureMainDatabase(connectionConfig);

@@ -48,7 +48,7 @@ internal static class Program
 
         var launcherOptions = OptionsBuilder.CreateWithDebug<LauncherOptions>(args);
 
-        // 主库连接启动参数（--DbType/--ConnectionString 与 GFX_MAIN_DB_*，命令行优先）以最高优先级进入配置管线
+        // 主库连接启动参数（--DbType/--ConnectionString 与 DBTYPE/CONNECTIONSTRING 环境变量，命令行优先）以最高优先级进入配置管线
         builder.Configuration.AddMainDatabaseFromLauncherOptions(launcherOptions);
 
         if (builder.Environment.IsDevelopment())
@@ -86,7 +86,7 @@ internal static class Program
         // Client 特有：登录阻断异常（处罚事实源命中）→ HttpJsonResultData<BaseOperationAckResponse>.Error（不进共享层）
         builder.Services.AddHostControllers(option => { option.Filters.Add<PenaltyLoginBlockedExceptionFilter>(); });
 
-        // 主库连接统一走 DbConnection 节 / 共享 Database.json + GFX_MAIN_DB_* 单一入口（C269）
+        // 主库连接统一走 DbConnection 节 / 共享 Database.json + DBTYPE/CONNECTIONSTRING 环境变量单一入口（C269）
         var mainDbConfig = HostMainDbConnectionResolver.Resolve(builder.Configuration);
         var sqlSugar = SqlSugarClientConfig.AddSqlSugarClientService(mainDbConfig);
 

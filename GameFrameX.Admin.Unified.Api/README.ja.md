@@ -175,9 +175,9 @@ GameFrameX.Admin.Unified.Api/
 
 **本番 / コンテナ（PostgreSQL、環境変数でペア上書き）**：データベースを上書きする場合、タイプと接続文字列は必ず**ペアで**設定します。片方だけの上書きは起動時に即エラーになります。3 つの host（Web / Client / Hub）は**同じペアの変数**を使います：
 
-- `GFX_MAIN_DB_TYPE=PostgreSQL` + `GFX_MAIN_DB_CONNECTION_STRING=Host=...`
+- `DBTYPE=PostgreSQL` + `CONNECTIONSTRING=Host=...`
 - 3 ホストは `ConfigId=main` のみを使用します。単一メイン DB がすべての DB であり、他の DB の自動作成・導出は行いません。
-- DB 接続の注入は統一（低→高）：`Database.json` フォールバック &lt; 明示的な `DbConnection` セクション &lt; 起動引数（`LauncherOptions` の単一入口：`--DbType PostgreSQL --ConnectionString "..."` と `GFX_MAIN_DB_*` 環境変数が同じ入口、コマンドライン優先、必ずペアで）。`DbConnectionOptions` オプションクラスは廃止され、組み立てと検証は `LauncherOptions` + `MainDatabaseConnectionGuard` が直接担当します。
+- DB 接続の注入は統一（低→高）：`Database.json` フォールバック &lt; 明示的な `DbConnection` セクション &lt; 起動引数（`LauncherOptions` の単一入口：`--DbType PostgreSQL --ConnectionString "..."` と `DBTYPE/CONNECTIONSTRING` 環境変数が同じ入口、コマンドライン優先、必ずペアで）。`DbConnectionOptions` オプションクラスは廃止され、組み立てと検証は `LauncherOptions` + `MainDatabaseConnectionGuard` が直接担当します。
 - 他のデータベース（MySQL / Oracle / 達夢……全 34 種の DbType）への切り替えの接続文字列の書き方と例：[`GameFrameX.Application/Configuration/Database-ConnectionStrings.md`](GameFrameX.Application/Configuration/Database-ConnectionStrings.md)
 
 データベースについて、他にも知っておくべき決まりがいくつかあります：
@@ -221,8 +221,8 @@ Admin API の初回起動時、SqlSugar Code-First が自動で DB とテーブ�
 
 ```bash
 docker run -p 20802:20802 \
-  -e GFX_MAIN_DB_TYPE=PostgreSQL \
-  -e GFX_MAIN_DB_CONNECTION_STRING="Host=あなたのPG;Port=5432;Database=gameframex_admin;Username=...;Password=..." \
+  -e DBTYPE=PostgreSQL \
+  -e CONNECTIONSTRING="Host=あなたのPG;Port=5432;Database=gameframex_admin;Username=...;Password=..." \
   あなたのイメージ
 ```
 
@@ -230,8 +230,8 @@ docker run -p 20802:20802 \
 
 | 症状 | 最も可能性が高い原因 |
 |------|------------|
-| 起動時に DB 接続失敗のエラー | `Database.json`（または `GFX_MAIN_DB_*` 環境変数）の接続文字列が不正、もしくは PG が起動していない |
-| 起動時に「DbType が Sqlite/PostgreSQL だが、接続文字列が…の形式ではない」エラー | 環境変数が片方だけ上書きされている：`GFX_MAIN_DB_TYPE` と `GFX_MAIN_DB_CONNECTION_STRING` は必ずペアで設定すること |
+| 起動時に DB 接続失敗のエラー | `Database.json`（または `DBTYPE/CONNECTIONSTRING` 環境変数）の接続文字列が不正、もしくは PG が起動していない |
+| 起動時に「DbType が Sqlite/PostgreSQL だが、接続文字列が…の形式ではない」エラー | 環境変数が片方だけ上書きされている：`DBTYPE` と `CONNECTIONSTRING` は必ずペアで設定すること |
 | SQLite の DB ファイルが変な場所にできる | 接続文字列はプロセスの作業ディレクトリ基準で解決される——リポジトリルートに戻って `dotnet run` を実行。プロジェクトディレクトリにできた `db/` は削除すれば OK |
 | テーブルが作られない | Code-First スイッチはデフォルトでコード上すべて ON（C278）。明示的にオフに設定した覚えがあれば `Database.json` か環境変数を確認 |
 | Swagger が開かない | 開発環境以外ではデフォルトで Swagger をマウントしない。下の [OpenAPI のエクスポート](#openapi-をフロントエンドへエクスポート) を参照 |
