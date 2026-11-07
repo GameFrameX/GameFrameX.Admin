@@ -72,42 +72,6 @@ public static class MenuSeedCatalog
     }
 
     /// <summary>
-    /// 获取 SuperAdmin 可见菜单 ID。
-    /// <para>规则: SuperAdminOnly 菜单(含整棵子树)及其目录祖先 + 公共总览与运营首页(dashboard/home)。只补目录祖先，不引入祖先下的业务菜单。</para>
-    /// </summary>
-    public static IReadOnlyList<long> SuperAdminVisibleMenuIds
-    {
-        get
-        {
-            var superAdminOnlyKeys = Definitions
-                                     .Where(u => u.SuperAdminOnly)
-                                     .Select(u => u.Key)
-                                     .ToHashSet(StringComparer.Ordinal);
-
-            var visibleKeys = new HashSet<string>(StringComparer.Ordinal) { "route:dashboard", "route:home", };
-            foreach (var definition in Definitions)
-            {
-                if (BelongsToSuperAdminOnlySubtree(definition.Key, superAdminOnlyKeys))
-                {
-                    visibleKeys.Add(definition.Key);
-                    var parentKey = definition.ParentKey;
-                    while (parentKey != null && DefinitionsByKey.TryGetValue(parentKey, out var parent))
-                    {
-                        if (parent.Type == MenuTypeEnum.Dir)
-                        {
-                            visibleKeys.Add(parent.Key);
-                        }
-
-                        parentKey = parent.ParentKey;
-                    }
-                }
-            }
-
-            return visibleKeys.Select(u => StableSeedId.Menu(u)).ToArray();
-        }
-    }
-
-    /// <summary>
     /// 获取 SuperAdmin-only 整棵子树的菜单 ID（根 + 所有后代）。
     /// <para>供管理员登录菜单树过滤：任何落入超管专属子树的菜单（含历史残留授权，如某菜单由管理员可见改为超管专属后仍残留 role-menu 授权）都不应出现在管理员导航中。</para>
     /// </summary>

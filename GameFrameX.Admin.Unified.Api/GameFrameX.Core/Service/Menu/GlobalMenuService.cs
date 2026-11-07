@@ -56,10 +56,11 @@ public class GlobalMenuService : IAdminApiController
     {
         if (_currentUserContext.SuperAdmin)
         {
-            var visibleMenuIds = MenuSeedCatalog.SuperAdminVisibleMenuIds.ToList();
+            // 超管导航放开全部启用菜单（含游戏业务运营域）：超管在接口层已放行全部端点校验（JwtHandler），
+            // 导航若只露平台专属子树，业务运营页将对超管不可达。
+            // 显式排除软删行：超管身份会跳过全局软删过滤器（SqlSugarSetup），否则被删菜单会重新出现在导航里。
             var menuList = await _systemMenuRepository.AsQueryable()
-                                               .Where(u => u.Type != MenuTypeEnum.Button && u.IsEnabled == true)
-                                               .Where(u => visibleMenuIds.Contains(u.Id))
+                                               .Where(u => u.Type != MenuTypeEnum.Button && u.IsEnabled == true && u.IsDeleted == false)
                                                .OrderBy(u => new { u.Type, u.OrderNo, u.Id, }).ToTreeAsync(u => u.Children, u => u.Pid, 0);
             return menuList.Adapt<List<MenuResponse>>();
         }
