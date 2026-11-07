@@ -87,7 +87,6 @@ internal static class Program
         // 主库连接统一走 DbConnection 节 + GFX_MAIN_DB_* 单一入口（C269）；LauncherOptions 裸参数仅作兼容兜底
         var mainDbConfig = HostMainDbConnectionResolver.Resolve(builder.Configuration, launcherOptions);
         var sqlSugar = SqlSugarClientConfig.AddSqlSugarClientService(mainDbConfig);
-        LegacySchemaStartupGuard.EnsureNotLegacySchema(sqlSugar, mainDbConfig);
 
         builder.Services.AddSingleton<ISqlSugarClient>(sqlSugar); // 单例注册
         builder.Services.AddScoped(typeof(Repository<>)); // 仓储注册

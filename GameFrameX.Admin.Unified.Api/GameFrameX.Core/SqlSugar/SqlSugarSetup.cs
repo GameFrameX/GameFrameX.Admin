@@ -62,11 +62,9 @@ public static class SqlSugarSetup
         });
         services.AddSingleton<ISqlSugarClient>(sqlSugar); // 单例注册
         services.AddScoped(typeof(SqlSugarRepository<>)); // 仓储注册
-        // 初始化数据库表结构及种子数据；建库/建表/种子前先做旧库拒绝检查（C406 / D7），
-        // 命中旧 schema 标志（tenant_ 前缀表或旧租户登记表）即 fail-closed 终止启动。
+        // 初始化数据库表结构及种子数据
         foreach (var config in dbOptions.ConnectionConfigs)
         {
-            LegacySchemaStartupGuard.EnsureNotLegacySchema(sqlSugar, config);
             InitDatabase(sqlSugar, config, effectiveTypes);
 
         }

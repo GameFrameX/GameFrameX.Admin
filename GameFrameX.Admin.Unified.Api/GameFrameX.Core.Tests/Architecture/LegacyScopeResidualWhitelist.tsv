@@ -16,11 +16,6 @@ GameFrameX.Admin.Unified.Api/GameFrameX.Entity/System/SystemWechatPayEntity.cs	A
 GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/PayConfig/PaymentOptionSettingDecryptClosureTests.cs	AppId	支付宝原生 AliPayAppId 加解密闭环样本，D2.5 保留
 GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/ClientApi/RuntimeCredentialDecryptClosureTests.cs	AppId	支付宝原生 AliPayAppId 加解密闭环样本，D2.5 保留
 GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/ClientApi/ClientApiWeChatPayCallbackTests.cs	AppId	微信支付回调协议测试，D2.5 保留
-# D7 断代说明：旧库拒绝启动守卫有意引用旧 schema 标志（行已标 c406-keep）
-GameFrameX.Admin.Unified.Api/GameFrameX.Core/Bootstrap/LegacySchemaStartupGuard.cs	tenant_	D7 旧库检测标志（tenant_ 前缀表 / system_tenant_entity），断代说明
-GameFrameX.Admin.Unified.Api/GameFrameX.Core/Bootstrap/LegacySchemaStartupGuard.cs	Tenant	D7 旧租户登记表断代说明（1.x SystemTenantEntity）
-GameFrameX.Admin.Unified.Api/GameFrameX.Core/Bootstrap/LegacySchemaStartupGuard.cs	tenant	D7 断代说明（多租户架构退场描述）
-GameFrameX.Admin.Unified.Api/GameFrameX.Core/SqlSugar/SqlSugarSetup.cs	tenant_	D7 守卫接线注释（旧 schema 标志 fail-closed）
 # R3-a：游戏服 Online 协议错误码镜像（vault error-code-table.md 唯一权威；后续项由游戏服仓/协议负责人收口）
 GameFrameX.Admin.Unified.Api/GameFrameX.Core/Enum/Errors/OnlineErrorCode.cs	tenant	R3-a 游戏服协议镜像（32200002 CrossTenantDenied 文案）
 GameFrameX.Admin.Unified.Api/error-codes.json	tenant	R3-a 协议镜像导出产物（ErrorCodeContractTests 生成，同 OnlineErrorCode）
@@ -54,9 +49,6 @@ GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/ServerManager/Online/OnlineSc
 GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/System/PlatformJwtIssuedClaimSetTests.cs	tenant	D12 负向断言：签发 claim 全集不含旧作用域 claim
 GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/System/PlatformJwtIssuedClaimSetTests.cs	appId	D12 负向断言：签发 claim 全集不含旧作用域 claim
 GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/HubApi/GameAppOpenAccessDecryptClosureTests.cs	tenant	D12 负向断言：机器通道身份不含旧作用域 claim
-GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/Bootstrap/LegacySchemaStartupGuardTests.cs	tenant_	D12 负向测试：预建 tenant_ 旧表触发启动拒绝
-GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/Bootstrap/LegacySchemaStartupGuardTests.cs	Tenant	D12 负向测试：旧租户登记表字面量触发拒绝
-GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/Bootstrap/LegacySchemaStartupGuardTests.cs	tenant	D12 负向测试：旧表名字面量（c406-keep）
 GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/SqlSugar/PhysicalTableNamespaceBoundaryTests.cs	tenant_	D12 负向断言：业务表禁止再现 tenant_ 前缀（c406-keep）
 GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/SqlSugar/SqlSugarDiffLogPrefixTests.cs	tenant_	D12 负向回归注释：lesson 原型引用旧前缀（c406-keep）
 GameFrameX.Admin.Unified.Api/GameFrameX.Core.Tests/GameBusiness/GameAppFeatureSwitchServiceTests.cs	tenant_	D12 断代注释：业务表不再带 tenant_ 前缀（c406-keep）
