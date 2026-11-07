@@ -171,12 +171,18 @@ export async function navigateByMenu(page: Page, leafTitle: string, rootGroup?: 
 
 
 export const ADMIN_ROOTS = ['总览', '区服', '内容运营', '在线运维', '玩家', '商业化', 'C 端交付', '审计', '系统'] as const;
-export const SUPERADMIN_ROOTS = ['总览', '系统'] as const;
+// 超管导航放开全部启用菜单（含游戏业务运营域）：根集合与普通管理员一致，
+// 超管另含平台专属分组（SUPERADMIN_GROUPS / SUPERADMIN_LEAVES）。
+export const SUPERADMIN_ROOTS = ADMIN_ROOTS;
+// 超管专属目录与叶子：普通管理员在整棵侧边栏 DOM 中都不应出现。
 export const SUPERADMIN_GROUPS = ['开发工具', '帮助文档', '全局配置'] as const;
 export const SUPERADMIN_LEAVES = [
   '菜单管理', '参数配置', '字典管理', '任务调度', '开放接口身份', '图形验证码配置', '平台系统邮件',
   '库表管理', '后台接口', 'SqlSugar', 'JWT配置', '限流配置', '日志配置', '密码策略配置', '全局渠道定义',
 ] as const;
+// 「系统」根下的叶子：普通管理员只见授权子集，超管两者都见。
+export const SYSTEM_LEAVES_ADMIN = ['账号管理', '角色管理', '个人中心', '文件管理', '定时任务', '对象存储配置'] as const;
+export const SYSTEM_LEAVES_SUPERADMIN = [...SYSTEM_LEAVES_ADMIN, ...SUPERADMIN_LEAVES] as const;
 
 export function menuRoot(page: Page, title: string) {
   return page.locator('.p-panelmenu-panel').filter({

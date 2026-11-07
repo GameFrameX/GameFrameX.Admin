@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { expectOverview, SUPERADMIN_LEAVES, superadminPage } from '../helpers';
+import { expectOverview, SYSTEM_LEAVES_SUPERADMIN, superadminPage } from '../helpers';
 import { expectNoApiAnomaly, installApiRecorder, sweepGroup } from '../module-coverage';
 import { selectGlobalServer } from '../server-selection';
 
@@ -43,9 +43,9 @@ test.describe('单 shell 超管模块覆盖', () => {
         await installApiRecorder(page);
         await page.goto('/');
         await expectOverview(page);
-        const reports = await sweepGroup(page, group, { minLeaves: group === '系统' ? 15 : 1, actions: true });
+        const reports = await sweepGroup(page, group, { minLeaves: group === '系统' ? SYSTEM_LEAVES_SUPERADMIN.length : 1, actions: true });
         expect(reports.every(report => !report.is404)).toBe(true);
-        if (group === '系统') expect(reports.map(report => report.leaf).sort()).toEqual([...SUPERADMIN_LEAVES].sort());
+        if (group === '系统') expect(reports.map(report => report.leaf).sort()).toEqual([...SYSTEM_LEAVES_SUPERADMIN].sort());
         await expectNoApiAnomaly(page, group === '系统' ? 13 : 1);
       } finally {
         await page.context().close();
