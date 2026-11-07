@@ -234,13 +234,6 @@ public class Startup
             options.LogEnabled = false;
             // 事件执行器（失败重试）
             options.AddExecutor<RetryEventHandlerExecutor>();
-            //// 替换事件源存储器
-            //options.ReplaceStorer(serviceProvider =>
-            //{
-            //    var redisCache = serviceProvider.GetService<ICache>();
-            //    // 创建默认内存通道事件源对象，可自定义队列路由key，比如这里是 eventbus
-            //    return new RedisEventSourceStorer(redisCache, "eventbus", 3000);
-            //});
         });
 
         // 平台系统邮件只从主库 SystemEmailProviderEntity 读取；缺配置时明确失败，不启用静态 SMTP fallback。
