@@ -17,37 +17,11 @@ public class HostMainDbConnectionResolverTests
             ["DbConnection:ConnectionConfigs:0:ConnectionString"] = "Host=pg-main;Port=5432;Database=gameframex_admin;Username=u;Password=p;",
         }).Build();
 
-        var main = HostMainDbConnectionResolver.Resolve(configuration, CreateLauncherOptions());
+        var main = HostMainDbConnectionResolver.Resolve(configuration);
 
         Assert.Equal("main", main.ConfigId?.ToString());
         Assert.Equal(DbType.PostgreSQL, main.DbType);
         Assert.Equal("Host=pg-main;Port=5432;Database=gameframex_admin;Username=u;Password=p;", main.ConnectionString);
-    }
-
-    [Fact]
-    public void Resolve_FallsBackToLauncherOptionsWhenNoConfiguredSource()
-    {
-        // 无 DbConnection 节、无 GFX_MAIN_DB_* 环境变量、输出目录无共享 Database.json：LauncherOptions 裸启动参数兜底（兼容层）
-        // 注入空基目录隔离——测试输出目录经传递依赖必然存在 Configuration/Database.json（C279 起为合法默认来源，不应命中本用例）
-        WithEnvironmentVariables(new Dictionary<string, string?>
-        {
-            ["GFX_MAIN_DB_TYPE"] = null,
-            ["GFX_MAIN_DB_CONNECTION_STRING"] = null,
-        }, () =>
-        {
-            var configuration = new ConfigurationBuilder().Build();
-            var launcherOptions = new LauncherOptions
-            {
-                DbType = "PostgreSQL",
-                ConnectionString = "Host=legacy-main;Port=5432;Database=main;Username=u;Password=p;",
-            };
-
-            var main = HostMainDbConnectionResolver.Resolve(configuration, launcherOptions, CreateEmptyBaseDirectory());
-
-            Assert.Equal("main", main.ConfigId?.ToString());
-            Assert.Equal(DbType.PostgreSQL, main.DbType);
-            Assert.Equal("Host=legacy-main;Port=5432;Database=main;Username=u;Password=p;", main.ConnectionString);
-        });
     }
 
     [Fact]
@@ -61,15 +35,15 @@ public class HostMainDbConnectionResolverTests
             var configuration = new ConfigurationBuilder().Build();
 
             var exception = Assert.Throws<InvalidOperationException>(() =>
-                                                                         HostMainDbConnectionResolver.Resolve(configuration, CreateLauncherOptions(), CreateEmptyBaseDirectory()));
+                                                                         HostMainDbConnectionResolver.Resolve(configuration, CreateEmptyBaseDirectory()));
             Assert.Contains("必须成对", exception.Message);
         });
     }
 
     [Fact]
-    public void Resolve_ThrowsWhenNoSourceAndLauncherOptionsEmpty()
+    public void Resolve_ThrowsWhenNoSourceConfigured()
     {
-        // 无节、无 GFX_MAIN_DB_*、无共享文件默认、兼容层裸参数也缺失：启动期友好报错而非 NRE（LauncherOptions 已降级非必填）
+        // 无 DbConnection 节、无 GFX_MAIN_DB_* 环境变量、输出目录无共享 Database.json：启动期明确报配置缺失
         WithEnvironmentVariables(new Dictionary<string, string?>
         {
             ["GFX_MAIN_DB_TYPE"] = null,
@@ -77,10 +51,9 @@ public class HostMainDbConnectionResolverTests
         }, () =>
         {
             var configuration = new ConfigurationBuilder().Build();
-            var launcherOptions = new LauncherOptions();
 
             var exception = Assert.Throws<InvalidOperationException>(() =>
-                                                                         HostMainDbConnectionResolver.Resolve(configuration, launcherOptions, CreateEmptyBaseDirectory()));
+                                                                         HostMainDbConnectionResolver.Resolve(configuration, CreateEmptyBaseDirectory()));
             Assert.Contains("配置缺失", exception.Message);
         });
     }
@@ -100,7 +73,7 @@ public class HostMainDbConnectionResolverTests
             {
                 var configuration = new ConfigurationBuilder().Build();
 
-                var main = HostMainDbConnectionResolver.Resolve(configuration, CreateLauncherOptions(), baseDir);
+                var main = HostMainDbConnectionResolver.Resolve(configuration, baseDir);
 
                 Assert.Equal("main", main.ConfigId?.ToString());
                 Assert.Equal(DbType.Sqlite, main.DbType);
@@ -127,7 +100,7 @@ public class HostMainDbConnectionResolverTests
                 ["DbConnection:ConnectionConfigs:0:ConnectionString"] = "Host=explicit-section;Port=5432;Database=main;Username=u;Password=p;",
             }).Build();
 
-            var main = HostMainDbConnectionResolver.Resolve(configuration, CreateLauncherOptions(), baseDir);
+            var main = HostMainDbConnectionResolver.Resolve(configuration, baseDir);
 
             Assert.Equal(DbType.PostgreSQL, main.DbType);
             Assert.Equal("Host=explicit-section;Port=5432;Database=main;Username=u;Password=p;", main.ConnectionString);
@@ -136,15 +109,6 @@ public class HostMainDbConnectionResolverTests
         {
             Directory.Delete(baseDir, true);
         }
-    }
-
-    private static LauncherOptions CreateLauncherOptions()
-    {
-        return new LauncherOptions
-        {
-            DbType = "Sqlite",
-            ConnectionString = "DataSource=./db/GameFrameX.Admin.db;",
-        };
     }
 
     /// <summary>

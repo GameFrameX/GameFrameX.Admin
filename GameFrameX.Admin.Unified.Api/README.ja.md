@@ -177,7 +177,6 @@ GameFrameX.Admin.Unified.Api/
 
 - `GFX_MAIN_DB_TYPE=PostgreSQL` + `GFX_MAIN_DB_CONNECTION_STRING=Host=...`
 - 3 ホストは `ConfigId=main` のみを使用します。単一メイン DB がすべての DB であり、他の DB の自動作成・導出は行いません。
-- 既存デプロイの素の `DbType` / `ConnectionString` 起動パラメータも引き続き使用可能（互換層）ですが、起動時に移行警告が出るので、早めに切り替えてください
 - 他のデータベース（MySQL / Oracle / 達夢……全 34 種の DbType）への切り替えの接続文字列の書き方と例：[`GameFrameX.Application/Configuration/Database-ConnectionStrings.md`](GameFrameX.Application/Configuration/Database-ConnectionStrings.md)
 
 データベースについて、他にも知っておくべき決まりがいくつかあります：

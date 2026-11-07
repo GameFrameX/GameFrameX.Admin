@@ -4,24 +4,11 @@ namespace GameFrameX.Core.SqlSugar;
 
 /// <summary>
 /// Client / Game / Hub 三 host 共享的进程启动选项。
-/// <para>本类只承载必须在数据库 Provider 初始化之前可用的进程级启动参数：数据库类型、数据库连接字符串、日志管道开关。</para>
+/// <para>本类只承载必须在数据库 Provider 初始化之前可用的进程级启动参数：日志管道开关。数据库连接一律经 HostMainDbConnectionResolver（DbConnection 节 / 共享 Database.json / GFX_MAIN_DB_* 环境变量）解析，不进本类。</para>
 /// <para>所有请求期业务配置（邮件、广告回调、沙箱、区域输出、Client API token、Game 登录票据策略等）已迁移到主库，通过 <c>IClientApiOptionsProvider</c> 按应用读取，禁止回流到本类。</para>
 /// </summary>
 public sealed class LauncherOptions
 {
-    /// <summary>
-    /// 数据库类型（兼容层）。C269 起正式入口为 GFX_MAIN_DB_TYPE + GFX_MAIN_DB_CONNECTION_STRING 成对环境变量（或 DbConnection 配置节），
-    /// 本参数仅在两者皆缺失时由 HostMainDbConnectionResolver 兜底消费并打迁移警告，故不再强制必填。
-    /// </summary>
-    [Option(nameof(DbType), Required = false)]
-    public string DbType { get; set; } = null!;
-
-    /// <summary>
-    /// 数据库连接字符串（兼容层）。消费路径与迁移提示同 <see cref="DbType"/>，不再强制必填。
-    /// </summary>
-    [Option(nameof(ConnectionString), Required = false)]
-    public string ConnectionString { get; set; } = null!;
-
     /// <summary>
     /// Grafana Loki 服务的 URL 地址。进程级日志管道在业务请求前初始化，Loki endpoint 属于 host 观测设施，不随请求切换。
     /// </summary>

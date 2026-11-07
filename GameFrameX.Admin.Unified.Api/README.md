@@ -177,7 +177,6 @@ Note: SQLite is for local development/debugging only. SQLite is forbidden in liv
 
 - `GFX_MAIN_DB_TYPE=PostgreSQL` + `GFX_MAIN_DB_CONNECTION_STRING=Host=...`
 - All three hosts use only `ConfigId=main`; the single main database is the entire database estate — no other databases are created or derived.
-- The legacy bare `DbType` / `ConnectionString` startup parameters still work (compatibility layer); startup prints a migration warning — switch soon
 - For other databases (MySQL / Oracle / DM… all 34 DbTypes), connection string syntax and examples: [`GameFrameX.Application/Configuration/Database-ConnectionStrings.md`](GameFrameX.Application/Configuration/Database-ConnectionStrings.md)
 
 A few more database conventions worth knowing:

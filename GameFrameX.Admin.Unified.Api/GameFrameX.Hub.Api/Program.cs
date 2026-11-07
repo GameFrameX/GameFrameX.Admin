@@ -44,8 +44,8 @@ internal static class Program
         builder.Services.AddSingleton<IHttpContextAccessor>(httpContextAccessor);
         builder.Services.AddHttpClient();
 
-        // 主库连接统一走 DbConnection 节 + GFX_MAIN_DB_* 单一入口（C269）；LauncherOptions 裸参数仅作兼容兜底
-        var mainDbConfig = HostMainDbConnectionResolver.Resolve(builder.Configuration, launcherOptions);
+        // 主库连接统一走 DbConnection 节 / 共享 Database.json + GFX_MAIN_DB_* 单一入口（C269）
+        var mainDbConfig = HostMainDbConnectionResolver.Resolve(builder.Configuration);
         var sqlSugar = SqlSugarClientConfig.AddSqlSugarClientService(mainDbConfig, HubUserAuditHandler.Handle(httpContextAccessor));
 
         builder.Services.AddSingleton<ISqlSugarClient>(sqlSugar); // 主库

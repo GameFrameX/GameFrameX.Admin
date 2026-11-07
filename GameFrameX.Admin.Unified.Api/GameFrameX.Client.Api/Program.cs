@@ -64,11 +64,9 @@ internal static class Program
         Console.WriteLine("当前配置的LauncherOptions摘要:");
         Console.WriteLine(JsonHelper.SerializeFormat(new
         {
-            launcherOptions.DbType,
             launcherOptions.IsConsole,
             launcherOptions.IsGrafanaLoki,
             GrafanaLokiUrlConfigured = launcherOptions.GrafanaLokiUrl.IsNotNullOrEmpty(),
-            ConnectionStringConfigured = launcherOptions.ConnectionString.IsNotNullOrEmpty(),
         }));
         Console.WriteLine("---------------------------------------------------");
         // 配置雪花ID（Foundation Snowflake 紧凑布局 + WorkerId 防撞，C360 / GFX-803）：
@@ -84,8 +82,8 @@ internal static class Program
         // Client 特有：登录阻断异常（处罚事实源命中）→ HttpJsonResultData<BaseOperationAckResponse>.Error（不进共享层）
         builder.Services.AddHostControllers(option => { option.Filters.Add<PenaltyLoginBlockedExceptionFilter>(); });
 
-        // 主库连接统一走 DbConnection 节 + GFX_MAIN_DB_* 单一入口（C269）；LauncherOptions 裸参数仅作兼容兜底
-        var mainDbConfig = HostMainDbConnectionResolver.Resolve(builder.Configuration, launcherOptions);
+        // 主库连接统一走 DbConnection 节 / 共享 Database.json + GFX_MAIN_DB_* 单一入口（C269）
+        var mainDbConfig = HostMainDbConnectionResolver.Resolve(builder.Configuration);
         var sqlSugar = SqlSugarClientConfig.AddSqlSugarClientService(mainDbConfig);
 
         builder.Services.AddSingleton<ISqlSugarClient>(sqlSugar); // 单例注册

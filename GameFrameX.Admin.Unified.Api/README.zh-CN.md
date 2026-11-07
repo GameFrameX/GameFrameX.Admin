@@ -177,7 +177,6 @@ GameFrameX.Admin.Unified.Api/
 
 - `GFX_MAIN_DB_TYPE=PostgreSQL` + `GFX_MAIN_DB_CONNECTION_STRING=Host=...`
 - 三宿主仅使用 `ConfigId=main`，单主库即全部数据库，不存在其他库的创建或推导。
-- 存量部署的裸 `DbType` / `ConnectionString` 启动参数仍可用（兼容层），启动会打迁移警告，请尽快切换
 - 换其他数据库（MySQL / Oracle / 达梦……全部 34 种 DbType）的连接串写法与示例：[`GameFrameX.Application/Configuration/Database-ConnectionStrings.md`](GameFrameX.Application/Configuration/Database-ConnectionStrings.md)
 
 关于数据库，还有几个约定你要知道：
