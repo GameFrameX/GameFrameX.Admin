@@ -457,7 +457,7 @@ test.describe('广告回调配置分包闭环（F2）', () => {
     await expect.poll(() => created, '广告回调配置新增请求未发出').toBe(true);
     await expect(page.locator('.p-datatable-tbody')).toContainText(token, { timeout: 20_000 });
 
-    // —— 编辑：分包选择器必须回显新增时所选分包（R5 绑定后 packageId 是配置身份的一部分）——
+    // —— 编辑：分包选择器必须回显新增时所选分包（绑定后 packageId 是配置身份的一部分）——
     await page.locator(`tr:has-text("${token}") >> text=编辑`).first().click();
     await expect(page.locator('.p-dialog')).toBeVisible({ timeout: 10_000 });
     await expect(page.locator('.p-dialog .parameter-panel')).toBeVisible({ timeout: 10_000 });

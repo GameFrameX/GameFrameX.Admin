@@ -120,7 +120,7 @@ test('已知 Online 码在五语言全部命中本地化文案（五语同步落
 	}
 })
 
-test('未知 Online 码五语言键未命中 → resolveResponseMessage 回退后端 message 原文（VC-1.10）', () => {
+test('未知 Online 码五语言键未命中 → resolveResponseMessage 回退后端 message 原文', () => {
 	for (const locale of Object.keys(sharedState.messages)) {
 		sharedState.locale = locale
 		for (const code of unknownOnlineCodes) {
