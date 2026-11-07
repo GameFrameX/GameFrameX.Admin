@@ -106,7 +106,7 @@ function readCodesTable(locale: string): Record<string, string> | undefined {
 	return codes as Record<string, string>
 }
 
-test('已知 Online 码在五语言全部命中本地化文案（C339 同步落地证据）', () => {
+test('已知 Online 码在五语言全部命中本地化文案（五语同步落地证据）', () => {
 	expect(onlineCodes.length).toBeGreaterThanOrEqual(20)
 	for (const locale of Object.keys(sharedState.messages)) {
 		sharedState.locale = locale

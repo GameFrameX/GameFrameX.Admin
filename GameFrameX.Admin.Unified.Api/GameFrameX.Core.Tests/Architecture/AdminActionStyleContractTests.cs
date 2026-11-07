@@ -322,7 +322,7 @@ public sealed class AdminActionStyleContractTests
         }
 
         AssertNoNewAndNoStale("S4", actual, ClassLevelAllowAnonymousLegacy,
-                              "服务类禁止类级 [AllowAnonymous]（类级特性使全部 action 含写操作匿名可达，GFX-664）；公开端点一律 action 级标注 + 目录 IsPublic 登记。C258 落地后例外清单必须清零。");
+                              "服务类禁止类级 [AllowAnonymous]（类级特性使全部 action 含写操作匿名可达）；公开端点一律 action 级标注 + 目录 IsPublic 登记。C258 落地后例外清单必须清零。");
     }
 
     [Fact]

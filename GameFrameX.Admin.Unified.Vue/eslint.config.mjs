@@ -203,8 +203,8 @@ export default [
             // 禁止 handle 前缀 handler 声明：统一 onXxx；存量已清零，此规则防增量
             'no-restricted-syntax': [
                 'error',
-                { selector: 'VariableDeclarator[id.name=/^handle[A-Z]/]', message: '事件 handler 统一 onXxx 前缀，禁止 handleXxx（GFX-714 / D5）' },
-                { selector: 'FunctionDeclaration[id.name=/^handle[A-Z]/]', message: '事件 handler 统一 onXxx 前缀，禁止 handleXxx（GFX-714 / D5）' },
+                { selector: 'VariableDeclarator[id.name=/^handle[A-Z]/]', message: '事件 handler 统一 onXxx 前缀，禁止 handleXxx' },
+                { selector: 'FunctionDeclaration[id.name=/^handle[A-Z]/]', message: '事件 handler 统一 onXxx 前缀，禁止 handleXxx' },
             ],
             '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
             '@typescript-eslint/naming-convention': namingConventionRule,

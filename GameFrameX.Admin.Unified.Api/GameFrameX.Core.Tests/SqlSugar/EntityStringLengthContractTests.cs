@@ -15,7 +15,7 @@ public class EntityStringLengthContractTests
         Assert.All(constants, field =>
         {
             var value = Convert.ToInt32(field.GetRawConstantValue());
-            Assert.True(value >= 256, $"常量 {field.Name}={value} 低于 256 下限（C281/GFX-689 规则：系统最低字符串长度 256）");
+            Assert.True(value >= 256, $"常量 {field.Name}={value} 低于 256 下限（系统最低字符串长度 256 规则）");
         });
     }
 
