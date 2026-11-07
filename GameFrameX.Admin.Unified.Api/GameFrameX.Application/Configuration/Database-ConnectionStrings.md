@@ -51,4 +51,4 @@
 ## 注意
 
 自 2.0 起为单游戏单主库：`ConfigId=main` 的主库是唯一业务库（见 [Database.json](./Database.json) 文件头第 3 条），不存在按作用域自动推导的分库。
-Database.json 中除 main 外可登记额外连接，仅供数据库运维工具按 ConfigId 直连对应库查看，不参与业务路由。连接串格式见上表。
+连接配置只允许一个 `main` 连接——启动配置校验强制（`GameFrameX.Core/Option/DbConnectionOptions.cs`，非单一 main 连接直接拒绝启动），不存在任何额外连接或多库路由。
