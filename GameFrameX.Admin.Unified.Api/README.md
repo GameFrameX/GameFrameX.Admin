@@ -825,6 +825,8 @@ On the very first startup against an empty database, web-api runs the "first bus
 
 Idempotency: once the account exists it is neither recreated nor is its password overwritten; on every startup the `sys_admin` menu grants only add newly introduced seed menus and never remove existing grants (manual narrowing done by operators in role management survives restarts). When neither variable is set and no business administrator exists, startup logs a "business administrator not initialized" warning. No log line ever prints a password.
 
+> Superadmin navigation scope: the superadmin sidebar lists every enabled menu (game business domains plus the protected platform groups) — the same nine roots as the business administrator, plus superadmin-only groups such as 全局配置; business administrators still cannot see superadmin-only pages. See `gfx-doc/decisions/2026-11-07-superadmin-business-menu-visibility.md`.
+
 > Password strength: the platform password policy is **off by default** on a fresh install (`strongPassword=false`), so neither initial password is strength-checked. Once enabled it requires 6–16 characters including upper case, lower case, digits and a special character. Set the initial passwords to that shape (12+ characters) and enable the policy before exposing the service.
 
 ### Pre-Release Checklist: Database Re-Seeding and Compact Short IDs
