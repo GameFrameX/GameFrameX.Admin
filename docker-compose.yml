@@ -147,6 +147,8 @@ services:
       # web-api 启动期自动创建该账号并绑定 sys_admin 角色；不设默认值，取值见 .env 注释
       GAMEFRAMEX_ADMIN_INITIAL_ACCOUNT: ${GAMEFRAMEX_ADMIN_INITIAL_ACCOUNT:-}
       GAMEFRAMEX_ADMIN_INITIAL_PASSWORD: ${GAMEFRAMEX_ADMIN_INITIAL_PASSWORD:-}
+      # 超管首装初始密码：不设置则密码留空，登录页走首装向导设置（种子 insert-only，已存在行不覆盖）
+      GFX_SUPERADMIN_INITIAL_PASSWORD: ${GFX_SUPERADMIN_INITIAL_PASSWORD:-}
     volumes:
       # 把后端仓库里的 appsettings.json 只读挂载进容器（覆盖镜像内同名文件）：
       # 好处是改配置后 docker compose restart web-api 即生效，无需重新构建镜像
