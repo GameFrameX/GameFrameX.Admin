@@ -84,7 +84,7 @@ Client API와 Hub API는 더 "가볍습니다": Client API는 Entity + Payment�
 | 캐시 | Memory / Redis | 단일 머신은 메모리로 충분, 다중 머신은 Redis 사용 |
 | 정기 작업 | 프로젝트 자체 Scheduler | 작업을 데이터베이스에 저장하고 다중 인스턴스 간 조율, 중복 실행 없음 |
 | 로그 | 데이터베이스 + ElasticSearch + Serilog | 작업 로그는 DB에, 대량 데이터는 ES 사용 |
-| 데이터베이스 | SQLite(로컬 기본) / PostgreSQL(프로덕션), MySQL / Oracle 등 10여 종도 지원 | 다른 DB 연결 문자열 작성법은 [치트시트 문서](GameFrameX.Application/Configuration/Database-ConnectionStrings.md) 참조 |
+| 데이터베이스 | SQLite(로컬 기본) / PostgreSQL(프로덕션), MySQL / Oracle 등 10여 종도 지원 | 다른 DB 연결 문자열 작성법은 다른 DB 연결 문자열 작성법은 [데이터베이스 섹션의 치트시트](#기술-스택) 참조 참조 |
 | 컨테이너화 | Docker Compose | 한 번의 명령으로 세 개의 호스트를 모두 실행 |
 
 ---
@@ -178,7 +178,50 @@ GameFrameX.Admin.Unified.Api/
 - `DBTYPE=PostgreSQL` + `CONNECTIONSTRING=Host=...`
 - 세 호스트는 `ConfigId=main`만 사용하며, 단일 메인 DB가 전부입니다. 다른 DB를 자동 생성하거나 유도하지 않습니다.
 - DB 연결 주입 통일(낮은 순): `Database.json` 폴백 &lt; 명시적 `DbConnection` 섹션 &lt; 시작 인자(`LauncherOptions` 단일 입구: `--DbType PostgreSQL --ConnectionString "..."`와 `DBTYPE/CONNECTIONSTRING` 환경변수가 같은 입구, 커맨드라인 우선, 반드시 쌍으로). `DbConnectionOptions` 옵션 클래스는 폐기되었으며 조립과 검증은 `LauncherOptions` + `MainDatabaseConnectionGuard`가 직접 담당합니다.
-- 다른 데이터베이스(MySQL / Oracle / DM…… 전체 34종 DbType)로 전환하는 연결 문자열 작성법과 예시: [`GameFrameX.Application/Configuration/Database-ConnectionStrings.md`](GameFrameX.Application/Configuration/Database-ConnectionStrings.md)
+<details>
+<summary>전체 34종 DbType 연결 문자열 치트시트(SqlSugar 공식 문서에서 발췌)</summary>
+
+> 출처: SqlSugar 공식 문서 donet5.com「데이터베이스 특색」(2026-08-21 발췌), SqlSugarCore 5.1.4.216 `DbType` 열거형 34개 값을 모두 포괄. 예시의 호스트 / DB명 / 계정 / 비밀번호는 공식 데모 값입니다. DB 전환 시 해당 값을 `Database.json`의 `DbType` / `ConnectionString` 필드에 반영하세요.
+
+| DbType | 连接串示例 | 备注 |
+|---|---|---|
+| MySql | `server=localhost;Database=SqlSugar4xTest;Uid=root;Pwd=haosql` | 可选 `Port=3306`、`Charset=utf8mb4` |
+| SqlServer | `server=.;uid=sa;pwd=haosql;database=SQLSUGAR4XTEST` | |
+| Sqlite | `DataSource=SqlSugar4xTest.sqlite` | 或绝对路径 `DataSource=c:\database\SqlSugar4xTest.sqlite` |
+| Oracle | `Data Source=localhost/orcl;User ID=system;Password=haha` | |
+| PostgreSQL | `PORT=5432;DATABASE=SqlSugar4xTest;HOST=localhost;PASSWORD=haosql;USER ID=postgres` | 多架构可加 `searchpath=架构名` |
+| Dm（达梦） | `Server=localhost;User Id=SYSDBA;PWD=SYSDBA;DATABASE=新DB;SCHEMA=myshcema` | |
+| Kdbndp（人大金仓） | `Server=127.0.0.1;Port=54321;UID=SYSTEM;PWD=system;database=SQLSUGAR4XTEST1` | |
+| Oscar（神通） | `PORT=2003;DATABASE=osrdb;HOST=localhost;PASSWORD=szoscar55;USER ID=SYSDBA` | |
+| MySqlConnector | 连接串同 MySql | .NET Core 高版本直接用 DbType=MySql，仅 .NET Framework 需此值 |
+| Access | `Provider=Microsoft.ACE.OleDB.15.0;Data Source=test.accdb` | |
+| OpenGauss | `PORT=5432;DATABASE=SqlSugar5Demo;HOST=localhost;PASSWORD=postgres;USER ID=postgres` | |
+| QuestDB | `host=localhost;port=8812;username=admin;password=quest;database=qdb;ServerCompatibilityMode=NoTypeLoading;` | |
+| HG（瀚高） | `Server=27.151.1;Port=5866;UId=design;Password=123;Database=design;searchpath=design` | |
+| ClickHouse | `host=localhost;port=8123;user=default;password=;database=default` | |
+| GBase（8s） | `Driver={GBase ODBC DRIVER (64-Bit)};Host=localhost;Service=19088;Server=gbase01;Database=testdb;Protocol=onsoctcp;` | ODBC 驱动 |
+| Odbc | `Driver={驱动名};....` | 键值对按目标库 ODBC 驱动文档填写；需 SqlSugar.OdbcCore 5.1.4.160+ 并启动时注册 `InstanceFactory.CustomAssemblies` |
+| OceanBaseForOracle | 参考 Oracle 格式 | OceanBase Oracle 模式；官方页面未给显式串（MySQL 模式用 DbType=OceanBase） |
+| TDengine | `Host=localhost;Port=6030;Username=root;Password=taosdata;Database=power` | |
+| GaussDB | `PORT=5432;DATABASE=SqlSugar5Demo;HOST=localhost;PASSWORD=postgres;USER ID=postgres` | ODBC 方式 |
+| OceanBase | `server=localhost;Database=SqlSugar4xTest;Uid=root;Pwd=haosql` | MySQL 模式 |
+| Tidb | `server=localhost;Database=SqlSugar4xTest;Uid=root;Pwd=haosql` | |
+| Vastbase（海量） | `PORT=5432;DATABASE=SqlSugar4xTest;HOST=localhost;PASSWORD=haosql;USER ID=postgres;No Reset On Close=true` | |
+| PolarDB（阿里） | `server=localhost;Database=SqlSugar4xTest;Uid=root;Pwd=haosql` | MySQL 兼容 |
+| Doris | `server=localhost;Database=SqlSugar4xTest;Uid=root;Pwd=haosql;Pooling=false` | |
+| Xugu（虚谷） | `IP=111.123.17;DB=HOUSE;User=SYSDBA;PWD=abc;Port=5138;AUTO_COMMIT=on;CHAR_SET=UTF8` | |
+| GoldenDB | `server=localhost;Database=SqlSugar4xTest;Uid=root;Pwd=haosql;Pooling=false;` | |
+| TDSQLForPGODBC | PostgreSQL 兼容串 | 腾讯 TDSQL PG 模式；官方页面未给显式串；需注册 SqlSugar.TDSQLForPGODBC.TDSQLForPGODBCAdapter |
+| TDSQLForOracleODBC | Oracle 兼容串 | 腾讯 TDSQL Oracle 模式；官方页面未给显式串；adapter 注册方式同上 |
+| TDSQL | `server=localhost;Database=SqlSugar4xTest;Uid=root;Pwd=haosql` | MySQL 内核 |
+| HANA | 官方文档页暂无示例（空壳页，截至 2026-08-21） | |
+| DB2 | 官方文档页暂无示例（空壳页，提示先用源码、NuGet 未更新，截至 2026-08-21） | |
+| GaussDBNative | 串同 GaussDB 格式 | 原生驱动 |
+| DuckDB | `DataSource=train_services.db` | |
+| MongoDb | `mongodb://root:123456@222.71.212.3:27017/testDB?authSource=admin` | 或 `host=222.71.212.3;Port=27017;Database=testDB;Username=root;Password=123456;authSource=admin` |
+| Custom | 连接串由适配器自定 | 自定义 provider：实现适配器并注册 `InstanceFactory.CustomAssemblies` |
+
+</details>
 
 데이터베이스에 대해 알아야 할 몇 가지 규칙:
 

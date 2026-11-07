@@ -242,7 +242,7 @@ docker compose -f docker-compose.admin.yml up -d --build
 
 - 単一メイン DB モデル：3 ホストが 1 つのメイン DB を共有し、エンティティの帰属は境界ルールで決まります（前述の「アイデンティティとスコープ」を参照）。
 - 2.0 は完全新規導入のみ想定：旧バージョンのデータは存在せず、旧 DB のアップグレード、移行スクリプト、互換レイヤーも提供しません。新規 DB の初期化のみサポートします。
-- DB 切り替え時の接続文字列の書き方は [`Database-ConnectionStrings.md`](GameFrameX.Admin.Unified.Api/GameFrameX.Application/Configuration/Database-ConnectionStrings.md) を参照。環境変数のペアオーバーライド（`DBTYPE` + `CONNECTIONSTRING`）などのデプロイ詳細は [バックエンド README · データベース](GameFrameX.Admin.Unified.Api/README.ja.md#データベースデフォルトはゼロ設定本番は-postgresql) を参照してください。
+- DB 切り替え時の接続文字列の書き方（34 種 DbType のチートシート、バックエンド README のデータベース・セクション内で折りたたみ）とペアの環境変数オーバーライド（`DBTYPE` + `CONNECTIONSTRING`）などの詳細は [バックエンド README · データベース](GameFrameX.Admin.Unified.Api/README.ja.md#データベースデフォルトはゼロ設定本番は-postgresql) を参照してください。
 
 > SQLite はローカル開発専用です。本番での使用は禁止。並行書き込みが弱く、独立したサービスプロセスがなく、バックアップ・復旧や運用監視の能力が不足しているためです。
 

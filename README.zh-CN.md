@@ -242,7 +242,7 @@ docker compose -f docker-compose.admin.yml up -d --build
 
 - 单主库模型：三个 host 共用一个主库，实体归属由边界规则决定（见上文「身份与作用域」）。
 - 2.0 仅面向全新部署：不存在旧版本历史数据，不提供旧库升级、迁移脚本或兼容层；只支持新库初始化。
-- 换库连接串写法见 [`Database-ConnectionStrings.md`](GameFrameX.Admin.Unified.Api/GameFrameX.Application/Configuration/Database-ConnectionStrings.md)；环境变量成对覆盖（`DBTYPE` + `CONNECTIONSTRING`）等部署细节见 [后端 README · 数据库](GameFrameX.Admin.Unified.Api/README.zh-CN.md#数据库默认零配置生产用-postgresql)。
+换库连接串写法（34 种 DbType 速查表，折叠于后端 README 数据库段）与环境变量成对覆盖（`DBTYPE` + `CONNECTIONSTRING`）等部署细节见 [后端 README · 数据库](GameFrameX.Admin.Unified.Api/README.zh-CN.md#数据库默认零配置生产用-postgresql)。
 
 > SQLite 只面向本地开发。生产禁用——并发写入弱、无独立服务进程、备份恢复与运维监控能力不足。
 

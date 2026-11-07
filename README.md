@@ -242,7 +242,7 @@ Not "recommendations" — hard constraints that **take effect by default**.
 
 - Single main database: all three hosts share one main database; entity ownership is decided by boundary rules (see Identity and Scope above).
 - 2.0 assumes fresh deployments only: there is no legacy 1.x data, no old-database upgrade, no migration scripts, and no compatibility layer; only fresh initialization is supported.
-- For connection-string syntax when switching databases, see [`Database-ConnectionStrings.md`](GameFrameX.Admin.Unified.Api/GameFrameX.Application/Configuration/Database-ConnectionStrings.md); for paired environment variable overrides (`DBTYPE` + `CONNECTIONSTRING`) and other deployment details, see [Backend README · Database](GameFrameX.Admin.Unified.Api/README.md#database-zero-config-by-default-postgresql-for-production).
+For connection-string syntax when switching databases (a 34-DbType cheat sheet, collapsed in the DB section) and paired environment variable overrides (`DBTYPE` + `CONNECTIONSTRING`), see [Backend README · Database](GameFrameX.Admin.Unified.Api/README.md#database-zero-config-by-default-postgresql-for-production).
 
 > SQLite is for local development only. Forbidden in production — weak concurrent writes, no standalone service process, and insufficient backup/restore and ops monitoring capabilities.
 
