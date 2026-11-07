@@ -62,9 +62,9 @@ public class DbInitSettingsDefaultTests
                             })
                             .Build();
 
-        var options = configuration.GetSection("DbConnection").Get<DbConnectionOptions>();
+        var configs = configuration.GetSection("DbConnection:ConnectionConfigs").Get<List<DbConnectionConfig>>();
 
-        var config = Assert.Single(options.ConnectionConfigs);
+        var config = Assert.Single(configs);
         Assert.True(config.DbSettings.EnableInitDb);
         Assert.True(config.DbSettings.EnableDiffLog);
         Assert.True(config.TableSettings.EnableInitTable);
@@ -84,9 +84,9 @@ public class DbInitSettingsDefaultTests
                             })
                             .Build();
 
-        var options = configuration.GetSection("DbConnection").Get<DbConnectionOptions>();
+        var configs = configuration.GetSection("DbConnection:ConnectionConfigs").Get<List<DbConnectionConfig>>();
 
-        var config = Assert.Single(options.ConnectionConfigs);
+        var config = Assert.Single(configs);
         Assert.False(config.DbSettings.EnableInitDb);
         Assert.True(config.DbSettings.EnableDiffLog);
     }

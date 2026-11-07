@@ -49,8 +49,10 @@ public class HostMainDbConnectionResolverTests
     }
 
     [Fact]
-    public void Resolve_ThrowsWhenGfxMainVariablesOnlyHalfSet()
+    public void Resolve_HalfEnvironmentPairAloneDoesNotProvideConnection()
     {
+        // 环境变量不是解析器的直接来源：GFX_MAIN_DB_* 由 LauncherOptions 统一入口合并并做成对校验（见 LauncherOptionsMainDatabaseTests）；
+        // 仅半套环境变量且无配置节 / 无共享文件时按配置缺失报错
         WithEnvironmentVariables(new Dictionary<string, string?>
         {
             ["GFX_MAIN_DB_CONNECTION_STRING"] = "Host=half-set;Port=5432;Database=main;Username=u;Password=p;",
@@ -60,7 +62,7 @@ public class HostMainDbConnectionResolverTests
 
             var exception = Assert.Throws<InvalidOperationException>(() =>
                                                                          HostMainDbConnectionResolver.Resolve(configuration, CreateEmptyBaseDirectory()));
-            Assert.Contains("必须成对", exception.Message);
+            Assert.Contains("配置缺失", exception.Message);
         });
     }
 

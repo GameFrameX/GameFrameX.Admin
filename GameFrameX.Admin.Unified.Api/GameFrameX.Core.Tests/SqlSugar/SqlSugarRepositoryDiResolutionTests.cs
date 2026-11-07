@@ -60,7 +60,6 @@ public sealed class SqlSugarRepositoryDiResolutionTests : IDisposable
                .AddSingleton<IHttpContextAccessor>(new HttpContextAccessor())
                .AddSingleton<ICache>(new FakeCache())
                .AddSingleton<IOptions<CacheOptions>>(Options.Create(new CacheOptions()))
-               .AddSingleton<IOptions<DbConnectionOptions>>(Options.Create(new DbConnectionOptions()))
                .AddSingleton<SystemCacheService>()
                ;
     }

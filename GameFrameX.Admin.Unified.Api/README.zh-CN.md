@@ -177,7 +177,7 @@ GameFrameX.Admin.Unified.Api/
 
 - `GFX_MAIN_DB_TYPE=PostgreSQL` + `GFX_MAIN_DB_CONNECTION_STRING=Host=...`
 - 三宿主仅使用 `ConfigId=main`，单主库即全部数据库，不存在其他库的创建或推导。
-- 主库连接注入统一（低到高）：`Database.json` 兜底 &lt; 显式 `DbConnection` 配置节（appsettings / 环境变量 `DbConnection__...` / 命令行 `--DbConnection:...`）&lt; `GFX_MAIN_DB_*` 成对环境变量（docker `-e`）&lt; 成对裸启动参数 `--DbType PostgreSQL --ConnectionString "..."`（也支持 `=` 连写；必须成对）。
+- 主库连接注入统一（低到高）：`Database.json` 兜底 &lt; 显式 `DbConnection` 配置节 &lt; 启动参数（`LauncherOptions` 统一入口：`--DbType PostgreSQL --ConnectionString "..."` 与 `GFX_MAIN_DB_*` 环境变量同源，命令行优先，必须成对）。`DbConnectionOptions` 选项类已退役，装配与校验由 `LauncherOptions` + `MainDatabaseConnectionGuard` 直接承担。
 - 换其他数据库（MySQL / Oracle / 达梦……全部 34 种 DbType）的连接串写法与示例：[`GameFrameX.Application/Configuration/Database-ConnectionStrings.md`](GameFrameX.Application/Configuration/Database-ConnectionStrings.md)
 
 关于数据库，还有几个约定你要知道：

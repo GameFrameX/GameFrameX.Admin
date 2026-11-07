@@ -2,7 +2,7 @@ using GameFrameX.Application.Platform.DataBase.Dto;
 using GameFrameX.Core.Extension.Const;
 using GameFrameX.Core.Option;
 using GameFrameX.Core.SqlSugar;
-using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Configuration;
 
 namespace GameFrameX.Application.Platform.DataBase;
 
@@ -13,13 +13,21 @@ namespace GameFrameX.Application.Platform.DataBase;
 public class SystemDatabaseService : IAdminApiController
 {
     private readonly ISqlSugarClient _db;
-    private readonly DbConnectionOptions _dbConnectionOptions;
+    private readonly IConfiguration _configuration;
 
     public SystemDatabaseService(ISqlSugarClient db,
-        IOptions<DbConnectionOptions> dbConnectionOptions)
+        IConfiguration configuration)
     {
         _db = db;
-        _dbConnectionOptions = dbConnectionOptions.Value;
+        _configuration = configuration;
+    }
+
+    /// <summary>
+    /// 连接清单直接来自 DbConnection 配置节（单 main；与装配点同一来源）。
+    /// </summary>
+    private List<DbConnectionConfig> LoadConnectionConfigs()
+    {
+        return _configuration.GetSection("DbConnection:ConnectionConfigs").Get<List<DbConnectionConfig>>() ?? new List<DbConnectionConfig>();
     }
 
     /// <summary>
@@ -29,7 +37,7 @@ public class SystemDatabaseService : IAdminApiController
     [DisplayName("获取库列表")]
     public List<string> GetList()
     {
-        return _dbConnectionOptions.ConnectionConfigs.Select(u => u.ConfigId.ToString() ?? string.Empty).ToList();
+        return LoadConnectionConfigs().Select(u => u.ConfigId.ToString() ?? string.Empty).ToList();
     }
 
     /// <summary>
@@ -230,7 +238,7 @@ public class SystemDatabaseService : IAdminApiController
     /// </summary>
     private DbConnectionConfig GetValidConfig(string configId)
     {
-        return _dbConnectionOptions.ConnectionConfigs.FirstOrDefault(u => u.ConfigId.ToString() == configId) ?? throw BusinessError.Oh("数据库连接配置不存在");
+        return LoadConnectionConfigs().FirstOrDefault(u => u.ConfigId.ToString() == configId) ?? throw BusinessError.Oh("数据库连接配置不存在");
     }
 
     /// <summary>

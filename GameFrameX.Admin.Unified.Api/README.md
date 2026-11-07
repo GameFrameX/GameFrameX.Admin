@@ -177,7 +177,7 @@ Note: SQLite is for local development/debugging only. SQLite is forbidden in liv
 
 - `GFX_MAIN_DB_TYPE=PostgreSQL` + `GFX_MAIN_DB_CONNECTION_STRING=Host=...`
 - All three hosts use only `ConfigId=main`; the single main database is the entire database estate — no other databases are created or derived.
-- Database injection is unified (lowest to highest): `Database.json` fallback &lt; explicit `DbConnection` section (appsettings / env vars `DbConnection__...` / command line `--DbConnection:...`) &lt; paired `GFX_MAIN_DB_*` env vars (docker `-e`) &lt; paired bare startup arguments `--DbType PostgreSQL --ConnectionString "..."` (`=` joined form also works; must be provided as a pair).
+- Database injection is unified (lowest to highest): `Database.json` fallback &lt; explicit `DbConnection` section &lt; startup parameters (single `LauncherOptions` entry: `--DbType PostgreSQL --ConnectionString "..."` and `GFX_MAIN_DB_*` env vars share one entry, command line wins, must be paired). The `DbConnectionOptions` options class is retired; wiring and validation are handled by `LauncherOptions` + `MainDatabaseConnectionGuard` directly.
 - For other databases (MySQL / Oracle / DM… all 34 DbTypes), connection string syntax and examples: [`GameFrameX.Application/Configuration/Database-ConnectionStrings.md`](GameFrameX.Application/Configuration/Database-ConnectionStrings.md)
 
 A few more database conventions worth knowing:

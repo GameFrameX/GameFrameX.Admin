@@ -39,8 +39,6 @@ internal static class Program
 
         var builder = WebApplication.CreateBuilder(args);
 
-        // 主库连接成对裸启动参数（--DbType/--ConnectionString）以最高优先级进入配置管线
-        builder.Configuration.AddMainDatabaseStartupArguments(args);
         // builder.WebHost.UseUrls("http://0.0.0.0:20808");
 
         // 存档整档上行上限（原 Game.Api，C268 合并迁入）：26 分表整档一次上行峰值。
@@ -49,6 +47,9 @@ internal static class Program
         builder.WebHost.ConfigureKestrel(options => { options.Limits.MaxRequestBodySize = 64 * 1024 * 1024; });
 
         var launcherOptions = OptionsBuilder.CreateWithDebug<LauncherOptions>(args);
+
+        // 主库连接启动参数（--DbType/--ConnectionString 与 GFX_MAIN_DB_*，命令行优先）以最高优先级进入配置管线
+        builder.Configuration.AddMainDatabaseFromLauncherOptions(launcherOptions);
 
         if (builder.Environment.IsDevelopment())
         {

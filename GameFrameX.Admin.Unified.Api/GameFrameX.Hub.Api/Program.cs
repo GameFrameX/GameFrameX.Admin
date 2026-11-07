@@ -19,12 +19,13 @@ internal static class Program
 
         var builder = WebApplication.CreateBuilder(args);
 
-        // 主库连接成对裸启动参数（--DbType/--ConnectionString）以最高优先级进入配置管线
-        builder.Configuration.AddMainDatabaseStartupArguments(args);
         // builder.WebHost.UseUrls("http://0.0.0.0:20808");
         // builder.WebHost.UseSentry(options => { options.Dsn = "https://a680507a1eba0d3e2c458bc00b86d583@sentry.zilancreative.com/4"; });
 
         var launcherOptions = OptionsBuilder.CreateWithDebug<LauncherOptions>(args);
+
+        // 主库连接启动参数（--DbType/--ConnectionString 与 GFX_MAIN_DB_*，命令行优先）以最高优先级进入配置管线
+        builder.Configuration.AddMainDatabaseFromLauncherOptions(launcherOptions);
 
         // 共享启动装配（C261，GFX-668）：日志 / 雪花 / CORS / JWT / MVC / HealthChecks / Swagger 收敛至 Core Bootstrap
         builder.UseHostBootstrapLogging(launcherOptions);
