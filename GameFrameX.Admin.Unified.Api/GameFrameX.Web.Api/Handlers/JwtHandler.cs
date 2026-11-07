@@ -57,7 +57,7 @@ public class JwtHandler : AuthorizationHandler<AdminJwtRequirement>
     }
 
     /// <summary>
-    /// 权限校验核心逻辑（U6/C42 接口驱动版）。
+    /// 权限校验核心逻辑（接口驱动版）。
     /// <para>判定链：APP 模式放行 → 超管放行 → 端点 RoutePath 查权限目录 → 公开/白名单放行 →
     /// 空绑定拒绝 → 绑定按钮 MenuId 集 ∩ 用户已授权 MenuId 集 非空放行。</para>
     /// <para>授权令牌是按钮 MenuId（稳定），既非路径也非 routeName。详见 ApiEndpointCatalogSync。</para>

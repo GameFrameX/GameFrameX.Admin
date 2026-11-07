@@ -8,7 +8,7 @@ namespace GameFrameX.Client.Api.Services.GameLoginTicket;
 /// 数据库驱动的 Game 登录票据签名 Key 解析服务。
 /// <para>生产签名唯一路径为主库 RSA（<see cref="GameLoginTicketKeyEntity"/>）；首次签发自动建 key 的开关由运行票据策略 <see cref="IClientApiOptionsProvider"/> 控制。</para>
 /// <para>签名 key 默认永不过期（ExpireTime = null）；手动轮换时可指定到期日，到期后被查询自然排除。不再自动预生成轮换。</para>
-/// <para>HMAC fallback 随 C13 删除（P1 决策），不再保留兼容分支。</para>
+/// <para>HMAC fallback 随 删除（P1 决策），不再保留兼容分支。</para>
 /// </summary>
 public sealed class GameLoginTicketKeyResolver : IGameLoginTicketKeyResolver
 {
@@ -42,7 +42,7 @@ public sealed class GameLoginTicketKeyResolver : IGameLoginTicketKeyResolver
             throw new InvalidOperationException("Game login ticket signing key is not configured.");
         }
 
-        // C372（GFX-838）：签发读取边界解密（C371 起库内为密文；无前缀明文直通兼容存量行；
+        // ：签发读取边界解密（起库内为密文；无前缀明文直通兼容存量行；
         // 进程级密文缓存兜底，避免每次签发 PBKDF2 派生）
         var privateKeyPem = GameFrameX.Core.Service.Business.SecretCrypto.DecryptCached(keys[0].PrivateKeyPem);
         return GameLoginTicketSigningKey.CreateRsa(keys[0].Kid, privateKeyPem, keys[0].PublicKeyPem);

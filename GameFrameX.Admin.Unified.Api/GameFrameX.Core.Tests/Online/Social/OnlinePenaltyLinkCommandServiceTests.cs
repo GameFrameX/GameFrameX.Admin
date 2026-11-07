@@ -15,10 +15,10 @@ using GameFrameX.Foundation.Orm.Entity;
 using Microsoft.AspNetCore.Http;
 using SqlSugar;
 
-// S3/C401 断链修复点
+// / 断链修复点
 namespace GameFrameX.Core.Tests.Online.Social;
 
-// C350 / GFX-754（vault:C7、vault:C2 S1.4/S1.5）：处罚联动命令服务契约自检。
+//  / （vault:、vault: .4/.5）：处罚联动命令服务契约自检。
 // 覆盖：命令 action 三值映射（Kick→kick_player / Ban→revoke_token / Mute→mute_player）、
 // IdempotencyKey 稳定形态（penalty-{id}-{command}-{serverId}）、全区服处罚逐区服聚合、
 // 单区服失败（Online 业务码 / 传输层）不抛不回滚事实源、非 Active / 纯落账动作 / 全区服无目标拒绝。

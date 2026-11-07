@@ -3,20 +3,20 @@ using GameFrameX.Application.GmCenter.Console.Dto;
 using GameFrameX.Application.ServerCenter.Online;
 using GameFrameX.Core.Enum;
 
-// S3/C401 断链修复点
+// / 断链修复点
 namespace GameFrameX.Application.GmCenter.Console;
 
 /// <summary>
 /// Online 控制台受控操作命令服务（高危；权限码 onlineControlledCommand:execute 仅同步管理员角色）。
 /// <para>
-/// 路由前缀 /api/onlineControlledCommand（change C344 / vault:C9 S8.1）。
+/// 路由前缀 /api/onlineControlledCommand（change / vault: .1）。
 /// 只承载四条新命令（<see cref="OnlineControlledCommandKind"/> 严格四值），经 <see cref="IOnlineServerClient"/>
 /// 直调 Online 显式命令接口；命令 action 名唯一实现点集中本文件（守护测试 OnlineOverviewIsolationTests）。
 /// </para>
 /// <para>
-/// 受控操作复用矩阵（禁平行实现）：踢下线/封禁/禁言经 C342 后端半边落地的
-/// <c>OnlinePenaltyLinkCommandService</c>（/api/onlinePenaltyLinkCommand/execute，承载 C350 处罚联动域），
-/// 发放/撤销资产经 C340 <c>OnlineAssetGrantCommandService</c>（/api/onlineAssetGrantCommand/grant|revoke）
+/// 受控操作复用矩阵（禁平行实现）：踢下线/封禁/禁言经 后端半边落地的
+/// <c>OnlinePenaltyLinkCommandService</c>（api/onlinePenaltyLinkCommand/execute，承载 处罚联动域），
+/// 发放/撤销资产经 <c>OnlineAssetGrantCommandService</c>（api/onlineAssetGrantCommand/grant|revoke）
 /// ——控制台操作面板直调上述既有端点，本服务不转发、不重新实现；
 /// Online/Console 源码出现既有命令 token 即为违规（守护测试 + 既有白名单测试全域拦截）。
 /// </para>
@@ -41,22 +41,22 @@ public class OnlineControlledCommandService : IAdminApiController
     }
 
     /// <summary>
-    /// 取消匹配 Ticket 命令的 Online 管理 action 名（mock 先行，联调以 vault C9 详表为准）。
+    /// 取消匹配 Ticket 命令的 Online 管理 action 名（mock 先行，联调以 vault 详表为准）。
     /// </summary>
     private const string CancelMatchTicketAction = "cancel_match_ticket";
 
     /// <summary>
-    /// 结束异常 Match 命令的 Online 管理 action 名（mock 先行，联调以 vault C9 详表为准）。
+    /// 结束异常 Match 命令的 Online 管理 action 名（mock 先行，联调以 vault 详表为准）。
     /// </summary>
     private const string EndAbnormalMatchAction = "end_abnormal_match";
 
     /// <summary>
-    /// 暂停/恢复玩家命令的 Online 管理 action 名（mock 先行，联调以 vault C9 详表为准）。
+    /// 暂停/恢复玩家命令的 Online 管理 action 名（mock 先行，联调以 vault 详表为准）。
     /// </summary>
     private const string SuspendResumePlayerAction = "suspend_resume_player";
 
     /// <summary>
-    /// 匹配隔离命令的 Online 管理 action 名（mock 先行，联调以 vault C9 详表为准）。
+    /// 匹配隔离命令的 Online 管理 action 名（mock 先行，联调以 vault 详表为准）。
     /// </summary>
     private const string MatchIsolationAction = "match_isolation";
 
@@ -77,7 +77,7 @@ public class OnlineControlledCommandService : IAdminApiController
     /// <summary>
     /// 执行受控操作命令（高危端点）：四值命令路由 + 目标/方向校验 + 双人复核字段必填。
     /// <para>
-    /// 幂等语义（vault:C9 VC-8.4 / vault:C2 S1.5）：每次调用按
+    /// 幂等语义（vault: / vault: .5）：每次调用按
     /// <see cref="BuildIdempotencyKey"/> 规则派生 Online IdempotencyKey 下发——同一（命令, 方向, 目标, 区服）
     /// 组合的重复调用携带相同幂等键，Online 侧按契约返回首次执行结果，不产生第二次副作用；
     /// 因此网络重试 / 运营重复点击天然安全，失败可直接重试。
@@ -225,8 +225,8 @@ public class OnlineControlledCommandService : IAdminApiController
     /// 幂等键与下发命令在 Online 侧可按同一标识对账。
     /// 为什么方向参与幂等键：同一目标的「暂停」与「恢复」是两次独立命令意图，各自独立幂等——
     /// 若共享幂等键，恢复操作会被 Online 判定为重复调用而返回暂停的首次结果，开关语义反转。
-    /// 为什么区服参与幂等键：同一命令可能逐区服下发（与 C350 处罚联动幂等键口径一致）。
-    /// 重复执行语义（VC-8.4）：同键重复调用 Online 侧返回首次执行结果，不产生第二次副作用。
+    /// 为什么区服参与幂等键：同一命令可能逐区服下发（与 处罚联动幂等键口径一致）。
+    /// 重复执行语义：同键重复调用 Online 侧返回首次执行结果，不产生第二次副作用。
     /// </para>
     /// </summary>
     private static string BuildIdempotencyKey(string action, ControlledCommandDirection? direction, string targetIdentifier, long serverId)

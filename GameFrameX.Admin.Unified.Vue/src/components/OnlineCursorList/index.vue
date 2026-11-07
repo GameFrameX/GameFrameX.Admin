@@ -33,10 +33,10 @@
 
 <script lang="ts" setup>
 /**
- * Online 游标列表通用组件（C349 / GFX-756；C341/C342/C344 复用前置）。
+ * Online 游标列表通用组件（复用前置）。
  *
  * 与 crud-data-table（页码模型）互斥的独立组件：分页走 Cursor + HasMore 透传
- * （vault C2 S1.2），交互为「加载更多」；不做行去重/修补（重复即暴露服务端 bug）。
+ * （vault .2），交互为「加载更多」；不做行去重/修补（重复即暴露服务端 bug）。
  * 状态机见同目录 cursorPager.ts（纯逻辑，node --test 单测覆盖）。
  */
 import { reactive, ref } from 'vue'

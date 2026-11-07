@@ -92,7 +92,7 @@ public class GameLoginTicketKeyService : BaseService<GameLoginTicketKeyEntity>
             await Repository.InsertAsync(entity);
             await MarkOldKeyRotatedAsync(entity.Id, now, oldKeyExpireTime);
 
-            // 审计（C373）：密钥生命周期操作结构化审计行；DB 操作日志管线断链期先落应用日志，管线修复后统一接入
+            // 审计：密钥生命周期操作结构化审计行；DB 操作日志管线断链期先落应用日志，管线修复后统一接入
             LogHelper.Info($"[KeyAudit] action=TicketKeyRotate newKid={entity.Kid} oldKeyExpireTime={oldKeyExpireTime} operator={_currentUserContext.Account}");
         }
     }
@@ -103,7 +103,7 @@ public class GameLoginTicketKeyService : BaseService<GameLoginTicketKeyEntity>
     public const int OldKeyDefaultExpireSeconds = 7 * 24 * 3600;
 
     /// <summary>
-    /// 旧钥退场上限窗口：30 天（对齐票据固定到期 30 天上限口径，C142）。
+    /// 旧钥退场上限窗口：30 天（对齐票据固定到期 30 天上限口径）。
     /// </summary>
     public const int OldKeyMaxExpireSeconds = 30 * 24 * 3600;
 

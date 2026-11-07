@@ -10,8 +10,8 @@ using GameFrameX.Entity.Game.Online;
 namespace GameFrameX.Entity.Business.Game.Online;
 
 /// <summary>
-/// 玩家分群定义。Admin 是分群定义的事实源（编排），Online 侧按其事件数据解释与命中判定（vault:C8 S7.5/S7.8）。
-/// <para>条件字段白名单（活跃天数 / 留存天数 / 累计付费金额三族起步，锚定 S7.5 标准事件族）集中登记于
+/// 玩家分群定义。Admin 是分群定义的事实源（编排），Online 侧按其事件数据解释与命中判定（vault: .5/.8）。
+/// <para>条件字段白名单（活跃天数 / 留存天数 / 累计付费金额三族起步，锚定 .5 标准事件族）集中登记于
 /// <c>OnlineRolloutSemanticMap</c>，本实体只承载 JSON 表达式不解释语义；同步状态反映最近一次 syncOnline 结果。</para>
 /// </summary>
 [SugarTable(null, "玩家分群定义")]
@@ -34,7 +34,7 @@ public class GameOnlinePlayerSegmentEntity : EntityBasic
 
     /// <summary>
     /// 分群条件表达式 JSON（字段 - 操作符 - 值 数组）。字段名必须在 <c>OnlineRolloutSemanticMap</c> 白名单内，
-    /// Admin 不解释条件语义（解释权在 Online 侧，命中记录可查 VC-7.11）。
+    /// Admin 不解释条件语义（解释权在 Online 侧，命中记录可查 .11）。
     /// </summary>
     [SugarColumn(ColumnDescription = "分群条件JSON", ColumnDataType = StaticConfig.CodeFirst_BigString, IsNullable = true)]
     public string? ConditionsJson { get; set; }

@@ -33,8 +33,8 @@ public class GameAreaService : GenericCrudSelectService<Entity.Business.Game.Gam
     /// </summary>
     protected override ISugarQueryable<GameAreaResponse> BuildPageQuery(PageGameAreaEntityRequest input)
     {
-        // 区服启用标记 C301 起归一基类 IsEnabled，会被全局 ISafeEnabledFilter 隐藏禁用行；
-        // 管理列表必须能看到禁用区服（否则无法重新启用，参照 GameAppPackageService 的 C67 FixPattern），
+        // 区服启用标记 起归一基类 IsEnabled，会被全局 ISafeEnabledFilter 隐藏禁用行；
+        // 管理列表必须能看到禁用区服（否则无法重新启用，参照 GameAppPackageService 的 FixPattern），
         // 故绕过全部过滤器并手动补软删条件。
         // 注意：Filter(null, true) 必须放在 LeftJoin 之后——SqlSugar 的 Filter 状态不随 join 链传递，
         // 放 join 前会被 join 重置（实测禁用行被 ISafeEnabledFilter 过滤），放 join 后才对整个查询生效。
@@ -46,7 +46,7 @@ public class GameAreaService : GenericCrudSelectService<Entity.Business.Game.Gam
                          .WhereIF(input.IsRecommend.HasValue, u => u.IsRecommend == input.IsRecommend.Value)
                          .WhereIF(input.IsEnabled.HasValue, u => u.IsEnabled == input.IsEnabled.Value)
                          .WhereIF(input.Language.HasValue, u => u.Language == input.Language.Value)
-                         // C301：分類名改用子查询取值。原 LeftJoin 形态下 SqlSugar 的 Filter/ClearFilter 均不生效
+                         // ：分類名改用子查询取值。原 LeftJoin 形态下 SqlSugar 的 Filter/ClearFilter 均不生效
                          //（join 查询不吃 queryable 级过滤器开关，实测禁用行被 ISafeEnabledFilter 隐藏），
                          // 改单表 + SqlFunc.Subqueryable 后 Filter(null, true) 才能对主查询生效。
                          .Select(u => new GameAreaResponse
@@ -97,7 +97,7 @@ public class GameAreaService : GenericCrudSelectService<Entity.Business.Game.Gam
 
 
     /// <summary>
-    /// 按 Id 取区服（含禁用行）。启用标记在基类 IsEnabled（C301 归一）后受全局 ISafeEnabledFilter 过滤，
+    /// 按 Id 取区服（含禁用行）。启用标记在基类 IsEnabled（归一）后受全局 ISafeEnabledFilter 过滤，
     /// 管理/转发操作必须触达禁用区服，故按 FixPattern 绕过全部过滤器并手动补软删条件。
     /// </summary>
     private async Task<Entity.Business.Game.GameAreaEntity> GetAreaForManagementAsync(long id)
@@ -109,7 +109,7 @@ public class GameAreaService : GenericCrudSelectService<Entity.Business.Game.Gam
     }
 
     /// <summary>
-    /// 详情：绕过全局过滤器读取（禁用区服 IsEnabled=false 会被 ISafeEnabledFilter 隐藏，详情页必须可见，C301）。
+    /// 详情：绕过全局过滤器读取（禁用区服 IsEnabled=false 会被 ISafeEnabledFilter 隐藏，详情页必须可见）。
     /// </summary>
     [HttpGet(CrudActionRoutes.Detail)]
     [DisplayName("区服详情")]
@@ -143,7 +143,7 @@ public class GameAreaService : GenericCrudSelectService<Entity.Business.Game.Gam
     }
 
     /// <summary>
-    /// 归一化区服 Server HTTP 接口前缀（来源 change C175）：Trim 空白与首尾斜杠；
+    /// 归一化区服 Server HTTP 接口前缀（来源 change）：Trim 空白与首尾斜杠；
     /// <para>ClientDispatch/Fulfillment 空值回填默认 <c>game/api</c>（保证历史路径不回归）；Gm/Control 允许空（空表示不构造对应能力 URL）。</para>
     /// </summary>
     private static void NormalizeEndpointPrefixes(GameAreaBaseRequest input)
@@ -193,7 +193,7 @@ public class GameAreaService : GenericCrudSelectService<Entity.Business.Game.Gam
         }
 
         await Repository.FakeDeleteAsync(entity); //假删除
-        //await Repository.DeleteAsync(entity);   //真删除
+        //await Repository.DeleteAsync(entity); //真删除
     }
 
     /// <summary>
@@ -269,7 +269,7 @@ public class GameAreaService : GenericCrudSelectService<Entity.Business.Game.Gam
         }
         //
         // await Repository.FakeDeleteAsync(entity); //假删除
-        // //await Repository.DeleteAsync(entity);   //真删除
+        // //await Repository.DeleteAsync(entity); //真删除
     }
 
     /// <summary>

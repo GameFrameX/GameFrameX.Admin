@@ -13,11 +13,11 @@ using GameFrameX.Payment.Apple.Option;
 namespace GameFrameX.Payment.Apple.Refund;
 
 /// <summary>
-/// Apple 退款管理器（C310 / GFX-718）。
+/// Apple 退款管理器。
 /// <para>Apple 政策：退款由用户发起、App Store 裁决，商家无主动退款 API——RefundAsync 显式失败（不静默缺失）。</para>
 /// <para>可用能力：退款历史查询（App Store Server API v2 /inApps/v2/refund/lookup）与消费信息上报
-/// （/inApps/v2/transactions/consumption，用户申请退款时辅助 Apple 裁决）。</para>
-/// <para>苹果双轨架构不变（C271：旧 verifyReceipt 与 AppStoreServer 并行），本实现只走 AppStoreServer 轨道。</para>
+/// （inApps/v2/transactions/consumption，用户申请退款时辅助 Apple 裁决）。</para>
+/// <para>苹果双轨架构不变（旧 verifyReceipt 与 AppStoreServer 并行），本实现只走 AppStoreServer 轨道。</para>
 /// </summary>
 public sealed class AppleRefundManager : IRefundManager
 {
@@ -84,7 +84,7 @@ public sealed class AppleRefundManager : IRefundManager
     }
 
     /// <summary>
-    /// 发送消费信息（/inApps/v2/transactions/consumption）：用户申请退款时上报道具已正常发放，辅助 Apple 裁决。
+    /// 发送消费信息（inApps/v2/transactions/consumption）：用户申请退款时上报道具已正常发放，辅助 Apple 裁决。
     /// </summary>
     public async Task<PaymentChannelRefundResponse> SendConsumptionInformationAsync(RefundOrderContext context, IPaymentOptionSetting optionSetting, HttpClient httpClient)
     {

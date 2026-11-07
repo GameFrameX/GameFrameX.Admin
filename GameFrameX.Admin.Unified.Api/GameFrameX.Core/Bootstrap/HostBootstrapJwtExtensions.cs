@@ -4,7 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 namespace GameFrameX.Core.Bootstrap;
 
 /// <summary>
-/// 静态 JWT Bearer 鉴权注册扩展（C261，GFX-668）：收敛 Hub Program.cs 内联的
+/// 静态 JWT Bearer 鉴权注册扩展：收敛 Hub Program.cs 内联的
 /// TokenValidationParameters 手写装配（约 35 行）。Admin host 走动态平台 JWT（<c>AddPlatformJwt</c>），不适用本扩展。
 /// </summary>
 public static class HostBootstrapJwtExtensions

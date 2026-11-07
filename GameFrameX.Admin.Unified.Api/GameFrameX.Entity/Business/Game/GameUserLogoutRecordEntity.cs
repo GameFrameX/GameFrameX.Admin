@@ -3,7 +3,7 @@ using GameFrameX.Entity.Base;
 namespace GameFrameX.Entity.Business.Game;
 
 /// <summary>
-/// 游戏玩家登出记录（C8：BLMarkLogout 自建；仅删号成功后上报，在线统计用）
+/// 游戏玩家登出记录（BLMarkLogout 自建；仅删号成功后上报，在线统计用）
 /// </summary>
 [SugarTable(null, "游戏玩家登出记录")]
 [BusinessTable]

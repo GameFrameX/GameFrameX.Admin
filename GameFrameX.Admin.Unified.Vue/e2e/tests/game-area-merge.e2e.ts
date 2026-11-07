@@ -60,7 +60,7 @@ test('合服向导：取消计划释放区服并允许同范围再次建计划',
 test('合服向导：真实登录、预演、双人复核、执行与源服退场', async ({ browser }) => {
   const targetName = process.env.E2E_MERGE_TARGET_NAME;
   const sourceNames: string[] = JSON.parse(process.env.E2E_MERGE_SOURCE_NAMES ?? '[]');
-  // C406 第 2 轮（R6）：复核人由 setup 在「账号管理」真实界面创建并重置口令（产品路径），
+  //  第 2 轮：复核人由 setup 在「账号管理」真实界面创建并重置口令（产品路径），
   // 凭证优先取环境变量，回落 setup 写入的 state 文件；不再直接写库造账号。
   const reviewer = process.env.E2E_MERGE_REVIEWER_ACCOUNT && process.env.E2E_MERGE_REVIEWER_PASSWORD
     ? { account: process.env.E2E_MERGE_REVIEWER_ACCOUNT, password: process.env.E2E_MERGE_REVIEWER_PASSWORD }

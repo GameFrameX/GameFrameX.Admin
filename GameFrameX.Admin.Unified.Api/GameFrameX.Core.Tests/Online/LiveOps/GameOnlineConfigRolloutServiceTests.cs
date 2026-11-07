@@ -17,7 +17,7 @@ using SqlSugar;
 
 namespace GameFrameX.Core.Tests.Online.LiveOps;
 
-// C343 / GFX-755（vault:C8 S7.7-S7.8 / VC-7.12）：配置灰度版本行服务测试（fake 单一入口，联调延后）。
+//  / （vault: .7-.8 / .12）：配置灰度版本行服务测试（fake 单一入口，联调延后）。
 // 覆盖：Percent 边界（0 拒 / 101 拒 / 1 与 100 收）、ConfigKey 数字校验、分群未同步拒绝、
 // 版本递增分配 + 旧生效行置 RolledBack、回滚 = 版本化新行（TargetVersion 指向恢复目标 + 语义字段拷贝）、
 // 回滚目标不存在拒绝、下发失败删行重抛（不留半生效审计行）。

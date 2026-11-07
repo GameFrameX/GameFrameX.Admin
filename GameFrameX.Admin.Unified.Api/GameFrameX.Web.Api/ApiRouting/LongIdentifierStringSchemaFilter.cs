@@ -5,7 +5,7 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 namespace GameFrameX.Web.Api.ApiRouting;
 
 /// <summary>
-/// Swashbuckle schema 过滤器：让 OpenAPI 契约与 ProjectJsonSerializerOptions 的 long→string 运行时契约一致（C270）。
+/// Swashbuckle schema 过滤器：让 OpenAPI 契约与 ProjectJsonSerializerOptions 的 long→string 运行时契约一致。
 /// </summary>
 /// <remarks>
 /// 序列化层对"属性名以 Id 结尾的 long"启用 <c>NumberHandling.WriteAsString</c>（响应输出字符串，雪花 Id 防 JS 超 2^53 丢精度），

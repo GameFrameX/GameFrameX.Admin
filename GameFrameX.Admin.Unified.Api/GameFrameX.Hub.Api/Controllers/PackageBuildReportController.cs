@@ -11,7 +11,7 @@ namespace GameFrameX.Hub.Api.Controllers;
 
 /// <summary>
 /// 打包上报控制器。
-/// <para>机器对机器调用（打包机 / CI / 流水线），由 <see cref="GameAppOpenAccessAuthMiddleware"/> 鉴权（非 JWT），故标记 <c>[AllowAnonymous]</c>（C236 起 JWT 默认鉴权由各控制器显式 <c>[Authorize]</c> 承担，本控制器不参与）。</para>
+/// <para>机器对机器调用（打包机 / CI / 流水线），由 <see cref="GameAppOpenAccessAuthMiddleware"/> 鉴权（非 JWT），故标记 <c>[AllowAnonymous]</c>（起 JWT 默认鉴权由各控制器显式 <c>[Authorize]</c> 承担，本控制器不参与）。</para>
 /// <para>分包 Id 驱动：查分包解析 <c>PackageName / PlatformCode / ChannelCode</c>，校验分包存在且启用，
 /// 资源包 → <see cref="GameAppAssetPackageVersionEntity"/>，整包 → <see cref="GameAppReleaseVersionEntity"/>，幂等 upsert（存在则更新，否则新增）。</para>
 /// <para>遵循 Hub.Api Controller 惯例（Repository 直接操作 Entity，不调 Application Service），故未提层 ScopeValidator / 未复用 Application.RemoteConfig 的 CheckXxxUnique —— Controller 自写归属与查重。</para>

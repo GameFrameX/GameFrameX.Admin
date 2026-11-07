@@ -355,7 +355,7 @@ export default {
             propCount: '수량',
         },
 
-        // Mail Campaign module (운영 메일 캠페인 / C135 / GFX-142)
+        // Mail Campaign module (운영 메일 캠페인 / / )
         mailCampaign: {
             add: '운영 메일 캠페인 추가',
             edit: '운영 메일 캠페인 편집',

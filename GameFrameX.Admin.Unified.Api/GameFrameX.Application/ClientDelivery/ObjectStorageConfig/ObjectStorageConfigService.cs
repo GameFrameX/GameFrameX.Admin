@@ -65,7 +65,7 @@ public class ObjectStorageConfigService
 #pragma warning disable CS8625 // 第 4 参数 existingConfigJson=null 表示新增场景无旧值，跨项目方法签名不可改
         entity.ConfigJson = ObjectStorageConfigNormalizer.Normalize(_schemaProvider, provider, input.ConfigJson ?? string.Empty, null);
 #pragma warning restore CS8625
-        // 凭证静态加密收口（C370）：规范化之后、落库之前对 schema 敏感字段加密
+        // 凭证静态加密收口：规范化之后、落库之前对 schema 敏感字段加密
         entity.ConfigJson = ObjectStorageConfigCrypto.EncryptConfigJson(provider, entity.ConfigJson);
 
         await ActiveConfigTransitionLock.WaitAsync();
@@ -117,7 +117,7 @@ public class ObjectStorageConfigService
         entity.IsEnabled = input.IsEnabled;
         entity.Remark = input.Remark;
         entity.ConfigJson = ObjectStorageConfigNormalizer.Normalize(_schemaProvider, entity.Provider, input.ConfigJson ?? string.Empty, entity.ConfigJson);
-        // 凭证静态加密收口（C370）：Normalize 的 ****** 保留语义从旧值（密文）取回的仍是密文，Encrypt 幂等跳过；新明文字段在此加密
+        // 凭证静态加密收口：Normalize 的 ****** 保留语义从旧值（密文）取回的仍是密文，Encrypt 幂等跳过；新明文字段在此加密
         entity.ConfigJson = ObjectStorageConfigCrypto.EncryptConfigJson(entity.Provider, entity.ConfigJson);
         entity.RowVersion = input.RowVersion;
 

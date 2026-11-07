@@ -1,10 +1,10 @@
 /**
- * OnlineCursorList 游标分页纯逻辑状态机（C349 / GFX-756，C340 前端半边）。
+ * OnlineCursorList 游标分页纯逻辑状态机（前端半边）。
  *
- * 契约（vault C2 S1.2 定稿 + C340 §3）：Online 域查询分页统一 `Cursor + HasMore`，
+ * 契约（vault .2 定稿 +）：Online 域查询分页统一 `Cursor + HasMore`，
  * 禁页码偏移。本模块只做状态搬运：
- *   - append / reset / cursor 透传 / hasMore 终止；
- *   - 不去重、不修补——重复或漏项是服务端 bug，必须原样暴露给 UI 与测试（透传原则）。
+ *  - append / reset / cursor 透传 / hasMore 终止；
+ *  - 不去重、不修补——重复或漏项是服务端 bug，必须原样暴露给 UI 与测试（透传原则）。
  * 无外部依赖：Vue 组件与 node --test 单测（cursorPager.test.mjs）共用本文件。
  */
 

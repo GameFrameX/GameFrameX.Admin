@@ -45,7 +45,7 @@ public sealed class PublicCallbackRouteResolver
             packageId = parsedPackageId;
         }
 
-        // 纵深防御（R5）：广告回调路由已改为必填 {packageId:long}，缺段请求在路由层即 404；
+        // 纵深防御：广告回调路由已改为必填 {packageId:long}，缺段请求在路由层即 404；
         // 此分支保证不变量在解析层同样成立——未来若再出现可选 packageId 的广告端点或测试直调本解析器，仍 fail-closed 拒绝
         if (!packageId.HasValue && string.Equals(endpoint.CallbackKind, "ad", StringComparison.OrdinalIgnoreCase))
         {

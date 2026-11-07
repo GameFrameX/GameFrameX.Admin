@@ -113,7 +113,7 @@ const loadEnums = async () => {
 }
 loadEnums()
 
-// Load app dictionary for app context column/filter (shared, idempotent — GFX-78/C96)
+// Load app dictionary for app context column/filter (shared, idempotent — /)
 // Open add dialog
 const openAddGameAreaEntity = () => {
   editGameAreaEntityTitle.value = t('message.gameBusiness.area.addArea')

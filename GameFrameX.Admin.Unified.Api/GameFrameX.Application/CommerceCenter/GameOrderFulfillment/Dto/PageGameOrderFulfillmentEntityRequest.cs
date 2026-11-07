@@ -3,7 +3,7 @@ using GameFrameX.Entity.Enum;
 namespace GameFrameX.Application.CommerceCenter.GameOrderFulfillment.Dto;
 
 /// <summary>
-/// 权益发货账本分页查询输入参数（C120）。过滤字段严格锁定见 change C120 §3 BuildPageQuery 表。
+/// 权益发货账本分页查询输入参数。过滤字段严格锁定见 change BuildPageQuery 表。
 /// </summary>
 public class PageGameOrderFulfillmentEntityRequest : BaseAreaPageRequest
 {

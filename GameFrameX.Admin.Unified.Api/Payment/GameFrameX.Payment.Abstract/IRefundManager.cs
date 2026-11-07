@@ -9,7 +9,7 @@ using GameFrameX.Payment.Abstract.Models;
 namespace GameFrameX.Payment.Abstract;
 
 /// <summary>
-/// 渠道退款管理器统一契约（C310 / GFX-718，恢复并升级自 7c23840c 之前的 IRefundManager）。
+/// 渠道退款管理器统一契约（恢复并升级自 7c23840c 之前的 IRefundManager）。
 /// <para>所有支付渠道（Apple / Google / Xsolla / 支付宝）必须提供实现；官方不支持商家主动退款的渠道
 /// （Apple：退款由用户发起、App Store 裁决；Google：Android Publisher API 无主动退款端点）
 /// 以 <see cref="SupportsProactiveRefund"/> = false 显式声明，调用方据此走统一错误路径，而不是静默缺失。</para>

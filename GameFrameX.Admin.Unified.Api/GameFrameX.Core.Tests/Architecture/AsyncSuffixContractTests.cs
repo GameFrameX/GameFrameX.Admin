@@ -2,11 +2,11 @@ using System.Reflection;
 
 namespace GameFrameX.Core.Tests.Architecture;
 
-// C289（GFX-696）异步命名规范守护：非豁免程序集中 public/internal 方法返回 Task/ValueTask（含泛型）
-// 必须以 Async 结尾。豁免清单与 gfx-doc C289 change.md 同源：
-//   - 程序集级：Core.Tests（测试方法）、Client.Api / Hub.Api（Controller action + SignalR Hub 是对外协议面，
-//     [Route("api/[controller]/[action]")] 下方法名即路由段，改名即变路由）；
-//   - 类型级：Payment.Apple.AppStoreServer.AppStoreServerApiClient（Apple 官方移植代码，最小 diff 原则）。
+// 异步命名规范守护：非豁免程序集中 public/internal 方法返回 Task/ValueTask（含泛型）
+// 必须以 Async 结尾。豁免清单与 gfx-doc change.md 同源：
+//  - 程序集级：Core.Tests（测试方法）、Client.Api / Hub.Api（Controller action + SignalR Hub 是对外协议面，
+//  [Route("api/[controller]/[action]")] 下方法名即路由段，改名即变路由）；
+//  - 类型级：Payment.Apple.AppStoreServer.AppStoreServerApiClient（Apple 官方移植代码，最小 diff 原则）。
 // 接口方法经接口声明本身检查（接口方法 IsPublic）；显式接口实现（private 可见性）由接口侧覆盖。
 // 新增豁免必须先在本测试登记并在 change 文档记录理由。
 public sealed class AsyncSuffixContractTests
@@ -20,7 +20,7 @@ public sealed class AsyncSuffixContractTests
 
     private static readonly HashSet<string> ExemptTypeMetadataNames = new(StringComparer.Ordinal)
     {
-        // Apple 官方移植代码，最小 diff 移植原则（C289 豁免清单）
+        // Apple 官方移植代码，最小 diff 移植原则（豁免清单）
         "GameFrameX.Payment.Apple.AppStoreServer.AppStoreServerApiClient",
     };
 
@@ -66,7 +66,7 @@ public sealed class AsyncSuffixContractTests
 
                 foreach (var method in type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly))
                 {
-                    // 守护口径与 C289 规范一致：public / internal / protected internal
+                    // 守护口径与 规范一致：public / internal / protected internal
                     if (!method.IsPublic && !method.IsAssembly && !method.IsFamilyOrAssembly)
                     {
                         continue;

@@ -134,29 +134,29 @@ public abstract class GameAreaBaseRequest : BaseUpdateRequest
     public string ServerParams { get; set; } = string.Empty;
 
     /// <summary>
-    /// 客户端转发 Server HTTP 路由前缀（来源 change C150 §3.2 / C175）。
+    /// 客户端转发 Server HTTP 路由前缀（来源 change /）。
     /// <para>Client API 代理玩家普通请求（建角、改名、查角色、创建订单等）的 Server HTTP 路由前缀，默认 <c>game/api</c>。</para>
     /// </summary>
     public string ClientDispatchApiPrefix { get; set; } = "game/api";
 
     /// <summary>
-    /// 履约投递 Server HTTP 路由前缀（来源 change C150 §3.2 / C175）。
+    /// 履约投递 Server HTTP 路由前缀（来源 change /）。
     /// <para>后台履约、发货、退款、邮件投递、广告奖励、Campaign 发布、后台运营操作等资产或运营投递的前缀，默认 <c>game/api</c>。</para>
     /// </summary>
     public string FulfillmentApiPrefix { get; set; } = "game/api";
 
     /// <summary>
-    /// GM 命令 Server HTTP 路由前缀（来源 change C150 §3.2 / C175）。默认空，空表示 Admin 不构造 GM URL。
+    /// GM 命令 Server HTTP 路由前缀（来源 change /）。默认空，空表示 Admin 不构造 GM URL。
     /// </summary>
     public string GmApiPrefix { get; set; } = string.Empty;
 
     /// <summary>
-    /// 管理控制 Server HTTP 路由前缀（来源 change C150 §3.2 / C175）。默认空，空表示 Admin 不构造控制 URL。
+    /// 管理控制 Server HTTP 路由前缀（来源 change /）。默认空，空表示 Admin 不构造控制 URL。
     /// </summary>
     public string ControlApiPrefix { get; set; } = string.Empty;
 
     /// <summary>
-    /// 是否允许客户端调试 GM 通道（来源 change C150 §3.2 / C175）。仅 Admin 配置标记，最终放行由 Game Server 启动参数与环境门禁决定，默认关闭。
+    /// 是否允许客户端调试 GM 通道（来源 change /）。仅 Admin 配置标记，最终放行由 Game Server 启动参数与环境门禁决定，默认关闭。
     /// </summary>
     public bool EnableClientGmApi { get; set; }
 }

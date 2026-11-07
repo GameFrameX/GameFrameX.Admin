@@ -17,9 +17,9 @@ using Microsoft.Extensions.Logging;
 namespace GameFrameX.Core.Logging;
 
 /// <summary>
-/// Monitor 日志采集中间件（C363 重建，字段面等价历史框架 LoggingMonitor）：action 执行后产出携带
+/// Monitor 日志采集中间件（重建，字段面等价历史框架 LoggingMonitor）：action 执行后产出携带
 /// <c>loggingMonitor</c> context 的日志消息并投递调度队列，由 <see cref="LoggingDispatchService"/> 分发到
-/// 文件 / 数据库（<see cref="DatabaseLoggingWriter"/> 三表分流 + C156 分表路由）/ ES 写入器。
+/// 文件 / 数据库（<see cref="DatabaseLoggingWriter"/> 三表分流 + 分表路由）/ ES 写入器。
 /// <para>语义依据：lesson 2026-07-11 三表分流（userInfo/logout 仅进 visit、异常进 exception、其余进 operation 且受
 /// sys_oplog 门控）依赖本中间件产出的 <c>actionName</c>（路由段，如 userInfo/logout）与 <c>actionTypeName</c>
 /// （方法名去 Async 后缀，如 Login）双字段；数据校验失败（validation）不落库。</para>

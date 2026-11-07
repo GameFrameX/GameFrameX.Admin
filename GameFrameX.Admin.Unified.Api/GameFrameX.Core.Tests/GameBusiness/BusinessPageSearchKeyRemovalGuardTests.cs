@@ -1,18 +1,18 @@
 namespace GameFrameX.Core.Tests.GameBusiness;
 
 /// <summary>
-/// 业务分页 SearchKey 重复过滤删除守护（C329 / GFX-739）。B佬 2026-09-10 拍板：业务分页查询
+/// 业务分页 SearchKey 重复过滤删除守护。B佬 2026-09-10 拍板：业务分页查询
 /// 只保留明确条件字段，与同列明确字段（Name/Title 等）模糊查询等价的 SearchKey 分支全部删除
 /// （16 个 Service + GameRole/GameUser 分页 DTO 去遮蔽 + TimeJob 补 Name 明确条件，main eec47f0d 落地）。
-/// <para>与日志侧 <c>LogPageSearchKeyFilterTests</c>（C327 / GFX-737，日志页 searchKey 是唯一模糊条件，保留）
+/// <para>与日志侧 <c>LogPageSearchKeyFilterTests</c>（日志页 searchKey 是唯一模糊条件，保留）
 /// 合成完整策略锁定。本守护为源码扫描：防止新增/复制 Service 时同列重复的 SearchKey 过滤回潮。</para>
 /// <para>保留项不受本守护约束：3 个 Service 的 SelectAsync 下拉搜索 searchKey（GameAppAssetPackage /
 /// GameAppAssetPackageVersion / GameAppPackage）；页面无明确名称字段、关键词为唯一模糊条件的分页
-/// （等同日志判例，见 C329 notes.md 审计表）。</para>
+/// （等同日志判例，见 notes.md 审计表）。</para>
 /// </summary>
 public sealed class BusinessPageSearchKeyRemovalGuardTests
 {
-    /// <summary>GFX-739 清理触及的 17 个 Service（16 个删重复 SearchKey WhereIF + TimeJob 补 Name 条件）。</summary>
+    /// <summary> 清理触及的 17 个 Service（16 个删重复 SearchKey WhereIF + TimeJob 补 Name 条件）。</summary>
     private static readonly string[] CleanedServices =
     {
         "GameAnnouncementService",

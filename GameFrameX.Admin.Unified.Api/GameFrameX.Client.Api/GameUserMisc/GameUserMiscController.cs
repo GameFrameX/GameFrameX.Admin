@@ -5,7 +5,7 @@ using GameFrameX.Core.Service;
 namespace GameFrameX.Client.Api.GameUserMisc;
 
 /// <summary>
-/// 游戏杂项控制器（C8：BLMarkLogout / BLRandomRobots 自建）
+/// 游戏杂项控制器（BLMarkLogout / BLRandomRobots 自建）
 /// <para>路由：POST /api/GameUserMisc/{Action}（继承 BaseController 基类路由）。</para>
 /// </summary>
 public class GameUserMiscController : BaseController

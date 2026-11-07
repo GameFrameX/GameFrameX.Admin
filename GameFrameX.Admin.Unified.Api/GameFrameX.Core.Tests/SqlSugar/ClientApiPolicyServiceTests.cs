@@ -8,10 +8,10 @@ using GameFrameX.Entity.Business.ClientApiConfig;
 
 namespace GameFrameX.Core.Tests.SqlSugar;
 
-// C378（GFX-838）+ C368/C371 组合：合并表写路径语义。
-// change：gfx-doc/dev/game-business/changes/C378-client-api-policy-merge/change.md
+// + / 组合：合并表写路径语义。
+// change：gfx-doc/dev/game-business/changes/-client-api-policy-merge/change.md
 // AddAsync 空白 SigningKey → 服务端生成 64-hex；策略行作用域唯一；
-// 票据固定到期时间 30 天上限（C142）；UpdateAsync <c>******</c> 与空白同义保留原值（C368）。
+// 票据固定到期时间 30 天上限；UpdateAsync <c>******</c> 与空白同义保留原值。
 public sealed class ClientApiPolicyServiceTests : IDisposable
 {
     private readonly ClientApiTestDb _db = new();
@@ -97,7 +97,7 @@ public sealed class ClientApiPolicyServiceTests : IDisposable
         var service = CreateService();
         var created = await service.AddAsync(new AddClientApiPolicyRequest { SigningKey = "original-key", });
 
-        // 空白与掩码同义（C368）
+        // 空白与掩码同义
         await service.UpdateAsync(new UpdateClientApiPolicyRequest
         {
             Id = created.Id,

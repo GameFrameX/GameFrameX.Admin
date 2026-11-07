@@ -363,7 +363,7 @@ public class GameOrderShipService
     }
 
     /// <summary>
-    /// 构造权益发货幂等键。规则见 change C113 §3。
+    /// 构造权益发货幂等键。规则见 change。
     /// </summary>
     private static string BuildFulfillmentIdempotencyKey(FulfillmentTypeEnum type, Entity.Business.Game.GameOrderEntity order, long operatorId)
     {

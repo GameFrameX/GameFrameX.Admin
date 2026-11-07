@@ -1,7 +1,7 @@
 namespace GameFrameX.Core.Service.PlatformPasswordPolicy.Dto;
 
 /// <summary>
-/// 平台密码策略配置输出（C173）。仅暴露密码强度策略字段，绝不回显 Cryptogram 密钥（CryptoType/PublicKey/PrivateKey）。
+/// 平台密码策略配置输出。仅暴露密码强度策略字段，绝不回显 Cryptogram 密钥（CryptoType/PublicKey/PrivateKey）。
 /// </summary>
 public sealed class PlatformPasswordPolicyConfigResponse
 {

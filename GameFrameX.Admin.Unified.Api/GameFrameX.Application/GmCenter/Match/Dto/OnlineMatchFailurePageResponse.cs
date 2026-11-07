@@ -1,7 +1,7 @@
 namespace GameFrameX.Application.GmCenter.Match.Dto;
 
 /// <summary>
-/// 匹配失败原因分页响应（change C341 §3 A0 字段终版：Items/ReasonSummary/NextCursor/HasMore + ServerTime）。
+/// 匹配失败原因分页响应（字段终版：Items/ReasonSummary/NextCursor/HasMore + ServerTime）。
 /// </summary>
 public class OnlineMatchFailurePageResponse
 {

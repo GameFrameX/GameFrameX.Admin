@@ -34,7 +34,7 @@
 
 このシステムは汎用 OA / CRM / モールシステムでは**ありません**。メニュー、権限、辞書、フォーム、クライアント設定などは、すべて「ゲーム管理画面」という実際の業務シナリオに沿って設計されています。
 
-本プロジェクトは [Admin.NET](https://gitee.com/zuohuaijun/Admin.NET) をベースに開発しており、Furion フレームワークの残存コードと旧 Admin.NET の業務命名は、すべて置換とベースライン再設定（U5 / U8 / C37–C41）が完了しています。原作者 [zuohuaijun](https://gitee.com/zuohuaijun) とコントリビューターの皆さんに感謝します。
+本プロジェクトは [Admin.NET](https://gitee.com/zuohuaijun/Admin.NET) をベースに開発しており、Furion フレームワークの残存コードと旧 Admin.NET の業務命名は、すべて置換とベースライン再設定（–）が完了しています。原作者 [zuohuaijun](https://gitee.com/zuohuaijun) とコントリビューターの皆さんに感謝します。
 
 ### リポジトリ構成
 
@@ -42,16 +42,16 @@
 
 ```
 Admin/
-├── GameFrameX.Admin.Unified.Api/    # .NET バックエンド：Admin / Client / Hub の 3 ホスト + Application / Entity / Core レイヤー
-├── GameFrameX.Admin.Unified.Vue/    # Vue フロントエンド：PrimeVue + Pinia + vue-i18n（5 言語）
-├── build/                           # Nginx 設定 + デプロイスクリプト（deploy-*.sh / docker-build-push.sh / entrypoint.sh）
-├── doc/                             # README 用画像
-├── .github/workflows/               # CI：3 API イメージとフロントエンドイメージのビルド、フロントエンドテスト、外部イメージ同期
-├── docker-compose.yml               # コマンド 1 つのフルスタック編成（PostgreSQL + 3 API + フロントエンド）
-├── docker-compose.admin.yml          # Admin 独立スタック：専用 PostgreSQL + 3 API ホスト、フロントエンドコンテナなし
-├── .env.example                     # compose 環境変数テンプレート（.env にコピーして必要に応じて上書き）
-├── AGENTS.md / CLAUDE.md            # AI エージェント連携入口（ルート指示 + readme_i18n 設定）
-└── LICENSE.md                       # ライセンス
+├── GameFrameX.Admin.Unified.Api/ # .NET バックエンド：Admin / Client / Hub の 3 ホスト + Application / Entity / Core レイヤー
+├── GameFrameX.Admin.Unified.Vue/ # Vue フロントエンド：PrimeVue + Pinia + vue-i18n（5 言語）
+├── build/ # Nginx 設定 + デプロイスクリプト（deploy-*.sh / docker-build-push.sh / entrypoint.sh）
+├── doc/ # README 用画像
+├── .github/workflows/ # CI：3 API イメージとフロントエンドイメージのビルド、フロントエンドテスト、外部イメージ同期
+├── docker-compose.yml # コマンド 1 つのフルスタック編成（PostgreSQL + 3 API + フロントエンド）
+├── docker-compose.admin.yml # Admin 独立スタック：専用 PostgreSQL + 3 API ホスト、フロントエンドコンテナなし
+├── .env.example # compose 環境変数テンプレート（.env にコピーして必要に応じて上書き）
+├── AGENTS.md / CLAUDE.md # AI エージェント連携入口（ルート指示 + readme_i18n 設定）
+└── LICENSE.md # ライセンス
 ```
 
 ## クイックスタート
@@ -72,15 +72,15 @@ git clone https://github.com/GameFrameX/Admin.git
 cd Admin
 
 # 2. バックエンドを起動（リポジトリルートで実行！ 接続文字列はワーキングディレクトリ相対で解決されます）
-dotnet run --project GameFrameX.Admin.Unified.Api/GameFrameX.Web.Api     # Admin API → http://localhost:20802
-dotnet run --project GameFrameX.Admin.Unified.Api/GameFrameX.Client.Api  # Client API → http://localhost:20808
-dotnet run --project GameFrameX.Admin.Unified.Api/GameFrameX.Hub.Api     # Hub API → http://localhost:20806
+dotnet run --project GameFrameX.Admin.Unified.Api/GameFrameX.Web.Api # Admin API → http://localhost:20802
+dotnet run --project GameFrameX.Admin.Unified.Api/GameFrameX.Client.Api # Client API → http://localhost:20808
+dotnet run --project GameFrameX.Admin.Unified.Api/GameFrameX.Hub.Api # Hub API → http://localhost:20806
 
 # 3. フロントエンドを起動
 cd GameFrameX.Admin.Unified.Vue
 corepack enable
 pnpm install
-pnpm run dev    # デフォルト http://localhost:20800（hash ルーティング）
+pnpm run dev # デフォルト http://localhost:20800（hash ルーティング）
 ```
 
 ブラウザを開く → ログインページが表示される → アカウント `admin` / パスワード `123456`（初回起動時に SqlSugar Code-First が自動でテーブル作成 + シードデータ投入を行います）。
@@ -229,7 +229,7 @@ docker compose -f docker-compose.admin.yml up -d --build
 
 | 脅威 | 対策 |
 |---|---|
-| 弱いパスワード | プロジェクト全体で **Argon2id** に統一（C214 システムユーザー / C215 プレイヤー）。旧 PBKDF2 は `AppSecretHasher` のみ保持（高エントロピー乱数キーのユースケースで、Argon2id は不要） |
+| 弱いパスワード | プロジェクト全体で **Argon2id** に統一（システムユーザー / プレイヤー）。旧 PBKDF2 は `AppSecretHasher` のみ保持（高エントロピー乱数キーのユースケースで、Argon2id は不要） |
 | SQL インジェクション | SqlSugar の完全パラメータ化。文字列連結なし |
 | 権限超過アクセス | ソフトデリートフィルタ + ロール権限 / サーバー区スコープ。SuperAdmin は権限チェックをバイパスするが Hub API は SuperAdmin を拒否 |
 | リプレイ攻撃 | HMAC 署名 + nonce キャッシュ + 5 分の時刻ずれ許容 |

@@ -2,13 +2,13 @@ using System.ComponentModel;
 using GameFrameX.Application.GmCenter.Asset.Dto;
 using GameFrameX.Application.ServerCenter.Online;
 
-// S3/C401 断链修复点
+// / 断链修复点
 namespace GameFrameX.Application.GmCenter.Asset;
 
 /// <summary>
-/// Online 资产交易详情查询服务。路由前缀 /api/onlineAssetTransactionQuery（change C340 / vault:C4 S3.7、VC-3.14）。
+/// Online 资产交易详情查询服务。路由前缀 /api/onlineAssetTransactionQuery（change / vault: .7、.14）。
 /// <para>按 TransactionId 反查交易全字段（IdempotencyKey、来源、原因、业务单号、操作者、Grant 明细、时间）；
-/// Admin 端点为 GET + <c>[FromQuery]</c> 复杂查询对象（C257 §4），Online 侧查询经 POST 通道携带 body。</para>
+/// Admin 端点为 GET + <c>[FromQuery]</c> 复杂查询对象，Online 侧查询经 POST 通道携带 body。</para>
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 133)]
 public class OnlineAssetTransactionQueryService : IAdminApiController

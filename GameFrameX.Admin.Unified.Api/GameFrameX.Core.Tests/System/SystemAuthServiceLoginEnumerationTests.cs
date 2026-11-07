@@ -5,7 +5,7 @@ using GameFrameX.Core.Utility;
 namespace GameFrameX.Core.Tests.System;
 
 /// <summary>
-/// Admin 登录账号枚举防护单测（C216）：RecordLoginFailure 计数/锁定统一响应 + EnumerationDecoyHash 诱饵合法性。
+/// Admin 登录账号枚举防护单测：RecordLoginFailure 计数/锁定统一响应 + EnumerationDecoyHash 诱饵合法性。
 /// <para>user null 与密码错误共用 RecordLoginFailure，响应不可区分（ErrorCode 均为 null、Message 统一）。</para>
 /// <para>耗时对齐（假 Verify）属运行时行为，由代码审查 + 登录端到端验收覆盖，不在本单测度量。</para>
 /// </summary>

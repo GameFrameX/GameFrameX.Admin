@@ -8,7 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 namespace GameFrameX.Core.Tests.Payment;
 
 /// <summary>
-/// Apple JWS 测试材料：自建 Root CA + 叶子证书链 + ES256 JWS 签名（C271 Server API 验证路径测试用）。
+/// Apple JWS 测试材料：自建 Root CA + 叶子证书链 + ES256 JWS 签名（Server API 验证路径测试用）。
 /// <para>与 ClientApi 嵌套实现同源逻辑，独立为共享文件供支付域测试复用。</para>
 /// </summary>
 public sealed class AppleJwsTestMaterial : IDisposable

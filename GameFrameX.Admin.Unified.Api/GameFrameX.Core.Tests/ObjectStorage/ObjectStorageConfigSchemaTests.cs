@@ -9,7 +9,7 @@ namespace GameFrameX.Core.Tests.ObjectStorage;
 
 /// <summary>
 /// 对象存储配置契约层防漂移测试：Registry / Schema / Normalizer / Parser。
-/// 对应 change.md §5 验证标准「Registry 测试 / 配置测试」可离线验证部分。
+/// 对应 change.md 验证标准「Registry 测试 / 配置测试」可离线验证部分。
 /// 不依赖 DB、历史框架 运行时与云凭证。
 /// </summary>
 public class ObjectStorageConfigSchemaTests

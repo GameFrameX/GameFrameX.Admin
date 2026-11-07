@@ -1,8 +1,8 @@
 namespace GameFrameX.Client.Api.GameUserPay.Dto;
 
 /// <summary>
-/// 支付验真请求（C11 支付域 Verify；凭证按 PayChannel：Apple=ReceiptData 或 TransactionId 二选一 / Google=PurchaseToken）
-/// <para>C271 Apple 双形态：StoreKit 1 客户端上报 ReceiptData+TransactionId 走 verifyReceipt 旧路径；
+/// 支付验真请求（支付域 Verify；凭证按 PayChannel：Apple=ReceiptData 或 TransactionId 二选一 / Google=PurchaseToken）
+/// <para> Apple 双形态：StoreKit 1 客户端上报 ReceiptData+TransactionId 走 verifyReceipt 旧路径；
 /// StoreKit 2 客户端仅上报 TransactionId 走 App Store Server API v2 新路径（双轨向后兼容，老字段不删不改名）。</para>
 /// </summary>
 public class GameUserPayVerifyRequest

@@ -7,9 +7,9 @@ using GameFrameX.Core.Service;
 namespace GameFrameX.Client.Api.GameFeatureSwitch;
 
 /// <summary>
-/// 活动/功能开关聚合下发控制器（C347 客户端通道）。
+/// 活动/功能开关聚合下发控制器（客户端通道）。
 /// <para>客户端运行时拉取通道：从主库聚合下发命中开关，支持版本化差异感知（游戏运行中动态生效）。
-/// 解析全部委托 <see cref="FeatureSwitchDeliveryResolver"/>（C345 唯一实现）：消费方过滤 client|both、
+/// 解析全部委托 <see cref="FeatureSwitchDeliveryResolver"/>（唯一实现）：消费方过滤 client|both、
 /// 作用域评分 winner、时间窗（服务端 UTC 过滤）、设备灰度（稳定设备标识取模 + 白名单旁路，缺 DeviceId 仅全量命中）。</para>
 /// <para>判定权原则：下发 ≠ 授权。玩法/经济 gate 由 GameServer 业务端点依据开关值与时间窗实时校验，
 /// 本端点只负责展示层与配置分发；响应不携带任何机密（AppSecret / 签名密钥等）。</para>
@@ -22,7 +22,7 @@ public class GameFeatureSwitchController : BaseController
     /// <summary>
     /// 初始化活动/功能开关聚合下发控制器。
     /// </summary>
-    /// <param name="deliveryResolver">开关投放解析器（C345 共享实现）。</param>
+    /// <param name="deliveryResolver">开关投放解析器（共享实现）。</param>
     /// <param name="packageResolver">母包解析器，将请求包名展开为母包候选集合。</param>
     public GameFeatureSwitchController(FeatureSwitchDeliveryResolver deliveryResolver, GameAppPackageResolver packageResolver)
     {

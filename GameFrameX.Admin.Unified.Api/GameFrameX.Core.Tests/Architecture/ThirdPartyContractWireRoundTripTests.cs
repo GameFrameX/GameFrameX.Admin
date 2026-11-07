@@ -15,7 +15,7 @@ using Xunit.Abstractions;
 
 namespace GameFrameX.Core.Tests.Architecture;
 
-// C292 / GFX-698：第三方契约 DTO PascalCase 化后的 wire 冻结验证。
+//  / ：第三方契约 DTO PascalCase 化后的 wire 冻结验证。
 // 任务 1 的承诺是 wire format 零变化：Client.Api / Hub.Api 侧由 ClientHubDtoWireSnapshotTests（按
 // JsonPropertyName ?? Name 计算的快照）零变化覆盖；本测试补齐快照外程序集
 // （Payment.Xsolla / Email.TencentSes / GrafanaLoki 命名空间）的 round-trip 与真实样例反序列化，

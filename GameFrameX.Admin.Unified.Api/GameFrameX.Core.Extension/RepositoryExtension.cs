@@ -332,7 +332,7 @@ public static class RepositoryExtension
     /// 多库查询
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    /// <typeparam name="T2"></typeparam>
+    /// <typeparam name=""></typeparam>
     /// <param name="queryable"></param>
     /// <returns></returns>
     public static ISugarQueryable<T, T2> AS<T, T2>(this ISugarQueryable<T, T2> queryable)
@@ -378,7 +378,7 @@ public static class RepositoryExtension
     private static string GetQualifiedTableName<T>()
     {
         // 与 SqlSugarEntityBoundary.GetPhysicalTableName（建表/默认 CRUD 路径）保持单一来源，
-        // 确保 .AS() 多库读写用的表名与 CodeFirst 建表名恒等（C30 对齐）。
+        // 确保 .AS() 多库读写用的表名与 CodeFirst 建表名恒等。
         var entityType = typeof(T);
         var physicalName = SqlSugarEntityBoundary.GetPhysicalTableName(entityType, entityType.Name);
         return physicalName;

@@ -49,7 +49,7 @@ public sealed class PublishMailCampaignRequest
     /// <summary>命中过滤：最高等级（含），0 表示不限。</summary>
     public int MaxLevel { get; set; }
 
-    /// <summary>附件过期处置策略（B4）。</summary>
+    /// <summary>附件过期处置策略。</summary>
     public MailCampaignExpirePolicy ExpireAttachmentPolicy { get; set; }
 
     /// <summary>过期时间（Unix 秒，UTC），0 表示永不过期。</summary>

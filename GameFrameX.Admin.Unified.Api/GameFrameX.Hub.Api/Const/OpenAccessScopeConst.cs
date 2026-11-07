@@ -8,7 +8,7 @@ namespace GameFrameX.Hub.Api.Const;
 public static class OpenAccessScopeConst
 {
     /// <summary>
-    /// 功能开关服务器同步 scope：命中 <c>/api/FeatureSwitchSync</c> 路由前缀（C347）。
+    /// 功能开关服务器同步 scope：命中 <c>/api/FeatureSwitchSync</c> 路由前缀。
     /// </summary>
     public const string FeatureSwitchSync = "FeatureSwitchSync";
 }

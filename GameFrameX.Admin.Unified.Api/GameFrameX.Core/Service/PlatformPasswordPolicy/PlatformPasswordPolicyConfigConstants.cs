@@ -1,7 +1,7 @@
 namespace GameFrameX.Core.Service.PlatformPasswordPolicy;
 
 /// <summary>
-/// 平台密码策略配置常量（C173）。承载 SystemConfigEntity 固定记录编码与历史兼容默认值。
+/// 平台密码策略配置常量。承载 SystemConfigEntity 固定记录编码与历史兼容默认值。
 /// </summary>
 public static class PlatformPasswordPolicyConfigConstants
 {

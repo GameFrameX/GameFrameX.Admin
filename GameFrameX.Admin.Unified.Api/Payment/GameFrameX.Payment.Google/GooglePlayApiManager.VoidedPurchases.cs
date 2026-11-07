@@ -9,7 +9,7 @@ using Google.Apis.AndroidPublisher.v3.Data;
 namespace GameFrameX.Payment.Google;
 
 /// <summary>
-/// Google Play 已作废（退款/取消）交易查询（C310 / GFX-718）：Android Publisher API purchases.voidedpurchases.list 封装。
+/// Google Play 已作废（退款/取消）交易查询：Android Publisher API purchases.voidedpurchases.list 封装。
 /// </summary>
 public static partial class GooglePlayApiManager
 {

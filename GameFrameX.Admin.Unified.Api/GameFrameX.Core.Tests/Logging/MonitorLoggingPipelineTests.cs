@@ -35,9 +35,9 @@ using SqlSugar;
 namespace GameFrameX.Core.Tests.Logging;
 
 /// <summary>
-/// Monitor 日志采集与调度管线回归守护测试（C363 / T5，真实 HTTP → 行落库）：
+/// Monitor 日志采集与调度管线回归守护测试（真实 HTTP → 行落库）：
 /// TestServer 挂真实 <see cref="LoggingSetup.AddLoggingSetup"/>（Monitor 过滤器 + 调度队列 + 文件/数据库/ES Sink），
-/// SqlSugar sqlite 主库（main）+ 第二业务库（1001）双连接，覆盖三表分流、C156 分表路由、C171 动态开关、
+/// SqlSugar sqlite 主库（main）+ 第二业务库（1001）双连接，覆盖三表分流、 分表路由、 动态开关、
 /// sys_oplog 门控、[SuppressMonitor] 豁免、数据校验短路与 data/logs 文件生成。防复发锚点：
 /// 历史框架退役（2026-07-27）后全库 *_log_* 表零写入的事故不允许再次静默发生。
 /// </summary>
@@ -160,7 +160,7 @@ public sealed class MonitorLoggingPipelineTests : IAsyncLifetime
     }
 
     /// <summary>
-    /// 验收 5（C156）：管理员上下文操作日志路由到业务库 Log*，平台库不落任何该调用行。
+    /// 验收 5：管理员上下文操作日志路由到业务库 Log*，平台库不落任何该调用行。
     /// </summary>
     [Fact]
     public async Task Page_WithUserIdentity_WritesOperationRowToMainDatabase()
@@ -278,7 +278,7 @@ public sealed class MonitorLoggingPipelineTests : IAsyncLifetime
     }
 
     /// <summary>
-    /// 验收 7（C171）：platform_logging_config database.enabled=false 保存 + 刷新快照后，
+    /// 验收 7：platform_logging_config database.enabled=false 保存 + 刷新快照后，
     /// 同 Host 内后续调用立即停止落库（匿名上下文 → 平台库的既有语义同时得到验证）。
     /// </summary>
     [Fact]

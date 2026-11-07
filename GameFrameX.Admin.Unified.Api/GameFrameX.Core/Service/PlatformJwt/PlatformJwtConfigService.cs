@@ -7,7 +7,7 @@ namespace GameFrameX.Core.Service.PlatformJwt;
 
 /// <summary>
 /// 平台 JWT 配置服务。
-/// <para>宿主表说明（GFX-706）：本服务不持有独立宿主表，共享主库 SystemConfigEntity（system_config 表），以 Code 分区行 <c>platform_jwt_settings</c>（PlatformJwtConfigConstants.ConfigCode）存储本域配置 JSON。Platform* 前缀指平台级配置域，名实相符保留类名。</para>
+/// <para>宿主表说明：本服务不持有独立宿主表，共享主库 SystemConfigEntity（system_config 表），以 Code 分区行 <c>platform_jwt_settings</c>（PlatformJwtConfigConstants.ConfigCode）存储本域配置 JSON。Platform* 前缀指平台级配置域，名实相符保留类名。</para>
 /// </summary>
 [ApiDescriptionSettings(Order = 441)]
 public sealed class PlatformJwtConfigService : IAdminApiController

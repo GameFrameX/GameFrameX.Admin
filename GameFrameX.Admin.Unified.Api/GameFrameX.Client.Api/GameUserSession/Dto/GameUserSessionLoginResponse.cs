@@ -3,7 +3,7 @@ namespace GameFrameX.Client.Api.GameUserSession.Dto;
 
 /// <summary>
 /// 登录响应（原 BLLogin LoginResp 28 字段；键名与客户端 GameApiConvert.LoginRespKeyMap 同源定稿，
-/// 四态去向见 C13 change.md §1：新建下发 / 复用 C8 存档行 / 已在别处 / 空缺省）
+/// 四态去向见 change.md ：新建下发 / 复用 存档行 / 已在别处 / 空缺省）
 /// </summary>
 public class GameUserSessionLoginResponse
 {
@@ -28,13 +28,13 @@ public class GameUserSessionLoginResponse
     public long ForceDownload { get; set; }
 
     /// <summary>
-    /// 服务端配置 JSON（C280 差异下发：上行 md5 相等回 {"key":{"md5"}}；不等/缺失回
+    /// 服务端配置 JSON（差异下发：上行 md5 相等回 {"key":{"md5"}}；不等/缺失回
     /// {"key":{"md5","config"}}；种子无内容的键不回显。种子源见 GameServerConfigSeed）
     /// </summary>
     public string Config { get; set; } = string.Empty;
 
     /// <summary>
-    /// 存档最后同步时间（复用 C8 存档行 SyncTime；无档 = 0）
+    /// 存档最后同步时间（复用 存档行 SyncTime；无档 = 0）
     /// </summary>
     public long LastSyncTime { get; set; }
 
@@ -44,7 +44,7 @@ public class GameUserSessionLoginResponse
     public long ServerTime { get; set; }
 
     /// <summary>
-    /// 更新提示类型（C6 GetInfo 预填优先，此处空缺省 0）
+    /// 更新提示类型（GetInfo 预填优先，此处空缺省 0）
     /// </summary>
     public long UpdateHint { get; set; }
 
@@ -69,7 +69,7 @@ public class GameUserSessionLoginResponse
     public List<Models.GameUserSessionSocialBinding> SocialBindings { get; set; } = new();
 
     /// <summary>
-    /// 累计充值（分；C11 订单已到账汇总）
+    /// 累计充值（分； 订单已到账汇总）
     /// </summary>
     public long TotalPay { get; set; }
 

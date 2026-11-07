@@ -9,7 +9,7 @@ using GameFrameX.Core.Api;
 namespace GameFrameX.Application.SeedData.System;
 
 /// <summary>
-/// Online 社交治理 域菜单种子（partial；由 <see cref="GlobalMenuSeedData.BuildData"/> 聚合；change C350 / GFX-754）。
+/// Online 社交治理 域菜单种子（partial；由 <see cref="GlobalMenuSeedData.BuildData"/> 聚合；change /）。
 /// <para>消息审计与举报处置挂载在线运维根目录 route:gmCenter。</para>
 /// </summary>
 public partial class GlobalMenuSeedData

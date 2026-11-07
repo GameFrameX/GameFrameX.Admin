@@ -67,7 +67,7 @@ public sealed class EmailSender : IEmailSender
             return null;
         }
 
-        // C372（GFX-838）：邮件凭据读取边界解密（C371 起库内密文；无前缀明文直通兼容存量行；
+        // ：邮件凭据读取边界解密（起库内密文；无前缀明文直通兼容存量行；
         // 进程级密文缓存兜底，避免每次发送 PBKDF2 派生）。实体为本次查询的请求本地实例，改写无副作用。
         entity.FromEmailSecretId = SecretCrypto.DecryptCached(entity.FromEmailSecretId) ?? string.Empty;
         entity.FromEmailSecretKey = SecretCrypto.DecryptCached(entity.FromEmailSecretKey) ?? string.Empty;

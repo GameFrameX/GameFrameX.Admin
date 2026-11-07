@@ -1,7 +1,7 @@
 namespace GameFrameX.Application.Dashboard.GameHome.Dto;
 
 /// <summary>
-/// 首页在线人数时序单点（C321 / GFX-730）
+/// 首页在线人数时序单点
 /// </summary>
 public class GameHomeOnlineTrendPointResponse
 {

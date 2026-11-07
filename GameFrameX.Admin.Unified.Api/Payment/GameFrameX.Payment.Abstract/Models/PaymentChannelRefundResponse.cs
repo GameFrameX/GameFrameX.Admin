@@ -7,7 +7,7 @@
 namespace GameFrameX.Payment.Abstract.Models;
 
 /// <summary>
-/// 渠道退款发起 / 消费信息上报结果（C310 / GFX-718）。
+/// 渠道退款发起 / 消费信息上报结果。
 /// </summary>
 public sealed class PaymentChannelRefundResponse
 {

@@ -12,11 +12,11 @@ using Microsoft.AspNetCore.Http;
 namespace GameFrameX.Core.Tests.SqlSugar;
 
 /// <summary>
-/// GFX-919 / C388 回归测试：渠道定义管理查询不得显示软删行。
+///  / 回归测试：渠道定义管理查询不得显示软删行。
 /// 根因：ChannelDefinitionManagementServiceBase.BuildPageQuery 用 .Filter(null, true) 绕过全部全局过滤器
 /// （意图：管理列表显示禁用渠道 + 跨 scope 合并），连带禁用了 ISafeDeletedFilter，软删行穿透分页列表。
 /// 复刻生产主库连接装配（ClientApiTestDb 三组过滤器），Sqlite 单库做服务级 PageAsync/AvailableAsync 端到端验证；
-/// 修复契约（C67 FixPattern 同构）：Filter(null, true) 后必须手动补 u.IsDeleted == false，且禁用行仍须可见（可重新启用）。
+/// 修复契约（FixPattern 同构）：Filter(null, true) 后必须手动补 u.IsDeleted == false，且禁用行仍须可见（可重新启用）。
 /// </summary>
 public sealed class ChannelDefinitionSoftDeleteVisibilityTests : IDisposable
 {
@@ -51,7 +51,7 @@ public sealed class ChannelDefinitionSoftDeleteVisibilityTests : IDisposable
         Assert.Contains("GFX_919_ACTIVE", codes);
         // 禁用行必须仍可见：Filter(null, true) 的原意图（停用渠道可重新启用），修复不得破坏。
         Assert.Contains("GFX_919_DISABLED", codes);
-        // 软删行不得出现在管理列表（GFX-919 缺陷主体）。
+        // 软删行不得出现在管理列表。
         Assert.DoesNotContain("GFX_919_SOFTDELETED", codes);
     }
 

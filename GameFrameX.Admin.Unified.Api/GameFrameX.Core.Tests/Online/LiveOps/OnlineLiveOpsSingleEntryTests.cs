@@ -12,7 +12,7 @@ using GameFrameX.Entity.Game.Online;
 
 namespace GameFrameX.Core.Tests.Online.LiveOps;
 
-// C343 / GFX-755（vault:C8 S7.7）：LiveOps 统一下发单一入口守护测试。
+//  / （vault: .7）：LiveOps 统一下发单一入口守护测试。
 // 覆盖：Application.Platform 业务层唯一 IOnlineServerClient 注入点 = OnlineLiveOpsDispatchService（旁路直连即失败）、
 // 七个 Online 命令名冻结、兄弟 Service 一律依赖 IOnlineLiveOpsDispatchService 转调、
 // LiveOpsSourceKind 五值契约、两个新 Service 可被动态 API 路由发现（IAdminApiController）、
@@ -22,8 +22,8 @@ public sealed class OnlineLiveOpsSingleEntryTests
     /// <summary>
     /// 单一入口铁律：LiveOps 域（GameFrameX.Application.Platform.Online.LiveOps）内除 Dispatch 实现类自身外，
     /// 任何类都不得注入 IOnlineServerClient（旁路直连即失败）。
-    /// 范围说明（2026-09-13 C340 rebase 收窄）：Asset/Social/Console/Match 观测域 Service 按各自 change 设计
-    /// 直连 IOnlineServerClient（C339 基座的既定消费方式；Match 域为 C341 纯只读观测，不属于 LiveOps 写命令
+    /// 范围说明（2026-09-13 rebase 收窄）：Asset/Social/Console/Match 观测域 Service 按各自 change 设计
+    /// 直连 IOnlineServerClient（基座的既定消费方式；Match 域为 纯只读观测，不属于 LiveOps 写命令
     /// 统一下发范畴，其零持久化约束由 OnlineObservatoryNoPersistenceTests 独立守护），不在本断言范围；
     /// 三个既有运营域（RemoteConfig/Announcement/MailCampaign）的下发入口由 SiblingServices 断言锁定。
     /// </summary>
@@ -57,7 +57,7 @@ public sealed class OnlineLiveOpsSingleEntryTests
     }
 
     /// <summary>
-    /// Online 命令名冻结（change.md A0 契约对齐块）：常量值与路由表逐个锁定，改名须回 change 评审。
+    /// Online 命令名冻结（契约对齐块）：常量值与路由表逐个锁定，改名须回 change 评审。
     /// </summary>
     [Fact]
     public void FrozenOnlineActionNames_AreExact()

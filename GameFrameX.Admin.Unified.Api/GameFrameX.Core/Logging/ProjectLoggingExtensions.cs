@@ -3,7 +3,7 @@ using Microsoft.Extensions.Hosting;
 namespace GameFrameX.Core.Logging;
 
 /// <summary>
-/// 项目日志注册入口（C363 接通真实实现，取代历史框架退役时留下的空桩）：
+/// 项目日志注册入口（接通真实实现，取代历史框架退役时留下的空桩）：
 /// Monitor 采集中间件全局过滤器 + 文件日志 Sink + 数据库/ES 日志写入器，统一由
 /// <see cref="LoggingDispatchService"/> 后台调度消费。
 /// </summary>

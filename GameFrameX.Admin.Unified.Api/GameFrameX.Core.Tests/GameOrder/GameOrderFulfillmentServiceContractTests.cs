@@ -7,7 +7,7 @@ using GameFrameX.Entity.Enum;
 namespace GameFrameX.Core.Tests.GameOrder;
 
 /// <summary>
-/// 权益发货账本 Admin API 契约自检（C120 / GFX-122）。
+/// 权益发货账本 Admin API 契约自检。
 /// 编译期即 failing-without-implementation（服务/DTO 类型不存在则编译失败）；运行期断言路由方法与过滤字段不漂移。
 /// </summary>
 public class GameOrderFulfillmentServiceContractTests
@@ -75,7 +75,7 @@ public class GameOrderFulfillmentServiceContractTests
     [Fact]
     public void ActionEndpoints_Return_ObjectOutput_Not_StringEnvelope()
     {
-        // C223 / GFX-644：Admin 端点 result 统一对象契约。三个高风险动作端点返回 Task<FulfillmentActionResponse>，
+        //  / ：Admin 端点 result 统一对象契约。三个高风险动作端点返回 Task<FulfillmentActionResponse>，
         // 失败抛 BusinessException 走 AdminResultFilter；不再暴露 HttpJsonResultData<string> 双重信封。
         var expected = typeof(Task<FulfillmentActionResponse>);
         foreach (var methodName in new[] { "RefundAsync", "CompensateAsync", "ResendAsync", })
@@ -90,7 +90,7 @@ public class GameOrderFulfillmentServiceContractTests
     [Fact]
     public void Service_Exposes_No_HttpJsonResultData_Endpoints()
     {
-        // C223：Admin 服务边界内不再有 HttpJsonResultData 返回签名（对外 string 生态收敛在 Client.Api / GameOrderShipService）。
+        // ：Admin 服务边界内不再有 HttpJsonResultData 返回签名（对外 string 生态收敛在 Client.Api / GameOrderShipService）。
         var offender = typeof(GameOrderFulfillmentService)
                        .GetMethods(BindingFlags.Public | BindingFlags.Instance)
                        .Where(m => m.DeclaringType == typeof(GameOrderFulfillmentService))

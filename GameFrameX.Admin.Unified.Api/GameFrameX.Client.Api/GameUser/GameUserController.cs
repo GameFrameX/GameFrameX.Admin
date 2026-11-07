@@ -34,10 +34,10 @@ public class GameUserController : BaseController<GameUserEntity>
     /// </summary>
     /// <param name="service"></param>
     /// <param name="clientApiTokenIssuer"></param>
-    /// <param name="clientApiSessionKeyIssuer">登录期 per-session 会话密钥签发服务（C7）</param>
+    /// <param name="clientApiSessionKeyIssuer">登录期 per-session 会话密钥签发服务</param>
     /// <param name="gameUserEmailService"></param>
     /// <param name="gamePenaltyEnforcementService"></param>
-    /// <param name="gameUserPasswordService">玩家账号密码哈希服务（PBKDF2，C198 / GFX-627）</param>
+    /// <param name="gameUserPasswordService">玩家账号密码哈希服务（PBKDF2， /）</param>
     /*/// <param name="googleOAuth2Service"></param>*/
     public GameUserController(SqlSugarRepository<GameUserEntity> service, ClientApiTokenIssuer clientApiTokenIssuer,
         ClientApiSessionKeyIssuer clientApiSessionKeyIssuer,
@@ -728,7 +728,7 @@ public class GameUserController : BaseController<GameUserEntity>
     }
 
     /// <summary>
-    /// 匿名设备登录（C12 A1：承接旧 SSO Lookup 语义——按设备标识找号或建号，
+    /// 匿名设备登录（A1：承接旧 SSO Lookup 语义——按设备标识找号或建号，
     /// 无密码，设备标识即凭证）。VendorId/InstallId/Channel/Platform/ClientVersion
     /// 为记录性字段，当前不落库。
     /// </summary>
@@ -1239,7 +1239,7 @@ public class GameUserController : BaseController<GameUserEntity>
         output.ExpireTime = token.ExpireTime;
         output.Provider = provider;
 
-        // C7: token 签发后签发 per-session 会话密钥（AES-256-GCM 信封 kid/secret），到期与 AccessToken 对齐
+        // : token 签发后签发 per-session 会话密钥（AES-256-GCM 信封 kid/secret），到期与 AccessToken 对齐
         var sessionKey = await _clientApiSessionKeyIssuer.IssueAsync(token.ExpireTime);
         output.SessionKeyId = sessionKey.Kid;
         output.SessionKeySecret = sessionKey.Secret;

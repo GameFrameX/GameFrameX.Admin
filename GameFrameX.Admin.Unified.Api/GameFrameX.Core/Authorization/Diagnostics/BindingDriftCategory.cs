@@ -3,7 +3,7 @@ using GameFrameX.Entity.Enum;
 namespace GameFrameX.Core.Authorization.Diagnostics;
 
 /// <summary>
-/// 菜单权限/endpoint 绑定漂移类别（C128 稳定诊断契约）。
+/// 菜单权限/endpoint 绑定漂移类别（稳定诊断契约）。
 /// <para>枚举值即契约：未来对 ApiEndpointCatalogSync / JwtHandler 授权链路的改动一旦引入下列任一漂移，
 /// 回归测试必须失败。新增类别只能追加到末尾，不得重排或重命名既有成员。</para>
 /// </summary>
@@ -46,7 +46,7 @@ public enum BindingDriftCategory
     /// <summary>
     /// 同 <c>(HttpMethod, RoutePath)</c> 被多个活方法占用，采集仅保留首个。severity=Warning。
     /// <para>（历史注记：成员 7 <c>AuthenticatedOnlyRouteMissingFromLive</c> 已随登录态白名单特性化退役删除——
-    /// <c>[AuthenticatedOnly]</c> 特性长在方法上，方法删除则登记自动消失，该漂移结构性不可再发生，GFX-684/C277。
+    /// <c>[AuthenticatedOnly]</c> 特性长在方法上，方法删除则登记自动消失，该漂移结构性不可再发生，/。
     /// 显式数值不复用，已删除成员的值永久空缺。）</para>
     /// </summary>
     DuplicateEndpointKey = 8,

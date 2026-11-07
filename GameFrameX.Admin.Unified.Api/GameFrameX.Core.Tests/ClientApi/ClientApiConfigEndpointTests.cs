@@ -79,7 +79,7 @@ public sealed class ClientApiConfigEndpointTests
 
         var root = ClientApiResultReader.Read(result);
         var data = ClientApiResultReader.Data(root);
-        // GFX-706：GetInfo 纯只读——设备注册副作用已拆至 RegisterDevice，携带标识调用也不写设备表
+        // ：GetInfo 纯只读——设备注册副作用已拆至 RegisterDevice，携带标识调用也不写设备表
         var deviceCount = await db.MainDb.Queryable<GameAppDeviceEntity>().CountAsync();
         Assert.Equal(0, ClientApiResultReader.Code(root));
         Assert.Equal(0, deviceCount);

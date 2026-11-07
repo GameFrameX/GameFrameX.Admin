@@ -6,7 +6,7 @@ using GameFrameX.Payment.Abstract;
 namespace GameFrameX.Core.Service.Business;
 
 /// <summary>
-/// 支付配置 ConfigJson 敏感字段级加解密收口（C371 / GFX-838，对齐 C370 ObjectStorageConfigCrypto）：
+/// 支付配置 ConfigJson 敏感字段级加解密收口（对齐 ObjectStorageConfigCrypto）：
 /// 写入侧在 ValidateConfigJson 校验之后、落库之前调用 <see cref="EncryptConfigJson"/>；
 /// 读取侧（PaymentOptionSettingProvider 反序列化前）调用 <see cref="DecryptConfigJson"/>。
 /// <para>敏感字段集合由渠道 Option 类的 <c>[PaymentField(Sensitive = true)]</c> 标注驱动（与表单 schema 反射同源），

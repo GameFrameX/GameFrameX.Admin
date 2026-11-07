@@ -6,29 +6,29 @@ using GameFrameX.Entity.Enum;
 namespace GameFrameX.Core.Middleware;
 
 /// <summary>
-/// 传输签名验证中间件（C1 hmac-foundation-migration 落地 v1；C2 sig-keyring-server 扩展 v2 密钥环；
-/// C267 v2 query 升级 RFC 3986 canonical 并收口 HMAC 计算到 <see cref="CanonicalRequestBuilder"/>）。
-/// 校验客户端 "Signature" 头的单层 HMAC-SHA256 签名 —— UTF-8 输入、Base64 输出（RFC 2104 + RFC 4648 §4）。
+/// 传输签名验证中间件（hmac-foundation-migration 落地 v1； sig-keyring-server 扩展 v2 密钥环；
+///  v2 query 升级 RFC 3986 canonical 并收口 HMAC 计算到 <see cref="CanonicalRequestBuilder"/>）。
+/// 校验客户端 "Signature" 头的单层 HMAC-SHA256 签名 —— UTF-8 输入、Base64 输出（RFC 2104 + RFC 4648）。
 /// <para>v1 头 = "v1;&lt;ts&gt;;&lt;mid&gt;;&lt;base64&gt;"，message = "v1" \n METHOD \n path \n query \n ts \n mid \n hex(sha256(body))，
-/// query 为原始串（C1 客户端行为，过渡逃生通道语义，C267 canonical 仅作用于 v2），
-/// 密钥为全局常量（<see cref="SignatureValidationOptions.Secret"/>，过渡期回退路径，C3 全量切换后退役）；</para>
+/// query 为原始串（客户端行为，过渡逃生通道语义， canonical 仅作用于 v2），
+/// 密钥为全局常量（<see cref="SignatureValidationOptions.Secret"/>，过渡期回退路径， 全量切换后退役）；</para>
 /// <para>v2 头 = "v2;&lt;keyId&gt;;&lt;ts&gt;;&lt;mid&gt;;&lt;base64&gt;"，message = v2 \n METHOD \n path \n <b>canonicalQuery</b> \n keyId \n ts \n mid \n hex(sha256(body))
 /// （拼装与 HMAC 计算均委托 <see cref="CanonicalRequestBuilder"/>，规范正文 gfx-doc/dev/signature/spec.md）——
 /// keyId 进 message 防「签名挪用」降级攻击（把 A key 的签名配 B 的 keyId 重放必然验签失败），
 /// query 按 RFC 3986 canonical（key 字典序 + percent-encoding），前置代理改写参数顺序/编码不再破签，
 /// 密钥来自 主库密钥环（<see cref="ISignatureKeyResolver"/>，按 Kid 定位）。</para>
-/// <para>启用语义（C2 起）：<see cref="SignatureValidationOptions.IsEnabled"/> 降级为灰度总开关 ——
-/// false = 完全旁路（现网默认，与 C1 行为一致）；true = 验签失败后按运行配置
+/// <para>启用语义：<see cref="SignatureValidationOptions.IsEnabled"/> 降级为灰度总开关 ——
+/// false = 完全旁路（现网默认，与 行为一致）；true = 验签失败后按运行配置
 /// <see cref="RiskEnforcementModeEnum"/> 分流：FailClosed 拒绝（默认安全），AuditOnly/FailOpen 记录后放行。</para>
-/// <para>拒签信封码分级（HTTP 401 + camelCase 小写信封，与 C1 同形态）：60101 签名不符（含缺头/格式/时间窗/重放）、
+/// <para>拒签信封码分级（HTTP 401 + camelCase 小写信封，与 同形态）：60101 签名不符（含缺头/格式/时间窗/重放）、
 /// 60102 keyId 未知、60103 key 禁用或租约到期。</para>
-/// <para>双端测试向量：canting 仓 gfx-doc/dev/hmac-signature/changes/C2-sig-keyring-server/test-vectors.json。</para>
+/// <para>双端测试向量：canting 仓 gfx-doc/dev/hmac-signature/changes/-sig-keyring-server/test-vectors.json。</para>
 /// </summary>
 public sealed class SignatureValidationMiddleware
 {
     /// <summary>
     /// cola 客户端实际使用的签名头名（注意与 GlobalConst.SignatureHeader = "GameFrameX-Signature" 是两个不同的头）。
-    /// C267 起与 Hub OpenAccess 单头统一，常量收敛到 <see cref="SignatureSpec.SignatureHeader"/>。
+    ///  起与 Hub OpenAccess 单头统一，常量收敛到 <see cref="SignatureSpec.SignatureHeader"/>。
     /// </summary>
     public const string ColaSignatureHeader = SignatureSpec.SignatureHeader;
 
@@ -70,7 +70,7 @@ public sealed class SignatureValidationMiddleware
             return;
         }
 
-        // 启动期公开只读端点（Tier 0，C379）：远程配置 / 程序版本 / 资源版本等运营性公开数据端点打标豁免。
+        // 启动期公开只读端点（Tier 0）：远程配置 / 程序版本 / 资源版本等运营性公开数据端点打标豁免。
         // 豁免必须先于 App 风险模式分流——这类端点是登录前第一波请求，客户端本就不在启动期做签名，
         // 若进 FailClosed 分流会打断所有存量客户端启动流程。命中标记即完全跳过验签（含伪造签名头，不做
         // "带错签名反而拒"语义）；安全边界为 RequireAppContext 上下文解析 + TLS，不改变其他中间件行为。
@@ -169,13 +169,13 @@ public sealed class SignatureValidationMiddleware
         var method = context.Request.Method;
         var path = context.Request.Path.Value?.TrimEnd('/') ?? string.Empty;
         var query = context.Request.QueryString.Value?.TrimStart('?') ?? string.Empty;
-        // C267：v2 消息串 query 段走 RFC 3986 canonical（key 字典序 + percent-encoding），
+        // ：v2 消息串 query 段走 RFC 3986 canonical（key 字典序 + percent-encoding），
         // 不再依赖客户端原始顺序 —— 前置代理改写参数顺序/编码不再破签；v1 保持原始串（逃生通道）
         var canonicalQuery = CanonicalRequestBuilder.CanonicalQuery(context.Request.Query);
 
         if (keyId == null)
         {
-            // v1 过渡期：C1 全局常量优先回退（客户端未注入密钥环时行为与 C1 完全一致），
+            // v1 过渡期： 全局常量优先回退（客户端未注入密钥环时行为与 完全一致），
             // 再遍历 主库生效密钥环（无 keyId 寻址，只能逐把尝试）
             var message = BuildSignatureMessage(method, path, query, ts, mid, bodyBytes);
             if (VerifyHmac(Encoding.UTF8.GetBytes(options.Secret), message, provided))
@@ -250,20 +250,20 @@ public sealed class SignatureValidationMiddleware
     }
 
     /// <summary>
-    /// v1 message（C1 历史规格，过渡逃生通道保留）：query 保持客户端原始串
+    /// v1 message（历史规格，过渡逃生通道保留）：query 保持客户端原始串
     /// （Uri.Query.TrimStart('?')），与客户端 NetLib.ApiServerHttpRequest 逐字节对齐。
-    /// body 摘要走 <see cref="CanonicalRequestBuilder.BodyHashHex"/>（C267 消重 SHA-256 计算）。
+    /// body 摘要走 <see cref="CanonicalRequestBuilder.BodyHashHex"/>（消重 SHA-256 计算）。
     /// </summary>
     internal static string BuildSignatureMessage(string method, string path, string query, long ts, ulong mid, byte[] body)
     {
-        // ponytail: v1 按原始串对齐（C1 客户端行为），若前置代理改写 URL 编码或参数顺序两端会不一致；
-        // v2 已升级 canonical（见 TryValidateAsync），此路径 C3 全量切换后随 v1 一起退役
+        // ponytail: v1 按原始串对齐（客户端行为），若前置代理改写 URL 编码或参数顺序两端会不一致；
+        // v2 已升级 canonical（见 TryValidateAsync），此路径 全量切换后随 v1 一起退役
         return $"v1\n{method}\n{path}\n{query}\n{ts}\n{mid}\n{CanonicalRequestBuilder.BodyHashHex(body)}";
     }
 
     /// <summary>
     /// HMAC-SHA256 重算 + 恒时比较（先比长度再 FixedTimeEquals，避免长度差异短路泄露计时信号）。
-    /// <para>计算走 <see cref="CanonicalRequestBuilder.HmacSha256(byte[], string)"/> —— 全仓唯一 HMAC 实现（C267）。</para>
+    /// <para>计算走 <see cref="CanonicalRequestBuilder.HmacSha256(byte[], string)"/> —— 全仓唯一 HMAC 实现。</para>
     /// </summary>
     private static bool VerifyHmac(byte[] secret, string message, byte[] provided)
     {

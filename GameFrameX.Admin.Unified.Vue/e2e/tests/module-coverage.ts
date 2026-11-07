@@ -3,13 +3,13 @@ import { navigateByMenu, shot, sleep } from './helpers';
 
 // —— 分模块覆盖扫描共用骨架（2026-10-20 套件重组；同日补动作层：搜索规则/详情/编辑回显/删除取消/下拉）——
 // 每个模块（侧边栏根面板）一个用例（modules/*.e2e.ts），本文件提供共用能力：
-//   installApiRecorder / readApiRecords / apiAnomalies —— 被动 API 记录（含请求体快照）与异常过滤
-//     （fetch/XHR 打桩只读不改，证明页面自身发出的请求及结果，符合真实点击化约束）
-//   renderedMenuGroups —— 按根面板（模块）枚举渲染后侧边栏的叶子（不读菜单树接口）
-//   sweepGroup —— 模块内逐叶子：真实点击导航 → 404 采样 → 搜索/重置/新增对话框交互探测；
-//     actions 开启时追加行级动作探针：详情开/关、编辑回显 + 下拉面板开、删除二次确认取消、
-//     搜索关键词真实输入 + payload 断言 + 重置清空断言、搜索下拉真实选值。
-//     全部非破坏性（不提交编辑、不确认删除）；写入半边（编辑提交/真删）由 crud-roundtrips 承载。
+//  installApiRecorder / readApiRecords / apiAnomalies —— 被动 API 记录（含请求体快照）与异常过滤
+//  （fetch/XHR 打桩只读不改，证明页面自身发出的请求及结果，符合真实点击化约束）
+//  renderedMenuGroups —— 按根面板（模块）枚举渲染后侧边栏的叶子（不读菜单树接口）
+//  sweepGroup —— 模块内逐叶子：真实点击导航 → 404 采样 → 搜索/重置/新增对话框交互探测；
+//  actions 开启时追加行级动作探针：详情开/关、编辑回显 + 下拉面板开、删除二次确认取消、
+//  搜索关键词真实输入 + payload 断言 + 重置清空断言、搜索下拉真实选值。
+//  全部非破坏性（不提交编辑、不确认删除）；写入半边（编辑提交/真删）由 crud-roundtrips 承载。
 // 覆盖产物写入用例 annotations（leaves 清单 + 每叶交互面），报告可审计。
 
 export type ApiRecord = { url: string; status: number; code: number | null; body?: string };
@@ -385,9 +385,9 @@ async function collapseSelectOverlay(page: Page): Promise<void> {
   await sleep(250);
 }
 // —— 搜索规则探针的页面豁免清单（按侧边栏渲染叶子名）——
-// Online 游标页（C349/C365）：ServerId 作用域守卫是设计行为（issue #4 + vault C2 S1.7 硬校验），
-//   关键词/下拉断言不适用；玩家中心 游戏角色/游戏用户 首个检索字段是数字 ID（long wire），
-//   中文关键词会触发绑定 500（COV-P2-03 跟进统一 400），用数字关键词验证同样的接线。
+// Online 游标页：ServerId 作用域守卫是设计行为（issue #4 + vault .7 硬校验），
+//  关键词/下拉断言不适用；玩家中心 游戏角色/游戏用户 首个检索字段是数字 ID（long wire），
+//  中文关键词会触发绑定 500（COV-P2-03 跟进统一 400），用数字关键词验证同样的接线。
 const SEARCH_RULES_SKIP_LEAVES = new Set([
   '在线总览', '消息审计', '玩家分群', '配置灰度发布', '举报处置', '资产流水', '交易详情',
   '资产审计', '匹配队列总览', '匹配失败原因', '异常Ticket查询', '玩家时间线', '统一审计检索', '受控操作',
@@ -719,7 +719,7 @@ export type GroupSweepOptions = {
   shotLabel?: string;
   // 开启行级动作层（搜索规则 payload + 详情/编辑回显/删除取消 + 下拉交互）
   actions?: boolean;
-  // 跳过通用 CRUD 探针的叶子（C404：开服/合服向导是流程页，无 SearchForm/CrudDataTable 与行级 CRUD 动作，
+  // 跳过通用 CRUD 探针的叶子（开服/合服向导是流程页，无 SearchForm/CrudDataTable 与行级 CRUD 动作，
   // 通用探针不适用；写路径由专属用例 game-area-provision / game-area-merge 以真实流程覆盖。
   // 跳过的叶子仍计入叶子数下限断言，并在 annotations 中标记 skipped 供审计）
   skipLeaves?: string[];

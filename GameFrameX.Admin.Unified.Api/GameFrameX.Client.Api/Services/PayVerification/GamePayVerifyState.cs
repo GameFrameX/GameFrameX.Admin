@@ -1,7 +1,7 @@
 namespace GameFrameX.Client.Api.Services.PayVerification;
 
 /// <summary>
-/// 验真结果三态（C11 支付域）
+/// 验真结果三态（支付域）
 /// </summary>
 public enum GamePayVerifyState
 {

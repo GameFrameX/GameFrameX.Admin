@@ -1,14 +1,14 @@
 namespace GameFrameX.Application.ServerCenter.Online;
 
 /// <summary>
-/// Online Runtime 业务响应体（来源 change C339 / vault:C2 S1.2 公共响应结构，Admin 侧消费形态）。
+/// Online Runtime 业务响应体（来源 change / vault: .2 公共响应结构，Admin 侧消费形态）。
 /// <para>
 /// 物理传输层复用 Foundation <c>HttpJsonResultData</c> 信封（与 Server HTTP 交互惯例一致，经
-/// <c>ToHttpJsonResult&lt;string&gt;</c> 解包）；本类型是信封 data 内的业务响应结构，对齐 vault C2 §1：
+/// <c>ToHttpJsonResult&lt;string&gt;</c> 解包）；本类型是信封 data 内的业务响应结构，对齐 vault ：
 /// 响应至少包含 <c>Code / MessageKey / RequestId / ServerTime / Data</c>——机器判断走 <c>Code</c>，
 /// 本地化走 <c>MessageKey</c>（Admin 侧按镜像数字码展示，不依赖中文文案判断业务成败）。
 /// </para>
-/// <para>字段名以 vault S1.2 定稿为唯一权威；vault 详表落盘前以此首版形态经 <c>OnlineServerClient</c> 内部调整，调用方无感。</para>
+/// <para>字段名以 vault .2 定稿为唯一权威；vault 详表落盘前以此首版形态经 <c>OnlineServerClient</c> 内部调整，调用方无感。</para>
 /// </summary>
 public sealed class OnlineApiResponse<T> where T : class
 {

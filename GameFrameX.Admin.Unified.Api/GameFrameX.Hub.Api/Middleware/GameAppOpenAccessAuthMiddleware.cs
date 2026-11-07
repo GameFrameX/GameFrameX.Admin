@@ -24,7 +24,7 @@ public class GameAppOpenAccessAuthMiddleware
     private const string NonceCachePrefix = "gameAppOpenAccess:nonce:";
 
     /// <summary>
-    /// 时间戳允许偏差（±秒），与 C181 Signature 默认 ±5min 一致。
+    /// 时间戳允许偏差（±秒），与 Signature 默认 ±5min 一致。
     /// </summary>
     private const int AllowedDriftSeconds = 300;
 
@@ -43,7 +43,7 @@ public class GameAppOpenAccessAuthMiddleware
         var credentialRepo = context.RequestServices.GetRequiredService<Repository<GameAppOpenAccessEntity>>();
         var userRepo = context.RequestServices.GetRequiredService<Repository<UserEntity>>();
 
-        // 2. 鉴权头（C267 起单头 Signature: v2;{accessKey};{ts};{nonce};{base64sig}，与传输签名规范统一）
+        // 2. 鉴权头（起单头 Signature: v2;{accessKey};{ts};{nonce};{base64sig}，与传输签名规范统一）
         var signatureHeader = context.Request.Headers[SignatureSpec.SignatureHeader].FirstOrDefault();
         if (!TryParseSignatureHeader(signatureHeader, out var accessKey, out var timestamp, out var nonce, out var providedSignature))
         {
@@ -67,7 +67,7 @@ public class GameAppOpenAccessAuthMiddleware
             return;
         }
 
-        // C372（GFX-838）：开放访问凭证读取边界解密（C371 起库内密文；无前缀明文直通兼容存量行）。
+        // ：开放访问凭证读取边界解密（起库内密文；无前缀明文直通兼容存量行）。
         // 实体为本次查询的请求本地实例，改写无副作用；进程级密文缓存兜底，避免每请求 PBKDF2 派生。
         credential.AccessSecret = SecretCrypto.DecryptCached(credential.AccessSecret) ?? string.Empty;
 
@@ -90,8 +90,8 @@ public class GameAppOpenAccessAuthMiddleware
             return;
         }
 
-        // 6. HMAC 签名校验（C267：复用 CanonicalRequestBuilder.BuildV2Message —— v2 message 单一拼装，
-        //    body 入签 + canonical query；比较改字节级 FixedTimeEquals，替代原字符串序数比较）
+        // 6. HMAC 签名校验（复用 CanonicalRequestBuilder.BuildV2Message —— v2 message 单一拼装，
+        //  body 入签 + canonical query；比较改字节级 FixedTimeEquals，替代原字符串序数比较）
         context.Request.EnableBuffering();
         byte[] bodyBytes;
         using (var buffer = new MemoryStream())
@@ -147,7 +147,7 @@ public class GameAppOpenAccessAuthMiddleware
     }
 
     /// <summary>
-    /// 解析单头 <c>Signature: v2;{accessKey};{ts};{nonce};{base64sig}</c>（C267 格式）。
+    /// 解析单头 <c>Signature: v2;{accessKey};{ts};{nonce};{base64sig}</c>（格式）。
     /// </summary>
     /// <param name="headerValue">签名头原始值。</param>
     /// <param name="accessKey">输出：凭证 AccessKey（keyId 段位）。</param>
@@ -189,7 +189,7 @@ public class GameAppOpenAccessAuthMiddleware
     }
 
     /// <summary>
-    /// v2 消息串验签（C267）：accessKey 充当 keyId、nonce 充当 mid 段位，body 入签；
+    /// v2 消息串验签：accessKey 充当 keyId、nonce 充当 mid 段位，body 入签；
     /// 消息串拼装与 HMAC 计算均委托 <see cref="CanonicalRequestBuilder"/>（全仓唯一实现）；
     /// 比较为字节级恒时（先比长度再 FixedTimeEquals）。
     /// </summary>

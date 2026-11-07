@@ -92,7 +92,7 @@ export interface PageGameCommodityEntityRequest {
   /** 多少rmb */
   cost?: boolean | null;
   /**
-   * 数量（搜索表单为文本输入，宽容读取字符串提交——C391）
+   * 数量（搜索表单为文本输入，宽容读取字符串提交——）
    * @format int64
    */
   number?: number | null;
@@ -138,7 +138,7 @@ export interface GameCommodityAddPostData {
   data: GameCommodityResponse;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;
@@ -164,7 +164,7 @@ export interface GameCommodityDetailGetData {
   data: GameCommodityResponse;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;
@@ -187,7 +187,7 @@ export interface GameCommodityPagePostData {
   data: GameCommodityResponseSqlSugarPagedList;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;

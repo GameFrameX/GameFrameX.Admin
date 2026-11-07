@@ -13,7 +13,7 @@ using GameFrameX.Web.Api.ApiRouting;
 namespace GameFrameX.Core.Tests.ApiRouting;
 
 /// <summary>
-/// C391（GFX-923 / Api#291）：模型绑定失败显式 400 防线。
+/// ：模型绑定失败显式 400 防线。
 /// 动态控制器无 [ApiController]，Startup 配置的 InvalidModelStateResponseFactory 原本对其失活，
 /// 绑定失败静默产出 null 参数 → 500 NRE；本过滤器把工厂接到全量 Admin MVC action。
 /// 仅拦绑定失败；校验特性违规（[Range]/[Required]）维持历史放行语义（前端 pageSize=1000 等既定用法）。

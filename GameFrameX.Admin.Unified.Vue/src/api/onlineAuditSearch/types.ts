@@ -2,7 +2,7 @@
 /* tslint:disable */
 
 /**
- * 统一审计行来源标识（change C344 / vault:C9 S8.2；三来源口径见 OnlineAuditSourceMap）。
+ * 统一审计行来源标识（change / vault: .2；三来源口径见 OnlineAuditSourceMap）。
  * @format int32
  */
 export enum OnlineAuditSourceKind {
@@ -15,12 +15,12 @@ export enum OnlineAuditSourceKind {
 }
 
 /**
- * 统一审计检索行（三来源五维统一字段；change C344 / vault:C9 S8.2）。
+ * 统一审计检索行（三来源五维统一字段；change / vault: .2）。
  *
  * 字段映射唯一来源是 OnlineAuditSourceMap——禁止在 Service 内散落第二套映射。
  */
 export interface OnlineAuditSearchEntryResponse {
-  /** 统一审计行来源标识（change C344 / vault:C9 S8.2；三来源口径见 OnlineAuditSourceMap）。 */
+  /** 统一审计行来源标识（change / vault: .2；三来源口径见 OnlineAuditSourceMap）。 */
   source?: OnlineAuditSourceKind;
   /** 操作者标识（Admin 操作日志 = 账号；Online 审计 = 操作者 Id；域命令 = 操作者 Id/账号）。 */
   operatorIdentifier?: string | null;
@@ -42,7 +42,7 @@ export interface OnlineAuditSearchEntryResponse {
 }
 
 /**
- * 统一审计检索分页输入参数（五维过滤：操作者/对象/作用域/命令类型/时间窗；change C344 / vault:C9 S8.2）。
+ * 统一审计检索分页输入参数（五维过滤：操作者/对象/作用域/命令类型/时间窗；change / vault: .2）。
  *
  * 作用域维度（ServerId）在此是可选过滤而非调用前置：本地两来源（Admin 操作日志 / 域命令记录）
  * 支持无作用域全量检索；Online 审计事件来源仅在 ServerId 提供时参与聚合
@@ -94,7 +94,7 @@ export interface PageOnlineAuditSearchRequest {
   pageSize?: number;
 }
 
-/** 统一审计检索分页响应（Admin 出参；change C344 / vault:C9 S8.2）。 */
+/** 统一审计检索分页响应（Admin 出参；change / vault: .2）。 */
 export interface PageOnlineAuditSearchResponse {
   /** 统一审计行（三来源归并，按 OccurredAt 倒序）。 */
   items?: OnlineAuditSearchEntryResponse[] | null;
@@ -112,11 +112,11 @@ export interface OnlineAuditSearchPagePostData {
   code: number;
   /** 错误或提示信息 */
   message: string;
-  /** 统一审计检索分页响应（Admin 出参；change C344 / vault:C9 S8.2）。 */
+  /** 统一审计检索分页响应（Admin 出参；change / vault: .2）。 */
   data: PageOnlineAuditSearchResponse;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;

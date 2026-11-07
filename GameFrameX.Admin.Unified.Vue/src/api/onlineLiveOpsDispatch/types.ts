@@ -4,7 +4,7 @@
 import type { LiveOpsSourceKind, OnlineLiveOpsDispatchResponse } from "../_shared/data-contracts";
 
 /**
- * LiveOps 统一下发输入（来源 change C343 / vault:C8 S7.7）。
+ * LiveOps 统一下发输入（来源 change / vault: .7）。
  *
  * 五类来源硬枚举 + 业务主键 + 目标区服 ServerId；
  * `Reason` 必填进审计；`SegmentId` 可选定向分群。越枚举值 / 越作用域在入口即拒绝。
@@ -46,14 +46,14 @@ export interface OnlineLiveOpsDispatchDispatchPostData {
   /** 错误或提示信息 */
   message: string;
   /**
-   * LiveOps 统一下发回执（来源 change C343 / vault:C8 S7.7）。
+   * LiveOps 统一下发回执（来源 change / vault: .7）。
    *
    * 透传 Online 确认版本 / 状态供前端回显；`Merged` 标记邮件来源「同目标合并返回首次回执」路径。
    */
   data: OnlineLiveOpsDispatchResponse;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;

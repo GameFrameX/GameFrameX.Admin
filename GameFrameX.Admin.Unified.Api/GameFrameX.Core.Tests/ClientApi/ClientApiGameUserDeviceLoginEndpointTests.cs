@@ -10,7 +10,7 @@ using GameFrameX.Entity.Business.Game;
 namespace GameFrameX.Core.Tests.ClientApi;
 
 /// <summary>
-/// GameUser.DeviceLogin 端点级行为测试（GFX-729 / C320）：匿名设备登录按 DeviceId 找号或建号，
+/// GameUser.DeviceLogin 端点级行为测试：匿名设备登录按 DeviceId 找号或建号，
 /// 覆盖首登建号 IsNewRegister=true、二次登录找号 IsNewRegister=false、AccessToken PascalCase 契约、
 /// 账号删除/禁用态拒绝四场景。
 /// </summary>
@@ -90,7 +90,7 @@ public sealed class ClientApiGameUserDeviceLoginEndpointTests
             // 登录响应契约：AccessToken 以 PascalCase 命名输出且非空
             Assert.True(data.TryGetProperty("AccessToken", out var accessToken), "AccessToken 字段必须是 PascalCase");
             Assert.False(string.IsNullOrWhiteSpace(accessToken.GetString()));
-            // C7: 登录响应随 token 一起回传 per-session 会话密钥 kid/secret
+            // : 登录响应随 token 一起回传 per-session 会话密钥 kid/secret
             Assert.False(string.IsNullOrWhiteSpace(data.GetProperty("SessionKeyId").GetString()));
             Assert.Matches("^[0-9a-f]{64}$", data.GetProperty("SessionKeySecret").GetString());
         }

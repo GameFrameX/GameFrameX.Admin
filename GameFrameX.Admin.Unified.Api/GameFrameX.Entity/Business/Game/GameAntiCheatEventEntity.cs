@@ -7,7 +7,7 @@ namespace GameFrameX.Entity.Business.Game;
 /// 反作弊事件账本（安全治理事件事实源）。记录反作弊 / 广告奖励 Provider 上报的每一笔风险事件：
 /// 来源 Provider、风险等级、指向对象、证据摘要、<strong>建议</strong>处置、人工复核状态。
 /// <para>铁律：SuggestedAction 仅是 Provider 建议，<strong>永不自动落处罚</strong>；必须经人工复核（ManualReviewState Pending → Approved/Rejected/Escalated）。
-/// 本实体只承载事件与复核状态，不写处罚表——处罚创建/撤销属 C11-C（C115）职责。</para>
+/// 本实体只承载事件与复核状态，不写处罚表——处罚创建/撤销属 -C职责。</para>
 /// <para>幂等：ux_anticheat_idempotency 在数据库层保证 IdempotencyKey 唯一，重复上报不重复入账。</para>
 /// </summary>
 [SugarTable(null, "反作弊事件账本")]

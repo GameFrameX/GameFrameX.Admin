@@ -67,7 +67,7 @@ public sealed class ProjectSchedulerFactory : ISchedulerFactory
     }
 
     /// <summary>
-    /// 是否全局暂停（PauseAllJob 生效时触发循环整轮跳过，C404：循环此前不读该标记）。
+    /// 是否全局暂停（PauseAllJob 生效时触发循环整轮跳过，：循环此前不读该标记）。
     /// </summary>
     internal bool IsPausedAll()
     {
@@ -82,7 +82,7 @@ public sealed class ProjectSchedulerFactory : ISchedulerFactory
         }
 
         await scheduler.RunAsync(CancellationToken.None);
-        // 手动执行同样推进触发器运行态并写回（C404 §9.8）：该路径不经过触发循环的 Fire，
+        // 手动执行同样推进触发器运行态并写回：该路径不经过触发循环的 Fire，
         // 不补统计的话「任务调度」页的运行次数/最近运行时间会与真实执行脱节。
         foreach (var trigger in scheduler.GetTriggerSnapshot())
         {

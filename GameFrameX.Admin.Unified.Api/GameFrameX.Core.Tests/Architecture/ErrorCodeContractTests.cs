@@ -8,16 +8,16 @@ using GameFrameX.Core.Localization.Errors;
 
 namespace GameFrameX.Core.Tests.Architecture;
 
-// C263 / GFX-669：统一错误码体系 T1 契约守护。
+//  / ：统一错误码体系 契约守护。
 // 权威依据：gfx-doc/decisions/2026-08-20-unified-error-code-segment-system.md（ADR 分段表）
-// 与 gfx-doc/dev/global-config/changes/C262-unified-error-code-system/change.md（父 change）。
+// 与 gfx-doc/dev/global-config/changes/-unified-error-code-system/change.md（父 change）。
 // 五类断言：
-//   U1 全局数值唯一（0 保留给信封成功码，任何成员不得为 0；8 位取值域）
-//   S1 每成员前 3 位段命中 ErrorSegmentRegistry 且 EnumTypeName 与所属模块 enum 匹配（含 pending 段不可承载成员）
-//   S2 登记表自洽：段首位落在所属大域区间；已实现段必须存在对应 enum 且成员全部落在本段
-//   L1 全部枚举成员挂载非空 [ErrorText]（中英双语文案声明即数据，单一事实来源）
-//   C1 源码扫描禁 (XxxErrorCode)数字 强转字面量（杜绝魔法数字；扫描排除本测试文件自身与 bin/obj）
-//   R1 旧枚举防回潮（C264 / T2）：三 host Result/ResultCode.cs 不复存在，全仓无旧 using / 裸 ResultCode 成员引用
+//  全局数值唯一（0 保留给信封成功码，任何成员不得为 0；8 位取值域）
+//  每成员前 3 位段命中 ErrorSegmentRegistry 且 EnumTypeName 与所属模块 enum 匹配（含 pending 段不可承载成员）
+//  登记表自洽：段首位落在所属大域区间；已实现段必须存在对应 enum 且成员全部落在本段
+//  L1 全部枚举成员挂载非空 [ErrorText]（中英双语文案声明即数据，单一事实来源）
+//  源码扫描禁 (XxxErrorCode)数字 强转字面量（杜绝魔法数字；扫描排除本测试文件自身与 bin/obj）
+//  R1 旧枚举防回潮：三 host Result/ResultCode.cs 不复存在，全仓无旧 using / 裸 ResultCode 成员引用
 // 另含 BusinessException 新构造行为测试（message 缺省走 ErrorLocalizer + int Code 出站）。
 public sealed class ErrorCodeContractTests
 {
@@ -82,7 +82,7 @@ public sealed class ErrorCodeContractTests
         return members;
     }
 
-    // U1：全局数值唯一；0 保留给信封成功码；取值域为 8 位（10000000-99999999）。
+    // ：全局数值唯一；0 保留给信封成功码；取值域为 8 位（10000000-99999999）。
     [Fact]
     public void AllErrorCodes_AreGloballyUnique_AndZeroReserved()
     {
@@ -101,7 +101,7 @@ public sealed class ErrorCodeContractTests
         }
     }
 
-    // S1：每成员前 3 位命中段登记，且登记条目 EnumTypeName 与所属枚举名一致；pending 段不可承载成员。
+    // ：每成员前 3 位命中段登记，且登记条目 EnumTypeName 与所属枚举名一致；pending 段不可承载成员。
     [Fact]
     public void EveryMember_SegmentIsRegistered_AndMatchesModuleEnum()
     {
@@ -130,8 +130,8 @@ public sealed class ErrorCodeContractTests
         Assert.True(problems.Count == 0, string.Join("\n", problems));
     }
 
-    // S2：登记表自洽 —— 段首位落在所属大域区间；已实现段必须有对应 enum 且其成员全部落在该枚举登记的段集合内。
-    // 段集合按 EnumTypeName 分组（C339 起 OnlineErrorCode 一枚举跨 320～327 八段为合法形态；枚举成员仍不得漂出自己登记的段集合）。
+    // ：登记表自洽 —— 段首位落在所属大域区间；已实现段必须有对应 enum 且其成员全部落在该枚举登记的段集合内。
+    // 段集合按 EnumTypeName 分组（起 OnlineErrorCode 一枚举跨 320～327 八段为合法形态；枚举成员仍不得漂出自己登记的段集合）。
     [Fact]
     public void RegistryEntries_AreConsistent_WithDomainAndImplementedEnums()
     {
@@ -197,7 +197,7 @@ public sealed class ErrorCodeContractTests
         Assert.True(problems.Count == 0, string.Join("\n", problems));
     }
 
-    // C1：源码扫描禁 (XxxErrorCode)数字 强转字面量（魔法数字护栏；旧三 host ResultCode 强转已随 C264 切换消灭，不在本断言范围）。
+    // ：源码扫描禁 (XxxErrorCode)数字 强转字面量（魔法数字护栏；旧三 host ResultCode 强转已随 切换消灭，不在本断言范围）。
     [Fact]
     public void SourceCode_HasNoErrorCodeCastLiterals()
     {
@@ -225,7 +225,7 @@ public sealed class ErrorCodeContractTests
         Assert.True(violations.Count == 0, "发现 (XxxErrorCode)数字 强转字面量（禁止魔法数字，须直接引用枚举成员）：\n" + string.Join("\n", violations));
     }
 
-    // R1：旧三 host 错误码枚举防回潮（C264 / GFX-670 T2）——旧文件不得复现，全仓不得残留旧引用。
+    // R1：旧三 host 错误码枚举防回潮——旧文件不得复现，全仓不得残留旧引用。
     [Fact]
     public void LegacyHostResultCodeEnums_DoNotExist()
     {
@@ -234,7 +234,7 @@ public sealed class ErrorCodeContractTests
             "GameFrameX.Client.Api/Result/ResultCode.cs",
             "GameFrameX.Hub.Api/Result/ResultCode.cs",
             "GameFrameX.Game.Api/Result/ResultCode.cs",
-            // C265（GFX-671）：Admin 旧 D 码体系三文件防回潮
+            // ：Admin 旧 D 码体系三文件防回潮
             "GameFrameX.Core.Enum/ErrorCodeEnum.cs",
             "GameFrameX.Core.Enum/ErrorCodeTypeAttribute.cs",
             "GameFrameX.Core.Enum/ErrorCodeItemMetadataAttribute.cs",
@@ -248,7 +248,7 @@ public sealed class ErrorCodeContractTests
         // 全仓不得残留旧引用：using（含别名）或裸 ResultCode 成员引用（排除本测试文件自身与 bin/obj）
         var usingPattern = new Regex(@"using\s+(?:\w+\s*=\s*)?GameFrameX\.(?:Client|Hub|Game)\.Api\.Result\s*;");
         var memberPattern = new Regex(@"\b(?:Client|Hub)?ResultCode\.");
-        // C265：Admin 旧 D 码体系标识符（枚举/特性/出站 string 方法）全仓防回潮
+        // ：Admin 旧 D 码体系标识符（枚举/特性/出站 string 方法）全仓防回潮
         var adminLegacyPattern = new Regex(@"\b(?:ErrorCodeEnum|ErrorCodeTypeAttribute|ErrorCodeItemMetadataAttribute|ErrorCodeToString|ResolveErrorCode)\b");
         var violations = new List<string>();
 
@@ -274,7 +274,7 @@ public sealed class ErrorCodeContractTests
     }
 
     // E1：码表导出——每次测试运行把全部枚举成员的 [ErrorText] 双语文案合成仓库根 error-codes.json（数字 + 中英），
-    // 供前端 locale（C262 T4）与 Unity 客户端消费；产物与 ErrorTextAttribute 单一事实来源天然同源（同一张表序列化落盘）。
+    // 供前端 locale与 Unity 客户端消费；产物与 ErrorTextAttribute 单一事实来源天然同源（同一张表序列化落盘）。
     [Fact]
     public void Export_ErrorCodesJson_InSyncWithErrorTextAttributes()
     {

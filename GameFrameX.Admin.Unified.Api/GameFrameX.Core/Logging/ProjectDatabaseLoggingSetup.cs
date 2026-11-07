@@ -8,7 +8,7 @@ internal static class ProjectDatabaseLoggingSetup
     /// <summary>
     /// 注册操作日志数据库写入器。过滤语义取旧 Logging.json 的 <c>Database.MinimumLevel = Information</c>（最小级别）：
     /// Information 及以上放行——Monitor 正常调用为 Information，失败调用按 Error 输出，
-    /// 由 <see cref="DatabaseLoggingWriter.WriteSingleAsync"/> 落 exception 表并填 Exception 字段（C363 验收 2/3 的前提）。
+    /// 由 <see cref="DatabaseLoggingWriter.WriteSingleAsync"/> 落 exception 表并填 Exception 字段（验收 2/3 的前提）。
     /// </summary>
     public static void AddProjectDatabaseOperationLogging(this IServiceCollection services)
     {

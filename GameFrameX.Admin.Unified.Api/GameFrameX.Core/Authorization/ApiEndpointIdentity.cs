@@ -1,7 +1,7 @@
 namespace GameFrameX.Core.Authorization;
 
 /// <summary>
-/// API 端点路由归一化（U6/C42）。
+/// API 端点路由归一化。
 /// <para>统一三类输入到同一规范形式 <c>api/&lt;lower&gt;</c>：活端点模板、routeName（GetRouteName 输出）、请求 Path。
 /// 规范形式即 api_endpoint.RoutePath，也是端点↔按钮绑定的对账键。<b>RoutePath 不是授权令牌</b>，仅用于对账与请求期查端点身份。</para>
 /// </summary>

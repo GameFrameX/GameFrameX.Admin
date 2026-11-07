@@ -87,10 +87,10 @@ onUnmounted(() => {
   background: var(--sidebar-paper);
   border-right: 1px solid var(--hairline); // 发丝线替代 4px 色块分隔（纸面世界结构线）
   overflow: hidden;
-  transition: width 0.25s ease; // 折叠状态确认动效；全局 prefers-reduced-motion 已灭（GFX-659/C253）
+transition: width 0.25s ease; // 折叠状态确认动效；全局 prefers-reduced-motion 已灭
 
   &.aside-panel-collapsed {
-    width: 64px; // 与 navigationMenu/vertical.vue 的 .menu-collapsed 对齐，避免图标被 overflow:hidden 裁切（C256）
+width: 64px; // 与 navigationMenu/vertical.vue 的 .menu-collapsed 对齐，避免图标被 overflow:hidden 裁切
   }
 }
 

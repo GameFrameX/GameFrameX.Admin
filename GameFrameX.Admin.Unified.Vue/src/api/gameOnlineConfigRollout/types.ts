@@ -80,7 +80,7 @@ export interface GameOnlineConfigRolloutResponseSqlSugarPagedList {
   hasNextPage?: boolean;
 }
 
-/** 配置灰度版本行分页查询输入（来源 change C343 / vault:C8 S7.7）。 */
+/** 配置灰度版本行分页查询输入（来源 change / vault: .7）。 */
 export interface PageGameOnlineConfigRolloutRequest {
   searchKey?: string | null;
   /**
@@ -105,7 +105,7 @@ export interface PageGameOnlineConfigRolloutRequest {
   serverId?: string | null;
 }
 
-/** 灰度发布输入（来源 change C343 / vault:C8 S7.7）。Percent 边界常量直接引用 `OnlineRolloutSemanticMap`（禁内联第二套数值）。 */
+/** 灰度发布输入（来源 change / vault: .7）。Percent 边界常量直接引用 `OnlineRolloutSemanticMap`（禁内联第二套数值）。 */
 export interface PublishConfigRolloutRequest {
   /**
    * 目标区服Id（Online 作用域 ServerId）。
@@ -184,7 +184,7 @@ export interface PublishConfigRolloutResponse {
   createdTime?: number;
 }
 
-/** 灰度回滚输入（来源 change C343 / vault:C8 S7.8 / VC-7.12）。回滚 = 版本化新下发：恢复目标版本的 SegmentId/Percent 语义，生成新 ConfigVersion 行。 */
+/** 灰度回滚输入（来源 change / vault: .8 / .12）。回滚 = 版本化新下发：恢复目标版本的 SegmentId/Percent 语义，生成新 ConfigVersion 行。 */
 export interface RollbackConfigRolloutRequest {
   /**
    * 目标区服Id（Online 作用域 ServerId）。
@@ -268,7 +268,7 @@ export interface GameOnlineConfigRolloutPagePostData {
   data: GameOnlineConfigRolloutResponseSqlSugarPagedList;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;
@@ -292,7 +292,7 @@ export interface GameOnlineConfigRolloutPublishPostData {
   data: PublishConfigRolloutResponse;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;
@@ -316,7 +316,7 @@ export interface GameOnlineConfigRolloutRollbackPostData {
   data: RollbackConfigRolloutResponse;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;

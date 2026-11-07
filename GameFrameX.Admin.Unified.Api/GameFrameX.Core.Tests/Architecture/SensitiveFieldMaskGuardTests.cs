@@ -2,8 +2,8 @@ using System.Text.RegularExpressions;
 
 namespace GameFrameX.Core.Tests.Architecture;
 
-// C369（GFX-828）：敏感字段脱敏基建统一守护。
-// change：gfx-doc/dev/system-management/changes/C369-sensitive-field-mask-foundation/change.md
+// ：敏感字段脱敏基建统一守护。
+// change：gfx-doc/dev/system-management/changes/-sensitive-field-mask-foundation/change.md
 // SensitiveFieldMask（GameFrameX.Core/Service）是全仓 "******" 脱敏占位契约的唯一实现。
 // 历史上曾有 4 处并行副本 + 多处内联字面量，每个新凭证实体都要重新手接一遍，漏接即泄露。
 // 本守护防止回潮：Core 与测试工程之外不得再定义同语义字符串常量或出现 "******" 字面量赋值，

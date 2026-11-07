@@ -58,10 +58,10 @@
 
 <script lang="ts" setup name="onlineMatchQueueOverview">
 /**
- * 匹配队列总览页（C341 / GFX-757）。
+ * 匹配队列总览页。
  * 只读快照观测：Queues[] 数值卡片（Mode/Region 维度的深度/平均等待/吞吐）+ ServerTime 快照标注；
  * 默认 10s 轮询，遇 Online 7xxx 镜像码（限流/风控）即停（退避封装在 api/onlineMatch）。
- * 不缓存为权威状态——每次轮询即拉即弃（vault S4.9 只读观测方）。
+ * 不缓存为权威状态——每次轮询即拉即弃（vault .9 只读观测方）。
  */
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import ServerSelector from '/@/components/server-selector/ServerSelector.vue'

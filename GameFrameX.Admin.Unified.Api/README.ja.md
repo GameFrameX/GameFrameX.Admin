@@ -92,12 +92,12 @@ Client API と Hub API はどちらもより「スリム」です：Client API �
 ## 3つのホスト、それぞれ独立
 
 ```
-Admin API（20802）              Client API（20808）            Hub API（20806）
-    │                              │                              │
-    │ 管理画面用                    │ ゲームクライアント用           │ 外部システム / ゲーム側 / CI 用
-    │ ログイン / ユーザー / メニュー / │ ログイン / 決済 / 設定取得      │ サーバー / リソースバージョン /
-    │ 注文 / ログ / 定期ジョブ        │                              │ ビルド報告 / 機能スイッチ同期
-    │                              │                              │
+Admin API（20802） Client API（20808） Hub API（20806）
+    │ │ │
+    │ 管理画面用 │ ゲームクライアント用 │ 外部システム / ゲーム側 / CI 用
+    │ ログイン / ユーザー / メニュー / │ ログイン / 決済 / 設定取得 │ サーバー / リソースバージョン /
+    │ 注文 / ログ / 定期ジョブ │ │ ビルド報告 / 機能スイッチ同期
+    │ │ │
     └──────────── 共有 Entity ──────────────┬─────────────────────┘
                                            │
                                            ├── 共有 Payment（Client のみ使用）
@@ -126,32 +126,32 @@ Admin API は「動的 API」——Service を書けば自動的に API が生�
 
 ```
 GameFrameX.Admin.Unified.Api/
-├── GameFrameX.Web.Api/            # Admin API ホスト（起動エントリ、compose サービス名 web-api）
-├── GameFrameX.Client.Api/         # Client API ホスト（独立した WebApplication）
-├── GameFrameX.Hub.Api/            # Hub API ホスト（独立した WebApplication、従来型 Controller ルーティング）
-├── GameFrameX.Web.Core/           # Admin の起動ロジック、ミドルウェア、DI 設定（要注目）
-├── GameFrameX.Application/        # アプリケーション層（設定ファイル、シードデータ）
+├── GameFrameX.Web.Api/ # Admin API ホスト（起動エントリ、compose サービス名 web-api）
+├── GameFrameX.Client.Api/ # Client API ホスト（独立した WebApplication）
+├── GameFrameX.Hub.Api/ # Hub API ホスト（独立した WebApplication、従来型 Controller ルーティング）
+├── GameFrameX.Web.Core/ # Admin の起動ロジック、ミドルウェア、DI 設定（要注目）
+├── GameFrameX.Application/ # アプリケーション層（設定ファイル、シードデータ）
 ├── GameFrameX.Application.System/ # システム管理サービス（ユーザー/ロール/メニュー/ログ…）
-├── GameFrameX.Application.Game/   # ゲーム管理サービス（サーバー/注文/メール/引換コード…）
+├── GameFrameX.Application.Game/ # ゲーム管理サービス（サーバー/注文/メール/引換コード…）
 ├── GameFrameX.Application.Client/ # クライアント管理サービス（バージョン/チャネル/リソースパッケージ…）
 ├── GameFrameX.Application.Business/ # 業務サービス（デバイス / デバイスグループ）
-├── GameFrameX.Entity/             # エンティティ層（Base / System / Game / Client）
-├── GameFrameX.Core/               # コア層（リポジトリ、サービス基底クラス、認証、SignalR）
-├── GameFrameX.Core.Enum/          # 列挙型定義
-├── GameFrameX.Core.Extension/     # 拡張メソッドと共通 DTO（要注目、ここに車輪を探しに来ることが多い）
-├── GameFrameX.Core.SqlSugar/      # SqlSugar 設定、AOP、インターセプター
-├── GameFrameX.Core.Utility/       # ユーティリティクラス
+├── GameFrameX.Entity/ # エンティティ層（Base / System / Game / Client）
+├── GameFrameX.Core/ # コア層（リポジトリ、サービス基底クラス、認証、SignalR）
+├── GameFrameX.Core.Enum/ # 列挙型定義
+├── GameFrameX.Core.Extension/ # 拡張メソッドと共通 DTO（要注目、ここに車輪を探しに来ることが多い）
+├── GameFrameX.Core.SqlSugar/ # SqlSugar 設定、AOP、インターセプター
+├── GameFrameX.Core.Utility/ # ユーティリティクラス
 ├── GameFrameX.Core.BaseInputOutput/ # 基礎入出力モデル
-├── Payment/                       # 決済連携（Client API のみ参照）
-│   ├── GameFrameX.Payment.Abstract/          # 決済抽象インターフェース（先に定義、後に実装）
-│   ├── GameFrameX.Payment.AliPay/            # Alipay
-│   ├── GameFrameX.Payment.Apple/             # Apple IAP（アプリ内課金検証）
-│   ├── GameFrameX.Payment.Apple.AppStoreServer/  # App Store Server API v2
-│   ├── GameFrameX.Payment.Google/            # Google Play
-│   └── GameFrameX.Payment.Xsolla/            # Xsolla
-├── Dockerfile.web-api             # Admin API の Dockerfile（sdk:10.0 → aspnet:10.0）
-├── Dockerfile.client-api          # Client API の Dockerfile
-├── Dockerfile.hub-api             # Hub API の Dockerfile
+├── Payment/ # 決済連携（Client API のみ参照）
+│ ├── GameFrameX.Payment.Abstract/ # 決済抽象インターフェース（先に定義、後に実装）
+│ ├── GameFrameX.Payment.AliPay/ # Alipay
+│ ├── GameFrameX.Payment.Apple/ # Apple IAP（アプリ内課金検証）
+│ ├── GameFrameX.Payment.Apple.AppStoreServer/ # App Store Server API v2
+│ ├── GameFrameX.Payment.Google/ # Google Play
+│ └── GameFrameX.Payment.Xsolla/ # Xsolla
+├── Dockerfile.web-api # Admin API の Dockerfile（sdk:10.0 → aspnet:10.0）
+├── Dockerfile.client-api # Client API の Dockerfile
+├── Dockerfile.hub-api # Hub API の Dockerfile
 └── （統一オーケストレーションはリポジトリルートの docker-compose.yml へ移動済み：PostgreSQL + 3 API + フロントエンドの計 5 サービス）
 ```
 
@@ -253,7 +253,7 @@ dotnet run --project GameFrameX.Client.Api
 dotnet run --project GameFrameX.Hub.Api
 # リッスン http://localhost:20806、Swagger UI: http://localhost:20806/swagger
 
-# Game API（ゲームサーバー側）は Client API に統合済み（C268）：GameUser* コントローラーは Client.Api 経由で公開（http://*:20808）
+# Game API（ゲームサーバー側）は Client API に統合済み：GameUser* コントローラーは Client.Api 経由で公開（http://*:20808）
 ```
 
 Admin API の初回起動時、SqlSugar Code-First が自動で DB とテーブルを構築し、ついでにシードデータ（管理者、ロール、メニュー、辞書など）を流し込みます。空のデータベースに突然テーブルが大量に出てきても慌てないでください。正常な動作です。
@@ -276,7 +276,7 @@ docker run -p 20802:20802 \
 | 起動時に DB 接続失敗のエラー | `Database.json`（または `DBTYPE/CONNECTIONSTRING` 環境変数）の接続文字列が不正、もしくは PG が起動していない |
 | 起動時に「DbType が Sqlite/PostgreSQL だが、接続文字列が…の形式ではない」エラー | 環境変数が片方だけ上書きされている：`DBTYPE` と `CONNECTIONSTRING` は必ずペアで設定すること |
 | SQLite の DB ファイルが変な場所にできる | 接続文字列はプロセスの作業ディレクトリ基準で解決される——リポジトリルートに戻って `dotnet run` を実行。プロジェクトディレクトリにできた `db/` は削除すれば OK |
-| テーブルが作られない | Code-First スイッチはデフォルトでコード上すべて ON（C278）。明示的にオフに設定した覚えがあれば `Database.json` か環境変数を確認 |
+| テーブルが作られない | Code-First スイッチはデフォルトでコード上すべて ON。明示的にオフに設定した覚えがあれば `Database.json` か環境変数を確認 |
 | Swagger が開かない | 開発環境以外ではデフォルトで Swagger をマウントしない。下の [OpenAPI のエクスポート](#openapi-をフロントエンドへエクスポート) を参照 |
 | シードデータが入らない | シードデータのスイッチがオフになっている。またシードは主キー基準の Upsert なので、シードを変えたら旧レコードを削除しないと再投入されない |
 | Hub API の起動時に「JWTSettings 未設定」エラー | Hub は Admin の JWT 設定を再利用するため、`Hub.Api/appsettings.json` に Admin と同じ `JWTSettings` ノードが必要 |
@@ -449,7 +449,7 @@ OptimisticConcurrencyMiddleware
   → Swagger（スイッチ制御）
   → CORS
   → Authentication → Authorization
-  → オープンアクセス HMAC 認証ミドルウェア（/api/PackageBuildReport / /api/FeatureSwitchSync）
+  → オープンアクセス HMAC 認証ミドルウェア（api/PackageBuildReport / /api/FeatureSwitchSync）
   → HealthChecks / MapControllers
 ```
 
@@ -797,7 +797,7 @@ Hub は Admin の JWT 鍵を再利用しますが、読むのは自分の `appse
 ### Docker Compose（推奨）
 
 ```bash
-cd .. && docker compose up --build   # 統一オーケストレーションはリポジトリルート（フロントエンド込みで計 5 サービス）
+cd .. && docker compose up --build # 統一オーケストレーションはリポジトリルート（フロントエンド込みで計 5 サービス）
 ```
 
 コマンド 1 つで 3 つのホストをすべて起動できます。ポートマッピングはローカルの `dotnet run` と**完全に一致**します：
@@ -816,7 +816,7 @@ cd .. && docker compose up --build   # 統一オーケストレーションは�
 
 ### 初回デプロイ：超管パスワードと最初の業務管理者
 
-空の DB での初回起動時、web-api はテーブル作成とシード処理の後に「最初の業務管理者シードブートストラップ」（C406 / F3）を実行します。2 つの初期アカウントはそれぞれ別の環境変数で与え、役割が異なります：
+空の DB での初回起動時、web-api はテーブル作成とシード処理の後に「最初の業務管理者シードブートストラップ」を実行します。2 つの初期アカウントはそれぞれ別の環境変数で与え、役割が異なります：
 
 | 環境変数 | 役割 | 有効条件 |
 |---|---|---|
@@ -829,7 +829,7 @@ cd .. && docker compose up --build   # 統一オーケストレーションは�
 
 ### リリース前チェックリスト：DB 再投入とコンパクト短 ID
 
-この節は 2026-09-15 の旧ロング ID から短い ID への移行のみを説明し、データ変換スクリプトはありません。C406 以降は移行ツール自体を提供しません。2.0 は単一メイン DB の新規初期化のみサポートし、旧 DB はリリース前の完全バックアップによる全体ロールバックでのみ復元できます。
+この節は 2026-09-15 の旧ロング ID から短い ID への移行のみを説明し、データ変換スクリプトはありません。 以降は移行ツール自体を提供しません。2.0 は単一メイン DB の新規初期化のみサポートし、旧 DB はリリース前の完全バックアップによる全体ロールバックでのみ復元できます。
 
 コンパクト短 ID レイアウトのリリース方針は**リセット可能、移行スクリプトなし**（2026-09-15 決定）：新旧の ID レイアウトは非互換で、本番 PG のメイン DB は「全消し再投入」でリリースし、新旧 ID の混在は許されません。リリース前に以下を確認：
 
@@ -865,7 +865,7 @@ Swagger__Enabled=true dotnet run --project GameFrameX.Web.Api &
 # 2. フロントエンドのリポジトリルートへ取得
 curl -sSL http://localhost:20802/swagger/web.api/swagger.json \
   -o ../GameFrameX.Admin.Unified.Vue/openapi.json
-ls -lh ../GameFrameX.Admin.Unified.Vue/openapi.json   # だいたい 3 MB あるはず
+ls -lh ../GameFrameX.Admin.Unified.Vue/openapi.json # だいたい 3 MB あるはず
 
 # 3. フロントエンドで生成を実行
 ( cd ../GameFrameX.Admin.Unified.Vue && pnpm gen:api && git diff src/api/ )

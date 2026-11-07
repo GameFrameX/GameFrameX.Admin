@@ -98,172 +98,172 @@ GameFrameX ゲーム管理プラットフォームのフロントエンドプロ
 
 ```
 GameFrameX.Admin.Unified.Vue/
-├── src/                        # 業務ソースコード（時間の 99% はここ）
-├── public/                     # 静的リソース
-│   └── config/config.js        # Vite 起動時に生成されるランタイム設定
-├── scripts/                    # エンジニアリングスクリプト（gen-api、check-frontend など）
-├── openapi.json                # バックエンド Swagger エクスポート、pnpm gen:api の入力
-├── build/                      # Docker / Nginx / デプロイスクリプト
-├── Dockerfile                  # 多段階ビルドイメージ
-├── .cnb.yml                    # CNB クラウドネイティブビルド / デプロイパイプライン
-├── .env / .env.development / .env.production   # 環境変数
-├── eslint.config.mjs           # ESLint 9 flat config
+├── src/ # 業務ソースコード（時間の 99% はここ）
+├── public/ # 静的リソース
+│ └── config/config.js # Vite 起動時に生成されるランタイム設定
+├── scripts/ # エンジニアリングスクリプト（gen-api、check-frontend など）
+├── openapi.json # バックエンド Swagger エクスポート、pnpm gen:api の入力
+├── build/ # Docker / Nginx / デプロイスクリプト
+├── Dockerfile # 多段階ビルドイメージ
+├── .cnb.yml # CNB クラウドネイティブビルド / デプロイパイプライン
+├── .env / .env.development / .env.production # 環境変数
+├── eslint.config.mjs # ESLint 9 flat config
 ├── .prettierrc.json
 ├── tsconfig.json / tsconfig.typecheck.json
-├── vite.config.ts              # Vite 設定
-├── index.html                  # SPA エントリー（public/config/config.js を注入）
-├── package.json                # scripts / dependencies
+├── vite.config.ts # Vite 設定
+├── index.html # SPA エントリー（public/config/config.js を注入）
+├── package.json # scripts / dependencies
 ├── pnpm-lock.yaml
 ├── pnpm-workspace.yaml
 ├── CHANGELOG.md
-├── LICENSE     # ライセンスファイル
-└── README.md                   # 本ファイル
+├── LICENSE # ライセンスファイル
+└── README.md # 本ファイル
 ```
 
 ### src/ 詳解
 
 ```
 src/
-├── api/                          # バックエンド呼び出し（※）
-│   ├── _shared/                  # 自動生成される共有層（HttpClient + data-contracts）
-│   ├── <module-camel>/           # バックエンド tag ごとに 1 ディレクトリ、index.ts（Api class）+ types.ts を含む
-│   │   ├── index.ts              # 自動生成 + 末尾でトップレベル関数をエクスポート
-│   │   └── types.ts              # このモジュールだけで使う data-contracts
-│   └── <業務手書き>.ts             # ごく少数の手書き拡張、生成物と衝突しない命名
+├── api/ # バックエンド呼び出し（※）
+│ ├── _shared/ # 自動生成される共有層（HttpClient + data-contracts）
+│ ├── <module-camel>/ # バックエンド tag ごとに 1 ディレクトリ、index.ts（Api class）+ types.ts を含む
+│ │ ├── index.ts # 自動生成 + 末尾でトップレベル関数をエクスポート
+│ │ └── types.ts # このモジュールだけで使う data-contracts
+│ └── <業務手書き>.ts # ごく少数の手書き拡張、生成物と衝突しない命名
 │
-│   現在あるモジュール（抜粋）：
-│   systemAuth / systemUser / systemRole / systemMenu / systemConfig /
-│   globalMenu / globalDictType / globalLanguage / globalPlatform /
-│   gameAppReleaseVersion / gameAppAssetPackage / gameHomeEntity /
-│   gameOrderEntity / gameMailEntity / gameRedeemCodeEntity /
-│   platformCaptchaConfig / platformJwtConfig / platformPasswordPolicyConfig …
+│ 現在あるモジュール（抜粋）：
+│ systemAuth / systemUser / systemRole / systemMenu / systemConfig /
+│ globalMenu / globalDictType / globalLanguage / globalPlatform /
+│ gameAppReleaseVersion / gameAppAssetPackage / gameHomeEntity /
+│ gameOrderEntity / gameMailEntity / gameRedeemCodeEntity /
+│ platformCaptchaConfig / platformJwtConfig / platformPasswordPolicyConfig …
 │
-├── api-services/                 # 過去の遺物ディレクトリ、空になったので無視
+├── api-services/ # 過去の遺物ディレクトリ、空になったので無視
 │
-├── composables/                    # composables（※）
-│   ├── useCrudTable.ts             テーブルページング / ソート / loading ラップ
-│   ├── useEditDialog.ts            追加 / 編集ダイアログ（監査フィールドの除去、isEnabled デフォルト）
-│   ├── useTableColumnPersistence.ts  列幅 / 列順 / 列表示のローカル永続化
-│   ├── useRequiredFields.ts        必須フィールドの集合
-│   ├── usePrimeTablePage.ts        テーブルページング hook
-│   ├── formResolver.ts             フォームバリデーションルールの適合
-│   └── types/                      composables の TS 型
+├── composables/ # composables（※）
+│ ├── useCrudTable.ts テーブルページング / ソート / loading ラップ
+│ ├── useEditDialog.ts 追加 / 編集ダイアログ（監査フィールドの除去、isEnabled デフォルト）
+│ ├── useTableColumnPersistence.ts 列幅 / 列順 / 列表示のローカル永続化
+│ ├── useRequiredFields.ts 必須フィールドの集合
+│ ├── usePrimeTablePage.ts テーブルページング hook
+│ ├── formResolver.ts フォームバリデーションルールの適合
+│ └── types/ composables の TS 型
 │
-├── components/                   # 汎用コンポーネント
-│   ├── crud-data-table/            PrimeVue DataTable の CRUD ラップ
-│   ├── crud-form-fields/           フォームフィールドの統一描画
-│   ├── base-edit-dialog/           追加 / 編集ダイアログの基礎
-│   ├── search-form/                検索バー、authPrefix で自動的に権限ボタンを追加
-│   ├── time-column/                テーブル列：long 秒を自動フォーマット
-│   ├── form-label / form-help-text フォームフィールドのラベル / ヘルプテキスト
-│   ├── app-confirm-dialog          グローバル確認ダイアログ
-│   ├── narrow-screen-hint          狭画面ヒント
-│   ├── notice-bar                  通知バー
-│   ├── cropper / drag-verify / editor / icon-selector / reward-items-editor / svg-icon / table
+├── components/ # 汎用コンポーネント
+│ ├── crud-data-table/ PrimeVue DataTable の CRUD ラップ
+│ ├── crud-form-fields/ フォームフィールドの統一描画
+│ ├── base-edit-dialog/ 追加 / 編集ダイアログの基礎
+│ ├── search-form/ 検索バー、authPrefix で自動的に権限ボタンを追加
+│ ├── time-column/ テーブル列：long 秒を自動フォーマット
+│ ├── form-label / form-help-text フォームフィールドのラベル / ヘルプテキスト
+│ ├── app-confirm-dialog グローバル確認ダイアログ
+│ ├── narrow-screen-hint 狭画面ヒント
+│ ├── notice-bar 通知バー
+│ ├── cropper / drag-verify / editor / icon-selector / reward-items-editor / svg-icon / table
 │
-├── directive/                    # カスタムディレクティブ
-│   ├── authDirective.ts            v-auth — 権限による非表示
-│   ├── customDirective.ts          v-waves / v-drag / v-reclick（連打防止）
-│   ├── blockLoading.ts             v-block-loading — ブロック全体の loading オーバーレイ
-│   └── index.ts                    登録エントリー
+├── directive/ # カスタムディレクティブ
+│ ├── authDirective.ts v-auth — 権限による非表示
+│ ├── customDirective.ts v-waves / v-drag / v-reclick（連打防止）
+│ ├── blockLoading.ts v-block-loading — ブロック全体の loading オーバーレイ
+│ └── index.ts 登録エントリー
 │
-├── i18n/                         # 国際化
-│   ├── lang/                       フレームワークレベル（zh-cn / en / zh-tw / ja / ko）
-│   └── pages/                      業務レベル、モジュールごとのサブディレクトリ
-│       ├── system/ / client/ / game/ / home/ / login/ / menu/
-│       ├── personal/ / layout/ / errors/ / formI18n/ / chart/
-│       └── platform* / global*Config/
+├── i18n/ # 国際化
+│ ├── lang/ フレームワークレベル（zh-cn / en / zh-tw / ja / ko）
+│ └── pages/ 業務レベル、モジュールごとのサブディレクトリ
+│ ├── system/ / client/ / game/ / home/ / login/ / menu/
+│ ├── personal/ / layout/ / errors/ / formI18n/ / chart/
+│ └── platform* / global*Config/
 │
-├── layout/                       # レイアウト
-│   ├── splitter/                   メインレイアウトコンテナー
-│   ├── navMenu/                    左サイド / 横メニュー
-│   ├── navBars/                    トップバー（ユーザー / 通知 / 全画面 / テーマ）
-│   ├── routerView/                 keep-alive コンテナー
-│   ├── footer / logo / upgrade     その他のレイアウト要素
-│   └── index.vue                   レイアウトエントリー
+├── layout/ # レイアウト
+│ ├── splitter/ メインレイアウトコンテナー
+│ ├── navMenu/ 左サイド / 横メニュー
+│ ├── navBars/ トップバー（ユーザー / 通知 / 全画面 / テーマ）
+│ ├── routerView/ keep-alive コンテナー
+│ ├── footer / logo / upgrade その他のレイアウト要素
+│ └── index.vue レイアウトエントリー
 │
-├── router/                       # ルーティング（※）
-│   ├── index.ts                    ルーターインスタンス + ガード
-│   ├── frontEnd.ts                 フロントエンド制御ルート（フォールバック、現在未使用）
-│   ├── backEnd.ts                  バックエンド動的ルーティングの核
-│   ├── globalConfigRoutes.ts       グローバル設定ルート
-│   └── route.ts                    静的 / フォールバックルート（/login / 404 / 401）
+├── router/ # ルーティング（※）
+│ ├── index.ts ルーターインスタンス + ガード
+│ ├── frontEnd.ts フロントエンド制御ルート（フォールバック、現在未使用）
+│ ├── backEnd.ts バックエンド動的ルーティングの核
+│ ├── globalConfigRoutes.ts グローバル設定ルート
+│ └── route.ts 静的 / フォールバックルート（login / 404 / 401）
 │
-├── stores/                       # Pinia 状態
-│   ├── themeConfig.ts              テーマ / レイアウト / ダーク / 透かし / globalI18n / isRequestRoutes
-│   ├── userInfo.ts                 ユーザー情報 + authBtnList + constList + dictList
-│   ├── routesList.ts               メニューツリー
-│   ├── tagsViewRoutes.ts           Tabs バー
-│   ├── keepAliveNames.ts           keep-alive でキャッシュされる name リスト
-│   └── index.ts                    Pinia インスタンス + 永続化アダプター
+├── stores/ # Pinia 状態
+│ ├── themeConfig.ts テーマ / レイアウト / ダーク / 透かし / globalI18n / isRequestRoutes
+│ ├── userInfo.ts ユーザー情報 + authBtnList + constList + dictList
+│ ├── routesList.ts メニューツリー
+│ ├── tagsViewRoutes.ts Tabs バー
+│ ├── keepAliveNames.ts keep-alive でキャッシュされる name リスト
+│ └── index.ts Pinia インスタンス + 永続化アダプター
 │
-├── theme/                        # SCSS テーマ
-│   ├── z-index.scss                統一 z-index スケール
-│   ├── breakpoints.scss            ブレークポイント（--bp-lg = 1024）
-│   ├── primevue-overrides.scss     PrimeVue token の上書き
-│   └── common/transition.scss      汎用トランジション
+├── theme/ # SCSS テーマ
+│ ├── z-index.scss 統一 z-index スケール
+│ ├── breakpoints.scss ブレークポイント（--bp-lg = 1024）
+│ ├── primevue-overrides.scss PrimeVue token の上書き
+│ └── common/transition.scss 汎用トランジション
 │
-├── types/                        # TS 型宣言
+├── types/ # TS 型宣言
 │
-├── utils/                        # ユーティリティ関数（純関数を維持）
-│   ├── request.ts                  手書き API 用 axios インスタンス
-│   ├── axios-utils.ts              生成 API 用 HttpClient + getAPI シングルトンキャッシュ
-│   ├── http/shared.ts              ※ 共有インターセプター（JWT / refresh / エラーコード i18n）
-│   ├── storage.ts                  Local / Session（キーに __NEXT_NAME__: プレフィックス）
-│   ├── authFunction.ts             auth() / hasAnyAuth() 関数型権限
-│   ├── message.ts                  showSuccess / showError / showConfirm（PrimeVue Toast）
-│   ├── watermark.ts                透かし
-│   ├── isEnabled.ts                IsEnabled の正規化と追加時デフォルト値
-│   ├── rowVersion.ts               行バージョン読み取り（rowVersion / RowVersion 互換）
-│   ├── primevue-locale.ts          PrimeVue コンポーネントの言語切替
-│   ├── formatTime.ts               日付 / 時刻フォーマット
-│   ├── download.ts / exportExcel.ts  エクスポート
-│   ├── sanitize.ts                 DOMPurify ラップ
-│   ├── fontawesome.ts              FA 自動オンデマンド
-│   ├── icons.ts                    FA 名前マッピング
-│   ├── build.ts                    CDN 設定
-│   ├── arrayOperation.ts / commonFunction.ts / base64Conver.ts / crudConfig.ts / getStyleSheets.ts / loading.ts / mitt.ts / other.ts / template-utils.ts
-│   └── http/                       インターセプター分割
+├── utils/ # ユーティリティ関数（純関数を維持）
+│ ├── request.ts 手書き API 用 axios インスタンス
+│ ├── axios-utils.ts 生成 API 用 HttpClient + getAPI シングルトンキャッシュ
+│ ├── http/shared.ts ※ 共有インターセプター（JWT / refresh / エラーコード i18n）
+│ ├── storage.ts Local / Session（キーに __NEXT_NAME__: プレフィックス）
+│ ├── authFunction.ts auth() / hasAnyAuth() 関数型権限
+│ ├── message.ts showSuccess / showError / showConfirm（PrimeVue Toast）
+│ ├── watermark.ts 透かし
+│ ├── isEnabled.ts IsEnabled の正規化と追加時デフォルト値
+│ ├── rowVersion.ts 行バージョン読み取り（rowVersion / RowVersion 互換）
+│ ├── primevue-locale.ts PrimeVue コンポーネントの言語切替
+│ ├── formatTime.ts 日付 / 時刻フォーマット
+│ ├── download.ts / exportExcel.ts エクスポート
+│ ├── sanitize.ts DOMPurify ラップ
+│ ├── fontawesome.ts FA 自動オンデマンド
+│ ├── icons.ts FA 名前マッピング
+│ ├── build.ts CDN 設定
+│ ├── arrayOperation.ts / commonFunction.ts / base64Conver.ts / crudConfig.ts / getStyleSheets.ts / loading.ts / mitt.ts / other.ts / template-utils.ts
+│ └── http/ インターセプター分割
 │
-├── views/                        # 業務ページ
-│   ├── system/                     システム管理（ユーザー / ロール / メニュー / 辞書 / ログ / 設定 / 通知 ……）
-│   ├── game/                       ゲーム管理（区服 / 商品 / 注文 / メール / 引換コード / ショップ / お知らせ / アイテム ……）
-│   ├── client/                     クライアント管理（プラットフォーム / バージョン / チャネル / デバイス / 言語 / リソースパッケージ / オープン API ……）
-│   ├── contentCenter / chart / chartCenter / chartCenter / opsCenter / trustCenter / automationCenter / goodsCenter / redeemCenter / webShopCenter / playerCenter
-│   ├── home/                       ホームダッシュボード
-│   ├── login/                      ログイン
-│   ├── personal/                   個人センター
-│   ├── error/                      404 / 401
-│   └── global/                     グローバルルートコンテナー
+├── views/ # 業務ページ
+│ ├── system/ システム管理（ユーザー / ロール / メニュー / 辞書 / ログ / 設定 / 通知 ……）
+│ ├── game/ ゲーム管理（区服 / 商品 / 注文 / メール / 引換コード / ショップ / お知らせ / アイテム ……）
+│ ├── client/ クライアント管理（プラットフォーム / バージョン / チャネル / デバイス / 言語 / リソースパッケージ / オープン API ……）
+│ ├── contentCenter / chart / chartCenter / chartCenter / opsCenter / trustCenter / automationCenter / goodsCenter / redeemCenter / webShopCenter / playerCenter
+│ ├── home/ ホームダッシュボード
+│ ├── login/ ログイン
+│ ├── personal/ 個人センター
+│ ├── error/ 404 / 401
+│ └── global/ グローバルルートコンテナー
 │
-├── App.vue                       # ルートコンポーネント
-├── main.ts                       # ※ アプリケーションエントリー
-├── auto-imports.d.ts             # unplugin-auto-import 生成
-└── components.d.ts               # unplugin-vue-components 生成
+├── App.vue # ルートコンポーネント
+├── main.ts # ※ アプリケーションエントリー
+├── auto-imports.d.ts # unplugin-auto-import 生成
+└── components.d.ts # unplugin-vue-components 生成
 ```
 
 ### scripts/ 詳解
 
 ```
 scripts/
-├── gen-api.mjs                   # pnpm gen:api — swagger-typescript-api でプログラム的に生成
-├── post-gen.mjs                  # 生成物の分割 + src/api/<module>/ へ再構成
-├── migrate-api-services.mjs      # 過去の移行スクリプト
-├── migrate-to-api-dir.mjs        # api-services/ を api/ へ統合
-├── check-i18n-keys.mjs           # pnpm run lint:i18n — 5 言語キー完全性
-├── check-frontend-standards.mjs  # pnpm run check:frontend — クロスプラットフォーム規約ゲート
-│   ├─ modes: all / routes / permissions / api / api-query-get
-│   │         / text / sys-abbreviation / text-baseline / self-test
-│   ├─ routes         バックエンドメニュー component ↔ src/views/<file>
-│   ├─ permissions    フロント v-auth 宣言 ↔ バックエンドシード Btn
-│   ├─ api            手書き vs 生成 API の重複 review
-│   ├─ api-query-get  page/list/query 系インターフェースで GET の params 送信を禁止
-│   ├─ text           changed files のハードコード中国語スキャン
-│   └─ sys-abbreviation C179 回帰：業務での Sys/sys 略記を禁止
-├── smoke-test.mjs                # スモークテスト
-├── fix-collisions.mjs            # 衝突修正
-├── frontend-standards-allowlist.json   # 規約免除リスト
-└── i18n-text-baseline.json       # ハードコード中国語免除ベースライン（C151 過去の負債）
+├── gen-api.mjs # pnpm gen:api — swagger-typescript-api でプログラム的に生成
+├── post-gen.mjs # 生成物の分割 + src/api/<module>/ へ再構成
+├── migrate-api-services.mjs # 過去の移行スクリプト
+├── migrate-to-api-dir.mjs # api-services/ を api/ へ統合
+├── check-i18n-keys.mjs # pnpm run lint:i18n — 5 言語キー完全性
+├── check-frontend-standards.mjs # pnpm run check:frontend — クロスプラットフォーム規約ゲート
+│ ├─ modes: all / routes / permissions / api / api-query-get
+│ │ / text / sys-abbreviation / text-baseline / self-test
+│ ├─ routes バックエンドメニュー component ↔ src/views/<file>
+│ ├─ permissions フロント v-auth 宣言 ↔ バックエンドシード Btn
+│ ├─ api 手書き vs 生成 API の重複 review
+│ ├─ api-query-get page/list/query 系インターフェースで GET の params 送信を禁止
+│ ├─ text changed files のハードコード中国語スキャン
+│ └─ sys-abbreviation 回帰：業務での Sys/sys 略記を禁止
+├── smoke-test.mjs # スモークテスト
+├── fix-collisions.mjs # 衝突修正
+├── frontend-standards-allowlist.json # 規約免除リスト
+└── i18n-text-baseline.json # ハードコード中国語免除ベースライン（過去の負債）
 ```
 
 ---
@@ -282,7 +282,7 @@ git clone https://github.com/GameFrameX/Admin.git
 cd Admin/GameFrameX.Admin.Unified.Vue
 corepack enable
 pnpm install
-pnpm run dev    # デフォルト http://localhost:20800
+pnpm run dev # デフォルト http://localhost:20800
 ```
 
 ブラウザを開く → ログインページが表示される → バックエンド担当者にアカウントをもらう。
@@ -344,8 +344,8 @@ Vite 起動時にこれらの値が `public/config/config.js` の `window.__env_
 
 ```json
 [
-  { "path": "/dashboard",    "name": "dashboard",  "component": "/home/index" },
-  { "path": "/system/user",  "name": "systemUser", "component": "/system/user/index" }
+  { "path": "/dashboard", "name": "dashboard", "component": "/home/index" },
+  { "path": "/system/user", "name": "systemUser", "component": "/system/user/index" }
 ]
 ```
 
@@ -409,9 +409,9 @@ Vite 起動時にこれらの値が `public/config/config.js` の `window.__env_
 import { getAPI } from '/@/utils/axios-utils'
 import { SystemUser } from '/@/api/systemUser'
 
-const api = getAPI(SystemUser)                       // シングルトンキャッシュ、複数回呼んでもオーバーヘッドなし
+const api = getAPI(SystemUser) // シングルトンキャッシュ、複数回呼んでもオーバーヘッドなし
 const res = await api.systemUserPagePost({ page: 1, pageSize: 20 })
-const user = res.data.result.items[0]                 // 自動正規化された { code, result, ... }
+const user = res.data.result.items[0] // 自動正規化された { code, result, ... }
 ```
 
 手書き API の呼び出しパターン：
@@ -468,9 +468,9 @@ export const pageX = (params: PageParams) =>
 
 ```
 src/views/system/demo/
-├── index.vue          # リストページ
+├── index.vue # リストページ
 └── component/
-    └── editDemo.vue   # 追加/編集ダイアログ
+    └── editDemo.vue # 追加/編集ダイアログ
 ```
 
 ### 2. リストページを書く
@@ -614,12 +614,12 @@ src/i18n/pages/system/demo/
 コードは書き終わってもまだページは見えません——メニューはバックエンドが管理しています。バックエンド担当者に伝えること：
 
 ```
-path:        /system/demo
-name:        systemDemo
-component:   /system/demo/index       ← src/views/ のパスと一致させること
-title:       通知公告
-titleCode:   system.demo.title        ← zh-cn.ts に存在させること
-parent:      /system
+path: /system/demo
+name: systemDemo
+component: /system/demo/index ← src/views/ のパスと一致させること
+title: 通知公告
+titleCode: system.demo.title ← zh-cn.ts に存在させること
+parent: /system
 ```
 
 バックエンドの commit + デプロイ後、フロントエンドで再ログインするとメニューが見えます。
@@ -627,7 +627,7 @@ parent:      /system
 ### 6. コミット
 
 ```bash
-pnpm run quality      # すべてのゲートを一括実行
+pnpm run quality # すべてのゲートを一括実行
 git add .
 git commit -m "feat(system.demo): お知らせリスト + ダイアログを追加"
 git push
@@ -688,9 +688,9 @@ git push
 ### コミットフロー
 
 ```bash
-pnpm run quality      # 必須：lint + typecheck + test:unit + build + check:frontend
+pnpm run quality # 必須：lint + typecheck + test:unit + build + check:frontend
 git add .
-git commit -m "<scope>(<module>): <subject>"   # 中国語 / 英語どちらでも可、≤ 60 字
+git commit -m "<scope>(<module>): <subject>" # 中国語 / 英語どちらでも可、≤ 60 字
 git push
 ```
 
@@ -788,7 +788,7 @@ Network で `/userInfo` レスポンスの `buttons` フィールドに期待の
 **Docker デプロイ後も API アドレスが古いまま**
 1. `docker exec -it <container> cat /usr/share/nginx/html/config/config.js` で `window.__env__.VITE_API_URL` を確認
 2. 古い → 起動時に `-e VITE_API_URL=...` を渡していない
-3. 新しい値なのにブラウザが古い → Ctrl+F5 / Cmd+Shift+R で強制リロード
+3. 新しい値なのにブラウザが古い → Ctrl+ / Cmd+Shift+R で強制リロード
 4. それでもダメ → コンテナーが古いイメージで起動しているので `docker pull` で最新を取得
 
 **ビルドが OOM**
@@ -808,8 +808,8 @@ Docker Desktop → Preferences → Resources → Memory を 8G+、Swap を 4G+ �
 
 ```bash
 docker build -t gameframex-admin-web:dev -f GameFrameX.Admin.Unified.Vue/Dockerfile .
-docker run -d -p 80:80 gameframex-admin-web:dev                                          # デフォルト API アドレス
-docker run -d -p 80:80 -e VITE_API_URL=https://api.example.com gameframex-admin-web:dev   # カスタム API
+docker run -d -p 80:80 gameframex-admin-web:dev # デフォルト API アドレス
+docker run -d -p 80:80 -e VITE_API_URL=https://api.example.com gameframex-admin-web:dev # カスタム API
 ```
 
 コンテナーには小さな魔法があります：`build/entrypoint.sh` が起動時に環境変数を読んで `config.js` を書き換えるので、**同じイメージを環境変数で別環境に切り替えられます**。
@@ -825,13 +825,13 @@ docker run -d -p 80:80 -e VITE_API_URL=https://api.example.com gameframex-admin-
 ./build/docker-build-push.sh \
   --platforms linux/amd64,linux/arm64 \
   --tag v2.4.33
-./build/docker-build-push.sh --no-push                # ビルドのみで push しない
+./build/docker-build-push.sh --no-push # ビルドのみで push しない
 ./build/docker-build-push.sh \
   --registry registry.cn-hangzhou.aliyuncs.com \
   --namespace myns \
   --username your_user \
   --password your_pass \
-  --tag v2.4.33                                       # プライベートリポジトリ認証
+  --tag v2.4.33 # プライベートリポジトリ認証
 ```
 
 | パラメーター | 説明 | デフォルト値 |
@@ -913,11 +913,11 @@ Swagger__Enabled=true dotnet run --project ../GameFrameX.Admin.Unified.Api/GameF
 
 # 2. swagger.json を取得
 curl -sSL http://localhost:20802/swagger/web.api/swagger.json -o openapi.json
-ls -lh openapi.json   # 約 3 MB のはず
+ls -lh openapi.json # 約 3 MB のはず
 
 # 3. フロントエンド生成を実行
 pnpm gen:api
-git diff src/api/     # 破壊的変更がないか確認
+git diff src/api/ # 破壊的変更がないか確認
 ```
 
 Client / Hub API も同じパターン：`/swagger/client.api/swagger.json`（ポート 20808）、`/swagger/hub.api/swagger.json`。フロントの Admin プロジェクトは Admin API だけ使うので、この 2 つは通常取得不要です。

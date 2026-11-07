@@ -77,11 +77,11 @@ public class PaymentOptionSettingProvider : IPaymentOptionSettingProvider
         var packageId = ResolveCurrentPackageId(context, _database);
         return GetPaymentConfigs(normalizedChannel, packageId)
                .Where(config => !string.IsNullOrWhiteSpace(config.ConfigJson))
-               // C372（GFX-838）：支付配置读取边界字段级解密（C371 起库内敏感字段密文；
+               // ：支付配置读取边界字段级解密（起库内敏感字段密文；
                // DecryptConfigJson 自带密文→明文进程缓存；未注册渠道 schema 未知的字段原样透传）
                .Select(config => DeserializeOptionSetting(normalizedChannel, PaymentConfigCrypto.DecryptConfigJson(normalizedChannel, config.ConfigJson)))
                .OfType<IPaymentOptionSetting>()
-               // C401（GFX-1213）：回调通知地址按当前 {packageId} 回调路由运行期补全/规范化，
+               // ：回调通知地址按当前 {packageId} 回调路由运行期补全/规范化，
                // 保证提交给网关的地址能命中公开回调端点（详见 NormalizeCallbackNotifyUrl）
                .Select(setting => NormalizeCallbackNotifyUrl(normalizedChannel, setting, packageId))
                .ToList();
@@ -162,7 +162,7 @@ public class PaymentOptionSettingProvider : IPaymentOptionSettingProvider
     }
 
     /// <summary>
-    /// 按公开回调路由规范化支付渠道的回调通知地址（C401，GFX-1213）：站点根地址自动补全路由段
+    /// 按公开回调路由规范化支付渠道的回调通知地址：站点根地址自动补全路由段
     /// （含当前分包段）；旧地址无法识别时置空并由支付处理器按「通知地址未配置」拒绝下单，避免网关回调打在无法命中的地址上
     /// 导致已付款订单不发货。其余渠道地址原样透传。
     /// </summary>

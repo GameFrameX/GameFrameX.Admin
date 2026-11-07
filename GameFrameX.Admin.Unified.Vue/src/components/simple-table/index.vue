@@ -485,7 +485,7 @@ defineExpose({
         }
       }
 
-      // 工具图标由 SvgIcon/span 直挂换原生 button（C248 键盘可达），抹平 UA 默认外观并保留右距节奏
+      // 工具图标由 SvgIcon/span 直挂换原生 button（键盘可达），抹平 UA 默认外观并保留右距节奏
       .table-footer-tool-btn {
         border: 0;
         background: transparent;

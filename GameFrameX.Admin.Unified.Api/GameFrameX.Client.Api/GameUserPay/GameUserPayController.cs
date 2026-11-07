@@ -10,7 +10,7 @@ using GameFrameX.Entity.Enum;
 namespace GameFrameX.Client.Api.GameUserPay;
 
 /// <summary>
-/// 游戏玩家支付控制器（C11 支付域：Create/Verify/Query/Report 四 op 自建）
+/// 游戏玩家支付控制器（支付域：Create/Verify/Query/Report 四 op 自建）
 /// <para>路由：POST /api/GameUserPay/{Action}（继承 BaseController 基类路由）。</para>
 /// <para>由签名中间件验证请求，订单写入主库。</para>
 /// </summary>
@@ -29,7 +29,7 @@ public class GameUserPayController : BaseController
     ///
     /// </summary>
     /// <param name="payOrderRepository">支付订单仓储</param>
-    /// <param name="optionsProvider">运行配置 Provider（沙箱充值发货开关，C378 起读策略合并表）</param>
+    /// <param name="optionsProvider">运行配置 Provider（沙箱充值发货开关， 起读策略合并表）</param>
     /// <param name="payReceiptVerifier">支付收据验真器</param>
     public GameUserPayController(Repository<GameOrderEntity> payOrderRepository,
         IClientApiOptionsProvider optionsProvider,
@@ -114,7 +114,7 @@ public class GameUserPayController : BaseController
             });
         }
 
-        // C271 跨订单幂等防重：同一 Apple 渠道交易号（TransactionId）已绑定其他订单并回填 ProviderTransactionId 时拒绝，
+        //  跨订单幂等防重：同一 Apple 渠道交易号（TransactionId）已绑定其他订单并回填 ProviderTransactionId 时拒绝，
         // 防止同一笔渠道交易经 verifyReceipt / Server API 任一路径重复验真发货
         if (request.PayChannel == 100 && !string.IsNullOrEmpty(request.TransactionId))
         {

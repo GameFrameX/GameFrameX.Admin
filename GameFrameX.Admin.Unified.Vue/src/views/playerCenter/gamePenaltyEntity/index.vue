@@ -14,7 +14,7 @@
     </Card>
     <Card style="margin-top: 8px">
       <template #content>
-        <!-- 表格动作列前缀用已落地的端点权限族 gamePenalty:*（GFX-818 联调发现：
+        <!-- 表格动作列前缀用已落地的端点权限族 gamePenalty:*（联调发现：
              legacy gamePenaltyEntity: 前缀无端点映射，showActionColumn 恒隐藏整列，#action-extra
              内的「同步 Online 运行时」按钮结构性不可达；SearchForm 前缀属 allowlist 残差另论） -->
         <CrudDataTable :value="tableData" style="width: 100%" v-block-loading="loading" showGridlines stripedRows
@@ -141,7 +141,7 @@ const onRevoke = (row: any) => {
 // RestrictTrade=4 / RestrictMatch=5 纯落账动作无 Online 运行时对应物，服务端抛 PenaltyActionNotLinkable）
 const LINKABLE_ACTION_TYPES = [1, 2, 3]
 
-// 「同步 Online 运行时」仅对生效中（status=1）且可联动的处罚开放（C342 / GFX-758）
+// 「同步 Online 运行时」仅对生效中（status=1）且可联动的处罚开放
 const canSyncOnline = (row: any) =>
   row.status === 1 && LINKABLE_ACTION_TYPES.includes(row.actionType)
 
@@ -193,7 +193,7 @@ const customActions: CrudAction[] = [
     visible: (row: any) => row.status === 1,
   },
   // 「同步 Online 运行时」走 customActions 而非 #action-extra 插槽：showActionColumn 仅按
-  // customActions 的权限码门控整列，插槽按钮会被门控连带隐藏（GFX-818 联调发现——legacy
+  // customActions 的权限码门控整列，插槽按钮会被门控连带隐藏（联调发现——legacy
   // gamePenaltyEntity: 前缀无显式按钮行，revoke 仅为 permission:auto 隐式行，列恒不渲染）
   {
     auth: 'syncOnlineRuntime',

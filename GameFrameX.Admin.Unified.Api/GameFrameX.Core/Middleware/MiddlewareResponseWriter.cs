@@ -1,7 +1,7 @@
 namespace GameFrameX.Core.Middleware;
 
 /// <summary>
-/// 中间件错误响应共享出口（C270，GFX-676）：MVC 之前的中间件层拒绝响应统一由本类型书写，
+/// 中间件错误响应共享出口：MVC 之前的中间件层拒绝响应统一由本类型书写，
 /// 各中间件不得私写 <c>JsonSerializer.Serialize</c> / <c>Response.WriteAsync</c>
 /// （守护测试 <c>MiddlewareErrorResponseWriterGuardTests</c> 锁定防回潮）。
 /// <para>两种 wire 形态（历史契约并存，不可合并为单一形态）：</para>

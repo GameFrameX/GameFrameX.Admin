@@ -38,7 +38,7 @@ public sealed class ProjectRuntimePipelineBoundaryTests
         var webStartup = File.ReadAllText(Path.Combine(root, "GameFrameX.Web.Api/Startup.cs"));
         var loggingSetup = File.ReadAllText(Path.Combine(root, "GameFrameX.Core/Logging/LoggingSetup.cs"));
 
-        // C204（GFX-633）：Application.Platform/Startup.cs 已删除，调度注册收敛到 Web.Core/Startup.cs 一处。
+        // ：Application.Platform/Startup.cs 已删除，调度注册收敛到 Web.Core/Startup.cs 一处。
         // Admin 与 Game 两套调度入口都在 Web.Core 启动管线注册，且均使用项目封装而非历史框架遗留 .AddSchedule(。
         Assert.Contains("AddAdminSchedule", webStartup);
         Assert.Contains("AddGameSchedule", webStartup);

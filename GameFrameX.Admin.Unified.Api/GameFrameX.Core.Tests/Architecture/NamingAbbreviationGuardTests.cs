@@ -3,13 +3,13 @@ using System.Text.RegularExpressions;
 
 namespace GameFrameX.Core.Tests.Architecture;
 
-// C309（GFX-713）命名禁简写守护测试（政策收口）。B佬 2026-08-22 D1 决策：全系统不允许简写；
+// 命名禁简写守护测试（政策收口）。B佬 2026-08-22 决策：全系统不允许简写；
 // 豁免与基线是临时措施，随清理批次收缩，基线清零后删除快照文件本身（不留永久基线）。
 // 规范单一事实来源：gfx-doc/agent-handbook/naming-convention.md（白名单与本测试常量两处一致，改动须双向同步）。
 // 三层词表（优先级从高到低）：
-//   1. 第三方品牌名强制豁免（标识符含品牌字符串即豁免，先于禁止词判断——AdMob* 不因 Ad 词命中）；
-//   2. GFX/Gfx 前缀豁免；
-//   3. 业务简写禁止表（含复数形式），按 PascalCase/camelCase 词边界分词后整词匹配（Dictionary 是完整词，不误伤 Dict）。
+//  1. 第三方品牌名强制豁免（标识符含品牌字符串即豁免，先于禁止词判断——AdMob* 不因 Ad 词命中）；
+//  2. GFX/Gfx 前缀豁免；
+//  3. 业务简写禁止表（含复数形式），按 PascalCase/camelCase 词边界分词后整词匹配（Dictionary 是完整词，不误伤 Dict）。
 // 通用技术缩写（Id/Url/Api/Db/Sms/Auth/Config/Info/Jwt/Http/Ip/Dns）不在禁止表内即天然允许，
 // 白名单登记于 naming-convention.md 与下方 AllowedTechnicalAbbreviations（供文档一致性核对）。
 // 守护范围：类型 / 方法 / 属性 / 字段（含枚举成员）标识符；方法参数与局部变量不在本测试范围。
@@ -21,7 +21,7 @@ public sealed class NamingAbbreviationGuardTests
 {
     private static readonly string RepositoryRoot = GetRepositoryRoot();
 
-    /// <summary>业务简写禁止表（D1 政策）：分词后整词命中即违规。含复数形式。</summary>
+    /// <summary>业务简写禁止表（政策）：分词后整词命中即违规。含复数形式。</summary>
     private static readonly HashSet<string> ProhibitedAbbreviations = new(StringComparer.Ordinal)
     {
         "Ad", "Ads",

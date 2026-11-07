@@ -24,7 +24,7 @@ export interface GameHomeOnlineResponseHttpJsonResultData {
   extras?: any | null;
 }
 
-/** 首页在线人数时序单点（C321 / GFX-730） */
+/** 首页在线人数时序单点 */
 export interface GameHomeOnlineTrendPointResponse {
   /**
    * 整点桶时间（Unix 秒）
@@ -39,7 +39,7 @@ export interface GameHomeOnlineTrendPointResponse {
 }
 
 /**
- * 首页 24h 在线人数时序（C321 / GFX-730）
+ * 首页 24h 在线人数时序
  *
  * 最近 24 个整点桶（含当前进行中桶），桶内取该小时最后一次采样值；无采样数据的桶 OnlineCount 为 null（前端降级画 —）。
  */
@@ -53,7 +53,7 @@ export interface GameHomeOnlineTrendResponseHttpJsonResultData {
   code?: number;
   message?: string | null;
   /**
-   * 首页 24h 在线人数时序（C321 / GFX-730）
+   * 首页 24h 在线人数时序
    *
    * 最近 24 个整点桶（含当前进行中桶），桶内取该小时最后一次采样值；无采样数据的桶 OnlineCount 为 null（前端降级画 —）。
    */
@@ -67,7 +67,7 @@ export interface GameHomeOnlineTrendResponseHttpJsonResultData {
 }
 
 /**
- * 首页运营驾驶舱聚合读数（C321 / GFX-730）
+ * 首页运营驾驶舱聚合读数
  *
  * 纯聚合计数输出，非 CRUD Response，无 Id/RowVersion（同 `GameHomeOnlineResponse` / `GameOrderSummaryResponse` 先例）。
  */
@@ -124,7 +124,7 @@ export interface GameHomeOverviewResponseHttpJsonResultData {
   code?: number;
   message?: string | null;
   /**
-   * 首页运营驾驶舱聚合读数（C321 / GFX-730）
+   * 首页运营驾驶舱聚合读数
    *
    * 纯聚合计数输出，非 CRUD Response，无 Id/RowVersion（同 `GameHomeOnlineResponse` / `GameOrderSummaryResponse` 先例）。
    */

@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 namespace GameFrameX.Core.Tests.Logging;
 
 /// <summary>
-/// Monitor 管线回归测试（T5）请求体：Keyword 必填用于触发 [ApiController] 自动 400 校验短路场景；
+/// Monitor 管线回归测试请求体：Keyword 必填用于触发 [ApiController] 自动 400 校验短路场景；
 /// 正常路径下作为复杂参数落入 <c>parameters[0].value</c>，供操作日志行 RequestParam 三要素断言。
 /// </summary>
 public sealed class MonitorPipelineTestRequest

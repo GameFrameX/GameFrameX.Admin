@@ -8,10 +8,10 @@ using Microsoft.AspNetCore.Authorization;
 namespace GameFrameX.Hub.Api.Controllers;
 
 /// <summary>
-/// 功能开关服务器同步控制器（C347 Hub 通道）。
+/// 功能开关服务器同步控制器（Hub 通道）。
 /// <para>游戏服务器运行时同步通道：机器对机器调用，由 <see cref="GameAppOpenAccessAuthMiddleware"/>
-/// 鉴权（C267 HMAC v2 单头 + nonce 去重 + 时间窗，scope = <see cref="OpenAccessScopeConst.FeatureSwitchSync"/>），
-/// 非 JWT，故标记 <c>[AllowAnonymous]</c>（C236 起 JWT 默认鉴权由各控制器显式承担，本控制器不参与，
+/// 鉴权（HMAC v2 单头 + nonce 去重 + 时间窗，scope = <see cref="OpenAccessScopeConst.FeatureSwitchSync"/>），
+/// 非 JWT，故标记 <c>[AllowAnonymous]</c>（起 JWT 默认鉴权由各控制器显式承担，本控制器不参与，
 /// 与 <c>PackageBuildReportController</c> 同模式）。</para>
 /// <para>服务器通道无 platform/package/language/channel 上下文，四维传 null →
 /// 仅命中 Default 哨兵行；服务器同步无设备身份，不做设备灰度（灰度是设备维度，语义如此设计）。</para>
@@ -26,7 +26,7 @@ public class FeatureSwitchSyncController : BaseController
     /// <summary>
     /// 初始化功能开关服务器同步控制器。
     /// </summary>
-    /// <param name="deliveryResolver">开关投放解析器（C345 共享实现，两通道唯一解析入口）。</param>
+    /// <param name="deliveryResolver">开关投放解析器（共享实现，两通道唯一解析入口）。</param>
     public FeatureSwitchSyncController(FeatureSwitchDeliveryResolver deliveryResolver)
     {
         _deliveryResolver = deliveryResolver;

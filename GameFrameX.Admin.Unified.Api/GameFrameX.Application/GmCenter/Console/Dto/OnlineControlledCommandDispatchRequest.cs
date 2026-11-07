@@ -1,7 +1,7 @@
 namespace GameFrameX.Application.GmCenter.Console.Dto;
 
 /// <summary>
-/// 受控操作命令线缆请求（vault:C9 S8.1 契约；mock 先行，联调以 vault 详表为准）。
+/// 受控操作命令线缆请求（vault: .1 契约；mock 先行，联调以 vault 详表为准）。
 /// <para>区服 ServerId由 OnlineScopeContext 注入，不在线缆体内重复。</para>
 /// </summary>
 public class OnlineControlledCommandDispatchRequest
@@ -42,7 +42,7 @@ public class OnlineControlledCommandDispatchRequest
     public string ReviewerOperatorId { get; set; } = null!;
 
     /// <summary>
-    /// 幂等键（Online IdempotencyKey，VC-8.4：同键重复执行返回首次结果）。
+    /// 幂等键（Online IdempotencyKey，：同键重复执行返回首次结果）。
     /// </summary>
     public string IdempotencyKey { get; set; } = null!;
 }

@@ -1,7 +1,7 @@
 namespace GameFrameX.Application.Dashboard.GameHome.Dto;
 
 /// <summary>
-/// 首页运营驾驶舱聚合读数（C321 / GFX-730）
+/// 首页运营驾驶舱聚合读数
 /// <para>纯聚合计数输出，非 CRUD Response，无 Id/RowVersion（同 <c>GameHomeOnlineResponse</c> / <c>GameOrderSummaryResponse</c> 先例）。</para>
 /// </summary>
 public class GameHomeOverviewResponse

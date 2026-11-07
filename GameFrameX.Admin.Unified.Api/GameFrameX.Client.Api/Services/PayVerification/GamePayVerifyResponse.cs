@@ -1,7 +1,7 @@
 namespace GameFrameX.Client.Api.Services.PayVerification;
 
 /// <summary>
-/// 验真结果（C11 支付域；具名类替代元组）
+/// 验真结果（支付域；具名类替代元组）
 /// </summary>
 public sealed class GamePayVerifyResponse
 {

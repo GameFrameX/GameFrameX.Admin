@@ -5,7 +5,7 @@ using GameFrameX.Core.Service;
 namespace GameFrameX.Client.Api.GameUserReward;
 
 /// <summary>
-/// 游戏玩家奖励控制器（C8 奖励域：BLGetUserRewards / BLReceiveRewards1 自建）
+/// 游戏玩家奖励控制器（奖励域：BLGetUserRewards / BLReceiveRewards1 自建）
 /// <para>路由：POST /api/GameUserReward/{Action}（继承 BaseController 基类路由）。</para>
 /// </summary>
 public class GameUserRewardController : BaseController

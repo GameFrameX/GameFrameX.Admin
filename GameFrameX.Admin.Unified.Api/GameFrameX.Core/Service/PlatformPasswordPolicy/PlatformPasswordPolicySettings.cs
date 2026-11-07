@@ -1,7 +1,7 @@
 namespace GameFrameX.Core.Service.PlatformPasswordPolicy;
 
 /// <summary>
-/// 平台密码策略私有配置载荷（C173）。字段严格等于 strongPassword / passwordStrengthValidation /
+/// 平台密码策略私有配置载荷。字段严格等于 strongPassword / passwordStrengthValidation /
 /// passwordStrengthValidationMsg 三项，禁止未列字段。默认值等价历史 Cryptogram 密码策略值。
 /// </summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]

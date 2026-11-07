@@ -9,9 +9,9 @@ using GameFrameX.Core.Api;
 namespace GameFrameX.Application.SeedData.System;
 
 /// <summary>
-/// Online 匹配观测域菜单种子（partial；由 <see cref="GlobalMenuSeedData.BuildData"/> 聚合；change C341 / GFX-753）。
+/// Online 匹配观测域菜单种子（partial；由 <see cref="GlobalMenuSeedData.BuildData"/> 聚合；change /）。
 /// <para>
-/// 容器 route:onlineCenter 由 C340 的 <see cref="GlobalMenuSeedData.OnlineMenus"/>（GlobalMenuSeedData.Online.cs）提供；
+/// 容器 route:onlineCenter 由 的 <see cref="GlobalMenuSeedData.OnlineMenus"/>（GlobalMenuSeedData.Online.cs）提供；
 /// 本文件只落匹配观测三页（队列总览/失败原因/异常 Ticket）+ 三查询按钮，不动既有行（并行 change 泳道纪律）。
 /// 区服运行状态只读观测菜单。
 /// </para>

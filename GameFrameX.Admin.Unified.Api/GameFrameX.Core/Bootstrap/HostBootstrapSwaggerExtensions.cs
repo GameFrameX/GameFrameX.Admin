@@ -6,7 +6,7 @@ using Microsoft.OpenApi;
 namespace GameFrameX.Core.Bootstrap;
 
 /// <summary>
-/// 三 host（Client / Hub / Game）共享的 Swagger 启动装配扩展（C261，GFX-668）。
+/// 三 host（Client / Hub / Game）共享的 Swagger 启动装配扩展。
 /// <para>收敛各 Program.cs 内联的 <c>AddSwaggerService</c> 私有方法与 enableSwagger 判断。
 /// Admin host 的 Swagger 语义不同（单文档 + AdminResultOperationFilter 包装），不适用本扩展。</para>
 /// </summary>

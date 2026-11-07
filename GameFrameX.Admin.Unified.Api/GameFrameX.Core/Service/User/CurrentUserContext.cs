@@ -3,7 +3,7 @@ using GameFrameX.Entity.Enum;
 namespace GameFrameX.Core.Service.User;
 
 /// <summary>
-/// 当前登录用户上下文（HttpContextAccessor 当前用户访问器；GFX-706 由 UserManager 更名）。
+/// 当前登录用户上下文（HttpContextAccessor 当前用户访问器； 由 UserManager 更名）。
 /// </summary>
 public class CurrentUserContext
 {

@@ -3,7 +3,7 @@ using GameFrameX.Entity.Base;
 namespace GameFrameX.Entity.Business.Game;
 
 /// <summary>
-/// 首页在线人数时序采样（C321 / GFX-730）
+/// 首页在线人数时序采样
 /// <para>后台 Job 每 15 分钟按「启用区服 Control GetOnlinePlayer 求和」聚合全服在线数落表，
 /// 首页趋势接口按整点桶回读，缺桶返回 null（前端降级画 —）。</para>
 /// </summary>
@@ -20,7 +20,7 @@ public class GameHomeOnlineSampleEntity : EntityBasic
     public long SampleTime { get; set; }
 
     /// <summary>
-    /// 全服在线人数（启用区服在线人数之和，区服不可达或未配置管理地址时按 0 计，语义同 C175）
+    /// 全服在线人数（启用区服在线人数之和，区服不可达或未配置管理地址时按 0 计，语义同）
     /// </summary>
     [SugarColumn(ColumnDescription = "全服在线人数", DefaultValue = "0")]
     public int OnlineCount { get; set; }

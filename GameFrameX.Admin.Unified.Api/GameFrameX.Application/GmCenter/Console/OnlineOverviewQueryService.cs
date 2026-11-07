@@ -2,16 +2,16 @@ using System.ComponentModel;
 using GameFrameX.Application.GmCenter.Console.Dto;
 using GameFrameX.Application.ServerCenter.Online;
 
-// S3/C401 断链修复点
+// / 断链修复点
 namespace GameFrameX.Application.GmCenter.Console;
 
 /// <summary>
-/// Online 在线总览查询服务。路由前缀 /api/onlineOverviewQuery（change C344 / vault:C9 S8.1）。
+/// Online 在线总览查询服务。路由前缀 /api/onlineOverviewQuery（change / vault: .1）。
 /// <para>
 /// 快照语义：实时透传 Online 玩家侧查询 API，Admin 侧零持久化、零缓存——运行态快照非权威状态。
 /// X6 口径红线：数据源唯一 = Online 玩家侧查询 API，<b>不含管理员连接</b>——不得计入管理员浏览器
 /// 连接链路（Hub 长连接与在线用户服务的管理员口径），也不得复用首页驾驶舱的在线计数口径
-/// （C321 产物，与玩家在线口径不同源）；守护测试 OnlineOverviewIsolationTests 锁定本 Service
+/// （产物，与玩家在线口径不同源）；守护测试 OnlineOverviewIsolationTests 锁定本 Service
 /// 及其依赖闭包对相关四个类型的零引用（类型名清单见守护测试内）。
 /// </para>
 /// </summary>
@@ -19,7 +19,7 @@ namespace GameFrameX.Application.GmCenter.Console;
 public class OnlineOverviewQueryService : IAdminApiController
 {
     /// <summary>
-    /// 在线总览快照查询 action 名（mock 先行，联调以 vault C9 详表为准）。
+    /// 在线总览快照查询 action 名（mock 先行，联调以 vault 详表为准）。
     /// </summary>
     private const string QueryOnlineOverviewAction = "query_online_overview";
 

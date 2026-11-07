@@ -6,7 +6,7 @@ using Microsoft.Extensions.Configuration;
 namespace GameFrameX.Core.Tests.Bootstrap;
 
 /// <summary>
-/// 紧凑短 ID 布局冻结守卫（2026-09-15 决策，C360 / GFX-803）。
+/// 紧凑短 ID 布局冻结守卫（2026-09-15 决策， /）。
 /// <para>epoch / 位宽一旦有数据落库即不可更改：改一次 = 与历史 Id 空间重叠。
 /// 布局先经 <see cref="CompactSnowflakeLayoutInitializer"/>（ModuleInitializer）应用于测试进程。</para>
 /// </summary>
@@ -81,7 +81,7 @@ public sealed class HostBootstrapSnowflakeCompactLayoutTests
     {
         // 防撞必要性断言（布局恒等式）：Id 可由 (时间戳, WorkerId, 序列) 完全重建，
         // 即除 Worker 位外无任何实例区分维度——WorkerId 相同的两个实例在同 (ts, seq) 坐标上必然产出相同 Id，
-        // 故同库写入实例必须互斥配置 WorkerId（GFX-803 的存在理由）。
+        // 故同库写入实例必须互斥配置 WorkerId。
         var instance = new IdWorker(5, 0, SnowFlakeExtension.CompactEpochMilliseconds, 0, SnowFlakeExtension.CompactWorkerIdBits, SnowFlakeExtension.CompactDatacenterIdBits, SnowFlakeExtension.CompactSequenceBits);
         var id = instance.NextId();
 

@@ -92,12 +92,12 @@ Client API 和 Hub API 都更「瘦」：Client API 只引用 Entity + Payment�
 ## 三個主機，各管各的
 
 ```
-Admin API（20802）              Client API（20808）            Hub API（20806）
-    │                              │                              │
-    │ 管理後台用                    │ 遊戲客戶端用                  │ 外部系統 / 遊戲端 / CI 用
-    │ 登入 / 用戶 / 選單 /          │ 登入 / 支付 / 拿組態          │ 區服 / 資源版本 /
-    │ 訂單 / 日誌 / 定時任務         │                              │ 打包上報 / 功能開關同步
-    │                              │                              │
+Admin API（20802） Client API（20808） Hub API（20806）
+    │ │ │
+    │ 管理後台用 │ 遊戲客戶端用 │ 外部系統 / 遊戲端 / CI 用
+    │ 登入 / 用戶 / 選單 / │ 登入 / 支付 / 拿組態 │ 區服 / 資源版本 /
+    │ 訂單 / 日誌 / 定時任務 │ │ 打包上報 / 功能開關同步
+    │ │ │
     └──────────── 共享 Entity ──────────────┬─────────────────────┘
                                            │
                                            ├── 共享 Payment（僅 Client 用）
@@ -126,32 +126,32 @@ Admin API 是「動態 API」——寫 Service 自動出接口；Hub API 是「�
 
 ```
 GameFrameX.Admin.Unified.Api/
-├── GameFrameX.Web.Api/            # Admin API 宿主（啟動入口，compose 服務名 web-api）
-├── GameFrameX.Client.Api/         # Client API 宿主（獨立 WebApplication）
-├── GameFrameX.Hub.Api/            # Hub API 宿主（獨立 WebApplication，傳統 Controller 路由）
-├── GameFrameX.Web.Core/           # Admin 的啟動邏輯、中介軟體、DI 組態（重點）
-├── GameFrameX.Application/        # 應用層（組態檔、種子資料）
+├── GameFrameX.Web.Api/ # Admin API 宿主（啟動入口，compose 服務名 web-api）
+├── GameFrameX.Client.Api/ # Client API 宿主（獨立 WebApplication）
+├── GameFrameX.Hub.Api/ # Hub API 宿主（獨立 WebApplication，傳統 Controller 路由）
+├── GameFrameX.Web.Core/ # Admin 的啟動邏輯、中介軟體、DI 組態（重點）
+├── GameFrameX.Application/ # 應用層（組態檔、種子資料）
 ├── GameFrameX.Application.System/ # 系統管理服務（用戶/角色/選單/日誌...）
-├── GameFrameX.Application.Game/   # 遊戲管理服務（區服/訂單/郵件/兌換碼...）
+├── GameFrameX.Application.Game/ # 遊戲管理服務（區服/訂單/郵件/兌換碼...）
 ├── GameFrameX.Application.Client/ # 客戶端管理服務（版本/渠道/資源包...）
 ├── GameFrameX.Application.Business/ # 業務服務（設備 / 設備分組）
-├── GameFrameX.Entity/             # 實體層（Base / System / Game / Client）
-├── GameFrameX.Core/               # 核心層（倉儲、服務基類、認證、SignalR）
-├── GameFrameX.Core.Enum/          # 列舉定義
-├── GameFrameX.Core.Extension/     # 擴充方法與公共 DTO（重點，常來這兒找輪子）
-├── GameFrameX.Core.SqlSugar/      # SqlSugar 組態、AOP、攔截器
-├── GameFrameX.Core.Utility/       # 工具類別
+├── GameFrameX.Entity/ # 實體層（Base / System / Game / Client）
+├── GameFrameX.Core/ # 核心層（倉儲、服務基類、認證、SignalR）
+├── GameFrameX.Core.Enum/ # 列舉定義
+├── GameFrameX.Core.Extension/ # 擴充方法與公共 DTO（重點，常來這兒找輪子）
+├── GameFrameX.Core.SqlSugar/ # SqlSugar 組態、AOP、攔截器
+├── GameFrameX.Core.Utility/ # 工具類別
 ├── GameFrameX.Core.BaseInputOutput/ # 基礎輸入輸出模型
-├── Payment/                       # 支付整合（僅 Client API 引用）
-│   ├── GameFrameX.Payment.Abstract/          # 支付抽象介面（先定義後實作）
-│   ├── GameFrameX.Payment.AliPay/            # 支付寶
-│   ├── GameFrameX.Payment.Apple/             # Apple IAP（內購驗證）
-│   ├── GameFrameX.Payment.Apple.AppStoreServer/  # App Store Server API v2
-│   ├── GameFrameX.Payment.Google/            # Google Play
-│   └── GameFrameX.Payment.Xsolla/            # Xsolla
-├── Dockerfile.web-api             # Admin API 的 Dockerfile（sdk:10.0 → aspnet:10.0）
-├── Dockerfile.client-api          # Client API 的 Dockerfile
-├── Dockerfile.hub-api             # Hub API 的 Dockerfile
+├── Payment/ # 支付整合（僅 Client API 引用）
+│ ├── GameFrameX.Payment.Abstract/ # 支付抽象介面（先定義後實作）
+│ ├── GameFrameX.Payment.AliPay/ # 支付寶
+│ ├── GameFrameX.Payment.Apple/ # Apple IAP（內購驗證）
+│ ├── GameFrameX.Payment.Apple.AppStoreServer/ # App Store Server API v2
+│ ├── GameFrameX.Payment.Google/ # Google Play
+│ └── GameFrameX.Payment.Xsolla/ # Xsolla
+├── Dockerfile.web-api # Admin API 的 Dockerfile（sdk:10.0 → aspnet:10.0）
+├── Dockerfile.client-api # Client API 的 Dockerfile
+├── Dockerfile.hub-api # Hub API 的 Dockerfile
 └── (統一編排已上移倉儲根 docker-compose.yml：PostgreSQL + 三 API + 前端共 5 服務)
 ```
 
@@ -253,7 +253,7 @@ dotnet run --project GameFrameX.Client.Api
 dotnet run --project GameFrameX.Hub.Api
 # 監聽 http://localhost:20806，Swagger UI: http://localhost:20806/swagger
 
-# Game API（遊戲伺服器側）已併入 Client API（C268）：GameUser* 控制器隨 Client.Api 暴露（http://*:20808）
+# Game API（遊戲伺服器側）已併入 Client API：GameUser* 控制器隨 Client.Api 暴露（http://*:20808）
 ```
 
 第一次啟動 Admin API 時，SqlSugar Code-First 會自動建庫建表，順手把種子資料（管理員、角色、選單、字典這些）灌進去。所以你看到一個空資料庫突然冒出一堆表，別慌，那是正常操作。
@@ -276,7 +276,7 @@ docker run -p 20802:20802 \
 | 啟動報資料庫連線失敗 | `Database.json`（或 `DBTYPE/CONNECTIONSTRING` 環境變數）連接串不對，或者 PG 沒起 |
 | 啟動報「DbType 為 Sqlite/PostgreSQL，但連接串不是 …風格」 | 環境變數半套覆蓋了：`DBTYPE` 和 `CONNECTIONSTRING` 必須成對設定 |
 | SQLite 庫檔案落錯位置 | 連接串相對處理程序工作目錄解析——回到倉儲根目錄執行 `dotnet run`；專案目錄裡跑出來的 `db/` 刪掉即可 |
-| 表沒建出來 | Code-First 開關預設在程式碼中全開（C278）；若顯式組態過關閉項，檢查 `Database.json` 或環境變數 |
+| 表沒建出來 | Code-First 開關預設在程式碼中全開；若顯式組態過關閉項，檢查 `Database.json` 或環境變數 |
 | Swagger 打不開 | 非開發環境預設不掛 Swagger，見下面的 [匯出 OpenAPI](#匯出-openapi-給前端) |
 | 種子資料沒灌進去 | 種子資料開關被關了；另外種子是按主鍵 Upsert 的，改了種子要刪舊記錄才會重灌 |
 | Hub API 啟動報「未組態 JWTSettings」 | Hub 複用 Admin 的 JWT 組態，`Hub.Api/appsettings.json` 裡要有和 Admin 一致的 `JWTSettings` 節點 |
@@ -449,7 +449,7 @@ OptimisticConcurrencyMiddleware
   → Swagger（開關控制）
   → CORS
   → Authentication → Authorization
-  → 開放接入 HMAC 鑑權中介軟體（/api/PackageBuildReport / /api/FeatureSwitchSync）
+  → 開放接入 HMAC 鑑權中介軟體（api/PackageBuildReport / /api/FeatureSwitchSync）
   → HealthChecks / MapControllers
 ```
 
@@ -797,7 +797,7 @@ Hub 複用 Admin 的 JWT 金鑰，但讀的是自己 `appsettings.json` 裡的 `
 ### Docker Compose（推薦）
 
 ```bash
-cd .. && docker compose up --build   # 統一編排位於倉儲根（含前端共 5 服務）
+cd .. && docker compose up --build # 統一編排位於倉儲根（含前端共 5 服務）
 ```
 
 一條命令把三個主機全拉起來。埠映射和本地 `dotnet run` **完全一致**：
@@ -816,7 +816,7 @@ cd .. && docker compose up --build   # 統一編排位於倉儲根（含前端�
 
 ### 首次部署：超管密碼與首個業務管理員
 
-以全新資料庫首次啟動時，web-api 在建表與種子之後執行「首個業務管理員種子引導」（C406 / F3）。兩個初始帳號各走各的環境變數，職責不同：
+以全新資料庫首次啟動時，web-api 在建表與種子之後執行「首個業務管理員種子引導」。兩個初始帳號各走各的環境變數，職責不同：
 
 | 環境變數 | 作用 | 生效條件 |
 |---|---|---|
@@ -829,7 +829,7 @@ cd .. && docker compose up --build   # 統一編排位於倉儲根（含前端�
 
 ### 發布前清單：資料庫重灌與緊湊短 ID
 
-本節僅說明 2026-09-15 的歷史長 ID → 緊湊短 ID 升級，該升級不提供資料轉換指令碼。C406 起不再提供任何遷移工具：2.0 只支援單主庫全新初始化，舊庫只能靠發布前的完整備份整體回滾。
+本節僅說明 2026-09-15 的歷史長 ID → 緊湊短 ID 升級，該升級不提供資料轉換指令碼。 起不再提供任何遷移工具：2.0 只支援單主庫全新初始化，舊庫只能靠發布前的完整備份整體回滾。
 
 緊湊短 ID 佈局的發布口徑是**可重置、無遷移指令碼**（決策 2026-09-15）：新舊 ID 佈局不相容，生產 PG 主庫按「清空重灌」發布，不允許新舊 ID 混寫。發布前過一遍：
 
@@ -865,7 +865,7 @@ Swagger__Enabled=true dotnet run --project GameFrameX.Web.Api &
 # 2. 拉到前端倉儲根
 curl -sSL http://localhost:20802/swagger/web.api/swagger.json \
   -o ../GameFrameX.Admin.Unified.Vue/openapi.json
-ls -lh ../GameFrameX.Admin.Unified.Vue/openapi.json   # 大概 3 MB 才對
+ls -lh ../GameFrameX.Admin.Unified.Vue/openapi.json # 大概 3 MB 才對
 
 # 3. 前端跑產生
 ( cd ../GameFrameX.Admin.Unified.Vue && pnpm gen:api && git diff src/api/ )

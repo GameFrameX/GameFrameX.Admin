@@ -15,11 +15,11 @@ using GameFrameX.Core.Api;
 namespace GameFrameX.Application.SeedData.System;
 
 /// <summary>
-/// Online LiveOps 域菜单种子（partial；由 <see cref="GlobalMenuSeedData.BuildData"/> 聚合；来源 change C343 / vault:C8 S7.7 + C340 资产三页 / vault:C4 S3.7（2026-09-13 rebase 并集））。
-/// <para>C366（2026-09-16）：容器 route:onlineCenter 归入在线运维顶层根（Pid=0、Path=/gmCenter），全部叶子前缀收敛为 /gmCenter/*；
+/// Online LiveOps 域菜单种子（partial；由 <see cref="GlobalMenuSeedData.BuildData"/> 聚合；来源 change / vault: .7 + 资产三页 / vault: .7（2026-09-13 rebase 并集））。
+/// <para>（2026-09-16）：容器 route:onlineCenter 归入在线运维顶层根（Pid=0、Path=/gmCenter），全部叶子前缀收敛为 /gmCenter/*；
 /// Key/Id 不变，存量 role-menu 绑定无感。</para>
-/// <para>容器行 route:onlineCenter 与 C340（Online 平台管理）§3 规格逐字段一致——并行 change 同定义时 seed upsert 按 StableSeedId 幂等合并；
-/// 三个既有运营域页面的 dispatchOnline 按钮行也集中在本文件（C343 增量），避免散插多域 partial 加剧并行冲突。</para>
+/// <para>容器行 route:onlineCenter 与 （Online 平台管理） 规格逐字段一致——并行 change 同定义时 seed upsert 按 StableSeedId 幂等合并；
+/// 三个既有运营域页面的 dispatchOnline 按钮行也集中在本文件（增量），避免散插多域 partial 加剧并行冲突。</para>
 /// </summary>
 public partial class GlobalMenuSeedData
 {
@@ -307,7 +307,7 @@ public partial class GlobalMenuSeedData
                 AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
-            // ---- 三个既有运营域页面的 dispatchOnline 按钮（C343 增量，集中本文件）----
+            // ---- 三个既有运营域页面的 dispatchOnline 按钮（增量，集中本文件）----
             new()
             {
                 Id = StableSeedId.Menu("remoteConfig:dispatchOnline"),
@@ -506,7 +506,7 @@ public partial class GlobalMenuSeedData
             },
             new()
             {
-                // 高危：人工发放入口（vault:C4 六类来源之 Admin 人工；仅管理员角色可见可执行）。
+                // 高危：人工发放入口（vault: 六类来源之 Admin 人工；仅管理员角色可见可执行）。
                 Id = StableSeedId.Menu("onlineWalletLedger:grant"),
                 Key = "onlineWalletLedger:grant",
                 Pid = StableSeedId.Menu("route:onlineWalletLedger"),
@@ -618,7 +618,7 @@ public partial class GlobalMenuSeedData
                 AllowAdminWhenSuperAdminOnly = false,
                 IsDeleted = false,
             },
-            // ---- C344 控制台三页面（在线总览 / 玩家时间线 / 统一审计检索）----
+            // ---- 控制台三页面（在线总览 / 玩家时间线 / 统一审计检索）----
             new()
             {
                 Id = StableSeedId.Menu("route:onlineDashboard"),
@@ -707,7 +707,7 @@ public partial class GlobalMenuSeedData
             new()
             {
                 // MENU-P2-02 欠账清理：受控操作命令台（取消 Ticket/结束异常对局/玩家暂停恢复/匹配隔离，双人复核）。
-                // C344 控制台设计为 玩家时间线 深链意图页（预填 playerId/serverId），不占侧边栏：IsHide 隐藏页，路由注册 + 深链直达。
+                //  控制台设计为 玩家时间线 深链意图页（预填 playerId/serverId），不占侧边栏：IsHide 隐藏页，路由注册 + 深链直达。
                 Id = StableSeedId.Menu("route:controlledOperation"),
                 Key = "route:controlledOperation",
                 Pid = StableSeedId.Menu("route:gmCenter"),

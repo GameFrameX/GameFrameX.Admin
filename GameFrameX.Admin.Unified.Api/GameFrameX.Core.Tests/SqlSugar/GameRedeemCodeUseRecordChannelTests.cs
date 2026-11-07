@@ -6,7 +6,7 @@ using SqlSugar;
 namespace GameFrameX.Core.Tests.SqlSugar;
 
 /// <summary>
-/// BLA-32 / C71 回归测试：复刻 GameRedeemCodeUseRecordService.BuildPageQuery 的查询形状
+///  / 回归测试：复刻 GameRedeemCodeUseRecordService.BuildPageQuery 的查询形状
 /// （区服 + 兑换码(Code+AreaId) + 渠道 三重 LeftJoin，新增 input.ChannelId WhereIF 与 ChannelId/ChannelName 投影）。
 /// 用 Sqlite 内存文件库 + ConfigureBaseFilters 做端到端查询验证。
 /// </summary>
@@ -97,8 +97,8 @@ public sealed class GameRedeemCodeUseRecordChannelTests : IDisposable
 
     private ISugarQueryable<GameRedeemCodeUseRecordResponse> BuildQuery(long? channelId, long? areaId = null, string? code = null, long? playerId = null)
     {
-        // 复刻 GameRedeemCodeUseRecordEntityService.BuildPageQuery 的 BLA-32 增量部分（兑换码 + 渠道 join、ChannelId 过滤与投影）。
-        // 注：区服 LeftJoin 是 BuildPageQuery 既有逻辑（非 BLA-32 范围）且本测试不校验区服列，此处不复刻；
+        // 复刻 GameRedeemCodeUseRecordEntityService.BuildPageQuery 的 增量部分（兑换码 + 渠道 join、ChannelId 过滤与投影）。
+        // 注：区服 LeftJoin 是 BuildPageQuery 既有逻辑（非 范围）且本测试不校验区服列，此处不复刻；
         // 同时可避免与 GameOrderShipServiceTests（不以 ConfigureBaseSettings 初始化、PascalCase 表名）共享 SqlSugar 静态实体缓存导致的 join 表名漂移。
         return _db.Queryable<GameRedeemCodeUseRecordEntity>()
                   .WhereIF(areaId > 0, u => u.AreaId == areaId)

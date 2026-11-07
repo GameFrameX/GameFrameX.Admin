@@ -2,12 +2,12 @@ using System.Text.RegularExpressions;
 
 namespace GameFrameX.Core.Tests.Architecture;
 
-// C231 / U10：DTO 命名规范契约测试。规范正文：gfx-doc/decisions/2026-08-19-unified-dto-suffix-request-response.md（C237 推翻 2026-08-17 边界×后缀矩阵后的单套规则）。
-// 五规则：R1 Dto 目录文件名=主类型名；R2 全仓单一后缀规则（输入 Request / 输出 Response，Admin/Client/Hub/Game 四 host 一致）；R3 Core.BaseInputOutput 公共类 Base 前缀；R4 禁 Req/Resp 冗余前缀；R5 Payment 渠道工程与 Client.Api/Services 禁 Result/Info/Item/Params 后缀（C290，GFX-697）。
-// R2 例外：C232/C233/C237 后曾长期零例外；2026-08-27 c303 决策（RemoteConfig 命名统一）明确 LocationResponse -> Location 映射，按规范决策更新例外清单登记 RemoteConfigLocation 一条（见 LegacyViolations）。
+//  / ：DTO 命名规范契约测试。规范正文：gfx-doc/decisions/2026-08-19-unified-dto-suffix-request-response.md（推翻 2026-08-17 边界×后缀矩阵后的单套规则）。
+// 五规则：R1 Dto 目录文件名=主类型名；R2 全仓单一后缀规则（输入 Request / 输出 Response，Admin/Client/Hub/Game 四 host 一致）；R3 Core.BaseInputOutput 公共类 Base 前缀；R4 禁 Req/Resp 冗余前缀；R5 Payment 渠道工程与 Client.Api/Services 禁 Result/Info/Item/Params 后缀。
+// R2 例外：// 后曾长期零例外；2026-08-27 c303 决策（RemoteConfig 命名统一）明确 LocationResponse -> Location 映射，按规范决策更新例外清单登记 RemoteConfigLocation 一条（见 LegacyViolations）。
 // 第三方 webhook payload 镜像（Xsolla 嵌套 snake_case 结构、Hub.Api WebHook 目录、Google 镜像目录）按决策文档豁免清单豁免，不是例外。
-// R5 的 LegacyViolations 条目不是待清理违规，而是 Apple/Xsolla 官方 JSON 镜像类的显式豁免登记（C290）：类型名跟随第三方原始命名，双向断言同样适用（镜像类删除后须移除豁免条目）。
-// 双向断言：新增违规失败（防回潮）；例外清单出现死条目也失败（防僵尸例外，参照 C118 baseline 清零经验）。
+// R5 的 LegacyViolations 条目不是待清理违规，而是 Apple/Xsolla 官方 JSON 镜像类的显式豁免登记：类型名跟随第三方原始命名，双向断言同样适用（镜像类删除后须移除豁免条目）。
+// 双向断言：新增违规失败（防回潮）；例外清单出现死条目也失败（防僵尸例外，参照 baseline 清零经验）。
 public sealed class DtoNamingConventionTests
 {
     private static readonly string RepositoryRoot = GetRepositoryRoot();
@@ -20,7 +20,7 @@ public sealed class DtoNamingConventionTests
 
     private static readonly HashSet<string> LegacyViolations = new(StringComparer.Ordinal)
     {
-        // R5 官方 JSON 镜像豁免（C290）：Apple verifyReceipt / App Store Server API 与 Xsolla webhook / payment/token
+        // R5 官方 JSON 镜像豁免：Apple verifyReceipt / App Store Server API 与 Xsolla webhook / payment/token
         // API 的官方字段镜像类，类型名跟随第三方原始命名（snake_case 属性同源），不套自家 Request/Response 后缀。
         "R5|Payment/GameFrameX.Payment.Apple/Models/Receipt/AppleReceiptInfo.cs|AppleReceiptInfo",
         "R5|Payment/GameFrameX.Payment.Apple/Models/Receipt/AppleReceiptVerificationInfo.cs|AppleReceiptVerificationInfo",
@@ -28,13 +28,13 @@ public sealed class DtoNamingConventionTests
         "R5|Payment/GameFrameX.Payment.Xsolla/Models/XsollaTransactionItem.cs|XsollaTransactionItem",
         "R5|Payment/GameFrameX.Payment.Xsolla/Models/XsollaVerifyReceiptItem.cs|XsollaVerifyReceiptItem",
         "R5|Payment/GameFrameX.Payment.Xsolla/Order/OrderManager.cs|OrderParamsCreateItem",
-        // R2 决策级例外（2026-08-27 c303 RemoteConfig 命名统一，GFX-719/C311）：决策映射表明确
+        // R2 决策级例外（2026-08-27 c303 RemoteConfig 命名统一，/）：决策映射表明确
         // 旧名 LocationResponse 后缀类型 -> RemoteConfigLocation（RemoteConfigResponse 的嵌套 IP 地理位置类型，
         // wire JSON 形态不变），依据 gfx-doc/decisions/2026-08-27-c303-remote-config-naming-unification.md。
         "R2|GameFrameX.Client.Api/RemoteConfig/Dto/RemoteConfigLocation.cs|RemoteConfigLocation",
     };
 
-    // R5 扫描根目录（C290，GFX-697）：Payment 渠道封装工程（Apple.AppStoreServer 官方 SDK 镜像工程整体不扫）
+    // R5 扫描根目录：Payment 渠道封装工程（Apple.AppStoreServer 官方 SDK 镜像工程整体不扫）
     // 与 Client.Api/Services 服务层。输出类后缀统一 Response、输入统一 Request，禁 Result/Info/Item/Params 混用。
     private static readonly string[] PaymentSuffixRuleDirectories =
     {
@@ -209,7 +209,7 @@ public sealed class DtoNamingConventionTests
             return true;
         }
 
-        // 第三方 webhook payload 镜像（C233）：Xsolla 嵌套结构名跟随 Xsolla JSON 对象名（含 snake_case）、
+        // 第三方 webhook payload 镜像：Xsolla 嵌套结构名跟随 Xsolla JSON 对象名（含 snake_case）、
         // Tapd WebHook 目录同理，不套自家后缀（决策文档 §二矩阵「第三方 SDK 镜像跟随第三方原始命名」）。
         if (relativePath.Contains("/Integrations/Payment/Dto/XsollaWebHook", StringComparison.Ordinal)
             || relativePath.Contains("Hub.Api/Dto/WebHook/", StringComparison.Ordinal))

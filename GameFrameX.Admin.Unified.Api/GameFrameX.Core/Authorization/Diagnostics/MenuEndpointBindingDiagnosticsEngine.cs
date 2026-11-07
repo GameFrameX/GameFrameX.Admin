@@ -1,7 +1,7 @@
 namespace GameFrameX.Core.Authorization.Diagnostics;
 
 /// <summary>
-/// 菜单权限/endpoint 绑定漂移诊断纯函数引擎（C128）。
+/// 菜单权限/endpoint 绑定漂移诊断纯函数引擎。
 /// <para>输入只读快照，输出按稳定 <see cref="BindingDriftCategory"/> 分类的结构化报告。
 /// 不依赖 SqlSugar / HttpContext / 任何有状态服务，可被单元测试直接调用。
 /// 引擎 <b>不写 DB、不触发</b> ApiEndpointCatalogSync。</para>
@@ -155,7 +155,7 @@ public static class MenuEndpointBindingDiagnosticsEngine
             }
         }
 
-        // 7) 登录态白名单漂移类别已随 [AuthenticatedOnly] 特性化退役（GFX-684/C277）：
+        // 7) 登录态白名单漂移类别已随 [AuthenticatedOnly] 特性化退役：
         // 特性长在方法上，方法删除/改名则登记自动消失，该漂移结构性不可再发生。
 
         // 确定性排序：Category → HttpMethod → RoutePath → DetailAsync。

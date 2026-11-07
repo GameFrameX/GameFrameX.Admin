@@ -59,7 +59,7 @@
 
 <script lang="ts" setup name="onlineConfigRollout">
 /**
- * 配置灰度发布页（C343 / GFX-759 前端半边）。
+ * 配置灰度发布页（前端半边）。
  * 版本行只读列表（只由 publish/rollback 追加，历史行不可改删）；publish 顶部高危入口；
  * rollback 行操作（customActions 相对码 onlineConfigRollout:rollback）。
  * Admin 只编排（SegmentId + Percent 1-100），不解释分群命中与百分比桶（Online 侧语义）。

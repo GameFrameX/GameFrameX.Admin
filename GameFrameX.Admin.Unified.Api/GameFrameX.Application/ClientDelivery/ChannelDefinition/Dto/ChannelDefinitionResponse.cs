@@ -5,9 +5,9 @@ namespace GameFrameX.Application.ClientDelivery.ChannelDefinition.Dto;
 /// <summary>
 /// 渠道输出参数
 /// </summary>
-// 纯 POCO 投影（C228）：属性名与 GameFrameX.Entity.System.ChannelDefinition 及其基类链保持一致，
+// 纯 POCO 投影：属性名与 GameFrameX.Entity.System.ChannelDefinition 及其基类链保持一致，
 // 供 .Select&lt;ChannelDefinitionResponse&gt;() 自动投影与 Mapster 按名映射。
-// ChannelDefinition 为抽象类（不映射物理表，C22 拆分），不满足 IBasePageResponse&lt;T&gt; 的 new() 约束，故保留非泛型 IBaseResponse。
+// ChannelDefinition 为抽象类（不映射物理表， 拆分），不满足 IBasePageResponse&lt;T&gt; 的 new() 约束，故保留非泛型 IBaseResponse。
 public class ChannelDefinitionResponse : IBaseResponse
 {
     /// <summary>

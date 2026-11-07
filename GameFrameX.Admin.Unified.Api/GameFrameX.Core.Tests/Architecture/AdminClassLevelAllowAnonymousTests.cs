@@ -5,10 +5,10 @@ using Microsoft.AspNetCore.Authorization;
 namespace GameFrameX.Core.Tests.Architecture;
 
 /// <summary>
-/// C258 防回潮契约：Admin host（Web.Api）的 <see cref="IAdminApiController"/> 服务类禁止类级
+///  防回潮契约：Admin host（Web.Api）的 <see cref="IAdminApiController"/> 服务类禁止类级
 /// <c>[AllowAnonymous]</c>。类级特性会被 ApiEndpointCatalogSync 收进 action 的 EndpointMetadata，
 /// 使该服务全部端点（含 AddAsync/UpdateAsync/DeleteAsync/SetStatusAsync 写操作）登记为 IsPublic，
-/// JwtHandler.CheckAuthorizeAsync 对 IsPublic 端点在权限判定前短路放行 → 匿名写可达（GFX-664）。
+/// JwtHandler.CheckAuthorizeAsync 对 IsPublic 端点在权限判定前短路放行 → 匿名写可达。
 /// 公开端点必须 action 级标注并经端点目录登记 IsPublic。
 /// </summary>
 public sealed class AdminClassLevelAllowAnonymousTests

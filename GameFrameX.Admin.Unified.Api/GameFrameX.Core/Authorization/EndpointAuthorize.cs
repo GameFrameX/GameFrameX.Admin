@@ -1,7 +1,7 @@
 namespace GameFrameX.Core.Authorization;
 
 /// <summary>
-/// 端点鉴权纯函数（U6/C42）。把"端点绑定按钮 MenuId 集 ∩ 用户已授权 MenuId 集"抽为可单测的纯逻辑，
+/// 端点鉴权纯函数。把"端点绑定按钮 MenuId 集 ∩ 用户已授权 MenuId 集"抽为可单测的纯逻辑，
 /// JwtHandler 请求期调用，避免把 DB/缓存依赖混进判定。
 /// </summary>
 public static class EndpointAuthorize

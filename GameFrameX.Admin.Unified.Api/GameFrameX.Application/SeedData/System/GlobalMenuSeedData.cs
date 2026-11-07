@@ -9,7 +9,7 @@ namespace GameFrameX.Application.SeedData.System;
 /// 菜单按业务域拆分到 GlobalMenuSeedData.&lt;Domain&gt;.cs 各 partial 文件；本文件仅保留 seed 入口与 <see cref="BuildData"/> 聚合。
 /// </summary>
 /// <remarks>
-/// 权威收敛种子（C278）：global_menu.path / component 等菜单结构以本 seed 的 upsert 为唯一权威纠正源（spec §132/133），
+/// 权威收敛种子：global_menu.path / component 等菜单结构以本 seed 的 upsert 为唯一权威纠正源（spec /133），
 /// 每次启动按 seed 值覆盖已有行；其余普通种子只补缺不覆盖。
 /// </remarks>
 [IncrementSeed]

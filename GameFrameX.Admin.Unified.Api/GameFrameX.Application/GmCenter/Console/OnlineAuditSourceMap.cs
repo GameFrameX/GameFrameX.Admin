@@ -7,7 +7,7 @@ using GameFrameX.Entity.Business.Game.Online;
 namespace GameFrameX.Application.GmCenter.Console;
 
 /// <summary>
-/// 统一审计三来源 → 五维统一字段映射的唯一来源（change C344 / vault:C9 S8.2）。
+/// 统一审计三来源 → 五维统一字段映射的唯一来源（change / vault: .2）。
 /// <para>
 /// 三来源口径（Admin 侧零事件镜像，全部实时读取原表/透传 Online）：
 /// <list type="number">
@@ -15,8 +15,8 @@ namespace GameFrameX.Application.GmCenter.Console;
 /// MonitorLogging 全 action 自动落库）——操作者取账号，目标对象/作用域从 <c>RequestParam</c> JSON 尽力提取
 /// （提取不到即 null，不伪造）；命令类型取 Controller.Action；时间取 LogDateTime。</description></item>
 /// <item><description><b>OnlineAuditEvent</b>：Online 审计事件（经 <c>IOnlineServerClient</c> 实时透传）——五维直映。</description></item>
-/// <item><description><b>DomainCommandRecord</b>：各域命令事实源表——处罚落账（<see cref="GamePenaltyEntity"/>，C350）
-/// 与配置灰度发布记录（<see cref="GameOnlineConfigRolloutEntity"/>，C343）；资产人工发放/撤销的审计在 Online 侧，
+/// <item><description><b>DomainCommandRecord</b>：各域命令事实源表——处罚落账（<see cref="GamePenaltyEntity"/>）
+/// 与配置灰度发布记录（<see cref="GameOnlineConfigRolloutEntity"/>）；资产人工发放/撤销的审计在 Online 侧，
 /// 由 OnlineAuditEvent 来源覆盖（本地无镜像表）。</description></item>
 /// </list>
 /// 禁止在 Service 内散落第二套映射——新增来源必须回到本文件登记并同步守护说明。
@@ -87,7 +87,7 @@ public static class OnlineAuditSourceMap
     }
 
     /// <summary>
-    /// 处罚落账行（C350 事实源）→ 统一审计行。
+    /// 处罚落账行（事实源）→ 统一审计行。
     /// </summary>
     public static OnlineAuditSearchEntryResponse FromPenaltyRecord(GamePenaltyEntity penalty)
     {
@@ -105,7 +105,7 @@ public static class OnlineAuditSourceMap
     }
 
     /// <summary>
-    /// 配置灰度发布记录行（C343 事实源）→ 统一审计行。
+    /// 配置灰度发布记录行（事实源）→ 统一审计行。
     /// </summary>
     public static OnlineAuditSearchEntryResponse FromConfigRolloutRecord(GameOnlineConfigRolloutEntity rollout)
     {

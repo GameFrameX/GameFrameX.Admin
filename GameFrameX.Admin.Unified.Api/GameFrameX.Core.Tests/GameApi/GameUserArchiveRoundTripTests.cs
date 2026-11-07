@@ -10,8 +10,8 @@ using GameFrameX.Core.SqlSugar;
 namespace GameFrameX.Core.Tests.GameApi;
 
 /// <summary>
-/// C8 T2 RED：存档三件套 round-trip 契约（上行 → 服务端透传存储 → 下行逐元素字节等价）。
-/// <para>T3 实现前全红（NotImplementedException）；转绿标准 = 本文件 5 用例全过。</para>
+///  RED：存档三件套 round-trip 契约（上行 → 服务端透传存储 → 下行逐元素字节等价）。
+/// <para> 实现前全红（NotImplementedException）；转绿标准 = 本文件 5 用例全过。</para>
 /// <para>分表行内容为客户端 DBTable 逗号拼接格式原样字符串（服务端不解析）。</para>
 /// </summary>
 public sealed class GameUserArchiveRoundTripTests
@@ -159,7 +159,7 @@ public sealed class GameUserArchiveRoundTripTests
         var controller = CreateController(db);
 
         // 客户端发 "syncList": null 会覆盖 property initializer = new()，InSyncList 必须 null 兜底
-        // 否则 22 个 InSyncList 调用首个就 NRE（C8 线上崩溃复现）
+        // 否则 22 个 InSyncList 调用首个就 NRE（线上崩溃复现）
         var request = CreateFullUpload(2006, 0);
         request.SyncList = null!;
 

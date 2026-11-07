@@ -3,7 +3,7 @@ using GameFrameX.Entity.Base;
 namespace GameFrameX.Entity.Business.Game;
 
 /// <summary>
-/// 游戏玩家存档（C8 存档三件套）
+/// 游戏玩家存档（存档三件套）
 /// <para>分表透传存储：BranchesJson 原样保存客户端 24 张分表行数组，服务端不解析行内容（round-trip 字节等价的前提）。</para>
 /// </summary>
 [SugarTable(null, "游戏玩家存档")]
@@ -157,8 +157,8 @@ public class GameUserArchiveEntity : EntityBasicSelect
     public string ClientVersion { get; set; } = string.Empty;
 
     /// <summary>
-    /// 登录会话 id（P0-2：C13 登录时生成下发，存档行单副本承载）
-    /// <para>ponytail: 单副本起步（一玩家一行一列，后登录覆盖）；多端并发顶号天花板 = Redis SETNX 抢占，见 C13 change。</para>
+    /// 登录会话 id（P0-2： 登录时生成下发，存档行单副本承载）
+    /// <para>ponytail: 单副本起步（一玩家一行一列，后登录覆盖）；多端并发顶号天花板 = Redis SETNX 抢占，见 change。</para>
     /// </summary>
     [SugarColumn(ColumnDescription = "登录会话 id", IsNullable = true)]
     public long? SessionId { get; set; }

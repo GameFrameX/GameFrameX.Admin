@@ -1,7 +1,7 @@
 namespace GameFrameX.Application.GmCenter.Match.Dto;
 
 /// <summary>
-/// 异常 Ticket 分页响应（change C341 §3 A0 字段终版：Items/NextCursor/HasMore + ServerTime）。
+/// 异常 Ticket 分页响应（字段终版：Items/NextCursor/HasMore + ServerTime）。
 /// </summary>
 public class OnlineMatchAbnormalTicketPageResponse
 {

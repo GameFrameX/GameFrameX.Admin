@@ -72,7 +72,7 @@ public sealed class GameAntiCheatEventService
     /// 占位即入账（本站点执行 == 持久化，无外部副作用），并发同键由 <c>ux_anticheat_idempotency</c> 唯一索引仲裁，
     /// 输家按 Replay 口径返回既有事件（不重复入账、不抛错）；ManualReviewState 固定为 Pending。</para>
     /// <para><strong>建议不自动生效</strong>：SuggestedAction 仅落字段，本方法不创建任何处罚记录；
-    /// 处罚创建/撤销属 C11-C（C115）职责，复核通过后的映射由 C11-D-followup 承接。</para>
+    /// 处罚创建/撤销属 -C职责，复核通过后的映射由 -D-followup 承接。</para>
     /// </summary>
     [HttpPost("submit")]
     [ApiDescriptionSettings(Name = "Submit")]
@@ -113,7 +113,7 @@ public sealed class GameAntiCheatEventService
     /// <summary>
     /// 人工复核动作。
     /// <para><strong>合法状态迁移</strong>：仅 Pending → Approved/Rejected/Escalated；非 Pending 拒绝重审，目标状态非法拒绝。</para>
-    /// <para><strong>不写处罚表</strong>：本方法只更新事件自身的复核状态与审计字段；是否据此创建处罚属 C11-C（C115）与 C11-D-followup。</para>
+    /// <para><strong>不写处罚表</strong>：本方法只更新事件自身的复核状态与审计字段；是否据此创建处罚属 -C与 -D-followup。</para>
     /// </summary>
     [HttpPost("review")]
     [ApiDescriptionSettings(Name = "Review")]

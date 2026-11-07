@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 import { expectOverview, navigateByMenu, shot } from './helpers';
 
-// C406 / GFX-1232：替代 C405 的 client-api-protocol-correlation 用例。
+//  / ：替代 的 client-api-protocol-correlation 用例。
 // 新单游戏协议只认 X-Proto-Ver；旧三头（GameFrameX-Tenant-Id / GameFrameX-App-Id / GameFrameX-App-Secret）
 // 在生产代码已无读取方——本用例证明：附带旧头时结果与不带时完全一致（被忽略）。
 const CLIENT_API_URL = process.env.E2E_CLIENT_API_URL;

@@ -31,7 +31,7 @@
 
 <script lang="ts" setup name="onlineMessageAudit">
 /**
- * 消息审计查询页（C342 / GFX-758，vault:C7）。
+ * 消息审计查询页（vault:）。
  * 脱敏内容展示——Content 列 sensitive 遮蔽，与 Online 事件脱敏规则一致（Admin 侧兜底脱敏双保险）；
  * 只读，无写路径。查询实时透传 Online，Admin 不落消息镜像。
  */

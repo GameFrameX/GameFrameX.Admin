@@ -1,5 +1,5 @@
 /**
- * VC-1.10 Admin 前端半边断言（C348 / GFX-751）：未知 Online 码回退后端 message。
+ * .10 Admin 前端半边断言：未知 Online 码回退后端 message。
  *
  * 被测对象是真实 src/utils/http/shared.ts 的 resolveResponseMessage。该模块依赖
  * vue-i18n 与浏览器 storage / message 工具，但被测断言只关心"已知码 → 命中 i18n / 未知码 → 回退原文"，
@@ -84,7 +84,7 @@ vi.mock('../message', () => ({
 
 // ── 断言数据 ──────────────────────────────────────────────
 
-// C339 Online 八段（320～327）镜像 vault 1xxx～8xxx；段号 = 前 3 位
+//  Online 八段（320～327）镜像 vault 1xxx～8xxx；段号 = 前 3 位
 const isOnlineCode = (code: string): boolean => {
 	const head = Math.floor(Number(code) / 100000)
 	return head >= 320 && head <= 327

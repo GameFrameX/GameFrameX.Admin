@@ -1,7 +1,7 @@
 namespace GameFrameX.Application.GmCenter.Match.Dto;
 
 /// <summary>
-/// 匹配失败原因分页查询输入参数（change C341 §3；Cursor 翻页透传 Online）。
+/// 匹配失败原因分页查询输入参数（change；Cursor 翻页透传 Online）。
 /// </summary>
 public class PageOnlineMatchFailureRequest
 {

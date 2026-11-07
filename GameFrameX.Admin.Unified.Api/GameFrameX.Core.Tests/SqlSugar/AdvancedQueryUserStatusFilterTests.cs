@@ -6,7 +6,7 @@ using SqlSugar;
 
 namespace GameFrameX.Core.Tests.SqlSugar;
 
-// GFX-131 / C131 回归测试：锁定 5 个 game-business 服务 BuildPageQuery 中此前漂移的过滤字段
+//  / 回归测试：锁定 5 个 game-business 服务 BuildPageQuery 中此前漂移的过滤字段
 // （PageInput 已声明、Service 此前未应用）。每条测试复刻对应 Service 的 WhereIF 形状，
 // 用 Sqlite 内存文件库 + ConfigureBaseFilters 端到端验证「传值收窄 / 不传全量」契约。
 // 注：仅复刻过滤形状，省略 SelectAsync<Output>() 投影与 LeftJoin——投影/连接不影响 WHERE 过滤断言。

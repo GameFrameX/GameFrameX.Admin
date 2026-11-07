@@ -3,7 +3,7 @@ using GameFrameX.Entity.Base;
 namespace GameFrameX.Entity.Business.Game;
 
 /// <summary>
-/// 游戏玩家奖励记录（C8 奖励域：BLGetUserRewards / BLReceiveRewards1 自建）
+/// 游戏玩家奖励记录（奖励域：BLGetUserRewards / BLReceiveRewards1 自建）
 /// <para>一玩家一 key 一行；Content 为奖励内容 JSON（客户端 json.decode 后取 .rewards），
 /// 最小自建模型下领取时创建的记录 Content 为空（客户端发奖用本地任务配置，不从服务端 content 取）。</para>
 /// <para>token 幂等：同 token 重放必须返回相同结果（客户端响应丢失重试时补发本地奖励，防丢奖）。</para>

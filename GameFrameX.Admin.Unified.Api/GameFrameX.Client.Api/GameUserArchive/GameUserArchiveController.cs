@@ -6,10 +6,10 @@ using GameFrameX.Core.Service;
 namespace GameFrameX.Client.Api.GameUserArchive;
 
 /// <summary>
-/// 游戏玩家存档控制器（C8 存档三件套）
+/// 游戏玩家存档控制器（存档三件套）
 /// <para>路由：POST /api/GameUserArchive/{Action}（继承 BaseController 基类路由，不走动态 API 规则）。</para>
 /// <para>存储为透传模型：22 张 String[] 分表以原始行字符串（客户端 DBTable 逗号拼接格式）存
-/// BranchesJson，服务端不解析行内容——round-trip 逐元素字节等价的前提（见 C8 notes §E）。</para>
+/// BranchesJson，服务端不解析行内容——round-trip 逐元素字节等价的前提。</para>
 /// </summary>
 public class GameUserArchiveController : BaseController
 {
@@ -180,7 +180,7 @@ public class GameUserArchiveController : BaseController
     /// <para>Rcode 语义原样保留（0=成功；1/2/3 分支由客户端状态机消费）。
     /// 服务端无档 = 新用户场景，回 Rcode 1（旧通道静默忽略语义：客户端空分支本地起步）。
     /// 不可用 Rcode 0 + ForceSync=1 + 空档：ForceSync=1 的消费端是 _UseServerData，
-    /// 空 user 数组在 response.user[1] 直接 nil 崩（C13 Editor 实连发现）。</para>
+    /// 空 user 数组在 response.user[1] 直接 nil 崩（Editor 实连发现）。</para>
     /// </summary>
     /// <param name="request"></param>
     /// <returns></returns>
@@ -252,7 +252,7 @@ public class GameUserArchiveController : BaseController
     /// <summary>
     /// 查询目标玩家存档摘要（原 BLGetOtherProgress；绑定/切换冲突窗展示用）。
     /// <para>Rcode：0 = 有云端数据（摘要字段）；1 = 无云端数据（客户端展示兜底值）。</para>
-    /// <para>客户端调用方已在 C7 删除（死代码），服务端按契约先建能力，接线随冲突窗恢复。</para>
+    /// <para>客户端调用方已在 删除（死代码），服务端按契约先建能力，接线随冲突窗恢复。</para>
     /// </summary>
     /// <param name="request"></param>
     /// <returns></returns>

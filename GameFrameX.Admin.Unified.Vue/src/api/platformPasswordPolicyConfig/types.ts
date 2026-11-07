@@ -1,7 +1,7 @@
 /* eslint-disable */
 /* tslint:disable */
 
-/** 平台密码策略配置输出（C173）。仅暴露密码强度策略字段，绝不回显 Cryptogram 密钥（CryptoType/PublicKey/PrivateKey）。 */
+/** 平台密码策略配置输出。仅暴露密码强度策略字段，绝不回显 Cryptogram 密钥（CryptoType/PublicKey/PrivateKey）。 */
 export interface PlatformPasswordPolicyConfigResponse {
   /** 是否开启密码强度验证。 */
   strongPassword?: boolean;
@@ -42,11 +42,11 @@ export interface PlatformPasswordPolicyConfigDetailPostData {
   code: number;
   /** 错误或提示信息 */
   message: string;
-  /** 平台密码策略配置输出（C173）。仅暴露密码强度策略字段，绝不回显 Cryptogram 密钥（CryptoType/PublicKey/PrivateKey）。 */
+  /** 平台密码策略配置输出。仅暴露密码强度策略字段，绝不回显 Cryptogram 密钥（CryptoType/PublicKey/PrivateKey）。 */
   data: PlatformPasswordPolicyConfigResponse;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;

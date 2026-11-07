@@ -12,7 +12,7 @@ namespace GameFrameX.Entity.Business.Game;
 // 由渠道自身保证全局唯一；按渠道和交易号共同约束，避免重复处理。
 [SugarIndex("ux_game_order_provider_transaction", nameof(PayChannel), OrderByType.Asc, nameof(ProviderTransactionId), OrderByType.Asc, true)]
 [SugarIndex("idx_game_order_apple_original_transaction_id", nameof(AppleOriginalTransactionId), OrderByType.Asc)]
-// 首页聚合「今日订单」按 CreatedTime 过滤计数走索引（C321 / GFX-730）
+// 首页聚合「今日订单」按 CreatedTime 过滤计数走索引
 [SugarIndex("idx_game_order_created_time", nameof(CreatedTime), OrderByType.Asc)]
 [BusinessTable]
 [IncrementTable]

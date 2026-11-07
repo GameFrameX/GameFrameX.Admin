@@ -1,5 +1,5 @@
 /**
- * 运营邮件 Campaign 枚举与契约类型（前端语义名，对齐后端 C134 / GFX-141）。
+ * 运营邮件 Campaign 枚举与契约类型（前端语义名，对齐后端 /）。
  * 生成 types.ts 的同 enum 是 ValueN（数字无名），这里保留语义名供业务可读；
  * 值域（0/1/2...）与后端 C# 枚举一致，运行时传数字给后端。
  */
@@ -18,7 +18,7 @@ export enum MailCampaignExpirePolicy {
   AutoClaim = 2,
 }
 
-// Admin 侧发布生命周期状态（对齐 C134 MailCampaignPublishStatus）
+// Admin 侧发布生命周期状态（对齐 MailCampaignPublishStatus）
 export enum MailCampaignPublishStatus {
   Draft = 0,
   Published = 1,
@@ -41,7 +41,7 @@ export interface MailCampaignAttachment {
   iconId?: number;
 }
 
-// Campaign 行（对齐 C134 GameMailCampaignEntityOutput，camelCase）
+// Campaign 行（对齐 GameMailCampaignEntityOutput，camelCase）
 export interface MailCampaignRow {
   id?: number;
   areaId: number;
@@ -112,7 +112,7 @@ export const MAIL_CAMPAIGN_LANGUAGE_OPTIONS = [
   { value: 'ko', labelKey: 'message.gameBusiness.mailCampaign.languageKo' },
 ];
 
-// 附件 RewardType 选项（一期仅 NormalItem 可发放，对齐 C134 范围外声明 / Server 约束）
+// 附件 RewardType 选项（一期仅 NormalItem 可发放，对齐 范围外声明 / Server 约束）
 export const MAIL_CAMPAIGN_REWARD_TYPE_OPTIONS = [
   { value: 0, labelKey: 'message.gameBusiness.mailCampaign.rewardTypeNormalItem' },
 ];

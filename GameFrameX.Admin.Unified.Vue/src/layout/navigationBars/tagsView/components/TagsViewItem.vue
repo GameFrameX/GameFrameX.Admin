@@ -103,7 +103,7 @@ const label = computed(() => {
     color: var(--p-primary-color);
   }
 
-  // 按压反馈（GFX-661）：缩放动画受全局 prefers-reduced-motion 豁免
+  // 按压反馈：缩放动画受全局 prefers-reduced-motion 豁免
   &:active {
     transform: scale(0.96);
   }
@@ -129,7 +129,7 @@ const label = computed(() => {
   }
 
   &-action {
-    // 触控目标 36px（GFX-661）：375px 视口下也可点准
+    // 触控目标 36px：375px 视口下也可点准
     width: 36px;
     height: 36px;
     display: inline-flex;
@@ -147,7 +147,7 @@ const label = computed(() => {
       background: color-mix(in srgb, var(--p-primary-100) 55%, transparent);
     }
 
-    // 按压反馈（GFX-661）
+    // 按压反馈
     &:active {
       color: var(--p-primary-color);
       background: color-mix(in srgb, var(--p-primary-100) 80%, transparent);

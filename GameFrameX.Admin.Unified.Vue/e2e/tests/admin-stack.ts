@@ -3,13 +3,13 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname } from 'node:path';
 import { navigateByMenu } from './helpers';
 
-// C406 / GFX-1232 集成第 2 轮（R6）：业务管理员账号与 sys_admin 角色的全部非超管菜单授权
+//  / 集成第 2 轮：业务管理员账号与 sys_admin 角色的全部非超管菜单授权
 // 已由 Web.Api 首启种子引导（GAMEFRAMEX_ADMIN_INITIAL_ACCOUNT / _PASSWORD）创建，
 // 原 admin-menu-fixture 的 role/grantMenu 主动授权例外随之删除；本文件只保留：
 // 1. 隔离栈守卫（防止误打共享栈）；
 // 2. 信封字段读取工具（供向导用例解析响应）；
 // 3. 合服复核人账号的产品路径准备：由引导出来的 admin 在「账号管理」真实界面创建，
-//    并通过「重置密码」取得明文初始口令，写入 state 目录供合服用例读取（不入证据目录）。
+//  并通过「重置密码」取得明文初始口令，写入 state 目录供合服用例读取（不入证据目录）。
 export function readField(value: unknown, name: string): unknown {
   if (!value || typeof value !== 'object') return undefined;
   const record = value as Record<string, unknown>;

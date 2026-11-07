@@ -18,8 +18,8 @@ namespace GameFrameX.Core.Tests.ClientApi;
 
 /// <summary>
 /// SignatureValidationMiddleware 单元测试。
-/// v1 向量取自 C1-hmac-foundation-migration/test-vectors.json（固定历史 ts，用大时间窗跑通验签路径）；
-/// v2 向量取自 C2-sig-keyring-server/test-vectors.json（W1-W6 六条双密钥组，期望值逐字抄录，禁止本地重算——
+/// v1 向量取自 -hmac-foundation-migration/test-vectors.json（固定历史 ts，用大时间窗跑通验签路径）；
+/// v2 向量取自 -sig-keyring-server/test-vectors.json（W1-W6 六条双密钥组，期望值逐字抄录，禁止本地重算——
 /// W1/W2 同参数双 key 是双密钥共存锚）。
 /// <para>密钥环用 <see cref="FakeSignatureKeyResolver"/> 内存桩：NotBeforeTime=0 / ExpireTime=null（永久生效）
 /// 不受真实时钟影响；到期/未生效用例用向量历史时刻（1755244800，必然早于当前时间）构造。</para>
@@ -33,7 +33,7 @@ public sealed class SignatureValidationMiddlewareTests
     private const string V1Body = "{\"hello\":\"world\"}";
     private const string V1Signature = "xvcjY+eEGdZu+qGaqDqSrjTXYiSpqkmftxV1lyU1iuU=";
 
-    // ===== C2 v2 双密钥向量常量（抄录自 C2 test-vectors.json，事实源唯一） =====
+    // ===== v2 双密钥向量常量（抄录自 test-vectors.json，事实源唯一） =====
     private const string KeyAId = "sk-vector-a-001";
     private const string KeyA = "GFX-C2-VECTOR-TEST-KEY-A";
     private const string KeyBId = "sk-vector-b-002";
@@ -140,7 +140,7 @@ public sealed class SignatureValidationMiddlewareTests
             onNext();
             return Task.CompletedTask;
         });
-        // C261 起 RiskEnforcementModeResolver 改为方法内 RequestServices 按需解析（避免参数注入在无作用域上下文请求上触发仓储构造）
+        //  起 RiskEnforcementModeResolver 改为方法内 RequestServices 按需解析（避免参数注入在无作用域上下文请求上触发仓储构造）
         context.RequestServices = new ServiceCollection()
                                   .AddSingleton(riskResolver ?? new FakeRiskEnforcementModeResolver())
                                   .BuildServiceProvider();
@@ -156,7 +156,7 @@ public sealed class SignatureValidationMiddlewareTests
         }
     }
 
-    // ==================== C1 既有用例（v1 兼容回归，不删不改） ====================
+    // ==================== 既有用例（v1 兼容回归，不删不改） ====================
 
     [Fact]
     public async Task ValidSignature_V1Vector_Passes()
@@ -268,7 +268,7 @@ public sealed class SignatureValidationMiddlewareTests
         Assert.True(nextCalled);
     }
 
-    // ==================== C2 新增：v2 密钥环验签（向量 W1-W6） ====================
+    // ==================== 新增：v2 密钥环验签（向量 W1-W6） ====================
 
     [Fact]
     public async Task V2_W1Vector_KeyA_Passes()
@@ -360,7 +360,7 @@ public sealed class SignatureValidationMiddlewareTests
     [Fact]
     public void BuildV2SignatureMessage_MatchesVectorMessage()
     {
-        // message 构造逐字节对齐向量事实源（W1 的 message 串）；C267 起拼装收口到 CanonicalRequestBuilder（全仓唯一）
+        // message 构造逐字节对齐向量事实源（W1 的 message 串）； 起拼装收口到 CanonicalRequestBuilder（全仓唯一）
         var message = CanonicalRequestBuilder.BuildV2Message("POST", "/cola", "op=BLLogin&userid=10086", KeyAId, 1755244800, "1", Encoding.UTF8.GetBytes(V1Body));
         Assert.Equal("v2\nPOST\n/cola\nop=BLLogin&userid=10086\nsk-vector-a-001\n1755244800\n1\n93a23971a914e5eacbf0a8d25154cda309c3c1c72fbb9914d47c60f3cb681588", message);
     }
@@ -368,7 +368,7 @@ public sealed class SignatureValidationMiddlewareTests
     [Fact]
     public async Task V2_ReorderedUrlQuery_SameCanonicalSignature_Passes()
     {
-        // C267 活体验证：URL query 乱序（?userid=...&op=...）但 canonical 后与 W1 一致 → W1 签名依然通过。
+        //  活体验证：URL query 乱序（?userid=...&op=...）但 canonical 后与 W1 一致 → W1 签名依然通过。
         // 证明服务端按 canonical（字典序）验签、不再依赖客户端原始参数顺序（代理改写不再破签）。
         var nextCalled = false;
         var context = CreateV2Context(KeyAId, 1755244800, 1, W1Signature, query: "?userid=10086&op=BLLogin");
@@ -397,7 +397,7 @@ public sealed class SignatureValidationMiddlewareTests
         Assert.Equal(SignatureValidationMiddleware.SignatureRejectedCode, await ReadEnvelopeCodeAsync(context));
     }
 
-    // ==================== C2 新增：拒签码分级（60102 / 60103） ====================
+    // ==================== 新增：拒签码分级（60102 / 60103） ====================
 
     [Fact]
     public async Task V2_UnknownKeyId_RejectedWith60102()
@@ -495,12 +495,12 @@ public sealed class SignatureValidationMiddlewareTests
         Assert.Equal(SignatureValidationMiddleware.SignatureRejectedCode, await ReadEnvelopeCodeAsync(replay));
     }
 
-    // ==================== C2 新增：v1 兼容遍历（App 域密钥环 + 常量回退） ====================
+    // ==================== 新增：v1 兼容遍历（App 域密钥环 + 常量回退） ====================
 
     [Fact]
     public async Task V1_SignedWithKeyringKey_TraversesActiveSetAndPasses()
     {
-        // v1 无 keyId：中间件应在 App 域生效密钥集合内遍历（非 C1 常量签的名也要能过）
+        // v1 无 keyId：中间件应在 App 域生效密钥集合内遍历（非 常量签的名也要能过）
         var signature = SignV1(KeyA, "POST", "/cola", "op=BLLogin&userid=10086", 1755244800, 20, V1Body);
         var nextCalled = false;
         var context = CreateContext("v1;1755244800;20;" + signature, V1Body);
@@ -515,7 +515,7 @@ public sealed class SignatureValidationMiddlewareTests
     [Fact]
     public async Task V1_UnknownKey_FallsBackToConstantAndFails()
     {
-        // ring 内没有能验过这把签名的 key，也不匹配 C1 常量 → 60101（常量回退不豁免失败签名）
+        // ring 内没有能验过这把签名的 key，也不匹配 常量 → 60101（常量回退不豁免失败签名）
         var signature = SignV1("GFX-UNKNOWN-KEY", "POST", "/cola", "op=BLLogin&userid=10086", 1755244800, 21, V1Body);
         var nextCalled = false;
         var context = CreateContext("v1;1755244800;21;" + signature, V1Body);
@@ -528,7 +528,7 @@ public sealed class SignatureValidationMiddlewareTests
         Assert.Equal(SignatureValidationMiddleware.SignatureRejectedCode, await ReadEnvelopeCodeAsync(context));
     }
 
-    // ==================== C2 新增：双密钥共存（R5）与灰度分流 ====================
+    // ==================== 新增：双密钥共存与灰度分流 ====================
 
     [Fact]
     public async Task DualKeyCoexistence_DisableKeyA_KeyBStillPasses()
@@ -586,7 +586,7 @@ public sealed class SignatureValidationMiddlewareTests
     [Fact]
     public async Task EnabledFalse_V2BadSignature_CompletelyBypassed()
     {
-        // 灰度总开关 false = 完全旁路（现网默认，与 C1 行为一致）
+        // 灰度总开关 false = 完全旁路（现网默认，与 行为一致）
         var nextCalled = false;
         var context = CreateV2Context("sk-not-exist", 1755244800, 1, "AAAA");
 
@@ -595,7 +595,7 @@ public sealed class SignatureValidationMiddlewareTests
         Assert.True(nextCalled);
     }
 
-    // ==================== C379 新增：Tier 0 公开只读端点豁免（标记命中先于风险模式分流） ====================
+    // ==================== 新增：Tier 0 公开只读端点豁免（标记命中先于风险模式分流） ====================
 
     /// <summary>
     /// 构造「路由已匹配打标 action」的上下文：endpoint metadata 携带 <see cref="PublicStartupEndpointAttribute"/>。
@@ -622,7 +622,7 @@ public sealed class SignatureValidationMiddlewareTests
     public async Task PublicStartupEndpoint_FailClosedMissingHeader_Exempted()
     {
         // ① IsEnabled=true + FailClosed + 标记端点缺签名头 → 放行（豁免先于风险模式分流，FailClosed 不打断启动流程）；
-        //    FakeRiskEnforcementModeResolver 默认即 FailClosed（与中间件默认安全口径一致）
+        //  FakeRiskEnforcementModeResolver 默认即 FailClosed（与中间件默认安全口径一致）
         var nextCalled = false;
         var context = CreateMarkedContext(null);
 
@@ -636,7 +636,7 @@ public sealed class SignatureValidationMiddlewareTests
     public async Task UnmarkedEndpoint_FailClosedMissingHeader_RejectedWith60101()
     {
         // ② 同条件未标记端点缺签名头 → 401 + 60101（签名语义零变化）；
-        //    GetEndpoint() 为 null 的安全降级（不豁免）由既有 MissingHeader_RejectedWith60101 等用例覆盖（未 SetEndpoint 即 null）
+        //  GetEndpoint() 为 null 的安全降级（不豁免）由既有 MissingHeader_RejectedWith60101 等用例覆盖（未 SetEndpoint 即 null）
         var nextCalled = false;
         var context = CreateUnmarkedContext(null);
 
@@ -664,7 +664,7 @@ public sealed class SignatureValidationMiddlewareTests
     public async Task RegisterDeviceAction_FailClosedMissingHeader_RejectedWith60101()
     {
         // ④ RegisterDevice 归 Tier 1（写副作用，不打标）：用真实 action 的反射元数据构造 endpoint metadata，
-        //    证明生产端点真实携带的特性集合不触发豁免，走正常验签（缺头 401）
+        //  证明生产端点真实携带的特性集合不触发豁免，走正常验签（缺头 401）
         var method = typeof(GameAssetPackageVersionController).GetMethod(nameof(GameAssetPackageVersionController.RegisterDevice))!;
         var attributes = method.GetCustomAttributes(inherit: false);
         var nextCalled = false;
@@ -678,7 +678,7 @@ public sealed class SignatureValidationMiddlewareTests
         Assert.Equal(SignatureValidationMiddleware.SignatureRejectedCode, await ReadEnvelopeCodeAsync(context));
     }
 
-    // ==================== C2 新增：租约判定纯函数 ====================
+    // ==================== 新增：租约判定纯函数 ====================
 
     [Fact]
     public void Judge_LeaseAndEnableSemantics()

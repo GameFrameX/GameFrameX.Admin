@@ -2,7 +2,7 @@
 /* tslint:disable */
 
 /**
- * 异常 Ticket 检索类别（Admin 侧自有检索枚举，vault 无此概念；change C341 §3 A0）。
+ * 异常 Ticket 检索类别（Admin 侧自有检索枚举，vault 无此概念）。
  *
  * 定义在 Application.Platform（非 Core.Enum），不触碰 EnumContractTests SHA-256 契约锁。
  * @format int32
@@ -16,7 +16,7 @@ export enum AbnormalKind {
   Orphan = 3,
 }
 
-/** 异常 Ticket 分页响应（change C341 §3 A0 字段终版：Items/NextCursor/HasMore + ServerTime）。 */
+/** 异常 Ticket 分页响应（字段终版：Items/NextCursor/HasMore + ServerTime）。 */
 export interface OnlineMatchAbnormalTicketPageResponse {
   /** 当前页异常 Ticket 行（已做展示键映射）。 */
   items?: OnlineMatchAbnormalTicketResponse[] | null;
@@ -67,7 +67,7 @@ export interface OnlineMatchAbnormalTicketResponse {
   cancelCount?: number | null;
 }
 
-/** 匹配失败原因分页响应（change C341 §3 A0 字段终版：Items/ReasonSummary/NextCursor/HasMore + ServerTime）。 */
+/** 匹配失败原因分页响应（字段终版：Items/ReasonSummary/NextCursor/HasMore + ServerTime）。 */
 export interface OnlineMatchFailurePageResponse {
   /** 当前页失败明细行（已做展示键映射）。 */
   items?: OnlineMatchFailureResponse[] | null;
@@ -114,7 +114,7 @@ export interface OnlineMatchFailureResponse {
   occurredAt?: number;
 }
 
-/** 异常 Ticket 分页查询输入参数（change C341 §3；按异常类别检索，Cursor 翻页透传 Online）。 */
+/** 异常 Ticket 分页查询输入参数（change；按异常类别检索，Cursor 翻页透传 Online）。 */
 export interface PageOnlineMatchAbnormalTicketRequest {
   /**
    * 区服作用域（必填，经 OnlineScopeContextFactory 校验区服归属）。
@@ -123,7 +123,7 @@ export interface PageOnlineMatchAbnormalTicketRequest {
    */
   serverId: string;
   /**
-   * 异常 Ticket 检索类别（Admin 侧自有检索枚举，vault 无此概念；change C341 §3 A0）。
+   * 异常 Ticket 检索类别（Admin 侧自有检索枚举，vault 无此概念）。
    *
    * 定义在 Application.Platform（非 Core.Enum），不触碰 EnumContractTests SHA-256 契约锁。
    */
@@ -139,7 +139,7 @@ export interface PageOnlineMatchAbnormalTicketRequest {
   pageSize?: number;
 }
 
-/** 匹配失败原因分页查询输入参数（change C341 §3；Cursor 翻页透传 Online）。 */
+/** 匹配失败原因分页查询输入参数（change；Cursor 翻页透传 Online）。 */
 export interface PageOnlineMatchFailureRequest {
   /**
    * 区服作用域（必填，经 OnlineScopeContextFactory 校验区服归属）。
@@ -181,11 +181,11 @@ export interface OnlineMatchTicketQueryAbnormalPagePostData {
   code: number;
   /** 错误或提示信息 */
   message: string;
-  /** 异常 Ticket 分页响应（change C341 §3 A0 字段终版：Items/NextCursor/HasMore + ServerTime）。 */
+  /** 异常 Ticket 分页响应（字段终版：Items/NextCursor/HasMore + ServerTime）。 */
   data: OnlineMatchAbnormalTicketPageResponse;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;
@@ -205,11 +205,11 @@ export interface OnlineMatchTicketQueryFailurePagePostData {
   code: number;
   /** 错误或提示信息 */
   message: string;
-  /** 匹配失败原因分页响应（change C341 §3 A0 字段终版：Items/ReasonSummary/NextCursor/HasMore + ServerTime）。 */
+  /** 匹配失败原因分页响应（字段终版：Items/ReasonSummary/NextCursor/HasMore + ServerTime）。 */
   data: OnlineMatchFailurePageResponse;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;

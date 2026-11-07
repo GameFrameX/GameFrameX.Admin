@@ -8,7 +8,7 @@ namespace GameFrameX.Application.SeedData.System;
 
 /// <summary>
 /// 平台主库用户种子数据。
-/// <para>superadmin 初始密码两条路径（C322 随机打印机制的替代）：①环境变量 <c>GFX_SUPERADMIN_INITIAL_PASSWORD</c>
+/// <para>superadmin 初始密码两条路径（随机打印机制的替代）：①环境变量 <c>GFX_SUPERADMIN_INITIAL_PASSWORD</c>
 /// 有值时按该值 Argon2id 哈希入库并标记 <c>PasswordConfigured=true</c>（无头部署场景）；②未设置时密码留空、
 /// 标记 <c>PasswordConfigured=false</c>，等待登录页首装向导设置（有浏览器场景，密码不经控制台）。</para>
 /// <para>种子 insert-only 语义保证只有首次安装真正写入，已存在行不会被覆盖重置，首装提示也只打印一次。</para>

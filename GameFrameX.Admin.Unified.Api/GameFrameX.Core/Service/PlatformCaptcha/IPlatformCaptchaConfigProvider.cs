@@ -1,7 +1,7 @@
 namespace GameFrameX.Core.Service.PlatformCaptcha;
 
 /// <summary>
-/// 平台图形验证码运行时配置提供器接口（C217 可测性重构：SystemAuthService 注入此接口，便于测试 fake）。
+/// 平台图形验证码运行时配置提供器接口（可测性重构：SystemAuthService 注入此接口，便于测试 fake）。
 /// </summary>
 public interface IPlatformCaptchaConfigProvider
 {

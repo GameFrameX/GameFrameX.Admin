@@ -71,7 +71,7 @@ export interface GameOnlinePlayerSegmentResponse {
    * @format int64
    */
   updateTime?: number;
-  /** 乐观锁版本号（C228：GenericCrudService TResponse 必含，乐观锁编辑链路与默认排序依赖）。 */
+  /** 乐观锁版本号（GenericCrudService TResponse 必含，乐观锁编辑链路与默认排序依赖）。 */
   rowVersion?: string;
 }
 
@@ -111,7 +111,7 @@ export interface PageGameOnlinePlayerSegmentRequest {
   syncStatus?: OnlinePlayerSegmentSyncStatus;
 }
 
-/** 分群同步 Online 输入（来源 change C343 / vault:C8 S7.6）。 */
+/** 分群同步 Online 输入（来源 change / vault: .6）。 */
 export interface SyncPlayerSegmentOnlineRequest {
   /**
    * @min 1
@@ -201,7 +201,7 @@ export interface GameOnlinePlayerSegmentAddPostData {
   data: GameOnlinePlayerSegmentResponse;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;
@@ -227,7 +227,7 @@ export interface GameOnlinePlayerSegmentDetailGetData {
   data: GameOnlinePlayerSegmentResponse;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;
@@ -250,7 +250,7 @@ export interface GameOnlinePlayerSegmentPagePostData {
   data: GameOnlinePlayerSegmentResponseSqlSugarPagedList;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;
@@ -274,7 +274,7 @@ export interface GameOnlinePlayerSegmentSyncOnlinePostData {
   data: SyncPlayerSegmentOnlineResponse;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;

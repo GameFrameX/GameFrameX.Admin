@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace GameFrameX.Core.Tests.Architecture;
 
 /// <summary>
-/// C225 + C228 防回潮契约：Admin host 的 API action 返回签名禁止裸 string / object / dynamic，
+///  + 防回潮契约：Admin host 的 API action 返回签名禁止裸 string / object / dynamic，
 /// 且禁止任何数据库 Entity 出现在返回签名（含 ListAsync&lt;Entity&gt; / SqlSugarPagedList&lt;Entity&gt; 集合泛型与
 /// HttpJsonResultData&lt;Entity&gt; 信封泛型）——业务载荷一律强类型 Output（纯投影 POCO），
 /// 交 AdminResultFilter 自动包装或显式返回 HttpJsonResultData&lt;Output&gt;（Filter 透传，防双重信封）。
@@ -32,10 +32,10 @@ public sealed class AdminEndpointReturnContractTests
     /// </summary>
     private static readonly HashSet<string> SensitiveDisplayFieldAllowlist = new(StringComparer.Ordinal)
     {
-        // App 签名密钥环：列表/详情恒 ******（PageAsync 强制重置）；AddAsync/RotateAsync 响应一次性回传明文（C2 AppSignatureKeyService）
+        // App 签名密钥环：列表/详情恒 ******（PageAsync 强制重置）；AddAsync/RotateAsync 响应一次性回传明文（AppSignatureKeyService）
         "GameFrameX.Application.ClientDelivery.Security.AppSignatureKey.Dto.AppSignatureKeyResponse.Secret",
         "GameFrameX.Application.ClientDelivery.Security.AppSignatureKey.Dto.AppSignatureKeyRevealResponse.Secret",
-        // App 会话密钥环：列表/详情恒 ******（PageAsync/DetailAsync 强制重置）；AddAsync/RotateAsync 响应一次性回传明文（C5 SessionKeyService）
+        // App 会话密钥环：列表/详情恒 ******（PageAsync/DetailAsync 强制重置）；AddAsync/RotateAsync 响应一次性回传明文（SessionKeyService）
         "GameFrameX.Application.ClientDelivery.Security.SessionKey.Dto.SessionKeyResponse.Secret",
         "GameFrameX.Application.ClientDelivery.Security.SessionKey.Dto.SessionKeyRevealResponse.Secret",
         // OpenAccess 凭证签发/轮换响应一次性回传明文，列表与详情不再输出（GameAppOpenAccessService）
@@ -48,7 +48,7 @@ public sealed class AdminEndpointReturnContractTests
         "GameFrameX.Application.ClientDelivery.AdvertisementCallbackConfig.Dto.AdvertisementCallbackConfigResponse.SigningSecret",
         "GameFrameX.Application.ClientDelivery.AdvertisementCallbackConfig.Dto.AdvertisementCallbackConfigResponse.VerificationKeys",
         "GameFrameX.Application.ClientDelivery.ClientApiPolicy.Dto.ClientApiPolicyResponse.SigningKey",
-        // 平台 JWT 配置：IssuerSigningKey 恒为掩码常量（C244），Has*/Validate* 为布尔标志/配置（PlatformJwtConfigService）
+        // 平台 JWT 配置：IssuerSigningKey 恒为掩码常量，Has*/Validate* 为布尔标志/配置（PlatformJwtConfigService）
         "GameFrameX.Core.Service.PlatformJwt.Dto.PlatformJwtConfigResponse.IssuerSigningKey",
         "GameFrameX.Core.Service.PlatformJwt.Dto.PlatformJwtConfigResponse.HasSigningKey",
         "GameFrameX.Core.Service.PlatformJwt.Dto.PlatformJwtConfigResponse.ValidateIssuerSigningKey",
@@ -61,12 +61,12 @@ public sealed class AdminEndpointReturnContractTests
         // 一次性明文回传（response-envelope 规则 5）：重置密码初始值、OpenAccess 凭证签发
         "GameFrameX.Core.Service.User.Dto.ResetPwdResponse.NewPassword",
         "GameFrameX.Application.Platform.OpenAccess.Dto.SecretCreateResponse.Secret",
-        // Client host（C227 批次 2 之前暂豁免）：游戏用户令牌 / Google OAuth 交换令牌为端点业务载荷本身
+        // Client host（批次 2 之前暂豁免）：游戏用户令牌 / Google OAuth 交换令牌为端点业务载荷本身
         "GameFrameX.Client.Api.GameUser.Dto.GetGameUserEntityResponse.AccessToken",
         "GameFrameX.Client.Api.GameUser.Dto.GoogleAuthExchangeResponse.AccessToken",
-        // C237 后缀统一后 Client host Response 进入本扫描集：登录类响应一次性回显的会话密钥（AES-256-GCM 信封对称密钥，仅登录非空，其余响应恒 null）
+        //  后缀统一后 Client host Response 进入本扫描集：登录类响应一次性回显的会话密钥（AES-256-GCM 信封对称密钥，仅登录非空，其余响应恒 null）
         "GameFrameX.Client.Api.GameUser.Dto.GetGameUserEntityResponse.SessionKeySecret",
-        // C290 后缀统一（Result→Response）进入本扫描集：登录期 per-session 会话密钥签发响应，Secret 仅签发一次性回显（ClientApiSessionKeyIssuer）
+        //  后缀统一（Result→Response）进入本扫描集：登录期 per-session 会话密钥签发响应，Secret 仅签发一次性回显（ClientApiSessionKeyIssuer）
         "GameFrameX.Client.Api.Services.Auth.ClientApiSessionKeyIssueResponse.Secret",
         // 密码策略配置：正则/文案/开关名命中 password，值为策略配置而非密码（PlatformPasswordPolicyService）
         "GameFrameX.Core.Service.PlatformPasswordPolicy.Dto.PlatformPasswordPolicyConfigResponse.PasswordStrengthValidation",
@@ -112,7 +112,7 @@ public sealed class AdminEndpointReturnContractTests
     }
 
     /// <summary>
-    /// C228 契约：Admin API action 返回签名（含集合 / 分页 / 信封泛型参数）禁止出现数据库 Entity。
+    ///  契约：Admin API action 返回签名（含集合 / 分页 / 信封泛型参数）禁止出现数据库 Entity。
     /// </summary>
     [Fact]
     public void AdminApiActions_DoNotReturnDatabaseEntities()
@@ -138,7 +138,7 @@ public sealed class AdminEndpointReturnContractTests
     }
 
     /// <summary>
-    /// C228 契约：全部 Output 类型禁止出现原值类敏感字段（Password / 哈希 / Secret 原值 / Token）。
+    ///  契约：全部 Output 类型禁止出现原值类敏感字段（Password / 哈希 / Secret 原值 / Token）。
     /// 脱敏显示字段（值恒 ******）与一次性明文字段须登记 <see cref="SensitiveDisplayFieldAllowlist"/>。
     /// </summary>
     [Fact]
@@ -163,7 +163,7 @@ public sealed class AdminEndpointReturnContractTests
     }
 
     /// <summary>
-    /// C228 契约：GenericCrudService 子类的 TResponse 必含 Id 与 RowVersion（乐观锁编辑链路与默认排序依赖，
+    ///  契约：GenericCrudService 子类的 TResponse 必含 Id 与 RowVersion（乐观锁编辑链路与默认排序依赖，
     /// 缺失时 Mapster 投影静默丢字段、编辑乐观锁静默失效）。
     /// </summary>
     [Fact]

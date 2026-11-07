@@ -8,7 +8,7 @@ using GameFrameX.Core.Service.Business;
 namespace GameFrameX.Application.ClientDelivery.Security.SessionKey;
 
 /// <summary>
-/// App 会话密钥环管理服务（change C5 server-envelope-middleware；C7 登录自动签发见 Client.Api 的 ClientApiSessionKeyIssuer）。
+/// App 会话密钥环管理服务（change server-envelope-middleware； 登录自动签发见 Client.Api 的 ClientApiSessionKeyIssuer）。
 /// <para>密钥明文仅服务端随机生成（不接受外部提交，避免弱密钥入环），仅 AddAsync/RotateAsync 响应一次性回显；
 /// 列表/详情一律脱敏 ******；实体禁删（历史 key 是在途加密信封的解密依据），退场走 DisableAsync 或租约到期。</para>
 /// <para>作用域：主库。路由前缀 /api/sessionKeyEntity。</para>
@@ -234,7 +234,7 @@ public class SessionKeyService : BaseService<SessionKeyEntity>
     /// <summary>
     /// 生成 Key ID：session-{时间戳}-{随机后缀}。人可读、wire 稳定（进入信封 JSON 的 kid 字段，
     /// 字符白名单 [A-Za-z0-9._-]{1,64}），随机后缀避免同秒并发新增/轮换撞名。
-    /// <para>public static：Client.Api 登录自动签发（C7 ClientApiSessionKeyIssuer）与本服务共用同一 Kid 形状。</para>
+    /// <para>public static：Client.Api 登录自动签发（ClientApiSessionKeyIssuer）与本服务共用同一 Kid 形状。</para>
     /// </summary>
     public static string GenerateKid(long now)
     {
@@ -244,7 +244,7 @@ public class SessionKeyService : BaseService<SessionKeyEntity>
 
     /// <summary>
     /// 生成 AES 会话密钥明文：32 字节 CSPRNG → 64 位小写 hex（URL/Header 安全，256-bit 熵）。
-    /// <para>public static：Client.Api 登录自动签发（C7）与本服务共用。</para>
+    /// <para>public static：Client.Api 登录自动签发与本服务共用。</para>
     /// </summary>
     public static string GenerateSecret()
     {
@@ -252,7 +252,7 @@ public class SessionKeyService : BaseService<SessionKeyEntity>
     }
 
     /// <summary>
-    /// 一次性回显输出：库内密文（C371），响应携带生成时明文。
+    /// 一次性回显输出：库内密文，响应携带生成时明文。
     /// </summary>
     private static SessionKeyRevealResponse ToRevealOutput(SessionKeyEntity entity, string plainSecret)
     {

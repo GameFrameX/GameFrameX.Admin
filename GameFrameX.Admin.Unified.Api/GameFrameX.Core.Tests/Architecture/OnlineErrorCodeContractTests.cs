@@ -5,14 +5,14 @@ using GameFrameX.Core.Localization.Errors;
 
 namespace GameFrameX.Core.Tests.Architecture;
 
-// C339 / GFX-750：Online 横切契约八段镜像错误码三方对照守护。
+//  / ：Online 横切契约八段镜像错误码三方对照守护。
 // 权威依据：vault gfx-doc/dev/online-platform/spec.md L105 八段分段定义（协议段 Nxxx ↔ Admin 镜像段 32(N-1)），
 // 镜像成员详表快照 = gfx-doc/dev/online-platform/contracts/error-code-table.md（vault 详表落盘前由本仓首版拟定，
 // 经 2026-09-13 项目负责人评审，落盘后 vault 表为唯一权威，本测试内嵌快照须随 vault 同步，漂移即红）。
 // 三方对照（任何一侧改动不同步另两侧即失败）：
-//   A OnlineErrorCode 枚举（[ErrorText] 声明即数据）
-//   B ErrorLocalizer 运行时码表（GetCultureTable 现算，error-codes.json 导出同源）
-//   C vault 表快照（本测试内嵌常量；八段分段表 + 成员详表）
+//  A OnlineErrorCode 枚举（[ErrorText] 声明即数据）
+//  B ErrorLocalizer 运行时码表（GetCultureTable 现算，error-codes.json 导出同源）
+//  C vault 表快照（本测试内嵌常量；八段分段表 + 成员详表）
 public sealed class OnlineErrorCodeContractTests
 {
     /// <summary>

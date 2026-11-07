@@ -2,7 +2,7 @@ namespace GameFrameX.Application.GmCenter.Asset.Dto;
 
 /// <summary>
 /// 资产交易详情响应（Transaction/Grant 全字段：TransactionId、IdempotencyKey、状态、来源、原因、业务单号、操作者、Grant 明细、时间；
-/// vault:C4 交易不变量——每笔变更可追溯，VC-3.14 Admin 展示半边）。
+/// vault: 交易不变量——每笔变更可追溯，.14 Admin 展示半边）。
 /// </summary>
 public class OnlineAssetTransactionDetailResponse
 {
@@ -22,7 +22,7 @@ public class OnlineAssetTransactionDetailResponse
     public string Status { get; set; } = string.Empty;
 
     /// <summary>
-    /// 来源（vault:C4 六类）。
+    /// 来源（vault: 六类）。
     /// </summary>
     public string Source { get; set; } = string.Empty;
 

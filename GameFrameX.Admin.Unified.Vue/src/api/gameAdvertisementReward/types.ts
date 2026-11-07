@@ -18,7 +18,7 @@ export enum AdvertisementRewardStatusEnum {
 export type AddGameAdvertisementRewardEntityRequest = object;
 
 /**
- * 广告奖励发放账本输出参数（C114 / GFX-111 后端跟进）。投影暴露实体全字段：
+ * 广告奖励发放账本输出参数（后端跟进）。投影暴露实体全字段：
  * Provider/TransactionId/AdvertisementUnit/RoleId/UserId/AreaId/RewardItem/RewardAmount/Status/IdempotencyKey/FailureReason/IsSandbox + 审计列。
  */
 export interface GameAdvertisementRewardResponse {
@@ -80,7 +80,7 @@ export interface GameAdvertisementRewardResponseSqlSugarPagedList {
 }
 
 /**
- * 广告奖励发放账本分页/导出查询输入参数（C114 / GFX-111 后端跟进）。
+ * 广告奖励发放账本分页/导出查询输入参数（后端跟进）。
  *
  * 过滤字段对齐前端检索表单：Provider/Status/RoleId 常用 + TransactionId/AdvertisementUnit/AreaId/时间范围 高级。
  */
@@ -142,13 +142,13 @@ export interface GameAdvertisementRewardAddPostData {
   /** 错误或提示信息 */
   message: string;
   /**
-   * 广告奖励发放账本输出参数（C114 / GFX-111 后端跟进）。投影暴露实体全字段：
+   * 广告奖励发放账本输出参数（后端跟进）。投影暴露实体全字段：
    * Provider/TransactionId/AdvertisementUnit/RoleId/UserId/AreaId/RewardItem/RewardAmount/Status/IdempotencyKey/FailureReason/IsSandbox + 审计列。
    */
   data: GameAdvertisementRewardResponse;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;
@@ -171,13 +171,13 @@ export interface GameAdvertisementRewardDetailGetData {
   /** 错误或提示信息 */
   message: string;
   /**
-   * 广告奖励发放账本输出参数（C114 / GFX-111 后端跟进）。投影暴露实体全字段：
+   * 广告奖励发放账本输出参数（后端跟进）。投影暴露实体全字段：
    * Provider/TransactionId/AdvertisementUnit/RoleId/UserId/AreaId/RewardItem/RewardAmount/Status/IdempotencyKey/FailureReason/IsSandbox + 审计列。
    */
   data: GameAdvertisementRewardResponse;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;
@@ -200,7 +200,7 @@ export interface GameAdvertisementRewardExportPostData {
   data: GameAdvertisementRewardResponse[];
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;
@@ -223,7 +223,7 @@ export interface GameAdvertisementRewardPagePostData {
   data: GameAdvertisementRewardResponseSqlSugarPagedList;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;

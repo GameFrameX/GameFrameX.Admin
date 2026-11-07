@@ -25,7 +25,7 @@ public sealed class AuthenticatedOnlyRouteWhitelistTests
 
     /// <summary>
     /// 仅登录端点必须显式标注 [AuthenticatedOnly]，
-    /// 端点仍需落在「仅需登录」档，否则普通管理员会被自动隐藏按钮挡成 403（GFX-683 回潮）。
+    /// 端点仍需落在「仅需登录」档，否则普通管理员会被自动隐藏按钮挡成 403。
     /// </summary>
     [Theory]
     [MemberData(nameof(EscapeHatchActions))]
@@ -38,7 +38,7 @@ public sealed class AuthenticatedOnlyRouteWhitelistTests
     }
 
     /// <summary>
-    /// 防回潮：Web.Api/Handlers 生产代码不得出现登录态白名单手写路由清单/中转表标识残留（GFX-684）。
+    /// 防回潮：Web.Api/Handlers 生产代码不得出现登录态白名单手写路由清单/中转表标识残留。
     /// 权限语义必须在方法定义处用特性声明，任何「集中登记路由字符串」的形态都是回潮。
     /// </summary>
     [Fact]

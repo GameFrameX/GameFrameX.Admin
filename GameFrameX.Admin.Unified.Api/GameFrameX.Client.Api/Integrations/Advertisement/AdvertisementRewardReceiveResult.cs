@@ -5,7 +5,7 @@ namespace GameFrameX.Client.Api.Integrations.Advertisement;
 /// <summary>
 /// 广告奖励回调处理结果。
 /// <para><c>Code</c> 约定：验签失败 <c>601</c>，其他失败 <c>0</c> 且 <see cref="IsValid"/>=false，成功 <c>0</c> 且 <see cref="IsValid"/>=true。</para>
-/// <para>注：change.md §3 以 record 形式描述，实现遵循项目 C# 8.0 语法上限改为 sealed class，字段集合（5 项）与类型保持一致。</para>
+/// <para>注：change.md 以 record 形式描述，实现遵循项目 C# 8.0 语法上限改为 sealed class，字段集合（5 项）与类型保持一致。</para>
 /// </summary>
 public sealed class AdvertisementRewardReceiveResult
 {

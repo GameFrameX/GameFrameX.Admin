@@ -47,7 +47,7 @@
 
 <script lang="ts" setup name="onlineTransactionDetail">
 /**
- * 交易详情页（C349 / GFX-756）。
+ * 交易详情页。
  * 单对象详情 + GrantItems 明细表，无游标面（vault detail 端点返回单对象）。
  */
 import { ref, computed, watch, onMounted } from 'vue'

@@ -60,10 +60,10 @@ public class Startup
 
         // 配置选项
         services.AddProjectOptions();
-        // C404 / GFX-1216 R3：审计留存配置（Configuration/AuditRetention.json，默认值在 AuditRetentionOptions）
+        //  / R3：审计留存配置（Configuration/AuditRetention.json，默认值在 AuditRetentionOptions）
         services.Configure<GameFrameX.Application.Audit.Retention.AuditRetentionOptions>(configuration.GetSection(GameFrameX.Application.Audit.Retention.AuditRetentionOptions.ConfigurationSectionName));
         services.AddProjectDependencyInjection();
-        // 密码哈希统一 Argon2id（C214），无需启动期密钥注入；密码强度策略由 PlatformPasswordPolicyConfigProvider 快照驱动。
+        // 密码哈希统一 Argon2id，无需启动期密钥注入；密码强度策略由 PlatformPasswordPolicyConfigProvider 快照驱动。
 
         // 缓存注册
         var cache = services.AddCache();
@@ -72,7 +72,7 @@ public class Startup
         services.AddSqlSugar(configuration, webHostEnvironment, cache, httpContextAccessor);
         // 支付配置 schema 提供器（供 GamePaymentConfigService 在 admin 主机解析）
         services.AddScoped<IPaymentConfigSchemaProvider, PaymentConfigSchemaProvider>();
-        // 渠道退款管理器（C310 / GFX-718）：四渠道统一 IRefundManager 契约；Payment.* 工程不在自动扫描范围，须显式注册
+        // 渠道退款管理器：四渠道统一 IRefundManager 契约；Payment.* 工程不在自动扫描范围，须显式注册
         services.AddScoped<IRefundManager, GameFrameX.Payment.Xsolla.Refund.XsollaRefundManager>();
         services.AddScoped<IRefundManager, GameFrameX.Payment.Apple.Refund.AppleRefundManager>();
         services.AddScoped<IRefundManager, GameFrameX.Payment.Google.Refund.GoogleRefundManager>();
@@ -87,30 +87,30 @@ public class Startup
         services.AddSingleton<IObjectStorageAdapterFactory, ObjectStorage.Abstract.DefaultObjectStorageAdapterFactory>();
         services.AddHttpClient();
         services.AddHttpClient<IMailCampaignServerClient, MailCampaignServerClient>();
-        // C339 / vault:C2 S1.7：Online 平台管理客户端基座（作用域注入 + 镜像错误码映射）。
+        //  / vault: .7：Online 平台管理客户端基座（作用域注入 + 镜像错误码映射）。
         services.AddScoped<OnlineScopeContextFactory>();
         services.AddScoped<GameFrameX.Application.ServerCenter.GameAreaProvision.GameAreaProvisionService>();
         services.AddScoped<IOnlineServerEndpointResolver, OnlineServerEndpointResolver>();
         services.AddHttpClient<IOnlineServerClient, OnlineServerClient>();
         services.AddGameAreaMergeClient();
-        // C343 / vault:C8 S7.7：LiveOps 统一下发单一入口（业务层唯一消费 IOnlineServerClient 的调度面）。
+        //  / vault: .7：LiveOps 统一下发单一入口（业务层唯一消费 IOnlineServerClient 的调度面）。
         services.AddScoped<IOnlineLiveOpsDispatchService, OnlineLiveOpsDispatchService>();
-        // C200：外网 IP 查询命名客户端（ComputerUtility.GetIpFromOnlineAsync 使用），配置超时避免国外部署 myip.ipip.net 挂死。
+        // ：外网 IP 查询命名客户端（ComputerUtility.GetIpFromOnlineAsync 使用），配置超时避免国外部署 myip.ipip.net 挂死。
         services.AddHttpClient("remoteIp", client => { client.Timeout = TimeSpan.FromSeconds(5); });
         services.AddSingleton<PlatformRateLimitConfigProvider>();
         services.AddHostedService<PlatformRateLimitStartupLoader>();
-        // 平台日志运行时配置（C171）：快照由启动加载器填充，DB/ES Writer 写路径读快照实现同 Host 动态生效
+        // 平台日志运行时配置：快照由启动加载器填充，DB/ES Writer 写路径读快照实现同 Host 动态生效
         services.AddSingleton<PlatformLoggingConfigProvider>();
         services.AddHostedService<PlatformLoggingStartupLoader>();
-        // 平台密码策略运行时配置（C173）：快照由启动加载器填充并镜像同步 CryptogramUtility 密码策略静态属性，
+        // 平台密码策略运行时配置：快照由启动加载器填充并镜像同步 CryptogramUtility 密码策略静态属性，
         // UserService.ChangePwdAsync 读镜像实现保存后同 Host 动态生效
         services.AddSingleton<PlatformPasswordPolicyConfigProvider>();
         services.AddHostedService<PlatformPasswordPolicyStartupLoader>();
-        // C406 / F3：新装首个业务管理员种子引导（角色 + 菜单授权 + 环境变量账号）；须在密码策略加载之后注册
+        //  / ：新装首个业务管理员种子引导（角色 + 菜单授权 + 环境变量账号）；须在密码策略加载之后注册
         services.AddHostedService<InitialAdminStartupBootstrap>();
         // JWT
         services.AddHostedService<PlatformJwtStartupValidator>();
-        // U6/C42：API 端点目录启动同步（端点登记→绑定迁移→自动隐藏按钮→预热权限缓存）。
+        // /：API 端点目录启动同步（端点登记→绑定迁移→自动隐藏按钮→预热权限缓存）。
         services.AddHostedService<ApiEndpointCatalogSync>();
         services.AddPlatformJwt();
         // 允许跨域（支持通过 CORS_ORIGINS 环境变量配置允许的域名列表，逗号分隔；未配置则允许所有来源）
@@ -146,7 +146,7 @@ public class Startup
             });
         }
 
-        // 共享健康检查注册（C261，GFX-668）：与三 host 同口径收敛至 Core Bootstrap（self live + database ready）
+        // 共享健康检查注册：与三 host 同口径收敛至 Core Bootstrap（self live + database ready）
         services.AddHostHealthChecks();
         // 业务定时任务实现（非控制器，显式注册供 GameTimeJobDispatchJob 按名解析执行）。
         services.AddScoped<EmailTask>();
@@ -190,7 +190,7 @@ public class Startup
         });
         AddAdminSwagger(services);
 
-        // ElasticSearch（C171：配置由 PlatformLoggingConfigProvider 快照驱动，不再读 Logging.json）
+        // ElasticSearch（配置由 PlatformLoggingConfigProvider 快照驱动，不再读 Logging.json）
         services.AddElasticSearch();
 
         // 配置Nginx转发获取客户端真实IP。
@@ -241,7 +241,7 @@ public class Startup
         // 即时通讯
         services.AddProjectSignalR();
 
-        // 系统日志（C171：DB/ES Writer 无条件注册，启停由快照动态门控，不再读 Logging.json）
+        // 系统日志（DB/ES Writer 无条件注册，启停由快照动态门控，不再读 Logging.json）
         services.AddLoggingSetup();
 
         // 验证码：配置从主库 system_config 读取，运行时缓存由保存操作失效。
@@ -353,7 +353,7 @@ public class Startup
             // 健康探针必须匿名放行：存活/就绪探针用于容器编排与负载均衡，不能依赖登录态。
             // 否则 JwtHandler 对未登记端点 fail-closed（JwtHandler.CheckAuthorizeAsync），/health 返回 401，
             // docker healthcheck 期望 200 会判定 unhealthy，进而阻塞 depends_on: service_healthy 的下游服务。
-            // 端点映射与三 host 共用 Core Bootstrap（C261），Admin 特有要求：全局鉴权下必须 allowAnonymous。
+            // 端点映射与三 host 共用 Core Bootstrap，Admin 特有要求：全局鉴权下必须 allowAnonymous。
             endpoints.MapHostHealthChecks(allowAnonymous: true);
 
             // 注册动态 API controller 端点。此前靠 c47ff90d 误删的 MapControllerRoute("default") 顺带注册
@@ -404,7 +404,7 @@ public class Startup
             // 否则 schema 只反映方法签名返回类型 T，与实际 {code,result,...} 响应脱节，前端按 openapi 生成的客户端类型错误。
             options.OperationFilter<AdminResultOperationFilter>();
             // 让 schema 与 ProjectJsonSerializerOptions 的 long→string 运行时契约一致：
-            // Id 结尾的 long 响应实际输出字符串，schema 同步声明 string，防止前端生成 number 类型诱导精度回转（C270）。
+            // Id 结尾的 long 响应实际输出字符串，schema 同步声明 string，防止前端生成 number 类型诱导精度回转。
             options.SchemaFilter<LongIdentifierStringSchemaFilter>();
             // 为整数枚举 schema 补 x-enum-varnames / x-enum-descriptions：swagger-typescript-api 依赖它生成
             // 命名枚举成员（否则退化为 Value1/Value2，前端无法按语义引用）。

@@ -2,10 +2,10 @@
 /* tslint:disable */
 
 /**
- * Online 控制台受控操作命令枚举（严格四值，来源 change C344 / vault:C9 S8.1）。
+ * Online 控制台受控操作命令枚举（严格四值，来源 change / vault: .1）。
  *
  * 只承载本 change 新增的四条运行时干预命令；踢下线/封禁/禁言与发放/撤销资产等既有命令
- * 由 C350 `OnlinePenaltyLinkCommandService`、C340 `OnlineAssetGrantCommandService` 既有端点承载
+ * 由 `OnlinePenaltyLinkCommandService`、 `OnlineAssetGrantCommandService` 既有端点承载
  * （复用矩阵，禁平行实现——守护测试 `OnlineOverviewIsolationTests` 锁定枚举四值与 Console 域零既有命令 token）。
  * 新增命令必须回 vault 评审并同步守护测试。
  * @format int32
@@ -22,7 +22,7 @@ export enum OnlineControlledCommandKind {
 }
 
 /**
- * 开关型受控命令的方向（来源 change C344 A0 补充锁定）。
+ * 开关型受控命令的方向（来源 补充锁定）。
  *
  * SuspendResumePlayer（暂停/恢复）与 MatchIsolation（隔离/解除）是开关型命令，必须携带方向；
  * CancelTicket / EndAbnormalMatch 是单向动作，禁止携带方向（携带即参数校验拒绝）。
@@ -37,9 +37,9 @@ export enum ControlledCommandDirection {
 }
 
 /**
- * 受控操作命令回执（线缆/Admin 出参共用；vault:C9 S8.1 契约，mock 先行）。
+ * 受控操作命令回执（线缆/Admin 出参共用；vault: .1 契约，mock 先行）。
  *
- * 透传 Online 首次执行结果——同 IdempotencyKey 的重复调用拿到的是首次回执（VC-8.4），不产生第二次副作用。
+ * 透传 Online 首次执行结果——同 IdempotencyKey 的重复调用拿到的是首次回执，不产生第二次副作用。
  */
 export interface OnlineControlledCommandAckResponse {
   /** 命令标识（回显）。 */
@@ -60,7 +60,7 @@ export interface OnlineControlledCommandAckResponse {
 }
 
 /**
- * 受控操作命令输入参数（高危端点；change C344 / vault:C9 S8.1）。
+ * 受控操作命令输入参数（高危端点；change / vault: .1）。
  *
  * 高危复核口径（A0 锁定）：本端点整体高危（权限码仅同步管理员角色），`Reason` 与
  * `ReviewerOperatorId` 对全部四命令必填——双人复核字段落地 vault「审批（如需）」，不做通用审批流。
@@ -74,10 +74,10 @@ export interface OnlineControlledCommandRequest {
    */
   serverId: string;
   /**
-   * Online 控制台受控操作命令枚举（严格四值，来源 change C344 / vault:C9 S8.1）。
+   * Online 控制台受控操作命令枚举（严格四值，来源 change / vault: .1）。
    *
    * 只承载本 change 新增的四条运行时干预命令；踢下线/封禁/禁言与发放/撤销资产等既有命令
-   * 由 C350 `OnlinePenaltyLinkCommandService`、C340 `OnlineAssetGrantCommandService` 既有端点承载
+   * 由 `OnlinePenaltyLinkCommandService`、 `OnlineAssetGrantCommandService` 既有端点承载
    * （复用矩阵，禁平行实现——守护测试 `OnlineOverviewIsolationTests` 锁定枚举四值与 Console 域零既有命令 token）。
    * 新增命令必须回 vault 评审并同步守护测试。
    */
@@ -98,7 +98,7 @@ export interface OnlineControlledCommandRequest {
    */
   playerId?: string | null;
   /**
-   * 开关型受控命令的方向（来源 change C344 A0 补充锁定）。
+   * 开关型受控命令的方向（来源 补充锁定）。
    *
    * SuspendResumePlayer（暂停/恢复）与 MatchIsolation（隔离/解除）是开关型命令，必须携带方向；
    * CancelTicket / EndAbnormalMatch 是单向动作，禁止携带方向（携带即参数校验拒绝）。
@@ -128,14 +128,14 @@ export interface OnlineControlledCommandExecutePostData {
   /** 错误或提示信息 */
   message: string;
   /**
-   * 受控操作命令回执（线缆/Admin 出参共用；vault:C9 S8.1 契约，mock 先行）。
+   * 受控操作命令回执（线缆/Admin 出参共用；vault: .1 契约，mock 先行）。
    *
-   * 透传 Online 首次执行结果——同 IdempotencyKey 的重复调用拿到的是首次回执（VC-8.4），不产生第二次副作用。
+   * 透传 Online 首次执行结果——同 IdempotencyKey 的重复调用拿到的是首次回执，不产生第二次副作用。
    */
   data: OnlineControlledCommandAckResponse;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;

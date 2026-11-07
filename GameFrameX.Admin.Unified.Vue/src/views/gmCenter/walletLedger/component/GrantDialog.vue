@@ -47,8 +47,8 @@
 
 <script lang="ts" setup name="onlineWalletLedgerGrantDialog">
 /**
- * 受限命令：人工发放弹层（C349 / GFX-756）。
- * 经 Online Grant API 转发（绝不直写资产——vault C2 S1.6 / C340 §3 高危红线）。
+ * 受限命令：人工发放弹层。
+ * 经 Online Grant API 转发（绝不直写资产——vault .6 / 高危红线）。
  * 理由必填（≤500 字），幂等键 = businessOrderNumber（缺省时服务端生成）。
  */
 import { ref } from 'vue'

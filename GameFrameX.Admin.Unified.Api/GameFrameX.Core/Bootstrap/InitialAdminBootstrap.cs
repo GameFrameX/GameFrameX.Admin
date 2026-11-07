@@ -10,7 +10,7 @@ using GameFrameX.Foundation.Utility.DistributedSystem.Snowflake;
 namespace GameFrameX.Core.Bootstrap;
 
 /// <summary>
-/// 新装首个业务管理员种子引导（C406 / F3）。
+/// 新装首个业务管理员种子引导。
 /// <para>Web.Api 初始化（旧库守卫 + 建表 + 种子）之后执行：
 /// ①<see cref="CommonConst.SysAdminRole"/> 角色不存在时创建，并按 <see cref="RoleMenuService"/> 同口径
 /// （超管专属子树不授予、<c>AllowAdminWhenSuperAdminOnly</c> 可读选择器照常授予）授予全部非超管种子菜单；
@@ -18,7 +18,7 @@ namespace GameFrameX.Core.Bootstrap;
 /// 成对设置且库中尚无任何业务管理员（<see cref="UserEntity"/>）时创建该账号（Argon2id）并绑定管理员角色。</para>
 /// <para>幂等口径：账号已存在不重建、不覆盖密码；角色菜单授权每次启动补齐全部缺失的种子菜单授权——
 /// 运营在管理端删掉 <c>sys_admin</c> 的某条种子菜单授权后，下次重启会被补回（模板角色的手工授权不持久，
-/// 与 C353 口径一致）。需要收窄权限时新建自定义角色，不要直接修改 <c>sys_admin</c>；
+/// 与 口径一致）。需要收窄权限时新建自定义角色，不要直接修改 <c>sys_admin</c>；
 /// 这与 global_menu 种子的 upsert 语义同向：菜单行与模板角色授权都由启动期种子保证。</para>
 /// <para>口令永不落入日志；密码不满足平台密码强度策略时 fail-closed 终止启动（错误信息不含密码）。</para>
 /// </summary>

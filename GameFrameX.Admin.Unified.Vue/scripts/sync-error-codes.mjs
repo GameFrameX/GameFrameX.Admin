@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 
 /**
- * 错误码五语言码表同步脚本（C348 / GFX-751，C339 前端半边 S1.3-B1）
+ * 错误码五语言码表同步脚本（前端半边 .3-）
  *
  * 读 Api 仓 ErrorCodeContractTests 导出的 error-codes.json，重写五语言
  * src/i18n/pages/errors/{zh-cn,zh-tw,en,ja,ko}.ts 的 codes 段：
  * - zh-cn / en：取 error-codes.json 的 zh-CN / en-US（后端权威）；
  * - zh-tw / ja / ko：取 scripts/error-codes-translations.json 翻译 overlay，
- *   缺失即列出全清单并退出非 0——不静默回退英文，翻译必须显式登记。
+ *  缺失即列出全清单并退出非 0——不静默回退英文，翻译必须显式登记。
  *
  * 输入解析链：--input <path> > 环境变量 GFX_ERROR_CODES_JSON > 仓库根旁邻
  * ../GameFrameX.Admin.Unified.Api/error-codes.json（主 checkout 布局）。
@@ -17,12 +17,12 @@
  *
  * 段位限定：--segments "320-327"（逗号分隔 3 位段号或闭区间）。限定后仅该段内
  * 前端=后端（新增/更新/删除），段外条目原样保留——用于增量落地不清偿全表滞后；
- * 不带 --segments 即全量同步（既有 12 码滞后归 GFX-672 全量清偿时使用）。
+ * 不带 --segments 即全量同步（既有 12 码滞后归 全量清偿时使用）。
  *
  * 用法：
- *   node scripts/sync-error-codes.mjs                        # 全量同步
- *   node scripts/sync-error-codes.mjs --segments 320-327     # 仅 Online 八段（C339）
- *   node scripts/sync-error-codes.mjs --input /path/error-codes.json
+ *  node scripts/sync-error-codes.mjs # 全量同步
+ *  node scripts/sync-error-codes.mjs --segments 320-327 # 仅 Online 八段
+ *  node scripts/sync-error-codes.mjs --input /path/error-codes.json
  */
 
 import {readFileSync, writeFileSync} from 'node:fs';
@@ -83,7 +83,7 @@ function parseSegmentSpec(spec) {
     return segments;
 }
 
-/** 错误码 = 段号(3 位)×100000 + 5 位序号（U1 规则），段号即前 3 位 */
+/** 错误码 = 段号(3 位)×100000 + 5 位序号（规则），段号即前 3 位 */
 const segmentOf = (code) => Math.floor(Number(code) / 100000);
 
 // ── 输入解析 ──────────────────────────────────────────────

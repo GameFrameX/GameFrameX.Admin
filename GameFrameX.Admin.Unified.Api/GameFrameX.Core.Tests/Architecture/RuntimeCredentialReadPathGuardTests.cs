@@ -2,8 +2,8 @@ using System.Text.RegularExpressions;
 
 namespace GameFrameX.Core.Tests.Architecture;
 
-// C372（GFX-838）T4：运行时凭证读取点源码级守护——清单见
-// gfx-doc/dev/client-api/changes/C372-runtime-credential-decrypt-closure/notes.md（T1 盘点表）。
+// ：运行时凭证读取点源码级守护——清单见
+// gfx-doc/dev/client-api/changes/-runtime-credential-decrypt-closure/notes.md（盘点表）。
 // 1）每个读取点必须出现对应解密收口调用（新增读取点 / 删除收口调用即失败，防止明文兼容读回潮成永久态）；
 // 2）明文零泄漏：读取点源码中日志 / 异常语句不得携带敏感凭证字段名（解密结果禁止进入日志与异常参数）。
 public sealed partial class RuntimeCredentialReadPathGuardTests
@@ -24,7 +24,7 @@ public sealed partial class RuntimeCredentialReadPathGuardTests
         ("GameFrameX.Client.Api/Integrations/Payment/PaymentOptionSettingProvider.cs", "PaymentConfigCrypto.DecryptConfigJson", 1),
         // Hub.Api 链路
         ("GameFrameX.Hub.Api/Middleware/GameAppOpenAccessAuthMiddleware.cs", "SecretCrypto.DecryptCached", 1),
-        // C370 已收口的主库域读取（防回退）
+        //  已收口的主库域读取（防回退）
         ("GameFrameX.Application/Platform/OpenAccess/SystemOpenAccessService.cs", "SecretCrypto.Decrypt", 1),
     };
 

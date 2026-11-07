@@ -2,13 +2,13 @@ using System.ComponentModel;
 using GameFrameX.Application.GmCenter.Asset.Dto;
 using GameFrameX.Application.ServerCenter.Online;
 
-// S3/C401 断链修复点
+// / 断链修复点
 namespace GameFrameX.Application.GmCenter.Asset;
 
 /// <summary>
 /// Online 资产人工发放/撤销受限命令服务（高危；权限码 onlineAssetGrantCommand:grant / :revoke 仅同步管理员角色）。
 /// <para>
-/// 路由前缀 /api/onlineAssetGrantCommand（change C340 / vault:C4 S3.6「Admin 人工发放或撤销」六类来源之一）。
+/// 路由前缀 /api/onlineAssetGrantCommand（change / vault: .6「Admin 人工发放或撤销」六类来源之一）。
 /// 经 <see cref="IOnlineServerClient"/> 调 Online Grant API——Admin 侧零直写（守护测试 OnlineAssetCommandWhitelistTests）；
 /// <c>Reason</c> 必填进审计；幂等键由服务端按业务单号规则生成（见 <see cref="ResolveBusinessOrderNumber"/>）。
 /// </para>
@@ -17,12 +17,12 @@ namespace GameFrameX.Application.GmCenter.Asset;
 public class OnlineAssetGrantCommandService : IAdminApiController
 {
     /// <summary>
-    /// 资产发放命令的 Online 管理 action 名（vault:C4 统一发放入口；mock 先行，联调以 vault 详表为准）。
+    /// 资产发放命令的 Online 管理 action 名（vault: 统一发放入口；mock 先行，联调以 vault 详表为准）。
     /// </summary>
     private const string GrantAssetAction = "grant_asset";
 
     /// <summary>
-    /// 资产撤销命令的 Online 管理 action 名（vault:C4 统一撤销入口；mock 先行，联调以 vault 详表为准）。
+    /// 资产撤销命令的 Online 管理 action 名（vault: 统一撤销入口；mock 先行，联调以 vault 详表为准）。
     /// </summary>
     private const string RevokeAssetAction = "revoke_asset";
 
@@ -142,7 +142,7 @@ public class OnlineAssetGrantCommandService : IAdminApiController
     /// <summary>
     /// 幂等键（业务单号）解析——Admin 侧资产命令的唯一幂等语义入口。
     /// <para>
-    /// 幂等键语义（vault:C4 S3.5 / VC-1.4）：调用方携带 <c>BusinessOrderNumber</c> 时以其为幂等键——
+    /// 幂等键语义（vault: .5 /）：调用方携带 <c>BusinessOrderNumber</c> 时以其为幂等键——
     /// 同一业务单号的重复调用（网络重试 / 运营重复点击）在 Online 侧只生效一次，并返回首次执行结果，
     /// 不产生第二笔资产变更；未提供时服务端按业务单号规则生成
     /// <c>{prefix}-{yyyyMMddHHmmss}-{Guid 前 8 位}</c> 形态的新单号（发放 GFX-GRANT- / 撤销 GFX-REVOKE-），

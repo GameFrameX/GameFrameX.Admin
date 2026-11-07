@@ -2,7 +2,7 @@ using GameFrameX.Application.GmCenter.Match;
 
 namespace GameFrameX.Core.Tests.Online.Match;
 
-// C341 / GFX-753（vault:C5）：匹配 Ticket 展示映射契约自检。
+//  / （vault:）：匹配 Ticket 展示映射契约自检。
 // 覆盖：Ticket 状态 6 键 / 失败原因 4 键穷举锁定（严格按 A0 声明顺序，键集合变更须回 change 评审）、
 // 已知原值映射、未知原值兜底、null/空值兜底、大小写敏感（Online 原值大小写不同即视为未知，不做宽松匹配）。
 public sealed class OnlineMatchTicketDisplayMapTests

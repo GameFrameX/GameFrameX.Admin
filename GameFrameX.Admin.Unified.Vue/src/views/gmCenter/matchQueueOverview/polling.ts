@@ -1,5 +1,5 @@
 /**
- * 匹配队列观测轮询（C341 §3：退避封装；7xxx 镜像码即停 + Toast）。
+ * 匹配队列观测轮询（：退避封装；7xxx 镜像码即停 + Toast）。
  *
  * 自 onlineMatch 手写 API 层收敛迁出——HTTP 调用已改走生成层
  *（src/api/onlineMatchQueueQuery），本文件只承载纯前端轮询/错误码判定逻辑。
@@ -7,10 +7,10 @@
 import {showError} from '../../../utils/message';
 import {t} from '../../../i18n/index';
 
-// 轮询间隔常量（C341 §3：默认 10000，前端可配；遵循 Online 侧限流，遇 7xxx 即退避）
+// 轮询间隔常量（：默认 10000，前端可配；遵循 Online 侧限流，遇 7xxx 即退避）
 export const ONLINE_MATCH_POLL_INTERVAL_MS = 10000;
 
-// Online 7xxx 段（限流与风控）经 C339 八段镜像为 Admin 326xxxxx 段（OnlineErrorCode.RateLimited=32600001 起）。
+// Online 7xxx 段（限流与风控）经 八段镜像为 Admin 326xxxxx 段（OnlineErrorCode.RateLimited=32600001 起）。
 const ONLINE_RATE_LIMIT_MIRROR_MIN = 32600000;
 const ONLINE_RATE_LIMIT_MIRROR_MAX = 32700000;
 

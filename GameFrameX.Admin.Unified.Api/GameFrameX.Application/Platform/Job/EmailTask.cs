@@ -9,7 +9,7 @@ using GameFrameX.Foundation.Http.Normalization;
 using GameFrameX.Foundation.Json;
 using Microsoft.Extensions.Logging;
 
-// 邮件定时任务实现（C404/GFX-1216 调度合一：解除自单仓整合以来的整体块注释，并把执行体移植到当前 API 面）。
+// 邮件定时任务实现（调度合一：解除自单仓整合以来的整体块注释，并把执行体移植到当前 API 面）。
 // 注意：本类不是 Admin API 控制器（不继承 BaseService），经 Startup 显式注册进 DI，
 // 由 GameTimeJobDispatchJob 按业务定时任务 cron 到期触发——继承 BaseService 会被动态 API
 // 发现成控制器并撞上 AdminActionStyle / EndpointGolden / ParameterShape 守护测试。

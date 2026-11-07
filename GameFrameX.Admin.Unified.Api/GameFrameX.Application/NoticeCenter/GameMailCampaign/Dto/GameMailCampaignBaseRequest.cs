@@ -37,33 +37,33 @@ public abstract class GameMailCampaignBaseRequest : BaseUpdateRequest
     public MailCampaignMailType MailType { get; set; }
 
     /// <summary>
-    /// 多语言标题 JSON（ListAsync&lt;MailLocalizedContent&gt;）。
+    /// 多语言标题 JSON（ListAsync&lt;MailLocalizedContent&gt）。
     /// </summary>
     [Required(ErrorMessage = "多语言标题不能为空")]
     public string TitlesJson { get; set; } = null!;
 
     /// <summary>
-    /// 多语言正文 JSON（ListAsync&lt;MailLocalizedContent&gt;）。
+    /// 多语言正文 JSON（ListAsync&lt;MailLocalizedContent&gt）。
     /// </summary>
     public string ContentsJson { get; set; } = null!;
 
     /// <summary>
-    /// 多语言发件人名称 JSON（ListAsync&lt;MailLocalizedContent&gt;）。
+    /// 多语言发件人名称 JSON（ListAsync&lt;MailLocalizedContent&gt）。
     /// </summary>
     public string SenderNamesJson { get; set; } = null!;
 
     /// <summary>
-    /// 附件列表 JSON（ListAsync&lt;MailCampaignAttachment&gt;）。
+    /// 附件列表 JSON（ListAsync&lt;MailCampaignAttachment&gt）。
     /// </summary>
     public string AttachmentsJson { get; set; } = null!;
 
     /// <summary>
-    /// 服务器 Id 白名单 JSON（ListAsync&lt;int&gt;）。
+    /// 服务器 Id 白名单 JSON（ListAsync&lt;int&gt）。
     /// </summary>
     public string ServerIdsJson { get; set; } = null!;
 
     /// <summary>
-    /// 渠道 Id 白名单 JSON（ListAsync&lt;int&gt;）。
+    /// 渠道 Id 白名单 JSON（ListAsync&lt;int&gt）。
     /// </summary>
     public string ChannelIdsJson { get; set; } = null!;
 
@@ -78,7 +78,7 @@ public abstract class GameMailCampaignBaseRequest : BaseUpdateRequest
     public int MaxLevel { get; set; }
 
     /// <summary>
-    /// 附件过期处置策略（B4）。
+    /// 附件过期处置策略。
     /// </summary>
     public MailCampaignExpirePolicy ExpireAttachmentPolicy { get; set; }
 

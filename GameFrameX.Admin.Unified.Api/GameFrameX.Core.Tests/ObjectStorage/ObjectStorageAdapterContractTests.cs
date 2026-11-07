@@ -4,7 +4,7 @@ namespace GameFrameX.Core.Tests.ObjectStorage;
 
 /// <summary>
 /// 对象存储 Adapter 契约测试：AdapterFactory 解析 + Context 构建 + IObjectStorageAdapter fake seam。
-/// 对应 change.md §5 验证标准「Adapter 契约测试：用可控 SDK seam/fake 验证参数和异常语义」。
+/// 对应 change.md 验证标准「Adapter 契约测试：用可控 SDK seam/fake 验证参数和异常语义」。
 /// 不发起真实云请求；LocalAdapter 真实 IO 与云连通留集成/浏览器 e2e。
 /// </summary>
 public class ObjectStorageAdapterContractTests

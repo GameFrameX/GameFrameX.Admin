@@ -18,10 +18,10 @@ using GameFrameX.Foundation.Orm.Entity;
 using Microsoft.AspNetCore.Http;
 using SqlSugar;
 
-// S3/C401 断链修复点
+// / 断链修复点
 namespace GameFrameX.Core.Tests.Online.LiveOps;
 
-// C343 / GFX-755（vault:C8 S7.7）：统一下发服务行为测试（mock-first：fake IOnlineServerClient，联调延后）。
+//  / （vault: .7）：统一下发服务行为测试（mock-first：fake IOnlineServerClient，联调延后）。
 // 覆盖：四类配置来源路由到冻结命令名 + 载荷键断言、越枚举拒绝、来源不存在拒绝、应用归属不符拒绝、
 // 邮件方案C（Published 同目标合并返回首次回执 / Draft 拒绝并指引 / ServerId≠AreaId 拒绝 / 合并路径不发起 Online 调用）、
 // 分群同步通道回执映射。作用域走真实 OnlineScopeContextFactory（含区服归属校验）。

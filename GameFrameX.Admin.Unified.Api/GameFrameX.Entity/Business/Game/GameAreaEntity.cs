@@ -12,7 +12,7 @@ namespace GameFrameX.Entity.Business.Game;
 public class GameAreaEntity : EntityBasicSelect
 {
     /// <summary>
-    /// 区服默认启用。启用标记复用基类 IsEnabled（C301 归一，原独立列 is_enable 移除）：
+    /// 区服默认启用。启用标记复用基类 IsEnabled（归一，原独立列 is_enable 移除）：
     /// 全局 ISafeEnabledFilter 会隐藏 IsEnabled==false 的行，管理列表如需展示禁用区服须按 FixPattern 用 Filter(null, true) 绕过。
     /// </summary>
     public GameAreaEntity()
@@ -169,7 +169,7 @@ public class GameAreaEntity : EntityBasicSelect
     public string AppVersion { get; set; } = null!;
 
     /// <summary>
-    /// 客户端转发 Server HTTP 路由前缀（来源 change C150 §3.2 / C175）。
+    /// 客户端转发 Server HTTP 路由前缀（来源 change /）。
     /// <para>Client API 代理玩家普通请求（建角、改名、查角色、创建订单等）的 Server HTTP 路由前缀。</para>
     /// <para>默认 <c>game/api</c>；由 <see cref="GameFrameX.Application.ServerCenter.GameServerEndpointUrlBuilder"/> 按 <c>ClientDispatch</c> 能力消费。</para>
     /// </summary>
@@ -177,7 +177,7 @@ public class GameAreaEntity : EntityBasicSelect
     public string ClientDispatchApiPrefix { get; set; } = "game/api";
 
     /// <summary>
-    /// 履约投递 Server HTTP 路由前缀（来源 change C150 §3.2 / C175）。
+    /// 履约投递 Server HTTP 路由前缀（来源 change /）。
     /// <para>后台履约、发货、退款、邮件投递、广告奖励、Campaign 发布、后台运营操作等资产或运营投递的前缀。</para>
     /// <para>默认 <c>game/api</c>；由 <see cref="GameFrameX.Application.ServerCenter.GameServerEndpointUrlBuilder"/> 按 <c>Fulfillment</c> 能力消费。</para>
     /// </summary>
@@ -185,28 +185,28 @@ public class GameAreaEntity : EntityBasicSelect
     public string FulfillmentApiPrefix { get; set; } = "game/api";
 
     /// <summary>
-    /// GM 命令 Server HTTP 路由前缀（来源 change C150 §3.2 / C175）。
+    /// GM 命令 Server HTTP 路由前缀（来源 change /）。
     /// <para>GM / 调试命令前缀。默认空，空表示 Admin 不构造 GM URL（构造器按 <c>Gm</c> 能力消费时空值抛异常，拒绝拼出根地址调用）。</para>
     /// </summary>
     [SugarColumn(ColumnDescription = "GM 命令 Server HTTP 路由前缀", Length = EntityStringLength.Length256, IsNullable = true)]
     public string GmApiPrefix { get; set; } = null!;
 
     /// <summary>
-    /// 管理控制 Server HTTP 路由前缀（来源 change C150 §3.2 / C175）。
+    /// 管理控制 Server HTTP 路由前缀（来源 change /）。
     /// <para>管理控制 / 运维控制接口（reload、健康检查、全服在线人数等控制类 Server API）前缀。默认空，空表示 Admin 不构造控制 URL（构造器按 <c>Control</c> 能力消费时空值抛异常）。</para>
     /// </summary>
     [SugarColumn(ColumnDescription = "管理控制 Server HTTP 路由前缀", Length = EntityStringLength.Length256, IsNullable = true)]
     public string ControlApiPrefix { get; set; } = null!;
 
     /// <summary>
-    /// Online 平台管理 Server HTTP 路由前缀（来源 change C339 / vault:C2 S1.7）。
+    /// Online 平台管理 Server HTTP 路由前缀（来源 change / vault: .7）。
     /// <para>GFX Online 平台管理接口（Admin→Online Runtime 的作用域调用）前缀。默认 <c>online/admin</c>；空值拒绝构造 URL（同 Gm/Control 守卫，空表示该区服未开放 Online 管理）。</para>
     /// </summary>
     [SugarColumn(ColumnDescription = "Online 平台管理 Server HTTP 路由前缀", Length = EntityStringLength.Length256, IsNullable = true, DefaultValue = "online/admin")]
     public string OnlineAdminApiPrefix { get; set; } = "online/admin";
 
     /// <summary>
-    /// 是否允许客户端调试 GM 通道（Admin 配置标记，来源 change C150 §3.2 / C175）。
+    /// 是否允许客户端调试 GM 通道（Admin 配置标记，来源 change /）。
     /// <para>默认关闭。这只是 Admin 侧配置入口，最终是否放行仍由 Game Server 启动参数与环境门禁决定。</para>
     /// </summary>
     [SugarColumn(ColumnDescription = "是否允许客户端调试 GM 通道", DefaultValue = "false")]

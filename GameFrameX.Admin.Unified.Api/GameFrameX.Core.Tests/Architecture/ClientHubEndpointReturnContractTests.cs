@@ -5,13 +5,13 @@ using Microsoft.AspNetCore.Mvc;
 namespace GameFrameX.Core.Tests.Architecture;
 
 /// <summary>
-/// C227 防回潮契约：Client.Api / Hub.Api 的 API action 返回签名禁止 HttpJsonResultData&lt;string&gt; / &lt;object&gt;
-/// 与裸 HttpJsonResultData（U9 统一 DTO 决策：对外 data 一律强类型对象，成功确认由信封 code==0 承载）。
+///  防回潮契约：Client.Api / Hub.Api 的 API action 返回签名禁止 HttpJsonResultData&lt;string&gt; / &lt;object&gt;
+/// 与裸 HttpJsonResultData（统一 DTO 决策：对外 data 一律强类型对象，成功确认由信封 code==0 承载）。
 /// 与 AdminEndpointReturnContractTests 同机制：反射扫描测试输出目录全部 GameFrameX 程序集，天然无视源码注释。
 /// </summary>
 public sealed class ClientHubEndpointReturnContractTests
 {
-    // C268 迁移豁免：GameUserPayController.Report 随 Game.Api 物理并入，保留 HttpJsonResultData<object> 历史 wire 形态
+    //  迁移豁免：GameUserPayController.Report 随 Game.Api 物理并入，保留 HttpJsonResultData<object> 历史 wire 形态
     // （合并零漂移前提；Game 控制器语义收敛/强类型 DTO 化由后续 change 处理，届时删除本条目）
     private static readonly HashSet<string> MigratedLegacyEnvelopes = new()
     {

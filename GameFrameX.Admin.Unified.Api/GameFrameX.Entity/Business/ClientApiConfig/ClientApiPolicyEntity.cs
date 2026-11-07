@@ -3,7 +3,7 @@ using GameFrameX.Entity.Base;
 namespace GameFrameX.Entity.Business.ClientApiConfig;
 
 /// <summary>
-/// Client API 运行策略合并配置（C378 四表合一：Token / 登录票据 / 区服输出 / 订单策略）。
+/// Client API 运行策略合并配置（四表合一：Token / 登录票据 / 区服输出 / 订单策略）。
 /// <para>节划分理由：令牌节是服务端内部签名密钥语义，天然全局级（不区分应用）；票据节与输出节均为应用作用域的运行窗口 / 开关，随行作用域回退。</para>
 /// <para>存量数据由启动期迁移执行器从原四表幂等迁入（同键 Id 大者优先），迁移后原四表停写。</para>
 /// </summary>
@@ -32,7 +32,7 @@ public class ClientApiPolicyEntity : EntityBasic
 
     /// <summary>
     /// 【令牌节】访问令牌签名密钥。服务端内部 HMAC 签发/校验使用，任何人都无需读取明文；
-    /// 空白提交时服务端自动生成 64-hex（C368 空值防护语义承载）。列表/详情恒为脱敏占位。
+    /// 空白提交时服务端自动生成 64-hex（空值防护语义承载）。列表/详情恒为脱敏占位。
     /// </summary>
     [SugarColumn(ColumnDescription = "访问令牌签名密钥", Length = EntityStringLength.Length512)]
     public string SigningKey { get; set; } = string.Empty;
@@ -44,7 +44,7 @@ public class ClientApiPolicyEntity : EntityBasic
     public int LifetimeMinutes { get; set; }
 
     /// <summary>
-    /// 【票据节】票据固定到期时间（Unix 秒）。0 表示永不过期；非 0 值必须晚于当前时间且不超过 30 天（C142 决策）。
+    /// 【票据节】票据固定到期时间（Unix 秒）。0 表示永不过期；非 0 值必须晚于当前时间且不超过 30 天。
     /// </summary>
     [SugarColumn(ColumnDescription = "票据到期时间", DefaultValue = "0")]
     public long TicketExpireTime { get; set; }

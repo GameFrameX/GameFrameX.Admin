@@ -5,9 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 namespace GameFrameX.Core.Tests.GameApi;
 
 /// <summary>
-/// Game.Api 路由守护（C8 T4b 前置修复的锁定测试）。
+/// Game.Api 路由守护（T4b 前置修复的锁定测试）。
 /// <para>Game.Api 不走 Admin 动态 API 路由，Controller 必须带类级
-/// <c>[Route("api/[controller]/[action]")]</c>——T3 三个 Controller 均漏加（单测直接
+/// <c>[Route("api/[controller]/[action]")]</c>—— 三个 Controller 均漏加（单测直接
 /// new 调方法不经过路由层，掩盖到 T4b 联调才暴露为 404）。本测试锁两层：
 /// 类级 Route 存在 + 公开 action 均有 HTTP 谓词特性，缺一即红。</para>
 /// </summary>

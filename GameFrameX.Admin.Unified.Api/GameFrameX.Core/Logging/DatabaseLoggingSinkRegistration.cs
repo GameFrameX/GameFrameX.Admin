@@ -3,7 +3,7 @@ namespace GameFrameX.Core.Logging;
 /// <summary>
 /// 数据库日志 Sink 注册项：把 <see cref="IDatabaseLoggingWriter"/> 与其注册期配置
 /// （<see cref="ProjectLoggingOptions.WriteFilter"/> 等）配对，供调度器按各自过滤语义分发。
-/// 对应 <see cref="ProjectLoggingExtensions.AddDatabaseLogging{TWriter}"/> 的真实注册（C363 接通空桩）。
+/// 对应 <see cref="ProjectLoggingExtensions.AddDatabaseLogging{TWriter}"/> 的真实注册（接通空桩）。
 /// </summary>
 internal sealed class DatabaseLoggingSinkRegistration
 {

@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Routing;
 namespace GameFrameX.Core.Tests.Provider;
 
 /// <summary>
-/// Admin 统一错误响应数字码契约最小测试（C41 立项；C265 / GFX-671 切换统一数字错误码出站）。
+/// Admin 统一错误响应数字码契约最小测试（立项； / 切换统一数字错误码出站）。
 /// </summary>
 public class AdminResultProviderErrorCodeTests
 {
@@ -124,7 +124,7 @@ public class AdminResultProviderErrorCodeTests
     }
 
     /// <summary>
-    /// action 已显式返回统一信封时必须透传，防止双重包装（C223 双重信封根因的回归防护）。
+    /// action 已显式返回统一信封时必须透传，防止双重包装（双重信封根因的回归防护）。
     /// </summary>
     [Fact]
     public async Task OnActionExecutionAsync_ExplicitHttpJsonResult_PassesThroughWithoutWrapping()

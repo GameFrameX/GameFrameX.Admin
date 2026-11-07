@@ -6,7 +6,7 @@ using Microsoft.Extensions.Primitives;
 namespace GameFrameX.Core.Tests.SignatureAuth;
 
 /// <summary>
-/// CanonicalRequestBuilder 单元测试（C267-A）。
+/// CanonicalRequestBuilder 单元测试（-A）。
 /// 覆盖：字典序、percent-encoding（RFC 3986 保留字）、空 value、剔除 Signature 参数、
 /// Unicode key/value、重复 key 保留出现顺序、v2 message 字段顺序、空 body 常量、
 /// HMAC-SHA256 已知向量（RFC 4231 风格第三方事实源）。
@@ -36,10 +36,10 @@ public sealed class CanonicalRequestBuilderTests
     [Fact]
     public void PercentEncode_LeavesUnreservedAndEncodesReserved()
     {
-        // RFC 3986 §2.3 unreserved 原样保留
+        // RFC 3986 unreserved 原样保留
         Assert.Equal("abcXYZ0189-._~", CanonicalRequestBuilder.PercentEncode("abcXYZ0189-._~"));
 
-        // §2.2 reserved 与空格、非 ASCII 必须编码（%XX 大写十六进制）
+        //  reserved 与空格、非 ASCII 必须编码（%XX 大写十六进制）
         Assert.Equal("%3A%2F%3F%23%5B%5D%40%21%24%26%27%28%29%2A%2B%2C%3B%3D", CanonicalRequestBuilder.PercentEncode(":/?#[]@!$&'()*+,;="));
         Assert.Equal("%20", CanonicalRequestBuilder.PercentEncode(" "));
         Assert.Equal("%E4%B8%AD", CanonicalRequestBuilder.PercentEncode("中"));

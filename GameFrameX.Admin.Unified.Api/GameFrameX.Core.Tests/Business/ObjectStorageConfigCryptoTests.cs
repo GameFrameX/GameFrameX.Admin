@@ -4,8 +4,8 @@ using GameFrameX.Core.Service.Business.ObjectStorage;
 
 namespace GameFrameX.Core.Tests.Business;
 
-// C370（GFX-829）：对象存储 ConfigJson schema 驱动字段级加解密收口 ObjectStorageConfigCrypto 的行为契约。
-// change：gfx-doc/dev/system-management/changes/C370-secret-crypto-foundation/change.md
+// ：对象存储 ConfigJson schema 驱动字段级加解密收口 ObjectStorageConfigCrypto 的行为契约。
+// change：gfx-doc/dev/system-management/changes/-secret-crypto-foundation/change.md
 // 用真实 aliyun schema（AccessKeySecret 唯一敏感字段，Endpoint/BucketName/AccessKeyId 明文）验证：
 // 字段级选择性加密、往返还原、幂等、降级直存、fail-closed、畸形 JSON 直通、无敏感字段 Provider 直通、随机密文各自可解。
 public sealed class ObjectStorageConfigCryptoTests : IDisposable

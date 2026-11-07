@@ -2,13 +2,13 @@ using System.Text.RegularExpressions;
 
 namespace GameFrameX.Core.Tests.Architecture;
 
-// C270（GFX-676）：中间件错误响应出口统一守护。
-// change：gfx-doc/dev/client-api/changes/C270-gfx-676-middleware-error-response-writer/change.md
+// ：中间件错误响应出口统一守护。
+// change：gfx-doc/dev/client-api/changes/-gfx-676-middleware-error-response-writer/change.md
 // 两条守护（防回潮）：
-//   G1 Middleware/ 目录下中间件不得私写 JSON 序列化错误响应（JsonSerializer.Serialize 仅允许共享 writer；
-//      JsonSerializer.Deserialize 解析凭证 Scopes 等合法用途不受限制）
-//   G2 Middleware/ 目录下中间件不得直接 Response.WriteAsync 错误响应（仅允许共享 writer；
-//      CryptoEnvelopeMiddleware 响应侧加密回写用的是 originalBody.WriteAsync（局部流变量），不命中本模式）
+//  G1 Middleware/ 目录下中间件不得私写 JSON 序列化错误响应（JsonSerializer.Serialize 仅允许共享 writer；
+//  JsonSerializer.Deserialize 解析凭证 Scopes 等合法用途不受限制）
+//  G2 Middleware/ 目录下中间件不得直接 Response.WriteAsync 错误响应（仅允许共享 writer；
+//  CryptoEnvelopeMiddleware 响应侧加密回写用的是 originalBody.WriteAsync（局部流变量），不命中本模式）
 public sealed class MiddlewareErrorResponseWriterGuardTests
 {
     private static readonly string RepositoryRoot = GetRepositoryRoot();

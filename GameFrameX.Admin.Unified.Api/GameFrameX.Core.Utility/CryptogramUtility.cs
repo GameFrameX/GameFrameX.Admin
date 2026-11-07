@@ -4,7 +4,7 @@ namespace GameFrameX.Core.Utility;
 
 /// <summary>
 /// 密码哈希与密码强度策略静态工具。密码存储统一 Argon2id（Foundation <c>PasswordHashHelper</c>），不可逆；
-/// 不再保留可逆的 SM2/SM4 与无盐 MD5 路径（C214）。
+/// 不再保留可逆的 SM2/SM4 与无盐 MD5 路径。
 /// </summary>
 public static class CryptogramUtility
 {
@@ -13,7 +13,7 @@ public static class CryptogramUtility
     public static string PasswordStrengthValidationMsg { get; private set; } = string.Empty; // 密码强度验证提示
 
     /// <summary>
-    /// 应用平台密码策略快照到静态属性（C173）。由 <c>PlatformPasswordPolicyConfigProvider.RefreshAsync</c>
+    /// 应用平台密码策略快照到静态属性。由 <c>PlatformPasswordPolicyConfigProvider.RefreshAsync</c>
     /// 在启动期与 SuperAdmin 保存后调用，使 <c>UserService.ChangePwd</c> 读取的密码策略静态属性
     /// 始终反映 SystemConfigEntity 最新快照，实现同 Host 动态生效。
     /// </summary>
@@ -28,7 +28,7 @@ public static class CryptogramUtility
     }
 
     /// <summary>
-    /// 账号枚举防护诱饵哈希（C216）：登录路径账号不存在时，用它跑一次假 <see cref="VerifyPassword"/>，
+    /// 账号枚举防护诱饵哈希：登录路径账号不存在时，用它跑一次假 <see cref="VerifyPassword"/>，
     /// 使响应耗时与"密码错误"路径对齐（都是单次 Argon2id 验证），配合统一错误响应避免泄露账号是否存在。
     /// 进程级静态生成一次，不含任何真实账号信息。
     /// </summary>

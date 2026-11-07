@@ -3,7 +3,7 @@ using GameFrameX.Core.Authorization.Diagnostics;
 namespace GameFrameX.Core.Tests.Authorization;
 
 /// <summary>
-/// C128 菜单权限/endpoint 绑定漂移诊断引擎行为契约测试。
+///  菜单权限/endpoint 绑定漂移诊断引擎行为契约测试。
 /// <para>每个漂移类别一个最小用例 + 全一致绿路径。引擎为纯函数，直接构造快照调用，无 DB 依赖。</para>
 /// </summary>
 public sealed class MenuEndpointBindingDiagnosticsEngineTests
@@ -201,7 +201,7 @@ public sealed class MenuEndpointBindingDiagnosticsEngineTests
 
     // ---------- 8. DuplicateEndpointKey ----------
     // （历史注记：段落 7 AuthenticatedOnlyRouteMissingFromLive 已随登录态白名单 [AuthenticatedOnly]
-    // 特性化退役删除——特性长在方法上，方法删除则登记自动消失，该漂移结构性不可再发生，GFX-684/C277。）
+    // 特性化退役删除——特性长在方法上，方法删除则登记自动消失，该漂移结构性不可再发生，/。）
 
     [Fact]
     public void Diagnose_DuplicateLiveEndpointKey_ReportsWarning()

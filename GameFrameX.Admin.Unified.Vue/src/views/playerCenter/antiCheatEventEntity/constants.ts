@@ -1,5 +1,5 @@
-// C124 / GFX-115 反作弊事件管理页枚举常量 + i18n key + severity map。
-// 对齐后端 C116（GFX-114）枚举：GameFrameX.Core.Enum。
+//  / 反作弊事件管理页枚举常量 + i18n key + severity map。
+// 对齐后端 枚举：GameFrameX.Core.Enum。
 
 export const ANTI_CHEAT_PROVIDER = {
     TopOn: 1,

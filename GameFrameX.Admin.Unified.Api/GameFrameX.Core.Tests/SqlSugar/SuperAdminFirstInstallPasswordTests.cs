@@ -11,7 +11,7 @@ using SqlSugar;
 namespace GameFrameX.Core.Tests.SqlSugar;
 
 /// <summary>
-/// superadmin 首装密码初始化守护（C322 随机打印机制的首装向导/env 注入替代）。
+/// superadmin 首装密码初始化守护（随机打印机制的首装向导/env 注入替代）。
 /// <para>锁定四项语义：①env 未设置时首装 seed 出 PasswordConfigured=false + 空密码（等待登录页向导）；
 /// ②env 设置时 seed 出 Argon2id 哈希 + PasswordConfigured=true（无头部署路径，且两次构建哈希不同——随机盐）；
 /// ③二次 InitDatabase 后密码与配置状态不被重置（insert-only 幂等）；④首装打印初始化指引且指引与路径匹配，二次不打印。</para>

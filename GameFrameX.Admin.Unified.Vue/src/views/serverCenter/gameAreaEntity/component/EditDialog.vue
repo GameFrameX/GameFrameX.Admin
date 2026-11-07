@@ -212,7 +212,7 @@ const beforeOpen = async (form: any, isEditor: boolean) => {
 
 
   await loadScopedOptions()
-  // 接口配置默认值（C175/C176）：ClientDispatch/Fulfillment 默认 game/api；Gm/Control 空 = 不构造对应能力 URL；EnableClientGm 默认关闭。
+  // 接口配置默认值：ClientDispatch/Fulfillment 默认 game/api；Gm/Control 空 = 不构造对应能力 URL；EnableClientGm 默认关闭。
   // 仅新增模式填前缀默认；编辑回显保持后端归一化后的存储值，null 前缀规整为空串避免显示 "null"。
   if (form.clientDispatchApiPrefix == null && !isEditor) form.clientDispatchApiPrefix = 'game/api'
   if (form.fulfillmentApiPrefix == null && !isEditor) form.fulfillmentApiPrefix = 'game/api'

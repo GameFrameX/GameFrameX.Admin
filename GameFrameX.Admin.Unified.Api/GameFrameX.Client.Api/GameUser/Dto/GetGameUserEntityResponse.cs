@@ -66,7 +66,7 @@ public sealed class GetGameUserEntityResponse : EntityBaseId
     public bool IsGuest { get; set; }
 
     /// <summary>
-    /// 本次请求是否新建账号（C12 A1：DeviceLogin 按设备找号，未命中即建号）
+    /// 本次请求是否新建账号（A1：DeviceLogin 按设备找号，未命中即建号）
     /// </summary>
     public bool IsNewRegister { get; set; }
 

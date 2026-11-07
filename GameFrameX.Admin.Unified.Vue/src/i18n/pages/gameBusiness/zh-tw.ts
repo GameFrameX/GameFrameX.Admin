@@ -355,7 +355,7 @@ export default {
             propCount: '數量',
         },
 
-        // 運營郵件活動模組（C135 / GFX-142）
+        // 運營郵件活動模組
         mailCampaign: {
             add: '新增運營郵件活動',
             edit: '編輯運營郵件活動',

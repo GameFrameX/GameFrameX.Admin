@@ -51,9 +51,9 @@
 
 <script lang="ts" setup name="gamePenaltyEntitySyncOnlineResultDialog">
 /**
- * 「同步 Online 运行时」结果弹层（C342 / GFX-758）。
+ * 「同步 Online 运行时」结果弹层。
  * 展示联动命令聚合结果：命令种类、各目标区服执行结果、旧 Token 吊销确认字段
- * （vault:C2 S1.4 契约的 Admin 展示半边；服务端验证引用 vault 侧用例）。
+ * （vault: .4 契约的 Admin 展示半边；服务端验证引用 vault 侧用例）。
  */
 import { ref } from 'vue'
 import Dialog from 'primevue/dialog'

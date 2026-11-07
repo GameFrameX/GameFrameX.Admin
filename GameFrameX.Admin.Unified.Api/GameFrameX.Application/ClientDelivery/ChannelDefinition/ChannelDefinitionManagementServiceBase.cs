@@ -62,7 +62,7 @@ public abstract class ChannelDefinitionManagementServiceBase<TEntity>
 
         return Repository.AsQueryable()
                          .Filter(null, true)
-                         // Filter(null,true) 绕过作用域过滤的同时也关掉了软删全局过滤，显式恢复（Api#287）
+                         // Filter(null,true) 绕过作用域过滤的同时也关掉了软删全局过滤，显式恢复
                          .Where(u => u.IsDeleted == false)
                          .Where(u => u.Scope == ManagedScope)
                          .WhereIF(!string.IsNullOrWhiteSpace(searchKey), u =>

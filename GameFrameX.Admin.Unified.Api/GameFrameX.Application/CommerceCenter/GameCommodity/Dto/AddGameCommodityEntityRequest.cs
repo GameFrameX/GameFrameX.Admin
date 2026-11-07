@@ -5,7 +5,7 @@ namespace GameFrameX.Application.CommerceCenter.GameCommodity.Dto;
 /// <summary>
 /// 游戏商品交易增加输入参数
 /// </summary>
-// C391（GFX-923 / Api#291）：AddRequest 继承空基类 BaseAddRequest，不携带主键 Id（对齐
+// ：AddRequest 继承空基类 BaseAddRequest，不携带主键 Id（对齐
 // AddGameGoodsCatalogueEntityRequest 的既定修正注释）。此前 Id:long 带 [Required] 属新增语义错误。
 // 契约：CategoryId 统一 long（Id 后缀契约兼容数字/字符串提交）；Number 为数量、保持 long，
 // 前端 TextField 提交 JS string，加 AllowReadingFromString 宽容读取，防整个 body 反序列化失败 → input null → NRE。

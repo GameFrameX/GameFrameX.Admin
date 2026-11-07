@@ -5,7 +5,7 @@ using GameFrameX.Entity.Enum;
 namespace GameFrameX.Core.Tests.C116;
 
 /// <summary>
-/// C116（GFX-114 / C11-D 未阻塞子集）单元测试：
+/// （-D 未阻塞子集）单元测试：
 /// 风险策略 fail closed/open 解析默认安全 + NullAppAttestationVerifier fail-hard 保证 + 新增枚举锁定。
 /// </summary>
 public class C116AntiCheatAndRiskEnforcementTests

@@ -41,7 +41,7 @@ const currentYear = new Date().getFullYear();
       }
     }
 
-    // flex 布局，窄屏自动换行，避免横向溢出（C143）
+    // flex 布局，窄屏自动换行，避免横向溢出
     display: flex;
     flex-wrap: wrap;
     justify-content: center;

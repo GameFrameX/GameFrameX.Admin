@@ -1,7 +1,7 @@
 namespace GameFrameX.Application.GmCenter.Match.Dto;
 
 /// <summary>
-/// 异常 Ticket 分页查询输入参数（change C341 §3；按异常类别检索，Cursor 翻页透传 Online）。
+/// 异常 Ticket 分页查询输入参数（change；按异常类别检索，Cursor 翻页透传 Online）。
 /// </summary>
 public class PageOnlineMatchAbnormalTicketRequest
 {

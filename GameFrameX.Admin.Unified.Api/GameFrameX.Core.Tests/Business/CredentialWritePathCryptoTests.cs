@@ -15,8 +15,8 @@ using Microsoft.Extensions.Logging.Abstractions;
 
 namespace GameFrameX.Core.Tests.Business;
 
-// C371（GFX-838）T6：凭证写入路径「确定最终明文之后、落库之前加密」两条代表链路。
-// change：gfx-doc/dev/game-business/changes/C371-credential-encryption-application/change.md
+// ：凭证写入路径「确定最终明文之后、落库之前加密」两条代表链路。
+// change：gfx-doc/dev/game-business/changes/-credential-encryption-application/change.md
 // 密钥环（SignatureKey）：Add/Rotate 响应一次性回显明文，库内密文且可解密还原；
 // JSON 凭证（Advertisement）：Add 后汇总列密文 + ConfigJson 敏感字段密文、非敏感字段明文，Update 掩码保留。
 // 其余实体（SessionKey / TicketKey / Policy / OpenAccess / Payment）与上述同型插入，

@@ -207,7 +207,7 @@ public static class MenuSeedCatalog
                                   .FirstOrDefault(u => u.Count() > 1);
         if (duplicateKey != null)
         {
-            // 列出冲突行 id/key，避免只给重复值无法定位两行来源（C331 / GFX-741）
+            // 列出冲突行 id/key，避免只给重复值无法定位两行来源
             var keyConflicts = duplicateKey.Select(u => $"{u.Id}/{u.Key}").ToArray();
             throw new InvalidOperationException($"global_menu.Key 重复: {duplicateKey.Key}（冲突行: {string.Join(", ", keyConflicts)}）。");
         }
@@ -217,7 +217,7 @@ public static class MenuSeedCatalog
                                          .FirstOrDefault(u => u.Count() > 1);
         if (duplicatePermission != null)
         {
-            // 列出冲突行 id/key，避免只给重复值无法定位两行来源（C331 / GFX-741）
+            // 列出冲突行 id/key，避免只给重复值无法定位两行来源
             var permissionConflicts = duplicatePermission.Select(u => $"{u.Id}/{u.Key}").ToArray();
             throw new InvalidOperationException($"global_menu.Permission 重复: {duplicatePermission.Key}（冲突行: {string.Join(", ", permissionConflicts)}）。");
         }

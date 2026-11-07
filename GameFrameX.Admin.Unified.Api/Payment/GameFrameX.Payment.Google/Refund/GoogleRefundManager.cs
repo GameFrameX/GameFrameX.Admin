@@ -11,7 +11,7 @@ using GameFrameX.Payment.Google.Option;
 namespace GameFrameX.Payment.Google.Refund;
 
 /// <summary>
-/// Google Play 退款管理器（C310 / GFX-718）。
+/// Google Play 退款管理器。
 /// <para>官方能力：Android Publisher API 无商家主动退款端点（退款在 Google Play Console 或由 Google 支持处理）——
 /// RefundAsync 显式失败（不静默缺失）；退款状态查询走 purchases.voidedpurchases.list（<see cref="GooglePlayApiManager.GetVoidedPurchasesAsync"/>）。</para>
 /// </summary>

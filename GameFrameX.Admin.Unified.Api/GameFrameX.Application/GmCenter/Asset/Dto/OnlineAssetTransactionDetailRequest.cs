@@ -1,7 +1,7 @@
 namespace GameFrameX.Application.GmCenter.Asset.Dto;
 
 /// <summary>
-/// 资产交易详情查询输入参数（GET 复杂查询对象，显式 <c>[FromQuery]</c> 绑定，C257 §4）。
+/// 资产交易详情查询输入参数（GET 复杂查询对象，显式 <c>[FromQuery]</c> 绑定）。
 /// <para>作用域必填：详情查询同样经 OnlineScopeContextFactory 校验后路由到目标区服的 Online 管理 API。</para>
 /// </summary>
 public class OnlineAssetTransactionDetailRequest

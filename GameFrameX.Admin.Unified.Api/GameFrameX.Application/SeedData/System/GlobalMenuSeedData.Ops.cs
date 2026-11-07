@@ -582,7 +582,7 @@ public partial class GlobalMenuSeedData
             },
             new()
             {
-                // GFX-754（change C350）：处罚页同步 Online 运行时按钮（父行 route:gamePenaltyEntity 同 change 收编补入 Player partial）。
+                // ：处罚页同步 Online 运行时按钮（父行 route:gamePenaltyEntity 同 change 收编补入 Player partial）。
                 Id = StableSeedId.Menu("gamePenalty:syncOnlineRuntime"),
                 Key = "gamePenalty:syncOnlineRuntime",
                 Pid = StableSeedId.Menu("route:gamePenaltyEntity"),

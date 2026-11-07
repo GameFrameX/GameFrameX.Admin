@@ -74,7 +74,7 @@ export interface DeleteMenuRequest {
 }
 
 /**
- * 请求期端点权限条目（U6/C42 缓存值）：由 `ApiEndpointCatalogSync` 在启动时构建并预热，
+ * 请求期端点权限条目（缓存值）：由 `ApiEndpointCatalogSync` 在启动时构建并预热，
  * JwtHandler 请求期按 RoutePath 查得，做端点→绑定按钮→已授权 MenuId 反向鉴权。
  */
 export interface EndpointPermissionEntry {
@@ -284,7 +284,7 @@ export interface GlobalMenuEndpointPermissionMapAsyncGetData {
   data: Record<string, EndpointPermissionEntry>;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;
@@ -307,7 +307,7 @@ export interface GlobalMenuListGetData {
   data: GlobalMenuResponse[];
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;
@@ -330,7 +330,7 @@ export interface GlobalMenuLoginMenuTreeGetData {
   data: MenuResponse[];
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;
@@ -353,7 +353,7 @@ export interface GlobalMenuOwnButtonPermListGetData {
   data: string[];
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;
@@ -376,7 +376,7 @@ export interface GlobalMenuOwnMenuIdListGetData {
   data: number[];
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;

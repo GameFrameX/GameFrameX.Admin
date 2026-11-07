@@ -39,9 +39,9 @@
 
 <script lang="ts" setup name="onlineConfigRolloutRollbackDialog">
 /**
- * 灰度回滚弹层（C343 / GFX-759 高危入口）。
+ * 灰度回滚弹层（高危入口）。
  * 回滚 = 版本化新下发：新行 TargetVersion 指向要恢复的历史版本（SegmentId/Percent 恢复到目标语义），
- * 旧行置 RolledBack 不可变；理由必填进审计（VC-7.12：回滚后行为恢复 + 审计完整）。
+ * 旧行置 RolledBack 不可变；理由必填进审计（.12：回滚后行为恢复 + 审计完整）。
  * ServerId 取发布行原值（同配置维度），不可在回滚时改目标作用域。
  */
 import { ref, computed } from 'vue'

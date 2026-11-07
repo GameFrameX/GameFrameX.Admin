@@ -589,7 +589,7 @@ public partial class GlobalMenuSeedData
             },
             new()
             {
-                // C302/GFX-715 域聚合页（与处罚管理共用 gamePenaltyEntity 端点与权限码，无自有按钮）；
+                // / 域聚合页（与处罚管理共用 gamePenaltyEntity 端点与权限码，无自有按钮）；
                 // 访问该页端点要求同时持有处罚管理按钮授权。
                 Id = StableSeedId.Menu("route:penaltyEnforcement"),
                 Key = "route:penaltyEnforcement",

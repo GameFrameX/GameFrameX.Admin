@@ -18,9 +18,9 @@ using SqlSugar;
 
 namespace GameFrameX.Core.Tests.HubApi;
 
-// C372（GFX-838）T3/T5/T6：Hub.Api 开放访问中间件凭证解密收口——密文凭证（C371 起库内形态）
+// //：Hub.Api 开放访问中间件凭证解密收口——密文凭证（起库内形态）
 // 经完整 InvokeAsync 管线验签通过；密文存在而密钥缺失 fail-closed 抛错。
-// change：gfx-doc/dev/client-api/changes/C372-runtime-credential-decrypt-closure/change.md
+// change：gfx-doc/dev/client-api/changes/-runtime-credential-decrypt-closure/change.md
 public sealed class GameAppOpenAccessDecryptClosureTests : IDisposable
 {
     private readonly ClientApiTestDb _db = new();
@@ -164,7 +164,7 @@ public sealed class GameAppOpenAccessDecryptClosureTests : IDisposable
     }
 
     /// <summary>
-    /// 构造按 C267 规范签名的开放访问请求（v2 单头 + body 入签 + canonical query 为空），
+    /// 构造按 规范签名的开放访问请求（v2 单头 + body 入签 + canonical query 为空），
     /// 客户端以<b>明文</b> secret 计算 HMAC——中间件必须先解密库内密文才能验签通过。
     /// </summary>
     private DefaultHttpContext CreateSignedRequest(string plaintextSecret)

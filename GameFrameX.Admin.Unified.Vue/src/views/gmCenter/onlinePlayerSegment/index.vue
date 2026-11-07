@@ -54,7 +54,7 @@
 
 <script lang="ts" setup name="onlinePlayerSegment">
 /**
- * 玩家分群页（C343 / GFX-759 前端半边）。
+ * 玩家分群页（前端半边）。
  * Admin 只编排分群定义（名称 + 条件白名单），不解释、不复算命中（语义解释在 Online 侧）；
  * 定义生效须经 syncOnline 弹层显式同步（高危：理由必填进审计）。
  * authPrefix 用菜单 Key 前缀 onlinePlayerSegment（与后端 seed 按钮 Key 逐字一致）。

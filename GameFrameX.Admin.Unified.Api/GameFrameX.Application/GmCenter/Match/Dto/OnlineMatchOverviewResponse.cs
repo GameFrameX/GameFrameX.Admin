@@ -1,7 +1,7 @@
 namespace GameFrameX.Application.GmCenter.Match.Dto;
 
 /// <summary>
-/// 匹配队列总览响应（change C341 §3 A0 字段终版）。
+/// 匹配队列总览响应（字段终版）。
 /// </summary>
 public class OnlineMatchOverviewResponse
 {

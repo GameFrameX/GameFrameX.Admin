@@ -14,22 +14,22 @@ using Microsoft.AspNetCore.Mvc.Routing;
 
 namespace GameFrameX.Core.Tests.Architecture;
 
-// C257：Admin API Action 写法规范契约测试。规范正文：gfx-doc/agent-handbook/admin-api-action-style.md（单一事实来源）。
+// ：Admin API Action 写法规范契约测试。规范正文：gfx-doc/agent-handbook/admin-api-action-style.md（单一事实来源）。
 // 六规则 + 试点 URL 冻结断言：
-//   S1 显式模板必填（每个 declared public action 必须有非空相对模板 [HttpXxx(...)]，三种字面形态均可；override 继承基类特性视为合规）
-//   S2 禁绝对路径模板（唯一长期豁免：SystemAuthService swagger 集成端点）
-//   S3 禁 action 路由段 Async 后缀（C289 起方法名 Async 由 AsyncSuffixContractTests 强制，URL 段契约独立守护）
-//   S4 禁类级 [AllowAnonymous]（GFX-664/C258 匿名写可达收口；C258 落地后例外清零，死条目断言强制清理）
-//   S5 declared public action 必须带 [DisplayName]（Swagger 展示名；inherit:true 继承基类的算数）
-//   S6 服务文件裸中文 BusinessError.Oh("…") 快照（只减不增；错误抛出唯一标准 BusinessError.Oh(XxxErrorCode.X)，见规范 §6）
-//   S7 试点 GlobalDictionaryTypeService URL 冻结端到端断言（显式模板重写前后 api/globalDictionaryType/* 路由与谓词逐条一致）
+//  显式模板必填（每个 declared public action 必须有非空相对模板 [HttpXxx(...)]，三种字面形态均可；override 继承基类特性视为合规）
+//  禁绝对路径模板（唯一长期豁免：SystemAuthService swagger 集成端点）
+//  禁 action 路由段 Async 后缀（起方法名 Async 由 AsyncSuffixContractTests 强制，URL 段契约独立守护）
+//  禁类级 [AllowAnonymous]（匿名写可达收口； 落地后例外清零，死条目断言强制清理）
+//  declared public action 必须带 [DisplayName]（Swagger 展示名；inherit:true 继承基类的算数）
+//  服务文件裸中文 BusinessError.Oh("…") 快照（只减不增；错误抛出唯一标准 BusinessError.Oh(XxxErrorCode.X)，见规范）
+//  试点 GlobalDictionaryTypeService URL 冻结端到端断言（显式模板重写前后 api/globalDictionaryType/* 路由与谓词逐条一致）
 // 双向断言：新增违规失败（防回潮）；例外清单出现死条目也失败（防僵尸例外，参照 DtoNamingConventionTests 模式）。
-// 例外清单随按模块清零批次（notes.md 批次 A1→B3）只减不增；试点服务 GlobalDictionaryTypeService 重写完成后即从 S1 例外移除。
+// 例外清单随按模块清零批次（notes.md 批次 A1→）只减不增；试点服务 GlobalDictionaryTypeService 重写完成后即从 例外移除。
 public sealed class AdminActionStyleContractTests
 {
     private static readonly string RepositoryRoot = GetRepositoryRoot();
 
-    // ============ S1 显式模板必填：类粒度例外（该类全部 declared public action 豁免，整类重写批清零） ============
+    // ============ 显式模板必填：类粒度例外（该类全部 declared public action 豁免，整类重写批清零） ============
 
     private static readonly HashSet<string> ExplicitTemplateLegacyClasses = new(StringComparer.Ordinal)
     {
@@ -73,30 +73,30 @@ public sealed class AdminActionStyleContractTests
         "UserService",
     };
 
-    // ============ S2 绝对路径模板：TypeName.MethodName 粒度 ============
+    // ============ 绝对路径模板：TypeName.MethodName 粒度 ============
 
     private static readonly HashSet<string> AbsoluteTemplateLegacy = new(StringComparer.Ordinal)
     {
-        // SystemAuthService swagger 集成专用端点（规范 §1 唯一长期豁免）
+        // SystemAuthService swagger 集成专用端点（规范 唯一长期豁免）
         "SystemAuthService.SwaggerCheckUrl",
         "SystemAuthService.SwaggerSubmitUrlAsync",
     };
 
-    // ============ S3 Async 后缀：TypeName.MethodName 粒度 ============
+    // ============ Async 后缀：TypeName.MethodName 粒度 ============
 
     private static readonly HashSet<string> AsyncRouteSegmentLegacy = new(StringComparer.Ordinal)
     {
-        // 无 Name 无模板，路由段 = getEndpointPermissionMapAsync（C257 遗留）；动词收敛批消灭
+        // 无 Name 无模板，路由段 = getEndpointPermissionMapAsync（遗留）；动词收敛批消灭
         "GlobalMenuService.GetEndpointPermissionMapAsync",
     };
 
-    // ============ S4 类级 [AllowAnonymous]：C258（GFX-664）落地后本清单必须清零 ============
+    // ============ 类级 [AllowAnonymous]：落地后本清单必须清零 ============
 
     private static readonly HashSet<string> ClassLevelAllowAnonymousLegacy = new(StringComparer.Ordinal)
     {
     };
 
-    // ============ S5 [DisplayName] 存在性：TypeName.MethodName 粒度 ============
+    // ============ [DisplayName] 存在性：TypeName.MethodName 粒度 ============
 
     private static readonly HashSet<string> DisplayNameLegacy = new(StringComparer.Ordinal)
     {
@@ -168,7 +168,7 @@ public sealed class AdminActionStyleContractTests
         "SessionKeyService.RotateAsync",
     };
 
-    // ============ S6 裸中文 BusinessError.Oh：服务文件 → 计数快照（只减不增） ============
+    // ============ 裸中文 BusinessError.Oh：服务文件 → 计数快照（只减不增） ============
 
     private static readonly Dictionary<string, int> BareChineseErrorSnapshot = new(StringComparer.Ordinal)
     {
@@ -222,7 +222,7 @@ public sealed class AdminActionStyleContractTests
 
     private static readonly Regex BareChineseErrorRegex = new(@"BusinessError\.Oh\(\s*\$?""", RegexOptions.Compiled);
 
-    // 服务文件清单来源：与盘点（C257 notes.md / inventory.json）同源——Admin host 四项目中声明 IAdminApiController 家族服务类的 .cs
+    // 服务文件清单来源：与盘点（notes.md / inventory.json）同源——Admin host 四项目中声明 IAdminApiController 家族服务类的 .cs
     private static readonly string[] AdminServiceDirectories =
     {
         "GameFrameX.Application",
@@ -282,8 +282,8 @@ public sealed class AdminActionStyleContractTests
     [Fact]
     public void S3_ActionRouteSegments_MustNotEndWithAsync()
     {
-        // C289（GFX-696）规范更新：public/internal Task 方法名必须带 Async 后缀（AsyncSuffixContractTests 强制），
-        // C257 的“方法名禁 Async”退役；本规则收敛为 URL 契约守护 —— action 路由段来源
+        // 规范更新：public/internal Task 方法名必须带 Async 后缀（AsyncSuffixContractTests 强制），
+        //  的“方法名禁 Async”退役；本规则收敛为 URL 契约守护 —— action 路由段来源
         // （ApiDescriptionSettings.Name，其次无模板时的方法名）禁止 Async 后缀，
         // 防止 URL 随方法名漂移（全量路由由 AdminEndpointGoldenSnapshotTests 冻结）。
         var actual = new HashSet<string>(StringComparer.Ordinal);
@@ -340,7 +340,7 @@ public sealed class AdminActionStyleContractTests
 
                 if (GetHttpTemplate(method) is null)
                 {
-                    // 无显式模板的存量（S1 例外类）不重复计 DisplayName 例外；重写批补模板时同步补 DisplayName
+                    // 无显式模板的存量（例外类）不重复计 DisplayName 例外；重写批补模板时同步补 DisplayName
                     continue;
                 }
 
@@ -381,7 +381,7 @@ public sealed class AdminActionStyleContractTests
                     Environment.NewLine + "若为清理，请同步更新 BareChineseErrorSnapshot。");
     }
 
-    // ============ S7 试点 URL 冻结：GlobalDictionaryTypeService 显式模板重写前后路由逐条一致 ============
+    // ============ 试点 URL 冻结：GlobalDictionaryTypeService 显式模板重写前后路由逐条一致 ============
 
     [Theory]
     [InlineData(nameof(GlobalDictionaryTypeService.PageAsync), "api/globalDictionaryType/page", "POST")]

@@ -3,8 +3,8 @@ using GameFrameX.Entity.Base;
 namespace GameFrameX.Entity.Business.Game;
 
 /// <summary>
-/// App 会话密钥（AES-256-GCM 加密信封对称密钥环，change C5 server-envelope-middleware）。
-/// <para>形状照 <see cref="AppSignatureKeyEntity"/>（C2 密钥环先例）：Kid 版本化寻址、NotBefore/Expire 租约、
+/// App 会话密钥（AES-256-GCM 加密信封对称密钥环，change server-envelope-middleware）。
+/// <para>形状照 <see cref="AppSignatureKeyEntity"/>（密钥环先例）：Kid 版本化寻址、NotBefore/Expire 租约、
 /// Rotate 双活、禁删保护；区别在算法为 AES-GCM 信封密钥（会话层，双向 c2s/s2c HKDF 分钥）而非 HMAC 签名密钥。</para>
 /// 客户端信封自报 kid 定密钥（双活轮换窗口内新旧 key 共存）。</para>
 /// </summary>
@@ -25,7 +25,7 @@ public class SessionKeyEntity : EntityBasic
     /// <summary>
     /// 会话密钥（明文存储，32 字节 CSPRNG 的 64 位 hex）。
     /// <para><b>为何明文：</b>AES-GCM 是对称算法，解密端必须持与加密端完全相同的密钥，
-    /// 单向 hash 无法还原密钥参与计算（同 C2 签名密钥与 OpenAccess 理由）。缓解措施：管理面列表/详情一律脱敏 ******，
+    /// 单向 hash 无法还原密钥参与计算（同 签名密钥与 OpenAccess 理由）。缓解措施：管理面列表/详情一律脱敏 ******，
     /// 仅 Add/Rotate 响应一次性明文回显，且实体禁删（见管理面 Delete 保护）。</para>
     /// </summary>
     [SugarColumn(ColumnDescription = "会话密钥（明文 hex，对称算法解密必需）", Length = EntityStringLength.Length1024)]

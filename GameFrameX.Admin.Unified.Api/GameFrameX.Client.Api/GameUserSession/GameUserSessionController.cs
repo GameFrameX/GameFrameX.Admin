@@ -9,7 +9,7 @@ using GameFrameX.Entity.Business.Game.ServerConfig;
 namespace GameFrameX.Client.Api.GameUserSession;
 
 /// <summary>
-/// 游戏玩家登录会话控制器（C13 登录控制面：LoginAsync 自建，承接原 BLLogin）
+/// 游戏玩家登录会话控制器（登录控制面：LoginAsync 自建，承接原 BLLogin）
 /// <para>路由：POST /api/GameUserSession/{Action}（继承 BaseController 基类路由）。</para>
 /// <para>签名中间件验证请求，用户身份由请求正文携带，配置从主库读取。</para>
 /// </summary>
@@ -37,7 +37,7 @@ public class GameUserSessionController : BaseController
     /// <summary>
     ///
     /// </summary>
-    /// <param name="archiveRepository">玩家存档仓储（C8 存档行 + P0-2 会话列）</param>
+    /// <param name="archiveRepository">玩家存档仓储（存档行 + P0-2 会话列）</param>
     /// <param name="userRepository">玩家账号仓储（注销判定）</param>
     /// <param name="orderRepository">支付订单仓储（累计充值汇总）</param>
     /// <param name="serverConfigRepository">游戏运营配置主库仓储</param>
@@ -53,10 +53,10 @@ public class GameUserSessionController : BaseController
     }
 
     /// <summary>
-    /// 登录（28 字段四态去向见 C13 change.md §1）。
+    /// 登录（28 字段四态去向见 change.md）。
     /// <para>P0-3 保留：rcode=1 版本过低 / rcode=2 账号注销（AccountNoticeWindow 消费）。
     /// 其余空缺省字段按"空安全"约定下发（0 / "" / 空数组）。</para>
-    /// <para>config 走 C280 差异下发（原 P0-1 回显法升级）：种子内容源 10 键，上行 md5
+    /// <para>config 走 差异下发（原 P0-1 回显法升级）：种子内容源 10 键，上行 md5
     /// 相等只回 {md5}，不等/缺失回 {md5, config}（对齐原厂 BLLogin 增量同步语义）。</para>
     /// </summary>
     /// <param name="request"></param>
@@ -86,7 +86,7 @@ public class GameUserSessionController : BaseController
             });
         }
 
-        // 存档行（复用 C8）：有档读 SyncTime/InstallationId/DeviceModel 并覆盖会话标记；无档 lastSyncTime=0 不建行（存档链路负责建行）
+        // 存档行（复用）：有档读 SyncTime/InstallationId/DeviceModel 并覆盖会话标记；无档 lastSyncTime=0 不建行（存档链路负责建行）
         var archive = await _archiveRepository.GetFirstAsync(x => x.UserId == request.UserId);
         var lastSyncTime = 0L;
         var installationId = string.Empty;
@@ -102,7 +102,7 @@ public class GameUserSessionController : BaseController
             await _archiveRepository.UpdateAsync(archive);
         }
 
-        // 累计充值：C11 订单已到账（Shipped 及以后）汇总（AccountId = userId 字符串）
+        // 累计充值： 订单已到账（Shipped 及以后）汇总（AccountId = userId 字符串）
         var accountId = request.UserId.ToString(CultureInfo.InvariantCulture);
         var orders = await _orderRepository.GetListAsync(x => x.AccountId == accountId && x.Status >= OrderStatusEnum.Shipped);
         var totalPay = orders.Sum(x => (long)x.Amount);

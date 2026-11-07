@@ -2,7 +2,7 @@
 /* tslint:disable */
 
 /**
- * 资产流水行（vault:C4 账本不变量字段：TransactionId / Player / App / Server / 来源 / 原因 / 业务单号 / 操作者 / 前后值 / 时间；
+ * 资产流水行（vault: 账本不变量字段：TransactionId / Player / App / Server / 来源 / 原因 / 业务单号 / 操作者 / 前后值 / 时间；
  * App/Server 由查询作用域隐含，不在行内重复）。线缆与 Admin 响应共用形态（账本行无脱敏面）。
  */
 export interface OnlineAssetLedgerEntryResponse {
@@ -22,7 +22,7 @@ export interface OnlineAssetLedgerEntryResponse {
    * @format int64
    */
   afterValue?: number;
-  /** 来源（Admin 人工 / 支付 / 邮件 / 兑换码 / 对局 / 活动，vault:C4 六类）。 */
+  /** 来源（Admin 人工 / 支付 / 邮件 / 兑换码 / 对局 / 活动，vault: 六类）。 */
   source?: string | null;
   /** 原因（进审计的操作理由原文）。 */
   reason?: string | null;
@@ -37,7 +37,7 @@ export interface OnlineAssetLedgerEntryResponse {
   occurredAt?: number;
 }
 
-/** 资产流水分页响应（Cursor + HasMore，vault:C2 S1.2；透传 Online 游标语义，不套页码偏移）。 */
+/** 资产流水分页响应（Cursor + HasMore，vault: .2；透传 Online 游标语义，不套页码偏移）。 */
 export interface OnlineAssetLedgerPageResponse {
   /** 当前页流水行。 */
   items?: OnlineAssetLedgerEntryResponse[] | null;
@@ -48,7 +48,7 @@ export interface OnlineAssetLedgerPageResponse {
 }
 
 /**
- * 资产流水分页查询输入参数（vault:C4 LedgerEntry 查询；Cursor 翻页，vault:C2 S1.2 定稿）。
+ * 资产流水分页查询输入参数（vault: LedgerEntry 查询；Cursor 翻页，vault: .2 定稿）。
  *
  * 查询实时透传 Online，Admin 不落资产镜像。
  */
@@ -99,11 +99,11 @@ export interface OnlineAssetLedgerQueryPagePostData {
   code: number;
   /** 错误或提示信息 */
   message: string;
-  /** 资产流水分页响应（Cursor + HasMore，vault:C2 S1.2；透传 Online 游标语义，不套页码偏移）。 */
+  /** 资产流水分页响应（Cursor + HasMore，vault: .2；透传 Online 游标语义，不套页码偏移）。 */
   data: OnlineAssetLedgerPageResponse;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;

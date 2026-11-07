@@ -3,10 +3,10 @@ using Microsoft.Extensions.Hosting;
 namespace GameFrameX.Core.Logging;
 
 /// <summary>
-/// 日志调度后台服务（C363 重建，取代历史框架退役时丢失的调度器）：消费 <see cref="LoggingDispatchQueue"/>，
+/// 日志调度后台服务（重建，取代历史框架退役时丢失的调度器）：消费 <see cref="LoggingDispatchQueue"/>，
 /// 把每批消息按各 Sink 注册期 <see cref="ProjectLoggingOptions.WriteFilter"/> 语义分发到文件 Sink 与
 /// <see cref="IDatabaseLoggingWriter"/> 集合。任一 Sink 写入异常只记录并继续——数据库日志
-/// （C156 分表路由、C171 动态开关在 Writer 写路径内生效）与文件日志互不拖累，更不阻断业务线程。
+/// （分表路由、 动态开关在 Writer 写路径内生效）与文件日志互不拖累，更不阻断业务线程。
 /// </summary>
 internal sealed class LoggingDispatchService : BackgroundService
 {
@@ -79,7 +79,7 @@ internal sealed class LoggingDispatchService : BackgroundService
             }
             catch (Exception exception)
             {
-                // DB/ES 写入失败隔离：吞并记录，不影响其它 Sink 与业务（C156：日志写入失败不得影响业务线程）
+                // DB/ES 写入失败隔离：吞并记录，不影响其它 Sink 与业务（日志写入失败不得影响业务线程）
                 DispatchLogError(exception, "数据库日志写入失败");
             }
         }

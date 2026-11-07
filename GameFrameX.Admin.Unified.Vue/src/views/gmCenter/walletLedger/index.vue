@@ -40,9 +40,9 @@
 
 <script lang="ts" setup name="onlineWalletLedger">
 /**
- * 玩家资产流水页（C349 / GFX-756）。
+ * 玩家资产流水页。
  * 分页走 OnlineCursorList（Cursor + HasMore 透传）；Grant/Revoke 经受限命令 API。
- * 数据区不落资产镜像表——查询实时透传 Online（vault C2 S1.6 + C340 §3）。
+ * 数据区不落资产镜像表——查询实时透传 Online（vault .6 +）。
  */
 import { ref, computed, watch, onMounted, nextTick } from 'vue'
 import ServerSelector from '/@/components/server-selector/ServerSelector.vue'

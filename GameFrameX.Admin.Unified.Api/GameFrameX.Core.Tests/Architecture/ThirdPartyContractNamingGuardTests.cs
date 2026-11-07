@@ -2,12 +2,12 @@ using System.Text.RegularExpressions;
 
 namespace GameFrameX.Core.Tests.Architecture;
 
-// C292 / GFX-698：第三方契约命名治理守护（issue 任务 2 的豁免登记 + 防扩散）。
+//  / ：第三方契约命名治理守护（issue 任务 2 的豁免登记 + 防扩散）。
 // 四规则：
-//   R1 全仓活代码公开属性名禁止 snake_case（含下划线）——第三方 wire 名只能经 [JsonPropertyName] 镜像；
-//   R2 全仓活代码公开属性名禁止纯小写单词——仅允许登记的 LegacyViolations（自家业务 DTO 待后续治理）；
-//   R3 SCREAMING_SNAKE 枚举成员仅允许 Apple AppStoreServer Models 目录（Apple 官方模型风格镜像）；
-//   R4 中文枚举成员仅允许 WechatReturnCodeEnum（Senparc 移植的微信返回码原文）。
+//  R1 全仓活代码公开属性名禁止 snake_case（含下划线）——第三方 wire 名只能经 [JsonPropertyName] 镜像；
+//  R2 全仓活代码公开属性名禁止纯小写单词——仅允许登记的 LegacyViolations（自家业务 DTO 待后续治理）；
+//  R3 SCREAMING_SNAKE 枚举成员仅允许 Apple AppStoreServer Models 目录（Apple 官方模型风格镜像）；
+//  R4 中文枚举成员仅允许 WechatReturnCodeEnum（Senparc 移植的微信返回码原文）。
 // 双向断言：新增违规失败（防扩散）；豁免/例外清单出现死条目也失败（防僵尸，参照 DtoNamingConventionTests 口径）。
 // 活代码定义：剥离 /* */ 块注释与 // 行注释后仍存在的声明（Xsolla/Google 镜像类内有大量注释形态的旧字段，保留不动）。
 public sealed class ThirdPartyContractNamingGuardTests
@@ -23,7 +23,7 @@ public sealed class ThirdPartyContractNamingGuardTests
         RegexOptions.Multiline | RegexOptions.Compiled);
 
     /// <summary>R2 例外：自家业务 DTO 的存量纯小写属性（非第三方契约，改名涉及 Admin wire 评审，待独立 change 治理）。
-    /// GameCommodity 四项 status 已随 C292/#187 PascalCase 化清零（main 既有僵尸条目，C289 顺手删除）。</summary>
+    /// GameCommodity 四项 status 已随 /#187 PascalCase 化清零（main 既有僵尸条目， 顺手删除）。</summary>
     private static readonly HashSet<string> LowercaseWordLegacyViolations = new(StringComparer.Ordinal)
     {
     };
@@ -41,7 +41,7 @@ public sealed class ThirdPartyContractNamingGuardTests
     /// <summary>R4 豁免类型：Senparc 移植的微信返回码枚举，成员名为微信官方中文描述。</summary>
     private const string WechatReturnCodeEnumFile = "GameFrameX.Entity/Enum/WechatReturnCodeEnum.cs";
 
-    /// <summary>第三方契约镜像登记表（C292 任务 1 治理对象）：文件必须存在且属性已全量 PascalCase（防回潮）。</summary>
+    /// <summary>第三方契约镜像登记表（任务 1 治理对象）：文件必须存在且属性已全量 PascalCase（防回潮）。</summary>
     private static readonly string[] ThirdPartyMirrorRegistry =
     {
         "Payment/GameFrameX.Payment.Xsolla/Order/OrderManager.cs",

@@ -36,8 +36,8 @@
 
 <script lang="ts" setup name="onlineWalletLedgerRevokeDialog">
 /**
- * 受限命令：撤销发放弹层（C349 / GFX-756）。
- * 按 transactionId 定位原交易（C349 P1-1 解释：UI 不再收 GrantItems）；
+ * 受限命令：撤销发放弹层。
+ * 按 transactionId 定位原交易（P1-1 解释：UI 不再收 GrantItems）；
  * 理由必填（≤500 字）进审计。
  */
 import { ref } from 'vue'

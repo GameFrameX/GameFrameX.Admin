@@ -9,7 +9,7 @@ public interface IJobPersistence
     Task OnExecutionRecordAsync(PersistenceExecutionRecordContext context);
 
     /// <summary>
-    /// 注册期持久化（C404 §9.8）：把扫描 / 预载合并后的作业与触发器 upsert 进数据库，
+    /// 注册期持久化：把扫描 / 预载合并后的作业与触发器 upsert 进数据库，
     /// 使内置作业在「任务调度」页可见、触发器运行态可写回。无持久化能力的实现返回即可。
     /// </summary>
     /// <param name="jobDetail">作业元数据。</param>

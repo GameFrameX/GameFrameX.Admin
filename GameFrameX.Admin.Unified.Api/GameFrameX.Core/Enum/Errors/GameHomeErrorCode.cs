@@ -1,7 +1,7 @@
 namespace GameFrameX.Core.Enum.Errors;
 
 /// <summary>
-/// 游戏数据域首页错误码（段 605，见 <see cref="ErrorSegmentRegistry"/>；C321 / GFX-730）。
+/// 游戏数据域首页错误码（段 605，见 <see cref="ErrorSegmentRegistry"/>； /）。
 /// </summary>
 public enum GameHomeErrorCode
 {

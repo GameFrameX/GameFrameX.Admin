@@ -4,7 +4,7 @@ using GameFrameX.ObjectStorage.Abstract;
 namespace GameFrameX.Core.Service.Business.ObjectStorage;
 
 /// <summary>
-/// 对象存储 ConfigJson 敏感字段级加解密收口（C370 / GFX-829）：写入侧在 <see cref="ObjectStorageConfigNormalizer.Normalize"/> 规范化之后、
+/// 对象存储 ConfigJson 敏感字段级加解密收口：写入侧在 <see cref="ObjectStorageConfigNormalizer.Normalize"/> 规范化之后、
 /// 落库之前调用 <see cref="EncryptConfigJson"/>；读取侧在 <see cref="IObjectStorageAdapterFactory.BuildContext"/> 之前调用 <see cref="DecryptConfigJson"/>。
 /// <para>敏感字段集合由 Provider Schema 的 <c>Sensitive</c> 标记驱动（与表单脱敏同源），非敏感字段（Bucket / Endpoint 等）保持明文可读；
 /// 字段值为 <see cref="SecretCrypto"/> 密文形态（<c>enc:sec:v1:</c> 前缀）时幂等跳过。</para>

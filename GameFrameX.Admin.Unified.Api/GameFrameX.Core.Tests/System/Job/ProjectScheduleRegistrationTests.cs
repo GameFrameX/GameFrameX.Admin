@@ -50,7 +50,7 @@ public sealed class ProjectScheduleRegistrationTests
     [Fact]
     public void ScheduledTaskHostedService_IsRetiredFromApplicationAssembly()
     {
-        // 调度合一（C404）：旧引擎类型必须不存在于任何产线程序集，Startup 亦不再注册（类型删除即编译期保证）。
+        // 调度合一：旧引擎类型必须不存在于任何产线程序集，Startup 亦不再注册（类型删除即编译期保证）。
         var assembly = typeof(GameFrameX.Application.Platform.Job.GameTimeJobDispatchJob).Assembly;
         Assert.Null(assembly.GetType("GameFrameX.Application.Platform.Job.ScheduledTaskHostedService", false));
     }

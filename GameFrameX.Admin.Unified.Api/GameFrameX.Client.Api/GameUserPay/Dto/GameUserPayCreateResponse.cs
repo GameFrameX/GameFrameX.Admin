@@ -1,7 +1,7 @@
 namespace GameFrameX.Client.Api.GameUserPay.Dto;
 
 /// <summary>
-/// 支付下单响应（C11 支付域 Create；沙箱策略命中时 IsNeedPay=false 即免支付直发）
+/// 支付下单响应（支付域 Create；沙箱策略命中时 IsNeedPay=false 即免支付直发）
 /// </summary>
 public class GameUserPayCreateResponse
 {

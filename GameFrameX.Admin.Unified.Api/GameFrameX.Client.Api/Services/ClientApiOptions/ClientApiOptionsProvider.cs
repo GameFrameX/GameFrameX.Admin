@@ -37,7 +37,7 @@ public sealed class ClientApiOptionsProvider : IClientApiOptionsProvider
                    : new EmailOptions
                    {
                        FromEmailAddress = entity.FromEmailAddress,
-                       // C372（GFX-838）：凭证读取边界解密（C371 起库内密文；无前缀明文直通）
+                       // ：凭证读取边界解密（起库内密文；无前缀明文直通）
                        FromEmailSecretId = SecretCrypto.DecryptCached(entity.FromEmailSecretId) ?? string.Empty,
                        FromEmailSecretKey = SecretCrypto.DecryptCached(entity.FromEmailSecretKey) ?? string.Empty,
                    };
@@ -54,7 +54,7 @@ public sealed class ClientApiOptionsProvider : IClientApiOptionsProvider
             return null;
         }
 
-        // C372（GFX-838）：广告回调读取边界解密——ConfigJson 字段级（自带密文→明文进程缓存）。
+        // ：广告回调读取边界解密——ConfigJson 字段级（自带密文→明文进程缓存）。
         // ConfigValues / ConfigJson 一律携带明文，消费方（奖励服务 / WebHook 验签）不感知密文形态。
         var decryptedConfigJson = AdvertisementCallbackConfigCrypto.DecryptConfigJson(entity.Provider, entity.ConfigJson);
         var configValues = ParseConfigValues(decryptedConfigJson);
@@ -116,7 +116,7 @@ public sealed class ClientApiOptionsProvider : IClientApiOptionsProvider
         var entity = await GetEffectivePolicyRowAsync();
         return new ClientApiTokenPolicyOptions
         {
-            // C372（GFX-838）：令牌签名密钥读取边界解密（C371 起库内密文；无前缀明文直通）
+            // ：令牌签名密钥读取边界解密（起库内密文；无前缀明文直通）
             SigningKey = string.IsNullOrWhiteSpace(entity?.SigningKey) ? null : SecretCrypto.DecryptCached(entity.SigningKey),
             LifetimeMinutes = entity == null
                                   ? ClientApiPlatformDefaults.ClientApiTokenLifetimeMinutesDefault

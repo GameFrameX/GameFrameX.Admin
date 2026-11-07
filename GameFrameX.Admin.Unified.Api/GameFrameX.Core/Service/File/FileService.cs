@@ -319,7 +319,7 @@ public class FileService : IAdminApiController
         var finalName = newFile.Id + suffix;
         var objectKey = string.IsNullOrEmpty(path) ? finalName : path + "/" + finalName;
 
-        // 上传 Provider 失败 → 不写文件记录。ConfigJson 敏感字段解密走进程级缓存（C370，禁止每请求 PBKDF2 派生）
+        // 上传 Provider 失败 → 不写文件记录。ConfigJson 敏感字段解密走进程级缓存（禁止每请求 PBKDF2 派生）
         var adapter = _adapterFactory.Resolve(config.Provider);
         var context = _adapterFactory.BuildContext(config.Provider, ObjectStorageConfigCrypto.DecryptConfigJson(config.Provider, config.ConfigJson), config.PathTemplate);
         try

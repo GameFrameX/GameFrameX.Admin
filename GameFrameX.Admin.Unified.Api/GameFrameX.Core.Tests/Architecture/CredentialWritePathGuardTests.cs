@@ -1,8 +1,8 @@
 namespace GameFrameX.Core.Tests.Architecture;
 
-// C371（GFX-838）T7：保留凭证写入路径源码级守护（10 条规则，9 个源文件）——每个落库写入点必须出现 SecretCrypto.Encrypt
+// ：保留凭证写入路径源码级守护（10 条规则，9 个源文件）——每个落库写入点必须出现 SecretCrypto.Encrypt
 // （密钥环类）或 *ConfigCrypto.EncryptConfigJson（JSON 字段级类）收口调用。
-// change：gfx-doc/dev/game-business/changes/C371-credential-encryption-application/change.md
+// change：gfx-doc/dev/game-business/changes/-credential-encryption-application/change.md
 // 新增凭证实体 / 新增写入方法时若绕过收口，本测试失败，防止明文落库回潮。
 public sealed class CredentialWritePathGuardTests
 {

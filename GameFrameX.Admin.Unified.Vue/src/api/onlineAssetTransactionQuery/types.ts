@@ -3,7 +3,7 @@
 
 /**
  * 资产交易详情响应（Transaction/Grant 全字段：TransactionId、IdempotencyKey、状态、来源、原因、业务单号、操作者、Grant 明细、时间；
- * vault:C4 交易不变量——每笔变更可追溯，VC-3.14 Admin 展示半边）。
+ * vault: 交易不变量——每笔变更可追溯，.14 Admin 展示半边）。
  */
 export interface OnlineAssetTransactionDetailResponse {
   /** 交易 Id。 */
@@ -12,7 +12,7 @@ export interface OnlineAssetTransactionDetailResponse {
   idempotencyKey?: string | null;
   /** 交易状态（字符串透传 Online 状态机：Succeeded / Failed / Reverted 等，Admin 不解释状态机只展示）。 */
   status?: string | null;
-  /** 来源（vault:C4 六类）。 */
+  /** 来源（vault: 六类）。 */
   source?: string | null;
   /** 原因（进审计的操作理由原文）。 */
   reason?: string | null;
@@ -62,12 +62,12 @@ export interface OnlineAssetTransactionQueryDetailGetData {
   message: string;
   /**
    * 资产交易详情响应（Transaction/Grant 全字段：TransactionId、IdempotencyKey、状态、来源、原因、业务单号、操作者、Grant 明细、时间；
-   * vault:C4 交易不变量——每笔变更可追溯，VC-3.14 Admin 展示半边）。
+   * vault: 交易不变量——每笔变更可追溯，.14 Admin 展示半边）。
    */
   data: OnlineAssetTransactionDetailResponse;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;

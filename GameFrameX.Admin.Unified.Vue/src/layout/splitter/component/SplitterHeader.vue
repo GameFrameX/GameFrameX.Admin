@@ -86,7 +86,7 @@ const onToggleCollapse = () => {
 }
 
 // 手机端：用汉堡图标 fa-bars（移动端菜单标准，比 fa-outdent 直观），深色醒目
-// FA7 渲染链路已修复（C149），mobile 回归 SvgIcon 方案，与 desktop 统一
+// FA7 渲染链路已修复，mobile 回归 SvgIcon 方案，与 desktop 统一
 @include bp-down(sm) {
   .collapse-icon-desktop {
     display: none;

@@ -59,7 +59,7 @@ export interface GameLoginTicketKeyRotateRequest {
    */
   expireTime?: number | null;
   /**
-   * 旧密钥退场时间（Unix 秒，C373）：轮换后旧钥被打 RotatedTime 标记并收窄到期时间到此值，
+   * 旧密钥退场时间（Unix 秒）：轮换后旧钥被打 RotatedTime 标记并收窄到期时间到此值，
    * 到点被生效查询自然排除（Server 按 kid 验签，窗口内旧公钥仍可验）。
    *
    * null = 默认 now + 7 天；不得早于当前时间，不得晚于 now + 30 天（对齐票据 30 天上限口径）。
@@ -102,7 +102,7 @@ export interface GameLoginTicketKeyDetailGetData {
   data: GameLoginTicketKeyResponse;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;
@@ -129,7 +129,7 @@ export interface GameLoginTicketKeyPagePostData {
   data: GameLoginTicketKeyResponseSqlSugarPagedList;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;

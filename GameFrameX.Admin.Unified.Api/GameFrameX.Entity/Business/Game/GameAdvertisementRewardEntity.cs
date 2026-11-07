@@ -5,7 +5,7 @@ namespace GameFrameX.Entity.Business.Game;
 
 /// <summary>
 /// 游戏广告奖励发放账本。
-/// <para>广告奖励发放权威事实源（C114 / GFX-110），覆盖 TopOn / GoogleAdMob / UnityAds 服务端回调。</para>
+/// <para>广告奖励发放权威事实源，覆盖 TopOn / GoogleAdMob / UnityAds 服务端回调。</para>
 /// <para>幂等：<see cref="IdempotencyKey"/> = <c>adreward:{NormalizedProvider}:{TransactionId}</c>，数据库唯一约束兜底，同一广告 transaction 重放不重复发奖。</para>
 /// </summary>
 [SugarTable(null, "游戏广告奖励发放账本")]

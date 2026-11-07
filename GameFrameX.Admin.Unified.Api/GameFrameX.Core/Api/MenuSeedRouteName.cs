@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc.Routing;
 namespace GameFrameX.Core.Api;
 
 /// <summary>
-/// 菜单种子按钮 Permission（routeName，<c>controller:action</c> 形态）的类型安全拼接入口（C368）。
+/// 菜单种子按钮 Permission（routeName，<c>controller:action</c> 形态）的类型安全拼接入口。
 /// <para>
 /// 种子写法：<c>Permission = MenuSeedRouteName.Of&lt;UserService&gt;(nameof(UserService.DeleteUserAsync))</c>。
 /// 控制器段与动作段均按 <see cref="AdminApiRouteNaming"/> 唯一事实源推导——服务改名/删除后种子随编译自动跟随或报错，
@@ -32,7 +32,7 @@ public static class MenuSeedRouteName
         }
 
         // 同名重载可能挂不同路由（如基类 CRUD update 与派生回退 return）；路由集合不唯一即拒绝推导，
-        // 避免静默取首个命中导致 Permission 指向错误端点。消歧手段：按语义改名派生方法（C368 先例）。
+        // 避免静默取首个命中导致 Permission 指向错误端点。消歧手段：按语义改名派生方法（先例）。
         var routePaths = methods.Select(u => AdminApiRouteNaming.BuildRoutePath(typeof(TService), u))
                                 .Distinct(StringComparer.OrdinalIgnoreCase)
                                 .ToArray();

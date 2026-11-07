@@ -8,7 +8,7 @@ using GameFrameX.Entity.System;
 namespace GameFrameX.Application.Platform.Job;
 
 /// <summary>
-/// 首页在线人数时序采样作业（C321 / GFX-730）
+/// 首页在线人数时序采样作业
 /// <para>每 15 分钟按「启用区服 Control GetOnlinePlayer 求和」聚合全服在线数，
 /// upsert 到主库采样表（15 分钟桶起点 + 当前值覆盖）；首页 onlineTrend 接口按整点桶回读。</para>
 /// </summary>

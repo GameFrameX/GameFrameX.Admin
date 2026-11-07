@@ -11,7 +11,7 @@ namespace GameFrameX.Client.Api.Services.PayVerification;
 
 /// <summary>
 /// 默认验真实现：按 PayChannel 取渠道 handler 调其 VerifyReceiptAsync（原生实现 Pay.Apple / Pay.Google）。
-/// <para>C271 Apple 双形态路由：receiptData 形态（StoreKit 1）走 verifyReceipt 旧路径；
+/// <para> Apple 双形态路由：receiptData 形态（StoreKit 1）走 verifyReceipt 旧路径；
 /// 仅 transactionId 形态（StoreKit 2）走 App Store Server API v2 新路径（前置 fail-closed 检查）。</para>
 /// <para>渠道不支持 / 支付配置未加载 / 必要凭证缺失 → Rejected（明确错误码拒绝，绝不静默放行）；
 /// 渠道验真失败（收据无效等）→ Pending（Rcode=7，可疑不记账）。</para>
@@ -65,7 +65,7 @@ public sealed class GamePayReceiptVerifier : IPayReceiptVerifier
         Payment.Abstract.Interface.ITransactionData transactionData; // ponytail: 完全限定——本 host 引 Sentry，其同名 ITransactionData 与 Pay.Abstract 歧义
         if (channelName == "apple")
         {
-            // C271 双形态路由：StoreKit 1（receiptData）走 verifyReceipt 旧路径；StoreKit 2（仅 transactionId）走 Server API v2 新路径
+            //  双形态路由：StoreKit 1（receiptData）走 verifyReceipt 旧路径；StoreKit 2（仅 transactionId）走 Server API v2 新路径
             if (!string.IsNullOrEmpty(request.ReceiptData))
             {
                 if (string.IsNullOrEmpty(request.TransactionId))
@@ -161,7 +161,7 @@ public sealed class GamePayReceiptVerifier : IPayReceiptVerifier
     }
 
     /// <summary>
-    /// 汇总 Server API v2 新路径必需凭证缺失项（C271 fail-closed：缺任一即 Rejected，不外呼、不降级旧路径）
+    /// 汇总 Server API v2 新路径必需凭证缺失项（fail-closed：缺任一即 Rejected，不外呼、不降级旧路径）
     /// </summary>
     private static string GetMissingServerApiCredentials(ApplePaymentOptionSetting setting)
     {

@@ -6,10 +6,10 @@ using GameFrameX.Core.SqlSugar;
 using GameFrameX.Entity.Business.Game;
 using SqlSugar;
 
-// S3/C401 断链修复点
+// / 断链修复点
 namespace GameFrameX.Core.Tests.Online.Asset;
 
-// C340 / GFX-752（vault:C4 S3.7、VC-3.14）：资产交易详情查询服务契约自检。
+//  / （vault: .7、.14）：资产交易详情查询服务契约自检。
 // 覆盖：详情经 POST 通道带 TransactionId body 透传、Grant 明细列表映射、
 // 空 TransactionId 兜底拒绝、区服不归属目标 App 拒绝。
 public sealed class OnlineAssetTransactionQueryServiceTests : IDisposable

@@ -5,7 +5,7 @@ using GameFrameX.Core.Service;
 namespace GameFrameX.Client.Api.GameUserRank;
 
 /// <summary>
-/// 游戏玩家排行榜控制器（C9 排行域：RSGet*/RSQuery*/RSHeartBeat 9 op 自建）
+/// 游戏玩家排行榜控制器（排行域：RSGet*/RSQuery*/RSHeartBeat 9 op 自建）
 /// <para>路由：POST /api/GameUserRank/{Action}（继承 BaseController 基类路由）。</para>
 /// <para>分组模型：组按 RankType+ConfigKey+ConfigId+RoundToken 匹配（RoundToken = 报名时代币数），
 /// 组容量满自动开新组；机器人补位行同表存储，保证 GetAsync/Query/HeartBeat 三视图一致。</para>
@@ -43,7 +43,7 @@ public class GameUserRankController : BaseController
     }
 
     /// <summary>
-    /// 报名进榜（GFX-706 由 Get 更名 JoinRank，消除 GET 语义误导；原 RSGetBakeOutRank/GetMultiRank/GetWeeklyRank1/GetWeeklyRank2，四 op 同构收编）
+    /// 报名进榜（由 Get 更名 JoinRank，消除 GET 语义误导；原 RSGetBakeOutRank/GetMultiRank/GetWeeklyRank1/GetWeeklyRank2，四 op 同构收编）
     /// <para>找同轮次令牌的未满组入组（满了开新组），插入/更新本人行（四展示字段 + Score=Token），
     /// 机器人补位到榜单固定规模，组内按 Score 降序算名次后返回全组。</para>
     /// </summary>

@@ -1,5 +1,5 @@
 /**
- * 品牌主色色板（C254 / GFX-660）。
+ * 品牌主色色板。
  *
  * 品牌色取自项目 logo（src/assets/logo-mini.svg）采样最高频主色——深海蓝 #03538F，
  * 经 @primeuix/themes 的 palette() 生成 10 阶语义色阶（字面量固化，避免运行时依赖）。

@@ -1,6 +1,6 @@
 <template>
   <div class="crud-data-table">
-    <!-- 工具栏（change C146）：列设置齿轮 + 导出按钮。仅在有需要时渲染。 -->
+    <!-- 工具栏：列设置齿轮 + 导出按钮。仅在有需要时渲染。 -->
     <div v-if="showToolbar" class="crud-data-table-toolbar">
       <div class="crud-data-table-toolbar-left">
         <slot name="toolbar-left" />
@@ -75,7 +75,7 @@
       </template>
       <!-- 默认 slot 模式：未传 columns 时向后兼容，使用方继续手摆 <Column> -->
       <slot v-else />
-      <!-- 行展开插槽透传（C404）：使用方的 #expansion 需要直达内部 DataTable 才能渲染展开行；
+      <!-- 行展开插槽透传：使用方的 #expansion 需要直达内部 DataTable 才能渲染展开行；
            仅在使用方提供时启用，不影响其他页面 -->
       <template v-if="$slots.expansion" #expansion="expansionProps">
         <slot name="expansion" v-bind="expansionProps" />
@@ -192,7 +192,7 @@ const props = withDefaults(defineProps<{
   storageKey?: string
   /** 是否显示列设置齿轮按钮，默认 true（仅 columns 模式生效） */
   showColumnConfig?: boolean
-  /** 是否显示导出按钮，默认 false（显式 opt-in——后端 Export 端点是逐服务显式提供的（C147），
+  /** 是否显示导出按钮，默认 false（显式 opt-in——后端 Export 端点是逐服务显式提供的，
    *  未提供端点的页面显示按钮只会得到 404 死按钮；叠加 `${authPrefix}:export` 权限码） */
   showExport?: boolean
   /** 导出时携带的查询条件，应与 pageApi 入参一致（命中数据范围） */
@@ -221,7 +221,7 @@ const emit = defineEmits<{
 const dataTableRef = ref()
 const columnConfigPanelRef = ref()
 
-// ── 列配置 + 本地持久化（change C146） ──────────────────────────
+// ── 列配置 + 本地持久化 ──────────────────────────
 // 仅 columns 模式启用；slot 模式下 columnsList 为空，composable 内部无副作用。
 const columnsList = computed<CrudColumnConfig[]>(() => props.columns ?? [])
 const {
@@ -235,7 +235,7 @@ const {
 
 const hasColumns = computed(() => columnsList.value.length > 0)
 
-// ── 移动端列优先级过滤（change C252） ──────────────────────────
+// ── 移动端列优先级过滤 ──────────────────────────
 // 窄视口（< 768px，与 theme/breakpoints.scss bp-down(md) 一致）下隐藏
 // responsivePriority >= 2 的次要列，核心列（默认 1）直接可读。仅作用于渲染层，
 // 列设置面板 / 偏好持久化 / 导出均不受影响（导出走 visibleColumns）。
@@ -265,7 +265,7 @@ function onReset() {
   resetColumns()
 }
 
-// ── 导出前端层（change C146，对接后端 C147 契约） ────────────────
+// ── 导出前端层（对接后端 契约） ────────────────
 const exporting = ref(false)
 
 /** 工具栏整体显隐：任一按钮需要显示即渲染 */
@@ -276,7 +276,7 @@ const showToolbar = computed(() => (hasColumns.value && props.showColumnConfig) 
  * （动态路由 `${authPrefix}/export`），Blob 下载。
  *
  * 安全约束：sensitive 列在收集阶段即剔除（字段级数据权限），即便用户在列设置
- * 面板将其纳入可见集合也不会导出；导出列白名单由前端可见列决定，后端 C147
+ * 面板将其纳入可见集合也不会导出；导出列白名单由前端可见列决定，后端
  * 再做一次白名单投影兜底。
  */
 async function onExport() {
@@ -423,13 +423,13 @@ defineExpose({
     }
   }
 
-  // 移动端操作按钮只显示图标，隐藏文字（C143，阈值见 theme/breakpoints.scss）
+  // 移动端操作按钮只显示图标，隐藏文字（阈值见 theme/breakpoints.scss）
   @include bp-down(sm) {
     .crud-action-label {
       display: none;
     }
 
-    // 文字隐藏后按钮只剩图标，扩触控目标至 36px（GFX-661）
+    // 文字隐藏后按钮只剩图标，扩触控目标至 36px
     :deep(.p-datatable-tbody .p-button) {
       min-width: 36px;
       min-height: 36px;

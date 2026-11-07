@@ -4,7 +4,7 @@ using SqlSugar;
 namespace GameFrameX.Core.Extension;
 
 /// <summary>
-/// SqlSugar 雪花 ID 进程级接管初始化器（C361 / GFX-804）。
+/// SqlSugar 雪花 ID 进程级接管初始化器。
 /// <para>SqlSugar 对 long 主键的默认值插入回填经 <c>StaticConfig.CustomSnowFlakeFunc</c> 取号
 /// （反编译 SqlSugarCore 5.1.4.216 证实 <c>IdWorker.NextId()</c> 首先消费该 func，非空即 Invoke 返回）。
 /// 此前该 func 只在 <c>SqlSugarSetup.AddSqlSugar</c>（仅 Web.Api 装配）安装——Hub / Client

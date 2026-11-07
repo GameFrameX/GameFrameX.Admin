@@ -1,5 +1,5 @@
 /**
- * 配置灰度发布枚举选项（C343 / GFX-759 前端半边）。
+ * 配置灰度发布枚举选项（前端半边）。
  * 值域对齐后端 OnlineConfigRolloutKind（RemoteConfig=1/Announcement=2/DeviceGroup=3/ScheduledTask=4；
  * 邮件不参与灰度编排——后端枚举即无此值，前端不造第五项）。
  */

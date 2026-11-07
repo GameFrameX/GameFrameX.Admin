@@ -5,7 +5,7 @@ using GameFrameX.Payment.Apple.AppStoreServer.Models;
 namespace GameFrameX.Core.Tests.System;
 
 /// <summary>
-/// ComputerUtility.GetIpFromOnlineAsync（C200 异步化 + 内存缓存）与 AppStoreServerApiClient 兜底 HttpClient 校验的单元测试。
+/// ComputerUtility.GetIpFromOnlineAsync（异步化 + 内存缓存）与 AppStoreServerApiClient 兜底 HttpClient 校验的单元测试。
 /// </summary>
 public class ComputerUtilityGetIpFromOnlineTests
 {
@@ -74,7 +74,7 @@ public class ComputerUtilityGetIpFromOnlineTests
     [Fact]
     public void AppStoreServerApiClient_ThrowsWhenHttpClientNull()
     {
-        // C200：移除 new HttpClient() 兜底，未注入 HttpClient 必须显式失败而非静默新建。
+        // ：移除 new HttpClient() 兜底，未注入 HttpClient 必须显式失败而非静默新建。
 #pragma warning disable CS8625 // 测试意图：传入 null HttpClient 验证 ArgumentNullException
         Assert.Throws<ArgumentNullException>(() =>
                                                  new AppStoreServerApiClient("key", "keyId", "issuerId", "bundleId", ApplePayEnvironment.Production, null));

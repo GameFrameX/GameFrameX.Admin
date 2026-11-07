@@ -148,27 +148,27 @@ public class GameAreaResponse : IBasePageResponse<Entity.Business.Game.GameAreaE
     public string AppVersion { get; set; } = null!;
 
     /// <summary>
-    /// 客户端转发 Server HTTP 路由前缀（来源 change C150 §3.2 / C175）。默认 game/api。
+    /// 客户端转发 Server HTTP 路由前缀（来源 change /）。默认 game/api。
     /// </summary>
     public string ClientDispatchApiPrefix { get; set; } = "game/api";
 
     /// <summary>
-    /// 履约投递 Server HTTP 路由前缀（来源 change C150 §3.2 / C175）。默认 game/api。
+    /// 履约投递 Server HTTP 路由前缀（来源 change /）。默认 game/api。
     /// </summary>
     public string FulfillmentApiPrefix { get; set; } = "game/api";
 
     /// <summary>
-    /// GM 命令 Server HTTP 路由前缀（来源 change C150 §3.2 / C175）。默认空，空表示不构造 GM URL。
+    /// GM 命令 Server HTTP 路由前缀（来源 change /）。默认空，空表示不构造 GM URL。
     /// </summary>
     public string GmApiPrefix { get; set; } = null!;
 
     /// <summary>
-    /// 管理控制 Server HTTP 路由前缀（来源 change C150 §3.2 / C175）。默认空，空表示不构造控制 URL。
+    /// 管理控制 Server HTTP 路由前缀（来源 change /）。默认空，空表示不构造控制 URL。
     /// </summary>
     public string ControlApiPrefix { get; set; } = null!;
 
     /// <summary>
-    /// 是否允许客户端调试 GM 通道（Admin 配置标记，来源 change C150 §3.2 / C175）。
+    /// 是否允许客户端调试 GM 通道（Admin 配置标记，来源 change /）。
     /// </summary>
     public bool EnableClientGmApi { get; set; }
 

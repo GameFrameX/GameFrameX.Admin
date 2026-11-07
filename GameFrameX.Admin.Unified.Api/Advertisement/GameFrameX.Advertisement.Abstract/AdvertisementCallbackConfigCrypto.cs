@@ -5,7 +5,7 @@ using GameFrameX.Core.Service.Business;
 namespace GameFrameX.Advertisement.Abstract;
 
 /// <summary>
-/// 广告回调配置 ConfigJson 敏感字段级加解密收口（C371 / GFX-838，对齐 C370 ObjectStorageConfigCrypto）：
+/// 广告回调配置 ConfigJson 敏感字段级加解密收口（对齐 ObjectStorageConfigCrypto）：
 /// 写入侧在 NormalizeConfigJson 规范化之后、落库之前调用 <see cref="EncryptConfigJson"/>；
 /// 读取侧在构建回调验签上下文之前调用 <see cref="DecryptConfigJson"/>。
 /// <para>敏感字段集合由 Provider Schema 的 <c>Sensitive</c> 标记或 <c>Type == "secret"</c> 驱动（与表单脱敏 / 必填校验同源判定），

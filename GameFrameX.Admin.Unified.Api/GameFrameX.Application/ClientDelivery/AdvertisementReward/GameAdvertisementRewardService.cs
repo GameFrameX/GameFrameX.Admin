@@ -5,10 +5,10 @@ using GameFrameX.Application.ClientDelivery.AdvertisementReward.Dto;
 namespace GameFrameX.Application.ClientDelivery.AdvertisementReward;
 
 /// <summary>
-/// 广告奖励发放账本 Admin 查询服务（C114 / GFX-110 事实源的管理面跟进，MENU-P2-03 欠账清理）。
+/// 广告奖励发放账本 Admin 查询服务（事实源的管理面跟进，MENU-P2-03 欠账清理）。
 /// <para>只读：PageAsync（继承基类）/ GetAsync 详情（继承基类）/ ExportAsync 导出当前过滤列表（上限 1000 行，文件化由前端处理）。</para>
 /// <para>事实数据铁律：OnAddingAsync / OnUpdatingAsync 抛错关闭默认 AddAsync/UpdateAsync 端点，无 DeleteAsync 端点。</para>
-/// <para>高风险动作 RetryAsync / MarkProcessedAsync 涉及 C114 幂等状态机（同 IdempotencyKey 复用账本行从 Failed 翻回），
+/// <para>高风险动作 RetryAsync / MarkProcessedAsync 涉及 幂等状态机（同 IdempotencyKey 复用账本行从 Failed 翻回），
 /// 留待单独 change 落地；前端对应按钮已由 gameAdRewardEntity:retry / :markProcessed 权限码门控，未种码即隐藏。</para>
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]

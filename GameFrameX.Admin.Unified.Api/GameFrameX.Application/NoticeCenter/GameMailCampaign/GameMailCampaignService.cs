@@ -19,7 +19,7 @@ namespace GameFrameX.Application.NoticeCenter.GameMailCampaign;
 
 /// <summary>
 /// 运营邮件 Campaign 草稿/发布/撤回管理服务。路由前缀 /api/gameMailCampaignEntity（历史框架 去后缀 + lowerCamelCase）。
-/// <para>状态机 B1/B3/B4：Draft 可自由增删改与发布重试；Published/Revoked 主体不可编辑/删除（B1），仅 Published 可撤回（撤回不可逆 B3）；Server 拒绝落 Failed。</para>
+/// <para>状态机 //：Draft 可自由增删改与发布重试；Published/Revoked 主体不可编辑/删除，仅 Published 可撤回（撤回不可逆）；Server 拒绝落 Failed。</para>
 /// <para>与既有 <c>GameMailService</c>（直发 post_mail）是两套独立系统，不合并。</para>
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
@@ -79,7 +79,7 @@ public class GameMailCampaignService
     }
 
     /// <summary>
-    /// 更新前：仅 Draft 可编辑（Published/Revoked 主体不可变 B1）；AreaId 从既有实体回填不可变。
+    /// 更新前：仅 Draft 可编辑（Published/Revoked 主体不可变）；AreaId 从既有实体回填不可变。
     /// </summary>
     protected override async Task OnUpdatingAsync(UpdateGameMailCampaignEntityRequest input)
     {
@@ -103,7 +103,7 @@ public class GameMailCampaignService
     }
 
     /// <summary>
-    /// 删除：仅 Draft/Failed 可删除（Published/Revoked 主体不可删 B1）。
+    /// 删除：仅 Draft/Failed 可删除（Published/Revoked 主体不可删）。
     /// </summary>
     public override async Task DeleteAsync(BaseDeleteRequest input)
     {
@@ -143,7 +143,7 @@ public class GameMailCampaignService
 
     /// <summary>
     /// 发布 Campaign：调用 Server publish。Ok 时回写 ServerCampaignId/PublishVersion/PublishedTime 并置 Published；非 Ok 时置 Failed 并记录 LastServerCode/Message，抛出友好错误。
-    /// <para>仅 Draft/Failed 可发布（Published/Revoked 主体不可重复发布 B1）。</para>
+    /// <para>仅 Draft/Failed 可发布（Published/Revoked 主体不可重复发布）。</para>
     /// </summary>
     [HttpPost]
     [ApiDescriptionSettings(Name = "Publish")]
@@ -213,7 +213,7 @@ public class GameMailCampaignService
     }
 
     /// <summary>
-    /// 撤回 Campaign：调用 Server revoke。仅 Published 可撤回（撤回不可逆 B3，已发放资产不回滚）。Ok 时回写 RevokedTime/RevokeOperator 并置 Revoked。
+    /// 撤回 Campaign：调用 Server revoke。仅 Published 可撤回（撤回不可逆，已发放资产不回滚）。Ok 时回写 RevokedTime/RevokeOperator 并置 Revoked。
     /// </summary>
     [HttpPost]
     [ApiDescriptionSettings(Name = "Revoke")]
@@ -260,7 +260,7 @@ public class GameMailCampaignService
     }
 
     /// <summary>
-    /// 经 Online 统一下发当前 Campaign（来源 change C343 / vault:C8 S7.7，方案C）：转调 OnlineLiveOpsDispatchService 单一入口（publish_mail_campaign 通道）。
+    /// 经 Online 统一下发当前 Campaign（来源 change / vault: .7，方案C）：转调 OnlineLiveOpsDispatchService 单一入口（publish_mail_campaign 通道）。
     /// <para>邮件不重复下发：单一入口只收 Published（同目标 ServerId==AreaId 合并返回首次发布回执）；Draft/Failed/Revoked 拒绝并指引走本服务 publish 链路。</para>
     /// </summary>
     [HttpPost("dispatchOnline")]
@@ -279,7 +279,7 @@ public class GameMailCampaignService
     }
 
     /// <summary>
-    /// 解析目标区服（调用 Server 接口的目标地址由区服 HttpManageUrl + FulfillmentApiPrefix 承载，来源 change C175）。
+    /// 解析目标区服（调用 Server 接口的目标地址由区服 HttpManageUrl + FulfillmentApiPrefix 承载，来源 change）。
     /// </summary>
     private async Task<Entity.Business.Game.GameAreaEntity> ResolveAreaAsync(long areaId)
     {
@@ -377,7 +377,7 @@ public class GameMailCampaignService
     }
 
     /// <summary>
-    /// Server 业务码 → Admin ErrorCode（C119）映射。
+    /// Server 业务码 → Admin ErrorCode映射。
     /// </summary>
     private static MailCampaignErrorCode MapServerCodeToErrorCode(MailCampaignServerCode code)
     {

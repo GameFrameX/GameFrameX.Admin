@@ -25,7 +25,7 @@ export interface OnlineAssetAuditEntryResponse {
   occurredAt?: number;
 }
 
-/** 资产审计分页响应（Cursor + HasMore，vault:C2 S1.2；透传 Online 游标语义）。 */
+/** 资产审计分页响应（Cursor + HasMore，vault: .2；透传 Online 游标语义）。 */
 export interface OnlineAssetAuditPageResponse {
   /** 当前页审计行。 */
   items?: OnlineAssetAuditEntryResponse[] | null;
@@ -36,7 +36,7 @@ export interface OnlineAssetAuditPageResponse {
 }
 
 /**
- * 资产审计分页查询输入参数（操作者/时间/作用域/命令类型 + 目标玩家；Cursor 翻页，vault:C2 S1.2）。
+ * 资产审计分页查询输入参数（操作者/时间/作用域/命令类型 + 目标玩家；Cursor 翻页，vault: .2）。
  *
  * ServerId 必填；审计查询无跨区服聚合端点。
  */
@@ -91,11 +91,11 @@ export interface OnlineAssetAuditQueryPagePostData {
   code: number;
   /** 错误或提示信息 */
   message: string;
-  /** 资产审计分页响应（Cursor + HasMore，vault:C2 S1.2；透传 Online 游标语义）。 */
+  /** 资产审计分页响应（Cursor + HasMore，vault: .2；透传 Online 游标语义）。 */
   data: OnlineAssetAuditPageResponse;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;

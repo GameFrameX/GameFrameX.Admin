@@ -129,7 +129,7 @@ public sealed class ClientApiEndpointCoverageTests
 
                 var httpMethod = httpAttribute.HttpMethods.Single().ToUpperInvariant();
                 var actionRoute = httpAttribute.Template;
-                // C300（GFX-708）：controller 自身显式声明 [Route] 时路由前缀以声明为准（如改名后锁定旧路径的
+                // ：controller 自身显式声明 [Route] 时路由前缀以声明为准（如改名后锁定旧路径的
                 // GameAnnouncementController）；未声明的沿用基类 token 惯例 api/{controllerName}
                 var declaredRoute = controllerType.GetCustomAttributes<RouteAttribute>(false).SingleOrDefault();
                 var routePrefix = declaredRoute == null

@@ -3,7 +3,7 @@ using GameFrameX.Entity.Enum;
 namespace GameFrameX.Application.CommerceCenter.GameOrderFulfillment.Dto;
 
 /// <summary>
-/// 权益发货账本输出参数（C120）。投影暴露实体全字段：
+/// 权益发货账本输出参数。投影暴露实体全字段：
 /// Type/Status/FailureReason/IdempotencyKey/OperatorId/ItemsJson/订单快照（OrderId/PayChannel/ProviderTransactionId/Sku/RoleId/AreaId/AccountId/Amount）/审计列。
 /// </summary>
 public class GameOrderFulfillmentResponse : IBasePageResponse<Entity.Business.Game.GameOrderFulfillmentEntity>

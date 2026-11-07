@@ -4,9 +4,9 @@ namespace GameFrameX.Entity.Business.Game.App;
 
 /// <summary>
 /// 应用开放访问凭证。
-/// <para>物理表名由类名下划线化推导为 <c>game_app_open_access_entity</c>（C34 契约：受管实体 <c>SugarTable</c> 首参为 <c>null</c>，不硬编码表名）。</para>
+/// <para>物理表名由类名下划线化推导为 <c>game_app_open_access_entity</c>（契约：受管实体 <c>SugarTable</c> 首参为 <c>null</c>，不硬编码表名）。</para>
 /// <para>对称平台级 <see cref="Entity.System.SystemOpenAccessEntity"/>：System = 平台开放接口身份，GameApp = 应用机器凭证。</para>
-/// <para>鉴权走 Hub.Api <c>GameAppOpenAccessAuthMiddleware</c>（HMAC-SHA256 签名 + Scopes 接口范围校验），与 SystemOpenAccessEntity 的 C181 Signature scheme 独立共存。</para>
+/// <para>鉴权走 Hub.Api <c>GameAppOpenAccessAuthMiddleware</c>（HMAC-SHA256 签名 + Scopes 接口范围校验），与 SystemOpenAccessEntity 的 Signature scheme 独立共存。</para>
 /// </summary>
 [SugarTable(null, "应用开放访问凭证")]
 [BusinessTable]
@@ -56,7 +56,7 @@ public class GameAppOpenAccessEntity : EntityBasic
     public string AccessKey { get; set; } = null!;
 
     /// <summary>
-    /// 访问密钥。C371（GFX-838）起经 <c>SecretCrypto</c> 密文落库（HMAC-SHA256 签名验证需服务端持有可逆共享密钥）。
+    /// 访问密钥。起经 <c>SecretCrypto</c> 密文落库（HMAC-SHA256 签名验证需服务端持有可逆共享密钥）。
     /// <para>签发 / 轮换时仅返回一次明文，列表 / 详情不得输出。</para>
     /// </summary>
     [SugarColumn(ColumnDescription = "访问Secret", Length = EntityStringLength.Length512)]

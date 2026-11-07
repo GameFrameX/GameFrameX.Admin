@@ -1,7 +1,7 @@
 namespace GameFrameX.Core.Bootstrap
 {
     /// <summary>
-    /// 崩溃退出兜底 watchdog（C381 / GFX-873）。
+    /// 崩溃退出兜底 watchdog。
     /// <para>背景：.NET 10 linux/arm64 容器存在运行时异常传播路径僵死——逃逸 Program.Main 的未处理异常
     /// 不终止进程，主线程 100% CPU 卡在异常 unwind 且运行时崩溃 banner 从未打印，容器 restart 策略
     /// 依赖进程退出而永不触发（一次瞬态崩溃升级为永久 unhealthy）。本组件在崩溃路径上武装超时强退：

@@ -5,10 +5,10 @@ namespace GameFrameX.Application.PlayerCenter.GameUser;
 /// <summary>
 /// 玩家账号密码哈希服务：纯 Argon2id（每用户随机盐 + OWASP 推荐成本参数，PHC 自描述格式）。
 /// <para>复用 Foundation <see cref="PasswordHashHelper"/>；玩家 Password / EmailPassword 列一律以 <c>$argon2id$</c> PHC 串存储。</para>
-/// <para>系统未上线、无存量玩家数据，故不留 PBKDF2/MD5 fallback、不做懒升级、不做兼容窗口（C198 → C215 迁移）。</para>
+/// <para>系统未上线、无存量玩家数据，故不留 PBKDF2/MD5 fallback、不做懒升级、不做兼容窗口（→ 迁移）。</para>
 /// <para>服务本身无状态；登记为 Scoped（Admin / Hub 侧经 AddProjectDependencyInjection 的 ScopedTypes 白名单，
 /// Client.Api 侧手动 AddScoped），两侧注入同一实现。</para>
-/// <para>Hash/Verify 入口对 null 明文统一按空串处理（兼容 C198 既有测试矩阵 + 防止上层漏校验时 Foundation 抛
+/// <para>Hash/Verify 入口对 null 明文统一按空串处理（兼容 既有测试矩阵 + 防止上层漏校验时 Foundation 抛
 /// ArgumentNullException）；null storedHash 在 Verify 中直接返回 false（Foundation Verify 对 null 抛）。</para>
 /// </summary>
 public class GameUserPasswordService

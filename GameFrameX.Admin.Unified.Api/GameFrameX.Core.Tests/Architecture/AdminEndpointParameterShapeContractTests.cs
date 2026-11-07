@@ -9,21 +9,21 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GameFrameX.Core.Tests.Architecture;
 
-// C352（GFX-770）：Admin API 端点参数形状契约测试。规范正文：gfx-doc/agent-handbook/admin-api-action-style.md §4 参数绑定（单一事实来源）。
-// 规则（GFX-770 全量反射扫描方法论固化）：
-//   合规形状 —— 0 参数；单简单类型（基元/enum/string/Guid/decimal/日期时间，GET 路径段特例）；
-//              单 IFormFile / IFormFile 集合（multipart 文件上传原生形态，不可对象化）；
-//              单 Request DTO（类型名以 Request/Input 结尾；泛型取泛型定义名，如 DataExportRequest<TQuery>）
-//   违规形状 —— 参数 ≥ 2（散参数 / body+query 混合绑定）；
-//              入参为 object/dynamic/ExpandoObject/IDynamicMetaObjectProvider（动态参数零容忍）；
-//              入参为 *Entity（Entity 直传：审计与软删除等系统字段进入请求契约构成越权攻击面，C228 入参侧对偶）
+// ：Admin API 端点参数形状契约测试。规范正文：gfx-doc/agent-handbook/admin-api-action-style.md 参数绑定（单一事实来源）。
+// 规则（全量反射扫描方法论固化）：
+//  合规形状 —— 0 参数；单简单类型（基元/enum/string/Guid/decimal/日期时间，GET 路径段特例）；
+//  单 IFormFile / IFormFile 集合（multipart 文件上传原生形态，不可对象化）；
+//  单 Request DTO（类型名以 Request/Input 结尾；泛型取泛型定义名，如 DataExportRequest<TQuery>）
+//  违规形状 —— 参数 ≥ 2（散参数 / body+query 混合绑定）；
+//  入参为 object/dynamic/ExpandoObject/IDynamicMetaObjectProvider（动态参数零容忍）；
+//  入参为 *Entity（Entity 直传：审计与软删除等系统字段进入请求契约构成越权攻击面， 入参侧对偶）
 // 扫描范围：三程序集（Application.Platform / Application.Platform / Core.Service）全部 concrete IAdminApiController 实现，
-//          方法枚举含继承链（覆盖 GenericCrudService<,,,,> 泛型族基类 action 的实例化入参），
-//          过滤 [NonAction] / IsSpecialName / object 声明；违规按声明类名归因（泛型取泛型定义名）。
+//  方法枚举含继承链（覆盖 GenericCrudService<,,,,> 泛型族基类 action 的实例化入参），
+//  过滤 [NonAction] / IsSpecialName / object 声明；违规按声明类名归因（泛型取泛型定义名）。
 // 双向断言：违规 ⊆ 例外清单（防新增）且例外清单 ⊆ 违规（防僵尸条目，参照 AdminActionStyleContractTests 模式）；例外清单只减不增。
 public sealed class AdminEndpointParameterShapeContractTests
 {
-    // ============ 例外清单：issue 4 条整改完成后的存量（GFX-770 清单外新确认，后续独立 change 清零） ============
+    // ============ 例外清单：issue 4 条整改完成后的存量（清单外新确认，后续独立 change 清零） ============
 
     private static readonly HashSet<string> ParameterShapeLegacy = new(StringComparer.Ordinal)
     {
@@ -33,7 +33,7 @@ public sealed class AdminEndpointParameterShapeContractTests
         "FileService.UploadFileAsync",
         // 3 散参（message/title/isHtml，平台系统邮件发送）
         "SystemMessageService.SendEmailAsync",
-        // Entity 直传入参（UserEntity，与 GFX-770 已整改的 WechatUser 同性质越权攻击面）
+        // Entity 直传入参（UserEntity，与 已整改的 WechatUser 同性质越权攻击面）
         "UserService.UpdateBaseInfoAsync",
     };
 

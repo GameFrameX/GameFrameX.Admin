@@ -5,14 +5,14 @@ using GameFrameX.Entity.Business.Game.Online;
 namespace GameFrameX.Application.GmCenter.LiveOps.Dispatch;
 
 /// <summary>
-/// LiveOps 统一下发单一入口契约（来源 change C343 / vault:C8 S7.7）。
+/// LiveOps 统一下发单一入口契约（来源 change / vault: .7）。
 /// <para>
-/// 单一入口铁律：Application.Platform 业务层仅本实现注入 <c>IOnlineServerClient</c>（除 C339 既有管理通道外）；
+/// 单一入口铁律：Application.Platform 业务层仅本实现注入 <c>IOnlineServerClient</c>（除 既有管理通道外）；
 /// 分群同步 / 灰度发布与回滚 / 既有运营域页面的「经 Online 下发」动作一律经本接口转调，
 /// 禁止旁路自建 HTTP 直连 Online Runtime。接口存在是为了单测 fake 注入（同 <c>IMailCampaignServerClient</c> 范式）。
 /// </para>
 /// <para>
-/// 五类来源路由（Online admin API 命令名，冻结于 change.md A0 契约对齐块）：
+/// 五类来源路由（Online admin API 命令名，冻结于 契约对齐块）：
 /// RemoteConfig→publishRemoteConfig / DeviceGroup→syncDeviceGroup / ScheduledTask→syncScheduledTask /
 /// Announcement→pushAnnouncement / MailCampaign→既有 publish 链路（publish_mail_campaign，方案C 合并语义）；
 /// 分群同步与灰度发布/回滚为内部通道（syncPlayerSegment / publishConfigRollout / rollbackConfigRollout）。

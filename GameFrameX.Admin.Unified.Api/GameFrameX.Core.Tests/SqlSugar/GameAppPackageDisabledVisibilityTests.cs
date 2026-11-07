@@ -5,7 +5,7 @@ using SqlSugar;
 namespace GameFrameX.Core.Tests.SqlSugar;
 
 /// <summary>
-/// BLA-28 / C67 回归测试：验证全局 ISafeEnabledFilter 会隐藏 IsEnabled==false 的分包，
+///  / 回归测试：验证全局 ISafeEnabledFilter 会隐藏 IsEnabled==false 的分包，
 /// 而 .Filter(null, true) 绕过 + 手动补 IsDeleted==false + 搜索过滤 WhereIF（BuildPageQuery/SetStatusAsync 采用的模式）
 /// 能让禁用分包重新可见且不破坏软删除排除与搜索过滤语义。
 /// 复刻生产过滤器注册（ConfigureBaseFilters + ConfigureClientFilters），用 Sqlite 内存文件库做端到端查询验证。
@@ -24,7 +24,7 @@ public sealed class GameAppPackageDisabledVisibilityTests : IDisposable
         };
         SqlSugarUnifiedConfig.ConfigureBaseSettings(config);
         _db = new SqlSugarScope(config);
-        // 复刻生产全局过滤器：软删除 + 启用/禁用（ISafeEnabledFilter 即 BLA-28 根因）。
+        // 复刻生产全局过滤器：软删除 + 启用/禁用（ISafeEnabledFilter 即 根因）。
         SqlSugarUnifiedConfig.ConfigureBaseFilters(_db);
         SqlSugarUnifiedConfig.ConfigureClientFilters(_db);
         _db.CodeFirst.InitTables(typeof(GameAppPackageEntity));

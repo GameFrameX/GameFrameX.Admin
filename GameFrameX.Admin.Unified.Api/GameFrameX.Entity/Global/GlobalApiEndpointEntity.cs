@@ -4,7 +4,7 @@ using GameFrameX.Entity.Routing;
 namespace GameFrameX.Entity.Global;
 
 /// <summary>
-/// API 端点权限表（U6/C42）。
+/// API 端点权限表。
 /// <para>每个 ASP.NET Core MVC 发现的 Admin API 端点一行，即一个按钮级权限点。Id 为 DB 代理主键（稳定身份，不由路径派生）；
 /// RoutePath 为规范化路由（可变，仅用于启动对账），<b>不</b>作为授权令牌。授权令牌是按钮 MenuId。</para>
 /// </summary>

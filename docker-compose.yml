@@ -2,23 +2,23 @@
 # GameFrameX Admin —— Docker Compose 统一部署配置（单仓整合版，2026-10-20 起为唯一 compose）
 # =====================================================================================
 # 【快速开始】在 仓库根目录 打开终端执行：
-#   docker compose up -d                # 构建镜像并后台启动全部服务（第一次会比较慢）
-#   docker compose ps                   # 查看运行状态，全部显示 healthy 即正常
-#   docker logs -f gameframex-web-api # 跟踪某个服务日志（Ctrl+C 退出跟踪，不影响服务）
-#   docker compose down                 # 停止并删除容器（数据库数据保留）
-#   docker compose down -v              # 停止并【删除所有数据】！数据库会清空，慎用
+#  docker compose up -d # 构建镜像并后台启动全部服务（第一次会比较慢）
+#  docker compose ps # 查看运行状态，全部显示 healthy 即正常
+#  docker logs -f gameframex-web-api # 跟踪某个服务日志（Ctrl+C 退出跟踪，不影响服务）
+#  docker compose down # 停止并删除容器（数据库数据保留）
+#  docker compose down -v # 停止并【删除所有数据】！数据库会清空，慎用
 #
 # 【改了代码怎么生效】需要重新构建镜像：
-#   docker compose up -d --build            # 全部重建
-#   docker compose up -d --build web-api  # 只重建某个服务（前端改动不影响后端层缓存）
+#  docker compose up -d --build # 全部重建
+#  docker compose up -d --build web-api # 只重建某个服务（前端改动不影响后端层缓存）
 #
 # 【配置覆盖规则】本文件中所有 ${变量:-默认值} 的含义：
-#   优先读取 仓库根 .env 文件里的同名变量，没有才用冒号后面的默认值。
-#   例：新建 .env 文件写入一行  POSTGRES_PASSWORD=我的密码  即可覆盖默认密码，本文件无需改动。
+#  优先读取 仓库根 .env 文件里的同名变量，没有才用冒号后面的默认值。
+#  例：新建 .env 文件写入一行 POSTGRES_PASSWORD=我的密码 即可覆盖默认密码，本文件无需改动。
 # =====================================================================================
 
 # ─────────────────────────────────────────────────────────────────
-# 共享数据库配置模板（C279：DBTYPE/CONNECTIONSTRING 成对覆盖、单一入口管线，经 YAML anchor 合并进各 service environment；
+# 共享数据库配置模板（DBTYPE/CONNECTIONSTRING 成对覆盖、单一入口管线，经 YAML anchor 合并进各 service environment；
 # 值由 .env 的 POSTGRES_HOST/PORT/USER/PASSWORD 插值，覆盖能力不变）
 #
 # 【这是什么】YAML 锚点（模板）：下面 web-api / client-api / hub-api 三个服务的
@@ -29,24 +29,24 @@ x-main-db: &main-db
   # 数据库类型，当前使用 PostgreSQL，一般不需要改
   DBTYPE: PostgreSQL
   # 主库连接串（三个 API 共用）。各字段含义：
-  #   Host=postgres   → 数据库地址。postgres 是下方 postgres 服务在容器网络里的名字，
-  #                      不要改成 localhost（容器里的 localhost 是容器自己，连不到数据库）；
-  #                      要连接宿主机上已安装的 PostgreSQL 时改为 host.docker.internal
-  #   Port            → 数据库端口，与下方 postgres 服务保持一致
-  #   Database        → 业务主库库名（由 init.sql 预建，启动时会自动补建缺失的库）
-  #   Username/Password → 登录账号/密码，默认值与下方 postgres 服务的初始化账号一致
+  #  Host=postgres → 数据库地址。postgres 是下方 postgres 服务在容器网络里的名字，
+  #  不要改成 localhost（容器里的 localhost 是容器自己，连不到数据库）；
+  #  要连接宿主机上已安装的 PostgreSQL 时改为 host.docker.internal
+  #  Port → 数据库端口，与下方 postgres 服务保持一致
+  #  Database → 业务主库库名（由 init.sql 预建，启动时会自动补建缺失的库）
+  #  Username/Password → 登录账号/密码，默认值与下方 postgres 服务的初始化账号一致
   CONNECTIONSTRING: "Host=${POSTGRES_HOST:-postgres};Port=${POSTGRES_PORT:-5432};Database=gameframex_admin;Username=${POSTGRES_USER:-gameframex};Password=${POSTGRES_PASSWORD:-GameFrameX@Local2026}"
-  # 运行凭证静态加密密钥（C370/C371，签名/会话/票据私钥/邮件/广告/支付等敏感列以 enc:sec:v1: 密文落库）：
-  #   留空 = 降级模式（明文直存/直读，功能不阻断）；设置后三 host 必须同值，且不得再变更
-  #   （密钥丢失 = 存量密文不可解）。同样写入根 .env（GAMEFRAMEX_SECRET_ENCRYPTION_KEY=...）。
+  # 运行凭证静态加密密钥（签名/会话/票据私钥/邮件/广告/支付等敏感列以 enc:sec:v1: 密文落库）：
+  #  留空 = 降级模式（明文直存/直读，功能不阻断）；设置后三 host 必须同值，且不得再变更
+  #  （密钥丢失 = 存量密文不可解）。同样写入根 .env（GAMEFRAMEX_SECRET_ENCRYPTION_KEY=...）。
   GAMEFRAMEX_SECRET_ENCRYPTION_KEY: ${GAMEFRAMEX_SECRET_ENCRYPTION_KEY:-}
 
 # 【修改数据库密码的完整步骤】（重要：只改本文件不生效！）
-#   POSTGRES_PASSWORD 只在数据卷「第一次初始化」时生效，已有数据的老库不会跟着变。
-#   ① 先改库内实际密码（执行一次即可）：
-#      docker exec -it gameframex-postgres psql -U gameframex -c "ALTER USER gameframex WITH PASSWORD '新密码';"
-#   ② 再把本文件两处旧密码默认值（上方 Password= 与下方 postgres 服务的 POSTGRES_PASSWORD=）改成新密码
-#   ③ 重新应用：docker compose up -d
+#  POSTGRES_PASSWORD 只在数据卷「第一次初始化」时生效，已有数据的老库不会跟着变。
+#  ① 先改库内实际密码（执行一次即可）：
+#  docker exec -it gameframex-postgres psql -U gameframex -c "ALTER USER gameframex WITH PASSWORD '新密码';"
+#  ② 再把本文件两处旧密码默认值（上方 Password= 与下方 postgres 服务的 POSTGRES_PASSWORD=）改成新密码
+#  ③ 重新应用：docker compose up -d
 # =====================================================================================
 
 # ─────────────────────────────────────────────────────────────────
@@ -55,9 +55,9 @@ x-main-db: &main-db
 # 【这是什么】OTLP 统一三信号（traces / metrics / logs，logs 自动入 Loki）上报 Grafana Cloud。
 # 【默认状态】三个值默认为空 = 不启用遥测，与未接入前行为一致，不影响现有部署。
 # 【怎么启用】在仓库根 .env 文件写入下面三行（凭证不进 git）：
-#   OTEL_ENDPOINT=https://otlp-gateway-prod-<region>.grafana.net/otlp
-#   OTEL_USER=<Grafana Cloud Stack 的 Instance ID 数字>
-#   OTEL_API_KEY=<Grafana Cloud API Key / glc_ token>
+#  OTEL_ENDPOINT=https://otlp-gateway-prod-<region>.grafana.net/otlp
+#  OTEL_USER=<Grafana Cloud Stack 的 Instance ID 数字>
+#  OTEL_API_KEY=<Grafana Cloud API Key / glc_ token>
 # 然后 docker compose up -d（已启动的 restart 即可）。凭证获取：Grafana Cloud Portal
 # (grafana.com) → Stack 卡片 → OpenTelemetry 页显示 endpoint 与 Instance ID；
 # API Key 在 Portal → API Keys（Role: MetricsPublisher）或 Access Policies → Create token。
@@ -95,8 +95,8 @@ services:
       # 时区：让数据库日志时间与本地一致
       - TZ=Asia/Shanghai
     # 端口映射，格式 "宿主机端口:容器端口"：
-    #   左边是宿主机端口，可用 .env 的 POSTGRES_PORT 覆盖（本机 5432 被占用时改它）；
-    #   右边是容器内 PostgreSQL 端口，不要改。
+    #  左边是宿主机端口，可用 .env 的 POSTGRES_PORT 覆盖（本机 5432 被占用时改它）；
+    #  右边是容器内 PostgreSQL 端口，不要改。
     # 注意：映射到宿主机后，同一局域网的设备都能尝试连接，请保持密码有一定强度。
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
@@ -143,7 +143,7 @@ services:
       # Swagger 在 Production 容器内显式开启（代码默认仅 Development 暴露，见 Startup.Configure）
       # 访问地址 http://localhost:20802/swagger；对外正式部署如不想暴露接口文档，删除本行即可
       Swagger__Enabled: "true"
-      # 新装首个业务管理员种子引导（C406 / F3）：两个变量成对设置且库中尚无业务管理员时，
+      # 新装首个业务管理员种子引导：两个变量成对设置且库中尚无业务管理员时，
       # web-api 启动期自动创建该账号并绑定 sys_admin 角色；不设默认值，取值见 .env 注释
       GAMEFRAMEX_ADMIN_INITIAL_ACCOUNT: ${GAMEFRAMEX_ADMIN_INITIAL_ACCOUNT:-}
       GAMEFRAMEX_ADMIN_INITIAL_PASSWORD: ${GAMEFRAMEX_ADMIN_INITIAL_PASSWORD:-}
@@ -171,7 +171,7 @@ services:
       start_period: 40s
 
   # ═══════════════════════ 客户端 API（端口 20808）═══════════════════════
-  # 面向游戏客户端的接口服务；主库连接同走 DBTYPE/CONNECTIONSTRING 单一入口（C269）
+  # 面向游戏客户端的接口服务；主库连接同走 DBTYPE/CONNECTIONSTRING 单一入口
   client-api:
     build:
       context: ./GameFrameX.Admin.Unified.Api
@@ -212,7 +212,7 @@ services:
       start_period: 40s
 
   # ═══════════════════════ Hub API（端口 20806）═══════════════════════
-  # 面向长连接/推送的 Hub 服务；主库连接同走 DBTYPE/CONNECTIONSTRING 单一入口（C269）
+  # 面向长连接/推送的 Hub 服务；主库连接同走 DBTYPE/CONNECTIONSTRING 单一入口
   hub-api:
     build:
       context: ./GameFrameX.Admin.Unified.Api

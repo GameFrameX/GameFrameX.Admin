@@ -27,7 +27,7 @@ export const useUserInfoStore = defineStore('userInfo', {
         // 	this.constList = res.data.data ?? [];
         // 	return this.constList;
         // },
-        // 超管判定单一事实来源（C335/GFX-744）：accountType=999 为平台超管。
+        // 超管判定单一事实来源：accountType=999 为平台超管。
         // 路由守卫 / 顶栏用户菜单 / 应用驾驶舱等调用方一律读此 getter，不得散写 999 字面判定；
         // 唯一例外：getApiUserInfo 内 hydrate 前读 API payload 的判定（赋值前 getter 不可用）。
         isSuperAdmin: (state) => Number(state.userInfos?.accountType) === 999,

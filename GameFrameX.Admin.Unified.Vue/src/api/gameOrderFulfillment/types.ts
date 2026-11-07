@@ -24,7 +24,7 @@ export enum FulfillmentStatusEnum {
 }
 
 /**
- * 权益发货账本高风险动作输入参数（C120）：RefundAsync / CompensateAsync / ResendAsync 共用。
+ * 权益发货账本高风险动作输入参数：RefundAsync / CompensateAsync / ResendAsync 共用。
  * 兼作 GenericCrudService 的 TAddRequest（AddAsync 端点已由 OnAddingAsync 抛错关闭，与 GameOrderService 复用 AddInput 于 SendAsync 同款）。
  */
 export interface FulfillmentActionRequest {
@@ -39,7 +39,7 @@ export interface FulfillmentActionRequest {
 }
 
 /**
- * 权益发货账本高风险动作输出（C223 / GFX-644，U9 信封统一后为三 host 通用）：RefundAsync / CompensateAsync / ResendAsync 成功响应的 data 对象契约。
+ * 权益发货账本高风险动作输出（信封统一后为三 host 通用）：RefundAsync / CompensateAsync / ResendAsync 成功响应的 data 对象契约。
  * Admin 端点返回本对象交 AdminResultFilter 自动包装 HttpJsonResultData，失败走 BusinessException 统一错误路径。
  */
 export interface FulfillmentActionResponse {
@@ -49,7 +49,7 @@ export interface FulfillmentActionResponse {
 }
 
 /**
- * 权益发货账本输出参数（C120）。投影暴露实体全字段：
+ * 权益发货账本输出参数。投影暴露实体全字段：
  * Type/Status/FailureReason/IdempotencyKey/OperatorId/ItemsJson/订单快照（OrderId/PayChannel/ProviderTransactionId/Sku/RoleId/AreaId/AccountId/Amount）/审计列。
  */
 export interface GameOrderFulfillmentResponse {
@@ -121,7 +121,7 @@ export interface GameOrderFulfillmentResponseSqlSugarPagedList {
   hasNextPage?: boolean;
 }
 
-/** 权益发货账本分页查询输入参数（C120）。过滤字段严格锁定见 change C120 §3 BuildPageQuery 表。 */
+/** 权益发货账本分页查询输入参数。过滤字段严格锁定见 change BuildPageQuery 表。 */
 export interface PageGameOrderFulfillmentEntityRequest {
   searchKey?: string | null;
   /**
@@ -163,7 +163,7 @@ export interface PageGameOrderFulfillmentEntityRequest {
 }
 
 /**
- * 权益发货账本更新输入参数（C120）。仅满足 GenericCrudService 的 TUpdateRequest 泛型约束；
+ * 权益发货账本更新输入参数。仅满足 GenericCrudService 的 TUpdateRequest 泛型约束；
  * UpdateAsync 端点已由 OnUpdatingAsync 抛错关闭（账本为事实数据，不支持修改）。
  */
 export interface UpdateGameOrderFulfillmentEntityRequest {
@@ -188,13 +188,13 @@ export interface GameOrderFulfillmentAddPostData {
   /** 错误或提示信息 */
   message: string;
   /**
-   * 权益发货账本输出参数（C120）。投影暴露实体全字段：
+   * 权益发货账本输出参数。投影暴露实体全字段：
    * Type/Status/FailureReason/IdempotencyKey/OperatorId/ItemsJson/订单快照（OrderId/PayChannel/ProviderTransactionId/Sku/RoleId/AreaId/AccountId/Amount）/审计列。
    */
   data: GameOrderFulfillmentResponse;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;
@@ -215,13 +215,13 @@ export interface GameOrderFulfillmentCompensatePostData {
   /** 错误或提示信息 */
   message: string;
   /**
-   * 权益发货账本高风险动作输出（C223 / GFX-644，U9 信封统一后为三 host 通用）：RefundAsync / CompensateAsync / ResendAsync 成功响应的 data 对象契约。
+   * 权益发货账本高风险动作输出（信封统一后为三 host 通用）：RefundAsync / CompensateAsync / ResendAsync 成功响应的 data 对象契约。
    * Admin 端点返回本对象交 AdminResultFilter 自动包装 HttpJsonResultData，失败走 BusinessException 统一错误路径。
    */
   data: FulfillmentActionResponse;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;
@@ -244,13 +244,13 @@ export interface GameOrderFulfillmentDetailGetData {
   /** 错误或提示信息 */
   message: string;
   /**
-   * 权益发货账本输出参数（C120）。投影暴露实体全字段：
+   * 权益发货账本输出参数。投影暴露实体全字段：
    * Type/Status/FailureReason/IdempotencyKey/OperatorId/ItemsJson/订单快照（OrderId/PayChannel/ProviderTransactionId/Sku/RoleId/AreaId/AccountId/Amount）/审计列。
    */
   data: GameOrderFulfillmentResponse;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;
@@ -273,7 +273,7 @@ export interface GameOrderFulfillmentExportPostData {
   data: GameOrderFulfillmentResponse[];
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;
@@ -296,7 +296,7 @@ export interface GameOrderFulfillmentPagePostData {
   data: GameOrderFulfillmentResponseSqlSugarPagedList;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;
@@ -317,13 +317,13 @@ export interface GameOrderFulfillmentRefundPostData {
   /** 错误或提示信息 */
   message: string;
   /**
-   * 权益发货账本高风险动作输出（C223 / GFX-644，U9 信封统一后为三 host 通用）：RefundAsync / CompensateAsync / ResendAsync 成功响应的 data 对象契约。
+   * 权益发货账本高风险动作输出（信封统一后为三 host 通用）：RefundAsync / CompensateAsync / ResendAsync 成功响应的 data 对象契约。
    * Admin 端点返回本对象交 AdminResultFilter 自动包装 HttpJsonResultData，失败走 BusinessException 统一错误路径。
    */
   data: FulfillmentActionResponse;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;
@@ -344,13 +344,13 @@ export interface GameOrderFulfillmentResendPostData {
   /** 错误或提示信息 */
   message: string;
   /**
-   * 权益发货账本高风险动作输出（C223 / GFX-644，U9 信封统一后为三 host 通用）：RefundAsync / CompensateAsync / ResendAsync 成功响应的 data 对象契约。
+   * 权益发货账本高风险动作输出（信封统一后为三 host 通用）：RefundAsync / CompensateAsync / ResendAsync 成功响应的 data 对象契约。
    * Admin 端点返回本对象交 AdminResultFilter 自动包装 HttpJsonResultData，失败走 BusinessException 统一错误路径。
    */
   data: FulfillmentActionResponse;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;

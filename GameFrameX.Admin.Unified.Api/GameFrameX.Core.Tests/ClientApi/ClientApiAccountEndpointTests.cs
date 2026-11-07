@@ -156,7 +156,7 @@ public sealed class ClientApiAccountEndpointTests
         Assert.Equal(0, ClientApiResultReader.Code(root));
         Assert.Equal("Email", data.GetProperty("Provider").GetString());
         Assert.False(string.IsNullOrWhiteSpace(data.GetProperty("AccessToken").GetString()));
-        // C7: 登录响应随 token 一起回传 per-session 会话密钥 kid/secret
+        // : 登录响应随 token 一起回传 per-session 会话密钥 kid/secret
         Assert.False(string.IsNullOrWhiteSpace(data.GetProperty("SessionKeyId").GetString()));
         Assert.Matches("^[0-9a-f]{64}$", data.GetProperty("SessionKeySecret").GetString());
     }
@@ -165,7 +165,7 @@ public sealed class ClientApiAccountEndpointTests
     public async Task GameUser_EmailLogin_AcceptsCorrectPassword_RejectsWrongAndMissingAccount()
     {
         using var db = new ClientApiTestDb();
-        // SeedUser 用 Argon2id 写入 EmailPassword，与生产 GameUserPasswordService 一致（C215）
+        // SeedUser 用 Argon2id 写入 EmailPassword，与生产 GameUserPasswordService 一致
         db.SeedUser(2001, "player@example.test", "right-password", email: "player@example.test");
         var controller = CreateController(db);
         db.AttachContext(controller);

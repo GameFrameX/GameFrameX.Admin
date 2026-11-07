@@ -3,8 +3,8 @@ using System.Text.RegularExpressions;
 
 namespace GameFrameX.Core.Tests.Architecture;
 
-// C406 D13 阻断测试（GFX-1232）：租户与 AppId 作用域全面物理清除后，防止残留回潮。
-// 依据：parallel-contract.md §1 D12-D13、§7 R2/R3/R4 与 evidence-audit/residual-scan.py 同口径。
+//  阻断测试：租户与 AppId 作用域全面物理清除后，防止残留回潮。
+// 依据：parallel-contract.md -、 R2/R3/R4 与 evidence-audit/residual-scan.py 同口径。
 //
 // 扫描范围：
 // 1. GameFrameX.Admin.Unified.Api/**（生产代码、实体、数据库模型、测试源码、slnx/csproj/props）；
@@ -12,11 +12,11 @@ namespace GameFrameX.Core.Tests.Architecture;
 // 3. 运行时配置：.env.example、docker-compose*.yml、appsettings*.json、Database.json、launchSettings.json。
 //
 // 白名单机制：本目录 LegacyScopeResidualWhitelist.tsv，每行 path_glob<TAB>token<TAB>reason；
-// 命中必须同时满足路径 glob 与 token 全字匹配（R2-a：按 token 精确匹配，不允许整行或整目录放行）。
-// 只允许 D2.5 第三方原生名称、D7 断代说明、R3-a 游戏服协议镜像、D12 旧字段/旧路径负向测试（R2-b）。
+// 命中必须同时满足路径 glob 与 token 全字匹配（：按 token 精确匹配，不允许整行或整目录放行）。
+// 只允许 .5 第三方原生名称、 断代说明、 游戏服协议镜像、 旧字段/旧路径负向测试。
 //
 // R4：除文件内容外，还扫描 git 跟踪文件路径——路径含 tenant 即失败（白名单除外）。
-// R2-c：正则先匹配最长 token（GameAppId 先于 AppId），GameApp* 其它产品名不命中本正则。
+// ：正则先匹配最长 token（GameAppId 先于 AppId），GameApp* 其它产品名不命中本正则。
 public sealed class LegacyScopeResidualGuardTests
 {
     private static readonly Regex ResidualTokenRegex = new(

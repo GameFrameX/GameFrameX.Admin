@@ -33,7 +33,7 @@ public sealed class ProjectScheduler
     }
 
     /// <summary>
-    /// 触发器运行态写回（C404 §9.8）：执行完成后把 NumberOfRuns / LastRunTime / NextRunTime /
+    /// 触发器运行态写回：执行完成后把 NumberOfRuns / LastRunTime / NextRunTime /
     /// Status / NumberOfErrors 经既有持久化链（OnTriggerChangedAsync，Updated）落库，
     /// 供「任务调度」页展示真实运行态。无持久化或行不存在时静默无效果（UPDATE 命中 0 行）。
     /// </summary>

@@ -37,7 +37,7 @@
 
 <script lang="ts" setup name="onlinePlayerSegmentEditDialog">
 /**
- * 玩家分群编辑弹层（C343 / GFX-759）。
+ * 玩家分群编辑弹层。
  * 条件构建器：field/op 走后端 OnlineRolloutSemanticMap 白名单（三值 × 三操作符），
  * 序列化为 List<OnlineSegmentCondition> JSON 存 conditionsJson；空条件 = 不限条件。
  * 编辑不会自动重同步 Online——保存后须显式 syncOnline 生效（后端语义，UI 不隐藏该事实）。

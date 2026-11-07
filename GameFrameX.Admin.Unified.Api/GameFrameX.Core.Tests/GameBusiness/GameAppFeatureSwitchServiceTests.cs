@@ -10,10 +10,10 @@ using SqlSugar;
 namespace GameFrameX.Core.Tests.GameBusiness;
 
 /// <summary>
-/// C345 活动/功能开关管理服务测试。
+///  活动/功能开关管理服务测试。
 /// <para>覆盖：写入侧事实固化（作用域维度归一为 Default 哨兵、消费方标记收小写、时间窗不倒置、
 /// ValueJson 合法性、灰度与白名单形状）、同作用域组合查重与自身排除、应用作用域锁定、
-/// 默认层不得携带具体包名（C80）、分页按应用作用域收口，以及物理表名落无前缀业务表。</para>
+/// 默认层不得携带具体包名、分页按应用作用域收口，以及物理表名落无前缀业务表。</para>
 /// </summary>
 public sealed class GameAppFeatureSwitchServiceTests : IDisposable
 {
@@ -130,7 +130,7 @@ public sealed class GameAppFeatureSwitchServiceTests : IDisposable
     }
 
     /// <summary>
-    /// 未登记的具体包名不得作为投放维度（C80 规则，由 PackageScopeValidator 收口）。
+    /// 未登记的具体包名不得作为投放维度（规则，由 PackageScopeValidator 收口）。
     /// </summary>
     [Fact]
     public async Task Add_RejectsUnregisteredPackage()
@@ -351,7 +351,7 @@ public sealed class GameAppFeatureSwitchServiceTests : IDisposable
 
     // 前置数据一律用显式主键的 InsertAsync 铺（主键确定性可控，断言不依赖取号时序）。
     // 注：测试进程的 SqlSugar 取号已由 SqlSugarSnowflakeFallbackInitializer 进程级接管
-    // （紧凑布局、同毫秒有序列），旧「同毫秒两次插入同主键」退化不再成立（C361 / GFX-804）。
+    // （紧凑布局、同毫秒有序列），旧「同毫秒两次插入同主键」退化不再成立。
     private long _nextSeedId = 900000;
 
     private async Task InsertAsync(string switchKey)

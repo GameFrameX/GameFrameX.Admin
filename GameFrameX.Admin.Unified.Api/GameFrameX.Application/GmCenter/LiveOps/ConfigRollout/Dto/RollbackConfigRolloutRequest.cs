@@ -6,7 +6,7 @@ using GameFrameX.Entity.Game.Online;
 namespace GameFrameX.Application.GmCenter.LiveOps.ConfigRollout.Dto;
 
 /// <summary>
-/// 灰度回滚输入（来源 change C343 / vault:C8 S7.8 / VC-7.12）。回滚 = 版本化新下发：恢复目标版本的 SegmentId/Percent 语义，生成新 ConfigVersion 行。
+/// 灰度回滚输入（来源 change / vault: .8 / .12）。回滚 = 版本化新下发：恢复目标版本的 SegmentId/Percent 语义，生成新 ConfigVersion 行。
 /// </summary>
 public sealed class RollbackConfigRolloutRequest
 {

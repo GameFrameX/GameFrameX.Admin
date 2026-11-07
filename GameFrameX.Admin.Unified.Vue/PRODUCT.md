@@ -33,7 +33,7 @@ GameFrameX Admin：游戏前后端一站式框架的管理后台（玩家中心�
 
 ## Brand Commitments
 
-GameFrameX 品牌：logo-mini.svg、品牌蓝采样色板（C254）。登录页按「新世界」处理——品牌 token 为基底、个性放足（2026-08-30 用户确认 Q1=B）。插画方向：品牌蓝重绘游戏开发主题（Q3=A），替换现有 unDraw 公共素材。
+GameFrameX 品牌：logo-mini.svg、品牌蓝采样色板。登录页按「新世界」处理——品牌 token 为基底、个性放足（2026-08-30 用户确认 Q1=B）。插画方向：品牌蓝重绘游戏开发主题（Q3=A），替换现有 unDraw 公共素材。
 
 ## Evidence on Hand
 

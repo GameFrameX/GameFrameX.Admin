@@ -7,9 +7,9 @@ using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
 namespace GameFrameX.Core.Tests.Architecture;
 
-// C289 全量端点 golden 冻结（GFX-696 硬验收）：对全部 IAdminApiController 实现的 public action
+//  全量端点 golden 冻结：对全部 IAdminApiController 实现的 public action
 // 纯内存套用 AdminApiControllerConvention（与运行时同一条路由推导代码路径，含 GET 单参数路径化），
-// 冻结 {类型|路由模板|谓词} 全量快照。方法名是内部实现不入快照（C289 批量加 Async 后缀正是靠此设计
+// 冻结 {类型|路由模板|谓词} 全量快照。方法名是内部实现不入快照（批量加 Async 后缀正是靠此设计
 // 证明路由零漂移）；任何端点漂移（路由 / 谓词 / 参数路径化变化）必令本快照变红，此后作为路由零漂移的永久守护。
 // 与 ThreeHostApiRoutingContractTests（5 端点样本断言）互补：本测试是全量枚举。
 // 基线重生成：GFX_ADMIN_ENDPOINT_GOLDEN_UPDATE=1 dotnet test（仅限合法端点调整，须 diff 核对后重跑）。

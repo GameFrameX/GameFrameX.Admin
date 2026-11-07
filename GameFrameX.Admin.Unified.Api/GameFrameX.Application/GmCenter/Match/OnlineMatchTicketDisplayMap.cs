@@ -1,9 +1,9 @@
 namespace GameFrameX.Application.GmCenter.Match;
 
 /// <summary>
-/// 匹配 Ticket 状态 / 失败原因 Online 原值 → 展示键映射（唯一落点，change C341 §3 A0；vault:C5）。
+/// 匹配 Ticket 状态 / 失败原因 Online 原值 → 展示键映射（唯一落点，；vault:）。
 /// <para>
-/// 映射以 vault C5 契约为唯一来源：Ticket 状态 6 值（Queued/Matching/Matched/Cancelled/Expired/Failed）、
+/// 映射以 vault 契约为唯一来源：Ticket 状态 6 值（Queued/Matching/Matched/Cancelled/Expired/Failed）、
 /// 失败原因 4 值（Timeout/CancelRace/RateLimited/DuplicateTicket）穷举锁定，键集合变更须回 change 评审。
 /// </para>
 /// <para>

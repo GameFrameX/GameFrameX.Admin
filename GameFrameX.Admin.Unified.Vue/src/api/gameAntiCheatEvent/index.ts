@@ -2,9 +2,9 @@
 /* tslint:disable */
 /*
  * ---------------------------------------------------------------
- * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API        ##
- * ##                                                           ##
- * ## AUTHOR: acacode                                           ##
+ * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API ##
+ * ## ##
+ * ## AUTHOR: acacode ##
  * ## SOURCE: https://github.com/acacode/swagger-typescript-api ##
  * ---------------------------------------------------------------
  */
@@ -102,7 +102,7 @@ export class GameAntiCheatEvent<SecurityDataType = unknown> {
    *
    * @tags gameAntiCheatEvent
    * @name GameAntiCheatEventReviewPost
-   * @summary 人工复核动作。 <strong>合法状态迁移</strong>：仅 Pending → Approved/Rejected/Escalated；非 Pending 拒绝重审，目标状态非法拒绝。 <strong>不写处罚表</strong>：本方法只更新事件自身的复核状态与审计字段；是否据此创建处罚属 C11-C（C115）与 C11-D-followup。
+   * @summary 人工复核动作。 <strong>合法状态迁移</strong>：仅 Pending → Approved/Rejected/Escalated；非 Pending 拒绝重审，目标状态非法拒绝。 <strong>不写处罚表</strong>：本方法只更新事件自身的复核状态与审计字段；是否据此创建处罚属 -C与 -D-followup。
    * @request POST:/api/gameAntiCheatEvent/review
    */
   gameAntiCheatEventReviewPost = (
@@ -121,7 +121,7 @@ export class GameAntiCheatEvent<SecurityDataType = unknown> {
    *
    * @tags gameAntiCheatEvent
    * @name GameAntiCheatEventSubmitPost
-   * @summary 反作弊事件上报接入（幂等）。 <strong>幂等策略</strong>：统一走 Foundation 协调器 + 事件表即 Store（GameFrameX.Application.GmCenter.GameAntiCheatEvent.AntiCheatEventIdempotencyStore）—— 占位即入账（本站点执行 == 持久化，无外部副作用），并发同键由 `ux_anticheat_idempotency` 唯一索引仲裁， 输家按 Replay 口径返回既有事件（不重复入账、不抛错）；ManualReviewState 固定为 Pending。 <strong>建议不自动生效</strong>：SuggestedAction 仅落字段，本方法不创建任何处罚记录； 处罚创建/撤销属 C11-C（C115）职责，复核通过后的映射由 C11-D-followup 承接。
+   * @summary 反作弊事件上报接入（幂等）。 <strong>幂等策略</strong>：统一走 Foundation 协调器 + 事件表即 Store（GameFrameX.Application.GmCenter.GameAntiCheatEvent.AntiCheatEventIdempotencyStore）—— 占位即入账（本站点执行 == 持久化，无外部副作用），并发同键由 `ux_anticheat_idempotency` 唯一索引仲裁， 输家按 Replay 口径返回既有事件（不重复入账、不抛错）；ManualReviewState 固定为 Pending。 <strong>建议不自动生效</strong>：SuggestedAction 仅落字段，本方法不创建任何处罚记录； 处罚创建/撤销属 -C职责，复核通过后的映射由 -D-followup 承接。
    * @request POST:/api/gameAntiCheatEvent/submit
    */
   gameAntiCheatEventSubmitPost = (

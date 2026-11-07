@@ -18,19 +18,19 @@ using GameFrameX.Entity.Business.Game.Announcement;
 using GameFrameX.Entity.Business.Game.Online;
 using GameFrameX.Entity.Business.Game.RemoteConfig;
 
-// S3/C401 断链修复点
+// / 断链修复点
 namespace GameFrameX.Application.GmCenter.LiveOps.Dispatch;
 
 /// <summary>
-/// LiveOps 统一下发单一入口服务（来源 change C343 / vault:C8 S7.7）。路由前缀 /api/onlineLiveOpsDispatch（去后缀 + lowerCamelCase）。
+/// LiveOps 统一下发单一入口服务（来源 change / vault: .7）。路由前缀 /api/onlineLiveOpsDispatch（去后缀 + lowerCamelCase）。
 /// <para>
 /// 单一入口铁律：本服务是 Application.Platform 业务层唯一注入 <see cref="IOnlineServerClient"/> 的业务类
-/// （C339 既有管理通道除外），分群 / 灰度 / 既有运营域页面的「经 Online 下发」动作全部经
+/// （既有管理通道除外），分群 / 灰度 / 既有运营域页面的「经 Online 下发」动作全部经
 /// <see cref="IOnlineLiveOpsDispatchService"/> 转调，禁止旁路自建 HTTP 直连 Online Runtime——
 /// 作用域注入（Factory 三元组）、协议码镜像、审计摘要只在此处发生一次，由 OnlineLiveOpsSingleEntryTests 守护。
 /// </para>
 /// <para>
-/// 五类来源路由表（Online admin API 命令名冻结于 change.md A0 契约对齐块，调整须回 change 评审）：
+/// 五类来源路由表（Online admin API 命令名冻结于 契约对齐块，调整须回 change 评审）：
 /// <list type="table">
 /// <listheader><term>来源</term><term>Online 命令</term><term>生效语义</term><term>幂等依据</term></listheader>
 /// <item><term>RemoteConfig</term><description>publishRemoteConfig</description><description>按配置记录整体发布，Online 以最新 Content 生效</description><description>同 ConfigId 重复发布 = 覆盖式最新版，Online 天然幂等</description></item>
@@ -46,7 +46,7 @@ namespace GameFrameX.Application.GmCenter.LiveOps.Dispatch;
 [ApiDescriptionSettings(GameConst.GroupName, Order = 100)]
 public class OnlineLiveOpsDispatchService : IOnlineLiveOpsDispatchService, IAdminApiController
 {
-    /// <summary>Online 命令：远程配置发布（来源路由表见类注释；命令名冻结于 change.md A0）。</summary>
+    /// <summary>Online 命令：远程配置发布（来源路由表见类注释；命令名冻结于）。</summary>
     public const string ActionPublishRemoteConfig = "publishRemoteConfig";
 
     /// <summary>Online 命令：设备分群定义同步。</summary>

@@ -55,7 +55,7 @@ export function getJWTDate(timestamp: number): Date {
     return new Date(timestamp * 1000);
 }
 
-// ── 时间戳转换（C145：后端时间字段统一 long 秒 + *Time 后缀，按后缀匹配）──
+// ── 时间戳转换（后端时间字段统一 long 秒 + *Time 后缀，按后缀匹配）──
 
 function formatTimestampValue(value: number): string {
     if (value > 0 && value < 4102444800) {
@@ -148,7 +148,7 @@ function normalizeBackendMessage(message: unknown): string {
 }
 
 /**
- * 解析业务错误展示文案：优先用失败信封 code（统一数字业务错误码，C262/C266）查当前
+ * 解析业务错误展示文案：优先用失败信封 code（统一数字业务错误码，/）查当前
  * locale 的 i18n 错误码表，命中则返回本地化文案；未命中（如 code 回退 HTTP 状态语义值）
  * 时回退到后端 message（服务端 ErrorLocalizer 已按请求语言解析）。
  * message 为对象时沿用既有 JSON.stringify 兜底语义。永不抛二次错误。
@@ -262,7 +262,7 @@ export function createResponseInterceptor() {
             local.set(REFRESH_ACCESS_TOKEN_KEY, newRefreshToken);
         }
 
-        // 业务码处理（C226：信封切换 HttpJsonResultData，成功 code=0；失败时 code 承载 HTTP 状态语义，401 仍触发清 token）
+        // 业务码处理（信封切换 HttpJsonResultData，成功 code=0；失败时 code 承载 HTTP 状态语义，401 仍触发清 token）
         if (serve.code === 401) {
             clearAccessTokens();
         } else if (serve.code === undefined) {
@@ -270,13 +270,13 @@ export function createResponseInterceptor() {
         } else if (serve.code !== 0) {
             const message = resolveResponseMessage(serve);
             showError(message);
-            // 业务码随异常透出（C341：调用方按码判断而非文案——如 onlineMatch 轮询遇 7xxx 镜像段即退避）
+            // 业务码随异常透出（调用方按码判断而非文案——如 onlineMatch 轮询遇 7xxx 镜像段即退避）
             const error = new Error(message) as Error & { code?: unknown };
             error.code = serve.code;
             throw error;
         }
 
-        // C145：不再自动覆写时间戳（后端 *Time 字段统一 long 秒，显示由 formatUnix 显式处理，
+        // ：不再自动覆写时间戳（后端 *Time 字段统一 long 秒，显示由 formatUnix 显式处理，
         // 避免覆写导致编辑回显 beforeOpen 与过期/轮换计算拿不到原始 long）。
         return res;
     };

@@ -14,7 +14,7 @@ public static class ErrorSegmentRegistry
         new(200, ErrorDomain.Protocol, "Common", nameof(CommonErrorCode), false, "协议域：通用错误（资源不存在、参数校验失败）"),
         new(201, ErrorDomain.Protocol, "Auth", nameof(AuthErrorCode), false, "协议域：认证授权（令牌、未授权、签名验证）"),
         new(202, ErrorDomain.Protocol, "Protocol", nameof(ProtocolErrorCode), false, "协议域：协议解析错误"),
-        // Admin 业务域 3xx-5xx（C265 / GFX-671 自旧体系 121 个 D 码按服务域归段平移，一段一模块）。
+        // Admin 业务域 3xx-5xx（自旧体系 121 个 D 码按服务域归段平移，一段一模块）。
         new(300, ErrorDomain.AdminBusiness, "SystemUser", nameof(SystemUserErrorCode), false, "Admin 系统用户与认证"),
         new(301, ErrorDomain.AdminBusiness, "RoleMenu", nameof(RoleMenuErrorCode), false, "Admin 角色与菜单"),
         new(302, ErrorDomain.AdminBusiness, "Dictionary", nameof(DictionaryErrorCode), false, "Admin 字典"),
@@ -34,7 +34,7 @@ public static class ErrorSegmentRegistry
         new(316, ErrorDomain.AdminBusiness, "Plugin", null, false, "Admin 动态插件（已退役，号段永久保留，禁止复用）"),
         new(317, ErrorDomain.AdminBusiness, "OnlineModeration", nameof(OnlineModerationErrorCode), false, "Admin Online 社交治理（消息审计/举报处置/处罚联动，C350）"),
         new(318, ErrorDomain.AdminBusiness, "AdvertisementCallbackConfig", nameof(AdvertisementCallbackConfigErrorCode), false, "Admin 广告回调配置"),
-        // Online 平台 8 子段（C339 / vault:C2 S1.3，一一镜像 vault 1xxx～8xxx 八段；协议段 Nxxx ↔ 镜像段 32(N-1)）。
+        // Online 平台 8 子段（vault: .3，一一镜像 vault 1xxx～8xxx 八段；协议段 Nxxx ↔ 镜像段 32(N-1)）。
         new(320, ErrorDomain.AdminBusiness, "OnlineSystem", nameof(OnlineErrorCode), false, "Online 镜像：系统与网络（vault 1xxx）"),
         new(321, ErrorDomain.AdminBusiness, "OnlineSession", nameof(OnlineErrorCode), false, "Online 镜像：鉴权与 Session（vault 2xxx）"),
         new(322, ErrorDomain.AdminBusiness, "OnlineScope", nameof(OnlineErrorCode), false, "Online 镜像：租户/App/Server 作用域（vault 3xxx）"),

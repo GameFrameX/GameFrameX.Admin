@@ -7,10 +7,10 @@ using GameFrameX.Core.SqlSugar;
 using GameFrameX.Entity.Business.Game;
 using SqlSugar;
 
-// S3/C401 断链修复点
+// / 断链修复点
 namespace GameFrameX.Core.Tests.Online.Console;
 
-// C344 / GFX-760（vault:C9 S8.1）：在线总览快照 Service 契约自检。
+//  / （vault: .1）：在线总览快照 Service 契约自检。
 // 覆盖：action 名与作用域注入、快照字段透传（Admin 零聚合零推断）、SnapshotNote 口径说明、跨作用域越界前置拒绝。
 public sealed class OnlineOverviewQueryServiceTests : IDisposable
 {

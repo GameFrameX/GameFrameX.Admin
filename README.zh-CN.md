@@ -34,7 +34,7 @@
 
 它**不是**通用 OA / CRM / 商城系统。菜单、权限、字典、表单、客户端配置等都是围绕"游戏后台"的真实业务场景设计的。
 
-本项目基于 [Admin.NET](https://gitee.com/zuohuaijun/Admin.NET) 二次开发，所有 Furion 框架残留与原 Admin.NET 业务命名已完成替换与重基线（U5 / U8 / C37–C41）。致谢原作者 [zuohuaijun](https://gitee.com/zuohuaijun) 及其贡献者。
+本项目基于 [Admin.NET](https://gitee.com/zuohuaijun/Admin.NET) 二次开发，所有 Furion 框架残留与原 Admin.NET 业务命名已完成替换与重基线（–）。致谢原作者 [zuohuaijun](https://gitee.com/zuohuaijun) 及其贡献者。
 
 ### 仓库结构
 
@@ -42,16 +42,16 @@
 
 ```
 Admin/
-├── GameFrameX.Admin.Unified.Api/    # .NET 后端：Admin / Client / Hub 三 host + Application / Entity / Core 分层
-├── GameFrameX.Admin.Unified.Vue/    # Vue 前端：PrimeVue + Pinia + vue-i18n（5 语言）
-├── build/                           # Nginx 配置 + 部署脚本（deploy-*.sh / docker-build-push.sh / entrypoint.sh）
-├── doc/                             # README 配图
-├── .github/workflows/               # CI：三 API 镜像与前端镜像构建、前端测试、外部镜像同步
-├── docker-compose.yml               # 一键全栈编排（PostgreSQL + 三 API + 前端）
-├── docker-compose.admin.yml          # Admin 独立栈：自带 PostgreSQL + 三 API 宿主，无前端容器
-├── .env.example                     # compose 环境变量模板（复制为 .env 后按需覆盖）
-├── AGENTS.md / CLAUDE.md            # AI Agent 协作入口（根指令 + readme_i18n 配置）
-└── LICENSE.md                       # 开源协议
+├── GameFrameX.Admin.Unified.Api/ # .NET 后端：Admin / Client / Hub 三 host + Application / Entity / Core 分层
+├── GameFrameX.Admin.Unified.Vue/ # Vue 前端：PrimeVue + Pinia + vue-i18n（5 语言）
+├── build/ # Nginx 配置 + 部署脚本（deploy-*.sh / docker-build-push.sh / entrypoint.sh）
+├── doc/ # README 配图
+├── .github/workflows/ # CI：三 API 镜像与前端镜像构建、前端测试、外部镜像同步
+├── docker-compose.yml # 一键全栈编排（PostgreSQL + 三 API + 前端）
+├── docker-compose.admin.yml # Admin 独立栈：自带 PostgreSQL + 三 API 宿主，无前端容器
+├── .env.example # compose 环境变量模板（复制为 .env 后按需覆盖）
+├── AGENTS.md / CLAUDE.md # AI Agent 协作入口（根指令 + readme_i18n 配置）
+└── LICENSE.md # 开源协议
 ```
 
 ## 快速开始
@@ -72,15 +72,15 @@ git clone https://github.com/GameFrameX/Admin.git
 cd Admin
 
 # 2. 起后端（在仓库根目录！连接串相对工作目录解析）
-dotnet run --project GameFrameX.Admin.Unified.Api/GameFrameX.Web.Api     # Admin API → http://localhost:20802
-dotnet run --project GameFrameX.Admin.Unified.Api/GameFrameX.Client.Api  # Client API → http://localhost:20808
-dotnet run --project GameFrameX.Admin.Unified.Api/GameFrameX.Hub.Api     # Hub API → http://localhost:20806
+dotnet run --project GameFrameX.Admin.Unified.Api/GameFrameX.Web.Api # Admin API → http://localhost:20802
+dotnet run --project GameFrameX.Admin.Unified.Api/GameFrameX.Client.Api # Client API → http://localhost:20808
+dotnet run --project GameFrameX.Admin.Unified.Api/GameFrameX.Hub.Api # Hub API → http://localhost:20806
 
 # 3. 起前端
 cd GameFrameX.Admin.Unified.Vue
 corepack enable
 pnpm install
-pnpm run dev    # 默认 http://localhost:20800（hash 路由）
+pnpm run dev # 默认 http://localhost:20800（hash 路由）
 ```
 
 打开浏览器 → 看到登录页 → 账号 `admin` / 密码 `123456`（首次启动 SqlSugar Code-First 会自动建表 + 灌种子）。
@@ -229,7 +229,7 @@ docker compose -f docker-compose.admin.yml up -d --build
 
 | 威胁 | 应对 |
 |---|---|
-| 弱密码 | 全项目统一 **Argon2id**（C214 系统用户 / C215 玩家）；旧 PBKDF2 仅保留 `AppSecretHasher`（高熵随机密钥场景，不需要 Argon2id） |
+| 弱密码 | 全项目统一 **Argon2id**（系统用户 / 玩家）；旧 PBKDF2 仅保留 `AppSecretHasher`（高熵随机密钥场景，不需要 Argon2id） |
 | SQL 注入 | SqlSugar 全参数化，无字符串拼接 |
 | 越权访问 | 软删除过滤 + 角色权限 / 区服范围；SuperAdmin 绕过权限检查但 Hub API 拒绝超管 |
 | 重放攻击 | HMAC 签名 + nonce 缓存 + 5 分钟时间偏差 |

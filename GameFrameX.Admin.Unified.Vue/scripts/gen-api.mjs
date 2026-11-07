@@ -22,7 +22,7 @@ const schemaPath = resolve(projectRoot, 'openapi.json');
 
 const spec = JSON.parse(readFileSync(schemaPath, 'utf8'));
 
-// C201：字段名归一化。后端 System.Text.Json PropertyNamingPolicy=null → JSON 字段为 PascalCase，
+// ：字段名归一化。后端 System.Text.Json PropertyNamingPolicy=null → JSON 字段为 PascalCase，
 // 前端 axios 响应拦截器（src/utils/http/shared.ts 的 normalizeResponseKeys/toCamelCaseKey）
 // 会把所有响应键递归转 camelCase 后才交给业务代码。故生成类型必须用 camelCase 才与运行时一致。
 // 在 spec 传给 generateApi 之前，递归把每个 JSON Schema 的 properties 键 + required 数组转 camelCase。
@@ -50,7 +50,7 @@ console.log(`\n[gen-api] stc 已生成 ${files.length} 个文件 -> ${outputDir}
 // 后处理：split（独占/共享类型）+ restructure（按 tag 分子目录到 src/api/<tag>/ + _shared/）
 await import('./post-gen.mjs');
 
-// ── C201：spec 字段名归一化 ──────────────────────────────────
+// ── ：spec 字段名归一化 ──────────────────────────────────
 
 /**
  * 字段名归一化规则：复刻前端 toCamelCaseKey（src/utils/http/shared.ts）。
@@ -68,7 +68,7 @@ function normalizeFieldName(name) {
  * operation parameters[].name 转 camelCase。
  * 不动 $ref（类型引用）、enum 值（运行时数据）、路径模板（本就是 camelCase）。
  * parameters[].name 同样归一化：后端 action 参数导出为 PascalCase（Id/Title/PageSize…），
- * 归一化后 query 内联类型字段为 camelCase，与 properties 口径一致（C304）。
+ * 归一化后 query 内联类型字段为 camelCase，与 properties 口径一致。
  */
 function normalizeSpecFieldNames(node) {
     if (Array.isArray(node)) {

@@ -7,10 +7,10 @@ using GameFrameX.Core.SqlSugar;
 using GameFrameX.Entity.Business.Game;
 using SqlSugar;
 
-// S3/C401 断链修复点
+// / 断链修复点
 namespace GameFrameX.Core.Tests.Online.Console;
 
-// C344 / GFX-760（vault:C9 S8.1 / VC-8.4）：受控操作命令 Service 契约自检。
+//  / （vault: .1 /）：受控操作命令 Service 契约自检。
 // 覆盖：四值命令路由（action 名 + 目标透传 + 禁填目标清空）、开关方向必填/单向禁填、
 // 双人复核字段必填、目标组合错配拒绝、幂等键派生规则（方向参与、同参稳定、跨命令/方向/目标隔离）。
 public sealed class OnlineControlledCommandServiceTests : IDisposable
@@ -116,7 +116,7 @@ public sealed class OnlineControlledCommandServiceTests : IDisposable
     }
 
     /// <summary>
-    /// 幂等键派生（VC-8.4）：同（命令,方向,目标,区服）两次调用键相同；方向不同键不同；单向命令无方向段；
+    /// 幂等键派生：同（命令,方向,目标,区服）两次调用键相同；方向不同键不同；单向命令无方向段；
     /// 区服不同键不同。键形态 onlineControlled-{command}[-{direction}]-{targetId}-{serverId}。
     /// </summary>
     [Fact]

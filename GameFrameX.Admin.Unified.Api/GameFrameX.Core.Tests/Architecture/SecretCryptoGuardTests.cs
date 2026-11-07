@@ -1,7 +1,7 @@
 namespace GameFrameX.Core.Tests.Architecture;
 
-// C370（GFX-829）：业务凭证静态加密写入 / 读取路径守护。
-// change：gfx-doc/dev/system-management/changes/C370-secret-crypto-foundation/change.md
+// ：业务凭证静态加密写入 / 读取路径守护。
+// change：gfx-doc/dev/system-management/changes/-secret-crypto-foundation/change.md
 // 三表写入路径必须经 SecretCrypto / ObjectStorageConfigCrypto 收口（写入加密），
 // 读取点必须走解密收口（发信构建 / 缓存加载 / Adapter 上下文构建）。
 public sealed class SecretCryptoGuardTests

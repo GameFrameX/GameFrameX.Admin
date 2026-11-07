@@ -2,7 +2,7 @@ namespace GameFrameX.Entity.Enum;
 
 /// <summary>
 /// 反作弊 / 广告奖励 Provider 来源（反作弊事件账本 GameAntiCheatEventEntity.Provider）。
-/// <para>严格锁定 4 值：与广告回调 Provider（C11-B / C114）对齐，避免任意 Provider 字符串；非枚举内的来源统一用 Custom 并在 ProviderName 字段记录实际名称。</para>
+/// <para>严格锁定 4 值：与广告回调 Provider（-B /）对齐，避免任意 Provider 字符串；非枚举内的来源统一用 Custom 并在 ProviderName 字段记录实际名称。</para>
 /// </summary>
 [Description("反作弊Provider")]
 [AdminEnum]

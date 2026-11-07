@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace GameFrameX.Core.Tests.Logging;
 
 /// <summary>
-/// Monitor 管线回归测试控制器（T5）：路由模板模拟 AdminApiRouteRules 产物
+/// Monitor 管线回归测试控制器：路由模板模拟 AdminApiRouteRules 产物
 /// <c>api/{controller}/{action}</c>（字面路由段如 userInfo/logout），命中
 /// <see cref="DatabaseLoggingWriter"/> 三表分流与 Monitor 过滤器豁免/校验路径。
 /// </summary>

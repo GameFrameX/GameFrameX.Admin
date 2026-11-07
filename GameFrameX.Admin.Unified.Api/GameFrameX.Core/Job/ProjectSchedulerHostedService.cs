@@ -6,7 +6,7 @@ namespace GameFrameX.Core.Job;
 
 /// <summary>
 /// 作业调度宿主服务：注册扫描 / 持久化预载的作业，并在启用持久化的进程内运行触发循环。
-/// <para>C404 / GFX-1216 调度合一前本服务只注册不调度（全仓唯一执行入口是任务调度页的手动执行）；
+/// <para> / 调度合一前本服务只注册不调度（全仓唯一执行入口是任务调度页的手动执行）；
 /// 本类补齐触发循环，使内置作业与经扫描派发的业务定时任务统一由本引擎按触发器到期执行。</para>
 /// <para>未启用持久化的进程（<c>GFX_DISABLE_SCHEDULE=1</c>）保持既有语义：仅注册占位，不触发。</para>
 /// </summary>
@@ -64,7 +64,7 @@ public sealed class ProjectSchedulerHostedService : BackgroundService
     }
 
     /// <summary>
-    /// 注册期持久化（C404 §9.8）：内置作业 upsert 进 SystemJob 表，使其在「任务调度」页可见、
+    /// 注册期持久化：内置作业 upsert 进 SystemJob 表，使其在「任务调度」页可见、
     /// 触发器运行态可写回。失败只告警不阻断调度。
     /// </summary>
     private async Task PersistRegisteredJobsAsync(CancellationToken stoppingToken)

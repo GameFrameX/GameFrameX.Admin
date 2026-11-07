@@ -12,9 +12,9 @@
 </template>
 
 <script setup lang="ts" name="narrowScreenHint">
-// F1 移动端收尾：窄屏（<640px）降级提示，桌面隐藏
+//  移动端收尾：窄屏（<640px）降级提示，桌面隐藏
 // 用于复杂页（富文本 / 代码 / 图表 / 手写画板）引导用户改用电脑端
-// 响应式 mixin bp-up(sm) 由 breakpoints.scss 全局注入（C143）
+// 响应式 mixin bp-up(sm) 由 breakpoints.scss 全局注入
 </script>
 
 <style scoped lang="scss">

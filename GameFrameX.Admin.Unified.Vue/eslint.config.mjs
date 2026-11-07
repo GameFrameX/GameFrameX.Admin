@@ -19,15 +19,15 @@ const browserGlobals = {
     clearInterval: 'readonly',
 }
 
-// ── TS 标识符命名规则（GFX-700 / C287）───────────────────────────────────────
+// ── TS 标识符命名规则───────────────────────────────────────
 // 变量/函数 camelCase；type/interface/class/enum PascalCase。
 // 已知合理场景的豁免面（在 selector 层放行并在此注释说明）：
 // - import：camelCase / PascalCase（组件与类型绑定，如 CrudDataTable、FormField）/ UPPER_CASE（常量）
 // - objectLiteralProperty：对象字面量键承载后端契约键/错误码/本地化 key，不做格式约束
-//   （后端契约字符串如 'NotifyApple' 属字符串字面量，本就不受本规则约束）
+//  （后端契约字符串如 'NotifyApple' 属字符串字面量，本就不受本规则约束）
 // - typeProperty：TS 类型属性常映射后端契约字段（Id/IsEnabled）与 kebab 事件名（toggle-visible），不在本规则范围
 // - variable 放行 UPPER_CASE（模块常量）与单/双首尾下划线（__NEXT_VERSION__ 全局版本注入等）；
-//   名字中间的下划线（getEnumXxxData_Index）不放行，存量逐点标注
+//  名字中间的下划线（getEnumXxxData_Index）不放行，存量逐点标注
 // - PascalCase 局部变量（defineAsyncComponent 组件占位等）不在此放行，存量逐点 eslint-disable + 理由注释
 const namingConventionRule = [
     'error',
@@ -53,13 +53,13 @@ const namingConventionRule = [
     { selector: 'parameter', format: ['camelCase'], leadingUnderscore: 'allow' },
 ]
 
-// ── vue/multi-word-component-names 惯例豁免块（GFX-700 / C287 建立，C296 / GFX-703 完成存量治理）──
+// ── vue/multi-word-component-names 惯例豁免块（建立， / 完成存量治理）──
 // eslint-plugin-vue 该规则的文件名分支报告位置硬编码为 1:1（Program:exit），早于任何注释位置，
 // 行内 eslint-disable 无法压制，故只能在此按精确路径冻结（精确路径而非 ignores 名称白名单：
 // 同目录今后新增同名文件仍会被主规则拦截，防增量语义最严）。
-// 命名治理已完成（C296 改名 132 个单词名/camelCase 文件），本清单仅剩 118 个约定豁免文件
+// 命名治理已完成（改名 132 个单词名/camelCase 文件），本清单仅剩 118 个约定豁免文件
 // （117 个 index.vue 目录式组件 + 401/404 错误页），不再是 TODO；新增非 index.vue 文件必须 multi-word。
-// 本清单只减不增（GFX-717 / C305）：与 scripts/frontend-standards-allowlist.json 的 componentNames
+// 本清单只减不增：与 scripts/frontend-standards-allowlist.json 的 componentNames
 // 上限快照比对，新增条目未扩快照会被 pnpm run check:frontend 拦截；收缩后请同步删快照条目。
 const frozenMultiWordComponentFiles = [
     'src/components/app-confirm-dialog/index.vue',
@@ -200,7 +200,7 @@ export default [
             'no-debugger': 'warn',
             'no-empty': ['warn', { allowEmptyCatch: true }],
             'no-unused-vars': 'off',
-            // 禁止 handle 前缀 handler 声明（GFX-714）：统一 onXxx；存量已清零，此规则防增量
+            // 禁止 handle 前缀 handler 声明：统一 onXxx；存量已清零，此规则防增量
             'no-restricted-syntax': [
                 'error',
                 { selector: 'VariableDeclarator[id.name=/^handle[A-Z]/]', message: '事件 handler 统一 onXxx 前缀，禁止 handleXxx（GFX-714 / D5）' },
@@ -231,10 +231,10 @@ export default [
             'no-empty': ['warn', { allowEmptyCatch: true }],
             'no-unused-vars': 'off',
             '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
-            // 组件名必须多词（GFX-700）：文件名分支报告位置硬编码 1:1，行内 eslint-disable 无法压制，
+            // 组件名必须多词：文件名分支报告位置硬编码 1:1，行内 eslint-disable 无法压制，
             // 存量违规由 frozenMultiWordComponentFiles 精确路径冻结；新文件一律受检。
             'vue/multi-word-component-names': 'error',
-            // prop 传递统一 camelCase（GFX-714 / D6）：自定义组件属性禁止连字符；
+            // prop 传递统一 camelCase：自定义组件属性禁止连字符；
             // 规则内置豁免 data-/aria-（HTML 标准 attribute）与 SVG 驼峰特例
             'vue/attribute-hyphenation': ['error', 'never'],
             'vue/no-mutating-props': 'warn',

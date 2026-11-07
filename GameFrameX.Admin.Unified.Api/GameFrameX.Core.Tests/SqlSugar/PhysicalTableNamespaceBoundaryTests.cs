@@ -86,8 +86,8 @@ public class PhysicalTableNamespaceBoundaryTests
     }
 
     /// <summary>
-    /// 第三方契约镜像豁免（C292 / GFX-698）：镜像 DTO 属性 PascalCase 化后必须用 JsonPropertyName 锁定第三方 wire 名，
-    /// 「自家 DTO 属性名即 wire 名」约束不适用。豁免区：Client.Api Integrations 集成区（C220 约定）、
+    /// 第三方契约镜像豁免：镜像 DTO 属性 PascalCase 化后必须用 JsonPropertyName 锁定第三方 wire 名，
+    /// 「自家 DTO 属性名即 wire 名」约束不适用。豁免区：Client.Api Integrations 集成区（约定）、
     /// Hub.Api WebHook 镜像区、zlpay 网关回传镜像类型。
     /// </summary>
     private static bool IsThirdPartyContractMirror(Type type)
@@ -175,7 +175,7 @@ public class PhysicalTableNamespaceBoundaryTests
 
     private static bool HasAllowedPrefix(string tableName)
     {
-        // D3：业务表不带前缀；system_/global_ 为保留前缀；tenant_ 前缀已随 C406 退场，禁止再现。
+        // ：业务表不带前缀；system_/global_ 为保留前缀；tenant_ 前缀已随 退场，禁止再现。
         return !tableName.StartsWith("tenant_", StringComparison.Ordinal) // c406-keep（负向断言：旧前缀禁止再现）
                && !tableName.StartsWith("system_sys_", StringComparison.Ordinal);
     }

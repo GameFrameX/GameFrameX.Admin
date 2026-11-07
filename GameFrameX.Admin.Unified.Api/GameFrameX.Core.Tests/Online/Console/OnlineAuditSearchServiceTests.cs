@@ -11,10 +11,10 @@ using GameFrameX.Entity.Business.Game;
 using GameFrameX.Entity.Business.Game.Online;
 using SqlSugar;
 
-// S3/C401 断链修复点
+// / 断链修复点
 namespace GameFrameX.Core.Tests.Online.Console;
 
-// C344 / GFX-760（vault:C9 S8.2）：统一审计检索 Service 契约自检。
+//  / （vault: .2）：统一审计检索 Service 契约自检。
 // 覆盖：三来源实时归并（Admin 操作日志 + Online 审计事件 + 域命令事实源）按 OccurredAt 倒序、
 // 来源标注与作用域回填、五维过滤（目标对象/作用域）、keyset 游标翻页、Online 来源未锚定跳过、
 // 脏游标拒绝、Online 来源失败原样透传（不软化缺源）。
@@ -68,7 +68,7 @@ public sealed class OnlineAuditSearchServiceTests : IDisposable
         });
 
         Assert.Equal(4, response.Items.Count);
-        // 倒序：opLog1(T4) > online 事件(TB) > rollout(T3) > penalty(T2)；opLog2 无作用域提取值被排除。
+        // 倒序：opLog1() > online 事件(TB) > rollout() > penalty()；opLog2 无作用域提取值被排除。
         Assert.Equal(T4, response.Items[0].OccurredAt);
         Assert.Equal(TB, response.Items[1].OccurredAt);
         Assert.Equal(T3, response.Items[2].OccurredAt);

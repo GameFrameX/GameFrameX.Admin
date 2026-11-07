@@ -1,7 +1,7 @@
 namespace GameFrameX.Client.Api.GameUserPay.Dto;
 
 /// <summary>
-/// 支付订单查询响应（C11 支付域 Query；查无时全字段空值 + code 0）
+/// 支付订单查询响应（支付域 Query；查无时全字段空值 + code 0）
 /// </summary>
 public class GameUserPayQueryResponse
 {

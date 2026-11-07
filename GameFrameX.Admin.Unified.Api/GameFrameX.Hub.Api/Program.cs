@@ -14,7 +14,7 @@ internal static class Program
 {
     private static void Main(string[] args)
     {
-        // GFX-873 / C381 信号③：进程级未处理异常兜底（后台线程致命异常 / 主线程崩溃打印阶段），须早于任何可能崩溃的构建代码
+        //  / 信号③：进程级未处理异常兜底（后台线程致命异常 / 主线程崩溃打印阶段），须早于任何可能崩溃的构建代码
         CrashExitWatchdog.EnableDomainUnhandledExceptionFallback();
 
         var builder = WebApplication.CreateBuilder(args);
@@ -27,7 +27,7 @@ internal static class Program
         // 主库连接启动参数（--DbType/--ConnectionString 与 DBTYPE/CONNECTIONSTRING 环境变量，命令行优先）以最高优先级进入配置管线
         builder.Configuration.AddMainDatabaseFromLauncherOptions(launcherOptions);
 
-        // 共享启动装配（C261，GFX-668）：日志 / 雪花 / CORS / JWT / MVC / HealthChecks / Swagger 收敛至 Core Bootstrap
+        // 共享启动装配：日志 / 雪花 / CORS / JWT / MVC / HealthChecks / Swagger 收敛至 Core Bootstrap
         builder.UseHostBootstrapLogging(launcherOptions);
         // Grafana Cloud OpenTelemetry（OTLP 三信号：traces/metrics/logs，logs 自动入 Loki）；凭证齐全才启用
         builder.UseHostOpenTelemetry("GameFrameX.Hub.Api");
@@ -35,7 +35,7 @@ internal static class Program
 
         // DataProtection 密钥环持久化到 data/DataProtection-Keys（容器内挂载卷 /app/data，与 Web/Client 同口径）
         builder.UseHostDataProtection();
-        // 紧凑短 ID 布局 + WorkerId 防撞（C360，GFX-803）：读 SnowFlake:WorkerId（环境变量 SnowFlake__WorkerId），
+        // 紧凑短 ID 布局 + WorkerId 防撞：读 SnowFlake:WorkerId（环境变量 SnowFlake__WorkerId），
         // 缺省兜底 2（Web.Api 配置 1 / Hub 2 / Client 3，单机全默认互不冲突）；同库实例必须互斥配置，越界 0-7 启动失败
         builder.UseSnowFlake(2);
         // 注册 JWT 鉴权（复用 Admin 同一份 JWTSettings 配置节，使 Admin 登录签发的 Token 可直接访问 Hub.Api）
@@ -48,16 +48,16 @@ internal static class Program
         builder.Services.AddSingleton<IHttpContextAccessor>(httpContextAccessor);
         builder.Services.AddHttpClient();
 
-        // 主库连接统一走 DbConnection 节 / 共享 Database.json + DBTYPE/CONNECTIONSTRING 环境变量单一入口（C269）
+        // 主库连接统一走 DbConnection 节 / 共享 Database.json + DBTYPE/CONNECTIONSTRING 环境变量单一入口
         var mainDbConfig = HostMainDbConnectionResolver.Resolve(builder.Configuration);
         var sqlSugar = SqlSugarClientConfig.AddSqlSugarClientService(mainDbConfig, HubUserAuditHandler.Handle(httpContextAccessor));
 
         builder.Services.AddSingleton<ISqlSugarClient>(sqlSugar); // 主库
         builder.Services.AddScoped(typeof(Repository<>)); // 仓储（主库）
-        // 基类服务面：FeatureSwitchDeliveryResolver 等共享实现以 SqlSugarRepository<T> 为构造参数（C345 冻结契约），
+        // 基类服务面：FeatureSwitchDeliveryResolver 等共享实现以 SqlSugarRepository<T> 为构造参数（冻结契约），
         // DI 不做基类向上匹配，须显式注册开放泛型基类 -> Repository<T> 实现（与上行为不同 descriptor，仓储无状态可各自实例化）
         builder.Services.AddScoped(typeof(SqlSugarRepository<>), typeof(Repository<>));
-        // 活动/功能开关投放解析器（C345 共享实现，依赖 Scoped 仓储，FeatureSwitchSync 端点消费）
+        // 活动/功能开关投放解析器（共享实现，依赖 Scoped 仓储，FeatureSwitchSync 端点消费）
         builder.Services.AddScoped<GameFrameX.Application.ClientDelivery.FeatureSwitch.FeatureSwitchDeliveryResolver>();
         // OpenAccess 机器凭证中间件 nonce 去重依赖链（与 Client.Api 同款注册）：ICache + SystemCacheService（仅依赖 ICache + IOptions<CacheOptions>）
         builder.Services.AddCache();
@@ -73,7 +73,7 @@ internal static class Program
 
         var app = builder.Build();
 
-        // GFX-873 / C381 信号②：host 已停（StopHost / 停机）后进程 15s 未退出即强退——
+        //  / 信号②：host 已停（StopHost / 停机）后进程 15s 未退出即强退——
         // BackgroundService 启动失败时 Run 正常返回无异常，仅此信号覆盖该类僵死
         var applicationLifetime = app.Services.GetRequiredService<IHostApplicationLifetime>();
         applicationLifetime.ApplicationStopped.Register(() => CrashExitWatchdog.Arm("GameFrameX.Hub.Api host 已停止"));
@@ -96,14 +96,14 @@ internal static class Program
         app.UseWhen(context => context.Request.Path.StartsWithSegments("/api/PackageBuildReport", StringComparison.OrdinalIgnoreCase),
                     branch => branch.UseMiddleware<GameAppOpenAccessAuthMiddleware>());
 
-        // 功能开关服务器同步（C347）：游戏服务器机器凭证同步通道，同一 OpenAccess 中间件鉴权（scope = FeatureSwitchSync 路由前缀）
+        // 功能开关服务器同步：游戏服务器机器凭证同步通道，同一 OpenAccess 中间件鉴权（scope = FeatureSwitchSync 路由前缀）
         app.UseWhen(context => context.Request.Path.StartsWithSegments("/api/" + GameFrameX.Hub.Api.Const.OpenAccessScopeConst.FeatureSwitchSync, StringComparison.OrdinalIgnoreCase),
                     branch => branch.UseMiddleware<GameAppOpenAccessAuthMiddleware>());
 
         app.MapHostHealthChecks();
         app.MapControllers();
 
-        // GFX-873 / C381 信号①：逃逸 Run 的未处理异常若在运行时传播路径僵死（linux/arm64 容器实测），
+        //  / 信号①：逃逸 Run 的未处理异常若在运行时传播路径僵死（linux/arm64 容器实测），
         // watchdog 超时强退保证进程必死，容器 restart 策略才可触发；原样重抛保留默认崩溃语义
         try
         {

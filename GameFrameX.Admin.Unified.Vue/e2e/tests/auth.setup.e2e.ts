@@ -3,7 +3,7 @@ import { ADMIN_ROOTS, ADMIN_STATE, shot, signIn } from './helpers';
 import { renderedMenuGroups } from './module-coverage';
 import { ensureMergeReviewer, isolatedAdminOrigin } from './admin-stack';
 
-// C406 / GFX-1232 集成第 2 轮（R6）：admin 账号由 Web.Api 首启种子引导创建
+//  / 集成第 2 轮：admin 账号由 Web.Api 首启种子引导创建
 // （GAMEFRAMEX_ADMIN_INITIAL_ACCOUNT / _PASSWORD，取值与 E2E_ACCOUNT / E2E_PASSWORD 一致），
 // sys_admin 角色已随引导获得全部非超管菜单——本 setup 不再做 role/grantMenu 主动授权。
 test('sign in as admin', async ({ page }) => {

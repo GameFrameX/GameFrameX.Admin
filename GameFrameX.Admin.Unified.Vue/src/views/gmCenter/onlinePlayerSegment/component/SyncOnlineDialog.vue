@@ -30,7 +30,7 @@
 
 <script lang="ts" setup name="onlinePlayerSegmentSyncOnlineDialog">
 /**
- * 分群同步 Online 弹层（C343 / GFX-759 高危入口）。
+ * 分群同步 Online 弹层（高危入口）。
  * 定义快照经统一下发入口（syncPlayerSegment 通道）送达 Online，Online 分配分群标识回写本行；
  * 理由必填（≤500 字）进审计；成功 toast 回显 Online 确认版本。
  */

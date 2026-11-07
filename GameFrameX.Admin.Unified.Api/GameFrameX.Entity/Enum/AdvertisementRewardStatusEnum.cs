@@ -2,7 +2,7 @@ namespace GameFrameX.Entity.Enum;
 
 /// <summary>
 /// 广告奖励发放状态。
-/// <para>事实数据应用作用域，记录广告回调奖励从认领到发放结果的状态流转（C114 / GFX-110）。</para>
+/// <para>事实数据应用作用域，记录广告回调奖励从认领到发放结果的状态流转。</para>
 /// </summary>
 [Description("广告奖励发放状态")]
 [AdminEnum]

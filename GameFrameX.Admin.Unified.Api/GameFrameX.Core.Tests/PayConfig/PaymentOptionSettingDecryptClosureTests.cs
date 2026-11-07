@@ -15,9 +15,9 @@ using SqlSugar;
 
 namespace GameFrameX.Core.Tests.PayConfig;
 
-// C372（GFX-838）T2/T5：支付配置读取链路解密收口——密文 ConfigJson（C371 起库内形态）
+// /：支付配置读取链路解密收口——密文 ConfigJson（起库内形态）
 // 经 PaymentOptionSettingProvider 反序列化前字段级解密，Option 拿到明文商户私钥。
-// change：gfx-doc/dev/client-api/changes/C372-runtime-credential-decrypt-closure/change.md
+// change：gfx-doc/dev/client-api/changes/-runtime-credential-decrypt-closure/change.md
 // PG 真库回归：作用域 Where 的 Nullable.HasValue 闭包曾使 SqlSugar 生成非法 SQL
 // （SQLite 报 near "IS"、PG 报 near "NOT"，真机冒烟发现 PG 同样失败），已提为局部布尔修复；
 // 与公开回调测试同款 PG fixture。SQLite 侧等价回归见 RuntimeCredentialDecryptClosureTests。

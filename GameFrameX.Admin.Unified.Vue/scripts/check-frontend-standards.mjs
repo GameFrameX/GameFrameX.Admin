@@ -867,7 +867,7 @@ function selfTest() {
     const additionDiff = diffFrozenAgainstSnapshot(['src/a/One.vue', 'src/b/Two.vue'], ['src/a/One.vue'])
     assert(additionDiff.additions.length === 1 && additionDiff.additions[0] === 'src/b/Two.vue', 'unregistered frozen entry should be flagged as addition')
     assert(diffFrozenAgainstSnapshot(['src/a/One.vue'], ['src/a/One.vue', 'src/c/Gone.vue']).stale.length === 1, 'shrunk entry should surface as stale snapshot hint, not a failure')
-    // GFX-734 守卫：views 顶层白名单 + 静态路由文件首段（先红后绿构造样本）
+    //  守卫：views 顶层白名单 + 静态路由文件首段（先红后绿构造样本）
     // c406-keep: retired audience segment remains a negative whitelist assertion.
     assert(viewsTopLevelViolation('tenant') !== null, 'retired audience segment should fail views whitelist')
     assert(viewsTopLevelViolation('system') === null, 'flat system directory should pass views whitelist')
@@ -884,7 +884,7 @@ function selfTest() {
     return true
 }
 
-// ── views 受众三段布局守护（GFX-734 / C325）──────────────────────────────────
+// ── views 受众三段布局守护──────────────────────────────────
 // 仅接纳九个运营中心与登录、错误页，旧受众目录拒绝。
 const OPERATION_CENTER_DIRECTORIES = ['dashboard', 'serverCenter', 'noticeCenter', 'gmCenter', 'playerCenter', 'commerceCenter', 'clientDelivery', 'audit', 'system']
 const VIEWS_TOP_LEVEL_ALLOWED = new Set(['login', 'error', ...OPERATION_CENTER_DIRECTORIES])
@@ -908,7 +908,7 @@ function checkViewsLayout() {
     return failures.length === 0
 }
 
-// ── 静态路由文件首段一致性守护（GFX-734 / C325）────────────────────
+// ── 静态路由文件首段一致性守护────────────────────
 // route.ts 中静态路由的 component 文件路径首段必须属于当前运营中心或共享目录。
 const STATIC_ROUTE_SCOPE_FILES = ['src/router/route.ts']
 const SHARED_ROUTE_FIRST_SEGMENTS = new Set(['login', 'error', ...OPERATION_CENTER_DIRECTORIES])
@@ -950,7 +950,7 @@ function checkSysAbbreviation() {
     const allowedTokens = new Set(Object.keys(allowlist))
     // Each pattern requires an uppercase letter right after `Sys`/`sys`, so legitimate
     // `System`/`system` (Sys followed by lowercase `t`) are never matched — only the
-    // `Sys`/`sys` business abbreviation leaks the C179 change removed.
+    // `Sys`/`sys` business abbreviation leaks the change removed.
     const patterns = [
         { re: /\bSys[A-Z][a-zA-Z]*/g, kind: 'Sys' },
         { re: /\bsys[A-Z][a-zA-Z]*/g, kind: 'sys' },
@@ -991,7 +991,7 @@ function checkSysAbbreviation() {
 
 function checkPrimeVueSeverity() {
     // PrimeVue Tag/Button severity 合法值是 warn 不是 warning（tag/index.d.ts、button/index.d.ts）。
-    // warning 落在所有样式分支之外会静默回退默认主色，警示语义丢失（GFX-649 / C242）。
+    // warning 落在所有样式分支之外会静默回退默认主色，警示语义丢失。
     // 拦截两类写法：
     // 1. 模板字面量属性 severity="warning"（含 :severity="'warning'"）
     // 2. JS 侧作为 severity 值使用的 'warning'（对象字段 severity: 'warning' / map 值）与 severity 类型联合
@@ -1020,9 +1020,9 @@ function checkPrimeVueSeverity() {
     return failures.length === 0
 }
 
-// eslint.config.mjs 的 multi-word 冻结清单只减不增守护（GFX-717 / C305）：
+// eslint.config.mjs 的 multi-word 冻结清单只减不增守护：
 // frozen 新条目未同步扩 allowlist componentNames 快照即失败（防豁免面扩张）；
-// 收缩（移除 frozen 条目）永远合法，只提示同步删快照，不再复现 C287 时代的无守护冻结。
+// 收缩（移除 frozen 条目）永远合法，只提示同步删快照，不再复现 时代的无守护冻结。
 const ESLINT_CONFIG_FILE = join(ROOT, 'eslint.config.mjs')
 
 function extractFrozenMultiWordFiles() {

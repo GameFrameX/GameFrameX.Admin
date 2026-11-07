@@ -4,7 +4,7 @@ using GameFrameX.Foundation.Http.Normalization;
 namespace GameFrameX.Core.Result;
 
 /// <summary>
-/// 三 host（Client / Hub / Game）共享的统一错误出口包装（C264，ADR 2026-08-20 统一错误码体系）。
+/// 三 host（Client / Hub / Game）共享的统一错误出口包装（ADR 2026-08-20 统一错误码体系）。
 /// </summary>
 /// <remarks>
 /// Foundation 信封 <see cref="HttpJsonResultData{T}"/> 的 <c>Error(int, string)</c> 为 NuGet 包签名，无法收口枚举；

@@ -6,7 +6,7 @@ using GameFrameX.Entity.Game.Mail;
 namespace GameFrameX.Core.Tests.MailCampaign;
 
 /// <summary>
-/// 运营邮件 Campaign Admin API 契约自检（C134 / GFX-141）。
+/// 运营邮件 Campaign Admin API 契约自检。
 /// 编译期即 failing-without-implementation（服务/DTO/枚举类型不存在则编译失败）；运行期反射断言路由方法、
 /// 过滤字段、枚举值域不漂移。跨仓库字段对齐铁律由 <see cref="MailCampaignServerClientTests"/> 通过
 /// 序列化 JSON 键名二次锚定。

@@ -27,7 +27,7 @@ const severityMap: Record<MessageType, string> = {
     info: 'info',
 }
 
-// toast 按 severity 分级停留时长（GFX-661）：错误类长文案需要更长阅读时间，成功/提示类快速反馈即可
+// toast 按 severity 分级停留时长：错误类长文案需要更长阅读时间，成功/提示类快速反馈即可
 const severityLifeMap: Record<MessageType, number> = {
     success: 3000,
     info: 3500,

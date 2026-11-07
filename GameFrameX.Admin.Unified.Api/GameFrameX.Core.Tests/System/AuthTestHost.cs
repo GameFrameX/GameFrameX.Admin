@@ -18,7 +18,7 @@ using SqlSugar;
 namespace GameFrameX.Core.Tests.System;
 
 /// <summary>
-/// SystemAuthService 端到端测试宿主（C217）：真实 SqlSugar 单主库（superadmin seed）+
+/// SystemAuthService 端到端测试宿主：真实 SqlSugar 单主库（superadmin seed）+
 /// 手写 fake（3 接口）+ CurrentUserContext 真实 + SystemConfigService 真实（FakeCache）+ ICaptcha/IServiceProvider null!（captcha IsEnabled=false 路径不调用）。
 /// <para>DefaultHttpContext 供 CreateTokenAsync 写响应头；FakePlatformJwtTokenService 捕获 payload 供 Claim 校验。</para>
 /// </summary>

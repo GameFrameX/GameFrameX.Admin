@@ -355,7 +355,7 @@ export default {
             propCount: '数量',
         },
 
-        // Mail Campaign module（運営メールキャンペーン / C135 / GFX-142）
+        // Mail Campaign module（運営メールキャンペーン / /）
         mailCampaign: {
             add: '運営メールキャンペーン追加',
             edit: '運営メールキャンペーン編集',

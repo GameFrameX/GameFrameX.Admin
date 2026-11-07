@@ -2,24 +2,24 @@ using System.ComponentModel;
 using GameFrameX.Application.GmCenter.Match.Dto;
 using GameFrameX.Application.ServerCenter.Online;
 
-// S3/C401 断链修复点
+// / 断链修复点
 namespace GameFrameX.Application.GmCenter.Match;
 
 /// <summary>
-/// Online 匹配 Ticket 明细查询服务。路由前缀 /api/onlineMatchTicketQuery（change C341 / vault:C5 S4.9）。
+/// Online 匹配 Ticket 明细查询服务。路由前缀 /api/onlineMatchTicketQuery（change / vault: .9）。
 /// <para>纯只读观测：失败原因明细与异常 Ticket（长时间未分配/重复取消/孤儿）检索实时透传 Online，
-/// 游标翻页往返；Admin 侧零持久化、零缓存。治理动作（如取消 Ticket）属 vault:C9 受控操作（C344），不在本服务。</para>
+/// 游标翻页往返；Admin 侧零持久化、零缓存。治理动作（如取消 Ticket）属 vault: 受控操作，不在本服务。</para>
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 121)]
 public class OnlineMatchTicketQueryService : IAdminApiController
 {
     /// <summary>
-    /// 失败原因明细查询 action 名（mock 先行，联调以 vault C5 详表为准）。
+    /// 失败原因明细查询 action 名（mock 先行，联调以 vault 详表为准）。
     /// </summary>
     private const string QueryMatchTicketFailuresAction = "query_match_ticket_failures";
 
     /// <summary>
-    /// 异常 Ticket 查询 action 名（mock 先行，联调以 vault C5 详表为准）。
+    /// 异常 Ticket 查询 action 名（mock 先行，联调以 vault 详表为准）。
     /// </summary>
     private const string QueryMatchAbnormalTicketsAction = "query_match_abnormal_tickets";
 

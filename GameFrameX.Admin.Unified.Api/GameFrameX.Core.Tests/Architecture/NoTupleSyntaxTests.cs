@@ -6,7 +6,7 @@ public sealed class NoTupleSyntaxTests
 {
     private static readonly string RepositoryRoot = GetRepositoryRoot();
 
-    // C118 (GFX-121): 后端 C# 元组语法已全部替换为具名 sealed class/DTO，基线清空，本测试恢复为“零容忍”架构关卡。
+    //  (): 后端 C# 元组语法已全部替换为具名 sealed class/DTO，基线清空，本测试恢复为“零容忍”架构关卡。
     // 新增任何元组语法（ValueTuple / Tuple<> / 元组表达式 / 元组解构）都会直接失败，必须用具名类型替代。
     private static readonly Dictionary<string, int> AllowedTupleSyntaxBaseline = new(StringComparer.Ordinal)
     {

@@ -53,7 +53,7 @@ public class SystemAuthServiceSetupPasswordTests
         using var host = new AuthTestHost();
         UseUniqueClientIp(host);
         var svc = host.BuildService();
-        // 字面播种「已配置」态（GFX-747 D4）：显式传 true 而非依赖默认参数，
+        // 字面播种「已配置」态：显式传 true 而非依赖默认参数，
         // 测 fail-closed 真实路径——WHERE password_configured == false 不命中 → 0 行更新 → 30000018
         await host.SeedSuperAdminAsync("superadmin", "123456", passwordConfigured: true);
 

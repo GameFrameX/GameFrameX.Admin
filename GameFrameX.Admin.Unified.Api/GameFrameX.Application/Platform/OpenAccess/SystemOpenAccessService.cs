@@ -63,7 +63,7 @@ public class SystemOpenAccessService : IAdminApiController
         }
 
         var openAccess = input.Adapt<SystemOpenAccessEntity>();
-        // 凭证静态加密收口（C370）：AccessSecret 以 enc:sec:v1: 密文落库
+        // 凭证静态加密收口：AccessSecret 以 enc:sec:v1: 密文落库
         openAccess.AccessSecret = SecretCrypto.Encrypt(openAccess.AccessSecret) ?? string.Empty;
         await _systemOpenAccessRepository.InsertAsync(openAccess);
     }
@@ -84,7 +84,7 @@ public class SystemOpenAccessService : IAdminApiController
         }
 
         var openAccess = input.Adapt<SystemOpenAccessEntity>();
-        // 凭证静态加密收口（C370）：幂等——存量密文行重写不换密文
+        // 凭证静态加密收口：幂等——存量密文行重写不换密文
         openAccess.AccessSecret = SecretCrypto.Encrypt(openAccess.AccessSecret) ?? string.Empty;
         _systemCacheService.Remove(CacheConst.KeyOpenAccess + openAccess.AccessKey);
 
@@ -123,7 +123,7 @@ public class SystemOpenAccessService : IAdminApiController
 
     /// <summary>
     /// 根据 Key 获取对象
-    /// <para>凭证解密收口（C370）：解密发生在 <see cref="SystemCacheService.GetOrAdd"/> 缓存 miss 的加载边界——
+    /// <para>凭证解密收口：解密发生在 <see cref="SystemCacheService.GetOrAdd"/> 缓存 miss 的加载边界——
     /// 缓存持有明文实体（进程级，配置语义），命中路径零 PBKDF2 派生；写入侧更新时 Remove 使缓存失效。</para>
     /// </summary>
     /// <param name="accessKey"></param>

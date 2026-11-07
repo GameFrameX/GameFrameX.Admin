@@ -3,7 +3,7 @@ using GameFrameX.Client.Api.GameUserPay.Dto;
 namespace GameFrameX.Client.Api.Services.PayVerification;
 
 /// <summary>
-/// 支付收据验真器（C11 支付域 Verify 通道）
+/// 支付收据验真器（支付域 Verify 通道）
 /// <para>默认实现经 <c>IPaymentChannelFactory</c> 按渠道取 handler 调其 VerifyReceiptAsync；
 /// 测试注入假实现（成功 / pending / 未配置三态）。</para>
 /// </summary>

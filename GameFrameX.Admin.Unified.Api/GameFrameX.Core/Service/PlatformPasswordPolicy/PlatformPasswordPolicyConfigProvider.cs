@@ -4,7 +4,7 @@ using GameFrameX.Entity.System;
 namespace GameFrameX.Core.Service.PlatformPasswordPolicy;
 
 /// <summary>
-/// 平台密码策略配置提供器（C173）。维护同一 Admin Host 内的内存快照：启动期由
+/// 平台密码策略配置提供器。维护同一 Admin Host 内的内存快照：启动期由
 /// PlatformPasswordPolicyStartupLoader（Web.Core）调 <see cref="RefreshAsync"/>
 /// 从主库 <see cref="SystemConfigEntity"/> 加载；SuperAdmin 保存配置后由配置服务调用 <see cref="RefreshAsync"/>
 /// 刷新快照并镜像同步 <see cref="CryptogramUtility"/> 密码策略静态属性，使后续 <c>UserService.ChangePwdAsync</c>

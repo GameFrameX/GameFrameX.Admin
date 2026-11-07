@@ -3,7 +3,7 @@ using GameFrameX.Entity.Base;
 namespace GameFrameX.Entity.Business.Game;
 
 /// <summary>
-/// 游戏排行榜条目（C9 排行域：RSGet*/RSQuery*/RSHeartBeat 自建）
+/// 游戏排行榜条目（排行域：RSGet*/RSQuery*/RSHeartBeat 自建）
 /// <para>一玩家一组一行（唯一键 RankType+GroupId+UserId）；组按 RankType+ConfigKey+ConfigId+RoundToken
 /// 匹配（RoundToken = 榜单轮次令牌 = 玩家当前活动代币数），组容量满自动开新组。</para>
 /// <para>机器人补位行同表存储（合成 userid），保证 Get/Query/HeartBeat 三视图榜单一致。</para>

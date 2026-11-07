@@ -212,22 +212,22 @@ export interface AddGameAreaEntityRequest {
   /** 运行参数。此前 BaseRequest 缺此声明，Adapt 无来源导致实体 NOT NULL 列恒 23502。 */
   serverParams?: string | null;
   /**
-   * 客户端转发 Server HTTP 路由前缀（来源 change C150 §3.2 / C175）。
+   * 客户端转发 Server HTTP 路由前缀（来源 change /）。
    *
    * Client API 代理玩家普通请求（建角、改名、查角色、创建订单等）的 Server HTTP 路由前缀，默认 `game/api`。
    */
   clientDispatchApiPrefix?: string | null;
   /**
-   * 履约投递 Server HTTP 路由前缀（来源 change C150 §3.2 / C175）。
+   * 履约投递 Server HTTP 路由前缀（来源 change /）。
    *
    * 后台履约、发货、退款、邮件投递、广告奖励、Campaign 发布、后台运营操作等资产或运营投递的前缀，默认 `game/api`。
    */
   fulfillmentApiPrefix?: string | null;
-  /** GM 命令 Server HTTP 路由前缀（来源 change C150 §3.2 / C175）。默认空，空表示 Admin 不构造 GM URL。 */
+  /** GM 命令 Server HTTP 路由前缀（来源 change /）。默认空，空表示 Admin 不构造 GM URL。 */
   gmApiPrefix?: string | null;
-  /** 管理控制 Server HTTP 路由前缀（来源 change C150 §3.2 / C175）。默认空，空表示 Admin 不构造控制 URL。 */
+  /** 管理控制 Server HTTP 路由前缀（来源 change /）。默认空，空表示 Admin 不构造控制 URL。 */
   controlApiPrefix?: string | null;
-  /** 是否允许客户端调试 GM 通道（来源 change C150 §3.2 / C175）。仅 Admin 配置标记，最终放行由 Game Server 启动参数与环境门禁决定，默认关闭。 */
+  /** 是否允许客户端调试 GM 通道（来源 change /）。仅 Admin 配置标记，最终放行由 Game Server 启动参数与环境门禁决定，默认关闭。 */
   enableClientGmApi?: boolean;
   /** 是否启用 */
   isEnabled: boolean;
@@ -301,15 +301,15 @@ export interface GameAreaResponse {
   serverParams?: string | null;
   /** 客户端版本 */
   appVersion?: string | null;
-  /** 客户端转发 Server HTTP 路由前缀（来源 change C150 §3.2 / C175）。默认 game/api。 */
+  /** 客户端转发 Server HTTP 路由前缀（来源 change /）。默认 game/api。 */
   clientDispatchApiPrefix?: string | null;
-  /** 履约投递 Server HTTP 路由前缀（来源 change C150 §3.2 / C175）。默认 game/api。 */
+  /** 履约投递 Server HTTP 路由前缀（来源 change /）。默认 game/api。 */
   fulfillmentApiPrefix?: string | null;
-  /** GM 命令 Server HTTP 路由前缀（来源 change C150 §3.2 / C175）。默认空，空表示不构造 GM URL。 */
+  /** GM 命令 Server HTTP 路由前缀（来源 change /）。默认空，空表示不构造 GM URL。 */
   gmApiPrefix?: string | null;
-  /** 管理控制 Server HTTP 路由前缀（来源 change C150 §3.2 / C175）。默认空，空表示不构造控制 URL。 */
+  /** 管理控制 Server HTTP 路由前缀（来源 change /）。默认空，空表示不构造控制 URL。 */
   controlApiPrefix?: string | null;
-  /** 是否允许客户端调试 GM 通道（Admin 配置标记，来源 change C150 §3.2 / C175）。 */
+  /** 是否允许客户端调试 GM 通道（Admin 配置标记，来源 change /）。 */
   enableClientGmApi?: boolean;
   /** 是否启用 */
   isEnabled?: boolean | null;
@@ -460,22 +460,22 @@ export interface UpdateGameAreaEntityRequest {
   /** 运行参数。此前 BaseRequest 缺此声明，Adapt 无来源导致实体 NOT NULL 列恒 23502。 */
   serverParams?: string | null;
   /**
-   * 客户端转发 Server HTTP 路由前缀（来源 change C150 §3.2 / C175）。
+   * 客户端转发 Server HTTP 路由前缀（来源 change /）。
    *
    * Client API 代理玩家普通请求（建角、改名、查角色、创建订单等）的 Server HTTP 路由前缀，默认 `game/api`。
    */
   clientDispatchApiPrefix?: string | null;
   /**
-   * 履约投递 Server HTTP 路由前缀（来源 change C150 §3.2 / C175）。
+   * 履约投递 Server HTTP 路由前缀（来源 change /）。
    *
    * 后台履约、发货、退款、邮件投递、广告奖励、Campaign 发布、后台运营操作等资产或运营投递的前缀，默认 `game/api`。
    */
   fulfillmentApiPrefix?: string | null;
-  /** GM 命令 Server HTTP 路由前缀（来源 change C150 §3.2 / C175）。默认空，空表示 Admin 不构造 GM URL。 */
+  /** GM 命令 Server HTTP 路由前缀（来源 change /）。默认空，空表示 Admin 不构造 GM URL。 */
   gmApiPrefix?: string | null;
-  /** 管理控制 Server HTTP 路由前缀（来源 change C150 §3.2 / C175）。默认空，空表示 Admin 不构造控制 URL。 */
+  /** 管理控制 Server HTTP 路由前缀（来源 change /）。默认空，空表示 Admin 不构造控制 URL。 */
   controlApiPrefix?: string | null;
-  /** 是否允许客户端调试 GM 通道（来源 change C150 §3.2 / C175）。仅 Admin 配置标记，最终放行由 Game Server 启动参数与环境门禁决定，默认关闭。 */
+  /** 是否允许客户端调试 GM 通道（来源 change /）。仅 Admin 配置标记，最终放行由 Game Server 启动参数与环境门禁决定，默认关闭。 */
   enableClientGmApi?: boolean;
   /** 是否启用 */
   isEnabled?: boolean;
@@ -499,7 +499,7 @@ export interface GameAreaAddPostData {
   data: GameAreaResponse;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;
@@ -525,7 +525,7 @@ export interface GameAreaDetailGetData {
   data: GameAreaResponse;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;
@@ -552,7 +552,7 @@ export interface GameAreaPagePostData {
   data: GameAreaResponseSqlSugarPagedList;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;
@@ -577,7 +577,7 @@ export interface GameAreaSelectPostData {
   data: BaseSelectPageResponse[];
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;
@@ -600,7 +600,7 @@ export interface GameAreaSelectStringPostData {
   data: BaseSelectPageStringResponse[];
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;

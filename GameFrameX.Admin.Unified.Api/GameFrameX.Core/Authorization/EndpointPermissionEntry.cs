@@ -1,7 +1,7 @@
 namespace GameFrameX.Core.Authorization;
 
 /// <summary>
-/// 请求期端点权限条目（U6/C42 缓存值）：由 <c>ApiEndpointCatalogSync</c> 在启动时构建并预热，
+/// 请求期端点权限条目（缓存值）：由 <c>ApiEndpointCatalogSync</c> 在启动时构建并预热，
 /// JwtHandler 请求期按 RoutePath 查得，做端点→绑定按钮→已授权 MenuId 反向鉴权。
 /// </summary>
 public sealed class EndpointPermissionEntry

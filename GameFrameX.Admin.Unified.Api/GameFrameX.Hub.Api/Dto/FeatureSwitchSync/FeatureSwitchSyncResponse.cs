@@ -1,7 +1,7 @@
 namespace GameFrameX.Hub.Api.Dto.FeatureSwitchSync;
 
 /// <summary>
-/// 功能开关服务器同步响应（C347 版本化差异协议，两通道同形）。
+/// 功能开关服务器同步响应（版本化差异协议，两通道同形）。
 /// <para><see cref="Version"/> 由投放解析器对有效候选集做 canonical md5 生成（小写 32 位 hex）：
 /// 任一业务字段变化或行集合增减必变；活动时间窗进出自然变版本，消费方短轮询即可感知差异。</para>
 /// </summary>

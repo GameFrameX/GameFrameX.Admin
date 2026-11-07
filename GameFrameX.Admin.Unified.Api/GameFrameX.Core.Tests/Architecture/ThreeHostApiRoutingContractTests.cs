@@ -18,7 +18,7 @@ using Microsoft.AspNetCore.Mvc.Routing;
 namespace GameFrameX.Core.Tests.Architecture;
 
 /// <summary>
-/// C235 三 Host API 路由契约防回潮守护测试。
+///  三 Host API 路由契约防回潮守护测试。
 /// 契约文档：gfx-doc/agent-handbook/api-routing-contract.md（单一事实来源，附录 A 采样表与本测试同源）。
 /// 与 Authorization/AdminApiRouteRulesTests（规则函数层）互补：本测试走 AdminApiControllerConvention.Apply
 /// 端到端推导（与运行时同一条代码路径，含 GET 单参数路径化），并锁定 Client/Hub 显式 token 路由声明
@@ -48,12 +48,12 @@ public sealed class ThreeHostApiRoutingContractTests
         Assert.Contains(expectedVerb, constraint.HttpMethods);
     }
 
-    // ============ Client / Hub host：显式 token 路由声明（附录 A 表 C1-C5 / H1-H5） ============
+    // ============ Client / Hub host：显式 token 路由声明（附录 A 表 - / H1-H5） ============
 
     [Fact]
     public void ClientHub_BaseControllers_DeclareTokenRouteTemplate()
     {
-        // C236：Hub 本地 BaseController 副本已回收，token 路由模板唯一来源为 Core 共享版，Client/Hub 控制器经继承链取用
+        // ：Hub 本地 BaseController 副本已回收，token 路由模板唯一来源为 Core 共享版，Client/Hub 控制器经继承链取用
         AssertTokenRoute(typeof(Service.BaseController));
         AssertTokenRoute(typeof(PackageBuildReportController));
     }
@@ -61,7 +61,7 @@ public sealed class ThreeHostApiRoutingContractTests
     [Fact]
     public void Client_GameAnnouncementController_RenamesClassButLocksLegacyRoute()
     {
-        // C300（GFX-708）：类名自 GameAnnouncementEntityServiceController 清理而来；调用方（游戏客户端）
+        // ：类名自 GameAnnouncementEntityServiceController 清理而来；调用方（游戏客户端）
         // 依赖既有路径，显式 [Route] 锁定旧 token 解析结果。MVC 路由模板收集与 GetCustomAttributes(inherit: true)
         // 同源，此处断言 controller 级路由唯一且等于旧值，防止基类 token 路由叠加出 api/GameAnnouncement 别名端点。
         var routes = typeof(GameAnnouncementController)
@@ -76,7 +76,7 @@ public sealed class ThreeHostApiRoutingContractTests
     [Fact]
     public void Hub_MachineChannels_UseOpenAccessAuthentication()
     {
-        // C405：Hub 仅保留机器通道，两个控制器均由 GameAppOpenAccessAuthMiddleware 使用 HMAC 鉴权；JWT 不应进入信任域。
+        // ：Hub 仅保留机器通道，两个控制器均由 GameAppOpenAccessAuthMiddleware 使用 HMAC 鉴权；JWT 不应进入信任域。
         Assert.False(typeof(Service.BaseController).IsDefined(typeof(AuthorizeAttribute), true));
         Assert.True(typeof(FeatureSwitchSyncController).IsDefined(typeof(AllowAnonymousAttribute), false));
         Assert.True(typeof(PackageBuildReportController).IsDefined(typeof(AllowAnonymousAttribute), false));
@@ -120,7 +120,7 @@ public sealed class ThreeHostApiRoutingContractTests
         Assert.Equal(expectedTemplate, attribute.Template);
     }
 
-    // ============ 信封成功语义三边一致（契约 §4） ============
+    // ============ 信封成功语义三边一致（契约） ============
 
     [Fact]
     public void EnvelopeSuccessCode_IsZeroAcrossThreeHosts()
@@ -129,7 +129,7 @@ public sealed class ThreeHostApiRoutingContractTests
         Assert.Equal(0, HttpJsonResultData<object>.Success(new object()).Code);
         // Admin host 成功包装链路：AdminResultFilter -> AdminResultFactory.Create -> Success
         Assert.Equal(0, AdminResultFactory.Create(new object()).Code);
-        // Client / Hub / Game：成功信封直接走 Foundation Success 出口（旧三 host ResultCode 的 Ok 成员已随 C264 统一错误码退役）
+        // Client / Hub / Game：成功信封直接走 Foundation Success 出口（旧三 host ResultCode 的 Ok 成员已随 统一错误码退役）
         Assert.Equal(0, HttpJsonResultData<object>.Success().Code);
         Assert.Equal(0, HttpJsonResultData<string>.Success().Code);
     }

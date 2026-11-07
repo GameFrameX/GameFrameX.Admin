@@ -15,10 +15,10 @@ using GameFrameX.Foundation.Orm.Entity;
 using Microsoft.AspNetCore.Http;
 using SqlSugar;
 
-// S3/C401 断链修复点
+// / 断链修复点
 namespace GameFrameX.Core.Tests.Online.Social;
 
-// C350 / GFX-754（vault:C7）：举报案件处置流契约自检（三步流：事实源写入 → 联动命令 → 通知/案件回写）。
+//  / （vault:）：举报案件处置流契约自检（三步流：事实源写入 → 联动命令 → 通知/案件回写）。
 // 覆盖：Mute 处置落账事实源（审计字段服务端强制）+ 联动 + 通知 + 回写全链成功；
 // Dismiss 不写事实源不通知；联动失败不回滚事实源且后续步骤继续（联动可重试）；
 // 案件回写失败落响应原因不阻断；Mute 缺时长服务端兜底拒绝；Page 过滤透传与游标往返。

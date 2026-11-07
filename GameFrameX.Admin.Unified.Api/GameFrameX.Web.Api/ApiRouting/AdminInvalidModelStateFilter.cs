@@ -5,11 +5,11 @@ using Microsoft.Extensions.Options;
 namespace GameFrameX.Web.Api.ApiRouting;
 
 /// <summary>
-/// 动态 API 控制器的模型绑定失败显式 400 防线（C391 / GFX-923）。
+/// 动态 API 控制器的模型绑定失败显式 400 防线。
 /// <para>
 /// 动态服务类无 [ApiController]，Startup 配置的 ApiBehaviorOptions.InvalidModelStateResponseFactory
 /// 只被 [ApiController] 注入的 ModelStateInvalidFilter 消费，对动态控制器完全失活——body 反序列化
-/// 失败时复杂参数静默为 null，首次解引用即 500 NRE（Api#291）。本过滤器把同一工厂接到全量
+/// 失败时复杂参数静默为 null，首次解引用即 500 NRE。本过滤器把同一工厂接到全量
 /// Admin MVC action 上，消灭「契约错位 → 静默 null → 500 NRE」这一类问题。
 /// </para>
 /// <para>

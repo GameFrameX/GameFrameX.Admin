@@ -46,7 +46,7 @@ const rules = {
 const beforeOpen = (form: any, isEditor: boolean) => {
 
 
-  // 每角色可用次数：缺省回退 0（C159 默认值；后端未返回字段时保证新建/编辑回显一致）
+  // 每角色可用次数：缺省回退 0（默认值；后端未返回字段时保证新建/编辑回显一致）
   if (form.roleUsageLimit === undefined || form.roleUsageLimit === null) {
     form.roleUsageLimit = 0
   }

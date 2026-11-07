@@ -21,7 +21,7 @@ using Microsoft.AspNetCore.Http;
 namespace GameFrameX.Core.Tests.ClientApi;
 
 /// <summary>
-/// 广告回调配置按 PackageId 绑定（R5）闭环测试：真实 <see cref="ClientApiOptionsProvider"/> + 真实奖励服务。
+/// 广告回调配置按 PackageId 绑定闭环测试：真实 <see cref="ClientApiOptionsProvider"/> + 真实奖励服务。
 /// <para>覆盖：分包隔离验签（各包只能用自己的密钥）、跨包密钥拒绝、无配置 fail-closed、
 /// 重复 (PackageId, Provider) 保存拒绝（31800001）、直插多条命中解析 fail-closed、账本 PackageId 与所选配置一致。
 /// 路由缺 packageId 的 404 由 <see cref="PublicCallbackLegacyRouteRejectionTests"/> 覆盖。</para>
@@ -127,7 +127,7 @@ public sealed class AdvertisementCallbackPackageBindingTests : IDisposable
     public async Task EmptyRouteProvider_FailsClosed_EvenWithSingleConfig()
     {
         using var db = CreateDb();
-        // F4 #22：路由上下文缺 provider 时不得退化为「该分包唯一配置」兜底选取，必须直接拒绝
+        //  #22：路由上下文缺 provider 时不得退化为「该分包唯一配置」兜底选取，必须直接拒绝
         InsertConfig(db, 7401, PackageA, "secret-alpha");
 
         var context = new DefaultHttpContext();

@@ -1,6 +1,6 @@
 /**
- * OnlineCursorList 组件类型定义（C349 / GFX-756，C340 前端半边）。
- * 分页契约：Cursor + HasMore 透传（vault C2 S1.2），禁页码偏移。
+ * OnlineCursorList 组件类型定义（前端半边）。
+ * 分页契约：Cursor + HasMore 透传（vault .2），禁页码偏移。
  */
 import type { CursorPage } from './cursorPager';
 
@@ -19,6 +19,6 @@ export interface OnlineColumnConfig {
     header: string;
     width?: string;
     align?: 'left' | 'center' | 'right';
-    /** 敏感列：默认遮蔽（******），点击显明——vault C2 S1.6 脱敏口径的展示层落法。 */
+    /** 敏感列：默认遮蔽（******），点击显明——vault .6 脱敏口径的展示层落法。 */
     sensitive?: boolean;
 }

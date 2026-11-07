@@ -26,7 +26,7 @@ public sealed class GameOnlinePlayerSegmentResponse
     public string? Description { get; set; }
 
     /// <summary>
-    /// 分群条件 JSON（List&lt;<see cref="OnlineSegmentCondition"/>&gt;）。
+    /// 分群条件 JSON（List&lt;<see cref="OnlineSegmentCondition"/>&gt）。
     /// </summary>
     public string? ConditionsJson { get; set; }
 
@@ -71,7 +71,7 @@ public sealed class GameOnlinePlayerSegmentResponse
     public long UpdateTime { get; set; }
 
     /// <summary>
-    /// 乐观锁版本号（C228：GenericCrudService TResponse 必含，乐观锁编辑链路与默认排序依赖）。
+    /// 乐观锁版本号（GenericCrudService TResponse 必含，乐观锁编辑链路与默认排序依赖）。
     /// </summary>
     public long RowVersion { get; set; }
 }

@@ -4,18 +4,18 @@ import { expectOverview, navigateByMenu, pickDateTime, shot, sleep, superadminPa
 // 单 shell 数据闭环：20 个保留实体，按根组 + 叶子标题真实导航，不读取菜单树或直接跳 hash。
 // 菜单归属和控件序列按终态对账，保留新增→编辑回显→删除的动作强度。
 // 例外与既有风险（集成轮核验，不以迁移宣称已修）：
-// - 应用管理已按 C400/C403 删除，不再作为 CRUD 例外或入口。
+// - 应用管理已按 / 删除，不再作为 CRUD 例外或入口。
 // - 游戏角色：历史新增权限问题；本轮 admin 显式授权后应复核，仍未加入此矩阵。
 // - 游戏内横幅/邮件/区服/邮件模板：区服与分类等前置数据、联动选择器尚需专项夹具。
 // - 游戏订单/发货账本：商业化中心的多表业务页，不是通用 CRUD 对话框。
-// - 支付配置：列表锚点；游戏内商品：级联与绑定（Api#291）；角色管理：上下文菜单动作。
+// - 支付配置：列表锚点；游戏内商品：级联与绑定；角色管理：上下文菜单动作。
 // - 分包管理、游戏公告、奖励模板/兑换码、物品目录、资源包、游戏运营配置：
-//   保留历史失败的闭环回归，不删除/跳过；隔离夹具提供语言/平台只读授权及奖励分组/物品。
-//   控件序列按终态核验，C402 失败原因与集成实际结果逐项见 C403 notes.md。
-// - 渠道软删问题 Api#287、邮件 Vue#198 等历史项不能因标题迁移直接视为修复。
+//  保留历史失败的闭环回归，不删除/跳过；隔离夹具提供语言/平台只读授权及奖励分组/物品。
+//  控件序列按终态核验， 失败原因与集成实际结果逐项见 notes.md。
+// - 渠道软删问题、邮件 Vue#198 等历史项不能因标题迁移直接视为修复。
 
 // 2026-10-20 补编辑半边：闭环升级为 新增 → 行回显 → 编辑提交（回显断言 + 改值）→ 行回显新值 → 删除 → 行消失。
-// update 路由按约定由 create 路由派生（xxx/add → xxx/update，C18 权限码对齐约定），不逐实体重复登记。
+// update 路由按约定由 create 路由派生（xxx/add → xxx/update， 权限码对齐约定），不逐实体重复登记。
 type EntitySpec = {
   name: string;
   menuTitle: string;
@@ -169,7 +169,7 @@ const ENTITIES: EntitySpec[] = [
   },
   {
     name: '兑换码',
-    rowEdit: false, // 动作列仅删除（C130 盘点同源）；编辑复用新增弹窗
+rowEdit: false, // 动作列仅删除（盘点同源）；编辑复用新增弹窗
     menuTitle: '兑换码',
     menuRoot: '商业化',
     fields: ['select', 'text', 'date', 'select', 'text', 'number', 'date', 'skip-select', 'reward-items'],
@@ -177,7 +177,7 @@ const ENTITIES: EntitySpec[] = [
     deleteApi: /gameRedeemCode\/delete/,
   },
   // 游戏内商品：级联 v2 已验证可用（前置目录数据已 seed），但 add 稳定 500 NRE——
-  // Api#291（AddRequest CategoryId:string/Number:long 与前端契约错位 → 绑定失败 input=null）。
+  // （AddRequest CategoryId:string/Number:long 与前端契约错位 → 绑定失败 input=null）。
   // 级别 InputNumber fill 的 onInputFocus NRE 已在应用启动层兜底修复（Vue#201），
   // 奖励模板「级别」改回真实 number fill 作回归。
   {
@@ -391,7 +391,7 @@ test.describe('CRUD 功能闭环（首批）', () => {
   }
 });
 
-// 广告回调配置闭环（F2 / R5：配置按分包绑定）：该页对话框是 schema 驱动（Provider 参数区 + 密钥 Password 框），
+// 广告回调配置闭环（配置按分包绑定）：该页对话框是 schema 驱动（Provider 参数区 + 密钥 Password 框），
 // 不进通用 CRUD 矩阵（fields 引擎不覆盖 password 型字段），此处专项覆盖：
 // 新增必须先选分包 → 提交链带 packageId；编辑弹窗回显所选分包标签；更新与删除闭环。
 // 权限口径（协调者裁定）：跨页选择器沿用 gameAppPackage Select 现有消费约定（同 remoteConfig / gamePaymentConfigEntity），

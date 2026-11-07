@@ -106,7 +106,7 @@ const langMenuItems = computed(() => [
   {label: t('message.layout.user.korean'), command: () => onLanguageChange('ko'), disabled: state.disabledI18n === 'ko'},
 ]);
 
-// 用户菜单触发器的读屏名称：可见用户名即名称来源，叠加菜单首项「个人中心」语义（C248 键盘/读屏可达）
+// 用户菜单触发器的读屏名称：可见用户名即名称来源，叠加菜单首项「个人中心」语义（键盘/读屏可达）
 const userMenuLabel = computed(() => {
   const displayName = userInfos.value.realName == '' ? userInfos.value.account : userInfos.value.realName;
   return `${displayName} (${t('message.user.dropdown2')})`;
@@ -213,7 +213,7 @@ onMounted(() => {
     height: 100%;
     display: flex;
     align-items: center;
-    // 触发器由 div 换原生 button（C248 键盘可达），抹平 UA 默认外观
+    // 触发器由 div 换原生 button（键盘可达），抹平 UA 默认外观
     border: 0;
     background: transparent;
     font: inherit;
@@ -227,7 +227,7 @@ onMounted(() => {
       }
     }
 
-    // 按压反馈（GFX-661）：缩放动画受全局 prefers-reduced-motion 豁免
+    // 按压反馈：缩放动画受全局 prefers-reduced-motion 豁免
     &:active {
       background: var(--p-content-border-color);
       transform: scale(0.96);
@@ -241,7 +241,7 @@ onMounted(() => {
 
 }
 
-// 手机端隐藏低频工具（组件大小/语言/全屏）与用户名，为折叠按钮腾出空间（C143，阈值见 theme/breakpoints.scss）
+// 手机端隐藏低频工具（组件大小/语言/全屏）与用户名，为折叠按钮腾出空间（阈值见 theme/breakpoints.scss）
 @include bp-down(sm) {
   .user-tool-secondary {
     display: none;

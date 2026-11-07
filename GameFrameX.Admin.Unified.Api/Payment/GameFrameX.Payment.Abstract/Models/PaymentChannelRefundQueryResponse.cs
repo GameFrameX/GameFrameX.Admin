@@ -7,7 +7,7 @@
 namespace GameFrameX.Payment.Abstract.Models;
 
 /// <summary>
-/// 渠道退款状态查询结果（C310 / GFX-718）。
+/// 渠道退款状态查询结果。
 /// </summary>
 public sealed class PaymentChannelRefundQueryResponse
 {

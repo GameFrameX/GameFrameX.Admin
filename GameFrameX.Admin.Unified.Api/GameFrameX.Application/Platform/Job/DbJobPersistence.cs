@@ -159,7 +159,7 @@ public class DbJobPersistence : IJobPersistence
         using var scope = _serviceScopeFactory.CreateScope();
         var jobDetailRepository = scope.ServiceProvider.GetRequiredService<SqlSugarRepository<SystemJobDetailEntity>>();
 
-        // 项目强制规则（C144）：*Time 字段一律 UTC 秒级 long?；
+        // 项目强制规则：*Time 字段一律 UTC 秒级 long?；
         // 与 历史框架.Schedule.JobDetail 边界处只允许通过 ScheduleTimeBridge 显式编码。
         var jobDetail = new SystemJobDetailEntity
         {
@@ -203,7 +203,7 @@ public class DbJobPersistence : IJobPersistence
         using var scope = _serviceScopeFactory.CreateScope();
         var jobTriggerRepository = scope.ServiceProvider.GetRequiredService<SqlSugarRepository<SystemJobTriggerEntity>>();
 
-        // 项目强制规则（C144）：*Time 字段一律 UTC 秒级 long?；
+        // 项目强制规则：*Time 字段一律 UTC 秒级 long?；
         // 与 历史框架.Schedule.Trigger 边界处只允许通过 ScheduleTimeBridge 显式编码。
         var jobTrigger = new SystemJobTriggerEntity
         {
@@ -251,7 +251,7 @@ public class DbJobPersistence : IJobPersistence
     }
 
     /// <summary>
-    /// 注册期持久化（C404 §9.8）：扫描 / 预载合并后的作业与触发器 upsert 进数据库。
+    /// 注册期持久化：扫描 / 预载合并后的作业与触发器 upsert 进数据库。
     /// <para>内置作业此前从未落库，「任务调度」页因此看不到它们；本方法在注册完成后
     /// 按存在性 insert / update（既有行以内存合并值为准——Preload 已把库值并入内存，写回等值幂等），
     /// 并保留 CreateType / ScriptCode 等脚本作业专属列不被覆盖。</para>
@@ -296,7 +296,7 @@ public class DbJobPersistence : IJobPersistence
 
     private static SystemJobDetailEntity ToDetailEntity(JobDetail jobDetail)
     {
-        // 项目强制规则（C144）：*Time 字段一律 UTC 秒级 long?；边界处只允许 ScheduleTimeBridge 显式编码。
+        // 项目强制规则：*Time 字段一律 UTC 秒级 long?；边界处只允许 ScheduleTimeBridge 显式编码。
         return new SystemJobDetailEntity
         {
             JobId = jobDetail.JobId ?? string.Empty,

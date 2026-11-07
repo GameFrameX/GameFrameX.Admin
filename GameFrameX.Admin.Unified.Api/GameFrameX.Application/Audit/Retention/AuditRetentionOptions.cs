@@ -1,7 +1,7 @@
 namespace GameFrameX.Application.Audit.Retention;
 
 /// <summary>
-/// 审计留存配置（C404 契约 §1.7）。默认值在代码中，`Configuration/AuditRetention.json` 可覆盖。
+/// 审计留存配置（契约）。默认值在代码中，`Configuration/AuditRetention.json` 可覆盖。
 /// </summary>
 public sealed class AuditRetentionOptions
 {

@@ -7,7 +7,7 @@
 namespace GameFrameX.Payment.Abstract.Models;
 
 /// <summary>
-/// 渠道侧退款状态归一枚举（C310 / GFX-718）：各渠道原始状态（Xsolla status / 支付宝 refund_status / Apple 退款历史 / Google voided purchases）统一映射到本枚举。
+/// 渠道侧退款状态归一枚举：各渠道原始状态（Xsolla status / 支付宝 refund_status / Apple 退款历史 / Google voided purchases）统一映射到本枚举。
 /// </summary>
 public enum RefundChannelStatusEnum
 {

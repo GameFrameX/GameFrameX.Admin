@@ -5,7 +5,7 @@ using GameFrameX.Foundation.Encryption;
 namespace GameFrameX.Core.Service.Business;
 
 /// <summary>
-/// 业务凭证静态加密唯一收口（C370 / GFX-829）：除连接串外的可逆凭证（邮件 Provider 凭据、开放接口 AccessSecret、
+/// 业务凭证静态加密唯一收口：除连接串外的可逆凭证（邮件 Provider 凭据、开放接口 AccessSecret、
 /// 对象存储 ConfigJson 敏感字段等）落库前加密、使用前解密都必须经过本类，禁止调用方自行判断密文形态。
 /// <para>密文格式为 <c>enc:sec:v1:&lt;Base64&gt;</c>，底层复用 Foundation.Encryption 的 <see cref="AesHelper"/>（AES-GCM + PBKDF2 600,000 迭代派生）；
 /// 密钥取环境变量 <see cref="KeyEnvironmentVariable"/>（GAMEFRAMEX_SECRET_ENCRYPTION_KEY），用于主库保留运行凭据的静态加密。</para>
@@ -91,9 +91,9 @@ public static class SecretCrypto
     }
 
     /// <summary>
-    /// 进程级「密文 → 明文」缓存（C372 / GFX-838）：PBKDF2 单次数百毫秒，无独立缓存的运行时读取点
+    /// 进程级「密文 → 明文」缓存：PBKDF2 单次数百毫秒，无独立缓存的运行时读取点
     /// （开放访问中间件、票据签发、邮件快照等每请求读取）经本缓存把派生摊销到「每 distinct 密文一次」。
-    /// 与 C370/C371 JSON 加密器的 DecryptCache 同款模式。
+    /// 与 / JSON 加密器的 DecryptCache 同款模式。
     /// <para>ponytail: 缓存无上限，容量受库内 distinct 密文数约束（密文含随机盐，每行每密文唯一）；
     /// 密钥轮换（更换环境变量值）后旧明文残留缓存，须重启进程生效；GetOrAdd 抛出（fail-closed）不落缓存。</para>
     /// </summary>

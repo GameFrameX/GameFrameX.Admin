@@ -92,7 +92,7 @@
 
 <script lang="ts" setup name="onlineDashboard">
 /**
- * 在线总览页（C344 / GFX-761，dashboard）。
+ * 在线总览页（dashboard）。
  * 数据源唯一 = Online 玩家侧查询 API 聚合快照（X6 口径）：
  * OnlineUserHub / OnlineUserService / GameHomeOnlineCounter 数据一律不计入。
  */

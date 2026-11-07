@@ -3,7 +3,7 @@ using GameFrameX.Entity.Enum;
 namespace GameFrameX.Application.ClientDelivery.AdvertisementReward.Dto;
 
 /// <summary>
-/// 广告奖励发放账本分页/导出查询输入参数（C114 / GFX-111 后端跟进）。
+/// 广告奖励发放账本分页/导出查询输入参数（后端跟进）。
 /// <para>过滤字段对齐前端检索表单：Provider/Status/RoleId 常用 + TransactionId/AdvertisementUnit/AreaId/时间范围 高级。</para>
 /// </summary>
 public class PageGameAdvertisementRewardEntityRequest : BaseAreaPageRequest

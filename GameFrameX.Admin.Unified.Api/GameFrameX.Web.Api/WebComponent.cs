@@ -17,7 +17,7 @@ namespace GameFrameX.Web.Api
             // Grafana Cloud OpenTelemetry（OTLP 三信号：traces/metrics/logs，logs 自动入 Loki）；凭证齐全才启用
             builder.UseHostOpenTelemetry("GameFrameX.Web.Api");
 
-            // Foundation 日志管道（C271，与 Client/Hub 同口径）：LogHandler.Create 建立 Serilog sinks（文件/控制台/Loki），
+            // Foundation 日志管道（与 Client/Hub 同口径）：LogHandler.Create 建立 Serilog sinks（文件/控制台/Loki），
             // AddSerilog 把 MEL ILogger<T> 全量路由进 Serilog，运行日志统一受 Foundation LogOptions 管控。
             // Web.Api 是容器主力 host，docker logs 依赖 stdout，控制台无条件开启。
             launcherOptions.IsConsole = true;

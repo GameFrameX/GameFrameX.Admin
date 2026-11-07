@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Builder;
 namespace GameFrameX.Core.Bootstrap;
 
 /// <summary>
-/// 三 host（Client / Hub / Game）共享的 CORS 启动装配扩展（C261，GFX-668）。
+/// 三 host（Client / Hub / Game）共享的 CORS 启动装配扩展。
 /// <para>收敛各 Program.cs 内联的 "CorsPolicy" AllowAnyOrigin 三连注册与 UseCors 调用。
 /// Admin host 的 CORS 语义不同（DefaultPolicy + CORS_ORIGINS 环境变量白名单），不适用本扩展。</para>
 /// </summary>

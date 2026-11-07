@@ -30,7 +30,7 @@ public class GameAssetPackageVersionController : BaseController<GameAppAssetPack
     }
 
     /// <summary>
-    /// 获取资源包版本信息（GFX-706 起纯只读：设备注册副作用已拆至 <see cref="RegisterDevice"/> 显式端点）
+    /// 获取资源包版本信息（起纯只读：设备注册副作用已拆至 <see cref="RegisterDevice"/> 显式端点）
     /// </summary>
     /// <returns></returns>
     [PublicStartupEndpoint]

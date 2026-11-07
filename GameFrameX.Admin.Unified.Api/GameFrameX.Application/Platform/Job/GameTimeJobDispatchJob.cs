@@ -7,7 +7,7 @@ using NCrontab;
 namespace GameFrameX.Application.Platform.Job;
 
 /// <summary>
-/// 业务定时任务扫描派发作业（C404 / GFX-1216 调度合一）。
+/// 业务定时任务扫描派发作业（调度合一）。
 /// <para>接替已退役的 <c>ScheduledTaskHostedService</c>：周期扫描 <see cref="GameTimeJobEntity"/> 全表，
 /// 按行的 cron（NCrontab 含秒 6 段）到期执行。语义与旧引擎对齐：</para>
 /// <list type="bullet">

@@ -98,171 +98,171 @@ GameFrameX 遊戲管理平台的前端工程，基於 Vue 3 + TypeScript + Vite 
 
 ```
 GameFrameX.Admin.Unified.Vue/
-├── src/                        # 業務源碼（99% 時間在這裡）
-├── public/                     # 靜態資源
-│   └── config/config.js        # Vite 啟動時生成的執行時組態
-├── scripts/                    # 工程化腳本（gen-api、check-frontend 等）
-├── openapi.json                # 後端 Swagger 導出，pnpm gen:api 的輸入
-├── build/                      # Docker / Nginx / 部署腳本
-├── Dockerfile                  # 多階段構建映像
-├── .cnb.yml                    # CNB 雲原生構建 / 部署流水線
-├── .env / .env.development / .env.production   # 環境變數
-├── eslint.config.mjs           # ESLint 9 flat config
+├── src/ # 業務源碼（99% 時間在這裡）
+├── public/ # 靜態資源
+│ └── config/config.js # Vite 啟動時生成的執行時組態
+├── scripts/ # 工程化腳本（gen-api、check-frontend 等）
+├── openapi.json # 後端 Swagger 導出，pnpm gen:api 的輸入
+├── build/ # Docker / Nginx / 部署腳本
+├── Dockerfile # 多階段構建映像
+├── .cnb.yml # CNB 雲原生構建 / 部署流水線
+├── .env / .env.development / .env.production # 環境變數
+├── eslint.config.mjs # ESLint 9 flat config
 ├── .prettierrc.json
 ├── tsconfig.json / tsconfig.typecheck.json
-├── vite.config.ts              # Vite 組態
-├── index.html                  # SPA 入口（注入 public/config/config.js）
-├── package.json                # scripts / dependencies
+├── vite.config.ts # Vite 組態
+├── index.html # SPA 入口（注入 public/config/config.js）
+├── package.json # scripts / dependencies
 ├── pnpm-lock.yaml
 ├── pnpm-workspace.yaml
 ├── CHANGELOG.md
-├── LICENSE     # 開源協議檔案
-└── README.md                   # 本檔案
+├── LICENSE # 開源協議檔案
+└── README.md # 本檔案
 ```
 
 ### src/ 詳解
 
 ```
 src/
-├── api/                          # 調後端的地方（※）
-│   ├── _shared/                  # 自動生成的共享層（HttpClient + data-contracts）
-│   ├── <module-camel>/           # 每個後端 tag 一個目錄，含 index.ts（Api class）+ types.ts
-│   │   ├── index.ts              # 自動生成 + 末尾導出頂層函式
-│   │   └── types.ts              # 僅本模組用到的 data-contracts
-│   └── <業務手寫>.ts             # 極少數手寫擴展，命名避免與生成物衝突
+├── api/ # 調後端的地方（※）
+│ ├── _shared/ # 自動生成的共享層（HttpClient + data-contracts）
+│ ├── <module-camel>/ # 每個後端 tag 一個目錄，含 index.ts（Api class）+ types.ts
+│ │ ├── index.ts # 自動生成 + 末尾導出頂層函式
+│ │ └── types.ts # 僅本模組用到的 data-contracts
+│ └── <業務手寫>.ts # 極少數手寫擴展，命名避免與生成物衝突
 │
-│   當前已有模組（節選）：
-│   systemAuth / systemUser / systemRole / systemMenu / systemConfig /
-│   globalMenu / globalDictType / globalLanguage / globalPlatform /
-│   gameAppReleaseVersion / gameAppAssetPackage / gameHomeEntity /
-│   gameOrderEntity / gameMailEntity / gameRedeemCodeEntity /
-│   platformCaptchaConfig / platformJwtConfig / platformPasswordPolicyConfig …
+│ 當前已有模組（節選）：
+│ systemAuth / systemUser / systemRole / systemMenu / systemConfig /
+│ globalMenu / globalDictType / globalLanguage / globalPlatform /
+│ gameAppReleaseVersion / gameAppAssetPackage / gameHomeEntity /
+│ gameOrderEntity / gameMailEntity / gameRedeemCodeEntity /
+│ platformCaptchaConfig / platformJwtConfig / platformPasswordPolicyConfig …
 │
-├── api-services/                 # 歷史遺留目錄，已清空，忽略
+├── api-services/ # 歷史遺留目錄，已清空，忽略
 │
-├── composables/                    # 組合式函式（※）
-│   ├── useCrudTable.ts             表格分頁 / 排序 / loading 封裝
-│   ├── useEditDialog.ts            新增 / 編輯彈窗（剝離審計欄位、isEnabled 預設）
-│   ├── useTableColumnPersistence.ts  列寬 / 列順序 / 列顯隱本地持久化
-│   ├── useRequiredFields.ts        必填欄位集合
-│   ├── usePrimeTablePage.ts        表格分頁 hook
-│   ├── formResolver.ts             表單校驗規則適配
-│   └── types/                      組合式函式的 TS 型別
+├── composables/ # 組合式函式（※）
+│ ├── useCrudTable.ts 表格分頁 / 排序 / loading 封裝
+│ ├── useEditDialog.ts 新增 / 編輯彈窗（剝離審計欄位、isEnabled 預設）
+│ ├── useTableColumnPersistence.ts 列寬 / 列順序 / 列顯隱本地持久化
+│ ├── useRequiredFields.ts 必填欄位集合
+│ ├── usePrimeTablePage.ts 表格分頁 hook
+│ ├── formResolver.ts 表單校驗規則適配
+│ └── types/ 組合式函式的 TS 型別
 │
-├── components/                   # 通用元件
-│   ├── crud-data-table/            PrimeVue DataTable 的 CRUD 封裝
-│   ├── crud-form-fields/           表單欄位統一渲染
-│   ├── base-edit-dialog/           新增 / 編輯彈窗基類
-│   ├── search-form/                查詢欄，支援 authPrefix 自動加權限按鈕
-│   ├── time-column/                表格列：long 秒自動格式化
-│   ├── form-label / form-help-text 表單欄位標籤 / 說明文字
-│   ├── app-confirm-dialog          全域確認彈窗
-│   ├── narrow-screen-hint          窄屏提示
-│   ├── notice-bar                  通知條
-│   ├── cropper / drag-verify / editor / icon-selector / reward-items-editor / svg-icon / table
+├── components/ # 通用元件
+│ ├── crud-data-table/ PrimeVue DataTable 的 CRUD 封裝
+│ ├── crud-form-fields/ 表單欄位統一渲染
+│ ├── base-edit-dialog/ 新增 / 編輯彈窗基類
+│ ├── search-form/ 查詢欄，支援 authPrefix 自動加權限按鈕
+│ ├── time-column/ 表格列：long 秒自動格式化
+│ ├── form-label / form-help-text 表單欄位標籤 / 說明文字
+│ ├── app-confirm-dialog 全域確認彈窗
+│ ├── narrow-screen-hint 窄屏提示
+│ ├── notice-bar 通知條
+│ ├── cropper / drag-verify / editor / icon-selector / reward-items-editor / svg-icon / table
 │
-├── directive/                    # 自訂指令
-│   ├── authDirective.ts            v-auth — 權限隱藏
-│   ├── customDirective.ts          v-waves / v-drag / v-reclick（防連點）
-│   ├── blockLoading.ts             v-block-loading — 整塊 loading 蒙層
-│   └── index.ts                    註冊入口
+├── directive/ # 自訂指令
+│ ├── authDirective.ts v-auth — 權限隱藏
+│ ├── customDirective.ts v-waves / v-drag / v-reclick（防連點）
+│ ├── blockLoading.ts v-block-loading — 整塊 loading 蒙層
+│ └── index.ts 註冊入口
 │
-├── i18n/                         # 國際化
-│   ├── lang/                       框架級（zh-cn / en / zh-tw / ja / ko）
-│   └── pages/                      業務級，按模組子目錄
-│       ├── system/ / client/ / game/ / home/ / login/ / menu/
-│       ├── personal/ / layout/ / errors/ / formI18n/ / chart/
-│       └── platform* / global*Config/
+├── i18n/ # 國際化
+│ ├── lang/ 框架級（zh-cn / en / zh-tw / ja / ko）
+│ └── pages/ 業務級，按模組子目錄
+│ ├── system/ / client/ / game/ / home/ / login/ / menu/
+│ ├── personal/ / layout/ / errors/ / formI18n/ / chart/
+│ └── platform* / global*Config/
 │
-├── layout/                       # 佈局
-│   ├── splitter/                   主佈局容器
-│   ├── navMenu/                    左側 / 橫向選單
-│   ├── navBars/                    頂欄（使用者 / 通知 / 全屏 / 主題）
-│   ├── routerView/                 keep-alive 容器
-│   ├── footer / logo / upgrade     其他佈局元素
-│   └── index.vue                   佈局入口
+├── layout/ # 佈局
+│ ├── splitter/ 主佈局容器
+│ ├── navMenu/ 左側 / 橫向選單
+│ ├── navBars/ 頂欄（使用者 / 通知 / 全屏 / 主題）
+│ ├── routerView/ keep-alive 容器
+│ ├── footer / logo / upgrade 其他佈局元素
+│ └── index.vue 佈局入口
 │
-├── router/                       # 路由（※）
-│   ├── index.ts                    路由實例 + 守衛
-│   ├── frontEnd.ts                 前端控制路由（兜底，目前用不到）
-│   ├── backEnd.ts                  後端動態路由核心
-│   ├── globalConfigRoutes.ts       全域組態路由
-│   └── route.ts                    靜態 / 兜底路由（/login / 404 / 401）
+├── router/ # 路由（※）
+│ ├── index.ts 路由實例 + 守衛
+│ ├── frontEnd.ts 前端控制路由（兜底，目前用不到）
+│ ├── backEnd.ts 後端動態路由核心
+│ ├── globalConfigRoutes.ts 全域組態路由
+│ └── route.ts 靜態 / 兜底路由（login / 404 / 401）
 │
-├── stores/                       # Pinia 狀態
-│   ├── themeConfig.ts              主題 / 佈局 / 暗色 / 浮水印 / globalI18n / isRequestRoutes
-│   ├── userInfo.ts                 使用者資訊 + authBtnList + constList + dictList
-│   ├── routesList.ts               選單樹
-│   ├── tagsViewRoutes.ts           Tabs 欄
-│   ├── keepAliveNames.ts           keep-alive 快取的 name 列表
-│   └── index.ts                    Pinia 實例 + 持久化配接器
+├── stores/ # Pinia 狀態
+│ ├── themeConfig.ts 主題 / 佈局 / 暗色 / 浮水印 / globalI18n / isRequestRoutes
+│ ├── userInfo.ts 使用者資訊 + authBtnList + constList + dictList
+│ ├── routesList.ts 選單樹
+│ ├── tagsViewRoutes.ts Tabs 欄
+│ ├── keepAliveNames.ts keep-alive 快取的 name 列表
+│ └── index.ts Pinia 實例 + 持久化配接器
 │
-├── theme/                        # SCSS 主題
-│   ├── z-index.scss                統一 z-index 階梯
-│   ├── breakpoints.scss            斷點（--bp-lg = 1024）
-│   ├── primevue-overrides.scss     PrimeVue token 覆蓋
-│   └── common/transition.scss      通用過渡
+├── theme/ # SCSS 主題
+│ ├── z-index.scss 統一 z-index 階梯
+│ ├── breakpoints.scss 斷點（--bp-lg = 1024）
+│ ├── primevue-overrides.scss PrimeVue token 覆蓋
+│ └── common/transition.scss 通用過渡
 │
-├── types/                        # TS 型別宣告
+├── types/ # TS 型別宣告
 │
-├── utils/                        # 工具函式（保持純函式）
-│   ├── request.ts                  手寫 API 用的 axios 實例
-│   ├── axios-utils.ts              生成 API 用的 HttpClient + getAPI 單例快取
-│   ├── http/shared.ts              ※ 共享攔截器（JWT / refresh / 錯誤碼 i18n）
-│   ├── storage.ts                  Local / Session（鍵加 __NEXT_NAME__: 前綴）
-│   ├── authFunction.ts             auth() / hasAnyAuth() 函式式權限
-│   ├── message.ts                  showSuccess / showError / showConfirm（PrimeVue Toast）
-│   ├── watermark.ts                浮水印
-│   ├── isEnabled.ts                IsEnabled 歸一化與新增預設值
-│   ├── rowVersion.ts               行版本讀取（相容 rowVersion / RowVersion）
-│   ├── primevue-locale.ts          PrimeVue 元件按語言切換
-│   ├── formatTime.ts               日期 / 時間格式化
-│   ├── download.ts / exportExcel.ts  匯出
-│   ├── sanitize.ts                 DOMPurify 封裝
-│   ├── fontawesome.ts              FA 自動按需
-│   ├── icons.ts                    FA 名稱映射
-│   ├── build.ts                    CDN 組態
-│   ├── arrayOperation.ts / commonFunction.ts / base64Conver.ts / crudConfig.ts / getStyleSheets.ts / loading.ts / mitt.ts / other.ts / template-utils.ts
-│   └── http/                       攔截器拆分
+├── utils/ # 工具函式（保持純函式）
+│ ├── request.ts 手寫 API 用的 axios 實例
+│ ├── axios-utils.ts 生成 API 用的 HttpClient + getAPI 單例快取
+│ ├── http/shared.ts ※ 共享攔截器（JWT / refresh / 錯誤碼 i18n）
+│ ├── storage.ts Local / Session（鍵加 __NEXT_NAME__: 前綴）
+│ ├── authFunction.ts auth() / hasAnyAuth() 函式式權限
+│ ├── message.ts showSuccess / showError / showConfirm（PrimeVue Toast）
+│ ├── watermark.ts 浮水印
+│ ├── isEnabled.ts IsEnabled 歸一化與新增預設值
+│ ├── rowVersion.ts 行版本讀取（相容 rowVersion / RowVersion）
+│ ├── primevue-locale.ts PrimeVue 元件按語言切換
+│ ├── formatTime.ts 日期 / 時間格式化
+│ ├── download.ts / exportExcel.ts 匯出
+│ ├── sanitize.ts DOMPurify 封裝
+│ ├── fontawesome.ts FA 自動按需
+│ ├── icons.ts FA 名稱映射
+│ ├── build.ts CDN 組態
+│ ├── arrayOperation.ts / commonFunction.ts / base64Conver.ts / crudConfig.ts / getStyleSheets.ts / loading.ts / mitt.ts / other.ts / template-utils.ts
+│ └── http/ 攔截器拆分
 │
-├── views/                        # 業務頁面
-│   ├── system/                     系統管理（使用者 / 角色 / 選單 / 字典 / 日誌 / 組態 / 通知 ……）
-│   ├── game/                       遊戲管理（區服 / 商品 / 訂單 / 郵件 / 兌換碼 / 商城 / 公告 / 物品 / 道具 ……）
-│   ├── client/                     客戶端管理（平台 / 版本 / 渠道 / 裝置 / 語言 / 資源包 / 開放介面 ……）
-│   ├── contentCenter / chart / chartCenter / chartCenter / opsCenter / trustCenter / automationCenter / goodsCenter / redeemCenter / webShopCenter / playerCenter
-│   ├── home/                       首頁儀表板
-│   ├── login/                      登入
-│   ├── personal/                   個人中心
-│   ├── error/                      404 / 401
-│   └── global/                     全域路由容器
+├── views/ # 業務頁面
+│ ├── system/ 系統管理（使用者 / 角色 / 選單 / 字典 / 日誌 / 組態 / 通知 ……）
+│ ├── game/ 遊戲管理（區服 / 商品 / 訂單 / 郵件 / 兌換碼 / 商城 / 公告 / 物品 / 道具 ……）
+│ ├── client/ 客戶端管理（平台 / 版本 / 渠道 / 裝置 / 語言 / 資源包 / 開放介面 ……）
+│ ├── contentCenter / chart / chartCenter / chartCenter / opsCenter / trustCenter / automationCenter / goodsCenter / redeemCenter / webShopCenter / playerCenter
+│ ├── home/ 首頁儀表板
+│ ├── login/ 登入
+│ ├── personal/ 個人中心
+│ ├── error/ 404 / 401
+│ └── global/ 全域路由容器
 │
-├── App.vue                       # 根元件
-├── main.ts                       # ※ 應用入口
-├── auto-imports.d.ts             # unplugin-auto-import 生成
-└── components.d.ts               # unplugin-vue-components 生成
+├── App.vue # 根元件
+├── main.ts # ※ 應用入口
+├── auto-imports.d.ts # unplugin-auto-import 生成
+└── components.d.ts # unplugin-vue-components 生成
 ```
 
 ### scripts/ 詳解
 
 ```
 scripts/
-├── gen-api.mjs                   # pnpm gen:api — 用 swagger-typescript-api 程式化生成
-├── post-gen.mjs                  # 生成產物拆分 + 重組到 src/api/<module>/
-├── migrate-api-services.mjs      # 歷史遷移腳本
-├── migrate-to-api-dir.mjs        # 把 api-services/ 合併到 api/
-├── check-i18n-keys.mjs           # pnpm run lint:i18n — 5 語言鍵完整性
-├── check-frontend-standards.mjs  # pnpm run check:frontend — 跨端規範門禁
-│   ├─ modes: all / routes / permissions / api / api-query-get
-│   │         / text / sys-abbreviation / text-baseline / self-test
-│   ├─ routes         後端選單 component ↔ src/views/<file>
-│   ├─ permissions    前端 v-auth 宣告 ↔ 後端種子 Btn
-│   ├─ api            手寫 vs 生成 API 重疊 review
-│   ├─ api-query-get  page/list/query 類介面禁止 GET 傳 params
-│   ├─ text           changed files 硬編碼中文掃描
-│   └─ sys-abbreviation C179 回歸：禁 Sys/sys 業務縮寫
-├── smoke-test.mjs                # 冒煙測試
-├── fix-collisions.mjs            # 衝突修復
-└── i18n-text-baseline.json       # 硬編碼中文豁免基線（C151 歷史欠債）
+├── gen-api.mjs # pnpm gen:api — 用 swagger-typescript-api 程式化生成
+├── post-gen.mjs # 生成產物拆分 + 重組到 src/api/<module>/
+├── migrate-api-services.mjs # 歷史遷移腳本
+├── migrate-to-api-dir.mjs # 把 api-services/ 合併到 api/
+├── check-i18n-keys.mjs # pnpm run lint:i18n — 5 語言鍵完整性
+├── check-frontend-standards.mjs # pnpm run check:frontend — 跨端規範門禁
+│ ├─ modes: all / routes / permissions / api / api-query-get
+│ │ / text / sys-abbreviation / text-baseline / self-test
+│ ├─ routes 後端選單 component ↔ src/views/<file>
+│ ├─ permissions 前端 v-auth 宣告 ↔ 後端種子 Btn
+│ ├─ api 手寫 vs 生成 API 重疊 review
+│ ├─ api-query-get page/list/query 類介面禁止 GET 傳 params
+│ ├─ text changed files 硬編碼中文掃描
+│ └─ sys-abbreviation 回歸：禁 Sys/sys 業務縮寫
+├── smoke-test.mjs # 冒煙測試
+├── fix-collisions.mjs # 衝突修復
+└── i18n-text-baseline.json # 硬編碼中文豁免基線（歷史欠債）
 ```
 
 ---
@@ -281,7 +281,7 @@ git clone https://github.com/GameFrameX/Admin.git
 cd Admin/GameFrameX.Admin.Unified.Vue
 corepack enable
 pnpm install
-pnpm run dev    # 預設 http://localhost:20800
+pnpm run dev # 預設 http://localhost:20800
 ```
 
 打開瀏覽器 → 看到登入頁 → 找後端同學要帳號。
@@ -343,8 +343,8 @@ Vite 啟動時會把這些值寫入 `public/config/config.js` 的 `window.__env_
 
 ```json
 [
-  { "path": "/dashboard",    "name": "dashboard",  "component": "/home/index" },
-  { "path": "/system/user",  "name": "systemUser", "component": "/system/user/index" }
+  { "path": "/dashboard", "name": "dashboard", "component": "/home/index" },
+  { "path": "/system/user", "name": "systemUser", "component": "/system/user/index" }
 ]
 ```
 
@@ -408,9 +408,9 @@ Vite 啟動時會把這些值寫入 `public/config/config.js` 的 `window.__env_
 import { getAPI } from '/@/utils/axios-utils'
 import { SystemUser } from '/@/api/systemUser'
 
-const api = getAPI(SystemUser)                       // 單例快取，多次調用無開銷
+const api = getAPI(SystemUser) // 單例快取，多次調用無開銷
 const res = await api.systemUserPagePost({ page: 1, pageSize: 20 })
-const user = res.data.result.items[0]                 // 自動歸一化的 { code, result, ... }
+const user = res.data.result.items[0] // 自動歸一化的 { code, result, ... }
 ```
 
 手寫 API 的調用範式：
@@ -467,9 +467,9 @@ export const pageX = (params: PageParams) =>
 
 ```
 src/views/system/demo/
-├── index.vue          # 列表頁
+├── index.vue # 列表頁
 └── component/
-    └── editDemo.vue   # 新增/編輯彈窗
+    └── editDemo.vue # 新增/編輯彈窗
 ```
 
 ### 2. 寫列表頁
@@ -613,12 +613,12 @@ src/i18n/pages/system/demo/
 程式碼寫完了但你還看不到頁面——選單是後端管的。告訴後端同學：
 
 ```
-path:        /system/demo
-name:        systemDemo
-component:   /system/demo/index       ← 要和 src/views/ 裡路徑一致
-title:       通知公告
-titleCode:   system.demo.title        ← 要在 zh-cn.ts 裡存在
-parent:      /system
+path: /system/demo
+name: systemDemo
+component: /system/demo/index ← 要和 src/views/ 裡路徑一致
+title: 通知公告
+titleCode: system.demo.title ← 要在 zh-cn.ts 裡存在
+parent: /system
 ```
 
 後端 commit + 部署後，前端重新登入就能看到選單。
@@ -626,7 +626,7 @@ parent:      /system
 ### 6. 提交
 
 ```bash
-pnpm run quality      # 一鍵跑所有門禁
+pnpm run quality # 一鍵跑所有門禁
 git add .
 git commit -m "feat(system.demo): 新增通知公告列表 + 彈窗"
 git push
@@ -687,9 +687,9 @@ git push
 ### 提交流程
 
 ```bash
-pnpm run quality      # 必過：lint + typecheck + test:unit + build + check:frontend
+pnpm run quality # 必過：lint + typecheck + test:unit + build + check:frontend
 git add .
-git commit -m "<scope>(<module>): <subject>"   # 中文 / 英文都可，≤ 60 字
+git commit -m "<scope>(<module>): <subject>" # 中文 / 英文都可，≤ 60 字
 git push
 ```
 
@@ -787,7 +787,7 @@ Network 看 `/userInfo` 回應裡的 `buttons` 欄位有沒有期待的字串；
 **Docker 部署後 API 地址還是舊的**
 1. `docker exec -it <container> cat /usr/share/nginx/html/config/config.js` 看 `window.__env__.VITE_API_URL`
 2. 是舊的 → 啟動時沒傳 `-e VITE_API_URL=...`
-3. 是新值但瀏覽器是舊的 → Ctrl+F5 / Cmd+Shift+R 強刷
+3. 是新值但瀏覽器是舊的 → Ctrl+ / Cmd+Shift+R 強刷
 4. 還不行 → 容器是舊映像起的，`docker pull` 拉最新
 
 **構建 OOM**
@@ -807,8 +807,8 @@ Docker Desktop → Preferences → Resources → Memory 調到 8G+，Swap 調到
 
 ```bash
 docker build -t gameframex-admin-web:dev -f GameFrameX.Admin.Unified.Vue/Dockerfile .
-docker run -d -p 80:80 gameframex-admin-web:dev                                          # 預設 API 地址
-docker run -d -p 80:80 -e VITE_API_URL=https://api.example.com gameframex-admin-web:dev   # 自訂 API
+docker run -d -p 80:80 gameframex-admin-web:dev # 預設 API 地址
+docker run -d -p 80:80 -e VITE_API_URL=https://api.example.com gameframex-admin-web:dev # 自訂 API
 ```
 
 容器有個小魔法：`build/entrypoint.sh` 啟動時讀環境變數重寫 `config.js`，所以**同一個映像可以靠環境變數切不同環境**。
@@ -824,13 +824,13 @@ docker run -d -p 80:80 -e VITE_API_URL=https://api.example.com gameframex-admin-
 ./build/docker-build-push.sh \
   --platforms linux/amd64,linux/arm64 \
   --tag v2.4.33
-./build/docker-build-push.sh --no-push                # 只構建不推
+./build/docker-build-push.sh --no-push # 只構建不推
 ./build/docker-build-push.sh \
   --registry registry.cn-hangzhou.aliyuncs.com \
   --namespace myns \
   --username your_user \
   --password your_pass \
-  --tag v2.4.33                                       # 私有倉庫認證
+  --tag v2.4.33 # 私有倉庫認證
 ```
 
 | 參數 | 說明 | 預設值 |
@@ -912,11 +912,11 @@ Swagger__Enabled=true dotnet run --project ../GameFrameX.Admin.Unified.Api/GameF
 
 # 2. 拉 swagger.json
 curl -sSL http://localhost:20802/swagger/web.api/swagger.json -o openapi.json
-ls -lh openapi.json   # 應 ~3 MB
+ls -lh openapi.json # 應 ~3 MB
 
 # 3. 跑前端生成
 pnpm gen:api
-git diff src/api/     # 看有沒有破壞性變更
+git diff src/api/ # 看有沒有破壞性變更
 ```
 
 Client / Hub API 也用同樣模式：`/swagger/client.api/swagger.json`（埠 20808）、`/swagger/hub.api/swagger.json`。前端 Admin 項目只用 Admin API，所以一般不用拉這兩個。

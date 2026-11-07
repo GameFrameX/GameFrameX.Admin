@@ -15,7 +15,7 @@ using GameFrameX.Payment.Abstract.Models;
 namespace GameFrameX.Payment.AliPay.Refund;
 
 /// <summary>
-/// 支付宝退款管理器（C310 / GFX-718）：统一收单交易退款 alipay.trade.refund + 退款查询 alipay.trade.fastpay.refund.query。
+/// 支付宝退款管理器：统一收单交易退款 alipay.trade.refund + 退款查询 alipay.trade.fastpay.refund.query。
 /// <para>全额退款：out_request_no 取商户订单号——同单重复退款支付宝按幂等语义返回原退款结果。</para>
 /// <para>SDK 为同步调用，按现有 AliPayPaymentHandler 同款 DefaultAopClient 构造与 Task.FromResult 包装风格。</para>
 /// </summary>

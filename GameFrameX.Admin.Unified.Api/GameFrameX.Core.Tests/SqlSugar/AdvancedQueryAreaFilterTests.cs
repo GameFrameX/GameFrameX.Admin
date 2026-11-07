@@ -6,7 +6,7 @@ using SqlSugar;
 namespace GameFrameX.Core.Tests.SqlSugar;
 
 /// <summary>
-/// GameAreaEntityService — IsDefault / IsRecommend / IsEnabled（C301 起归一基类列）/ Language(GameLanguage?) 过滤契约。
+/// GameAreaEntityService — IsDefault / IsRecommend / IsEnabled（起归一基类列）/ Language(GameLanguage?) 过滤契约。
 /// </summary>
 public sealed class AdvancedQueryAreaFilterTests : IDisposable
 {
@@ -31,7 +31,7 @@ public sealed class AdvancedQueryAreaFilterTests : IDisposable
     public async Task IsEnabledFilter_MapsToIsEnableColumn()
     {
         await SeedAsync();
-        // DTO 字段 IsEnabled → 实体基类列 IsEnabled（C301 归一）。禁用过滤只返回 IsEnabled=false 的区服。
+        // DTO 字段 IsEnabled → 实体基类列 IsEnabled（归一）。禁用过滤只返回 IsEnabled=false 的区服。
         var disabled = await BuildQuery(isEnabled: false).ToListAsync();
         Assert.Single(disabled);
         Assert.True(disabled[0].IsEnabled == false);
@@ -74,7 +74,7 @@ public sealed class AdvancedQueryAreaFilterTests : IDisposable
     private static GameAreaEntity BuildArea(long id, string name, bool isEnable, GameLanguage language, long now)
     {
         // 与 GameOrderShipServiceTests 一致的种子字段集（裸配置下所有列均 NOT NULL，需全量赋值）。
-        // 本测试只断言 IsEnabled（C301 归一基类列）/Language 过滤形状，其余列给占位值。
+        // 本测试只断言 IsEnabled（归一基类列）/Language 过滤形状，其余列给占位值。
         return new GameAreaEntity
         {
             Id = id, Name = name, Language = language,

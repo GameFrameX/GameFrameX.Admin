@@ -8,7 +8,7 @@ namespace GameFrameX.Entity.Game.Mail;
 
 /// <summary>
 /// 运营邮件 Campaign 的 Admin 侧生命周期状态。
-/// <para>镜像 Server <c>MailCampaignStatus</c>（Published/Revoked）并扩展 Admin 草稿态：<c>Draft</c>（未发布，可编辑）→ <c>Published</c>（Server 已接受，主体不可变 B1）→ <c>Revoked</c>（撤回不可逆 B3）；<c>Failed</c> 为 Server 拒绝后的中间态，仍停留草稿可重试发布。</para>
+/// <para>镜像 Server <c>MailCampaignStatus</c>（Published/Revoked）并扩展 Admin 草稿态：<c>Draft</c>（未发布，可编辑）→ <c>Published</c>（Server 已接受，主体不可变）→ <c>Revoked</c>（撤回不可逆）；<c>Failed</c> 为 Server 拒绝后的中间态，仍停留草稿可重试发布。</para>
 /// </summary>
 public enum MailCampaignPublishStatus
 {
@@ -18,12 +18,12 @@ public enum MailCampaignPublishStatus
     Draft = 0,
 
     /// <summary>
-    /// 已发布：Server 已接受 Campaign 并分配 <c>ServerCampaignId</c>，主体字段不可修改、不可删除（B1）；仅可撤回。
+    /// 已发布：Server 已接受 Campaign 并分配 <c>ServerCampaignId</c>，主体字段不可修改、不可删除；仅可撤回。
     /// </summary>
     Published = 1,
 
     /// <summary>
-    /// 已撤回：撤回不可逆（B3 已发放资产不回滚）；新玩家不再命中，未领取附件按 <c>ExpireAttachmentPolicy</c> 处理（B4）。
+    /// 已撤回：撤回不可逆（已发放资产不回滚）；新玩家不再命中，未领取附件按 <c>ExpireAttachmentPolicy</c> 处理。
     /// </summary>
     Revoked = 2,
 

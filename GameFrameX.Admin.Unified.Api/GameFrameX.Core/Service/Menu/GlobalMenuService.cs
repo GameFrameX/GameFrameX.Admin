@@ -66,7 +66,7 @@ public class GlobalMenuService : IAdminApiController
         else
         {
             var menuIdList = await GetMenuIdListAsync();
-            // B5: 过滤整棵 SuperAdmin-only 子树（而非仅 Allow 子集）。
+            // : 过滤整棵 SuperAdmin-only 子树（而非仅 Allow 子集）。
             // 旧逻辑只剔除 AdminReadableSuperAdminOnlyMenuIds，当某菜单由"管理员可见"改为"超管专属"(SuperAdminOnly=true, Allow=false)后，
             // 既有管理员的 role_menu 仍残留旧授权，且不在 Allow 集合内，导致菜单仍出现在管理员导航中（点击后端 403）。改为剔除整棵超管子树可防御性修复。
             var menuTreeIds = menuIdList
@@ -378,7 +378,7 @@ public class GlobalMenuService : IAdminApiController
     }
 
     /// <summary>
-    /// 获取端点权限目录（U6/C42）：(HttpMethod, RoutePath) → <see cref="EndpointPermissionEntry"/>。
+    /// 获取端点权限目录：(HttpMethod, RoutePath) → <see cref="EndpointPermissionEntry"/>。
     /// <para>由 <c>ApiEndpointCatalogSync</c> 启动时构建并预热；此处请求期按需返回缓存，缓存缺失则即时重建。</para>
     /// </summary>
     [DisplayName("获取端点权限目录")]

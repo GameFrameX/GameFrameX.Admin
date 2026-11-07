@@ -1,5 +1,5 @@
-// C124 / GFX-115 处罚生效状态查询页枚举常量 + i18n key + severity map + 运行时生效状态计算。
-// 对齐后端 C115（GFX-112）枚举：GameFrameX.Core.Enum。
+//  / 处罚生效状态查询页枚举常量 + i18n key + severity map + 运行时生效状态计算。
+// 对齐后端 枚举：GameFrameX.Core.Enum。
 
 export const PENALTY_TARGET_TYPE = {
     Account: 1,
@@ -43,7 +43,7 @@ export const PENALTY_STATUS_OPTIONS = [
     {value: PENALTY_STATUS.Expired, label: 'message.gameBusiness.penaltyEnforcement.status.expired'},
 ];
 
-// 运行时生效状态（前端计算，非后端枚举）。对齐 C115 §3.3 Enforcement 命中查询铁律：
+// 运行时生效状态（前端计算，非后端枚举）。对齐 Enforcement 命中查询铁律：
 // Status=Active AND (ExpiresAt IS NULL OR ExpiresAt>now) → 命中（生效中）。
 export const RUNTIME_STATUS = {
     Effective: 'effective',

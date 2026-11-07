@@ -132,7 +132,7 @@ const loadAreaList = async () => {
     areaList.value = res.data?.data ?? []
 }
 
-// 跳转入口（issue 第 3 条）。目标路由由 C123（GFX-113）实现；未合入时 fallback 提示。
+// 跳转入口（issue 第 3 条）。目标路由由 实现；未合入时 fallback 提示。
 const navigateIfReady = (path: string, query: Record<string, unknown>) => {
     const resolved = router.resolve({path, query})
     if (!resolved.matched || resolved.matched.length === 0) {

@@ -10,8 +10,8 @@ using SqlSugar;
 namespace GameFrameX.Application.Audit.Retention;
 
 /// <summary>
-/// 审计日志留存服务（C404 / GFX-1216 R3）。把主库超期的访问 / 操作日志按批搬入同库归档表，
-/// 再按归档保留天数清理归档表；范围不含异常日志与差异日志（契约 §1.7）。
+/// 审计日志留存服务。把主库超期的访问 / 操作日志按批搬入同库归档表，
+/// 再按归档保留天数清理归档表；范围不含异常日志与差异日志（契约）。
 /// </summary>
 public class AuditRetentionService
 {

@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GameFrameX.Core.Tests.Architecture;
 
-// C233 wire 冻结守护（U10 硬验收）：Client.Api / Hub.Api / Core.Extension 的 Dto 命名空间与
+//  wire 冻结守护（硬验收）：Client.Api / Hub.Api / Core.Extension 的 Dto 命名空间与
 // Client.Api Integrations 命名空间下全部 DTO 的「wire 属性名集合多重集」快照。
 // 依据决策文档 gfx-doc/decisions/2026-08-17-gameframex-dto-naming-convention.md §三：两 host MVC 序列化
 // NamingPolicy=null，DTO 属性名即 wire 字段名，已发布端点属性名零变化是硬边界；类名不进 wire（仅 Swagger

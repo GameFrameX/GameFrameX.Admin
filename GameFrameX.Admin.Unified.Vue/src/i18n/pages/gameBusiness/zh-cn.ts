@@ -355,7 +355,7 @@ export default {
             propCount: '数量',
         },
 
-        // 运营邮件活动模块（C135 / GFX-142）
+        // 运营邮件活动模块
         mailCampaign: {
             add: '添加运营邮件活动',
             edit: '编辑运营邮件活动',

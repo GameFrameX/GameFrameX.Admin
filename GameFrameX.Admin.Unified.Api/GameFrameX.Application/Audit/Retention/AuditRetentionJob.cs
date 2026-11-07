@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 namespace GameFrameX.Application.Audit.Retention;
 
 /// <summary>
-/// 审计日志归档内置作业（C404 / GFX-1216 R3；触发器按裁定 §9.8 改用 Cron）。
+/// 审计日志归档内置作业（触发器按裁定 改用 Cron）。
 /// 默认每天 03:30 由调度引擎触发；开关与天数见 <see cref="AuditRetentionOptions"/>。
 /// </summary>
 [JobDetail("job_auditRetention", Description = "审计日志归档", GroupName = "default", Concurrent = false)]

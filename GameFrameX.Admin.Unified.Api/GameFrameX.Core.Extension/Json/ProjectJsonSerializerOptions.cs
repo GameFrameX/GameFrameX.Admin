@@ -38,7 +38,7 @@ public static class ProjectJsonSerializerOptions
 
     /// <summary>
     /// 仅应用"Id 结尾 long 字符串化"契约（写出为字符串、可从字符串读回），不动其他选项。
-    /// 供 Hub/Client host 在保持自身 JSON 选项（如 PascalCase）的前提下复用 Admin 同一规则（C270）。
+    /// 供 Hub/Client host 在保持自身 JSON 选项（如 PascalCase）的前提下复用 Admin 同一规则。
     /// </summary>
     /// <remarks>整体替换 TypeInfoResolver；调用方若已有自定义 resolver 需自行合并（当前无此场景）。</remarks>
     public static void ApplyLongIdentifierStringContract(JsonSerializerOptions options)

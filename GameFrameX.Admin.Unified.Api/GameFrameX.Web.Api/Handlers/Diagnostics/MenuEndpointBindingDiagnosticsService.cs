@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 namespace GameFrameX.Web.Api.Handlers.Diagnostics;
 
 /// <summary>
-/// 菜单权限/endpoint 绑定漂移诊断薄壳服务（C128）。
+/// 菜单权限/endpoint 绑定漂移诊断薄壳服务。
 /// <para>把 DB（<see cref="GlobalApiEndpointEntity"/> / <see cref="GlobalMenuEndpointEntity"/> / <see cref="GlobalMenuEntity"/>）
 /// 与 ASP.NET Core MVC 活端点（<see cref="IActionDescriptorCollectionProvider"/>）
 /// 投影成 <see cref="BindingDiagnosticsRequest"/> 快照，委托 <see cref="MenuEndpointBindingDiagnosticsEngine"/> 产出报告。</para>

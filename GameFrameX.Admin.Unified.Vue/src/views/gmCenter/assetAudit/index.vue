@@ -28,7 +28,7 @@
 
 <script lang="ts" setup name="onlineAssetAudit">
 /**
- * 资产审计查询页（C349 / GFX-756）。
+ * 资产审计查询页。
  * 审计只读：操作者 / 命令类型 / 作用域 / 时间 + 目标玩家，无写路径。
  */
 import { ref, computed, watch, onMounted, nextTick } from 'vue'

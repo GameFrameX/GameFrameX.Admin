@@ -12,7 +12,7 @@ namespace GameFrameX.Core.Extension;
 /// <para>布局（2026-09-15 决策冻结，gfx-doc/decisions/2026-09-15-compact-snowflake-id.md）：
 /// epoch 2026-09-01 / WorkerId 3 位（0-7）/ DataCenter 0 位（维度移除，恒 0）/ 序列 10 位，
 /// 产出 13-14 位数字（&lt; 2^53 JS 安全域）。ID 唯一性仅由 (时间戳, WorkerId, 序列) 保证。</para>
-/// <para>多实例互斥采用显式配置路径（Redis/Cluster 适配已随 C170 / GFX-181 退役，进程内缓存的租约无法跨进程互斥）：
+/// <para>多实例互斥采用显式配置路径（Redis/Cluster 适配已随 / 退役，进程内缓存的租约无法跨进程互斥）：
 /// 同库写入的每个实例（Web.Api 多副本 / Hub / Client）必须互斥配置 <c>SnowFlake:WorkerId</c>，
 /// 越界（&gt; 7）在启动期显式失败——单数据中心同库实例上限 8。</para>
 /// </summary>
@@ -139,7 +139,7 @@ public static class SnowFlakeExtension
     }
 
     /// <summary>
-    /// SqlSugar 主键回填兜底取号（经 <c>StaticConfig.CustomSnowFlakeFunc</c> 消费，C361 / GFX-804）。
+    /// SqlSugar 主键回填兜底取号（经 <c>StaticConfig.CustomSnowFlakeFunc</c> 消费， /）。
     /// <para>为什么需要兜底：该 func 由 <c>SqlSugarSnowflakeFallbackInitializer</c>（ModuleInitializer）进程级安装，
     /// 覆盖一切加载 Core.Extension 的进程——包括未走三 host 启动装配的路径（一次性工具 / 单测）。
     /// Foundation 单例已初始化（生产 host 启动期 <see cref="InitSnowFlake"/> 显式互斥 WorkerId 先行）时直接复用单例；

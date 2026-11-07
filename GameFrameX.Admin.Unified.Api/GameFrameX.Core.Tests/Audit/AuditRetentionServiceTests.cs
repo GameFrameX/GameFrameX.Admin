@@ -11,7 +11,7 @@ using Microsoft.Extensions.Options;
 using SqlSugar;
 
 /// <summary>
-/// 审计留存服务测试（C404 / GFX-1216 R3）：超期搬移、未超期保留、批边界、幂等、归档清理、开关关闭、作业注册。
+/// 审计留存服务测试：超期搬移、未超期保留、批边界、幂等、归档清理、开关关闭、作业注册。
 /// </summary>
 public sealed class AuditRetentionServiceTests : IDisposable
 {
@@ -157,7 +157,7 @@ public sealed class AuditRetentionServiceTests : IDisposable
         var jobDetail = typeof(AuditRetentionJob).GetCustomAttributes(typeof(JobDetailAttribute), false).OfType<JobDetailAttribute>().Single();
         Assert.Equal("job_auditRetention", jobDetail.JobId);
         Assert.False(jobDetail.Concurrent);
-        // C404 裁定 §9.8：触发器由无参 [Daily]（调度合一后休眠）改为每天 03:30 的 Cron。
+        //  裁定：触发器由无参 [Daily]（调度合一后休眠）改为每天 03:30 的 Cron。
         var cron = typeof(AuditRetentionJob).GetCustomAttributes(typeof(CronAttribute), false).OfType<CronAttribute>().Single();
         Assert.Equal("trigger_auditRetention", cron.TriggerId);
         Assert.Equal("0 30 3 * * *", cron.Expression);

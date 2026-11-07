@@ -1,6 +1,6 @@
 namespace GameFrameX.Core.Tests.Architecture;
 
-// C341 / GFX-753（vault:C5 S4.9）：Online 匹配观测域零持久化守护测试。
+//  / （vault: .9）：Online 匹配观测域零持久化守护测试。
 // Admin 定位为只读观测方：观测数据是运行态快照，Service 层禁止 Repository 注入、禁止 SqlSugar 客户端持有、
 // 禁止 Entity 引用（不落队列/Ticket 镜像表或缓存）。文本级源扫描 Application.Platform/Online/Match/ 全部 .cs；
 // 双断言：目录非空（防目录改名后扫描扑空静默绿）+ 禁用模式零命中。

@@ -5,7 +5,7 @@ using GameFrameX.Core.Service;
 namespace GameFrameX.Client.Api.GameUserRace;
 
 /// <summary>
-/// 游戏玩家比赛控制器（C9 比赛域：BL 比赛 6 op 自建，形状全同收编单端点）
+/// 游戏玩家比赛控制器（比赛域：BL 比赛 6 op 自建，形状全同收编单端点）
 /// <para>路由：POST /api/GameUserRace/Entry（继承 BaseController 基类路由）。</para>
 /// </summary>
 public class GameUserRaceController : BaseController

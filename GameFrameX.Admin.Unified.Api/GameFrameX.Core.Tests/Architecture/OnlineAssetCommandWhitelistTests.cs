@@ -1,10 +1,10 @@
 namespace GameFrameX.Core.Tests.Architecture;
 
-// Online 资产域（change C340 / GFX-752 / vault:C4）三条红线守护：
+// Online 资产域（change / / vault:）三条红线守护：
 // ① Online/Asset 源码零数据面——资产事实全部以 Online Runtime 为唯一权威，Admin 侧不落任何资产镜像；
-//    查询/命令一律经 IOnlineServerClient 透传，域内源码不得出现任何 SqlSugar 仓储/客户端/写路径 API；
+//  查询/命令一律经 IOnlineServerClient 透传，域内源码不得出现任何 SqlSugar 仓储/客户端/写路径 API；
 // ② 发放/撤销命令 action 唯一入口——grant_asset / revoke_asset 两个 action 常量只允许出现在
-//    OnlineAssetGrantCommandService（高危权限码 onlineAssetGrantCommand:grant/:revoke 与之配套）；
+//  OnlineAssetGrantCommandService（高危权限码 onlineAssetGrantCommand:grant/:revoke 与之配套）；
 // ③ 查询 action 归位——query_wallet_ledger / query_transaction_detail / query_asset_audit 只允许出现在各自查询 Service。
 public sealed class OnlineAssetCommandWhitelistTests
 {

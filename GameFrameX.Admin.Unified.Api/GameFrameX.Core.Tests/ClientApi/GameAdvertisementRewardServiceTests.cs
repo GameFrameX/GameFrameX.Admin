@@ -17,7 +17,7 @@ using Microsoft.AspNetCore.Http;
 namespace GameFrameX.Core.Tests.ClientApi;
 
 /// <summary>
-/// <see cref="GameAdvertisementRewardService"/> 单测（C114 / GFX-110）。
+/// <see cref="GameAdvertisementRewardService"/> 单测。
 /// <para>覆盖三 Provider（TopOn / AdMob / UnityAds）验签 fail-closed、幂等重放、schema 驱动参数改名、发放失败→重试→成功。</para>
 /// </summary>
 public sealed class GameAdvertisementRewardServiceTests

@@ -1,9 +1,9 @@
 namespace GameFrameX.Entity.Enum;
 
 /// <summary>
-/// 区服游戏服 Server HTTP 接口能力类型（来源 change C150 §3.1 / C175 后端拆分）。
+/// 区服游戏服 Server HTTP 接口能力类型（来源 change / 后端拆分）。
 /// <para>调用游戏服 HTTP 时必须显式声明能力类型，由 <see cref="GameFrameX.Application.ServerCenter.GameServerEndpointUrlBuilder"/> 按能力类型选择区服对应前缀。</para>
-/// <para>C150 期「不得新增第五类」的授权 change 即 C339：OnlineAdmin 为第五类（Online 平台管理接口，vault:C2 S1.7）；此后新增能力仍须另建 change。</para>
+/// <para> 期「不得新增第五类」的授权 change 即 ：OnlineAdmin 为第五类（Online 平台管理接口，vault: .7）；此后新增能力仍须另建 change。</para>
 /// </summary>
 [Description("区服游戏服 HTTP 接口能力类型")]
 [AdminEnum]
@@ -32,7 +32,7 @@ public enum GameServerEndpointKindEnum
     [Description("管理控制")] Control = 4,
 
     /// <summary>
-    /// GFX Online 平台管理接口（Admin→Online Runtime 的作用域调用，来源 change C339 / vault:C2 S1.7）。
+    /// GFX Online 平台管理接口（Admin→Online Runtime 的作用域调用，来源 change / vault: .7）。
     /// <para>前缀取区服 <c>OnlineAdminApiPrefix</c>，默认 <c>online/admin</c>；空值拒绝构造 URL（同 Gm/Control 守卫，空表示该区服未开放 Online 管理）。</para>
     /// </summary>
     [Description("Online 平台管理")] OnlineAdmin = 5,

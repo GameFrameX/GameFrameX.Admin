@@ -1,7 +1,7 @@
 namespace GameFrameX.Core.Service.PlatformJwt;
 
 /// <summary>
-/// 平台 JWT 令牌签发与刷新服务接口（C217 可测性重构：SystemAuthService 注入此接口，便于测试 fake）。
+/// 平台 JWT 令牌签发与刷新服务接口（可测性重构：SystemAuthService 注入此接口，便于测试 fake）。
 /// </summary>
 public interface IPlatformJwtTokenService
 {

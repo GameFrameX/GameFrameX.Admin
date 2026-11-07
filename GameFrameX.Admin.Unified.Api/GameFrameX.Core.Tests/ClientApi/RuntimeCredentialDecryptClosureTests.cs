@@ -13,10 +13,10 @@ using Microsoft.AspNetCore.Http;
 
 namespace GameFrameX.Core.Tests.ClientApi;
 
-// C372（GFX-838）T2/T5/T6：运行时凭证读取解密收口——混合库（明文行 + 密文行共存）下
+// //：运行时凭证读取解密收口——混合库（明文行 + 密文行共存）下
 // Client.Api 六链路全部还原明文可用；密文存在而密钥缺失 fail-closed。
-// change：gfx-doc/dev/client-api/changes/C372-runtime-credential-decrypt-closure/change.md
-// 链路清单（T1 notes.md）：签名密钥环 / 会话密钥环 / 票据 RSA 私钥 / 选项 Provider（邮件·广告·令牌策略）/ 支付配置。
+// change：gfx-doc/dev/client-api/changes/-runtime-credential-decrypt-closure/change.md
+// 链路清单（notes.md）：签名密钥环 / 会话密钥环 / 票据 RSA 私钥 / 选项 Provider（邮件·广告·令牌策略）/ 支付配置。
 // Hub 链路（开放访问中间件）在 GameFrameX.Core.Tests/HubApi/GameAppOpenAccessDecryptClosureTests.cs。
 public sealed class RuntimeCredentialDecryptClosureTests : IDisposable
 {

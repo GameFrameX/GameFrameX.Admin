@@ -6,11 +6,11 @@ using SqlSugar;
 namespace GameFrameX.Core.Tests.AppScope;
 
 /// <summary>
-/// GFX-84 / C80 回归测试：PackageScopeValidator 分包级配置包名作用域校验。
+///  / 回归测试：PackageScopeValidator 分包级配置包名作用域校验。
 /// <para>规则集：</para>
 /// <list type="number">
-///   <item>package 为空 / "default" → 兜底放行，不查库。</item>
-///   <item>具体包名 → 必须命中启用中的分包，否则抛错。</item>
+///  <item>package 为空 / "default" → 兜底放行，不查库。</item>
+///  <item>具体包名 → 必须命中启用中的分包，否则抛错。</item>
 /// </list>
 /// <para>用 Sqlite 内存文件库 + ConfigureBaseFilters（软删除过滤）端到端验证；
 /// 校验器内部用 历史框架 <c>BusinessError.Oh</c> 抛友好异常，无 历史框架 host 的纯单测下友好异常构造可能触发

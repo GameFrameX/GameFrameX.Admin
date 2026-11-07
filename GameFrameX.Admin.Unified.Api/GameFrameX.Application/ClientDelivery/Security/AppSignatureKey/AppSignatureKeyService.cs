@@ -8,7 +8,7 @@ using GameFrameX.Core.Service.Business;
 namespace GameFrameX.Application.ClientDelivery.Security.AppSignatureKey;
 
 /// <summary>
-/// App 传输签名密钥环管理服务（change C2 sig-keyring-server）。
+/// App 传输签名密钥环管理服务（change sig-keyring-server）。
 /// <para>密钥明文仅服务端随机生成（不接受外部提交，避免弱密钥入环），仅 AddAsync/RotateAsync 响应一次性回显；
 /// 列表/详情一律脱敏 ******；实体禁删（历史 key 是在途请求与多版本客户端的验签依据），退场走 DisableAsync 或租约到期。</para>
 /// <para>作用域：主库。路由前缀 /api/appSignatureKeyEntity（动态路由规则：去 Service 后缀 + lowerCamelCase）。</para>
@@ -229,7 +229,7 @@ public class AppSignatureKeyService : BaseService<AppSignatureKeyEntity>
     }
 
     /// <summary>
-    /// 一次性回显输出：库内密文（C371），响应携带生成时明文。
+    /// 一次性回显输出：库内密文，响应携带生成时明文。
     /// </summary>
     private static AppSignatureKeyRevealResponse ToRevealOutput(AppSignatureKeyEntity entity, string plainSecret)
     {

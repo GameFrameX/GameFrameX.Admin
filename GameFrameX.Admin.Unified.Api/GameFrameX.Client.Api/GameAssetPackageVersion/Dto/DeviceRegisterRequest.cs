@@ -1,7 +1,7 @@
 namespace GameFrameX.Client.Api.GameAssetPackageVersion.Dto;
 
 /// <summary>
-/// 设备显式注册请求（GFX-706：从 GetInfo 隐式副作用拆出为独立端点）
+/// 设备显式注册请求（：从 GetInfo 隐式副作用拆出为独立端点）
 /// </summary>
 public class DeviceRegisterRequest
 {

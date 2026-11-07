@@ -1,7 +1,7 @@
 /* eslint-disable */
 /* tslint:disable */
 
-/** 总览队列概况行（按 Mode/Region 维度；字段与 C341 匹配队列快照对齐，运行态数据不缓存）。 */
+/** 总览队列概况行（按 Mode/Region 维度；字段与 匹配队列快照对齐，运行态数据不缓存）。 */
 export interface OnlineOverviewQueueSummaryResponse {
   /** 匹配模式。 */
   mode?: string | null;
@@ -24,7 +24,7 @@ export interface OnlineOverviewQueueSummaryResponse {
   throughputPerMinute?: number;
 }
 
-/** 在线总览快照查询输入参数（作用域必填；change C344 / vault:C9 S8.1）。 */
+/** 在线总览快照查询输入参数（作用域必填；change / vault: .1）。 */
 export interface OnlineOverviewRequest {
   /**
    * 区服作用域（必填，经 OnlineScopeContextFactory 校验区服归属）。
@@ -34,7 +34,7 @@ export interface OnlineOverviewRequest {
   serverId: string;
 }
 
-/** 在线总览快照响应（Admin 出参；change C344 / vault:C9 S8.1）。 */
+/** 在线总览快照响应（Admin 出参；change / vault: .1）。 */
 export interface OnlineOverviewResponse {
   /**
    * 在线玩家数（玩家侧连接口径，X6：不含管理员连接）。
@@ -75,11 +75,11 @@ export interface OnlineOverviewQuerySnapshotPostData {
   code: number;
   /** 错误或提示信息 */
   message: string;
-  /** 在线总览快照响应（Admin 出参；change C344 / vault:C9 S8.1）。 */
+  /** 在线总览快照响应（Admin 出参；change / vault: .1）。 */
   data: OnlineOverviewResponse;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;

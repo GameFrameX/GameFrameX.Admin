@@ -2,9 +2,9 @@
 /* tslint:disable */
 /*
  * ---------------------------------------------------------------
- * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API        ##
- * ##                                                           ##
- * ## AUTHOR: acacode                                           ##
+ * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API ##
+ * ## ##
+ * ## AUTHOR: acacode ##
  * ## SOURCE: https://github.com/acacode/swagger-typescript-api ##
  * ---------------------------------------------------------------
  */
@@ -124,7 +124,7 @@ export class ClientApiPolicy<SecurityDataType = unknown> {
    *
    * @tags clientApiPolicy
    * @name ClientApiPolicyRotatePost
-   * @summary 轮换策略签名密钥（C373）：生成新 64-hex 加密落库，旧值即刻作废——该密钥纯服务端内部使用， 无双轨需求（区别于 HMAC 密钥环/票据 RSA 的租约退场模型）。 响应不回显密钥（C368 背景已论证：任何响应均不回显明文/密文）。
+   * @summary 轮换策略签名密钥：生成新 64-hex 加密落库，旧值即刻作废——该密钥纯服务端内部使用， 无双轨需求（区别于 HMAC 密钥环/票据 RSA 的租约退场模型）。 响应不回显密钥（背景已论证：任何响应均不回显明文/密文）。
    * @request POST:/api/clientApiPolicy/rotate
    */
   clientApiPolicyRotatePost = (
@@ -143,7 +143,7 @@ export class ClientApiPolicy<SecurityDataType = unknown> {
    *
    * @tags clientApiPolicy
    * @name ClientApiPolicyUpdatePost
-   * @summary 更新运行策略。SigningKey 回传 `******` 或留空均保留原值（C368：空白与掩码同义），新明文加密落库。
+   * @summary 更新运行策略。SigningKey 回传 `******` 或留空均保留原值（空白与掩码同义），新明文加密落库。
    * @request POST:/api/clientApiPolicy/update
    */
   clientApiPolicyUpdatePost = (

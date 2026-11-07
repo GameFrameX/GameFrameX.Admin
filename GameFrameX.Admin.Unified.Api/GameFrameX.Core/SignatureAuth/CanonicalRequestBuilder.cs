@@ -3,22 +3,22 @@ using System.Security.Cryptography;
 namespace GameFrameX.Core.SignatureAuth;
 
 /// <summary>
-/// 传输签名规范化与 HMAC 计算的单一公共工具（C267 全仓唯一加签/验签实现）。
+/// 传输签名规范化与 HMAC 计算的单一公共工具（全仓唯一加签/验签实现）。
 /// <para>消息串格式（<see cref="SignatureSpec"/> 常量、微信支付 v3 风格逐字段 \n 分隔）：
 /// <c>v2\n{method}\n{path}\n{canonicalQuery}\n{keyId}\n{ts}\n{mid}\n{hex(sha256(body))}</c>。</para>
-/// <para>单一性约束（C267 守护测试锁定）：全仓禁止业务/信封代码直接 <c>new HMACSHA256(...)</c> / <c>new HMACSHA1(...)</c>，
+/// <para>单一性约束（守护测试锁定）：全仓禁止业务/信封代码直接 <c>new HMACSHA256(...)</c> / <c>new HMACSHA1(...)</c>，
 /// 必须走 <see cref="HmacSha256(byte[], string)"/> / <see cref="HmacSha256Base64(byte[], string)"/>；
 /// v2 message 拼装仅此一份。第三方协议实现（腾讯云 COS HMAC-SHA1）在 ObjectStorage 模块期外豁免。</para>
-/// <para>标准来源：RFC 2104（HMAC）+ RFC 3986 §2.1/§3.4（percent-encoding + canonical query）
-/// + AWS SigV4 canonical query 实践 + RFC 4648 §4（Base64）+ FIPS 180-4（SHA-256）。</para>
+/// <para>标准来源：RFC 2104（HMAC）+ RFC 3986 /（percent-encoding + canonical query）
+/// + AWS SigV4 canonical query 实践 + RFC 4648 （Base64）+ FIPS 180-4（SHA-256）。</para>
 /// </summary>
 public static class CanonicalRequestBuilder
 {
     /// <summary>
-    /// RFC 3986 §2.1 percent-encoding：保留字仅 ALPHA / DIGIT / "-" / "." / "_" / "~"（§2.3 unreserved），
-    /// 其余（含 §2.2 reserved、空格与非 ASCII）一律 %XX 大写十六进制。
+    /// RFC 3986 percent-encoding：保留字仅 ALPHA / DIGIT / "-" / "." / "_" / "~"（unreserved），
+    /// 其余（含 reserved、空格与非 ASCII）一律 %XX 大写十六进制。
     /// <para><see cref="Uri.EscapeDataString"/> 是 UTF-8 严格实现，行为符合本规格；
-    /// 禁止换成 <c>HttpUtility.UrlEncode</c>（表单风格 + 编码空格为 "+"）或 <c>Uri.EscapeUriString</c>（保留 ? # 等，不符合 §3.4）。</para>
+    /// 禁止换成 <c>HttpUtility.UrlEncode</c>（表单风格 + 编码空格为 "+"）或 <c>Uri.EscapeUriString</c>（保留 ? # 等，不符合）。</para>
     /// </summary>
     /// <param name="s">待编码字符串。</param>
     /// <returns>percent-encoded 字符串；入参 null 视为空串。</returns>
@@ -28,13 +28,13 @@ public static class CanonicalRequestBuilder
     }
 
     /// <summary>
-    /// canonical query（RFC 3986 §3.4 + AWS SigV4 canonical query 实践）：
+    /// canonical query（RFC 3986 + AWS SigV4 canonical query 实践）：
     /// 1) 剔除 <c>Signature</c> 参数（防把签名本身拼进待签串造成循环依赖）；
     /// 2) 按 key 字典序（Ordinal）排列；
     /// 3) 空 value 也要拼 <c>key=</c>；
     /// 4) key / value 各做 <see cref="PercentEncode"/>；
     /// 5) 用 "&amp;" 拼接；重复 key 的多个 value 保留出现顺序（稳定排序）。
-    /// <para>解决 C267 前的 ponytail：query 按原始顺序进签，前置代理改写参数顺序/编码即破签。</para>
+    /// <para>解决 前的 ponytail：query 按原始顺序进签，前置代理改写参数顺序/编码即破签。</para>
     /// </summary>
     /// <param name="query">请求 query 集合。</param>
     /// <returns>canonical query 串（无 "?" 前缀）；空集合返回空串。</returns>
@@ -65,7 +65,7 @@ public static class CanonicalRequestBuilder
     }
 
     /// <summary>
-    /// body 摘要：SHA-256 → hex 小写（FIPS 180-4 + RFC 4648 §8 hex 风格）。空 body 得常量
+    /// body 摘要：SHA-256 → hex 小写（FIPS 180-4 + RFC 4648 hex 风格）。空 body 得常量
     /// e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855。
     /// </summary>
     /// <param name="body">请求 body 字节。</param>
@@ -104,7 +104,7 @@ public static class CanonicalRequestBuilder
 
     /// <summary>
     /// HMAC-SHA256（RFC 2104）字节计算 —— 全仓唯一 HMAC 实现。
-    /// <para>业务/信封代码禁止直接 <c>new HMACSHA256(...)</c> / <c>new HMACSHA1(...)</c>（C267 守护测试锁定）。</para>
+    /// <para>业务/信封代码禁止直接 <c>new HMACSHA256(...)</c> / <c>new HMACSHA1(...)</c>（守护测试锁定）。</para>
     /// </summary>
     /// <param name="secret">密钥字节。</param>
     /// <param name="message">待签消息串（UTF-8 编码后参与计算）。</param>
@@ -118,7 +118,7 @@ public static class CanonicalRequestBuilder
     }
 
     /// <summary>
-    /// Base64(HMAC-SHA256)（RFC 2104 + RFC 4648 §4）—— envelope/信封侧与传输签名侧共用的唯一出口，
+    /// Base64(HMAC-SHA256)（RFC 2104 + RFC 4648）—— envelope/信封侧与传输签名侧共用的唯一出口，
     /// 取代历史上散落在各旧 helper / handler 中的多份 HMAC 实现。
     /// </summary>
     /// <param name="secret">密钥字节。</param>

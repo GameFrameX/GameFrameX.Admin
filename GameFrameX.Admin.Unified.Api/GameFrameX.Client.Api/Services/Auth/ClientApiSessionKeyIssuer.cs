@@ -48,7 +48,7 @@ public sealed class ClientApiSessionKeyIssuer
         };
         await _repository.InsertAsync(entity);
 
-        // 登录响应一次性回显明文（C371：库内密文，响应明文，与 Admin Add/Rotate 同构）
+        // 登录响应一次性回显明文（库内密文，响应明文，与 Admin Add/Rotate 同构）
         return new ClientApiSessionKeyIssueResponse(entity.Kid, plainSecret, expireAtUnixSeconds);
     }
 }

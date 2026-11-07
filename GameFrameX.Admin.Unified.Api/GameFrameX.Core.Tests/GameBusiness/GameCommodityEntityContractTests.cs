@@ -5,7 +5,7 @@ using GameFrameX.Core.Extension.Json;
 namespace GameFrameX.Core.Tests.GameBusiness;
 
 /// <summary>
-/// C391（GFX-923 / Api#291）：游戏商品 Add/Page DTO 与前端真实提交形态的 JSON 绑定契约。
+/// ：游戏商品 Add/Page DTO 与前端真实提交形态的 JSON 绑定契约。
 /// 前端 EditDialog 的 number 是 TextField（提交 JS string）；categoryId 取自目录 select 接口
 /// （BaseSelectPageResponse.Id 按 Id 契约序列化为 string，回填后提交 string；curl 等客户端可能
 /// 提交数字）。任一字段类型错位都会让整个 body 反序列化失败、input 静默为 null → 500 NRE。

@@ -109,7 +109,7 @@ onBeforeRouteUpdate((to) => {
   display: flex;
   align-items: center;
 
-  // 移动端隐藏面包屑，腾出顶栏空间（C143，阈值见 theme/breakpoints.scss）
+  // 移动端隐藏面包屑，腾出顶栏空间（阈值见 theme/breakpoints.scss）
   @include bp-down(md) {
     display: none;
   }

@@ -15,14 +15,14 @@ public sealed class HostApplicationGameReferenceGuardTests
     {
         // GameUserController 封禁/踢下线联动处罚执行（DI 注入接口）
         "GameFrameX.Application.PlayerCenter.GamePenalty.IGamePenaltyEnforcementService",
-        // GameUserController 用户密码校验（C214 Argon2id 路径）
+        // GameUserController 用户密码校验（Argon2id 路径）
         "GameFrameX.Application.PlayerCenter.GameUser.GameUserPasswordService",
         // GameOrderController 订单发货（Client.Api 支付回调后履约）
         "GameFrameX.Application.CommerceCenter.GameOrder.GameOrderShipService",
-        // C345 灰度判定原语唯一化：RemoteConfigRolloutMatcher 委托 Application 层共享实现，
+        //  灰度判定原语唯一化：RemoteConfigRolloutMatcher 委托 Application 层共享实现，
         // 与活动/功能开关投放共用同一套取模 + 白名单旁路语义（原 Client.Api 私有副本已收敛）。
         "GameFrameX.Application.ClientDelivery.Rollout.StableDeviceRolloutMatcher",
-        // C347 活动/功能开关客户端通道：GameFeatureSwitchController 消费 C345 冻结的共享投放解析器，
+        //  活动/功能开关客户端通道：GameFeatureSwitchController 消费 冻结的共享投放解析器，
         // Result/EffectiveItem 为解析器返回值与元素类型（控制器内做 Unix 秒 wire 转换）。
         "GameFrameX.Application.ClientDelivery.FeatureSwitch.FeatureSwitchDeliveryResolver",
         "GameFrameX.Application.ClientDelivery.FeatureSwitch.FeatureSwitchDeliveryResult",
@@ -31,8 +31,8 @@ public sealed class HostApplicationGameReferenceGuardTests
 
     private static readonly HashSet<string> HubApiAllowedReferences = new(StringComparer.Ordinal)
     {
-        // C405 Hub 仅保留机器通道；管理区服 DTO 已回收至 Web.Api 业务服务，Hub.Api 对管理业务层零可触达。
-        // C347 活动/功能开关服务器同步通道：FeatureSwitchSyncController 消费 C345 冻结的共享投放解析器，
+        //  Hub 仅保留机器通道；管理区服 DTO 已回收至 Web.Api 业务服务，Hub.Api 对管理业务层零可触达。
+        //  活动/功能开关服务器同步通道：FeatureSwitchSyncController 消费 冻结的共享投放解析器，
         // Result/EffectiveItem 为解析器返回值与元素类型（控制器内做 Unix 秒 wire 转换）。
         "GameFrameX.Application.ClientDelivery.FeatureSwitch.FeatureSwitchDeliveryResolver",
         "GameFrameX.Application.ClientDelivery.FeatureSwitch.FeatureSwitchDeliveryResult",

@@ -10,7 +10,7 @@ using GameFrameX.Entity.Game.Online;
 namespace GameFrameX.Entity.Business.Game.Online;
 
 /// <summary>
-/// 配置灰度发布（Rollout）版本行。每次发布 / 回滚都追加新行（版本化），历史行不可修改不可删除（vault:C8 S7.8 / VC-7.12）。
+/// 配置灰度发布（Rollout）版本行。每次发布 / 回滚都追加新行（版本化），历史行不可修改不可删除（vault: .8 / .12）。
 /// 回滚行的 <c>TargetVersion</c> 指向目标历史版本（回滚 = 版本化新下发，不是恢复旧行）；
 /// 灰度语义（SegmentId + Percent 1-100 ↔ Online 侧解释 ↔ 既有 RolloutMatcher）三方对照见 <c>OnlineRolloutSemanticMap</c>。</para>
 /// </summary>

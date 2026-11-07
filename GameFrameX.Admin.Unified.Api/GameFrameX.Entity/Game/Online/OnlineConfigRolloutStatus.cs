@@ -10,7 +10,7 @@ using GameFrameX.Entity.Enum;
 namespace GameFrameX.Entity.Game.Online;
 
 /// <summary>
-/// 灰度发布（Rollout）版本行状态（来源 change C343 / vault:C8 S7.8 / VC-7.12）。
+/// 灰度发布（Rollout）版本行状态（来源 change / vault: .8 / .12）。
 /// <para>回滚 = 版本化新下发：不修改、不删除任何历史行，被回退的版本行置 <see cref="RolledBack"/> 后不可再作为发布基线；
 /// 回滚动作本身产生携带新 <c>ConfigVersion</c> 与 <c>TargetVersion</c>（指向目标历史版本）的新行。</para>
 /// </summary>
@@ -24,7 +24,7 @@ public enum OnlineConfigRolloutStatus
     [Description("已发布")] Published = 1,
 
     /// <summary>
-    /// 已回退：被后续发布或回滚替代的历史版本，主体不可变、不可再作为发布基线（VC-7.12 审计追溯依据）。
+    /// 已回退：被后续发布或回滚替代的历史版本，主体不可变、不可再作为发布基线（.12 审计追溯依据）。
     /// </summary>
     [Description("已回退")] RolledBack = 2,
 }

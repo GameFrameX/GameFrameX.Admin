@@ -13,10 +13,10 @@ using GameFrameX.Foundation.Orm.Entity;
 using Microsoft.AspNetCore.Http;
 using SqlSugar;
 
-// S3/C401 断链修复点
+// / 断链修复点
 namespace GameFrameX.Core.Tests.ServerManager.Online;
 
-// S3/C401 断链修复点
+// / 断链修复点
 public sealed class OnlineScopeContextFactoryTests : IDisposable
 {
     private const long Area1001 = 2001;
@@ -28,7 +28,7 @@ public sealed class OnlineScopeContextFactoryTests : IDisposable
 
     public OnlineScopeContextFactoryTests()
     {
-        // 专属 ConfigId（C339）：SqlSugar 实体信息（含表名映射）按连接配置静态缓存且进程级共享；
+        // 专属 ConfigId：SqlSugar 实体信息（含表名映射）按连接配置静态缓存且进程级共享；
         // 不设 ConfigId 会与裸配置 fixture（AdvancedQueryAreaFilterTests / GameOrderShipServiceTests，
         // PascalCase 表名）互抢默认缓存键，后到者 InitTables no-op → insert 报 no such table
         //（AdvancedQueryAreaFilterTests ctor 注释记录的同类坑，ClientApi/Home 系靠独立 ConfigId 天然隔离）。

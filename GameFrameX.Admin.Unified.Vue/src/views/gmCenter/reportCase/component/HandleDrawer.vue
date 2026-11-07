@@ -53,7 +53,7 @@
 
 <script lang="ts" setup name="onlineReportCaseHandleDrawer">
 /**
- * 举报案件处置抽屉（C342 / GFX-758，vault:C7 S6.10）。
+ * 举报案件处置抽屉（vault: .10）。
  * 决策枚举 Dismiss/Warn/Mute/Ban/ForwardPenalty；理由必填（进审计）；
  * Mute/Ban 时 DurationMinutes 条件必填。提交前高危确认层（showConfirm）。
  * 服务端语义：Mute/Ban 先写 GamePenalty 事实源再触发 Online 联动命令。
@@ -84,7 +84,7 @@ const reasonError = ref('')
 const durationMinutes = ref<number | null>(null)
 const durationError = ref('')
 
-// OnlineReportDecisionKind（数字枚举 1-5，C356 联调实测——无字符串枚举转换器，线缆必须传数字）：
+// OnlineReportDecisionKind（数字枚举 1-5， 联调实测——无字符串枚举转换器，线缆必须传数字）：
 // Dismiss=1 驳回 / Warn=2 警告 / Mute=3 禁言 / Ban=4 封禁 / ForwardPenalty=5 转人工处罚
 const DECISION_WIRE: Record<string, number> = { Dismiss: 1, Warn: 2, Mute: 3, Ban: 4, ForwardPenalty: 5 }
 const decisionOptions = computed(() => [
@@ -95,7 +95,7 @@ const decisionOptions = computed(() => [
   { label: t('message.onlineCenter.reportCase.decision.forwardPenalty'), value: 'ForwardPenalty' },
 ])
 
-// Mute/Ban 产生处罚事实，DurationMinutes 条件必填（change.md §3）
+// Mute/Ban 产生处罚事实，DurationMinutes 条件必填（change.md）
 const needsDuration = computed(() => decision.value === 'Mute' || decision.value === 'Ban')
 
 const close = () => {

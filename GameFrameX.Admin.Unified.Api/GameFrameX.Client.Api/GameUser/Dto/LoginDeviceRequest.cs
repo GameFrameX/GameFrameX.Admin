@@ -11,7 +11,7 @@ using System.Text.Json.Serialization;
 namespace GameFrameX.Client.Api.GameUser.Dto;
 
 /// <summary>
-/// 匿名设备登录输入参数（C12 A1：承接旧 SSO Lookup 语义——按设备标识找号或建号）
+/// 匿名设备登录输入参数（A1：承接旧 SSO Lookup 语义——按设备标识找号或建号）
 /// </summary>
 public sealed class LoginDeviceRequest
 {

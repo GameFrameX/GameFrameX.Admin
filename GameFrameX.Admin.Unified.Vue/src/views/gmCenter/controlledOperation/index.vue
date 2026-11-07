@@ -135,7 +135,7 @@
 
 <script lang="ts" setup name="onlineControlledOperation">
 /**
- * 受控操作页（C344 / GFX-761，独立页承载；C356 联调对齐）。
+ * 受控操作页（独立页承载； 联调对齐）。
  * command 数字枚举严格四值；目标标识按命令动态；开关型命令 direction 必填；
  * 理由必填；复核人全部命令必填（双人复核全量口径）；
  * 幂等语义：同命令+方向+目标+区服重复调用返回首次结果，对调用方透明（响应无 duplicate 标志）。

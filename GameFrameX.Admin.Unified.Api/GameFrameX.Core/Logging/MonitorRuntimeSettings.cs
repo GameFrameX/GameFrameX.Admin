@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 namespace GameFrameX.Core.Logging;
 
 /// <summary>
-/// Monitor 采集结构性运行参数（C171：随 Host 重启生效，不做运行中热更新）。
+/// Monitor 采集结构性运行参数（随 Host 重启生效，不做运行中热更新）。
 /// </summary>
 internal sealed record MonitorRuntimeSettings
 {

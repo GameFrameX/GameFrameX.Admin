@@ -8,7 +8,7 @@ namespace GameFrameX.Entity.Business.Game;
 /// 游戏玩家账号
 /// </summary>
 [SugarTable(null, "游戏玩家账号")]
-// 首页聚合「今日新增玩家」按 CreatedTime 过滤计数走索引（C321 / GFX-730）
+// 首页聚合「今日新增玩家」按 CreatedTime 过滤计数走索引
 [SugarIndex("idx_game_user_created_time", nameof(CreatedTime), OrderByType.Asc)]
 [BusinessTable]
 [IncrementTable]
@@ -103,7 +103,7 @@ public class GameUserEntity : EntityBasicSelect
     public string WeChatId { get; set; } = null!;
 
     /// <summary>
-    /// 设备标识（C12 A1：匿名设备账号主绑定键，DeviceLogin 按 DeviceId 找号或建号）
+    /// 设备标识（A1：匿名设备账号主绑定键，DeviceLogin 按 DeviceId 找号或建号）
     /// </summary>
     [SugarColumn(ColumnDescription = "设备标识", Length = EntityStringLength.Length2048)]
     public string DeviceId { get; set; } = null!;

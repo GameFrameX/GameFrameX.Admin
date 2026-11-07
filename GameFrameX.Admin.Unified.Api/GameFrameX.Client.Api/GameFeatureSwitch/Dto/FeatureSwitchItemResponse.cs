@@ -1,7 +1,7 @@
 namespace GameFrameX.Client.Api.GameFeatureSwitch.Dto;
 
 /// <summary>
-/// 单条生效开关的投放投影（C347 客户端通道，与 Hub.Api 服务器通道同形）。
+/// 单条生效开关的投放投影（客户端通道，与 Hub.Api 服务器通道同形）。
 /// <para><see cref="ValueJson"/> 为开关参数 JSON 原文，客户端自行解析（服务端不做 schema 校验）。</para>
 /// </summary>
 public class FeatureSwitchItemResponse

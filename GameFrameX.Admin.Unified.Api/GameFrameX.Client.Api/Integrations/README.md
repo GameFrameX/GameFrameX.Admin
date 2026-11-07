@@ -6,13 +6,13 @@
 
 ```
 Integrations/
-└─ <Category>/               # 如 Payment / Ad / Auth / Push
-   ├─ *Controller.cs         # HTTP 入口（webhook 多端点保留）
-   ├─ *Factory.cs            # provider 工厂 / 选择
-   ├─ *Selector.cs           # 渠道路由（如下单选渠道）
-   ├─ *ServiceExtensions.cs  # DI 注册（AddXxxChannels），Program.cs 调用
-   ├─ *Service*.cs           # 编排 Service
-   └─ Dto/                   # 该类别专用 DTO
+└─ <Category>/ # 如 Payment / Ad / Auth / Push
+   ├─ *Controller.cs # HTTP 入口（webhook 多端点保留）
+   ├─ *Factory.cs # provider 工厂 / 选择
+   ├─ *Selector.cs # 渠道路由（如下单选渠道）
+   ├─ *ServiceExtensions.cs # DI 注册（AddXxxChannels），Program.cs 调用
+   ├─ *Service*.cs # 编排 Service
+   └─ Dto/ # 该类别专用 DTO
 ```
 
 namespace 统一 `GameFrameX.Client.Api.Integrations.<Category>`（Dto 用 `.Dto` 子命名空间）。
@@ -43,5 +43,5 @@ namespace 统一 `GameFrameX.Client.Api.Integrations.<Category>`（Dto 用 `.Dto
 
 ## 已有类别
 
-- `Payment/`（C220 迁入，2026-08-12）：`GameOrderController`（下单 + 各渠道 webhook）+ `PaymentChannel*` 编排 + `PaymentOptionSettingProvider` + `PaymentWebhookPolicy`。
-- `Ad/`（C221 迁入，C222 provider 模式）：`GameAdWebHookController` + `GameAdRewardService`（通用流程）+ `IAdCallbackHandler`（TopOn / AdMob / UnityAds 各 Handler）+ `AdCallbackFactory`。加平台 = 加 Handler + 一行 DI 注册，Service 不动。
+- `Payment/`（迁入，2026-08-12）：`GameOrderController`（下单 + 各渠道 webhook）+ `PaymentChannel*` 编排 + `PaymentOptionSettingProvider` + `PaymentWebhookPolicy`。
+- `Ad/`（迁入， provider 模式）：`GameAdWebHookController` + `GameAdRewardService`（通用流程）+ `IAdCallbackHandler`（TopOn / AdMob / UnityAds 各 Handler）+ `AdCallbackFactory`。加平台 = 加 Handler + 一行 DI 注册，Service 不动。

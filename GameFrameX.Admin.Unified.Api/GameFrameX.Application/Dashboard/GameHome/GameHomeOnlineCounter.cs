@@ -4,10 +4,10 @@ using GameFrameX.Entity.Enum;
 namespace GameFrameX.Application.Dashboard.GameHome;
 
 /// <summary>
-/// 全服在线人数聚合器（C321 / GFX-730）
+/// 全服在线人数聚合器
 /// <para>「启用且配置管理地址的区服，按 Control 能力前缀调用 GetOnlinePlayer 求和」逻辑的唯一实现，
 /// 供 <c>GameHomeService</c>（实时读数）与 <c>GameHomeOnlineSampleJob</c>（采样落表）复用，
-/// 语义继承 C175：区服不可达 / 未配置 ControlApiPrefix 时按 0 计。</para>
+/// 语义继承 ：区服不可达 / 未配置 ControlApiPrefix 时按 0 计。</para>
 /// </summary>
 public static class GameHomeOnlineCounter
 {
@@ -41,7 +41,7 @@ public static class GameHomeOnlineCounter
 
     /// <summary>
     /// 查询单个区服在线人数。Control 能力前缀为空（构造器抛异常）或调用异常时降级为 0，
-    /// 与历史「全局地址缺失 / 游戏服不可达降级 0」语义一致（来源 change C175）。
+    /// 与历史「全局地址缺失 / 游戏服不可达降级 0」语义一致（来源 change）。
     /// </summary>
     private static async Task<int> GetAreaOnlineAsync(HttpClient client, Entity.Business.Game.GameAreaEntity area)
     {

@@ -1,7 +1,7 @@
 /* eslint-disable */
 /* tslint:disable */
 
-/** Online 资产命令（发放/撤销）确认响应：透传 Online 首次执行结果（vault:C4 幂等语义——同幂等键重试返回首次结果，不产生第二笔变更）。 */
+/** Online 资产命令（发放/撤销）确认响应：透传 Online 首次执行结果（vault: 幂等语义——同幂等键重试返回首次结果，不产生第二笔变更）。 */
 export interface OnlineAssetGrantAckResponse {
   /** 交易 Id（本次命令产生或首次命中的交易）。 */
   transactionId?: string | null;
@@ -34,7 +34,7 @@ export interface OnlineAssetGrantItemRequest {
 }
 
 /**
- * Online 资产人工发放输入参数（高危；vault:C4「Admin 人工发放」六类来源之一）。
+ * Online 资产人工发放输入参数（高危；vault:「Admin 人工发放」六类来源之一）。
  *
  * 经 Online Grant API 执行，Admin 侧零直写；`Reason` 必填进审计；幂等键（业务单号）规则见命令服务。
  */
@@ -111,11 +111,11 @@ export interface OnlineAssetGrantCommandGrantPostData {
   code: number;
   /** 错误或提示信息 */
   message: string;
-  /** Online 资产命令（发放/撤销）确认响应：透传 Online 首次执行结果（vault:C4 幂等语义——同幂等键重试返回首次结果，不产生第二笔变更）。 */
+  /** Online 资产命令（发放/撤销）确认响应：透传 Online 首次执行结果（vault: 幂等语义——同幂等键重试返回首次结果，不产生第二笔变更）。 */
   data: OnlineAssetGrantAckResponse;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;
@@ -135,11 +135,11 @@ export interface OnlineAssetGrantCommandRevokePostData {
   code: number;
   /** 错误或提示信息 */
   message: string;
-  /** Online 资产命令（发放/撤销）确认响应：透传 Online 首次执行结果（vault:C4 幂等语义——同幂等键重试返回首次结果，不产生第二笔变更）。 */
+  /** Online 资产命令（发放/撤销）确认响应：透传 Online 首次执行结果（vault: 幂等语义——同幂等键重试返回首次结果，不产生第二笔变更）。 */
   data: OnlineAssetGrantAckResponse;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;

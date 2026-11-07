@@ -355,7 +355,7 @@ export default {
             propCount: 'Quantity',
         },
 
-        // Mail Campaign module (Operation mail Campaign / C135 / GFX-142)
+        // Mail Campaign module (Operation mail Campaign / / )
         mailCampaign: {
             add: 'Add Operation Mail Campaign',
             edit: 'Edit Operation Mail Campaign',

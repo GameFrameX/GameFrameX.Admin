@@ -32,7 +32,7 @@ const weekSuffixMap: Record<string, string> = {
 };
 
 /**
- * Unix 秒时间戳格式化（C145：后端时间字段统一 long 秒 + *Time 后缀）。
+ * Unix 秒时间戳格式化（后端时间字段统一 long 秒 + *Time 后缀）。
  * @param seconds Unix 秒；null/undefined/<=0/NaN 视为无值，返回 '-'。
  * @param format 格式，默认 'YYYY-mm-dd HH:MM:SS'。
  */
@@ -141,11 +141,11 @@ export function getWeek(dateTime: Date): number {
  * 将时间转换为 `几秒前`、`几分钟前`、`几小时前`、`几天前`
  * @param param 当前时间，new Date() 格式或者字符串时间格式
  * @param format 需要转换的时间格式字符串
- * @description param 10秒：  10 * 1000
- * @description param 1分：   60 * 1000
+ * @description param 10秒： 10 * 1000
+ * @description param 1分： 60 * 1000
  * @description param 1小时： 60 * 60 * 1000
  * @description param 24小时：60 * 60 * 24 * 1000
- * @description param 3天：   60 * 60* 24 * 1000 * 3
+ * @description param 3天： 60 * 60* 24 * 1000 * 3
  * @returns 返回拼接后的时间字符串
  */
 export function formatPast(param: string | Date, format: string = 'YYYY-mm-dd'): string {

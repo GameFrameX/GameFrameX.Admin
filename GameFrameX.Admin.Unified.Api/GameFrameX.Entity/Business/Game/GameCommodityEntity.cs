@@ -18,7 +18,7 @@ public class GameCommodityEntity : EntityBasic
     public string Status { get; set; } = null!;
 
     /// <summary>
-    /// 类别Id。引用 GameGoodsCatalogueEntity.Id（C391：由 string 统一为 long，对齐 GameGoodsEntity.ClassifyId 模式）。
+    /// 类别Id。引用 GameGoodsCatalogueEntity.Id（由 string 统一为 long，对齐 GameGoodsEntity.ClassifyId 模式）。
     ///</summary>
     [SugarColumn(ColumnDescription = "类别Id", DefaultValue = "0")]
     public long CategoryId { get; set; }

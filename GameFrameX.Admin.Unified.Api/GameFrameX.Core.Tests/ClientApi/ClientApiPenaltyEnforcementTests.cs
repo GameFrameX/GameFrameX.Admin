@@ -6,7 +6,7 @@ using GameFrameX.Entity.Business.Game;
 namespace GameFrameX.Core.Tests.ClientApi;
 
 /// <summary>
-/// 处罚事实源登录阻断查询规则验收（change C115 §3.3 / §3.5 验收）。
+/// 处罚事实源登录阻断查询规则验收（change / 验收）。
 /// 铁律：仅命中 ActionType ∈ {BanAsync, RestrictLogin} 的 Active + 未过期处罚；
 /// Mute / RestrictTrade / RestrictMatch 永不阻断登录。
 /// </summary>

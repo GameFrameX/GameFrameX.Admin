@@ -8,8 +8,8 @@ import {
   buildRequestParams,
 } from './cursorPager'
 
-// C349 / GFX-756 —— OnlineCursorList 游标分页纯逻辑状态机单测。
-// 契约（vault C2 S1.2 + C340 §3）：分页统一 Cursor + HasMore，禁页码偏移；
+//  / —— OnlineCursorList 游标分页纯逻辑状态机单测。
+// 契约（vault .2 +）：分页统一 Cursor + HasMore，禁页码偏移；
 // 状态机不去重、不修补——重复/漏项是服务端 bug，必须原样暴露（透传原则）。
 
 test('初始状态：未加载、无游标、无更多；请求参数不携带 cursor', () => {

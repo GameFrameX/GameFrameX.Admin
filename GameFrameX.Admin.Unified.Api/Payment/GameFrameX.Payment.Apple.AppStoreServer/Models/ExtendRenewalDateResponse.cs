@@ -31,7 +31,7 @@ public class ExtendRenewalDateResponse
     /// A Boolean value that indicates whether the subscription-renewal-date extension succeeded.
     /// <para>指示订阅续期日期延长是否成功的布尔值。</para>
     /// <para>https://developer.apple.com/documentation/appstoreserverapi/success</para>
-    /// <para>命名豁免（GFX-707）：Apple App Store Server API 官方契约字段 <c>success</c>，保留原生命名，不改 IsSuccess。</para>
+    /// <para>命名豁免：Apple App Store Server API 官方契约字段 <c>success</c>，保留原生命名，不改 IsSuccess。</para>
     /// </summary>
     public bool? Success { get; set; }
 

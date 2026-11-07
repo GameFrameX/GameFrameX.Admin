@@ -1,7 +1,7 @@
 namespace GameFrameX.Core.Option;
 
 /// <summary>
-/// 缓存配置选项（内存缓存键前缀；Redis / Cluster 适配已随 C170 / GFX-171 退役）
+/// 缓存配置选项（内存缓存键前缀；Redis / Cluster 适配已随 / 退役）
 /// </summary>
 public sealed class CacheOptions
 {

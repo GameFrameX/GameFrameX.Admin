@@ -19,7 +19,7 @@ using SqlSugar;
 namespace GameFrameX.Core.Tests.Platform.Job;
 
 /// <summary>
-/// C404 §9.8：EmailTask 正向发送路径——草稿邮件经 Fulfillment 通道投递成功后状态变 Sent、
+///  ：EmailTask 正向发送路径——草稿邮件经 Fulfillment 通道投递成功后状态变 Sent、
 /// MailId 缓存键清除；非草稿邮件直接返回（不发起 HTTP）。
 /// </summary>
 public sealed class EmailTaskTests : IDisposable

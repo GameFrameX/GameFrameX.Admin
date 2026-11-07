@@ -10,11 +10,11 @@ using GameFrameX.Core.Service.Business;
 namespace GameFrameX.Application.ClientDelivery.ClientApiPolicy;
 
 /// <summary>
-/// Client API 运行策略管理服务（C378 四表合一：Token / 登录票据 / 区服输出 / 订单策略单页管理）。
+/// Client API 运行策略管理服务（四表合一：Token / 登录票据 / 区服输出 / 订单策略单页管理）。
 /// <para>主库保存唯一运行策略，所有请求读取同一行。</para>
-/// <para>敏感字段（SigningKey）承载 C368 空值防护语义：新增空白自动生成 64-hex、更新空白与 <c>******</c> 同义保留原值；
+/// <para>敏感字段（SigningKey）承载 空值防护语义：新增空白自动生成 64-hex、更新空白与 <c>******</c> 同义保留原值；
 /// 输出恒为脱敏占位；该密钥纯服务端内部使用，任何响应均不回显明文。</para>
-/// <para>签名密钥以 <see cref="SecretCrypto"/> 密文落库（C371）：PreserveIfMasked 先换回库中原值（密文形态），
+/// <para>签名密钥以 <see cref="SecretCrypto"/> 密文落库：PreserveIfMasked 先换回库中原值（密文形态），
 /// Encrypt 幂等跳过已密文值，新明文在落库前加密。</para>
 /// </summary>
 [ApiDescriptionSettings(GameConst.GroupName, Order = 112)]
@@ -24,7 +24,7 @@ public class ClientApiPolicyService
         ClientApiPolicyResponse, PageClientApiPolicyRequest>
 {
     /// <summary>
-    /// 票据固定到期时间上限（秒）：30 天（C142 决策口径）。
+    /// 票据固定到期时间上限（秒）：30 天（决策口径）。
     /// </summary>
     private const long TicketExpireSecondsMax = 30L * 24 * 60 * 60;
 
@@ -38,9 +38,9 @@ public class ClientApiPolicyService
     }
 
     /// <summary>
-    /// 轮换策略签名密钥（C373）：生成新 64-hex 加密落库，旧值即刻作废——该密钥纯服务端内部使用，
+    /// 轮换策略签名密钥：生成新 64-hex 加密落库，旧值即刻作废——该密钥纯服务端内部使用，
     /// 无双轨需求（区别于 HMAC 密钥环/票据 RSA 的租约退场模型）。
-    /// <para>响应不回显密钥（C368 背景已论证：任何响应均不回显明文/密文）。</para>
+    /// <para>响应不回显密钥（背景已论证：任何响应均不回显明文/密文）。</para>
     /// </summary>
     [HttpPost("rotate")]
     [ApiDescriptionSettings(Name = "Rotate")]
@@ -60,7 +60,7 @@ public class ClientApiPolicyService
                         .UpdateColumns(e => new { e.SigningKey, e.UpdateTime, })
                         .ExecuteCommandAsync();
 
-        // 审计（C373）：密钥生命周期操作结构化审计行；DB 操作日志管线断链期先落应用日志，管线修复后统一接入
+        // 审计：密钥生命周期操作结构化审计行；DB 操作日志管线断链期先落应用日志，管线修复后统一接入
         LogHelper.Info($"[KeyAudit] action=PolicySigningKeyRotate policyId={entity.Id} oldKeyRevoked=immediately operator={_currentUserContext.Account}");
     }
 
@@ -93,7 +93,7 @@ public class ClientApiPolicyService
     }
 
     /// <summary>
-    /// 更新运行策略。SigningKey 回传 <c>******</c> 或留空均保留原值（C368：空白与掩码同义），新明文加密落库。
+    /// 更新运行策略。SigningKey 回传 <c>******</c> 或留空均保留原值（空白与掩码同义），新明文加密落库。
     /// </summary>
     [DisplayName("更新 Client API 运行策略")]
     public override async Task UpdateAsync(UpdateClientApiPolicyRequest input)
@@ -174,7 +174,7 @@ public class ClientApiPolicyService
     }
 
     /// <summary>
-    /// 解析签名密钥最终落库值（C368 + C371 组合语义）。
+    /// 解析签名密钥最终落库值（+ 组合语义）。
     /// <para>新增：空白 → CSPRNG 生成 64-hex；非空明文透传。</para>
     /// <para>更新：<c>******</c> 或空白 → 保留库中原值（密文形态）；新明文透传。</para>
     /// <para>最终值经 <see cref="SecretCrypto.Encrypt"/>：明文加密为 <c>enc:sec:v1:</c> 密文，已密文值幂等透传。</para>
@@ -191,7 +191,7 @@ public class ClientApiPolicyService
             }
             else
             {
-                // 保留库中原值：明文形态（存量）或密文形态（C371 加密后）均由 Encrypt 幂等处理
+                // 保留库中原值：明文形态（存量）或密文形态（加密后）均由 Encrypt 幂等处理
                 plain = storedKey;
             }
         }
@@ -218,7 +218,7 @@ public class ClientApiPolicyService
     }
 
     /// <summary>
-    /// 校验票据固定到期时间：0 放行（永不过期）；非 0 必须晚于当前时间且不超过 30 天（C142）。
+    /// 校验票据固定到期时间：0 放行（永不过期）；非 0 必须晚于当前时间且不超过 30 天。
     /// </summary>
     private static void ValidateTicketExpireTime(long ticketExpireTime)
     {

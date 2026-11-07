@@ -61,12 +61,12 @@ public sealed class CacheConst
     public const string KeyOpenAccessNonce = "cache:open_access_nonce:";
 
     /// <summary>
-    /// API 端点→绑定按钮 MenuId 集合缓存（U6/C42，全局单份，按端点 Id 索引）。
+    /// API 端点→绑定按钮 MenuId 集合缓存（全局单份，按端点 Id 索引）。
     /// </summary>
     public const string KeyEndpointButtons = "cache:endpoint_buttons:";
 
     /// <summary>
-    /// (HttpMethod,RoutePath)→ApiEndpoint 行缓存（U6/C42，JwtHandler 请求期查端点身份用）。
+    /// (HttpMethod,RoutePath)→ApiEndpoint 行缓存（JwtHandler 请求期查端点身份用）。
     /// </summary>
     public const string KeyEndpointByRoute = "cache:endpoint_by_route";
 }

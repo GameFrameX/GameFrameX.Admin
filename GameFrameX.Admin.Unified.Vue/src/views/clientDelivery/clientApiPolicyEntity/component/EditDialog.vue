@@ -145,7 +145,7 @@ const beforeSubmit = (form: any, isEditor: boolean) => {
     }
   }
 
-  // 签名密钥：新增留空自动生成；编辑留空/掩码均保留原值（C368 空白与掩码同义）
+  // 签名密钥：新增留空自动生成；编辑留空/掩码均保留原值（空白与掩码同义）
   const signingKey = isEditor && (!form.signingKey || form.signingKey === SECRET_MASK) ? '' : (form.signingKey ?? '')
 
   const normalized: Record<string, any> = {

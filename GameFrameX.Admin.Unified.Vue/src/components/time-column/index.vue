@@ -12,7 +12,7 @@ import Column from 'primevue/column'
 import {formatUnix} from '../../utils/formatTime'
 
 /**
- * Unix 秒时间戳列（C145：后端 *Time 字段统一 long 秒）。
+ * Unix 秒时间戳列（后端 *Time 字段统一 long 秒）。
  * 收口各页表格里反复手写的 `<Column><template #body>{{ formatUnix(data.x) }}</template></Column>` 样板。
  * 数据流仍保留原始 long，仅在此处就近格式化展示。
  */

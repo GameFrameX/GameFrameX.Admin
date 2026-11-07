@@ -105,7 +105,7 @@
 
 <script lang="ts" setup name="onlinePlayerTimeline">
 /**
- * 玩家时间线页（C344 / GFX-761）。
+ * 玩家时间线页。
  * 只消费 Online 事件信封（EventId/CorrelationId 透传），缺事件即空槽展示，
  * 不做本地推断补齐；事件分组 Session/Match/Asset/Social/Penalty/LiveOps。
  */
@@ -229,7 +229,7 @@ const loadMore = async () => {
   }
 }
 
-// 受控操作入口：携带当前 PlayerId / ServerId 预填（独立页承载，C344 交付清单四页面）
+// 受控操作入口：携带当前 PlayerId / ServerId 预填（独立页承载， 交付清单四页面）
 const goControlledOperation = () => {
   const query: Record<string, string> = {}
   if (timelineForm.value.playerId) {

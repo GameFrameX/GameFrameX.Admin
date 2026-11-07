@@ -2,9 +2,9 @@
 /* tslint:disable */
 /*
  * ---------------------------------------------------------------
- * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API        ##
- * ##                                                           ##
- * ## AUTHOR: acacode                                           ##
+ * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API ##
+ * ## ##
+ * ## AUTHOR: acacode ##
  * ## SOURCE: https://github.com/acacode/swagger-typescript-api ##
  * ---------------------------------------------------------------
  */
@@ -61,7 +61,7 @@ export class GameOrderFulfillment<SecurityDataType = unknown> {
    *
    * @tags gameOrderFulfillment
    * @name GameOrderFulfillmentCompensatePost
-   * @summary 人工补偿/补发（高风险）。委托 GameOrderShipService.CompensateAsync（C113）：按 Purchase 链路重发，账本落 CompensateAsync 类型 + OperatorId 审计。 C223：Admin result 统一对象契约——失败抛 BusinessException 走 AdminResultFilter 统一错误路径，不再透传 HttpJsonResultData 双重信封。
+   * @summary 人工补偿/补发（高风险）。委托 GameOrderShipService.CompensateAsync：按 Purchase 链路重发，账本落 CompensateAsync 类型 + OperatorId 审计。 ：Admin result 统一对象契约——失败抛 BusinessException 走 AdminResultFilter 统一错误路径，不再透传 HttpJsonResultData 双重信封。
    * @request POST:/api/gameOrderFulfillment/compensate
    */
   gameOrderFulfillmentCompensatePost = (
@@ -166,7 +166,7 @@ export class GameOrderFulfillment<SecurityDataType = unknown> {
    *
    * @tags gameOrderFulfillment
    * @name GameOrderFulfillmentRefundPost
-   * @summary 退款扣除（高风险）。C310 / GFX-718 起两阶段：已支付订单先渠道退款（按 PayChannel 路由 IRefundManager—— 渠道失败 / 不支持主动退款 / 配置缺失抛统一错误码 PaymentErrorCode 段 704，本地账本不动）， 渠道成功后委托 GameOrderShipService.RefundAsync（C113）：按订单状态走作废 / 扣除路径，账本落 RefundAsync 类型 + 状态 + FailureReason。 Unpaid 订单未收款，跳过渠道直接本地作废。 C223：Admin result 统一对象契约——失败抛 BusinessException 走 AdminResultFilter 统一错误路径，不再透传 HttpJsonResultData 双重信封。
+   * @summary 退款扣除（高风险）。 / 起两阶段：已支付订单先渠道退款（按 PayChannel 路由 IRefundManager—— 渠道失败 / 不支持主动退款 / 配置缺失抛统一错误码 PaymentErrorCode 段 704，本地账本不动）， 渠道成功后委托 GameOrderShipService.RefundAsync：按订单状态走作废 / 扣除路径，账本落 RefundAsync 类型 + 状态 + FailureReason。 Unpaid 订单未收款，跳过渠道直接本地作废。 ：Admin result 统一对象契约——失败抛 BusinessException 走 AdminResultFilter 统一错误路径，不再透传 HttpJsonResultData 双重信封。
    * @request POST:/api/gameOrderFulfillment/refund
    */
   gameOrderFulfillmentRefundPost = (
@@ -186,7 +186,7 @@ export class GameOrderFulfillment<SecurityDataType = unknown> {
    *
    * @tags gameOrderFulfillment
    * @name GameOrderFulfillmentResendPost
-   * @summary 重新发货（高风险）。收敛到 CompensateAsync（不新增发放类型枚举，C113 已锁定 Purchase/RefundAsync/CompensateAsync 三类）。 C223：Admin result 统一对象契约，同 CompensateAsync。
+   * @summary 重新发货（高风险）。收敛到 CompensateAsync（不新增发放类型枚举， 已锁定 Purchase/RefundAsync/CompensateAsync 三类）。 ：Admin result 统一对象契约，同 CompensateAsync。
    * @request POST:/api/gameOrderFulfillment/resend
    */
   gameOrderFulfillmentResendPost = (

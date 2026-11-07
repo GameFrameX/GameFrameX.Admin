@@ -3,7 +3,7 @@ using GameFrameX.Core.Bootstrap;
 namespace GameFrameX.Core.Tests.Bootstrap;
 
 /// <summary>
-/// CrashExitWatchdog 契约测试（C381 / GFX-873）：未处理异常在运行时传播路径僵死时，
+/// CrashExitWatchdog 契约测试：未处理异常在运行时传播路径僵死时，
 /// 宽限期内进程未终止则由 watchdog 强退，保证容器 restart 策略可触发。
 /// <para>测试一律注入终止动作——真实默认动作是 Environment.FailFast，会杀死测试进程。</para>
 /// </summary>

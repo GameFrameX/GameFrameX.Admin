@@ -4,7 +4,7 @@ using GameFrameX.Entity.Routing;
 namespace GameFrameX.Entity.Global;
 
 /// <summary>
-/// 菜单按钮 ↔ API 端点 绑定表（U6/C42）。“菜单侧把按钮和接口绑定”落在此表。多对多，OR 语义。
+/// 菜单按钮 ↔ API 端点 绑定表。“菜单侧把按钮和接口绑定”落在此表。多对多，OR 语义。
 /// </summary>
 [SugarTable(null, "菜单按钮接口绑定表")]
 [SugarIndex("ux_global_menu_endpoint_menu_endpoint", nameof(MenuId), OrderByType.Asc, nameof(EndpointId), OrderByType.Asc, true)]

@@ -4,8 +4,8 @@ using GameFrameX.Core.Filter;
 namespace GameFrameX.Core.Bootstrap;
 
 /// <summary>
-/// 三 host（Client / Hub / Game）共享的 MVC 注册扩展（C261，GFX-668）。
-/// <para>收敛各 Program.cs 内联的 AddControllers 装配：共享请求/响应日志两件套（MvcFilterApp.Init，C236 收敛）
+/// 三 host（Client / Hub / Game）共享的 MVC 注册扩展。
+/// <para>收敛各 Program.cs 内联的 AddControllers 装配：共享请求/响应日志两件套（MvcFilterApp.Init， 收敛）
 /// + PascalCase JSON 序列化（PropertyNamingPolicy 保持 null，前端契约依赖 PascalCase 字段名）。</para>
 /// </summary>
 public static class HostBootstrapMvcExtensions
@@ -33,7 +33,7 @@ public static class HostBootstrapMvcExtensions
                        {
                            // 修改Json 序列化格式为不修改（保持 PascalCase 契约）
                            config.JsonSerializerOptions.PropertyNamingPolicy = null;
-                           // Id 结尾的 long 序列化为字符串（雪花 Id 防 JS 超 2^53 丢精度），与 Admin 同一规则（C270）；
+                           // Id 结尾的 long 序列化为字符串（雪花 Id 防 JS 超 2^53 丢精度），与 Admin 同一规则；
                            // 反向宽容读取（字符串/数字均可入参）
                            ProjectJsonSerializerOptions.ApplyLongIdentifierStringContract(config.JsonSerializerOptions);
                        });

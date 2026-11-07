@@ -30,7 +30,7 @@
 
 <script lang="ts" setup name="onlineMatchAbnormalTicket">
 /**
- * 异常 Ticket 查询页（C341 / GFX-757）。
+ * 异常 Ticket 查询页。
  * 三类检索（Admin 自有枚举 AbnormalKind：LongWaiting/RepeatedCancel/Orphan）+ 游标翻页；
  * 状态展示走 displayKey 映射（onlineMatch.ticketStatus.*），Admin 不复制 Ticket 状态机语义。
  */
@@ -52,7 +52,7 @@ const queryParams = ref<Record<string, any>>({ abnormalKind: AbnormalKind.LongWa
 const listRef = ref()
 const listQueryVersion = ref(0)
 
-// AbnormalKind 三值（change.md §3 A0：Admin 侧自有检索枚举，vault 无此概念；线缆为数字枚举）
+// AbnormalKind 三值（change.md A0：Admin 侧自有检索枚举，vault 无此概念；线缆为数字枚举）
 const kindOptions = computed(() => [
   { label: t('message.onlineCenter.matchAbnormalTicket.kinds.longWaiting'), value: AbnormalKind.LongWaiting },
   { label: t('message.onlineCenter.matchAbnormalTicket.kinds.repeatedCancel'), value: AbnormalKind.RepeatedCancel },

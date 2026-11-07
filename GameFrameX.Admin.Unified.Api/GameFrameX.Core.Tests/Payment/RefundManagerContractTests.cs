@@ -9,7 +9,7 @@ using GameFrameX.Payment.Xsolla.Refund;
 namespace GameFrameX.Core.Tests.Payment;
 
 /// <summary>
-/// C310 / GFX-718 渠道退款契约测试：四渠道 IRefundManager 实现齐全、ChannelName 对齐 PaymentChannelRegistry、
+///  / 渠道退款契约测试：四渠道 IRefundManager 实现齐全、ChannelName 对齐 PaymentChannelRegistry、
 /// 主动退款能力矩阵锁定、不支持主动退款的渠道（Apple / Google）与不支持消费上报的渠道显式失败（不静默成功）。
 /// </summary>
 public class RefundManagerContractTests

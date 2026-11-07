@@ -6,7 +6,7 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 namespace GameFrameX.Core.Bootstrap;
 
 /// <summary>
-/// 四 host（Web / Client / Hub / Game）共享的 HealthChecks 启动装配扩展（C261，GFX-668）。
+/// 四 host（Web / Client / Hub / Game）共享的 HealthChecks 启动装配扩展。
 /// <para>收敛各 Program.cs / Startup.cs 内联的 live/ready 检查注册与三端点映射：
 /// 存活探针 self（live 标签，恒 Healthy）判进程可用性，就绪探针 database（ready 标签，
 /// <see cref="SqlSugarHealthCheck"/> 实测主库连通）判可对外服务。</para>

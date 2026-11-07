@@ -43,7 +43,7 @@ public static class SqlSugarSetup
         services.AddSnowFlakeIdGenerator(snowFlakeOpt);
         // SqlSugar 雪花 ID 取号已进程级接管：Core.Extension 的 SqlSugarSnowflakeFallbackInitializer
         // （ModuleInitializer）安装 StaticConfig.CustomSnowFlakeFunc，覆盖未装配本类的路径（Hub / Client /
-        // 测试进程）；此处不再接线 SnowFlakeSingle 内置 IdWorker（C361 / GFX-804）。
+        // 测试进程）；此处不再接线 SnowFlakeSingle 内置 IdWorker。
 
         var connectionConfig = configuration.GetSection("DbConnection").Get<DbConnectionConfig>() ?? new DbConnectionConfig();
         MainDatabaseConnectionGuard.EnsureMainDatabase(connectionConfig);
@@ -414,7 +414,7 @@ public static class SqlSugarSetup
 
         }
 
-        // 初始化种子数据（C278：默认 insert-only 只补缺；带 [IncreSeed] 特性的权威收敛种子保留覆盖更新，
+        // 初始化种子数据（默认 insert-only 只补缺；带 [IncreSeed] 特性的权威收敛种子保留覆盖更新，
         // 如 GlobalMenuSeedData——global_menu.path/component 以其 upsert 为唯一权威纠正源；
         // EnableIncreSeed=true 时收窄为只执行权威收敛种子）
         if (config.SeedSettings.EnableInitSeed)
@@ -422,7 +422,7 @@ public static class SqlSugarSetup
             var seedDataTypes = effectiveTypes.Where(u => !u.IsInterface && !u.IsAbstract && u.IsClass && u.GetInterfaces().Any(i => i.HasImplementedRawGeneric(typeof(ISqlSugarEntitySeedData<>))))
                                               .WhereIF(config.SeedSettings.EnableIncreSeed, u => u.IsDefined(typeof(IncrementSeedAttribute), false)).ToList();
 
-            // C331（GFX-741）：当前 global_menu 种子 Key→Id 映射，供主库启动自愈清理种子演化残留行
+            // ：当前 global_menu 种子 Key→Id 映射，供主库启动自愈清理种子演化残留行
             // （旧 Key 残留行与同 Key 异 Id 重复行两类，见 MenuSeedStaleRowCleaner）
             Dictionary<string, long>? globalMenuSeedIdsByKey = null;
             foreach (var seedType in seedDataTypes)
@@ -503,11 +503,11 @@ public static class SqlSugarSetup
                     DefaultDatabaseSeeder.SeedDefaultObjectStorageConfigIfEmpty(dbProvider);
                 }
 
-                // C117 (GFX-117)：8 棵游戏业务菜单路径已收敛到新前缀（appCenter/playerCenter/goodsCenter/
+                //  ()：8 棵游戏业务菜单路径已收敛到新前缀（appCenter/playerCenter/goodsCenter/
                 // redeemCenter/webShopCenter/contentCenter/opsCenter/automationCenter），旧 /game/<子域> 兼容迁移兜底已移除。
                 // global_menu.path / component 由 GlobalMenuSeedData upsert 作为唯一权威纠正源；
                 // dev/test 若被旧 seed 残留 / role-menu 派生数据阻碍一次性收敛，直接清库由 CodeFirst + seed 完整重建。
-                // C331（GFX-741）：实体改名后旧 Key 行不再被按主键 upsert 命中而残留，与新 Key 行同 Permission 并存
+                // ：实体改名后旧 Key 行不再被按主键 upsert 命中而残留，与新 Key 行同 Permission 并存
                 // 会让 ValidateDbMenus 启动崩溃；加载前先软删「非当前种子且非 permission:auto 运行期行」的自愈清理。
                 // 同因扩展：旧布局 Id 行（StableSeedId 紧凑布局切换前）同样不被按主键 upsert 命中，与新权威 Id 行
                 // 同 Key 并存触发「global_menu.Key 重复」启动崩溃；一并按 Key→权威 Id 映射清理。

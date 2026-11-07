@@ -2,9 +2,9 @@
 /* tslint:disable */
 /*
  * ---------------------------------------------------------------
- * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API        ##
- * ##                                                           ##
- * ## AUTHOR: acacode                                           ##
+ * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API ##
+ * ## ##
+ * ## AUTHOR: acacode ##
  * ## SOURCE: https://github.com/acacode/swagger-typescript-api ##
  * ---------------------------------------------------------------
  */
@@ -44,7 +44,7 @@ export class GameHome<SecurityDataType = unknown> {
    *
    * @tags gameHome
    * @name GameHomeOnlineTrendPost
-   * @summary 首页 24h 在线人数时序：最近 24 个整点桶回读采样表，桶内取最后一次采样，缺桶为 null（C321 / GFX-730）
+   * @summary 首页 24h 在线人数时序：最近 24 个整点桶回读采样表，桶内取最后一次采样，缺桶为 null
    * @request POST:/api/gameHome/onlineTrend
    */
   gameHomeOnlineTrendPost = (params: RequestParams = {}) =>
@@ -59,7 +59,7 @@ export class GameHome<SecurityDataType = unknown> {
    *
    * @tags gameHome
    * @name GameHomeOverviewPost
-   * @summary 首页运营驾驶舱聚合读数：在线人数、今日订单（待发货/退款中细分）、玩家总数/今日新增、区服计数（C321 / GFX-730）
+   * @summary 首页运营驾驶舱聚合读数：在线人数、今日订单（待发货/退款中细分）、玩家总数/今日新增、区服计数
    * @request POST:/api/gameHome/overview
    */
   gameHomeOverviewPost = (params: RequestParams = {}) =>

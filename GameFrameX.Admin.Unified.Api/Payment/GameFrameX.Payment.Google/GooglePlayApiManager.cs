@@ -43,7 +43,7 @@ public static partial class GooglePlayApiManager
             {
                 GoogleCredential credential;
                 var serviceAccountKeyJson = _settings.GooglePaymentServiceAccountKey;
-                // 凭证仅从支付渠道运行时配置注入；缺失时 fail-closed，禁止回退到产物目录明文凭证文件（C199）。
+                // 凭证仅从支付渠道运行时配置注入；缺失时 fail-closed，禁止回退到产物目录明文凭证文件。
                 if (string.IsNullOrWhiteSpace(serviceAccountKeyJson))
                 {
                     throw new InvalidOperationException("Google Play 服务账号凭证缺失：请在支付渠道配置中填入服务账号 JSON（GooglePaymentServiceAccountKey）。已移除从产物目录读取明文凭证文件的回退路径。");

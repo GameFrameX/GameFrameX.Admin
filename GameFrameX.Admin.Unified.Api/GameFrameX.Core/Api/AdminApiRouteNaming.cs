@@ -4,10 +4,10 @@ using Microsoft.AspNetCore.Mvc.Routing;
 namespace GameFrameX.Core.Api;
 
 /// <summary>
-/// Admin 动态 API 路由命名规则唯一事实源（自 <c>GameFrameX.Web.Api/ApiRouting/AdminApiRouteRules</c> 下沉，C368）。
+/// Admin 动态 API 路由命名规则唯一事实源（自 <c>GameFrameX.Web.Api/ApiRouting/AdminApiRouteRules</c> 下沉）。
 /// <para>
 /// 规则本体只此一份：<c>AdminApiRouteRules</c>（运行期路由约定）与 <see cref="MenuSeedRouteName"/>
-/// （菜单种子 Permission 拼接）均委托本类，两侧不可能漂移——GFX-710 式服务改名后
+/// （菜单种子 Permission 拼接）均委托本类，两侧不可能漂移—— 式服务改名后
 /// 种子 Permission 停留在旧路由名、按钮孤立、端点靠 permission:auto 挂根兜底 403 的根因即规则双写。
 /// </para>
 /// </summary>

@@ -1,7 +1,7 @@
 namespace GameFrameX.Client.Api.GameUserPay.Dto;
 
 /// <summary>
-/// 支付订单查询请求（C11 支付域 Query；OrderId / ProductId 二选一：按单号查单条 / 按用户+商品查最新一条）
+/// 支付订单查询请求（支付域 Query；OrderId / ProductId 二选一：按单号查单条 / 按用户+商品查最新一条）
 /// </summary>
 public class GameUserPayQueryRequest
 {

@@ -31,7 +31,7 @@
 
 <script lang="ts" setup name="onlineAuditSearch">
 /**
- * 统一审计检索页（C344 / GFX-761）。
+ * 统一审计检索页。
  * 三来源（Admin 操作日志 / Online 审计事件 / 各域命令记录）经后端
  * OnlineAuditSourceMap 五维统一映射后透传：source 列为数字枚举（1=管理操作 2=Online 事件 3=域命令）；本页只读，无写路径。
  */

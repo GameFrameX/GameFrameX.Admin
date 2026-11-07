@@ -1,11 +1,11 @@
 /**
  * 支付配置页「复制回调地址」URL 拼装纯函数。
  *
- * 契约来源：C298 gfx704-api-url-case-alignment（GFX-704）+ spec `## Payment Config Copy Notify URL`。
+ * 契约来源： gfx704-api-url-case-alignment+ spec `## Payment Config Copy Notify URL`。
  * 必须与后端 `GameOrderController` 公开 provider 回调路由一致：
- *   `/api/gameOrder/{action}/{packageId?}`
+ *  `/api/gameOrder/{action}/{packageId?}`
  * 其中 `{action}` 为 lowerCamelCase（`notifyApple` 等）。后端为 `BaseController` token 路由
- * `api/[controller]/[action]`，ASP.NET Core literal 路由段匹配大小写不敏感（C298 已实测：
+ * `api/[controller]/[action]`，ASP.NET Core literal 路由段匹配大小写不敏感（已实测：
  * 小写 / PascalCase 回调 URL 均命中路由），故前端统一输出小写 camel 规范形态，
  * 不要求与后端 action 方法名逐字符一致。公开回调只从 URL 路由段解析业务上下文，
  * 不得退化回旧 `/client/gameOrder/...` 或 query 形式。

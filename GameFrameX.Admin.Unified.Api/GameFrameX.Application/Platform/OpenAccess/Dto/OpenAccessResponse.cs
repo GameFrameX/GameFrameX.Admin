@@ -3,7 +3,7 @@ namespace GameFrameX.Application.Platform.OpenAccess.Dto;
 /// <summary>
 /// 开放接口身份输出参数
 /// </summary>
-// 纯 POCO 投影（C228）：属性名与 GameFrameX.Entity.System.SystemOpenAccessEntity 保持一致。
+// 纯 POCO 投影：属性名与 GameFrameX.Entity.System.SystemOpenAccessEntity 保持一致。
 // 注意：AccessSecret 永不输出（明文仅创建/轮换时一次性返回，与 Game 侧 GameAppOpenAccessResponse 对称）；
 public class OpenAccessResponse
 {

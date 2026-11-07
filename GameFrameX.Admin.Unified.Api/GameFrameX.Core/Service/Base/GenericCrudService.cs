@@ -20,7 +20,7 @@ public abstract class GenericCrudService<TEntity, TAddRequest, TUpdateRequest, T
     }
 
     /// <summary>
-    /// 复杂入参 null 兜底（C391 / GFX-923）：body 为字面 null 等场景绑定不产生 ModelState 错误，
+    /// 复杂入参 null 兜底：body 为字面 null 等场景绑定不产生 ModelState 错误，
     /// 参数可能为 null——统一抛参数校验业务异常（400 语义），替代各 action 首次解引用时的 500 NRE。
     /// </summary>
     private static void EnsureInputNotNull(object input)

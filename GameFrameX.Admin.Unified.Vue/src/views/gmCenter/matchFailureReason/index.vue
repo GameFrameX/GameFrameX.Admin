@@ -35,7 +35,7 @@
 
 <script lang="ts" setup name="onlineMatchFailureReason">
 /**
- * 匹配失败原因查询页（C341 / GFX-757）。
+ * 匹配失败原因查询页。
  * 原因码聚合（ReasonSummary[]）+ 下钻明细（按原因码过滤游标列表）；
  * 展示走 displayKey 映射（onlineMatch.failureReason.*），禁止按 ReasonText 文案判断。
  */
@@ -59,7 +59,7 @@ const listRef = ref()
 const listQueryVersion = ref(0)
 const reasonSummary = ref<OnlineMatchFailureReasonSummaryResponse[]>([])
 
-// 失败原因 Online 原值穷举（change.md §3 A0：Timeout/CancelRace/RateLimited/DuplicateTicket）
+// 失败原因 Online 原值穷举（change.md A0：Timeout/CancelRace/RateLimited/DuplicateTicket）
 const reasonOptions = computed(() => [
   { label: displayReason('Timeout'), value: 'Timeout' },
   { label: displayReason('CancelRace'), value: 'CancelRace' },

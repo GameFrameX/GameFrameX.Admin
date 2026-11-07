@@ -9,14 +9,14 @@ using GameFrameX.Foundation.Json;
 namespace GameFrameX.Core.Tests.MailCampaign;
 
 /// <summary>
-/// 运营邮件 Campaign Server 接口客户端契约自检（C134 / GFX-141，C175 调整调用签名）。
+/// 运营邮件 Campaign Server 接口客户端契约自检（调整调用签名）。
 /// <para>跨仓库契约铁律：Admin 与 Server 分属不同仓库，DTO 字段名 / 路由 action 名 / 响应业务码必须逐字对齐。
 /// 本测试通过伪造 <see cref="HttpMessageHandler"/> 端到端验证：</para>
 /// <list type="number">
-///   <item>URL 路由：<c>{HttpManageUrl}/{FulfillmentApiPrefix}/{publish,preview,revoke,query}_mail_campaign</c>（snake_case action，全部 POST，C175 起前缀取自区服而非全局配置）。</item>
-///   <item>请求体字段名：序列化 JSON 键名集合与 Server <c>PublishMailCampaignRequest</c> 等逐字对齐。</item>
-///   <item>响应信封解包：<c>HttpJsonResultData<string>.Success(JsonHelper.Serialize(data))</c> → 业务对象；<c>HttpJsonResultData<string>.Fail</c> → 抛 <see cref="InvalidOperationException"/>。</item>
-///   <item>Server 业务码原样透传（不做映射，映射在服务层）。</item>
+///  <item>URL 路由：<c>{HttpManageUrl}/{FulfillmentApiPrefix}/{publish,preview,revoke,query}_mail_campaign</c>（snake_case action，全部 POST， 起前缀取自区服而非全局配置）。</item>
+///  <item>请求体字段名：序列化 JSON 键名集合与 Server <c>PublishMailCampaignRequest</c> 等逐字对齐。</item>
+///  <item>响应信封解包：<c>HttpJsonResultData<string>.Success(JsonHelper.Serialize(data))</c> → 业务对象；<c>HttpJsonResultData<string>.Fail</c> → 抛 <see cref="InvalidOperationException"/>。</item>
+///  <item>Server 业务码原样透传（不做映射，映射在服务层）。</item>
 /// </list>
 /// </summary>
 public class MailCampaignServerClientTests

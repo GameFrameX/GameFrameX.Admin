@@ -1,7 +1,7 @@
 namespace GameFrameX.Client.Api.GameUserPay.Dto;
 
 /// <summary>
-/// 支付下单请求（C11 支付域 Create）
+/// 支付下单请求（支付域 Create）
 /// </summary>
 public class GameUserPayCreateRequest
 {

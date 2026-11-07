@@ -11,7 +11,7 @@ using SqlSugar;
 namespace GameFrameX.Core.Tests.System;
 
 /// <summary>
-/// 平台 JWT 签发 claim 集合精确断言（C406 身份收口）：
+/// 平台 JWT 签发 claim 集合精确断言（身份收口）：
 /// 真实 <see cref="PlatformJwtTokenService"/> 签发的 AccessToken claim 全集必须恰好为
 /// 身份四项（UserId/Account/RealName/AccountType）+ 签发框架项（iat/nbf/exp/iss/aud/platform_jwt_version），
 /// 不得出现 TenantId、TenantHost、AppId、组织或租户角色等已删除作用域 claim。 // c406-keep（有意引用旧 claim 名作禁止说明）

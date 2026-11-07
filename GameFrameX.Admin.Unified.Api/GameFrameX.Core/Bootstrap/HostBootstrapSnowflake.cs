@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Builder;
 namespace GameFrameX.Core.Bootstrap;
 
 /// <summary>
-/// 三 host（Client / Hub / Web）共享的雪花 ID 启动初始化（C261，GFX-668；C360 紧凑布局与 WorkerId 防撞）。
+/// 三 host（Client / Hub / Web）共享的雪花 ID 启动初始化（紧凑布局与 WorkerId 防撞）。
 /// <para>应用紧凑短 ID 布局（2026-09-15 决策冻结：epoch 2026-09-01 / Worker 3 位 0-7 / DataCenter 0 位 / 序列 10 位）
 /// 并按配置初始化 WorkerId。多实例同库部署时 ID 唯一性仅由 (时间戳, WorkerId, 序列) 保证——
 /// 同库写入的每个实例必须互斥配置 <c>SnowFlake:WorkerId</c>（环境变量 SnowFlake__WorkerId，0-7），

@@ -8,7 +8,7 @@ namespace GameFrameX.Entity.Game.Mail;
 
 /// <summary>
 /// Server 运营邮件 Campaign 接口业务码。值域逐字对齐 Server <c>OperationStatusCode</c>（跨仓库契约）。
-/// <para>Admin 收到 Server 响应后按此码映射到 Admin <c>MailCampaignErrorCode</c>（C119）并回写 <c>LastServerCode</c>。</para>
+/// <para>Admin 收到 Server 响应后按此码映射到 Admin <c>MailCampaignErrorCode</c>并回写 <c>LastServerCode</c>。</para>
 /// </summary>
 public enum MailCampaignServerCode
 {
@@ -18,7 +18,7 @@ public enum MailCampaignServerCode
     Ok = 0,
 
     /// <summary>
-    /// Campaign 已发布或已撤回，主体字段不可修改（B1）。
+    /// Campaign 已发布或已撤回，主体字段不可修改。
     /// </summary>
     HasExist = 1,
 

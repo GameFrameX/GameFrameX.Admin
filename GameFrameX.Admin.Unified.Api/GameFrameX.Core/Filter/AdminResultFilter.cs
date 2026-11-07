@@ -19,7 +19,7 @@ public sealed class AdminResultFilter : IAsyncActionFilter, IAsyncExceptionFilte
 
         if (executed.Result is ObjectResult objectResult)
         {
-            // action 已显式返回统一信封（HttpJsonResultData&lt;Output&gt;）时直接透传，防止双重包装
+            // action 已显式返回统一信封（HttpJsonResultData&lt;Output&gt）时直接透传，防止双重包装
             if (objectResult.Value is IHttpJsonResult)
             {
                 return;
@@ -43,7 +43,7 @@ public sealed class AdminResultFilter : IAsyncActionFilter, IAsyncExceptionFilte
     public Task OnExceptionAsync(ExceptionContext context)
     {
         var error = ResolveException(context.Exception);
-        // Development 环境把异常栈拼进响应消息并写日志（方便定位 Api#288 等深堆栈 NRE）
+        // Development 环境把异常栈拼进响应消息并写日志（方便定位 等深堆栈 NRE）
         var http = context.HttpContext;
         var env = http.RequestServices.GetService(typeof(Microsoft.Extensions.Hosting.IHostEnvironment)) as Microsoft.Extensions.Hosting.IHostEnvironment;
         if (env?.IsDevelopment() == true && context.Exception is not BusinessException and not VersionExceptions)

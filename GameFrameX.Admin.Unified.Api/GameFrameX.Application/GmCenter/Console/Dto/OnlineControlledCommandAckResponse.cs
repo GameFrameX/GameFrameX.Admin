@@ -1,8 +1,8 @@
 namespace GameFrameX.Application.GmCenter.Console.Dto;
 
 /// <summary>
-/// 受控操作命令回执（线缆/Admin 出参共用；vault:C9 S8.1 契约，mock 先行）。
-/// <para>透传 Online 首次执行结果——同 IdempotencyKey 的重复调用拿到的是首次回执（VC-8.4），不产生第二次副作用。</para>
+/// 受控操作命令回执（线缆/Admin 出参共用；vault: .1 契约，mock 先行）。
+/// <para>透传 Online 首次执行结果——同 IdempotencyKey 的重复调用拿到的是首次回执，不产生第二次副作用。</para>
 /// </summary>
 public class OnlineControlledCommandAckResponse
 {

@@ -11,7 +11,7 @@ namespace GameFrameX.Entity.Business.Game;
 
 /// <summary>
 /// 运营邮件 Campaign 草稿/发布记录。Admin 侧承载草稿编辑（多语言内容、附件、过滤、过期策略）+ Server 回写的发布状态。
-/// <para>生命周期 <c>Draft → Published → Revoked</c>（+ <c>Failed</c>）；发布后主体字段不可修改（B1）、不可删除，仅可撤回。</para>
+/// <para>生命周期 <c>Draft → Published → Revoked</c>（+ <c>Failed</c>）；发布后主体字段不可修改、不可删除，仅可撤回。</para>
 /// <para>与既有 <c>GameMailEntity</c>（历史直发 <c>post_mail</c>）是两套独立邮件系统，不合并、字段不混用。</para>
 /// </summary>
 [SugarTable(null, "运营邮件Campaign")]
@@ -93,7 +93,7 @@ public class GameMailCampaignEntity : EntityBasic
     public int MaxLevel { get; set; }
 
     /// <summary>
-    /// 附件过期处置策略（Server B4）。撤回或自然过期后未领取附件的处理方式。
+    /// 附件过期处置策略（Server）。撤回或自然过期后未领取附件的处理方式。
     /// </summary>
     [SugarColumn(ColumnDescription = "附件过期处置策略", DefaultValue = "0")]
     public MailCampaignExpirePolicy ExpireAttachmentPolicy { get; set; }

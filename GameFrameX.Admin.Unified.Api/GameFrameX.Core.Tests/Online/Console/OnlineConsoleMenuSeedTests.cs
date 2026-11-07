@@ -5,7 +5,7 @@ using GameFrameX.Entity.Global;
 
 namespace GameFrameX.Core.Tests.Online.Console;
 
-// C344 / GFX-760 菜单 seed 结构自检（vault:C9 S8.1 + C324 受众前缀化守护 + 高危按钮 Admin 独占）：
+//  / 菜单 seed 结构自检（vault: .1 + 受众前缀化守护 + 高危按钮 Admin 独占）：
 // 容器重定向到在线总览首屏 + 控制台三页面 + 四按钮（查询 ×3 + 受控操作 execute 高危）。
 // 本测试在 psql 不可用的环境（CI / 本机离线）下提供结构断言兜底；正式仓库以 psql 实测为铁证。
 public sealed class OnlineConsoleMenuSeedTests
@@ -16,7 +16,7 @@ public sealed class OnlineConsoleMenuSeedTests
         var menus = GlobalMenuSeedData.BuildData();
         var container = Assert.Single(menus, m => m.Key == "route:gmCenter");
 
-        // C403：独立在线运维根使用 Layout，不保留旧容器重定向。
+        // ：独立在线运维根使用 Layout，不保留旧容器重定向。
         Assert.Null(container.Redirect);
         Assert.Equal("Layout", container.Component);
     }
@@ -36,7 +36,7 @@ public sealed class OnlineConsoleMenuSeedTests
         Assert.Equal(title, page.Title);
         Assert.Equal(titleCode, page.TitleCode);
         Assert.Equal(orderNo, page.OrderNo);
-        // C403：叶子路径和组件直接使用 gmCenter 前缀。
+        // ：叶子路径和组件直接使用 gmCenter 前缀。
         Assert.Equal(path, page.Path);
         Assert.Equal(component, page.Component);
         // 控制台查询受众：管理员角色 + 运营负责人 + 客服 GM + 数据分析。

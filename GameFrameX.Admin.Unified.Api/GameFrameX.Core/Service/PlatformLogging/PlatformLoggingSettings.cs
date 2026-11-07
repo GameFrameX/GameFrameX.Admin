@@ -1,7 +1,7 @@
 namespace GameFrameX.Core.Service.PlatformLogging;
 
 /// <summary>
-/// 平台日志私有配置载荷。字段严格等于 change C171 §3 列举集合，禁止未列字段。
+/// 平台日志私有配置载荷。字段严格等于 change 列举集合，禁止未列字段。
 /// </summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
 public sealed class PlatformLoggingSettings

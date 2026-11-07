@@ -14,7 +14,7 @@ using GameFrameX.Payment.Xsolla.Reports.Transactions;
 namespace GameFrameX.Payment.Xsolla.Refund;
 
 /// <summary>
-/// Xsolla 退款管理器（C310 / GFX-718，恢复自 7c23840c 之前的 Reports/Transactions/RefundManager 并适配当前代码）。
+/// Xsolla 退款管理器（恢复自 7c23840c 之前的 Reports/Transactions/RefundManager 并适配当前代码）。
 /// <para>主动退款：PUT https://api.xsolla.com/merchant/v2/merchants/{merchantId}/reports/transactions/{transactionId}/refund（Basic 认证）。</para>
 /// <para>与原实现的差异：鉴权 header 挂在 HttpRequestMessage 上（原实现写 HttpClient.DefaultRequestHeaders，
 /// IHttpClientFactory 复用实例时会叠加 Authorization 头导致 401）。</para>

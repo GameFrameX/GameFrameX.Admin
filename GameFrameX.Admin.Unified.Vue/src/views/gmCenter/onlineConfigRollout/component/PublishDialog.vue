@@ -41,10 +41,10 @@
 
 <script lang="ts" setup name="onlineConfigRolloutPublishDialog">
 /**
- * 灰度发布弹层（C343 / GFX-759 高危入口）。
+ * 灰度发布弹层（高危入口）。
  * Percent 仅做 1-100 边界校验（语义边界 OnlineRolloutSemanticMap），不做桶展开/命中计算；
  * SegmentId 下拉仅列已同步 Online 的分群（未同步分群 Online 无法解释命中，后端同样拒绝）；
- * 理由必填（≤500 字）进审计；成功 toast 回显 Online 确认版本（VC-7.12 Admin 半边）。
+ * 理由必填（≤500 字）进审计；成功 toast 回显 Online 确认版本（.12 Admin 半边）。
  */
 import { ref } from 'vue'
 import { usePageServer } from '../../components/usePageServer'

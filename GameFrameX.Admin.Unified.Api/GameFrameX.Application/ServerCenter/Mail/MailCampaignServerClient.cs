@@ -15,7 +15,7 @@ namespace GameFrameX.Application.ServerCenter.Mail;
 /// <para>路由：POST <c>{HttpManageUrl}/{FulfillmentApiPrefix}/{snake_case_action}</c>，
 /// action 名 <c>publish_mail_campaign</c>/<c>preview_mail_campaign</c>/<c>revoke_mail_campaign</c>/<c>query_mail_campaign</c>，
 /// 均为 POST（与既有 <c>post_mail</c> 同前缀同算法）。</para>
-/// <para>来源 change C150 §3 / C175：前缀不再读全局 <c>GameServerOptions.MailCampaignRoutePrefix</c>，改由区服 <c>FulfillmentApiPrefix</c> 经 <see cref="GameServerEndpointUrlBuilder"/> 按 <c>Fulfillment</c> 能力构造。</para>
+/// <para>来源 change / ：前缀不再读全局 <c>GameServerOptions.MailCampaignRoutePrefix</c>，改由区服 <c>FulfillmentApiPrefix</c> 经 <see cref="GameServerEndpointUrlBuilder"/> 按 <c>Fulfillment</c> 能力构造。</para>
 /// <para>请求 / 响应 DTO 字段名逐字对齐 Server（跨仓库契约）。Server 响应走 <c>HttpJsonResultData<string></c> 信封，<see cref="HttpJsonResultExtensions.ToHttpJsonResult{T}"/> 解包。</para>
 /// </summary>
 public sealed class MailCampaignServerClient : IMailCampaignServerClient

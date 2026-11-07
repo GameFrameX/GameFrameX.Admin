@@ -10,7 +10,7 @@ using SqlSugar;
 namespace GameFrameX.Core.Tests.ClientApi;
 
 /// <summary>
-/// GFX-86 / C89 回归测试：GameAppPackageResolver 运行时继承语义与缓存刷新信号。
+///  / 回归测试：GameAppPackageResolver 运行时继承语义与缓存刷新信号。
 /// 覆盖 InheritanceMode 三态（Inherit/Override/DisableAsync）回退行为、禁用分包不参与回退、
 /// 以及缓存信号对子包新增 / 父子关系重指 / 母包改名 / 继承模式切换的响应。
 /// </summary>

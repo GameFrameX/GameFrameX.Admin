@@ -3038,7 +3038,7 @@ public partial class GlobalMenuSeedData
             },
             new()
             {
-                // MENU-P2-03 欠账清理：广告奖励账本页前端先行（C114/GFX-110），本行补齐菜单挂载。
+                // MENU-P2-03 欠账清理：广告奖励账本页前端先行，本行补齐菜单挂载。
                 // 账本类事实数据页，与 权益发货账本 同款 IsHide 隐藏页先例（侧边栏不露出，URL 直达/深链使用）。
                 Id = StableSeedId.Menu("route:gameAdvertisementRewardEntity"),
                 Key = "route:gameAdvertisementRewardEntity",
@@ -3348,8 +3348,8 @@ public partial class GlobalMenuSeedData
             },
             // 「Client API 配置」组：本组各页即四类凭证分类法的管理面（应用身份 AppSecret / 传输签名 HMAC+OpenAccess /
             // 票据与令牌 RSA+Token+Session / 出站对接）。分层口径 AppSecret=身份、HMAC=强认证、RSA=票据准入，
-            // 权威定义见 gfx-doc/dev/client-api/spec.md「Credential Taxonomy And Auth Layering」（C377）。
-            // U14 在途：C376 菜单收敛后本组密钥与策略散页下线，凭证中心成为唯一存活入口。
+            // 权威定义见 gfx-doc/dev/client-api/spec.md「Credential Taxonomy And Auth Layering」。
+            //  在途： 菜单收敛后本组密钥与策略散页下线，凭证中心成为唯一存活入口。
             new()
             {
                 Id = StableSeedId.Menu("route:clientApiConfig"),

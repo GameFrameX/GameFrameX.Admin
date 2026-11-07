@@ -1,14 +1,14 @@
 namespace GameFrameX.Core.Tests.Architecture;
 
-// C344 / GFX-760（vault:C9 S8.1/S8.2）Online 控制台四条红线守护：
+//  / （vault: .1/.2）Online 控制台四条红线守护：
 // ① X6 口径：Online/Console 全域源码 + OnlineOverviewQueryService 依赖闭包零引用管理员连接链路
-//    （OnlineUserHub / OnlineUserService / OnlineUserEntity / GameHomeOnlineCounter）——
-//    玩家在线数据唯一来源是 Online 玩家侧查询 API，总览不得并入管理员浏览器连接，也不得复用
-//    首页驾驶舱 24h 在线时序（GameHomeOnlineCounter，C321 产物，口径不同源）；
+//  （OnlineUserHub / OnlineUserService / OnlineUserEntity / GameHomeOnlineCounter）——
+//  玩家在线数据唯一来源是 Online 玩家侧查询 API，总览不得并入管理员浏览器连接，也不得复用
+//  首页驾驶舱 24h 在线时序（GameHomeOnlineCounter， 产物，口径不同源）；
 // ② 受控命令枚举严格四值（CancelTicket / EndAbnormalMatch / SuspendResumePlayer / MatchIsolation）——
-//    新增命令必须回 vault 评审并同步本测试；
+//  新增命令必须回 vault 评审并同步本测试；
 // ③ 复用矩阵无平行实现：Online/Console 源码零出现既有命令 token（踢下线/吊销Token/禁言/发放/撤销资产），
-//    这些命令由 C350 OnlinePenaltyLinkCommandService 与 C340 OnlineAssetGrantCommandService 既有端点承载；
+//  这些命令由 OnlinePenaltyLinkCommandService 与 OnlineAssetGrantCommandService 既有端点承载；
 // ④ 四新命令 action 名只允许出现在 OnlineControlledCommandService（单一实现点，全域文本扫描）。
 public sealed class OnlineOverviewIsolationTests
 {

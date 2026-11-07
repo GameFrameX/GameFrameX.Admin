@@ -6,7 +6,7 @@ using GameFrameX.Entity.Enum;
 namespace GameFrameX.Core.Tests.Enum;
 
 /// <summary>
-/// AdminEnum 公开边界契约测试（C165）。
+/// AdminEnum 公开边界契约测试。
 /// 验证 SystemEnumService 改用 [AdminEnum] 显式标记后，与历史 Enum.json 程序集白名单行为等价：
 /// 标记集合 == GameFrameX.Core + GameFrameX.Entity 程序集（枚举原独立程序集 Core.Enum 已并入）的全部 public enum，未标记枚举被过滤。
 /// </summary>
@@ -40,14 +40,14 @@ public class AdminEnumVisibilityTests
     /// <summary>
     /// 非管理面枚举豁免：随功能收敛入 Core 程序集、但属于协议/中间件内部契约、
     /// 不应出现在 Admin 前端枚举列表的枚举（不带 [AdminEnum] = 不暴露，语义正确）。
-    /// C8 T4a：签名/加密信封中间件共享层收敛带入的密钥环查找结果枚举。
+    ///  T4a：签名/加密信封中间件共享层收敛带入的密钥环查找结果枚举。
     /// </summary>
     private static readonly HashSet<string> NonAdminEnums = new()
     {
         "GameFrameX.Core.Middleware.SessionKeyLookupResult",
         "GameFrameX.Core.Middleware.SignatureKeyLookupResult",
-        // C263（GFX-669）：统一错误码体系枚举是协议层内部契约（服务端出站 + 前端码表由本地化 JSON 导出），
-        // 不应出现在 Admin 前端业务枚举下拉列表；C262 T3 平移 Admin 域枚举时按同规则追加。
+        // ：统一错误码体系枚举是协议层内部契约（服务端出站 + 前端码表由本地化 JSON 导出），
+        // 不应出现在 Admin 前端业务枚举下拉列表； 平移 Admin 域枚举时按同规则追加。
         "GameFrameX.Core.Enum.Errors.ErrorDomain",
         "GameFrameX.Core.Enum.Errors.SystemErrorCode",
         "GameFrameX.Core.Enum.Errors.CommonErrorCode",
@@ -63,7 +63,7 @@ public class AdminEnumVisibilityTests
         "GameFrameX.Core.Enum.Errors.RedeemCodeErrorCode",
         "GameFrameX.Core.Enum.Errors.PaymentErrorCode",
         "GameFrameX.Core.Enum.Errors.AreaMergeErrorCode",
-        // C265（GFX-671）：Admin 业务域错误码枚举同规则豁免（服务端出站 + 码表由本地化 JSON 导出，不进前端枚举下拉）。
+        // ：Admin 业务域错误码枚举同规则豁免（服务端出站 + 码表由本地化 JSON 导出，不进前端枚举下拉）。
         "GameFrameX.Core.Enum.Errors.SystemUserErrorCode",
         "GameFrameX.Core.Enum.Errors.RoleMenuErrorCode",
         "GameFrameX.Core.Enum.Errors.DictionaryErrorCode",
@@ -73,11 +73,11 @@ public class AdminEnumVisibilityTests
         "GameFrameX.Core.Enum.Errors.DatabaseErrorCode",
         "GameFrameX.Core.Enum.Errors.OpenAccessErrorCode",
         "GameFrameX.Core.Enum.Errors.MailCampaignErrorCode",
-        // C339（GFX-750）：Online 八段镜像错误码同规则豁免（服务端出站 + 码表由本地化 JSON 导出，不进前端枚举下拉）。
+        // ：Online 八段镜像错误码同规则豁免（服务端出站 + 码表由本地化 JSON 导出，不进前端枚举下拉）。
         "GameFrameX.Core.Enum.Errors.OnlineErrorCode",
-        // C350（GFX-754）：Online 社交治理 317 段业务错误码同规则豁免（错误码枚举不进前端枚举下拉）。
+        // ：Online 社交治理 317 段业务错误码同规则豁免（错误码枚举不进前端枚举下拉）。
         "GameFrameX.Core.Enum.Errors.OnlineModerationErrorCode",
-        // F2（GFX-1232）：广告回调配置 318 段错误码同规则豁免（错误码枚举不进前端枚举下拉）。
+        // ：广告回调配置 318 段错误码同规则豁免（错误码枚举不进前端枚举下拉）。
         "GameFrameX.Core.Enum.Errors.AdvertisementCallbackConfigErrorCode",
         // Core.Enum 程序集并入 GameFrameX.Entity 后，Entity 域内邮件营销 4 个内部枚举
         // 进入白名单程序集 public enum 全集；现状即不带 [AdminEnum]（不暴露给前端下拉），如实豁免。

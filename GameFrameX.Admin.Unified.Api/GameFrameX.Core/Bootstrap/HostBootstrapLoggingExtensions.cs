@@ -4,7 +4,7 @@ using GameFrameX.Foundation.Logger;
 namespace GameFrameX.Core.Bootstrap;
 
 /// <summary>
-/// 三 host（Client / Hub / Game）共享的启动日志初始化扩展（C261，GFX-668）。
+/// 三 host（Client / Hub / Game）共享的启动日志初始化扩展。
 /// <para>统一 <see cref="LauncherOptions"/> 驱动口径：Loki 标签（ServerType/TagName）、LogType、
 /// IsGrafanaLoki / IsConsole / GrafanaLokiUrl 全部取自启动参数，替代各 Program.cs 内联副本
 /// （Hub 收敛前硬编码关闭 Loki / 控制台，属口径漂移，未配置时默认值同为 false，行为不变）。</para>

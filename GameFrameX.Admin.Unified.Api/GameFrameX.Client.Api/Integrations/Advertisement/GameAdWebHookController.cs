@@ -14,7 +14,7 @@ namespace GameFrameX.Client.Api.Integrations.Advertisement;
 /// 广告服务器回调。
 /// <para>广告网络回调不携带 <c>X-Api-Key</c>，必须先由公开回调 URL 的 packageId 路由参数建立包上下文，再通过 <see cref="IClientApiOptionsProvider"/> 读取该包的验签材料。</para>
 /// <para>无法解析包或包未配置验签材料时安全拒绝，禁止全表扫描或回落到进程级 key。</para>
-/// <para>TopOn / AdMob / UnityAds 的验签 + 幂等账本 + 发奖链路由 <see cref="GameAdvertisementRewardService"/> 统一处理（C114 / GFX-110）；Pangle 验签由 <see cref="PangleAdvertisementCallbackHandler"/> 处理（仅验签，不进发奖链路）。</para>
+/// <para>TopOn / AdMob / UnityAds 的验签 + 幂等账本 + 发奖链路由 <see cref="GameAdvertisementRewardService"/> 统一处理；Pangle 验签由 <see cref="PangleAdvertisementCallbackHandler"/> 处理（仅验签，不进发奖链路）。</para>
 /// </summary>
 public class GameAdWebHookController : BaseController<GameRoleAdvertisementEntity>
 {
@@ -39,7 +39,7 @@ public class GameAdWebHookController : BaseController<GameRoleAdvertisementEntit
 
     /// <summary>
     /// TopOn通知。
-    /// <para>验签 + 幂等账本 + 发奖由 <see cref="GameAdvertisementRewardService.ReceiveTopOnAsync"/> 处理；本端点仅保留 C59 公开回调路由与 HTTP 形状。</para>
+    /// <para>验签 + 幂等账本 + 发奖由 <see cref="GameAdvertisementRewardService.ReceiveTopOnAsync"/> 处理；本端点仅保留 公开回调路由与 HTTP 形状。</para>
     /// </summary>
     [PublicCallbackEndpoint("topon", "ad")]
     [HttpGet("{packageId:long}")]
@@ -84,7 +84,7 @@ public class GameAdWebHookController : BaseController<GameRoleAdvertisementEntit
     /// <summary>
     /// Google AdMob奖励视频广告回调通知。
     /// <para>验签 + 幂等账本 + 发奖由 <see cref="GameAdvertisementRewardService.ReceiveAdMobAsync"/> 处理。</para>
-    /// <para>发放成功后保留对 <see cref="GameRoleAdvertisementEntity"/> 的写入（C75/C91 应用作用域事实，范围外不动）。</para>
+    /// <para>发放成功后保留对 <see cref="GameRoleAdvertisementEntity"/> 的写入（应用作用域事实，范围外不动）。</para>
     /// </summary>
     [PublicCallbackEndpoint("admob", "ad")]
     [HttpGet("{packageId:long}")]
@@ -105,7 +105,7 @@ public class GameAdWebHookController : BaseController<GameRoleAdvertisementEntit
 
     /// <summary>
     /// Unity Ads 奖励回调通知。
-    /// <para>验签 + 幂等账本 + 发奖由 <see cref="GameAdvertisementRewardService.ReceiveUnityAdsAsync"/> 处理（C114 新增端点）。</para>
+    /// <para>验签 + 幂等账本 + 发奖由 <see cref="GameAdvertisementRewardService.ReceiveUnityAdsAsync"/> 处理（新增端点）。</para>
     /// </summary>
     [PublicCallbackEndpoint("unityads", "ad")]
     [HttpGet("{packageId:long}")]
@@ -117,7 +117,7 @@ public class GameAdWebHookController : BaseController<GameRoleAdvertisementEntit
     }
 
     /// <summary>
-    /// 发放成功后写入 <see cref="GameRoleAdvertisementEntity"/> 角色广告事实（C75/C91 应用作用域，保留不改）。
+    /// 发放成功后写入 <see cref="GameRoleAdvertisementEntity"/> 角色广告事实（应用作用域，保留不改）。
     /// </summary>
     private async Task WriteAdMobRoleAdvertisementFactAsync(AdMobCallbackRequest input)
     {

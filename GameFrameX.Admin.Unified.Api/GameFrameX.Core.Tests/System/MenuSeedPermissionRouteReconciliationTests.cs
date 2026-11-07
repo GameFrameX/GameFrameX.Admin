@@ -10,11 +10,11 @@ using Microsoft.AspNetCore.Mvc.Routing;
 namespace GameFrameX.Core.Tests.System;
 
 /// <summary>
-/// 种子按钮 Permission 与活端点目录对账守护（C368）。
+/// 种子按钮 Permission 与活端点目录对账守护。
 /// <para>
 /// Permission 现由 <see cref="MenuSeedRouteName.Of{TService}(string)"/> 按路由命名规则唯一事实源推导，
 /// 本测试以反射重建全量活端点路由（与 ApiEndpointCatalogSync 同口径），对 BuildData() 全部按钮 Permission
-/// 逐条对账：未命中即种子/端点漂移，红灯并给出可定位清单——GFX-710 式服务改名、端点下线、
+/// 逐条对账：未命中即种子/端点漂移，红灯并给出可定位清单—— 式服务改名、端点下线、
 /// ApiDescriptionSettings(Name) 改动都逃不过本测试。
 /// </para>
 /// </summary>

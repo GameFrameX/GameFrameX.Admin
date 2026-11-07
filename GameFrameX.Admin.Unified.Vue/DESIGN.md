@@ -193,7 +193,7 @@ components:
 三张 SVG（viewBox 300×220）线稿：终端、服务器机架、多端设备拓扑，各带 Actor 拓扑角点。样式只用五个类：主墨线（primary-color 2px stroke）、细线（primary-300 1.5px）、实心（primary-color fill）、淡填充（primary-100/200 fill）、mono 角标（9px，命名格式 `XX-NN`：TERM-01 / RACK-04 / NODE-07）。不引入第二色相，不使用位图或第三方插画素材。
 
 ### Named Rules
-**The One Moment Rule.** 每个界面最多一个强调动效时刻（登录页是盖章 0.22s `cubic-bezier(0.2, 0.9, 0.3, 1)`）；拖拽等连续操作必须瞬时跟手、不做宽度/位置过渡；`prefers-reduced-motion: reduce` 下全部过渡与动画归零（全局 GFX-659/C253 已声明，页面不得绕过）。
+**The One Moment Rule.** 每个界面最多一个强调动效时刻（登录页是盖章 0.22s `cubic-bezier(0.2, 0.9, 0.3, 1)`）；拖拽等连续操作必须瞬时跟手、不做宽度/位置过渡；`prefers-reduced-motion: reduce` 下全部过渡与动画归零（全局 / 已声明，页面不得绕过）。
 
 **The Registration Mark Rule.** 字段聚焦反馈是四角注册标记：8×2px 品牌蓝 300 阶线对贴字段四角，0.12s ease-out 淡入；不是发光、描边环绕或阴影抬升。
 

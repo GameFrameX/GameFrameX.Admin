@@ -7,7 +7,7 @@ namespace GameFrameX.Application.Platform.Email;
 /// 平台系统邮件分发器（路由薄层）。
 /// <para>本类仅承担 Provider 名 → <see cref="IEmailSender"/> 的解析与转发；具体发送由 <see cref="EmailSenderRegistry"/> 反射收集的各渠道实现承担。</para>
 /// <para>调用方传入已选中的 <see cref="GameFrameX.Entity.System.SystemEmailProviderEntity"/>；本类不读取数据库，避免重复选择策略。</para>
-/// <para>凭证解密收口（C370）：落库密文（<c>enc:sec:v1:</c>）在 <see cref="BuildOptions"/> 构建发送参数时经
+/// <para>凭证解密收口：落库密文（<c>enc:sec:v1:</c>）在 <see cref="BuildOptions"/> 构建发送参数时经
 /// <see cref="SecretCrypto.Decrypt"/> 解密——发信是所有 Provider 配置读取路径的唯一必经点，且为低频事件路径
 /// （安全通知等），每信一次解密的 PBKDF2 派生开销在秒级投递耗时内，不引入缓存。</para>
 /// <para>入口校验（空配置 / 空收件人 / 未注册渠道）抛 <see cref="InvalidOperationException"/>；渠道发送结果（含失败原因）经 <see cref="EmailSendResult"/> 返回。</para>
@@ -46,7 +46,7 @@ public static class SystemEmailDispatcher
 
     /// <summary>
     /// 把 <see cref="GameFrameX.Entity.System.SystemEmailProviderEntity"/> 映射为 <see cref="EmailSendOptions"/>，按渠道字段屏蔽差异。
-    /// 凭证列在此解密（C370 收口点，见类注释）。
+    /// 凭证列在此解密（收口点，见类注释）。
     /// </summary>
     private static EmailSendOptions BuildOptions(GameFrameX.Entity.System.SystemEmailProviderEntity provider, string receiverEmail, string subject, string body)
     {

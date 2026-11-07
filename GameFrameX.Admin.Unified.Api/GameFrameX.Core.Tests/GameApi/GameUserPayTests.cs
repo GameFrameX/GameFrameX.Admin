@@ -17,8 +17,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace GameFrameX.Core.Tests.GameApi;
 
 /// <summary>
-/// C11 T3 RED：支付域契约（Create 下单/沙箱直发、Verify 验真三态/幂等重放、Query 双形态/Paid 判定、Report 记账容错/幂等）
-/// <para>契约来源：C11 任务书（支付域 4 action）。</para>
+///  RED：支付域契约（Create 下单/沙箱直发、Verify 验真三态/幂等重放、Query 双形态/Paid 判定、Report 记账容错/幂等）
+/// <para>契约来源： 任务书（支付域 4 action）。</para>
 /// </summary>
 public sealed class GameUserPayTests
 {
@@ -244,7 +244,7 @@ public sealed class GameUserPayTests
 
             var root = ClientApiResultReader.Read(await controller.Verify(
                                                       new GameUserPayVerifyRequest { UserId = 7106, OrderId = "pay_dup_b", PayChannel = 100, TransactionId = "t-dup", }));
-            // C271 跨订单幂等防重：信封错误拒绝，验真不执行，订单 B 不发货
+            //  跨订单幂等防重：信封错误拒绝，验真不执行，订单 B 不发货
             Assert.Equal((int)PaymentErrorCode.PayChannelNotSupported, ClientApiResultReader.Code(root));
             Assert.Equal(0, verifier.CallCount);
 
@@ -423,7 +423,7 @@ public sealed class GameUserPayTests
     }
 
     /// <summary>
-    /// 真 Provider（C378 起沙箱判定经 IClientApiOptionsProvider 读策略合并表，不再直连仓储）
+    /// 真 Provider（起沙箱判定经 IClientApiOptionsProvider 读策略合并表，不再直连仓储）
     /// </summary>
     private static IClientApiOptionsProvider CreateOptionsProvider(ClientApiTestDb db, bool withAppContext)
     {

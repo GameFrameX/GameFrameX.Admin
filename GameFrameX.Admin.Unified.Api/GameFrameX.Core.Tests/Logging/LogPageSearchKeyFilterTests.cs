@@ -13,7 +13,7 @@ using SqlSugar;
 namespace GameFrameX.Core.Tests.Logging;
 
 /// <summary>
-/// 日志分页 searchKey 模糊过滤守护（C327 / GFX-737）：BaseLogService.QueryPagedAsync 按各日志服务声明的
+/// 日志分页 searchKey 模糊过滤守护：BaseLogService.QueryPagedAsync 按各日志服务声明的
 /// <c>SearchableTextColumns</c> 多列 OR Contains 模糊匹配；空 searchKey 不变；与时间范围条件 AND 叠加。
 /// </summary>
 public sealed class LogPageSearchKeyFilterTests : IDisposable

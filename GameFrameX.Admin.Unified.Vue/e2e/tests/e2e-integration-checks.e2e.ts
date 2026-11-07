@@ -3,7 +3,7 @@ import { expect, test, type Page } from '@playwright/test';
 import { ADMIN_ROOTS, expectOverview, navigateByMenu, shot, signIn, logoutByMenu } from './helpers';
 import { renderedMenuGroups } from './module-coverage';
 
-// C406 / GFX-1232 集成轮专项断言（第 1 轮 a–g + 第 2 轮 h/i/j）。
+//  / 集成轮专项断言（第 1 轮 a–g + 第 2 轮 h/i/j）。
 // 全部走真实菜单 / 真实表单 / 浏览器内 fetch；每项独立用例并 shot() 留证。
 
 const HUB_API = process.env.E2E_HUB_API_URL;
@@ -365,7 +365,7 @@ test('i 广告回调配置分包选择回显且回调地址单 packageId 形态'
   // 前置清理：失败重跑可能留下夹具分包上的配置，(PackageId, Provider) 唯一会令新增被拒
   await deleteExistingAdConfigs(page, [FIXTURE_PACKAGE_A.label, FIXTURE_PACKAGE_B.label]);
 
-  // 新增：真实界面选择分包（R5：分包是配置身份的一部分）
+  // 新增：真实界面选择分包（分包是配置身份的一部分）
   await page.locator('role=button[name="新增"]').first().click();
   const dialog = page.locator('.p-dialog');
   await expect(dialog).toBeVisible({ timeout: 10_000 });
@@ -467,7 +467,7 @@ test('j 广告回调跨包密钥被拒且缺分包 404', async ({ page, request 
   }
   await shot(page, 'c406-j-two-package-configs');
 
-  // 1. A 包回调用 B 包密钥签名 → 601 拒绝（R5：配置按『分包 + provider』精确命中）
+  // 1. A 包回调用 B 包密钥签名 → 601 拒绝（配置按『分包 + provider』精确命中）
   const crossKey = await request.get(topOnCallbackUrl(FIXTURE_PACKAGE_A.id, secretBeta, 'TX-CROSS-KEY'));
   expect(crossKey.status(), '跨包密钥签名必须被拒绝（601）').toBe(601);
 

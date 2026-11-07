@@ -4,10 +4,10 @@ using SqlSugar;
 namespace GameFrameX.Core.Const.MenuSeed;
 
 /// <summary>
-/// global_menu 种子演化残留行启动自愈清理（C331 / GFX-741）。
+/// global_menu 种子演化残留行启动自愈清理。
 /// <para>global_menu 的写入方只有两处：GlobalMenuSeedData 种子 upsert 与 ApiEndpointCatalogSync 的
 /// permission:auto:* 运行期行。因此「有效行中 Key 既不在当前种子集、又非 permission:auto: 前缀」即为
-/// 种子演化残留（典型来源：D1 禁简写改名后旧 Key 行不再被按主键 upsert 命中而留存）；
+/// 种子演化残留（典型来源： 禁简写改名后旧 Key 行不再被按主键 upsert 命中而留存）；
 /// 「Key 命中种子但 Id ≠ 种子权威 Id」是同因的另一形态：旧布局 Id 行不被按主键 upsert 命中，
 /// 权威 Id 行插入后同 Key 双行并存（典型来源：StableSeedId 紧凑布局切换前的旧雪花 Id 行残留）。</para>
 /// </summary>
@@ -23,7 +23,7 @@ public static class MenuSeedStaleRowCleaner
     /// 软删 global_menu 有效行中的种子演化残留行（旧 Key 行 + 同 Key 异 Id 重复行），
     /// 并把因此父级悬空的自动权限行 Pid 归 0。
     /// <para>调用时机：主库种子 upsert 完成后、<see cref="MenuSeedCatalog.LoadFromDb"/> 之前——
-    /// 残留行与新 Key 行同 Permission / 同 Key 并存会让 ValidateDbMenus 启动崩溃（GFX-741），必须先清理后校验。</para>
+    /// 残留行与新 Key 行同 Permission / 同 Key 并存会让 ValidateDbMenus 启动崩溃，必须先清理后校验。</para>
     /// <para>同 Key 异 Id 重复行仅在种子权威 Id 行在场时判定为残留：权威行缺席（如本次启动未执行 upsert）
     /// 时保留该行，避免误删该 Key 唯一的有效菜单定义。</para>
     /// <para>Pid 归 0 依据：ApiEndpointCatalogSync 每次启动会按 controllerPidMap 把 pid=0 的自动按钮

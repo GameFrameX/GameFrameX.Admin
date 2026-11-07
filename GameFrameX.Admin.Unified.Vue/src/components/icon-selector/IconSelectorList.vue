@@ -56,7 +56,7 @@ const onColClick = (v: unknown | string) => {
     border: 1px solid var(--p-surface-300);
     border-radius: 5px;
     margin-bottom: 10px;
-    // 触控目标 36px（GFX-661）
+    // 触控目标 36px
     height: 36px;
 
     i {
@@ -74,7 +74,7 @@ const onColClick = (v: unknown | string) => {
       }
     }
 
-    // 按压反馈（GFX-661）：缩放动画受全局 prefers-reduced-motion 豁免
+    // 按压反馈：缩放动画受全局 prefers-reduced-motion 豁免
     &:active {
       transform: scale(0.94);
     }

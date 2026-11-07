@@ -2,8 +2,8 @@ using GameFrameX.Core.Service.Business;
 
 namespace GameFrameX.Core.Tests.Business;
 
-// C370（GFX-829）：业务凭证静态加密收口 SecretCrypto 的行为契约。
-// change：gfx-doc/dev/system-management/changes/C370-secret-crypto-foundation/change.md
+// ：业务凭证静态加密收口 SecretCrypto 的行为契约。
+// change：gfx-doc/dev/system-management/changes/-secret-crypto-foundation/change.md
 // 覆盖：往返还原、enc:sec:v1: 前缀、明文兼容直通、幂等加密、空值透传、
 // 未配置密钥的降级直存、密文 + 缺密钥 / 错误密钥 / 篡改密文的失败语义、
 // 与连接串域 enc:v1: 密文互不认领（双向）。

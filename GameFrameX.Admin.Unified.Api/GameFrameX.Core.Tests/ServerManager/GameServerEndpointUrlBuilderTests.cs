@@ -5,7 +5,7 @@ using GameFrameX.Entity.Business.Game;
 
 namespace GameFrameX.Core.Tests.ServerManager;
 
-// C150 §3.3 / C175：GameServerEndpointUrlBuilder 契约自检。
+//  / ：GameServerEndpointUrlBuilder 契约自检。
 // 覆盖五类 kind、root/prefix/action 的斜杠归一化、空 prefix 拒绝（含 ClientDispatch/Fulfillment）、非法 root。
 public class GameServerEndpointUrlBuilderTests
 {
@@ -128,7 +128,7 @@ public class GameServerEndpointUrlBuilderTests
                                                      GameServerEndpointUrlBuilder.Build(area, GameServerEndpointKindEnum.Control, "reload"));
     }
 
-    // C339 / GFX-750：OnlineAdmin 第五档（Online 平台管理，vault:C2 S1.7）——默认前缀 / 自定义前缀 / 空值拒绝（同 Gm/Control 守卫）。
+    //  / ：OnlineAdmin 第五档（Online 平台管理，vault: .7）——默认前缀 / 自定义前缀 / 空值拒绝（同 Gm/Control 守卫）。
     [Fact]
     public void Build_OnlineAdmin_UsesDefaultPrefix()
     {

@@ -49,7 +49,7 @@ public sealed class OnlineServerClient : IOnlineServerClient
     public async Task<TResponse> GetAsync<TResponse>(string action, OnlineScopeContext scope) where TResponse : class
     {
         var url = await ResolveUrlAsync(action, scope);
-        // S3/C401 断链修复点
+        // / 断链修复点
         var urlWithScope = url + (url.Contains('?') ? "&" : "?")
             + "serverId=" + scope.ServerId;
 
@@ -127,14 +127,14 @@ public sealed class OnlineServerClient : IOnlineServerClient
             }
         }
 
-        // S3/C401 断链修复点
+        // / 断链修复点
         merged["ServerId"] = scope.ServerId;
         return merged;
     }
 
     /// <summary>
     /// 「Online 协议码 ↔ Admin 镜像码」段级映射：协议段 Nxxx ↔ 镜像段 32(N-1)（vault 八段一一镜像，见 <see cref="OnlineErrorCode"/> 注释）。
-    /// 段内未知详表成员按段级代表成员映射；协议段外未知码兜底系统段（VC-1.10 未知码不崩溃、不误判成功）。
+    /// 段内未知详表成员按段级代表成员映射；协议段外未知码兜底系统段（.10 未知码不崩溃、不误判成功）。
     /// 镜像数值不可手改，调整须回 vault 评审后三端同步。
     /// </summary>
     private static OnlineErrorCode MapToMirrorCode(int onlineCode)

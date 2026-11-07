@@ -536,7 +536,7 @@ export interface LogRequest {
 }
 
 /**
- * LiveOps 统一下发回执（来源 change C343 / vault:C8 S7.7）。
+ * LiveOps 统一下发回执（来源 change / vault: .7）。
  *
  * 透传 Online 确认版本 / 状态供前端回显；`Merged` 标记邮件来源「同目标合并返回首次回执」路径。
  */
@@ -566,7 +566,7 @@ export interface OnlineLiveOpsDispatchResponse {
 }
 
 /**
- * 既有运营域页面「经 Online 下发」动作的通用输入（来源 change C343 / vault:C8 S7.7）。
+ * 既有运营域页面「经 Online 下发」动作的通用输入（来源 change / vault: .7）。
  *
  * 来源类型由所在 Service 固定注入（远程配置 / 公告 / 邮件 Campaign），不 exposed 给前端选择；
  * 本输入只承载目标区服、可选定向分群与下发理由，内部统一转调 OnlineLiveOpsDispatchService 单一入口。
@@ -609,7 +609,7 @@ export interface OnlinePenaltyLinkResponse {
   allSucceeded?: boolean;
 }
 
-/** 单区服联动命令执行结果（VC-2.3 Admin 展示半边：旧 Token 吊销确认字段）。 */
+/** 单区服联动命令执行结果（Admin 展示半边：旧 Token 吊销确认字段）。 */
 export interface OnlinePenaltyLinkResultResponse {
   /** 目标区服 Id。 */
   serverId?: string;
@@ -623,7 +623,7 @@ export interface OnlinePenaltyLinkResultResponse {
   /** 失败原因摘要（成功时为 null）。 */
   failureMessage?: string | null;
   /**
-   * 旧 Token 吊销确认（vault:C2 S1.4：命令生效后 Online 确认已吊销该玩家旧 Token；
+   * 旧 Token 吊销确认（vault: .4：命令生效后 Online 确认已吊销该玩家旧 Token；
    * 服务端旧 Token 被拒的验证归 vault 侧用例，Admin 断言展示层确认字段）。
    */
   tokenRevokedConfirmed?: boolean;

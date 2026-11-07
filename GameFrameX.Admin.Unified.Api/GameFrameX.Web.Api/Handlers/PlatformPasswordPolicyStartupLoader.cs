@@ -4,7 +4,7 @@ using Microsoft.Extensions.Hosting;
 namespace GameFrameX.Web.Api.Handlers;
 
 /// <summary>
-/// 启动期加载平台密码策略到内存快照，并镜像同步 CryptogramUtility 密码策略静态属性（C173）。
+/// 启动期加载平台密码策略到内存快照，并镜像同步 CryptogramUtility 密码策略静态属性。
 /// </summary>
 public sealed class PlatformPasswordPolicyStartupLoader : IHostedService
 {

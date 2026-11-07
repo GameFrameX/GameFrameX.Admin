@@ -14,8 +14,8 @@ using GameFrameX.Entity.Business.Game;
 
 namespace GameFrameX.Core.Tests.Business;
 
-// C373（GFX-838）T1/T2/T3：密钥生命周期操作集。
-// change：gfx-doc/dev/client-api/changes/C373-credential-key-lifecycle/change.md
+// //：密钥生命周期操作集。
+// change：gfx-doc/dev/client-api/changes/-credential-key-lifecycle/change.md
 // TicketKey Rotate：旧钥退场参数（默认 now+7d、上限 now+30d、<=now 拒）+ RotatedTime 标记 + ExpireTime 收窄；
 // 策略合并表 SigningKey Rotate：新 64-hex 密文即刻替换（旧值作废）、UpdateTime 推进、响应无密钥；
 // 审计：两个 Rotate 端点源码级断言含 [KeyAudit] 结构化审计行（DB 操作日志管线断链期的调用意图守护）。
@@ -52,7 +52,7 @@ public sealed class KeyLifecycleRotateTests : IDisposable
     }
 
     /// <summary>
-    /// 预置一把「当前生效」的旧钥（模拟既有密钥形态；密文与否不影响轮换标记逻辑，用密文形态贴近 C371 后库内现状）。
+    /// 预置一把「当前生效」的旧钥（模拟既有密钥形态；密文与否不影响轮换标记逻辑，用密文形态贴近 后库内现状）。
     /// </summary>
     private GameLoginTicketKeyEntity SeedActiveTicketKey()
     {
@@ -179,7 +179,7 @@ public sealed class KeyLifecycleRotateTests : IDisposable
     }
 
     /// <summary>
-    /// 审计调用意图守护（T3）：DB 操作日志管线断链期，两个新 Rotate 端点必须保留 [KeyAudit] 结构化审计行
+    /// 审计调用意图守护：DB 操作日志管线断链期，两个新 Rotate 端点必须保留 [KeyAudit] 结构化审计行
     /// （含操作人/目标键），管线修复后统一接入 DB 审计。删除审计行即失败。
     /// </summary>
     [Fact]

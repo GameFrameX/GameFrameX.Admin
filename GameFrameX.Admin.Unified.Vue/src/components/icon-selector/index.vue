@@ -107,7 +107,7 @@ const state = reactive({
 });
 
 // PrimeVue Popover.show 需要 event/target 作锚点，无参调用会在 alignOverlay 读 currentTarget 直接抛
-// TypeError（HEAD 存量 bug，GFX-714 冒烟暴露）；suppressNextFocusShow 防止选完图标 hide 后 refocus 立即重开
+// TypeError（HEAD 存量 bug， 冒烟暴露）；suppressNextFocusShow 防止选完图标 hide 后 refocus 立即重开
 let suppressNextFocusShow = false;
 const onIconFocus = (event?: FocusEvent) => {
   if (!props.modelValue) return false;

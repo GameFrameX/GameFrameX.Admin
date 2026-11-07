@@ -57,7 +57,7 @@ public class SystemEmailProviderService
         EncryptProviderSecrets(entity);
         await Repository.InsertAsync(entity);
         var added = entity.Adapt<SystemEmailProviderResponse>();
-        // 凭证已密文化（C370），Add 响应与 Page/Detail 统一走脱敏，不回显任何形态的凭证值
+        // 凭证已密文化，Add 响应与 Page/Detail 统一走脱敏，不回显任何形态的凭证值
         MaskSensitiveFields(added);
         return added;
     }
@@ -97,7 +97,7 @@ public class SystemEmailProviderService
 
         ValidateProviderRequiredFields(entity.Provider, entity.DefaultFromEmail, entity.Host, entity.Port, entity.SecretId, entity.SecretKey, entity.TemplateId);
 
-        // SensitiveFieldMask.PreserveIfMasked 已把 ****** 换回库中原值（密文形态），Encrypt 幂等跳过；新明文在此加密后落库（C370）
+        // SensitiveFieldMask.PreserveIfMasked 已把 ****** 换回库中原值（密文形态），Encrypt 幂等跳过；新明文在此加密后落库
         EncryptProviderSecrets(entity);
 
         await Repository.AsUpdateable(entity)
@@ -222,7 +222,7 @@ public class SystemEmailProviderService
     }
 
     /// <summary>
-    /// 凭证敏感字段落库前静态加密（C370 <see cref="SecretCrypto"/> 收口）：新明文加密为 <c>enc:sec:v1:</c> 密文，
+    /// 凭证敏感字段落库前静态加密（<see cref="SecretCrypto"/> 收口）：新明文加密为 <c>enc:sec:v1:</c> 密文，
     /// <see cref="SensitiveFieldMask.PreserveIfMasked"/> 保留的库中旧值已是密文则幂等透传。
     /// </summary>
     private static void EncryptProviderSecrets(GameFrameX.Entity.System.SystemEmailProviderEntity entity)

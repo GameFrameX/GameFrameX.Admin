@@ -94,7 +94,7 @@ public class SystemAuthService : IAdminApiController
             }
         }
 
-        // 账号是否存在（C216 枚举防护：user null 跑假 Verify 对齐耗时 + 统一响应，不再抛 D0009）
+        // 账号是否存在（枚举防护：user null 跑假 Verify 对齐耗时 + 统一响应，不再抛 D0009）
         var user = await GetLoginUserByAccountAsync(account);
         if (user == null)
         {
@@ -130,7 +130,7 @@ public class SystemAuthService : IAdminApiController
     }
 
     /// <summary>
-    /// 记录登录失败并抛统一响应（C216 枚举防护）：<paramref name="failKey"/> 累计失败次数，达 <see cref="MaxLoginFailCount"/> 设置
+    /// 记录登录失败并抛统一响应（枚举防护）：<paramref name="failKey"/> 累计失败次数，达 <see cref="MaxLoginFailCount"/> 设置
     /// <paramref name="lockoutKey"/> 锁定并抛锁定提示；未达阈值抛"账号或密码错误"。user null 与密码错误共用此路径，响应不可区分。
     /// </summary>
     /// <param name="failKey">失败计数缓存键（账号维度）。</param>

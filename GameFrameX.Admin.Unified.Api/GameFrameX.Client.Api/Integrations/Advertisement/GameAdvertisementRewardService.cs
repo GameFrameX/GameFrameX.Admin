@@ -7,9 +7,9 @@ using GameFrameX.Foundation.Idempotency;
 namespace GameFrameX.Client.Api.Integrations.Advertisement;
 
 /// <summary>
-/// 广告奖励发放账本服务（C114 / GFX-110）。
+/// 广告奖励发放账本服务。
 /// <para>统一执行 TopOn / GoogleAdMob / UnityAds 服务端回调的「读 ConfigJson → 反序列化强类型 Option → 按 Option <c>*Param</c> 取参 → 按平台算法验签 → 幂等判定 → 调游戏服发奖 → 回写账本状态」链路。</para>
-/// <para>C222 provider 模式：平台特定（验签 + 角色解析）下沉到 <see cref="IAdvertisementCallbackHandler"/> 各实现，本类只保留通用流程 + <see cref="IAdvertisementCallbackFactory"/> 路由。加平台 = 加 Handler + 一行 DI 注册，本类不动。</para>
+/// <para> provider 模式：平台特定（验签 + 角色解析）下沉到 <see cref="IAdvertisementCallbackHandler"/> 各实现，本类只保留通用流程 + <see cref="IAdvertisementCallbackFactory"/> 路由。加平台 = 加 Handler + 一行 DI 注册，本类不动。</para>
 /// <para>fail closed：验签失败 / 配置缺失 / 角色缺失一律不写账本（验签失败）或不发奖。</para>
 /// <para>幂等判定统一走 Foundation 协调器 + 账本表即 Store（<see cref="AdvertisementRewardLedgerIdempotencyStore"/>）：
 /// IdempotencyKey = "adreward:" + NormalizedProvider + ":" + TransactionId，占位即 claim 一行 Pending，
@@ -90,7 +90,7 @@ public sealed class GameAdvertisementRewardService
     }
 
     /// <summary>
-    /// 三 Provider 同构处理流程（fail closed，顺序严格按 change.md §3；幂等判定统一走 Foundation 接口）。
+    /// 三 Provider 同构处理流程（fail closed，顺序严格按 change.md；幂等判定统一走 Foundation 接口）。
     /// </summary>
     private async Task<AdvertisementRewardReceiveResult> ReceiveAsyncCore(string providerCanonical,
         Func<AdvertisementCallbackOptions, IQueryCollection, OptionVerification> verify,

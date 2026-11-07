@@ -28,7 +28,7 @@ public class GameAreaClassifyService
 
     /// <summary>
     /// 更新前验证记录存在。
-    /// <para>DockerPassword 已不在 Output 回显（C228 敏感字段剔除），编辑弹窗回传空值时保留 DB 原值，避免误清空。</para>
+    /// <para>DockerPassword 已不在 Output 回显（敏感字段剔除），编辑弹窗回传空值时保留 DB 原值，避免误清空。</para>
     /// </summary>
     protected override async Task OnUpdatingAsync(UpdateGameAreaClassifyEntityRequest input)
     {

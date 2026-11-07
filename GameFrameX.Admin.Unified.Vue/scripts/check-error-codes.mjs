@@ -1,20 +1,20 @@
 #!/usr/bin/env node
 
 /**
- * 错误码五语言码表校验脚本（C348 / GFX-751，C339 前端半边 S1.3-B1）
+ * 错误码五语言码表校验脚本（前端半边 .3-）
  *
  * 断言口径：
- * - Online 段（320～327，C339 八段镜像 vault 1xxx～8xxx）零差异 = 硬断言：
- *   五语言缺失 / 多余 / 空文案，以及 zh-cn / en 与 error-codes.json 的
- *   zh-CN / en-US 文案漂移，任一命中退出码 1。
- * - 全表差异 = 软报告：仅打印不阻断——前端既有 12 码滞后归 GFX-672 清偿，
- *   退出码不受非 Online 差异影响。
+ * - Online 段（320～327， 八段镜像 vault 1xxx～8xxx）零差异 = 硬断言：
+ *  五语言缺失 / 多余 / 空文案，以及 zh-cn / en 与 error-codes.json 的
+ *  zh-CN / en-US 文案漂移，任一命中退出码 1。
+ * - 全表差异 = 软报告：仅打印不阻断——前端既有 12 码滞后归 清偿，
+ *  退出码不受非 Online 差异影响。
  *
  * 输入解析链同 sync-error-codes.mjs（--input / GFX_ERROR_CODES_JSON / 旁邻默认）。
  *
  * 用法：
- *   node scripts/check-error-codes.mjs
- *   node scripts/check-error-codes.mjs --input /path/error-codes.json
+ *  node scripts/check-error-codes.mjs
+ *  node scripts/check-error-codes.mjs --input /path/error-codes.json
  */
 
 import {readFileSync} from 'node:fs';
@@ -26,7 +26,7 @@ const REPO_ROOT = join(__dirname, '..');
 const I18N_DIR = join(REPO_ROOT, 'src', 'i18n', 'pages', 'errors');
 const LOCALES = ['zh-cn', 'zh-tw', 'en', 'ja', 'ko'];
 const BACKEND_FIELD = {'zh-cn': 'zh-CN', 'en': 'en-US'};
-// C339 段位登记：Online 八子段 320～327（OnlineSystem…OnlineTransient）
+//  段位登记：Online 八子段 320～327（OnlineSystem…OnlineTransient）
 const ONLINE_SEGMENTS = new Set([320, 321, 322, 323, 324, 325, 326, 327]);
 const segmentOf = (code) => Math.floor(Number(code) / 100000);
 const isOnlineCode = (code) => ONLINE_SEGMENTS.has(segmentOf(code));

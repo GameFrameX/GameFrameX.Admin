@@ -8,8 +8,8 @@ using Xunit;
 namespace GameFrameX.Core.Tests.System;
 
 /// <summary>
-/// MenuSeedStaleRowCleaner 单测（C331 / GFX-741）：global_menu 种子演化残留行启动自愈清理。
-/// <para>复现形态：实体改名（D1 禁简写）后旧 Key 行不再被种子 upsert 命中而留存，与新 Key 行同 Permission 并存，
+/// MenuSeedStaleRowCleaner 单测：global_menu 种子演化残留行启动自愈清理。
+/// <para>复现形态：实体改名（禁简写）后旧 Key 行不再被种子 upsert 命中而留存，与新 Key 行同 Permission 并存，
 /// 导致 ValidateDbMenus 启动崩溃；清理后有效行恒等于「当前种子 ∪ permission:auto:* 运行期行」。</para>
 /// <para>测试客户端沿用 <see cref="MenuSeedCatalogTestData"/> 的裸 SqlSugarClient 惯例（不带生产
 /// ConfigureExternalServices）：SqlSugar 实体元数据静态缓存按类型共享，混用两种客户端配置会因表名/可空映射
@@ -119,7 +119,7 @@ public class MenuSeedStaleRowCleanerTests
             db.Insertable(seedRows).ExecuteCommand();
             var seedIdsByKey = BuildSeedIdsByKey(seedRows);
 
-            // 复活 GFX-741 脏数据形态：旧简写 Key 子树（1 route + 1 按钮样本）与新全称 Key 行同 Permission 并存
+            // 复活 脏数据形态：旧简写 Key 子树（1 route + 1 按钮样本）与新全称 Key 行同 Permission 并存
             var legacyRoute = Normalize(new GlobalMenuEntity
             {
                 Id = StableSeedId.Menu("route:adCallbackConfigEntity"),

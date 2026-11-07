@@ -1,7 +1,7 @@
 namespace GameFrameX.Client.Api.GameUserPay.Dto;
 
 /// <summary>
-/// 支付流水上报请求（C11 支付域 Report；纯记账对账，不推进订单状态，响应 data 为 null）
+/// 支付流水上报请求（支付域 Report；纯记账对账，不推进订单状态，响应 data 为 null）
 /// </summary>
 public class GameUserPayReportRequest
 {

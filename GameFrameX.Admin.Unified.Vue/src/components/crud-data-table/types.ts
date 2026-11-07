@@ -34,8 +34,8 @@ export interface CrudAction {
 /**
  * 声明式列配置（CrudDataTable 的 columns prop）。
  *
- * 字段集合严格锁死（见 change C146 §3）：execute 期不得新增未声明字段（如
- * editable / filterable / aggregatable），需新增须先回 §3 取授权或立衍生 change。
+ * 字段集合严格锁死（见 change）：execute 期不得新增未声明字段（如
+ * editable / filterable / aggregatable），需新增须先回 取授权或立衍生 change。
  */
 export interface CrudColumnConfig {
   /** 列标识，同时是导出字段名，作为列偏好的唯一键 */
@@ -48,7 +48,7 @@ export interface CrudColumnConfig {
   align?: 'left' | 'center' | 'right'
   /**
    * 数字列标记（金额/ID/数量等）：true 时单元格渲染等宽数字（tabular-nums）
-   * 且未显式指定 align 时默认右对齐（C254 数字列规范）
+   * 且未显式指定 align 时默认右对齐（数字列规范）
    */
   numeric?: boolean
   /** 是否冻结列，默认 false */
@@ -69,7 +69,7 @@ export interface CrudColumnConfig {
    */
   bodyKey?: string
   /**
-   * 移动端列优先级（change C252）：1 = 核心列，所有视口显示（默认）；
+   * 移动端列优先级：1 = 核心列，所有视口显示（默认）；
    * >= 2 = 次要列，窄视口（< 768px，与 theme/breakpoints.scss bp-down(md) 一致）
    * 下不渲染，避免手机端横向拖动。仅影响渲染层——列设置面板、偏好持久化、
    * 导出列收集均不受此字段影响（桌面/导出语义不变）。

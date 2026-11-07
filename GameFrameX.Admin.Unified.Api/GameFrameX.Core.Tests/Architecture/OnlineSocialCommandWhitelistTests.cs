@@ -1,11 +1,11 @@
 namespace GameFrameX.Core.Tests.Architecture;
 
-// Online 社交治理（change C350 / GFX-754 / vault:C7）三条红线守护：
+// Online 社交治理（change / / vault:）三条红线守护：
 // ① 处罚联动命令枚举严格三值（Kick / Ban / Mute，X3 红线）——新增命令必须回 vault 评审并同步本测试；
 // ② Online/Social 源码零直写——事实源（GamePenaltyEntity）只经 GamePenaltyService.AddAsync 写入，
-//    Social 域自身只读（只读 Repository 允许；任何写入 API 调用或 ISqlSugarClient 依赖直接失败）；
+//  Social 域自身只读（只读 Repository 允许；任何写入 API 调用或 ISqlSugarClient 依赖直接失败）；
 // ③ Online 显式命令调用点唯一——kick_player / revoke_token / mute_player 三个 action 常量与
-//    OnlineLinkCommandAckData 联动命令响应类型只允许出现在 OnlinePenaltyLinkCommandService（处置流与处罚页同步均经其公共入口）。
+//  OnlineLinkCommandAckData 联动命令响应类型只允许出现在 OnlinePenaltyLinkCommandService（处置流与处罚页同步均经其公共入口）。
 public sealed class OnlineSocialCommandWhitelistTests
 {
     private static readonly string RepositoryRoot = GetRepositoryRoot();

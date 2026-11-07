@@ -7,7 +7,7 @@
 namespace GameFrameX.Payment.Abstract;
 
 /// <summary>
-/// 渠道退款入参聚合（C310 / GFX-718）：把订单侧退款所需字段一次传齐，避免各渠道实现各自回查订单表。
+/// 渠道退款入参聚合：把订单侧退款所需字段一次传齐，避免各渠道实现各自回查订单表。
 /// </summary>
 public sealed class RefundOrderContext
 {

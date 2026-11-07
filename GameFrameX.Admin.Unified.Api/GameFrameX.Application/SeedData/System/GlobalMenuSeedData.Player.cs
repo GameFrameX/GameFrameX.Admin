@@ -24,7 +24,7 @@ public partial class GlobalMenuSeedData
             {
                 Id = StableSeedId.Menu("route:player"),
                 Key = "route:player",
-                // C104 (GFX-97)：route:game 顶层目录被移除，其 8 个直接业务子目录提升为顶层根。
+                //  ()：route:game 顶层目录被移除，其 8 个直接业务子目录提升为顶层根。
                 Pid = 0,
                 Type = MenuTypeEnum.Dir,
                 Name = "player",
@@ -275,7 +275,7 @@ public partial class GlobalMenuSeedData
             },
             new()
             {
-                // C1: 邮箱新增用户按钮权限。原先缺失该 Button 种子，/api/gameUser/addByMail 无显式绑定 → 管理员 403。
+                // : 邮箱新增用户按钮权限。原先缺失该 Button 种子，/api/gameUser/addByMail 无显式绑定 → 管理员 403。
                 // 父菜单 route:gameUserEntity 已含 Admin，按钮经 ShouldSyncToRole 自动授予管理员角色（与 :add 一致）。
                 Id = StableSeedId.Menu("gameUserEntity:addByMail"),
                 Key = "gameUserEntity:addByMail",
@@ -473,7 +473,7 @@ public partial class GlobalMenuSeedData
             },
             new()
             {
-                // C120 / GFX-122：权益发货账本 Admin 查询/管理。route 菜单前端页未落地前 IsHide=true 占位，权限码已就绪供 API 鉴权。
+                //  / ：权益发货账本 Admin 查询/管理。route 菜单前端页未落地前 IsHide=true 占位，权限码已就绪供 API 鉴权。
                 Id = StableSeedId.Menu("route:gameOrderFulfillmentEntity"),
                 Key = "route:gameOrderFulfillmentEntity",
                 Pid = StableSeedId.Menu("route:commerceCenter"),

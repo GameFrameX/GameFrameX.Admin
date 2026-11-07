@@ -2,9 +2,9 @@
 /* tslint:disable */
 /*
  * ---------------------------------------------------------------
- * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API        ##
- * ##                                                           ##
- * ## AUTHOR: acacode                                           ##
+ * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API ##
+ * ## ##
+ * ## AUTHOR: acacode ##
  * ## SOURCE: https://github.com/acacode/swagger-typescript-api ##
  * ---------------------------------------------------------------
  */
@@ -73,7 +73,7 @@ export class GlobalMenu<SecurityDataType = unknown> {
    *
    * @tags globalMenu
    * @name GlobalMenuEndpointPermissionMapAsyncGet
-   * @summary 获取端点权限目录（U6/C42）：(HttpMethod, RoutePath) → GameFrameX.Core.Authorization.EndpointPermissionEntry。 由 `ApiEndpointCatalogSync` 启动时构建并预热；此处请求期按需返回缓存，缓存缺失则即时重建。
+   * @summary 获取端点权限目录：(HttpMethod, RoutePath) → GameFrameX.Core.Authorization.EndpointPermissionEntry。 由 `ApiEndpointCatalogSync` 启动时构建并预热；此处请求期按需返回缓存，缓存缺失则即时重建。
    * @request GET:/api/globalMenu/endpointPermissionMapAsync
    */
   globalMenuEndpointPermissionMapAsyncGet = (params: RequestParams = {}) =>

@@ -1,7 +1,7 @@
 {
-  // 审计留存配置（C404 契约 §1.7）。省略任意节点等价代码默认值：
+  // 审计留存配置（契约）。省略任意节点等价代码默认值：
   // 访问日志热 30 天 / 操作日志热 180 天 / 归档永久（0）/ 每批 5000 行 / 开启。
-  // 时间口径：CreatedTime / ArchivedTime 均为 UTC 秒级时间戳（C144）。
+  // 时间口径：CreatedTime / ArchivedTime 均为 UTC 秒级时间戳。
   "AuditRetention": {
     "Enabled": true,
     "VisitHotDataDays": 30,

@@ -21,7 +21,7 @@ export interface OnlineMatchOverviewRequest {
   region?: string | null;
 }
 
-/** 匹配队列总览响应（change C341 §3 A0 字段终版）。 */
+/** 匹配队列总览响应（字段终版）。 */
 export interface OnlineMatchOverviewResponse {
   /** 按 Mode/Region 维度的队列快照行。 */
   queues?: OnlineMatchQueueSnapshotResponse[] | null;
@@ -65,11 +65,11 @@ export interface OnlineMatchQueueQueryOverviewPostData {
   code: number;
   /** 错误或提示信息 */
   message: string;
-  /** 匹配队列总览响应（change C341 §3 A0 字段终版）。 */
+  /** 匹配队列总览响应（字段终版）。 */
   data: OnlineMatchOverviewResponse;
   /** 链路追踪标识，未启用追踪时为 null */
   trackId: string | null;
-  /** 已退役字段：统一错误码体系（C265）下恒为 null，数字业务错误码承载在 code 字段 */
+  /** 已退役字段：统一错误码体系下恒为 null，数字业务错误码承载在 code 字段 */
   errorCode: string | null;
   /** 响应类型（success/warning/error） */
   type: string | null;

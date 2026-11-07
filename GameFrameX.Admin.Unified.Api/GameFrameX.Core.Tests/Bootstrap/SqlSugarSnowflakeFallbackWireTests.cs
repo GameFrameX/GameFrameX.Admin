@@ -3,11 +3,11 @@ using SqlSugar;
 namespace GameFrameX.Core.Tests.Bootstrap;
 
 /// <summary>
-/// SqlSugar 雪花 ID 进程级接线守卫（C361 / GFX-804）。
+/// SqlSugar 雪花 ID 进程级接线守卫。
 /// <para>SqlSugar 主键回填取号必须经 <see cref="StaticConfig.CustomSnowFlakeFunc"/> 走 Foundation 紧凑布局——
 /// 该 func 由 Core.Extension 的 SqlSugarSnowflakeFallbackInitializer（ModuleInitializer）在模块加载时安装，
 /// 覆盖 Hub / Client（AddSqlSugarClientService 不装配 SqlSugarSetup）与一切未装配路径。
-/// 为空即 SqlSugar 退回内置 SnowFlakeSingle 18-19 位长布局，是 C361 要杜绝的退化路径。</para>
+/// 为空即 SqlSugar 退回内置 SnowFlakeSingle 18-19 位长布局，是 要杜绝的退化路径。</para>
 /// </summary>
 public sealed class SqlSugarSnowflakeFallbackWireTests
 {

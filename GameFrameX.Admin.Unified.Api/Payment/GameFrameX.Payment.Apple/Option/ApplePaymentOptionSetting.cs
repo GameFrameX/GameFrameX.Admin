@@ -53,7 +53,7 @@ public class ApplePaymentOptionSetting : IPaymentOptionSetting
     public string ApplePaymentRootCertificate { get; set; } = string.Empty;
 
     /// <summary>
-    /// 是否允许 Server API v2 验证新路径（C271 语义定稿）。
+    /// 是否允许 Server API v2 验证新路径（语义定稿）。
     /// <para>true（默认）：仅上报 transactionId 的 StoreKit 2 验证走 App Store Server API v2
     /// （GetTransactionInfo + JWS 验签）；receiptData 形态不受此开关影响，始终走 verifyReceipt 旧路径。</para>
     /// <para>false：transactionId 形态验证被明确拒绝（不降级旧路径）。</para>

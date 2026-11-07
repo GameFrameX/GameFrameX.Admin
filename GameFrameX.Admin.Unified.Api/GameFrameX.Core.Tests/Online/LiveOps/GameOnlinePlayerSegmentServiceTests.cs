@@ -15,7 +15,7 @@ using SqlSugar;
 
 namespace GameFrameX.Core.Tests.Online.LiveOps;
 
-// C343 / GFX-755（vault:C8 S7.5-S7.6）：玩家分群服务测试（fake 单一入口）。
+//  / （vault: .5-.6）：玩家分群服务测试（fake 单一入口）。
 // 覆盖：条件白名单校验（字段越白名单拒 / 操作符越白名单拒 / 条件值空拒 / 白名单内收）、
 // 新增默认 NotSynced、syncOnline 成功回写（Synced + Online 分配标识）、syncOnline 失败置 Failed 并重抛可重试、
 // 被灰度版本行引用的分群不可删除。

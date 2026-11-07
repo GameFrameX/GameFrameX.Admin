@@ -2,12 +2,12 @@ using System.Reflection;
 
 namespace GameFrameX.Core.Tests.Architecture;
 
-// 2026-09-11 列默认值守护测试（password_configured 23502 事故政策收口；GFX-746 / C337 起全量强制）。
+// 2026-09-11 列默认值守护测试（password_configured 23502 事故政策收口； / 起全量强制）。
 // 政策：实体非 nullable 值类型列必须带 SugarColumn.DefaultValue——PG 11+ 加带 DEFAULT 的 NOT NULL 列
 // 是零重写元数据操作，存量行直接读默认值，CodeFirst 演化不再触发 23502（两次事故：2026-07 global_menu
 // 四列 EnsureColumn 修补、2026-09-11 password_configured）。规范见
 // gfx-doc/decisions/2026-09-11-codefirst-column-default-policy.md。
-// 322 条存量违规已于 GFX-746（2026-09-11）全量补 DefaultValue 清零，基线快照文件与只减不增豁免机制随之删除；
+// 322 条存量违规已于 （2026-09-11）全量补 DefaultValue 清零，基线快照文件与只减不增豁免机制随之删除；
 // 本测试自此严格断言零违规。真正可选的业务列走 IsNullable = true + C# 可空类型（bool?/int?），不进本守护范围。
 // DDL 行为回归（存量库加列不炸、老行默认值、存量 NULL 回填）由 CodeFirstSchemaEvolutionPostgresTests 连真实 PG 锁定。
 public sealed class EntityColumnDefaultValueGuardTests

@@ -6,7 +6,7 @@ namespace GameFrameX.Core.Service.PlatformLogging;
 
 /// <summary>
 /// 平台日志配置服务（SuperAdmin-only）。DetailAsync 不回显 ES 明文 URI；UpdateAsync 用 CAS 乐观锁写回并刷新同 Host 快照。
-/// <para>宿主表说明（GFX-706）：本服务不持有独立宿主表，共享主库 SystemConfigEntity（system_config 表），以 Code 分区行 <c>platform_logging_config</c>（PlatformLoggingConfigConstants.ConfigCode）存储本域配置 JSON。Platform* 前缀指平台级配置域，名实相符保留类名。</para>
+/// <para>宿主表说明：本服务不持有独立宿主表，共享主库 SystemConfigEntity（system_config 表），以 Code 分区行 <c>platform_logging_config</c>（PlatformLoggingConfigConstants.ConfigCode）存储本域配置 JSON。Platform* 前缀指平台级配置域，名实相符保留类名。</para>
 /// </summary>
 [ApiDescriptionSettings(Order = 444)]
 public sealed class PlatformLoggingConfigService : IAdminApiController

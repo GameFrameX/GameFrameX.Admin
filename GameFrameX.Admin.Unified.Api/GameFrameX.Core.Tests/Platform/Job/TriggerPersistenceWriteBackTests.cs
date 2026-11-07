@@ -9,7 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using SqlSugar;
 
 /// <summary>
-/// C404 §9.8：注册期持久化（内置作业 upsert 进 SystemJob 表，任务调度页可见）
+///  ：注册期持久化（内置作业 upsert 进 SystemJob 表，任务调度页可见）
 /// 与触发器运行态写回（NumberOfRuns / LastRunTime 落库）。
 /// </summary>
 public sealed class TriggerPersistenceWriteBackTests : IDisposable

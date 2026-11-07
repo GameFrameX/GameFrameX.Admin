@@ -20,7 +20,7 @@ using GameFrameX.Foundation.Utility;
 namespace GameFrameX.Web.Api.Handlers;
 
 /// <summary>
-/// API 端点目录启动同步（U6/C42）。
+/// API 端点目录启动同步。
 /// <para>Host 启动后：枚举 ASP.NET Core MVC 发现的全部 Admin API 端点 → 与 <see cref="GlobalApiEndpointEntity"/> 对账（匹配/孤儿/新增）
 /// → 按 DB <c>global_menu.Permission</c>（routeName）一次性回填 <see cref="GlobalMenuEndpointEntity"/> 绑定
 /// → 为未绑定且非公开端点自动挂隐藏按钮 → 构建并预热请求期端点权限缓存。</para>
@@ -117,7 +117,7 @@ public sealed class ApiEndpointCatalogSync : IHostedService
 
             var isPublic = cad.EndpointMetadata.OfType<AllowAnonymousAttribute>().Any()
                            || cad.MethodInfo.GetCustomAttribute<AllowAnonymousAttribute>() != null;
-            // 「仅需登录」档与匿名档同源判定：直接扫 [AuthenticatedOnly] 特性（声明即登记，GFX-684），
+            // 「仅需登录」档与匿名档同源判定：直接扫 [AuthenticatedOnly] 特性（声明即登记），
             // 不再经由手写路由清单 → 中转表 → HashSet 三跳，routePath 由 ActionDescriptor 现算，登记侧与路由侧不可能漂移。
             var isAuthenticatedOnly = cad.EndpointMetadata.OfType<AuthenticatedOnlyAttribute>().Any()
                                       || cad.MethodInfo.GetCustomAttribute<AuthenticatedOnlyAttribute>() != null;
@@ -301,7 +301,7 @@ public sealed class ApiEndpointCatalogSync : IHostedService
 
     /// <summary>
     /// 一次性迁移：读 DB global_menu 按钮 Permission（routeName）→ RoutePath → 匹配 api_endpoint → 回填 global_menu_endpoint。
-    /// 幂等。**不**读 .g.cs 文件，保证 C43 删源生成器后仍可迁移。**不**动 Id/Key/role_menu。
+    /// 幂等。**不**读 .g.cs 文件，保证 删源生成器后仍可迁移。**不**动 Id/Key/role_menu。
     /// </summary>
     private async Task MigrateBindingsFromMenuPermissionAsync(
         SqlSugarRepository<GlobalMenuEntity> menuRepository,
@@ -345,7 +345,7 @@ public sealed class ApiEndpointCatalogSync : IHostedService
 
             if (matchedEndpoints.Count == 0 && !string.IsNullOrEmpty(routePath))
             {
-                // controller 改名兜底（GFX-709 等「加前缀」式改名后按钮 permission 前缀仍是旧名）：
+                // controller 改名兜底（等「加前缀」式改名后按钮 permission 前缀仍是旧名）：
                 // 直译路由未命中时，尝试「controller 以旧名为后缀 + action 相同」的端点，
                 // 如 gameAppOpenAccess:page → api/gameAppOpenAccess/page。
                 // 非后缀式改名（如 Dict→Dictionary）不在此列，保持孤立按钮不动。

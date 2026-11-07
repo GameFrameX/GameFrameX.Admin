@@ -15,15 +15,15 @@ using GameFrameX.Foundation.Orm.Entity;
 using Microsoft.AspNetCore.Http;
 using SqlSugar;
 
-// S3/C401 断链修复点
+// / 断链修复点
 namespace GameFrameX.Core.Tests.ServerManager.Online;
 
-// C339 / GFX-750（vault:C2 S1.7）：Online 管理 API 客户端契约自检（typed client 基座）。
+//  / （vault: .7）：Online 管理 API 客户端契约自检（typed client 基座）。
 // 覆盖：URL 形态（{HttpManageUrl}/{OnlineAdminApiPrefix}/{action}，默认 online/admin）、
 // 区服标识并入 POST 请求体顶层（业务体携带的伪作用域字段被鉴权值覆盖）与 GET 查询参数、
 // Foundation 信封解包（失败 / 成功缺 Data 抛 InvalidOperationException）、
 // Online 协议码非 0 按协议段映射镜像段成员抛 BusinessError（协议段 Nxxx ↔ 镜像段 32(N-1)，
-// 段外未知码兜底系统段——VC-1.10 不崩溃、不误判成功）、原始协议码随 Message errors 透出、
+// 段外未知码兜底系统段——.10 不崩溃、不误判成功）、原始协议码随 Message errors 透出、
 // 作用域构造后区服被删的时序漂移拒绝。
 public sealed class OnlineServerClientTests : IDisposable
 {
@@ -36,7 +36,7 @@ public sealed class OnlineServerClientTests : IDisposable
 
     public OnlineServerClientTests()
     {
-        // 专属 ConfigId（C339）：SqlSugar 实体信息（含表名映射）按连接配置静态缓存且进程级共享；
+        // 专属 ConfigId：SqlSugar 实体信息（含表名映射）按连接配置静态缓存且进程级共享；
         // 不设 ConfigId 会与裸配置 fixture（AdvancedQueryAreaFilterTests / GameOrderShipServiceTests，
         // PascalCase 表名）互抢默认缓存键，后到者 InitTables no-op → insert 报 no such table
         //（AdvancedQueryAreaFilterTests ctor 注释记录的同类坑，ClientApi/Home 系靠独立 ConfigId 天然隔离）。
@@ -73,7 +73,7 @@ public sealed class OnlineServerClientTests : IDisposable
     }
 
     /// <summary>
-    /// 自定义前缀：区服 OnlineAdminApiPrefix 覆写时 URL 随之变化（区服级 DB 配置承接，C173/C175 架构）。
+    /// 自定义前缀：区服 OnlineAdminApiPrefix 覆写时 URL 随之变化（区服级 DB 配置承接，/ 架构）。
     /// </summary>
     [Fact]
     public async Task PostAsync_Respects_CustomOnlineAdminPrefix_FromArea()
@@ -154,7 +154,7 @@ public sealed class OnlineServerClientTests : IDisposable
 
     /// <summary>
     /// 协议段映射（vault 八段）：Online 协议码非 0 按协议段 Nxxx → 镜像段 32(N-1) 代表成员抛 BusinessError；
-    /// 段外未知码兜底系统段 InternalError（VC-1.10：不崩溃、不误判成功）。
+    /// 段外未知码兜底系统段 InternalError（.10：不崩溃、不误判成功）。
     /// </summary>
     [Theory]
     [InlineData(1001, 32000001)] // 1xxx 系统与网络 → 段 320 InternalError

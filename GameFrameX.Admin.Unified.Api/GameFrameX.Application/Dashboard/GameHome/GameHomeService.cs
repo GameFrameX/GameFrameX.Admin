@@ -32,16 +32,16 @@ public class GameHomeService : IAdminApiController
     [DisplayName("获取在线玩家信息")]
     public async Task<HttpJsonResultData<GameHomeOnlineResponse>> GetOnlineAsync()
     {
-        // C175：从全局 GameServerOptions.HttpRootUrl 改为区服级聚合。仅统计启用且配置了管理地址的区服，
+        // ：从全局 GameServerOptions.HttpRootUrl 改为区服级聚合。仅统计启用且配置了管理地址的区服，
         // 每个区服按 Control 能力前缀调用 GetOnlinePlayer，求和返回全服在线人数。
-        // C321：区服表是主库业务表，经主库连接查询；无区服数据时返回明确业务错误而非裸 500。
+        // ：区服表是主库业务表，经主库连接查询；无区服数据时返回明确业务错误而非裸 500。
         var mainDb = ResolveDb("首页在线人数");
         var total = await GameHomeOnlineCounter.GetTotalOnlineAsync(mainDb, _httpClientFactory);
         return HttpJsonResultData<GameHomeOnlineResponse>.Success(new GameHomeOnlineResponse { OnlineCount = total, });
     }
 
     /// <summary>
-    /// 首页运营驾驶舱聚合读数：在线人数、今日订单（待发货/退款中细分）、玩家总数/今日新增、区服计数（C321 / GFX-730）
+    /// 首页运营驾驶舱聚合读数：在线人数、今日订单（待发货/退款中细分）、玩家总数/今日新增、区服计数
     /// </summary>
     /// <returns>聚合计数结果</returns>
     [HttpPost("overview")]
@@ -110,7 +110,7 @@ public class GameHomeService : IAdminApiController
     }
 
     /// <summary>
-    /// 首页 24h 在线人数时序：最近 24 个整点桶回读采样表，桶内取最后一次采样，缺桶为 null（C321 / GFX-730）
+    /// 首页 24h 在线人数时序：最近 24 个整点桶回读采样表，桶内取最后一次采样，缺桶为 null
     /// </summary>
     /// <returns>趋势点列表（按桶时间升序，共 24 个点）</returns>
     [HttpPost("onlineTrend")]
