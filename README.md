@@ -241,7 +241,7 @@ Not "recommendations" — hard constraints that **take effect by default**.
 **Zero-config by default**: running from local source defaults to SQLite (under `db/` at the repository root); production uses PostgreSQL (MySQL / Oracle and 34 DbTypes in total are also supported). `GameFrameX.Application/Configuration/Database.json` is the single source of connection strings (shared by the three hosts — change it once and all three pick it up).
 
 - Single main database: all three hosts share one main database; entity ownership is decided by boundary rules (see Identity and Scope above).
-- 2.0 is a breaking release: no old-database upgrade or data migration. Startup fails fast when legacy tenant structures are detected (e.g. `tenant_`-prefixed tables); only fresh initialization or a full pre-release backup rollback is supported.
+- 2.0 assumes fresh deployments only: there is no legacy 1.x data, no old-database upgrade, no migration scripts, and no compatibility layer; only fresh initialization is supported.
 - For connection-string syntax when switching databases, see [`Database-ConnectionStrings.md`](GameFrameX.Admin.Unified.Api/GameFrameX.Application/Configuration/Database-ConnectionStrings.md); for paired environment variable overrides (`GFX_MAIN_DB_TYPE` + `GFX_MAIN_DB_CONNECTION_STRING`) and other deployment details, see [Backend README · Database](GameFrameX.Admin.Unified.Api/README.md#database-zero-config-by-default-postgresql-for-production).
 
 > SQLite is for local development only. Forbidden in production — weak concurrent writes, no standalone service process, and insufficient backup/restore and ops monitoring capabilities.

@@ -241,7 +241,7 @@ docker compose -f docker-compose.admin.yml up -d --build
 **預設零配置**：本地源碼直跑預設 SQLite（倉庫根 `db/` 下），生產用 PostgreSQL（也支援 MySQL / Oracle 等共 34 種 DbType）。`GameFrameX.Application/Configuration/Database.json` 是單一連線字串來源（三 host 共享，改一處三處生效）。
 
 - 單主庫模型：三個 host 共用一個主庫，實體歸屬由邊界規則決定（見上文「身分與作用域」）。
-- 2.0 為斷代版本：不提供舊庫升級或資料遷移，偵測到舊租戶結構（如 `tenant_` 前綴表）時啟動直接失敗；只支援新庫初始化或發布前整體回滾備份。
+- 2.0 僅面向全新部署：不存在舊版本歷史資料，不提供舊庫升級、遷移腳本或相容層；只支援新庫初始化。
 - 換庫連線字串寫法見 [`Database-ConnectionStrings.md`](GameFrameX.Admin.Unified.Api/GameFrameX.Application/Configuration/Database-ConnectionStrings.md)；環境變數成對覆蓋（`GFX_MAIN_DB_TYPE` + `GFX_MAIN_DB_CONNECTION_STRING`）等部署細節見 [後端 README · 資料庫](GameFrameX.Admin.Unified.Api/README.zh-TW.md#資料庫預設零配置生產用-postgresql)。
 
 > SQLite 只面向本地開發。生產禁用——併發寫入弱、無獨立服務程序、備份恢復與維運監控能力不足。

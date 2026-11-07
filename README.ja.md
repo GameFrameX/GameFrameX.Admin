@@ -241,7 +241,7 @@ docker compose -f docker-compose.admin.yml up -d --build
 **デフォルトはゼロ設定**：ローカルでソースを直接実行する場合はデフォルトで SQLite（リポジトリルートの `db/` 配下）。本番では PostgreSQL（MySQL / Oracle など合計 34 種の DbType もサポート）。`GameFrameX.Application/Configuration/Database.json` が接続文字列の唯一の情報源です（3 ホストで共有、1 箇所変更すれば 3 ホストに反映）。
 
 - 単一メイン DB モデル：3 ホストが 1 つのメイン DB を共有し、エンティティの帰属は境界ルールで決まります（前述の「アイデンティティとスコープ」を参照）。
-- 2.0 は破壊的リリースです。旧 DB のアップグレードやデータ移行は提供せず、旧テナント構造（例：`tenant_` プレフィックスのテーブル）を検出すると起動が即失敗します。新規 DB の初期化、またはリリース前のバックアップ全体ロールバックのみサポートします。
+- 2.0 は完全新規導入のみ想定：旧バージョンのデータは存在せず、旧 DB のアップグレード、移行スクリプト、互換レイヤーも提供しません。新規 DB の初期化のみサポートします。
 - DB 切り替え時の接続文字列の書き方は [`Database-ConnectionStrings.md`](GameFrameX.Admin.Unified.Api/GameFrameX.Application/Configuration/Database-ConnectionStrings.md) を参照。環境変数のペアオーバーライド（`GFX_MAIN_DB_TYPE` + `GFX_MAIN_DB_CONNECTION_STRING`）などのデプロイ詳細は [バックエンド README · データベース](GameFrameX.Admin.Unified.Api/README.ja.md#データベースデフォルトはゼロ設定本番は-postgresql) を参照してください。
 
 > SQLite はローカル開発専用です。本番での使用は禁止。並行書き込みが弱く、独立したサービスプロセスがなく、バックアップ・復旧や運用監視の能力が不足しているためです。
