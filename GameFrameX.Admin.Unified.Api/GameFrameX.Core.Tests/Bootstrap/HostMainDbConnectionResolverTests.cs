@@ -12,9 +12,8 @@ public class HostMainDbConnectionResolverTests
     {
         var configuration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
         {
-            ["DbConnection:ConnectionConfigs:0:ConfigId"] = "main",
-            ["DbConnection:ConnectionConfigs:0:DbType"] = "PostgreSQL",
-            ["DbConnection:ConnectionConfigs:0:ConnectionString"] = "Host=pg-main;Port=5432;Database=gameframex_admin;Username=u;Password=p;",
+            ["DbConnection:DbType"] = "PostgreSQL",
+            ["DbConnection:ConnectionString"] = "Host=pg-main;Port=5432;Database=gameframex_admin;Username=u;Password=p;",
         }).Build();
 
         var main = HostMainDbConnectionResolver.Resolve(configuration);
@@ -36,9 +35,8 @@ public class HostMainDbConnectionResolverTests
         {
             var configuration = new ConfigurationBuilder().AddCommandLine(new[]
             {
-                "--DbConnection:ConnectionConfigs:0:ConfigId", "main",
-                "--DbConnection:ConnectionConfigs:0:DbType", "PostgreSQL",
-                "--DbConnection:ConnectionConfigs:0:ConnectionString", "Host=cli-args;Port=5432;Database=main;Username=u;Password=p;",
+                "--DbConnection:DbType", "PostgreSQL",
+                "--DbConnection:ConnectionString", "Host=cli-args;Port=5432;Database=main;Username=u;Password=p;",
             }).Build();
 
             var main = HostMainDbConnectionResolver.Resolve(configuration, CreateEmptyBaseDirectory());
@@ -121,9 +119,8 @@ public class HostMainDbConnectionResolverTests
         {
             var configuration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
             {
-                ["DbConnection:ConnectionConfigs:0:ConfigId"] = "main",
-                ["DbConnection:ConnectionConfigs:0:DbType"] = "PostgreSQL",
-                ["DbConnection:ConnectionConfigs:0:ConnectionString"] = "Host=explicit-section;Port=5432;Database=main;Username=u;Password=p;",
+                ["DbConnection:DbType"] = "PostgreSQL",
+                ["DbConnection:ConnectionString"] = "Host=explicit-section;Port=5432;Database=main;Username=u;Password=p;",
             }).Build();
 
             var main = HostMainDbConnectionResolver.Resolve(configuration, baseDir);
@@ -146,7 +143,7 @@ public class HostMainDbConnectionResolverTests
         Directory.CreateDirectory(Path.Combine(baseDir, "Configuration"));
         File.WriteAllText(
             Path.Combine(baseDir, "Configuration", "Database.json"),
-            "{\"DbConnection\":{\"ConnectionConfigs\":[{\"ConfigId\":\"main\",\"DbType\":\"Sqlite\",\"ConnectionString\":\"DataSource=./db/shared-default.db;\"}]}}");
+            "{\"DbConnection\":{\"DbType\":\"Sqlite\",\"ConnectionString\":\"DataSource=./db/shared-default.db;\"}}");
         return baseDir;
     }
 

@@ -1,4 +1,3 @@
-using GameFrameX.Core.Extension.Const;
 using GameFrameX.Core.Option;
 
 namespace GameFrameX.Core.Bootstrap;
@@ -8,12 +7,12 @@ namespace GameFrameX.Core.Bootstrap;
 /// </summary>
 /// <remarks>
 /// 优先级从低到高：共享 Database.json 文件默认（仅 DbConnection 节为空时生效）
-/// &lt; 显式 DbConnection 配置节（appsettings / 环境变量 / 命令行）
+/// &lt; 显式 DbConnection 配置节（appsettings / 环境变量 / 命令行，扁平键 DbType / ConnectionString）
 /// &lt; LauncherOptions 统一启动参数层（--DbType/--ConnectionString 与 GFX_MAIN_DB_*，命令行优先，经
 /// <see cref="LauncherOptionsMainDatabase"/> 以最高优先级追加进配置管线）。
 /// 环境变量与命令行的合并、成对校验全部由 LauncherOptions 承担；本类与 Web.Api 的 SqlSugarSetup 共用
-/// <see cref="MainDatabaseConnectionGuard"/> 做单 main 与 provider 一致性校验。
-/// </summary>
+/// <see cref="MainDatabaseConnectionGuard"/> 做 main 标识、必填与 provider 一致性校验。
+/// </remarks>
 public static class HostMainDbConnectionResolver
 {
     /// <summary>
@@ -34,31 +33,36 @@ public static class HostMainDbConnectionResolver
     /// <returns>主库连接配置（ConfigId=main）。</returns>
     internal static DbConnectionConfig Resolve(IConfiguration configuration, string baseDirectory)
     {
-        var connectionConfigs = LoadConnectionConfigs(configuration);
+        var connectionConfig = LoadMainConnectionConfig(configuration);
 
         // C279：节为空时读输出目录共享 Database.json 作三 host 统一默认（Client/Hub 经 csproj 文件链接复制，无程序集依赖）；
         // 刻意窄加载——只读这一个文件，不复制 Web.Api 的全目录扫描，防 Application 将来的 Admin 专属配置被吸入 Client/Hub
-        if (connectionConfigs.Count == 0 && !configuration.GetSection("DbConnection").Exists())
+        if (connectionConfig == null)
         {
             var sharedFile = Path.Combine(baseDirectory, "Configuration", "Database.json");
             if (File.Exists(sharedFile))
             {
-                connectionConfigs = LoadConnectionConfigs(new ConfigurationBuilder().AddJsonFile(sharedFile, false, false).Build());
+                connectionConfig = LoadMainConnectionConfig(new ConfigurationBuilder().AddJsonFile(sharedFile, false, false).Build());
             }
         }
 
-        if (connectionConfigs.Count == 0)
+        if (connectionConfig == null)
         {
             throw new InvalidOperationException(
-                "数据库主库连接配置缺失：请通过启动参数 --DbType + --ConnectionString（或 GFX_MAIN_DB_TYPE + GFX_MAIN_DB_CONNECTION_STRING 成对环境变量）提供，或在 DbConnection 配置节 / 输出目录共享 Database.json 中配置 main 项。");
+                "数据库主库连接配置缺失：请通过启动参数 --DbType + --ConnectionString（或 GFX_MAIN_DB_TYPE + GFX_MAIN_DB_CONNECTION_STRING 成对环境变量）提供，或在 DbConnection 配置节 / 输出目录共享 Database.json 中配置。");
         }
 
-        MainDatabaseConnectionGuard.EnsureSingleMainDatabase(connectionConfigs);
-        return connectionConfigs[0];
+        return MainDatabaseConnectionGuard.EnsureMainDatabase(connectionConfig);
     }
 
-    private static List<DbConnectionConfig> LoadConnectionConfigs(IConfiguration configuration)
+    private static DbConnectionConfig? LoadMainConnectionConfig(IConfiguration configuration)
     {
-        return configuration.GetSection("DbConnection:ConnectionConfigs").Get<List<DbConnectionConfig>>() ?? new List<DbConnectionConfig>();
+        var section = configuration.GetSection("DbConnection");
+        if (!section.Exists())
+        {
+            return null;
+        }
+
+        return section.Get<DbConnectionConfig>();
     }
 }

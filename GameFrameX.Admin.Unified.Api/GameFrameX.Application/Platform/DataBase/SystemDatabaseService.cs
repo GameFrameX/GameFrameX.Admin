@@ -23,11 +23,17 @@ public class SystemDatabaseService : IAdminApiController
     }
 
     /// <summary>
-    /// 连接清单直接来自 DbConnection 配置节（单 main；与装配点同一来源）。
+    /// 主库连接直接来自 DbConnection 配置节（扁平键；ConfigId 缺省按 main 归一）。
     /// </summary>
-    private List<DbConnectionConfig> LoadConnectionConfigs()
+    private DbConnectionConfig? LoadMainConnectionConfig()
     {
-        return _configuration.GetSection("DbConnection:ConnectionConfigs").Get<List<DbConnectionConfig>>() ?? new List<DbConnectionConfig>();
+        var connectionConfig = _configuration.GetSection("DbConnection").Get<DbConnectionConfig>();
+        if (connectionConfig != null && string.IsNullOrWhiteSpace(connectionConfig.ConfigId?.ToString()))
+        {
+            connectionConfig.ConfigId = SqlSugarConst.MainConfigId;
+        }
+
+        return connectionConfig;
     }
 
     /// <summary>
@@ -37,7 +43,8 @@ public class SystemDatabaseService : IAdminApiController
     [DisplayName("获取库列表")]
     public List<string> GetList()
     {
-        return LoadConnectionConfigs().Select(u => u.ConfigId.ToString() ?? string.Empty).ToList();
+        var connectionConfig = LoadMainConnectionConfig();
+        return connectionConfig == null ? new List<string>() : new List<string> { connectionConfig.ConfigId?.ToString() ?? string.Empty };
     }
 
     /// <summary>
@@ -238,7 +245,8 @@ public class SystemDatabaseService : IAdminApiController
     /// </summary>
     private DbConnectionConfig GetValidConfig(string configId)
     {
-        return LoadConnectionConfigs().FirstOrDefault(u => u.ConfigId.ToString() == configId) ?? throw BusinessError.Oh("数据库连接配置不存在");
+        var connectionConfig = LoadMainConnectionConfig();
+        return connectionConfig != null && connectionConfig.ConfigId?.ToString() == configId ? connectionConfig : throw BusinessError.Oh("数据库连接配置不存在");
     }
 
     /// <summary>

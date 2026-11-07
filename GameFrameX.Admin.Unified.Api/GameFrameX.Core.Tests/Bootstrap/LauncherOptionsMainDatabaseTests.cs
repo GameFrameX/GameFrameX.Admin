@@ -15,9 +15,8 @@ public class LauncherOptionsMainDatabaseTests
                              .AddMainDatabaseFromLauncherOptions(new LauncherOptions { DbType = "PostgreSQL", ConnectionString = "Host=cli-main;Port=5432;Database=main;Username=u;Password=p;" })
                              .Build();
 
-        Assert.Equal("main", configuration["DbConnection:ConnectionConfigs:0:ConfigId"]);
-        Assert.Equal("PostgreSQL", configuration["DbConnection:ConnectionConfigs:0:DbType"]);
-        Assert.Equal("Host=cli-main;Port=5432;Database=main;Username=u;Password=p;", configuration["DbConnection:ConnectionConfigs:0:ConnectionString"]);
+        Assert.Equal("PostgreSQL", configuration["DbConnection:DbType"]);
+        Assert.Equal("Host=cli-main;Port=5432;Database=main;Username=u;Password=p;", configuration["DbConnection:ConnectionString"]);
     }
 
     [Fact]
@@ -37,7 +36,7 @@ public class LauncherOptionsMainDatabaseTests
                              .AddMainDatabaseFromLauncherOptions(new LauncherOptions())
                              .Build();
 
-        Assert.Null(configuration.GetSection("DbConnection")["ConnectionConfigs:0:ConfigId"]);
+        Assert.Null(configuration["DbConnection:ConnectionString"]);
     }
 
     [Fact]

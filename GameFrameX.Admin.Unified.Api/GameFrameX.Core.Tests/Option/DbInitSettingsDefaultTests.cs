@@ -55,16 +55,13 @@ public class DbInitSettingsDefaultTests
         var configuration = new ConfigurationBuilder()
                             .AddInMemoryCollection(new Dictionary<string, string?>
                             {
-                                ["DbConnection:EnableConsoleSql"] = "false",
-                                ["DbConnection:ConnectionConfigs:0:ConfigId"] = "main",
-                                ["DbConnection:ConnectionConfigs:0:DbType"] = "Sqlite",
-                                ["DbConnection:ConnectionConfigs:0:ConnectionString"] = "DataSource=./db/GameFrameX.Admin.db;",
+                                ["DbConnection:DbType"] = "Sqlite",
+                                ["DbConnection:ConnectionString"] = "DataSource=./db/GameFrameX.Admin.db;",
                             })
                             .Build();
 
-        var configs = configuration.GetSection("DbConnection:ConnectionConfigs").Get<List<DbConnectionConfig>>();
+        var config = configuration.GetSection("DbConnection").Get<DbConnectionConfig>();
 
-        var config = Assert.Single(configs);
         Assert.True(config.DbSettings.EnableInitDb);
         Assert.True(config.DbSettings.EnableDiffLog);
         Assert.True(config.TableSettings.EnableInitTable);
@@ -79,14 +76,12 @@ public class DbInitSettingsDefaultTests
         var configuration = new ConfigurationBuilder()
                             .AddInMemoryCollection(new Dictionary<string, string?>
                             {
-                                ["DbConnection:ConnectionConfigs:0:ConfigId"] = "main",
-                                ["DbConnection:ConnectionConfigs:0:DbSettings:EnableInitDb"] = "false",
+                                ["DbConnection:DbSettings:EnableInitDb"] = "false",
                             })
                             .Build();
 
-        var configs = configuration.GetSection("DbConnection:ConnectionConfigs").Get<List<DbConnectionConfig>>();
+        var config = configuration.GetSection("DbConnection").Get<DbConnectionConfig>();
 
-        var config = Assert.Single(configs);
         Assert.False(config.DbSettings.EnableInitDb);
         Assert.True(config.DbSettings.EnableDiffLog);
     }

@@ -9,55 +9,54 @@ public class MainDatabaseConnectionGuardTests
     [InlineData(DbType.Sqlite, "DataSource=single.db")]
     [InlineData(DbType.PostgreSQL, "Host=localhost;Database=single;Username=user;Password=password")]
     [InlineData(DbType.MySql, "Server=localhost;Database=single;Uid=user;Pwd=password")]
-    public void EnsureSingleMainDatabase_AcceptsSingleMain(DbType databaseType, string connectionString)
+    public void EnsureMainDatabase_AcceptsMainConnection(DbType databaseType, string connectionString)
     {
-        var actual = MainDatabaseConnectionGuard.EnsureSingleMainDatabase(CreateConfigs(databaseType, connectionString));
+        var actual = MainDatabaseConnectionGuard.EnsureMainDatabase(CreateConfig(databaseType, connectionString));
 
-        var config = Assert.Single(actual);
-        Assert.Equal("main", config.ConfigId);
-        Assert.Equal(connectionString, config.ConnectionString);
+        Assert.Equal("main", actual.ConfigId);
+        Assert.Equal(connectionString, actual.ConnectionString);
     }
 
     [Fact]
-    public void EnsureSingleMainDatabase_FillsBlankConfigIdWithMain()
+    public void EnsureMainDatabase_FillsBlankConfigIdWithMain()
     {
-        var connectionConfigs = new List<DbConnectionConfig> { new() { ConfigId = null!, DbType = DbType.Sqlite, ConnectionString = "DataSource=main.db" } };
+        var connectionConfig = new DbConnectionConfig { ConfigId = null!, DbType = DbType.Sqlite, ConnectionString = "DataSource=main.db" };
 
-        MainDatabaseConnectionGuard.EnsureSingleMainDatabase(connectionConfigs);
+        MainDatabaseConnectionGuard.EnsureMainDatabase(connectionConfig);
 
-        Assert.Equal("main", Assert.Single(connectionConfigs).ConfigId);
+        Assert.Equal("main", connectionConfig.ConfigId);
     }
 
     [Fact]
-    public void EnsureSingleMainDatabase_RejectsMultipleConnections()
+    public void EnsureMainDatabase_RejectsNonMainConnection()
     {
-        var connectionConfigs = CreateConfigs(DbType.Sqlite, "DataSource=main.db");
-        connectionConfigs.Add(new DbConnectionConfig { ConfigId = "extra", DbType = DbType.Sqlite, ConnectionString = "DataSource=extra.db" });
+        var connectionConfig = CreateConfig(DbType.Sqlite, "DataSource=main.db");
+        connectionConfig.ConfigId = "legacy";
 
-        Assert.Throws<InvalidOperationException>(() => MainDatabaseConnectionGuard.EnsureSingleMainDatabase(connectionConfigs));
+        Assert.Throws<InvalidOperationException>(() => MainDatabaseConnectionGuard.EnsureMainDatabase(connectionConfig));
     }
 
     [Fact]
-    public void EnsureSingleMainDatabase_RejectsNonMainConnection()
+    public void EnsureMainDatabase_RejectsMissingConnectionString()
     {
-        var connectionConfigs = CreateConfigs(DbType.Sqlite, "DataSource=main.db");
-        connectionConfigs[0].ConfigId = "legacy";
+        var connectionConfig = new DbConnectionConfig { ConfigId = "main", DbType = DbType.Sqlite, ConnectionString = null! };
 
-        Assert.Throws<InvalidOperationException>(() => MainDatabaseConnectionGuard.EnsureSingleMainDatabase(connectionConfigs));
+        var exception = Assert.Throws<InvalidOperationException>(() => MainDatabaseConnectionGuard.EnsureMainDatabase(connectionConfig));
+        Assert.Contains("配置缺失", exception.Message);
     }
 
     [Theory]
     [InlineData(DbType.Sqlite, "Host=postgres;Database=main")]
     [InlineData(DbType.PostgreSQL, "DataSource=main.db")]
-    public void EnsureSingleMainDatabase_RejectsProviderMismatch(DbType databaseType, string connectionString)
+    public void EnsureMainDatabase_RejectsProviderMismatch(DbType databaseType, string connectionString)
     {
-        var connectionConfigs = CreateConfigs(databaseType, connectionString);
+        var connectionConfig = CreateConfig(databaseType, connectionString);
 
-        Assert.Throws<InvalidOperationException>(() => MainDatabaseConnectionGuard.EnsureSingleMainDatabase(connectionConfigs));
+        Assert.Throws<InvalidOperationException>(() => MainDatabaseConnectionGuard.EnsureMainDatabase(connectionConfig));
     }
 
-    private static List<DbConnectionConfig> CreateConfigs(DbType databaseType, string connectionString)
+    private static DbConnectionConfig CreateConfig(DbType databaseType, string connectionString)
     {
-        return new List<DbConnectionConfig> { new() { ConfigId = "main", DbType = databaseType, ConnectionString = connectionString } };
+        return new DbConnectionConfig { ConfigId = "main", DbType = databaseType, ConnectionString = connectionString };
     }
 }

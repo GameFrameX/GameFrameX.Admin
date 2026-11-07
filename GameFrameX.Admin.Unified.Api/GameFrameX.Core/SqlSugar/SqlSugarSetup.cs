@@ -45,30 +45,23 @@ public static class SqlSugarSetup
         // （ModuleInitializer）安装 StaticConfig.CustomSnowFlakeFunc，覆盖未装配本类的路径（Hub / Client /
         // 测试进程）；此处不再接线 SnowFlakeSingle 内置 IdWorker（C361 / GFX-804）。
 
-        var connectionConfigs = configuration.GetSection("DbConnection:ConnectionConfigs").Get<List<DbConnectionConfig>>() ?? new List<DbConnectionConfig>();
-        MainDatabaseConnectionGuard.EnsureSingleMainDatabase(connectionConfigs);
+        var connectionConfig = configuration.GetSection("DbConnection").Get<DbConnectionConfig>() ?? new DbConnectionConfig();
+        MainDatabaseConnectionGuard.EnsureMainDatabase(connectionConfig);
         var enableConsoleSql = configuration.GetValue("DbConnection:EnableConsoleSql", false);
 
-        connectionConfigs.ForEach(SetDbConfig);
+        SetDbConfig(connectionConfig);
 
 
-        var sqlSugar = new SqlSugarScope(connectionConfigs.Adapt<List<ConnectionConfig>>(), db =>
+        var sqlSugar = new SqlSugarScope(new List<ConnectionConfig> { connectionConfig.Adapt<ConnectionConfig>() }, db =>
         {
-            connectionConfigs.ForEach(config =>
-            {
-                var dbProvider = db.GetConnectionScope(config.ConfigId);
-                SetDbAop(dbProvider, enableConsoleSql, httpContextAccessor);
-                SetDbDiffLog(dbProvider, config);
-            });
+            var dbProvider = db.GetConnectionScope(connectionConfig.ConfigId);
+            SetDbAop(dbProvider, enableConsoleSql, httpContextAccessor);
+            SetDbDiffLog(dbProvider, connectionConfig);
         });
         services.AddSingleton<ISqlSugarClient>(sqlSugar); // 单例注册
         services.AddScoped(typeof(SqlSugarRepository<>)); // 仓储注册
         // 初始化数据库表结构及种子数据
-        foreach (var config in connectionConfigs)
-        {
-            InitDatabase(sqlSugar, config, effectiveTypes);
-
-        }
+        InitDatabase(sqlSugar, connectionConfig, effectiveTypes);
     }
 
     /// <summary>

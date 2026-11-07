@@ -1,4 +1,3 @@
-using GameFrameX.Core.Extension.Const;
 using GameFrameX.Core.SqlSugar;
 
 namespace GameFrameX.Core.Bootstrap;
@@ -8,8 +7,8 @@ namespace GameFrameX.Core.Bootstrap;
 /// </summary>
 /// <remarks>
 /// LauncherOptions 是启动参数的统一入口（Foundation OptionsBuilder 已合并命令行参数与环境变量，命令行优先）。
-/// 本类只做一件事：成对校验后翻译成 DbConnection 配置节键，以最高优先级追加进配置管线；
-/// 单 main 与 provider 一致性校验由 MainDatabaseConnectionGuard 在装配点统一执行，Database.json 仅作最后兜底。
+/// 写入的键与 Database.json 的 DbConnection 节扁平同构（DbType / ConnectionString 直接位于 DbConnection 下，ConfigId 固定 main 由守卫补默认）；
+/// 单 main、必填与 provider 一致性校验由 MainDatabaseConnectionGuard 在装配点统一执行，Database.json 仅作最后兜底。
 /// </remarks>
 public static class LauncherOptionsMainDatabase
 {
@@ -38,9 +37,8 @@ public static class LauncherOptionsMainDatabase
 
         return builder.AddInMemoryCollection(new Dictionary<string, string?>
         {
-            ["DbConnection:ConnectionConfigs:0:ConfigId"] = SqlSugarConst.MainConfigId,
-            ["DbConnection:ConnectionConfigs:0:DbType"] = databaseType,
-            ["DbConnection:ConnectionConfigs:0:ConnectionString"] = connectionString,
+            ["DbConnection:DbType"] = databaseType,
+            ["DbConnection:ConnectionString"] = connectionString,
         });
     }
 }
