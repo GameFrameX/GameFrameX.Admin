@@ -145,12 +145,12 @@ test('普通管理员在系统下仍可管理业务定时任务', async ({ page 
     }
   });
 
-  // 新增：Name=EmailTask、Cron 远期一次性；表单无 Id 输入（服务端雪花分配）。
+  // 新增：Name=GameMailDeliveryJob（唯一真实 IScheduleJob 实现，手动执行路径依赖按名解析）、Cron 远期一次性；表单无 Id 输入（服务端雪花分配）。
   await page.locator('role=button[name="新增"]').first().click();
   const dialog = page.locator('.p-dialog:visible').first();
   await expect(dialog).toBeVisible();
   const inputs = dialog.locator('input:visible:not([type="checkbox"]):not([readonly]):not(:disabled)');
-  await inputs.nth(0).fill('EmailTask');
+  await inputs.nth(0).fill('GameMailDeliveryJob');
   await inputs.nth(1).fill(marker);
   await inputs.nth(2).fill('0 0 3 1 1 *');
   await page.locator('role=button[name="确定"]').first().click();
