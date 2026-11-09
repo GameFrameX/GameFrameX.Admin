@@ -63,7 +63,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 COPY --from=build /app/publish .
 
 # Create data directory with proper permissions
-RUN mkdir -p /app/data && chown -R $APP_UID:$APP_UID /app/data
+RUN mkdir -p /app/data /app/db && chown -R $APP_UID:$APP_UID /app/data /app/db
 
 # Expose port
 EXPOSE 20808

@@ -63,8 +63,8 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 COPY --from=build /app/publish .
 
 # Create necessary directories and set ownership for non-root user
-RUN mkdir -p /app/wwwroot/Avatar /app/wwwroot/logs /app/wwwroot/upload /app/wwwroot/Upload /app/data/logs && \
-    chown -R $APP_UID:$APP_UID /app/data /app/wwwroot
+RUN mkdir -p /app/wwwroot/Avatar /app/wwwroot/logs /app/wwwroot/upload /app/wwwroot/Upload /app/data/logs /app/db && \
+    chown -R $APP_UID:$APP_UID /app/data /app/wwwroot /app/db
 
 # Expose port
 EXPOSE 20802
