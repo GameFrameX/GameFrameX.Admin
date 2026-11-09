@@ -19,8 +19,8 @@ namespace GameFrameX.Core.Tests.Bootstrap;
 /// 新装首个业务管理员种子引导测试：
 /// ①新库 + 环境变量：创建 1 个账号绑定 sys_admin，角色菜单 = 全部非超管种子菜单（超管专属子树 0），
 /// 密码 Argon2id 可验；②二次启动幂等：账号唯一、密码不覆盖、被删的种子授权补回、手工收窄的额外授权不删；
-/// ③不设变量：不建账号并输出警告；④弱密码：fail-closed 启动报错且错误信息不含密码。
-/// <para>env 操作与密码策略静态属性均进程级，集中本类并挂 MenuSeedCatalog 串行集合避免互染。</para>
+/// ③不设变量：静默创建默认账号 admin 并绑定角色，日志提示但不输出默认口令；④只设其一：警告且不创建；
+/// ⑤弱密码：fail-closed 启动报错且错误信息不含密码。
 /// </summary>
 [Collection("MenuSeedCatalog")]
 public sealed class InitialAdminBootstrapTests : IDisposable
@@ -138,7 +138,7 @@ public sealed class InitialAdminBootstrapTests : IDisposable
     }
 
     [Fact]
-    public async Task WithoutEnv_CreatesNoAccountAndWarns()
+    public async Task WithoutEnv_SilentlyCreatesDefaultAdminAccount()
     {
         using (new TemporaryEnvironment(InitialAdminBootstrap.InitialAccountEnvironmentVariable, null))
         using (new TemporaryEnvironment(InitialAdminBootstrap.InitialPasswordEnvironmentVariable, null))
@@ -149,11 +149,15 @@ public sealed class InitialAdminBootstrapTests : IDisposable
             output = await CaptureConsoleAsync(() => InitialAdminBootstrap.RunAsync(scope));
 
             var db = scope.GetConnectionScope("main");
-            Assert.Empty(db.Queryable<UserEntity>().Filter(null, true).ToList());
-            // 角色与授权仍会建立（首装即有管理员角色可分配），仅账号不创建
-            Assert.NotNull(db.Queryable<RoleEntity>().First(u => u.Code == CommonConst.SysAdminRole));
-            Assert.Contains("尚未初始化业务管理员", output);
-            Assert.Contains(InitialAdminBootstrap.InitialAccountEnvironmentVariable, output);
+            var user = Assert.Single(db.Queryable<UserEntity>().Filter(null, true).ToList());
+            Assert.Equal(InitialAdminBootstrap.DefaultInitialAccount, user.Account);
+            Assert.True(CryptogramUtility.VerifyPassword(InitialAdminBootstrap.DefaultInitialPassword, user.Password));
+
+            var role = db.Queryable<RoleEntity>().First(u => u.Code == CommonConst.SysAdminRole);
+            Assert.NotNull(role);
+            Assert.Contains(db.Queryable<UserRoleEntity>().ToList(), binding => binding.UserId == user.Id && binding.RoleId == role.Id);
+            Assert.Contains("静默创建", output);
+            Assert.DoesNotContain(InitialAdminBootstrap.DefaultInitialPassword, output);
         }
     }
 

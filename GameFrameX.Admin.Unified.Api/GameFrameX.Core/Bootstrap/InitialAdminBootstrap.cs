@@ -15,7 +15,8 @@ namespace GameFrameX.Core.Bootstrap;
 /// ①<see cref="CommonConst.SysAdminRole"/> 角色不存在时创建，并按 <see cref="RoleMenuService"/> 同口径
 /// （超管专属子树不授予、<c>AllowAdminWhenSuperAdminOnly</c> 可读选择器照常授予）授予全部非超管种子菜单；
 /// ②<see cref="InitialAccountEnvironmentVariable"/> 与 <see cref="InitialPasswordEnvironmentVariable"/>
-/// 成对设置且库中尚无任何业务管理员（<see cref="UserEntity"/>）时创建该账号（Argon2id）并绑定管理员角色。</para>
+/// 成对设置时用环境变量值，两者都未设置时静默使用 <see cref="DefaultInitialAccount"/> / <see cref="DefaultInitialPassword"/>；
+/// 库中尚无任何业务管理员（<see cref="UserEntity"/>）时创建该账号（Argon2id）并绑定管理员角色。
 /// <para>幂等口径：账号已存在不重建、不覆盖密码；角色菜单授权每次启动补齐全部缺失的种子菜单授权——
 /// 运营在管理端删掉 <c>sys_admin</c> 的某条种子菜单授权后，下次重启会被补回（模板角色的手工授权不持久，
 /// 与 口径一致）。需要收窄权限时新建自定义角色，不要直接修改 <c>sys_admin</c>；
@@ -33,6 +34,16 @@ public static class InitialAdminBootstrap
     /// 首个业务管理员初始密码注入环境变量名（与账号变量成对设置才生效）。
     /// </summary>
     public const string InitialPasswordEnvironmentVariable = "GAMEFRAMEX_ADMIN_INITIAL_PASSWORD";
+
+    /// <summary>
+    /// 环境变量未设置时的默认业务管理员账号（静默创建）。
+    /// </summary>
+    public const string DefaultInitialAccount = "admin";
+
+    /// <summary>
+    /// 环境变量未设置时的默认业务管理员初始密码（静默创建，与 e2e 默认口令一致；仅平台密码策略关闭时可用）。
+    /// </summary>
+    public const string DefaultInitialPassword = "123456";
 
     /// <summary>
     /// 执行引导。须在主库建表与种子初始化完成之后（依赖 MenuSeedCatalog 已 LoadFromDb）调用。
@@ -106,7 +117,8 @@ public static class InitialAdminBootstrap
     }
 
     /// <summary>
-    /// 按环境变量引导首个业务管理员账号；密码强度 fail-closed；全部日志不含口令。
+    /// 引导首个业务管理员账号：环境变量成对设置时用环境变量；两者都未设置时静默使用默认账号/密码创建；
+    /// 只设其一则警告并跳过。密码强度不满足平台策略时 fail-closed 终止启动；全部日志不含口令。
     /// </summary>
     private static async Task EnsureInitialAccountAsync(ISqlSugarClient db, long roleId)
     {
@@ -115,20 +127,18 @@ public static class InitialAdminBootstrap
         var accountConfigured = !string.IsNullOrWhiteSpace(account);
         var passwordConfigured = !string.IsNullOrWhiteSpace(password);
 
+        var usingDefaults = false;
+        if (!accountConfigured && !passwordConfigured)
+        {
+            account = DefaultInitialAccount;
+            password = DefaultInitialPassword;
+            usingDefaults = true;
+        }
+
         // 含软删行一并计数：账号唯一性以物理行为准，软删残留同样阻止重建，避免重启复活同名账号。
         var existingAdminCount = await db.Queryable<UserEntity>().Filter(null, true).CountAsync();
 
-        if (!accountConfigured && !passwordConfigured)
-        {
-            if (existingAdminCount == 0)
-            {
-                Console.WriteLine($"[Warning] 尚未初始化业务管理员：设置环境变量 {InitialAccountEnvironmentVariable} 与 {InitialPasswordEnvironmentVariable} 后重启即可引导创建首个业务管理员。");
-            }
-
-            return;
-        }
-
-        if (!accountConfigured || !passwordConfigured)
+        if (!usingDefaults && (!accountConfigured || !passwordConfigured))
         {
             Console.WriteLine($"[Warning] 环境变量 {InitialAccountEnvironmentVariable} 与 {InitialPasswordEnvironmentVariable} 必须成对设置，本次不引导创建业务管理员。");
             return;
@@ -138,6 +148,11 @@ public static class InitialAdminBootstrap
         {
             Console.WriteLine($"[Warning] 库中已存在业务管理员（{existingAdminCount} 个），环境变量 {InitialAccountEnvironmentVariable} / {InitialPasswordEnvironmentVariable} 被忽略：不重建账号、不覆盖密码。");
             return;
+        }
+
+        if (usingDefaults)
+        {
+            Console.WriteLine($"[InitialAdmin] 环境变量未设置，使用默认账号 {DefaultInitialAccount} 静默创建首个业务管理员（默认口令见 {nameof(InitialAdminBootstrap)} 常量），请登录后尽快修改密码。");
         }
 
         if (CryptogramUtility.StrongPassword && !System.Text.RegularExpressions.Regex.IsMatch(password!, CryptogramUtility.PasswordStrengthValidation))
@@ -170,6 +185,6 @@ public static class InitialAdminBootstrap
             IsEnabled = true,
         }).ExecuteCommandAsync();
 
-        Console.WriteLine($"[InitialAdmin] 已按环境变量引导创建首个业务管理员账号 {user.Account} 并绑定角色 {CommonConst.SysAdminRole}，请立即登录并按需修改密码。");
+        Console.WriteLine($"[InitialAdmin] 已引导创建首个业务管理员账号 {user.Account} 并绑定角色 {CommonConst.SysAdminRole}，请立即登录并按需修改密码。");
     }
 }
