@@ -34,6 +34,17 @@ public class GameUserService : GenericCrudSelectService<Entity.Business.Game.Gam
     }
 
     /// <summary>
+    /// 通用新增入口：与邮箱新增共用同一请求 DTO，直接委托，避免明文密码入库（D-29：绑定列已可空，无空值插入问题）
+    /// </summary>
+    /// <param name="input"></param>
+    /// <returns></returns>
+    [DisplayName("新增账号")]
+    public override async Task<GameUserResponse> AddAsync(AddGameUserEntityByMailRequest input)
+    {
+        return await AddByMailAsync(input);
+    }
+
+    /// <summary>
     /// 通过邮箱增加账号
     /// </summary>
     /// <param name="input"></param>
@@ -50,6 +61,8 @@ public class GameUserService : GenericCrudSelectService<Entity.Business.Game.Gam
         }
 
         entity = input.Adapt<Entity.Business.Game.GameUserEntity>();
+        // Name 为基类必填非空列，请求未携带时兜底（D-29：其余绑定列已可空，无需空串兜底）
+        entity.Name ??= string.Empty;
         entity.EmailPassword = _gameUserPasswordService.Hash(input.EmailPassword);
         entity.UserName = input.Email;
         entity.Password = _gameUserPasswordService.Hash(input.Password);
@@ -61,8 +74,6 @@ public class GameUserService : GenericCrudSelectService<Entity.Business.Game.Gam
     /// <summary>
     /// 封禁游戏账号
     /// </summary>
-    /// <param name="input"></param>
-    /// <returns></returns>
     [HttpPost]
     [ApiDescriptionSettings(Name = "Ban")]
     public async Task BanAsync(DeleteGameUserEntityRequest input)

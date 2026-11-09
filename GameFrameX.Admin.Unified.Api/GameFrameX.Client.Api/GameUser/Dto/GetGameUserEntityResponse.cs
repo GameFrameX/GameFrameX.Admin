@@ -16,14 +16,14 @@ public sealed class GetGameUserEntityResponse : EntityBaseId
     public string UserName { get; set; } = null!;
 
     /// <summary>
-    /// 头像
+    /// 头像（绑定项，可空）
     /// </summary>
-    public string Avatar { get; set; } = null!;
+    public string? Avatar { get; set; }
 
     /// <summary>
-    /// 手机
+    /// 手机（绑定项，可空）
     /// </summary>
-    public string Phone { get; set; } = null!;
+    public string? Phone { get; set; }
 
     /// <summary>
     /// 创建时间
@@ -31,34 +31,34 @@ public sealed class GetGameUserEntityResponse : EntityBaseId
     public long CreatedTime { get; set; }
 
     /// <summary>
-    /// 谷歌账号ID
+    /// 谷歌账号ID（绑定项，可空）
     /// </summary>
-    public string GoogleId { get; set; } = null!;
+    public string? GoogleId { get; set; }
 
     /// <summary>
-    /// 苹果账号ID
+    /// 苹果账号ID（绑定项，可空）
     /// </summary>
-    public string AppleId { get; set; } = null!;
+    public string? AppleId { get; set; }
 
     /// <summary>
-    /// Facebook账号ID
+    /// Facebook账号ID（绑定项，可空）
     /// </summary>
-    public string FacebookId { get; set; } = null!;
+    public string? FacebookId { get; set; }
 
     /// <summary>
-    /// Twitter账号ID
+    /// Twitter账号ID（绑定项，可空）
     /// </summary>
-    public string TwitterId { get; set; } = null!;
+    public string? TwitterId { get; set; }
 
     /// <summary>
-    /// Discord账号ID
+    /// Discord账号ID（绑定项，可空）
     /// </summary>
-    public string DiscordId { get; set; } = null!;
+    public string? DiscordId { get; set; }
 
     /// <summary>
-    /// 邮箱
+    /// 邮箱（绑定项，可空）
     /// </summary>
-    public string Email { get; set; } = null!;
+    public string? Email { get; set; }
 
     /// <summary>
     /// 是否为游客

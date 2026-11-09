@@ -29,18 +29,18 @@ public class GameUserEntity : EntityBasicSelect
     public string Password { get; set; } = null!;
 
     /// <summary>
-    /// 邮箱用户名
+    /// 邮箱用户名（绑定项，D-29：除必填项外全部可空）
     /// </summary>
-    [SugarColumn(ColumnDescription = "邮箱用户名")]
-    public string Email { get; set; } = null!;
+    [SugarColumn(ColumnDescription = "邮箱用户名", IsNullable = true)]
+    public string? Email { get; set; }
 
     /// <summary>
-    /// 邮箱密码
+    /// 邮箱密码（绑定项）
     /// <para>敏感凭据字段，不参与 JSON 序列化（HTTP 响应不可见），数据库存储不受影响。</para>
     /// </summary>
-    [SugarColumn(ColumnDescription = "邮箱密码")]
+    [SugarColumn(ColumnDescription = "邮箱密码", IsNullable = true)]
     [JsonIgnore]
-    public string EmailPassword { get; set; } = null!;
+    public string? EmailPassword { get; set; }
 
     /// <summary>
     /// 账号状态
@@ -49,64 +49,64 @@ public class GameUserEntity : EntityBasicSelect
     public GameUserStatus Status { get; set; }
 
     /// <summary>
-    /// 手机
+    /// 手机（绑定项，经 BindPhone / 统一 Unbind type=phone 维护）
     /// </summary>
-    [SugarColumn(ColumnDescription = "手机", Length = EntityStringLength.Length256)]
-    public string Phone { get; set; } = null!;
+    [SugarColumn(ColumnDescription = "手机", Length = EntityStringLength.Length256, IsNullable = true)]
+    public string? Phone { get; set; }
 
     /// <summary>
     /// 头像
     /// </summary>
-    [SugarColumn(ColumnDescription = "头像")]
-    public string Avatar { get; set; } = null!;
+    [SugarColumn(ColumnDescription = "头像", IsNullable = true)]
+    public string? Avatar { get; set; }
 
     /// <summary>
-    /// 谷歌账号ID
+    /// 谷歌账号ID（绑定项）
     /// </summary>
-    [SugarColumn(ColumnDescription = "谷歌账号ID", Length = EntityStringLength.Length2048)]
-    public string GoogleId { get; set; } = null!;
+    [SugarColumn(ColumnDescription = "谷歌账号ID", Length = EntityStringLength.Length2048, IsNullable = true)]
+    public string? GoogleId { get; set; }
 
     /// <summary>
-    /// 苹果账号ID
+    /// 苹果账号ID（绑定项）
     /// </summary>
-    [SugarColumn(ColumnDescription = "苹果账号ID", Length = EntityStringLength.Length2048)]
-    public string AppleId { get; set; } = null!;
+    [SugarColumn(ColumnDescription = "苹果账号ID", Length = EntityStringLength.Length2048, IsNullable = true)]
+    public string? AppleId { get; set; }
 
     /// <summary>
-    /// Facebook账号ID
+    /// Facebook账号ID（绑定项）
     /// </summary>
-    [SugarColumn(ColumnDescription = "Facebook账号ID", Length = EntityStringLength.Length2048)]
-    public string FacebookId { get; set; } = null!;
+    [SugarColumn(ColumnDescription = "Facebook账号ID", Length = EntityStringLength.Length2048, IsNullable = true)]
+    public string? FacebookId { get; set; }
 
     /// <summary>
-    /// Twitter账号ID
+    /// Twitter账号ID（绑定项）
     /// </summary>
-    [SugarColumn(ColumnDescription = "Twitter账号ID", Length = EntityStringLength.Length2048)]
-    public string TwitterId { get; set; } = null!;
+    [SugarColumn(ColumnDescription = "Twitter账号ID", Length = EntityStringLength.Length2048, IsNullable = true)]
+    public string? TwitterId { get; set; }
 
     /// <summary>
-    /// Discord账号ID
+    /// Discord账号ID（绑定项）
     /// </summary>
-    [SugarColumn(ColumnDescription = "Discord账号ID", Length = EntityStringLength.Length2048)]
-    public string DiscordId { get; set; } = null!;
+    [SugarColumn(ColumnDescription = "Discord账号ID", Length = EntityStringLength.Length2048, IsNullable = true)]
+    public string? DiscordId { get; set; }
 
     /// <summary>
-    /// QQ账号ID
+    /// QQ账号ID（绑定项）
     /// </summary>
-    [SugarColumn(ColumnDescription = "QQ账号ID", Length = EntityStringLength.Length2048)]
-    public string QqId { get; set; } = null!;
+    [SugarColumn(ColumnDescription = "QQ账号ID", Length = EntityStringLength.Length2048, IsNullable = true)]
+    public string? QqId { get; set; }
 
     /// <summary>
-    /// Wechat账号ID
+    /// Wechat账号ID（绑定项）
     /// </summary>
-    [SugarColumn(ColumnDescription = "Wechat账号ID", Length = EntityStringLength.Length2048)]
-    public string WeChatId { get; set; } = null!;
+    [SugarColumn(ColumnDescription = "Wechat账号ID", Length = EntityStringLength.Length2048, IsNullable = true)]
+    public string? WeChatId { get; set; }
 
     /// <summary>
     /// 设备标识（A1：匿名设备账号主绑定键，DeviceLogin 按 DeviceId 找号或建号）
     /// </summary>
-    [SugarColumn(ColumnDescription = "设备标识", Length = EntityStringLength.Length2048)]
-    public string DeviceId { get; set; } = null!;
+    [SugarColumn(ColumnDescription = "设备标识", Length = EntityStringLength.Length2048, IsNullable = true)]
+    public string? DeviceId { get; set; }
 
     /// <summary>
     /// 删除时间

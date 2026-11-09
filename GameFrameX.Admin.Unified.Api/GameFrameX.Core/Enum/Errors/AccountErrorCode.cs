@@ -152,6 +152,18 @@ public enum AccountErrorCode
     EmailCodeNotFoundOrExpired = 60100024,
 
     /// <summary>
+    /// 账号未绑定手机号（D-29：手机号为可解绑绑定项）
+    /// </summary>
+    [ErrorText("账号未绑定手机号", "Account has no phone bound")]
+    AccountNoBindPhone = 60100025,
+
+    /// <summary>
+    /// 手机号已被其他用户绑定
+    /// </summary>
+    [ErrorText("手机号已被其他用户绑定", "Phone is already bound to another user")]
+    AccountPhoneByOtherUser = 60100026,
+
+    /// <summary>
     /// 账号处于注销状态（旧 60200300）
     /// </summary>
     [ErrorText("账号处于注销状态", "Account is being deleted")]

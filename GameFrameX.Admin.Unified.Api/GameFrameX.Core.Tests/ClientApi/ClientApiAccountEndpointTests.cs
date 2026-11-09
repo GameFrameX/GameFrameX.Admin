@@ -117,48 +117,65 @@ public sealed class ClientApiAccountEndpointTests
     }
 
     [Fact]
-    public async Task GameUser_EmailRegister_RequiresActiveVerificationCode()
+    public async Task GameUser_BindPhone_WithValidTokenBindsAndPersists()
     {
         using var db = new ClientApiTestDb();
-        db.SeedEmailCode(2001, "player@example.test", "123456", true);
-        var controller = CreateController(db);
+        var user = db.SeedUser(1001, "guest-c108");
+        var issuer = CreateTokenIssuer();
+        var token = await issuer.IssueAsync(user, "Guest");
+        var controller = CreateController(db, issuer);
         db.AttachContext(controller);
 
-        var result = await controller.EmailRegister(new GameUserEmailRegisterEntityRequest
+        var result = await controller.BindPhone(new BindPhoneGameUserRequest
         {
-            UserName = "player@example.test",
-            Password = "password",
-            Code = "123456",
+            UserId = user.Id,
+            Phone = "13800138000",
+            AccessToken = token.Token,
         });
 
         var root = ClientApiResultReader.Read(result);
-        Assert.Equal((int)AccountErrorCode.EmailCodeNotFoundOrExpired, ClientApiResultReader.Code(root));
-        Assert.Equal("验证码错误或已过期，请重新获取验证码。", ClientApiResultReader.Message(root));
+        var saved = await db.MainDb.Queryable<GameUserEntity>().FirstAsync(u => u.Id == user.Id);
+        Assert.Equal(0, ClientApiResultReader.Code(root));
+        Assert.Equal("13800138000", saved.Phone);
     }
 
     [Fact]
-    public async Task GameUser_EmailRegister_WithValidCodeReturnsAccessToken()
+    public async Task GameUser_Unbind_PhoneAndEmail_ClearBoundFields()
     {
         using var db = new ClientApiTestDb();
-        db.SeedEmailCode(2001, "player@example.test", "123456");
-        var controller = CreateController(db);
+        var user = db.SeedUser(2001, "player@example.test", "right-password", email: "player@example.test");
+        var issuer = CreateTokenIssuer();
+        var token = await issuer.IssueAsync(user, "Guest");
+        var controller = CreateController(db, issuer);
         db.AttachContext(controller);
 
-        var result = await controller.EmailRegister(new GameUserEmailRegisterEntityRequest
+        var bindResult = await controller.BindPhone(new BindPhoneGameUserRequest
         {
-            UserName = "player@example.test",
-            Password = "password",
-            Code = "123456",
+            UserId = user.Id,
+            Phone = "13800138000",
+            AccessToken = token.Token,
+        });
+        Assert.Equal(0, ClientApiResultReader.Code(ClientApiResultReader.Read(bindResult)));
+
+        var unbindPhone = await controller.Unbind(new GameUserUnbindRequest
+        {
+            Id = user.Id,
+            Type = "phone",
+            AccessToken = token.Token,
+        });
+        var unbindEmail = await controller.Unbind(new GameUserUnbindRequest
+        {
+            Id = user.Id,
+            Type = "email",
+            AccessToken = token.Token,
         });
 
-        var root = ClientApiResultReader.Read(result);
-        var data = ClientApiResultReader.Data(root);
-        Assert.Equal(0, ClientApiResultReader.Code(root));
-        Assert.Equal("Email", data.GetProperty("Provider").GetString());
-        Assert.False(string.IsNullOrWhiteSpace(data.GetProperty("AccessToken").GetString()));
-        // : 登录响应随 token 一起回传 per-session 会话密钥 kid/secret
-        Assert.False(string.IsNullOrWhiteSpace(data.GetProperty("SessionKeyId").GetString()));
-        Assert.Matches("^[0-9a-f]{64}$", data.GetProperty("SessionKeySecret").GetString());
+        var saved = await db.MainDb.Queryable<GameUserEntity>().FirstAsync(u => u.Id == user.Id);
+        Assert.Equal(0, ClientApiResultReader.Code(ClientApiResultReader.Read(unbindPhone)));
+        Assert.Equal(0, ClientApiResultReader.Code(ClientApiResultReader.Read(unbindEmail)));
+        Assert.Null(saved.Phone);
+        Assert.Null(saved.Email);
+        Assert.Null(saved.EmailPassword);
     }
 
     [Fact]

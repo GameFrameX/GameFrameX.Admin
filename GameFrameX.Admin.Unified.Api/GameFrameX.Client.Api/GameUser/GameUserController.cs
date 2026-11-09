@@ -489,44 +489,6 @@ public class GameUserController : BaseController<GameUserEntity>
     #region Email
 
     /// <summary>
-    /// 注册游戏邮箱账号
-    /// </summary>
-    /// <param name="input"></param>
-    /// <returns></returns>
-    [HttpPost]
-    [ProducesResponseType(200, Type = typeof(GetGameUserEntityResponse))]
-    public async Task<HttpJsonResultData<GetGameUserEntityResponse>> EmailRegister([FromBody] GameUserEmailRegisterEntityRequest input)
-    {
-        var isAny = await PRepository.IsAnyAsync(m => m.Email == input.UserName);
-        if (isAny)
-        {
-            return GameApiResult.Error<GetGameUserEntityResponse>(AccountErrorCode.AccountEmailExists, "账号已存在");
-        }
-
-        var gameUserEmailEntity = await _gameUserEmailService.GetFirstAsync(u => u.Email == input.UserName && u.Code == input.Code && u.ExpirationTime > TimerHelper.UnixTimeSeconds());
-
-        if (gameUserEmailEntity == null)
-        {
-            return GameApiResult.Error<GetGameUserEntityResponse>(AccountErrorCode.EmailCodeNotFoundOrExpired, "验证码错误或已过期，请重新获取验证码。");
-        }
-
-        var entity = input.Adapt<GameUserEntity>();
-        entity.Name = input.UserName ?? string.Empty;
-        entity.Email = input.UserName ?? string.Empty;
-        entity.Status = GameUserStatus.Active;
-        entity.EmailPassword = _gameUserPasswordService.Hash(input.Password);
-        EnsureUserStringDefaults(entity);
-        var insertAsync = await PRepository.InsertAsync(entity);
-        if (insertAsync)
-        {
-            var output = await CreateLoginOutputAsync(entity, "Email");
-            return HttpJsonResultData<GetGameUserEntityResponse>.Success(output);
-        }
-
-        return HttpJsonResultData<GetGameUserEntityResponse>.ServerError();
-    }
-
-    /// <summary>
     /// 登录游戏账号
     /// </summary>
     /// <param name="input"></param>
@@ -610,16 +572,21 @@ public class GameUserController : BaseController<GameUserEntity>
         return HttpJsonResultData<GetGameUserEntityResponse>.ServerError();
     }
 
-
     /// <summary>
-    /// 解绑邮箱账号
+    /// 绑定手机号（D-29：手机号为可解绑绑定项；AccessToken 鉴权，无短信通道故不做验证码校验）
     /// </summary>
     /// <param name="input"></param>
     /// <returns></returns>
     [HttpPost]
     [ProducesResponseType(200, Type = typeof(GetGameUserEntityResponse))]
-    public async Task<HttpJsonResultData<GetGameUserEntityResponse>> UnbindEmailGameUser([FromBody] UnbindEmailGameUserRequest input)
+    public async Task<HttpJsonResultData<GetGameUserEntityResponse>> BindPhone([FromBody] BindPhoneGameUserRequest input)
     {
+        var tokenValidation = await _clientApiTokenIssuer.ValidateAsync(input.AccessToken);
+        if (!tokenValidation.IsValid || tokenValidation.UserId != input.UserId)
+        {
+            return GameApiResult.Error<GetGameUserEntityResponse>(AuthErrorCode.AuthorizeInvalid, "授权无效");
+        }
+
         // 检查用户是否存在
         var entity = await PRepository.GetFirstAsync(u => u.Id == input.UserId);
         if (entity == null)
@@ -627,25 +594,16 @@ public class GameUserController : BaseController<GameUserEntity>
             return GameApiResult.Error<GetGameUserEntityResponse>(AccountErrorCode.AccountNotFound, "用户不存在");
         }
 
-        // 检查用户是否已绑定邮箱账号
-        if (string.IsNullOrEmpty(entity.Email))
+        // 检查手机号是否已被其他用户绑定
+        var existingUser = await PRepository.GetFirstAsync(u => u.Phone == input.Phone && u.Id != input.UserId);
+        if (existingUser != null)
         {
-            return GameApiResult.Error<GetGameUserEntityResponse>(AccountErrorCode.AccountNoBindEmail, "用户未绑定邮箱账号");
+            return GameApiResult.Error<GetGameUserEntityResponse>(AccountErrorCode.AccountPhoneByOtherUser, "该手机号已被其他用户绑定");
         }
 
-        // 如果提供了密码，验证密码是否正确（可选的安全验证）
-        if (!string.IsNullOrEmpty(input.Password))
-        {
-            if (!_gameUserPasswordService.Verify(input.Password, entity.EmailPassword))
-            {
-                return GameApiResult.Error<GetGameUserEntityResponse>(AccountErrorCode.AccountOrPasswordError, "密码错误");
-            }
-        }
-
-        // 清除邮箱账号信息
-        entity.Email = null;
-        entity.EmailPassword = null;
-        var executeCommandAsync = await PRepository.AsUpdateable(entity).UpdateColumns(u => new { u.Email, u.EmailPassword, }).ExecuteCommandWithOptLockAsync(true);
+        // 更新用户的手机号
+        entity.Phone = input.Phone;
+        var executeCommandAsync = await PRepository.AsUpdateable(entity).UpdateColumns(u => new { Phone = u.Phone, }).ExecuteCommandWithOptLockAsync(true);
 
         if (executeCommandAsync > 0)
         {
@@ -1174,11 +1132,33 @@ public class GameUserController : BaseController<GameUserEntity>
                 // 清除账号信息
                 entity.QqId = null;
                 break;
+            case "email":
+                // 检查用户是否已绑定邮箱账号
+                if (string.IsNullOrEmpty(entity.Email))
+                {
+                    return GameApiResult.Error<GetGameUserEntityResponse>(AccountErrorCode.AccountNoBindEmail, "用户未绑定邮箱账号");
+                }
+
+                // 清除邮箱与邮箱独立密码（D-29：邮箱解绑并入统一 Unbind）
+                entity.Email = null;
+                entity.EmailPassword = null;
+                break;
+            case "phone":
+                // 检查用户是否已绑定手机号
+                if (string.IsNullOrEmpty(entity.Phone))
+                {
+                    return GameApiResult.Error<GetGameUserEntityResponse>(AccountErrorCode.AccountNoBindPhone, "用户未绑定手机号");
+                }
+
+                // 清除手机号
+                entity.Phone = null;
+                break;
             default:
                 return GameApiResult.Error<GetGameUserEntityResponse>(AccountErrorCode.AccountUnBindNotFound, "解绑类型不存在");
         }
 
-        var executeCommandAsync = await PRepository.Context.UpdateWithOptimisticLockAsync(entity) > 0;
+        // 解绑语义必须写入 null（清空绑定列）；默认 ignoreAllNullColumns=true 会跳过 null 列导致解绑不落库（存量缺陷，D-29 修复）
+        var executeCommandAsync = await PRepository.Context.UpdateWithOptimisticLockAsync(entity, ignoreAllNullColumns: false) > 0;
 
         if (executeCommandAsync)
         {
@@ -1207,21 +1187,10 @@ public class GameUserController : BaseController<GameUserEntity>
 
     private static void EnsureUserStringDefaults(GameUserEntity entity)
     {
+        // D-29：绑定字段（邮箱/手机/三方/设备）全部改为可空列，仅必填字段兜底默认值
         entity.Name ??= string.Empty;
         entity.UserName ??= string.Empty;
         entity.Password ??= string.Empty;
-        entity.Email ??= string.Empty;
-        entity.EmailPassword ??= string.Empty;
-        entity.Phone ??= string.Empty;
-        entity.Avatar ??= string.Empty;
-        entity.GoogleId ??= string.Empty;
-        entity.AppleId ??= string.Empty;
-        entity.FacebookId ??= string.Empty;
-        entity.TwitterId ??= string.Empty;
-        entity.DiscordId ??= string.Empty;
-        entity.QqId ??= string.Empty;
-        entity.WeChatId ??= string.Empty;
-        entity.DeviceId ??= string.Empty;
     }
 
     private async Task<GetGameUserEntityResponse> CreateLoginOutputAsync(GameUserEntity entity, string provider)

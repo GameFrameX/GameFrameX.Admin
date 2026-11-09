@@ -16,6 +16,7 @@ class|AccessToken,Id
 class|AccessToken,Id
 class|AccessToken,Id,Type
 class|AccessToken,IsSuccess,Message,PlayerId
+class|AccessToken,Phone,UserId
 class|AccountId,Amount,Channel,IsRecharge,IsSandbox,Items,PayChannel,Platform,PlayerId,ProductId
 class|AccountId,AreaId,Channel,ClientIp,Country,OpenId,PayChannel,Platform,RoleId,Scene,Sku,SubChannel
 class|ActivityData,AdStatus,Badge,BadgeCount,BiSync,Board,Bundle,BundleMeta,CacheItem,CurrentChapter,CurrentTask,DeviceModel,Energy,Frame,FrameCount,Icon,InstallationId,Inventory,Item,ItemUnlock,LocalRewards,MainTask,MainTaskMeta,Misc,Name,Notice,OrderChapterId,OrderGroupId,OrderMeta,Orders,Profile,ReturnUser,Shop,ShopItem,Slot,SyncList,SyncTime,Tutorial,User,UserId,Version
@@ -63,7 +64,6 @@ class|Code,Email
 class|Code,Email,Password,UserId
 class|Code,IdempotencyKey,IsValid,Message,Status
 class|Code,Name,Password,UserName
-class|Code,Name,Password,UserName
 class|Content,ExpirationTime,IsTranslate,Items,MailType,PostType,Roles,SubTitle,Title
 class|Count,Id,ItemId,Star
 class|CurrentTimes,Name
@@ -108,7 +108,6 @@ class|OrderId,ProductId,PurchaseToken,VoidedReason,VoidedSource,VoidedTimeMillis
 class|OrderId,ProductId,Rcode
 class|OrderId,ProductId,UserId
 class|OtherId,Version
-class|Password,UserId
 class|Password,UserId
 class|Password,UserId
 class|Password,UserId
