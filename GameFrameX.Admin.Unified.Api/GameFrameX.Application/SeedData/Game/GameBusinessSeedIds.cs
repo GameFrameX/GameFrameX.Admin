@@ -45,6 +45,21 @@ public static class GameBusinessSeedIds
     /// <summary>奖励模板 default 行。</summary>
     public const long RewardTemplateId = 31950208382437;
 
+    /// <summary>容器镜像标签 default 行。</summary>
+    public const long DockerTagId = 31950208582437;
+
+    /// <summary>功能开关 maintenance default 行。</summary>
+    public const long FeatureSwitchId = 31950208682437;
+
+    /// <summary>游戏应用分包 default 行（渠道引用既有 business-default 业务渠道种子）。</summary>
+    public const long AppPackageId = 31950208782437;
+
+    /// <summary>网页商城 default 行（默认下架）。</summary>
+    public const long WebShopId = 31950208882437;
+
+    /// <summary>客户端资源包版本 default 行（DefaultPackage × 1.0.0）。</summary>
+    public const long AssetPackageVersionId = 31950208982437;
+
     /// <summary>通用兑换码 default 行。</summary>
     public const long RedeemCodeId = 31950208482437;
 }

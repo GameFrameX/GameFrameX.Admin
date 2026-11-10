@@ -1,3 +1,6 @@
+using GameFrameX.Entity.Business.Game.App;
+using GameFrameX.Entity.Business.Game.FeatureSwitch;
+using GameFrameX.Entity.Business.Game.RemoteConfig;
 using System.Text.Json;
 using GameFrameX.Core.Option;
 using GameFrameX.Application.SeedData.Client;
@@ -73,7 +76,13 @@ public class SqlSugarDatabaseInitializationTests : IDisposable
                 typeof(GameMailEntity), typeof(GameMailSeedData),
                 typeof(GameRewardTemplateGroupEntity), typeof(GameRewardTemplateGroupSeedData),
                 typeof(GameRewardTemplateEntity), typeof(GameRewardTemplateSeedData),
-                typeof(GameRedeemCodeEntity), typeof(GameRedeemCodeSeedData) };
+                typeof(GameRedeemCodeEntity), typeof(GameRedeemCodeSeedData),
+                typeof(GameDockerTagEntity), typeof(GameDockerTagSeedData),
+                typeof(GameAppFeatureSwitchEntity), typeof(GameAppFeatureSwitchSeedData),
+                typeof(GameAppPackageEntity), typeof(GameAppPackageSeedData),
+                typeof(GameWebShopEntity), typeof(GameWebShopSeedData),
+                typeof(GameAppAssetPackageVersionEntity), typeof(GameAppAssetPackageVersionSeedData),
+                typeof(GameAppRemoteConfigEntity), typeof(GameAppRemoteConfigSeedData) };
             SqlSugarSetup.InitDatabase(scope, config, types);
             var database = scope.GetConnectionScope("main");
             var channel = Assert.Single(database.Queryable<ChannelDefinitionEntity>().ToList());
@@ -114,6 +123,24 @@ public class SqlSugarDatabaseInitializationTests : IDisposable
             Assert.Equal("GFX-DEFAULT-0001", redeemCode.Code);
             Assert.True(redeemCode.IsActive);
             Assert.Contains(GameBusinessSeedIds.GoodsConfigId.ToString(), redeemCode.Contents);
+            // 配置型默认种子（2026-11-10 第二批）：容器镜像、功能开关、分包、网页商城、资源包版本
+            var dockerTag = Assert.Single(database.Queryable<GameDockerTagEntity>().ToList());
+            Assert.True(dockerTag.IsDefault);
+            Assert.Equal("1.0.0", dockerTag.ServerVersion);
+            var featureSwitch = Assert.Single(database.Queryable<GameAppFeatureSwitchEntity>().ToList());
+            Assert.Equal("maintenance", featureSwitch.SwitchKey);
+            Assert.Equal("{}", featureSwitch.ValueJson);
+            var appPackage = Assert.Single(database.Queryable<GameAppPackageEntity>().ToList());
+            Assert.True(appPackage.IsDefault);
+            Assert.Equal(channel.Id, appPackage.ChannelId);
+            var webShopItem = Assert.Single(JsonSerializer.Deserialize<List<GamePropItem>>(Assert.Single(database.Queryable<GameWebShopEntity>().ToList()).ItemJson, EmbeddedJsonOptions.Instance));
+            Assert.Equal(GameBusinessSeedIds.GoodsId, webShopItem.Id);
+            var assetPackageVersion = Assert.Single(database.Queryable<GameAppAssetPackageVersionEntity>().ToList());
+            Assert.Equal("DefaultPackage", assetPackageVersion.AssetPackageName);
+            // 远程配置检测地址指向公网 Client.Api 域名（2026-11-10 决策）
+            var remoteConfig = Assert.Single(database.Queryable<GameAppRemoteConfigEntity>().ToList());
+            Assert.StartsWith("https://gameframex.client.api.alianblank.com/", remoteConfig.CheckResourceUrl);
+            Assert.Equal("https://gameframex.client.api.alianblank.com/api/GameAppVersion/GetInfo", remoteConfig.CheckAppVersionUrl);
             database.Updateable<ChannelDefinitionEntity>().SetColumns(row => new ChannelDefinitionEntity
                 { Name = "运维修改", IsEnabled = false, IsDeleted = true }).Where(row => row.Id == channel.Id).ExecuteCommand();
             SqlSugarSetup.InitDatabase(scope, config, types);
