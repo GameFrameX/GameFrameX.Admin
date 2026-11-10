@@ -28,7 +28,7 @@ public class GameAppRemoteConfigSeedData : ISqlSugarEntitySeedData<GameAppRemote
                 // Content 承载 API 端点地址清单（契约见 gfx-doc C15：schemaVersion 门卫 + 空键不覆盖）
                 CheckResourceUrl = "https://gameframex.client.api.alianblank.com/Bundles/com.ALianBlank.GFX/1.0.0/WebGL/DefaultPackage/20240130192515/",
                 CheckAppVersionUrl = "https://gameframex.client.api.alianblank.com/api/GameAppVersion/GetInfo",
-                Content = "{\"schemaVersion\":1,\"endpoints\":{\"gameApiBaseUrl\":\"http://127.0.0.1:20808\",\"clientApiBaseUrl\":\"http://127.0.0.1:20808\"}}",
+                Content = "{\"schemaVersion\":1,\"endpoints\":{\"gameApiBaseUrl\":\"https://gameframex.client.api.alianblank.com\",\"clientApiBaseUrl\":\"https://gameframex.client.api.alianblank.com\"}}",
                 AotCodeList = "[]",
                 Description = "默认",
                 CreatedTime = 1706620439,

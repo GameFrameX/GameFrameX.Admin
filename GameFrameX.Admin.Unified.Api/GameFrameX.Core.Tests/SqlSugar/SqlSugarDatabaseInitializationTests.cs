@@ -141,6 +141,7 @@ public class SqlSugarDatabaseInitializationTests : IDisposable
             var remoteConfig = Assert.Single(database.Queryable<GameAppRemoteConfigEntity>().ToList());
             Assert.StartsWith("https://gameframex.client.api.alianblank.com/", remoteConfig.CheckResourceUrl);
             Assert.Equal("https://gameframex.client.api.alianblank.com/api/GameAppVersion/GetInfo", remoteConfig.CheckAppVersionUrl);
+            Assert.Contains("\"clientApiBaseUrl\":\"https://gameframex.client.api.alianblank.com\"", remoteConfig.Content);
             database.Updateable<ChannelDefinitionEntity>().SetColumns(row => new ChannelDefinitionEntity
                 { Name = "运维修改", IsEnabled = false, IsDeleted = true }).Where(row => row.Id == channel.Id).ExecuteCommand();
             SqlSugarSetup.InitDatabase(scope, config, types);
