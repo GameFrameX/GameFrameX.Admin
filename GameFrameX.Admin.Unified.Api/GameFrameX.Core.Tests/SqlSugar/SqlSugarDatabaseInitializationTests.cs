@@ -139,7 +139,7 @@ public class SqlSugarDatabaseInitializationTests : IDisposable
             Assert.Equal("DefaultPackage", assetPackageVersion.AssetPackageName);
             // 远程配置检测地址指向公网 Client.Api 域名（2026-11-10 决策）
             var remoteConfig = Assert.Single(database.Queryable<GameAppRemoteConfigEntity>().ToList());
-            Assert.StartsWith("https://gameframex.client.api.alianblank.com/", remoteConfig.CheckResourceUrl);
+            Assert.Equal("https://gameframex.client.api.alianblank.com/api/GameAssetPackageVersion/GetInfo", remoteConfig.CheckResourceUrl);
             Assert.Equal("https://gameframex.client.api.alianblank.com/api/GameAppVersion/GetInfo", remoteConfig.CheckAppVersionUrl);
             Assert.Contains("\"clientApiBaseUrl\":\"https://gameframex.client.api.alianblank.com\"", remoteConfig.Content);
             database.Updateable<ChannelDefinitionEntity>().SetColumns(row => new ChannelDefinitionEntity

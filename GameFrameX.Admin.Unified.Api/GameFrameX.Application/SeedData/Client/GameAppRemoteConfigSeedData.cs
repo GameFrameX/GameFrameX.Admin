@@ -23,10 +23,10 @@ public class GameAppRemoteConfigSeedData : ISqlSugarEntitySeedData<GameAppRemote
                 AppVersion = "default",
                 Package = "default",
                 Language = "default",
-                // 检测地址指向公网 Client.Api 域名（2026-11-10 决策）：资源检测走同域 Bundles 路径，
-                // 版本检测路径与 Client.Api 路由模板 api/[controller]/[action] 对齐；
+                // 检测地址指向公网 Client.Api 域名（2026-11-10 决策）：资源检测与版本检测均为
+                // Client.Api 启动引导接口（路由模板 api/[controller]/[action]）；
                 // Content 承载 API 端点地址清单（契约见 gfx-doc C15：schemaVersion 门卫 + 空键不覆盖）
-                CheckResourceUrl = "https://gameframex.client.api.alianblank.com/Bundles/com.ALianBlank.GFX/1.0.0/WebGL/DefaultPackage/20240130192515/",
+                CheckResourceUrl = "https://gameframex.client.api.alianblank.com/api/GameAssetPackageVersion/GetInfo",
                 CheckAppVersionUrl = "https://gameframex.client.api.alianblank.com/api/GameAppVersion/GetInfo",
                 Content = "{\"schemaVersion\":1,\"endpoints\":{\"gameApiBaseUrl\":\"https://gameframex.client.api.alianblank.com\",\"clientApiBaseUrl\":\"https://gameframex.client.api.alianblank.com\"}}",
                 AotCodeList = "[]",
