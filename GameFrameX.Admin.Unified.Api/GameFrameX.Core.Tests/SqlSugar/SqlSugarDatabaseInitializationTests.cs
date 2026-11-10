@@ -1,8 +1,12 @@
+using System.Text.Json;
 using GameFrameX.Core.Option;
 using GameFrameX.Application.SeedData.Client;
 using GameFrameX.Entity.Business.Device;
 using GameFrameX.Entity.Business.Game.Release;
 using GameFrameX.Application.SeedData.System;
+using GameFrameX.Entity.Business.Game.Announcement;
+using GameFrameX.Application.SeedData.Game;
+using GameFrameX.Application.Platform;
 using GameFrameX.Core.Cache;
 using GameFrameX.Core.Tests.System;
 using GameFrameX.Core.SqlSugar;
@@ -56,7 +60,20 @@ public class SqlSugarDatabaseInitializationTests : IDisposable
             config.SeedSettings.EnableInitSeed = true;
             var types = new[] { typeof(GlobalMenuEntity), typeof(GlobalMenuSeedData), typeof(ChannelDefinitionEntity),
                 typeof(BusinessChannelSeedData), typeof(GameAppDeviceGroupEntity), typeof(GameAppDeviceGroupSeedData),
-                typeof(GameAppVersionDefinitionEntity), typeof(GameAppVersionDefinitionSeedData) };
+                typeof(GameAppVersionDefinitionEntity), typeof(GameAppVersionDefinitionSeedData),
+                typeof(GameAreaClassifyEntity), typeof(GameAreaClassifySeedData),
+                typeof(GameGoodsCatalogueEntity), typeof(GameGoodsCatalogueSeedData),
+                typeof(GameGoodsEntity), typeof(GameGoodsSeedData),
+                typeof(GameCommodityEntity), typeof(GameCommoditySeedData),
+                typeof(GameAreaEntity), typeof(GameAreaSeedData),
+                typeof(GameAnnouncementEntity), typeof(GameAnnouncementSeedData),
+                typeof(GameBannerAnnouncementEntity), typeof(GameBannerAnnouncementSeedData),
+                typeof(GameMailTemplateCategoryEntity), typeof(GameMailTemplateCategorySeedData),
+                typeof(GameMailTemplateEntity), typeof(GameMailTemplateSeedData),
+                typeof(GameMailEntity), typeof(GameMailSeedData),
+                typeof(GameRewardTemplateGroupEntity), typeof(GameRewardTemplateGroupSeedData),
+                typeof(GameRewardTemplateEntity), typeof(GameRewardTemplateSeedData),
+                typeof(GameRedeemCodeEntity), typeof(GameRedeemCodeSeedData) };
             SqlSugarSetup.InitDatabase(scope, config, types);
             var database = scope.GetConnectionScope("main");
             var channel = Assert.Single(database.Queryable<ChannelDefinitionEntity>().ToList());
@@ -65,6 +82,38 @@ public class SqlSugarDatabaseInitializationTests : IDisposable
             Assert.True(channel.IsEnabled);
             Assert.Single(database.Queryable<GameAppDeviceGroupEntity>().ToList());
             Assert.Equal(new[] { "1.0.0", "default" }, database.Queryable<GameAppVersionDefinitionEntity>().OrderBy(row => row.Name).Select(row => row.Name).ToArray());
+            // 游戏业务默认种子整套：分类→物品→商品→区服→公告/横幅→邮件三件套→奖励模板两件套→兑换码
+            var classify = Assert.Single(database.Queryable<GameAreaClassifyEntity>().ToList());
+            Assert.Equal("default", classify.Name);
+            var catalogue = Assert.Single(database.Queryable<GameGoodsCatalogueEntity>().ToList());
+            var goods = Assert.Single(database.Queryable<GameGoodsEntity>().ToList());
+            Assert.Equal(catalogue.Id, goods.ClassifyId);
+            var commodity = Assert.Single(database.Queryable<GameCommodityEntity>().ToList());
+            Assert.Equal(catalogue.Id, commodity.CategoryId);
+            var area = Assert.Single(database.Queryable<GameAreaEntity>().ToList());
+            Assert.Equal(classify.Id, area.ClassifyId);
+            Assert.True(area.IsDefault);
+            Assert.True(area.IsEnabled);
+            var announcement = Assert.Single(database.Queryable<GameAnnouncementEntity>().ToList());
+            Assert.True(announcement.IsActive);
+            Assert.Equal("default", announcement.Language);
+            Assert.Single(database.Queryable<GameBannerAnnouncementEntity>().ToList());
+            var mailCategory = Assert.Single(database.Queryable<GameMailTemplateCategoryEntity>().ToList());
+            var mailTemplate = Assert.Single(database.Queryable<GameMailTemplateEntity>().ToList());
+            Assert.Equal(mailCategory.Id, mailTemplate.CategoryId);
+            var mail = Assert.Single(database.Queryable<GameMailEntity>().ToList());
+            Assert.Equal(GameMailStatus.Draft, mail.Status);
+            Assert.True(mail.IsAllPost);
+            var rewardGroup = Assert.Single(database.Queryable<GameRewardTemplateGroupEntity>().ToList());
+            var rewardTemplate = Assert.Single(database.Queryable<GameRewardTemplateEntity>().ToList());
+            Assert.Equal(rewardGroup.Id, rewardTemplate.GroupId);
+            var rewardItem = Assert.Single(JsonSerializer.Deserialize<List<GamePropItem>>(rewardTemplate.RewardItemsJson, EmbeddedJsonOptions.Instance));
+            Assert.Equal(GameBusinessSeedIds.GoodsId, rewardItem.Id);
+            Assert.Equal(GameBusinessSeedIds.GoodsConfigId, rewardItem.ItemId);
+            var redeemCode = Assert.Single(database.Queryable<GameRedeemCodeEntity>().ToList());
+            Assert.Equal("GFX-DEFAULT-0001", redeemCode.Code);
+            Assert.True(redeemCode.IsActive);
+            Assert.Contains(GameBusinessSeedIds.GoodsConfigId.ToString(), redeemCode.Contents);
             database.Updateable<ChannelDefinitionEntity>().SetColumns(row => new ChannelDefinitionEntity
                 { Name = "运维修改", IsEnabled = false, IsDeleted = true }).Where(row => row.Id == channel.Id).ExecuteCommand();
             SqlSugarSetup.InitDatabase(scope, config, types);
